@@ -857,7 +857,7 @@ ED.Surgeon.prototype.setParameterDefaults = function()
 {
     this.originY = -300;
 
-		if (this.drawing.eye == ED.eye.Right)
+		if (this.drawing.eye == ED.eye.Left)
 		{
 				this.originX = 300;
 				this.originY = 0;
