@@ -392,7 +392,9 @@ ED.Drawing.prototype.load = function(_doodleSet)
 			_doodleSet[i].rotation,
 			_doodleSet[i].order
 		);
-				
+
+		this.doodleArray[i].id = i;
+
 				// Squiggle array
 				if (typeof(_doodleSet[i].squiggleArray) != 'undefined')
 				{
@@ -1244,9 +1246,11 @@ ED.Drawing.prototype.addDoodle = function(_className, rotation)
 						newDoodle.isForDrawing = true;
 				}
 				
+				newDoodle.id = this.doodleArray.length;
+
 				// Add to array
 				this.doodleArray[this.doodleArray.length] = newDoodle;
-				
+
 				if (newDoodle.addAtBack)
 				{
 						this.moveToBack();
