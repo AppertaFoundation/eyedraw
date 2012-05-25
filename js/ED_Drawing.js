@@ -1339,6 +1339,29 @@ ED.Drawing.prototype.lastDoodleOfClass = function(_className)
 }
 
 /**
+ * Returns all doodles of the passed className
+ *
+ * @param {String} _className Classname of doodle
+ * @returns {Doodle} The last doodle of the passed className
+ */
+ED.Drawing.prototype.allDoodlesOfClass = function(_className)
+{
+		var returnValue = [];
+
+	// Go through doodle array backwards looking for doodles of passed className
+	for (var i = this.doodleArray.length - 1; i >= 0; i--)
+	{
+				if (this.doodleArray[i].className == _className)
+				{
+						returnValue.push(this.doodleArray[i]);
+				}
+	}
+	 
+	return returnValue;
+}
+
+
+/**
  * Deletes all doodles that are deletable
  */
 ED.Drawing.prototype.deleteAllDoodles = function()
