@@ -169,13 +169,17 @@ ED.isFirefox = function()
  * @param {String} _IDSuffix String suffix to identify HTML elements related to this drawing
  * @param {Bool} _isEditable Flag indicating whether canvas is editable or not
  */
-ED.Drawing = function(_canvas, _eye, _IDSuffix, _isEditable, offset_x, offset_y)
+ED.Drawing = function(_canvas, _eye, _IDSuffix, _isEditable, offset_x, offset_y, _to_image)
 {
 	// Properties
 	this.canvas = _canvas;
 	this.eye = _eye;
 	this.IDSuffix = _IDSuffix;
     this.isEditable = _isEditable;
+	
+	this.convertToImage = (_to_image && !this.isEditable) ? true : false;
+	// Grab the canvas parent element
+	this.canvasParent = this.canvas.parentElement;
 	
 	this.context = this.canvas.getContext('2d');
 	this.doodleArray = new Array();
@@ -297,6 +301,26 @@ ED.Drawing = function(_canvas, _eye, _IDSuffix, _isEditable, offset_x, offset_y)
     }
 }
 
+/**
+ * Replaces the canvas element inline with a PNG image, useful for printing
+ */
+ED.Drawing.prototype.replaceWithImage = function()
+{	
+	var img = document.createElement("img");
+	// Base64 encoded PNG version of the canvas element
+	img.setAttribute('src', this.canvas.toDataURL('image/png'));
+	
+	// Removes canvas and hidden input element (+ any other children) as they will be replaced with an image
+	if(this.canvasParent.hasChildNodes())
+	{
+		while(this.canvasParent.childNodes.length >= 1)
+		{
+			this.canvasParent.removeChild(this.canvasParent.firstChild);
+		}
+	}
+	
+	this.canvasParent.appendChild(img);
+}
 
 /**
  * Preloads image files
@@ -1196,6 +1220,10 @@ ED.Drawing.prototype.deselectDoodles = function()
 
 ED.Drawing.prototype.isReady = function() {
 	this.modified = false;
+	if(this.convertToImage)
+	{
+		this.replaceWithImage();
+	}
 }
 
 /**
