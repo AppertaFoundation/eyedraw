@@ -855,8 +855,6 @@ ED.Rectus.prototype.setPropertyDefaults = function()
 	this.isSqueezable = false;
 	this.isMoveable = false;
 	this.isRotatable = false;
-    this.rangeOfApexX = new ED.Range(0, 0);
-	this.rangeOfApexY = new ED.Range(-400, -100);
 }
 
 /**
@@ -875,14 +873,28 @@ ED.Rectus.prototype.setParameterDefaults = function()
  */
 ED.Rectus.prototype.draw = function(_point)
 {
-    // Adjust ranges of apexX and apexY
-    if (this.apexY > this.insertionY - 10 && this.apexY < this.insertionY + 10)
+    // Constrain to a cross shaped path
+    var cw = 15;
+    
+    // Adjust ranges of apexX
+    if (this.apexY > this.insertionY - cw && this.apexY < this.insertionY + cw)
     {
         this.rangeOfApexX = new ED.Range(-100, +100);
     }
     else
     {
         this.rangeOfApexX = new ED.Range(0, 0);
+
+    }
+
+    // Adjust ranges of apexY
+    if (this.apexX > - cw && this.apexX < cw)
+    {
+        this.rangeOfApexY = new ED.Range(-400, -100);
+    }
+    else
+    {
+        this.rangeOfApexY = new ED.Range(-200, -200);
     }
     
 	// Get context
@@ -894,7 +906,7 @@ ED.Rectus.prototype.draw = function(_point)
 	// Boundary path
 	ctx.beginPath();
     
-    var muscleHalfWidth = 50;
+    var muscleHalfWidth = 60;
     var startY = -450;
 	
 	// Rectus
@@ -907,9 +919,9 @@ ED.Rectus.prototype.draw = function(_point)
 	ctx.closePath();
 	
 	// Set line attributes
-	ctx.lineWidth = 0;
+	ctx.lineWidth = 2;
 	ctx.fillStyle = "rgba(255, 140 , 80, 1)";
-    ctx.strokeStyle = "rgba(255, 184, 93, 0)";
+    ctx.strokeStyle = "rgba(255, 184, 93, 1)";
 	
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
@@ -988,7 +1000,6 @@ ED.Rectus.prototype.draw = function(_point)
             ctx.lineWidth = 4;
             ctx.strokeStyle = "black";
             ctx.stroke();
-     
         }
 	}
 	
@@ -1018,6 +1029,11 @@ ED.Rectus.prototype.getParameter = function(_parameter)
         case 'recession':
             returnValue = this.recession();
             break;
+
+        // Transposition
+        case 'transposition':
+            returnValue = this.transposition();
+            break;
             
         default:
             returnValue = "";
@@ -1039,6 +1055,11 @@ ED.Rectus.prototype.setParameter = function(_parameter, _value)
         case 'recession':
             this.apexY = _value * 16  + this.insertionY;
             break;
+ 
+        // Transposition
+        case 'transposition':
+            this.apexX = _value * 16;
+            break;
             
         default:
             break;
@@ -1053,6 +1074,16 @@ ED.Rectus.prototype.setParameter = function(_parameter, _value)
 ED.Rectus.prototype.recession = function()
 {
     return (Math.round(2 * (this.apexY - this.insertionY)/16)/2).toFixed(1);
+}
+
+/**
+ * Calculate transposition in half millimetre increments
+ *
+ * @returns {String} transposition
+ */
+ED.Rectus.prototype.transposition = function()
+{
+    return (Math.round(2 * this.apexX/16)/2).toFixed(1);
 }
 
 /**
