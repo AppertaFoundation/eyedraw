@@ -41,9 +41,9 @@ function eyeDrawInit(_properties)
 {
     // Get reference to the canvas
     var canvas = document.getElementById(_properties.canvasId);
-    
+
     // Create drawing
-    window[_properties.drawingName] = new ED.Drawing(canvas, _properties.eye, _properties.idSuffix, _properties.isEditable, _properties.offset_x, _properties.offset_y);
+    window[_properties.drawingName] = new ED.Drawing(canvas, _properties.eye, _properties.idSuffix, _properties.isEditable, _properties.offset_x, _properties.offset_y, _properties.to_image);
     
     // Preload any images
     window[_properties.drawingName].preLoadImagesFrom(_properties.graphicsPath);
@@ -52,7 +52,7 @@ function eyeDrawInit(_properties)
 		if (_properties.focus) {
 			canvas.focus();
 		}
-    
+	
     // Wait for the drawing object to be ready before adding objects or other commands
     window[_properties.drawingName].onLoaded = function()
     {
