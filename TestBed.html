@@ -15,6 +15,7 @@
         <script language="JavaScript" src="js/ED_VitreoRetinal.js" type="text/javascript"></script>
         <script language="JavaScript" src="js/ED_AntSeg.js" type="text/javascript"></script>
         <script language="JavaScript" src="js/ED_Strabismus.js" type="text/javascript"></script> 
+        <script language="JavaScript" src="js/ED_Glaucoma.js" type="text/javascript"></script> 
         
         <!--   This script handles the drawings for the page   -->
         <script type="text/javascript">
@@ -51,8 +52,8 @@
                 drawingEdit.onLoaded = function()
                 {
                     //drawingEdit.addDoodle('AntSeg');
-                    doodle = drawingEdit.addDoodle('StrabOpTemplate');
-                    medialRectus = drawingEdit.addDoodle('Rectus');
+                    doodle = drawingEdit.addDoodle('CapsularTensionRing');
+
 //                    lateralRectus = drawingEdit.addDoodle('Rectus');
 //                    
 //                    if (drawingEdit.eye == ED.eye.Right)
@@ -67,9 +68,8 @@
 //                    }
 
 
-                    //doodle = drawingEdit.addDoodle('OpticCup');
-                    //drawingEdit.addDoodle('OpticDisk');
-                    //drawingEdit.addDoodle('OpticDiskPit');
+                    //doodle = drawingEdit.addDoodle('RoundHole');
+
                     
                     //drawingEdit.addDoodle('Iris');
                     //drawingEdit.addDoodle('Pupil');
@@ -167,6 +167,8 @@
                             <button class="imgbutton" title="Vicryl suture" onclick="drawingEdit.addDoodle('Vicryl'); return false;" ><img src="graphics/Vicryl.gif" /></button>
                             <button class="imgbutton" title="Supramid" onclick="drawingEdit.addDoodle('AntSeg'); return false;" ><img src="graphics/Supramid.gif" /></button>
                             <button class="imgbutton" title="Acquired Pit of Optic Nerve" onclick="drawingEdit.addDoodle('CornealSuture'); return false;" ><img src="graphics/OpticDiskPit.gif" /></button>
+                            <button class="imgbutton" title="Capsular Tension Ring" onclick="drawingEdit.addDoodle('CapsularTensionRing'); return false;" ><img src="graphics/CapsularTensionRing.gif" /></button>
+
                             <br />
                             
                             <!-- Canvas element -->

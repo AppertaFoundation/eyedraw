@@ -164,6 +164,7 @@ ED.isFirefox = function()
  * @property {Bool} completeLine Flag indicating whether to draw an additional line to the first PointInLine doodle
  * @property {Float} scale Scaling of transformation from canvas to doodle planes, preserving aspect ratio and maximising doodle plnae
  * @property {Float} globalScaleFactor Factor used to scale all added doodles to this drawing, defaults to 1
+ * @property {Int} Current value of scrollFactor
  * @param {Canvas} _canvas Canvas element 
  * @param {Eye} _eye Right or left eye
  * @param {String} _IDSuffix String suffix to identify HTML elements related to this drawing
@@ -195,6 +196,7 @@ ED.Drawing = function(_canvas, _eye, _IDSuffix, _isEditable, offset_x, offset_y,
     this.newPointOnClick = false;
     this.completeLine = false;
     this.globalScaleFactor = 1;
+    this.scrollValue = 0;
     
     // Fit canvas making maximum use of doodle plane
     if (this.canvas.width >= this.canvas.height)
@@ -271,6 +273,13 @@ ED.Drawing = function(_canvas, _eye, _IDSuffix, _isEditable, offset_x, offset_y,
                                      var offset = ED.findOffset(this, offset_x, offset_y);
                                      var point = new ED.Point(e.pageX-offset.x,e.pageY-offset.y);
                                      drawing.mouseout(point); 
+                                     }, false);
+        
+        this.canvas.addEventListener('mousewheel', function(e) {
+                                     e.preventDefault();
+                                     //console.log(e);
+                                     //console.log(e.wheelDelta);
+                                     drawing.selectNextDoodle(e.wheelDelta);
                                      }, false);
         
         // iOS listeners
@@ -1198,7 +1207,6 @@ ED.Drawing.prototype.setParameterValueForClass= function(_parameter, _value, _cl
 
 /**
  * Deselect any selected doodles
- *
  */
 ED.Drawing.prototype.deselectDoodles = function()
 {
@@ -1212,6 +1220,71 @@ ED.Drawing.prototype.deselectDoodles = function()
     
     // Refresh drawing
     this.repaint();
+}
+
+/**
+ * Use scroll to select next doodle in array (From an idea of Adrian Duke)
+ */
+ED.Drawing.prototype.selectNextDoodle = function(_value)
+{
+    // Increment current scrollValue
+    this.scrollValue += _value;
+    
+    // Scroll direction
+    var up = _value > 0?true:false;
+    
+    // 'Damp' scroll speed by waiting for larger increments
+    var dampValue = 96;
+    
+    if (this.scrollValue > dampValue || this.scrollValue < -dampValue)
+    {
+        // Reset scrollValue
+        this.scrollValue = 0;
+        
+        // Index of selected doodle
+        var selectedIndex = -1;
+        
+        // Iterate through doodles
+        for (var i = 0; i < this.doodleArray.length; i++)
+        {
+            if (this.doodleArray[i].isSelected)
+            {
+                selectedIndex = i;
+                
+                // Deselected currently selected doodle
+                this.doodleArray[i].isSelected = false;
+            }
+            
+        }
+        
+        // If there is a selection, change it
+        if (selectedIndex >= 0)
+        {
+            // Change index
+            if (up)
+            {
+                selectedIndex++;
+                if (selectedIndex == this.doodleArray.length) selectedIndex = 0;
+            }
+            else
+            {
+                selectedIndex--;
+                if (selectedIndex < 0) selectedIndex = this.doodleArray.length - 1;
+            }
+            
+            // Wrap
+            if (selectedIndex == this.doodleArray.length)
+            {
+                
+            }
+            
+            this.doodleArray[selectedIndex].isSelected = true;
+            this.selectedDoodle = this.doodleArray[selectedIndex];
+        }
+        
+        // Refresh drawing
+        this.repaint();
+    }
 }
 
 /**
