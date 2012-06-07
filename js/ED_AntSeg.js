@@ -3090,7 +3090,7 @@ ED.CapsularTensionRing.prototype.setParameterDefaults = function()
 {
     this.originX = 0;
 	this.originY = 0;
-    this.rotation = Math.PI/2;
+    this.rotation = -Math.PI/2;
 }
 
 /**
