@@ -1114,7 +1114,7 @@ ED.Drawing.prototype.flipHor = function()
 ED.Drawing.prototype.deleteDoodle = function()
 {
 	// Should only be called if a doodle is selected, but check anyway
-	if (this.selectedDoodle != null)
+	if (this.selectedDoodle != null && this.selectedDoodle.canDelete)
 	{
 		// Go through doodles removing any that are selected (should be just one)
 		for (var i = 0; i < this.doodleArray.length; i++)
@@ -2182,6 +2182,8 @@ ED.Report.prototype.isMacOff = function()
  */
 ED.Doodle = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
 {
+	this.canDelete = true;
+
 	// Function called as part of prototype assignment has no parameters passed
 	if (typeof(_drawing) != 'undefined')
 	{

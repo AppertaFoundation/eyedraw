@@ -798,6 +798,7 @@ ED.Surgeon = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _sc
 	
 	// Set classname
 	this.className = "Surgeon";
+	this.canDelete = false;
 }
 
 /**
