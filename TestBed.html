@@ -14,6 +14,7 @@
 
         <script language="JavaScript" src="js/ED_VitreoRetinal.js" type="text/javascript"></script>
         <script language="JavaScript" src="js/ED_AntSeg.js" type="text/javascript"></script>
+        <script language="JavaScript" src="js/ED_Strabismus.js" type="text/javascript"></script> 
         <script language="JavaScript" src="js/ED_Glaucoma.js" type="text/javascript"></script> 
         
         <!--   This script handles the drawings for the page   -->
@@ -29,6 +30,8 @@
             var doodleAngleGradeSup;
             var doodle;
             var doodleSet;
+            var medialRectus;
+            var lateralRectus;
             
             // Runs on page load
             function init()
@@ -37,7 +40,7 @@
                 var canvas = document.getElementById('canvas');
                 
                 // Create a drawing linked to the canvas
-                drawingEdit = new ED.Drawing(canvas, ED.eye.Right, 'RPS', true);
+                drawingEdit = new ED.Drawing(canvas, ED.eye.Right, 'RPS', true, 0, 0);
                 
                 // Preload any images
                 drawingEdit.preLoadImagesFrom('graphics/');
@@ -48,13 +51,25 @@
                 // Wait for drawing object to be ready before adding objects or drawings
                 drawingEdit.onLoaded = function()
                 {
-                    //drawingEdit.addDoodle('AntSeg');
-                    doodle = drawingEdit.addDoodle('Surgeon');
+                    drawingEdit.addDoodle('AntSeg');
+                    doodle = drawingEdit.addDoodle('CapsularTensionRing');
+
+//                    lateralRectus = drawingEdit.addDoodle('Rectus');
+//                    
+//                    if (drawingEdit.eye == ED.eye.Right)
+//                    {
+//                        medialRectus.rotation = Math.PI/2;
+//                        lateralRectus.rotation = -Math.PI/2;
+//                    }
+//                    else
+//                    {
+//                        medialRectus.rotation = -Math.PI/2;
+//                        lateralRectus.rotation = Math.PI/2;                        
+//                    }
 
 
-                    //doodle = drawingEdit.addDoodle('OpticCup');
-                    //drawingEdit.addDoodle('OpticDisk');
-                    //drawingEdit.addDoodle('OpticDiskPit');
+                    //doodle = drawingEdit.addDoodle('RoundHole');
+
                     
                     //drawingEdit.addDoodle('Iris');
                     //drawingEdit.addDoodle('Pupil');
@@ -71,7 +86,7 @@
 //                    doodle = drawingEdit.addDoodle('AngleGrade');
 //                    doodle.rotation = 270 * Math.PI/180;
                     //drawingEdit.addDoodle('Patch');
-                    //drawingEdit.deselectDoodles();
+                    drawingEdit.deselectDoodles();
                     
                     
                     drawingEdit.drawAllDoodles();
@@ -80,9 +95,22 @@
                 // Function to detect changes in parameters (eg from mouse dragging)
                 drawingEdit.parameterListener = function()
                 {
-                    if (drawingEdit.selectedDoodle != null && drawingEdit.selectedDoodle.className == 'Surgeon')
+                    if (drawingEdit.selectedDoodle != null && drawingEdit.selectedDoodle.className == 'Rectus')
                     {
-                        document.getElementById('surgPos').value = drawingEdit.selectedDoodle.getParameter('surgeonPosition');
+                        if (typeof(medialRectus) != 'undefined' && medialRectus.isSelected)
+                        {
+                            document.getElementById('mr_value').value = medialRectus.getParameter('recession');
+                        }
+                        
+                        if (typeof(lateralRectus) != 'undefined' && lateralRectus.isSelected)
+                        {
+                            document.getElementById('lr_value').value = lateralRectus.getParameter('recession');
+                        }
+                        
+                        if (typeof(medialRectus) != 'undefined' && medialRectus.isSelected)
+                        {
+                            document.getElementById('mrt_value').value = medialRectus.getParameter('transposition');
+                        }                        
                     }
                 }
             }
@@ -91,6 +119,23 @@
             {
                 // Set new value for doodle
                 drawingEdit.setParameterForDoodle(doodle, 'surgeonPosition', _value); 
+            }
+            
+            // Sets suture type
+            function sutureType(_muscle, _value)
+            {
+                switch (_muscle)
+                {
+                    case 'mr':
+                        if (_value != 'Fixed') medialRectus.hangback = true;
+                        else medialRectus.hangback = false;
+                    break;
+                    case 'lr':
+                        if (_muscle == 'lr' && _value != 'Fixed') lateralRectus.hangback = true;
+                        else lateralRectus.hangback = false;
+                    break;
+                }
+                drawingEdit.repaint();
             }
             
             </script>
@@ -122,6 +167,8 @@
                             <button class="imgbutton" title="Vicryl suture" onclick="drawingEdit.addDoodle('Vicryl'); return false;" ><img src="graphics/Vicryl.gif" /></button>
                             <button class="imgbutton" title="Supramid" onclick="drawingEdit.addDoodle('AntSeg'); return false;" ><img src="graphics/Supramid.gif" /></button>
                             <button class="imgbutton" title="Acquired Pit of Optic Nerve" onclick="drawingEdit.addDoodle('CornealSuture'); return false;" ><img src="graphics/OpticDiskPit.gif" /></button>
+                            <button class="imgbutton" title="Capsular Tension Ring" onclick="drawingEdit.addDoodle('CapsularTensionRing'); return false;" ><img src="graphics/CapsularTensionRing.gif" /></button>
+
                             <br />
                             
                             <!-- Canvas element -->
@@ -129,16 +176,19 @@
                             <br />
                             <button title="Save" onclick="console.log(drawingEdit.save()); return false;" >Save</button><br />
                             <button title="Load" onclick="drawingEdit.load(doodleSet); drawingEdit.drawAllDoodles(); return false;" >Load</button><br />
-                            <select id="surgPos" onclick="setPosition(this.value);">
-                                <option value="Superior">Superior</option>
-                                <option value="Supero-temporal">Supero-temporal</option>
-                                <option value="Temporal">Temporal</option>
-                                <option value="Infero-temporal">Infero-temporal</option>
-                                <option value="Inferior">Inferior</option>
-                                <option value="Infero-nasal">Infero-nasal</option>
-                                <option value="Nasal">Nasal</option>
-                                <option value="Supero-nasal">Supero-nasal</option>
+                            <select onchange="sutureType('lr', this.value)">
+                                <option value="Fixed">Fixed</option>
+                                <option value="Hangback">Hangback</option>
+                                <option value="Adjustable">Adjustable</option>
                             </select>
+                            <select onchange="sutureType('mr', this.value)">
+                                <option value="Fixed">Fixed</option>
+                                <option value="Hangback">Hangback</option>
+                                <option value="Adjustable">Adjustable</option>
+                            </select></br>
+                            <input type="text" id="lr_value" onchange="lateralRectus.setParameter('recession', this.value);"/>
+                            <input type="text" id="mr_value" onchange="drawingEdit.setParameterForDoodle(medialRectus, 'recession', this.value);"/>
+                            <input type="text" id="mrt_value" onchange="medialRectus.setParameter('transposition', this.value);"/>
                         </span>
                     </div>
                 </form>

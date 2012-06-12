@@ -215,6 +215,12 @@ class OEEyeDrawWidget extends CWidget
 	 */
 	
 	public $offset_y = 0;
+	
+	/**
+	 * Convert canvas to image
+	 * @var bool
+	 */
+	public $to_image = false;
 
 	/**
 	 * Initializes the widget.
@@ -304,6 +310,7 @@ class OEEyeDrawWidget extends CWidget
 						'onLoadedCommandArray'=>$this->onLoadedCommandArray,
 						'offset_x'=>$this->offset_x,
 						'offset_y'=>$this->offset_y,
+						'to_image'=>$this->to_image,
 		);
 		
 		// Encode parameters and pass to a javascript function to set up canvas
