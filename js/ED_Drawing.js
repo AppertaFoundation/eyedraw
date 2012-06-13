@@ -177,6 +177,7 @@ ED.Drawing = function(_canvas, _eye, _IDSuffix, _isEditable, offset_x, offset_y,
 	this.eye = _eye;
 	this.IDSuffix = _IDSuffix;
     this.isEditable = _isEditable;
+    this.hoverTimer = null;
 	
 	this.convertToImage = (_to_image && !this.isEditable) ? true : false;
 	// Grab the canvas parent element
@@ -268,6 +269,12 @@ ED.Drawing = function(_canvas, _eye, _IDSuffix, _isEditable, offset_x, offset_y,
                                      var point = new ED.Point(e.pageX-offset.x,e.pageY-offset.y);
                                      drawing.mousemove(point); 
                                      }, false);
+
+        this.canvas.addEventListener('mouseover', function(e) {
+                                     var offset = ED.findOffset(this, offset_x, offset_y);
+                                     var point = new ED.Point(e.pageX-offset.x,e.pageY-offset.y);
+                                     drawing.mouseover(point);
+                                     }, false);
         
         this.canvas.addEventListener('mouseout', function(e) { 
                                      var offset = ED.findOffset(this, offset_x, offset_y);
@@ -277,8 +284,6 @@ ED.Drawing = function(_canvas, _eye, _IDSuffix, _isEditable, offset_x, offset_y,
         
         this.canvas.addEventListener('mousewheel', function(e) {
                                      e.preventDefault();
-                                     //console.log(e);
-                                     //console.log(e.wheelDelta);
                                      drawing.selectNextDoodle(e.wheelDelta);
                                      }, false);
         
@@ -560,6 +565,7 @@ ED.Drawing.prototype.drawAllDoodles = function()
  */  
 ED.Drawing.prototype.mousedown = function(_point)
 {
+    this.canvas.title = "";
 	// Set flag to indicate dragging can now take place
 	this.mouseDown = true;
     
@@ -645,6 +651,10 @@ ED.Drawing.prototype.mousedown = function(_point)
  */
 ED.Drawing.prototype.mousemove = function(_point)
 {
+    // Start the hover timer (also resets it)
+    //this.startHoverTimer(_point);
+    //this.canvas.title = "Hello";
+    
 	// Only drag if mouse already down and a doodle selected
 	if (this.mouseDown && this.selectedDoodle != null)
 	{
@@ -934,8 +944,22 @@ ED.Drawing.prototype.mouseup = function(_point)
  * @event
  * @param {Point} _point coordinates of mouse in canvas plane
  */  
+ED.Drawing.prototype.mouseover = function(_point)
+{
+    //console.log('mouseover');
+}
+
+/**
+ * Responds to mouse out event in canvas, stopping dragging operation
+ *
+ * @event
+ * @param {Point} _point coordinates of mouse in canvas plane
+ */  
 ED.Drawing.prototype.mouseout = function(_point)
 {
+    // Stop the hover timer
+    //this.stopHoverTimer();
+    
 	// Reset flag and mode
 	this.mouseDown = false;
     this.mode = ED.Mode.None;
@@ -1025,6 +1049,35 @@ ED.Drawing.prototype.keydown = function(e)
         e.preventDefault();
 	}
 }
+
+/*
+ED.Drawing.prototype.startHoverTimer = function(_point)
+{
+    //console.log("starting timer");
+    // Reset any existing timer
+    clearTimeout(this.hoverTimer);
+    
+    // Delete hover text
+    this.canvas.title = "";
+    
+    // Restart it
+    var drawing = this;
+    this.hoverTimer = setTimeout(function() {drawing.hover(_point);}, 1000);    
+}
+
+ED.Drawing.prototype.stopHoverTimer = function()
+{
+    console.log("stopping timer");
+    // Reset any existing timer
+    clearTimeout(this.hoverTimer);
+}
+
+ED.Drawing.prototype.hover = function(_point)
+{
+    console.log("HOVER appears at" + _point.x);
+    this.canvas.title = "Hello world";
+}
+*/
 
 /**
  * Moves selected doodle to front
