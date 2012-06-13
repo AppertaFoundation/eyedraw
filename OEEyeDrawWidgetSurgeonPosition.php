@@ -34,6 +34,6 @@ class OEEyeDrawWidgetSurgeonPosition extends OEEyeDrawWidget {
 	);
 
 	public $identifier = 'Position';
-
+	public $size = 140;
 	public $toolbar = false;
 }

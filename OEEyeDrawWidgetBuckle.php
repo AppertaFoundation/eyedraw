@@ -26,25 +26,20 @@
 
 require_once(dirname(__FILE__)."/OEEyeDrawWidget.php");
 
-class OEEyeDrawWidgetCataract extends OEEyeDrawWidget {
-	public $doodleToolBarArray = array('PhakoIncision','SidePort','IrisHook','PCIOL','ACIOL','PI','MattressSuture');
+class OEEyeDrawWidgetBuckle extends OEEyeDrawWidget {
+	public $doodleToolBarArray = array('CircumferentialBuckle','EncirclingBand','RadialSponge','BuckleSuture','DrainageSite');
 	public $size = 300;
 
 	public $onLoadedCommandArray = array(
-		array('addDoodle', array('AntSeg')),
-		array('addDoodle', array('PhakoIncision')),
-		array('addDoodle', array('SidePort',0)),
-		array('addDoodle', array('SidePort',3.1415926535898)),
-		array('addDoodle', array('PCIOL')),
+		array('addDoodle', array('BuckleOperation')),
 		array('deselectDoodles', array()),
 	);
 
-	public $identifier = 'Cataract';
+	public $identifier = 'Buckle';
 
 	public function init() {
 		if ($this->mode == 'view') {
 			$this->doodleToolBarArray = array();
-			$this->onLoadedCommandArray = array(array('addDoodle', array('AntSeg')),array('deselectDoodles', array()));
 		}
 
 		parent::init();
