@@ -3215,7 +3215,7 @@ ED.CapsularTensionRing.prototype.draw = function(_point)
 ED.CapsularTensionRing.prototype.description = function()
 {
     var returnValue = "Capsular Tension Ring";
-    if (displacementValue.length > 0) returnValue += " displaced" + displacementValue;
+    /* if (displacementValue.length > 0) returnValue += " displaced" + displacementValue;*/
     
 	return returnValue;
 }
