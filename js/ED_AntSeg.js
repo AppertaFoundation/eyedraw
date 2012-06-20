@@ -2134,7 +2134,7 @@ ED.PhakoIncision.prototype.setParameterDefaults = function()
     this.radius = this.defaultRadius;
     
     // Default is standard corneal phako wound
-    this.arc = 33 * Math.PI/180;
+    this.arc = 27 * Math.PI/180;
     
     // Incision length based on an average corneal radius of 6mm
     this.length = this.arc * (6 * this.radius)/this.defaultRadius;
