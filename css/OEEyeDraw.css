@@ -121,3 +121,17 @@ span.squiggle {
 .fillbutton {
 /*       display: list-item; */
 }
+
+/* Canvas tooltip */
+#canvasTooltip {
+    display: none;
+    position: absolute;
+    width: auto;
+    height: auto;
+    padding: 5px;
+    border-radius: 5px 5px; -moz-border-radius: 5px; -webkit-border-radius: 5px; 
+    box-shadow: 1px 3px 8px 1px rgba(0, 0, 0, 0.3); -webkit-box-shadow: 1px 3px 8px 1px rgba(0, 0, 0, 0.3); -moz-box-shadow: 1px 3px 8px 1px rgba(0, 0, 0, 0.3);
+    font-family: Calibri, Tahoma, Geneva, sans-serif;
+    font-size: 0.8em;
+    background: #FFFFAA; border: 1px solid #AAAAAA; 
+}

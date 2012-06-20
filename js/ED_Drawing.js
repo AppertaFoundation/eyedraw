@@ -199,6 +199,9 @@ ED.Drawing = function(_canvas, _eye, _IDSuffix, _isEditable, offset_x, offset_y,
     this.globalScaleFactor = 1;
     this.scrollValue = 0;
     
+    // Optional tooltip
+    this.canvasTooltip = document.getElementById('canvasTooltip');
+    
     // Fit canvas making maximum use of doodle plane
     if (this.canvas.width >= this.canvas.height)
     {
@@ -565,7 +568,6 @@ ED.Drawing.prototype.drawAllDoodles = function()
  */  
 ED.Drawing.prototype.mousedown = function(_point)
 {
-    this.canvas.title = "";
 	// Set flag to indicate dragging can now take place
 	this.mouseDown = true;
     
@@ -652,8 +654,7 @@ ED.Drawing.prototype.mousedown = function(_point)
 ED.Drawing.prototype.mousemove = function(_point)
 {
     // Start the hover timer (also resets it)
-    //this.startHoverTimer(_point);
-    //this.canvas.title = "Hello";
+    this.startHoverTimer(_point);
     
 	// Only drag if mouse already down and a doodle selected
 	if (this.mouseDown && this.selectedDoodle != null)
@@ -958,7 +959,7 @@ ED.Drawing.prototype.mouseover = function(_point)
 ED.Drawing.prototype.mouseout = function(_point)
 {
     // Stop the hover timer
-    //this.stopHoverTimer();
+    this.stopHoverTimer();
     
 	// Reset flag and mode
 	this.mouseDown = false;
@@ -1050,34 +1051,143 @@ ED.Drawing.prototype.keydown = function(e)
 	}
 }
 
-/*
+/**
+ * Starts a timer to display a tooltip simulating hover. Called from the mousemove event
+ *
+ * @event
+ * @param {Point} _point coordinates of mouse in canvas plane
+ */
 ED.Drawing.prototype.startHoverTimer = function(_point)
 {
-    //console.log("starting timer");
-    // Reset any existing timer
-    clearTimeout(this.hoverTimer);
-    
-    // Delete hover text
-    this.canvas.title = "";
-    
-    // Restart it
-    var drawing = this;
-    this.hoverTimer = setTimeout(function() {drawing.hover(_point);}, 1000);    
+    // Only show tooltips for editable drawings with a span element of id 'canvasTooltip'
+    if (this.isEditable && this.canvasTooltip != null)
+    {
+        // Stop any existing timer
+        this.stopHoverTimer();
+        
+        // Restart it 
+        var drawing = this;
+        this.hoverTimer = setTimeout(function() {drawing.hover(_point);}, 1000);
+    }
 }
 
+/**
+ * Stops the timer. Called by the mouseout event, and from the start of the startHoverTimer method
+ *
+ * @event
+ */
 ED.Drawing.prototype.stopHoverTimer = function()
 {
-    console.log("stopping timer");
-    // Reset any existing timer
-    clearTimeout(this.hoverTimer);
+    if (this.canvasTooltip != null)
+    {
+        // Reset any existing timer
+        clearTimeout(this.hoverTimer);
+        
+        // Clear text
+        this.canvasTooltip.innerHTML = "";
+        
+        // Hide hover
+        this.hideTooltip();
+    }
 }
 
+/**
+ * Triggered by the hover timer
+ *
+ * @event
+ * @param {Point} _point coordinates of mouse in canvas plane
+ */
 ED.Drawing.prototype.hover = function(_point)
 {
-    console.log("HOVER appears at" + _point.x);
-    this.canvas.title = "Hello world";
+    this.showTooltip(_point);
 }
-*/
+
+/**
+ * Shows a tooltip if present
+ *
+ * @event
+ * @param {Point} _point coordinates of mouse in canvas plane
+ */
+ED.Drawing.prototype.showTooltip = function(_point)
+{
+    // Get coordinates of mouse
+    var xAbs = _point.x;
+    var yAbs = _point.y;
+    if (this.canvas.offsetParent)
+    {
+        var obj = this.canvas;
+        var keepGoing;
+        
+        // The tooltip <span> has an absolute position (relative to the 1st parent element that has a position other than static)
+        do
+        {
+            // ***TODO*** is this a reliable way of getting the position attribute?
+        	var position = document.defaultView.getComputedStyle(obj,null).getPropertyValue('position');
+        	
+            // Flag to continue going up the tree
+        	keepGoing = false;
+        	
+            // Assign x and y values
+        	if (position != null) 
+        	{
+        		if (position == 'static')
+        		{
+        			keepGoing = true;
+        			xAbs += obj.offsetLeft;
+            		yAbs += obj.offsetTop;
+        		}
+        	}
+            
+            // Does parent exist, or is origin for absolute positioning
+            var keepGoing = keepGoing && (obj = obj.offsetParent) ;
+            
+        }
+        while (keepGoing);
+    }
+
+    // Adjust coodinates of tooltip
+    this.canvasTooltip.style.left = xAbs + "px";
+    this.canvasTooltip.style.top = (yAbs + 18) + "px";
+    
+    // Set flag to indicate success
+	var found = false;
+    
+    // Cycle through doodles from front to back doing hit test
+	for (var i = this.doodleArray.length - 1; i > -1; i--)
+	{
+        if (!found)
+		{
+            // Save context (draw method of each doodle may alter it)
+            this.context.save();
+            
+            // Successful hit test?
+            if (this.doodleArray[i].draw(_point))
+            {
+                this.canvasTooltip.innerHTML = this.doodleArray[i].tooltip();
+                found = true;
+            }
+            
+            // Restore context
+            this.context.restore();
+        }
+	}
+    
+    // Display tooltip
+    if (this.canvasTooltip.innerHTML.length > 0)
+    {
+        this.canvasTooltip.style.display = 'block';
+    }
+}
+
+/**
+ * Shows a tooltip
+ *
+ * @event
+ */
+ED.Drawing.prototype.hideTooltip = function()
+{
+    this.canvasTooltip.style.display = 'none';
+}
 
 /**
  * Moves selected doodle to front
@@ -2678,6 +2788,24 @@ ED.Doodle.prototype.groupDescription = function()
 ED.Doodle.prototype.description = function()
 {
 	return "";
+}
+
+/**
+ * Returns a string containing a text description of the doodle. String taken from language specific ED_Tooltips.js
+ *
+ * @returns {String} Tool tip text
+ */
+ED.Doodle.prototype.tooltip = function()
+{
+    var tip = ED.trans[this.className];
+    if (typeof(tip) != 'undefined')
+    {
+        return tip;
+    }
+    else
+    {
+        return "";
+    }
 }
 
 /**

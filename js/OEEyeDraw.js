@@ -49,9 +49,10 @@ function eyeDrawInit(_properties)
     window[_properties.drawingName].preLoadImagesFrom(_properties.graphicsPath);
     
     // Set focus to the canvas element
-		if (_properties.focus) {
-			canvas.focus();
-		}
+    if (_properties.focus)
+    {
+        canvas.focus();
+    }
 	
     // Wait for the drawing object to be ready before adding objects or other commands
     window[_properties.drawingName].onLoaded = function()
@@ -65,6 +66,7 @@ function eyeDrawInit(_properties)
     		window[_properties.drawingName].loadDoodles(_properties.inputId);
     		window[_properties.drawingName].drawAllDoodles();
     	}
+        
     	// Otherwise iterate through the command array, constructing argument string and running them
     	else
     	{
@@ -80,14 +82,14 @@ function eyeDrawInit(_properties)
 	                args += _properties.onLoadedCommandArray[i][1][j] + ","; // ***TODO*** will this work >1 one argument?
 	            }
 	            
-							args = args.replace(/,$/,'').split(',');
+				args = args.replace(/,$/,'').split(',');
 
-							window[_properties.drawingName][func].apply(window[_properties.drawingName], args);
+				window[_properties.drawingName][func].apply(window[_properties.drawingName], args);
 	        }
     	}
 			
-			// Mark the drawing unmodified
-			window[_properties.drawingName]["isReady"]();
+        // Mark the drawing unmodified
+        window[_properties.drawingName]["isReady"]();
     }
     
     // Detects changes in doodle parameters (eg from mouse dragging)

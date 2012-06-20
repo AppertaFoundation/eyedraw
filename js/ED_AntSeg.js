@@ -1416,6 +1416,7 @@ ED.PI.prototype.description = function()
 	return returnString;
 }
 
+
 /**
  * Radial keratotomy
  *
@@ -3181,7 +3182,9 @@ ED.CapsularTensionRing.prototype.draw = function(_point)
     var ep2 = new ED.Point(0, 0)
     ep2.setWithPolars(rm - 8 + rh, Math.PI/2 + theta);
     ctx.moveTo(ep2.x, ep2.y);
-    ctx.arc(cp2.x, cp2.y, 15, 0, 2 * Math.PI, false); 
+    ctx.arc(cp2.x, cp2.y, 15, 0, 2 * Math.PI, false);
+    
+    ctx.closePath();
     
     // Colour of fill is white but with transparency
     ctx.fillStyle = "rgba(255,255,255,0.75)";
@@ -3219,3 +3222,4 @@ ED.CapsularTensionRing.prototype.description = function()
     
 	return returnValue;
 }
+
