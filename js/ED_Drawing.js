@@ -1384,7 +1384,11 @@ ED.Drawing.prototype.addDoodle = function(_className, rotation)
         newDoodle.setParameterDefaults();
         
         if (typeof rotation != 'undefined') {
-            newDoodle.rotation = rotation;
+						if (rotation.match(/\./)) {
+							newDoodle.rotation = parseFloat(rotation);
+						} else {
+							newDoodle.rotation = parseInt(rotation);
+						}
         }
         
         // New doodles are selected by default
