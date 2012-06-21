@@ -2281,21 +2281,22 @@ ED.CornealScar.prototype.diagnosticHierarchy = function()
  */
 ED.PhakoIncision = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
 {
+    
+    // Set default values for new or loaded doodle (NB These are set before calling superclass constructor since latter calls setParameterDefaults method
+    this.defaultRadius = 334;
+    this.sutureSeparation = 1.5;
+    
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
 	
 	// Set classname
 	this.className = "PhakoIncision";
     
-    // Set default values for new or loaded doodle
-    this.defaultRadius = 334;
-    this.sutureSeparation = 1.5;
-    
     // Set initial value of length according to loaded arc value
-    this.length = this.arc * (6 * this.radius)/this.defaultRadius;
+    //this.length = this.arc * (6 * this.radius)/this.defaultRadius;
     
     // Set initial value of apexYDelta according to loaded apexY amd radius value
-    this.apexYDelta = - this.apexY - this.radius;
+    //this.apexYDelta = - this.apexY - this.radius;
 }
 
 /**
@@ -2350,7 +2351,8 @@ ED.PhakoIncision.prototype.setParameterDefaults = function()
     this.apexY = -this.defaultRadius;
     
     // Set initial value of apexYDelta to zero (ie default incision is a pocket)
-    this.apexYDelta = 0;
+    //this.apexYDelta = 0;
+    this.apexYDelta = - this.apexY - this.radius;;
     
     // Sideports are usually temporal
     if(this.drawing.eye == ED.eye.Right)
@@ -2382,14 +2384,10 @@ ED.PhakoIncision.prototype.draw = function(_point)
     var ro = r + d;
     var ri = r - d;
     
-    // Change incision length according to arc
+    // Change incision length according to radius
     if (this.drawing.mode == ED.Mode.Arc)
     {
         this.length = this.arc * (6 * this.radius)/this.defaultRadius;
-        
-        // Limit incision length to range allowed in CND, but with minimum of 1
-        if (this.length > 9.9) this.arc = 9.9 * this.defaultRadius/(6 * this.radius);
-        if (this.length < 1.0) this.arc = 1.0 * this.defaultRadius/(6 * this.radius);
     }
     // Otherwise change arc for constant incision length
     else if (this.drawing.mode == ED.Mode.Move)
@@ -2402,7 +2400,15 @@ ED.PhakoIncision.prototype.draw = function(_point)
     else if (this.drawing.mode == ED.Mode.Apex)
     {
         this.apexYDelta = - this.apexY - this.radius; 
-    }		 
+    }
+    
+    // Limit incision length to range allowed in CND, but with minimum of 1
+    if (this.length > 9.9) this.arc = 9.9 * this.defaultRadius/(6 * this.radius);
+    if (this.length < 1.0) this.arc = 1.0 * this.defaultRadius/(6 * this.radius);
+    
+    // Limit meridian to values in CND (nnn.n 000.5 to 180.0 degrees)
+    //if (this.rotation < -0.5 * Math.PI && this.rotation > -1 * Math.PI) this.rotation = -0.5 * Math.PI;
+    //if (this.rotation > -1.5 * Math.PI && this.rotation < -1 * Math.PI) this.rotation = -1.5 * Math.PI;
     
     // Boundary path
 	ctx.beginPath();

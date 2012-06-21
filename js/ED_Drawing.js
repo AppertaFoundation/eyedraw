@@ -1495,12 +1495,13 @@ ED.Drawing.prototype.addDoodle = function(_className, rotation)
         // Set default parameters (Don't need this since this method called in doodle constructor)
         //newDoodle.setParameterDefaults();
         
-        if (typeof rotation != 'undefined') {
-						if (rotation.match(/\./)) {
-							newDoodle.rotation = parseFloat(rotation);
-						} else {
-							newDoodle.rotation = parseInt(rotation);
-						}
+        if (typeof rotation != 'undefined')
+        {
+            if (rotation.match(/\./)) {
+                newDoodle.rotation = parseFloat(rotation);
+            } else {
+                newDoodle.rotation = parseInt(rotation);
+            }
         }
         
         // New doodles are selected by default
