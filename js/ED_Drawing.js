@@ -744,6 +744,8 @@ ED.Drawing.prototype.mousemove = function(_point)
 							
 							// Work out difference, and change doodle's angle of rotation by this amount
 							var deltaAngle = newAngle - oldAngle;
+                            
+                            // Force numeric value of rotation ***TODO*** do this more generically
 							this.selectedDoodle.rotation += deltaAngle;
                             
                             // Adjust radius property
@@ -1490,8 +1492,8 @@ ED.Drawing.prototype.addDoodle = function(_className, rotation)
             this.doodleArray[i].isSelected = false;
         }
         
-        // Set default parameters
-        newDoodle.setParameterDefaults();
+        // Set default parameters (Don't need this since this method called in doodle constructor)
+        //newDoodle.setParameterDefaults();
         
         if (typeof rotation != 'undefined') {
             newDoodle.rotation = rotation;

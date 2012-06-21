@@ -25,8 +25,6 @@
         <script type="text/javascript">
             
             // This set can be written by PHP and contains doodle data for this drawing from a database
-//var doodleSet = [{"subclass": "Fundus", "originX": 0, "originY": 0, "radius": 0, "apexX": 0, "apexY": 0, "scaleX": 1.00, "scaleY": 1.00, "arc": 180, "rotation": 0, "order": 0, "squiggleArray": []}, {"subclass": "RRD", "originX": 0, "originY": 0, "radius": 164, "apexX": 0, "apexY": -100, "scaleX": 1.00, "scaleY": 1.00, "arc": 120, "rotation": -26, "order": 1, "squiggleArray": []}, {"subclass": "Lattice", "originX": 0, "originY": 0, "radius": 319, "apexX": 0, "apexY": 0, "scaleX": 1.00, "scaleY": 1.00, "arc": 60, "rotation": 74, "order": 2, "squiggleArray": []}, ]
-            
             var doodleSet = [{"subclass": "PhakoIncision", "originX": 0, "originY": 0, "radius": 250, "apexX": 0, "apexY": -250, "scaleX": 1.00, "scaleY": 1.00, "arc": 90, "rotation": 319, "order": 0, "squiggleArray": []}];
             
             // Assign a global variable to each drawing on the page
@@ -55,45 +53,10 @@
                 // Wait for drawing object to be ready before adding objects or drawings
                 drawingEdit.onLoaded = function()
                 {
+                    // Add doodles here
                     drawingEdit.addDoodle('AntSeg');
-                    doodle = drawingEdit.addDoodle('PCIOL');
-                    drawingEdit.addDoodle('CapsularTensionRing');
-
-//                    lateralRectus = drawingEdit.addDoodle('Rectus');
-//                    
-//                    if (drawingEdit.eye == ED.eye.Right)
-//                    {
-//                        medialRectus.rotation = Math.PI/2;
-//                        lateralRectus.rotation = -Math.PI/2;
-//                    }
-//                    else
-//                    {
-//                        medialRectus.rotation = -Math.PI/2;
-//                        lateralRectus.rotation = Math.PI/2;                        
-//                    }
-
-
-                    //doodle = drawingEdit.addDoodle('RoundHole');
-
                     
-                    //drawingEdit.addDoodle('Iris');
-                    //drawingEdit.addDoodle('Pupil');
-                    
-                    //drawingEdit.addDoodle('Molteno');
-                    //var dood = drawingEdit.addDoodle('Supramid');
-                    //dood.baseRadius = 280;
-                    //drawingEdit.addDoodle('Vicryl');
-                    
-                    //doodleAngleGradeSup = drawingEdit.addDoodle('AngleGrade');
-//                    doodle.rotation = 90 * Math.PI/180;
-//                    doodle = drawingEdit.addDoodle('AngleGrade');
-//                    doodle.rotation = 180 * Math.PI/180;
-//                    doodle = drawingEdit.addDoodle('AngleGrade');
-//                    doodle.rotation = 270 * Math.PI/180;
-                    //drawingEdit.addDoodle('Patch');
                     drawingEdit.deselectDoodles();
-                    
-                    
                     drawingEdit.drawAllDoodles();
                 }
                 
@@ -164,15 +127,6 @@
                             <br />
                             
                             <!-- Doodle selection toolbar -->
-                            <button class="imgbutton" title="Disk haemorrhage" onclick="drawingEdit.addDoodle('DiskHaemorrhage'); return false;" ><img src="graphics/DiskHaemorrhage.gif" /></button>
-                            <button class="imgbutton" title="NerveFibreDefect" onclick="drawingEdit.addDoodle('NerveFibreDefect'); return false;" ><img src="graphics/NerveFibreDefect.gif" /></button>
-                            <button class="imgbutton" title="Papilloedema" onclick="drawingEdit.addDoodle('Papilloedema'); return false;" ><img src="graphics/Papilloedema.gif" /></button>
-                            <button class="imgbutton" title="Baerveldt" onclick="drawingEdit.addDoodle('Baerveldt'); return false;" ><img src="graphics/Baerveldt.gif" /></button>
-                            <button class="imgbutton" title="Ahmed" onclick="drawingEdit.addDoodle('Ahmed'); return false;" ><img src="graphics/Ahmed.gif" /></button>
-                            <button class="imgbutton" title="Vicryl suture" onclick="drawingEdit.addDoodle('Vicryl'); return false;" ><img src="graphics/Vicryl.gif" /></button>
-                            <button class="imgbutton" title="Supramid" onclick="drawingEdit.addDoodle('AntSeg'); return false;" ><img src="graphics/Supramid.gif" /></button>
-                            <button class="imgbutton" title="Acquired Pit of Optic Nerve" onclick="drawingEdit.addDoodle('CornealSuture'); return false;" ><img src="graphics/OpticDiskPit.gif" /></button>
-                            <button class="imgbutton" title="Capsular Tension Ring" onclick="drawingEdit.addDoodle('CapsularTensionRing'); return false;" ><img src="graphics/CapsularTensionRing.gif" /></button>
                             <button class="imgbutton" title="Toric IOL" onclick="drawingEdit.addDoodle('ToricPCIOL'); return false;" ><img src="graphics/ToricPCIOL.gif" /></button>
 
                             <br />
@@ -187,19 +141,6 @@
                             <br />
                             <button title="Save" onclick="console.log(drawingEdit.save()); return false;" >Save</button><br />
                             <button title="Load" onclick="drawingEdit.load(doodleSet); drawingEdit.drawAllDoodles(); return false;" >Load</button><br />
-                            <select onchange="sutureType('lr', this.value)">
-                                <option value="Fixed">Fixed</option>
-                                <option value="Hangback">Hangback</option>
-                                <option value="Adjustable">Adjustable</option>
-                            </select>
-                            <select onchange="sutureType('mr', this.value)">
-                                <option value="Fixed">Fixed</option>
-                                <option value="Hangback">Hangback</option>
-                                <option value="Adjustable">Adjustable</option>
-                            </select></br>
-                            <input type="text" id="lr_value" onchange="lateralRectus.setParameter('recession', this.value);"/>
-                            <input type="text" id="mr_value" onchange="drawingEdit.setParameterForDoodle(medialRectus, 'recession', this.value);"/>
-                            <input type="text" id="mrt_value" onchange="medialRectus.setParameter('transposition', this.value);"/>
                         </span>
                     </div>
                 </form>
