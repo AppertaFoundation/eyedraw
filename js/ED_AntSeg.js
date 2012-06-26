@@ -2281,6 +2281,8 @@ ED.CornealScar.prototype.diagnosticHierarchy = function()
  */
 ED.PhakoIncision = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
 {
+	// Set classname
+	this.className = "PhakoIncision";
     
     // Set default values for new or loaded doodle (NB These are set before calling superclass constructor since latter calls setParameterDefaults method
     this.defaultRadius = 334;
@@ -2288,15 +2290,12 @@ ED.PhakoIncision = function(_drawing, _originX, _originY, _radius, _apexX, _apex
     
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
-	
-	// Set classname
-	this.className = "PhakoIncision";
+
+    // Set initial value of length according to loaded arc value (set here since calculated for both new and saved parameters)
+    this.length = this.arc * (6 * this.radius)/this.defaultRadius;
     
-    // Set initial value of length according to loaded arc value
-    //this.length = this.arc * (6 * this.radius)/this.defaultRadius;
-    
-    // Set initial value of apexYDelta according to loaded apexY amd radius value
-    //this.apexYDelta = - this.apexY - this.radius;
+    // Set initial value of apexYDelta according to loaded apexY amd radius value  (set here since calculated for both new and saved parameters)
+    this.apexYDelta = - this.apexY - this.radius;
 }
 
 /**
@@ -2344,15 +2343,8 @@ ED.PhakoIncision.prototype.setParameterDefaults = function()
     // Default is standard corneal phako wound
     this.arc = 27 * Math.PI/180;
     
-    // Incision length based on an average corneal radius of 6mm
-    this.length = this.arc * (6 * this.radius)/this.defaultRadius;
-    
     // ApexY needs to change with radius on movement, so keep a record of the change
     this.apexY = -this.defaultRadius;
-    
-    // Set initial value of apexYDelta to zero (ie default incision is a pocket)
-    //this.apexYDelta = 0;
-    this.apexYDelta = - this.apexY - this.radius;;
     
     // Sideports are usually temporal
     if(this.drawing.eye == ED.eye.Right)
