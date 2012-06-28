@@ -48,3 +48,4 @@ ED.trans['PCIOL'] = 'Posterior chamber IOL<br/><br/>Click to select<br/>Drag the
 ED.trans['PhakoIncision'] = 'Phako incision<br/><br/>Click to select<br/>Drag the end handle to length<br/>Drag the middle handle to change section type<br/>Drag the incision itself to move';
 ED.trans['PI'] = 'Iridectomía periférica';
 ED.trans['SidePort'] = 'Side port<br/><br/>Click to select<br/>Drag to move';
+ED.trans['LimbalRelaxingIncision'] = 'Limbal relaxing incision<br/><br/>Click to select<br/>Drag to move';
