@@ -368,6 +368,7 @@ class DoodleInfo
         "CircumferentialBuckle" => "Circumferential buckle",
         "CNV" => "Choroidal new vessels",
         "CornealScar" => "Corneal scar",
+				"CornealSuture" => "Corneal suture",
         "CorticalCataract" => "Cortical cataract",
         "Cryo" => "Cryotherapy scar",
         "DiabeticNV" => "Diabetic new vessels",
