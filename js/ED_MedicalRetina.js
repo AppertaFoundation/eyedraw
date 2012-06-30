@@ -47,11 +47,11 @@ if (ED == null || typeof(ED) != "object") { var ED = new Object();}
  */
 ED.PostPole = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
 {
-	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
-	
 	// Set classname
 	this.className = "PostPole";
+    
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
 }
 
 /**
@@ -122,7 +122,7 @@ ED.PostPole.prototype.draw = function(_point)
 	ctx.beginPath();
 	
     // These values different for right and left side
-    if(this.drawing.eye != ED.eye.Right)
+    if (this.drawing.eye != ED.eye.Right)
     {
         var startX = 600;
         var midX1 = 350;
