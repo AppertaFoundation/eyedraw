@@ -199,7 +199,7 @@ ED.Drawing = function(_canvas, _eye, _IDSuffix, _isEditable, offset_x, offset_y,
     this.globalScaleFactor = 1;
     this.scrollValue = 0;
     
-    // Optional tooltip
+    // Optional tooltip (this property will be null is a span element with this id not found
     this.canvasTooltip = document.getElementById('canvasTooltip');
     
     // Fit canvas making maximum use of doodle plane

@@ -1519,14 +1519,14 @@ ED.Bleb.prototype.description = function()
  */
 ED.PI = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
 {
-	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
-	
 	// Set classname
 	this.className = "PI";
     
     // Class specific properties
     this.outerRadius = 360;
+    
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
 }
 
 /**
@@ -1561,6 +1561,13 @@ ED.PI.prototype.setPropertyDefaults = function()
  */
 ED.PI.prototype.setParameterDefaults = function()
 {
+    // Make it 45 degress to last one of same class
+    var angle = 45 * Math.PI/180;
+    var doodle = this.drawing.lastDoodleOfClass(this.className);
+    if (doodle)
+    {
+        this.rotation = doodle.rotation + angle;
+    }
 }
 
 /**
@@ -2345,15 +2352,25 @@ ED.PhakoIncision.prototype.setParameterDefaults = function()
     
     // ApexY needs to change with radius on movement, so keep a record of the change
     this.apexY = -this.defaultRadius;
-    
-    // Sideports are usually temporal
-    if(this.drawing.eye == ED.eye.Right)
+
+    // Make a subsequent incision 90 degress to last one of same class
+    var angle = Math.PI/2;
+    var doodle = this.drawing.lastDoodleOfClass(this.className);
+    if (doodle)
     {
-        this.rotation = -Math.PI/2;
+        this.rotation = doodle.rotation + angle;
     }
     else
     {
-        this.rotation = Math.PI/2;
+        // First incision is usually temporal
+        if (this.drawing.eye == ED.eye.Right)
+        {
+            this.rotation = -Math.PI/2;
+        }
+        else
+        {
+            this.rotation = Math.PI/2;
+        }
     }
 }
 
@@ -2648,11 +2665,11 @@ ED.PhakoIncision.prototype.setParameter = function(_parameter, _value)
  */
 ED.SidePort = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
 {
-	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
-	
 	// Set classname
 	this.className = "SidePort";
+    
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
 }
 
 /**
@@ -2698,16 +2715,25 @@ ED.SidePort.prototype.setParameterDefaults = function()
     // Incision length based on an average corneal radius of 6mm
     this.arc = this.incisionLength/6;
     
-    // Sideports are usually temporal
-    if(this.drawing.eye == ED.eye.Right)
+    // Make a subsequent incision 90 degress to last one of same class
+    var angle = Math.PI/2;
+    var doodle = this.drawing.lastDoodleOfClass(this.className);
+    if (doodle)
     {
-        this.rotation = -Math.PI/2;
+        this.rotation = doodle.rotation + angle;
     }
     else
     {
-        this.rotation = Math.PI/2;
+        // New sideports usually temporal
+        if (this.drawing.eye == ED.eye.Right)
+        {
+            this.rotation = -Math.PI/2;
+        }
+        else
+        {
+            this.rotation = Math.PI/2;
+        }
     }
-    
 }
 
 /**
@@ -2905,7 +2931,7 @@ ED.LimbalRelaxingIncision.prototype.draw = function(_point)
 	ctx.closePath();
     
     // Colour of fill
-    ctx.fillStyle = "rgba(200,200,200,0.75)";
+    ctx.fillStyle = "rgba(100,100,200,0.75)";
     
     // Set line attributes
     ctx.lineWidth = 4;
@@ -3182,11 +3208,11 @@ ED.IrisHook.prototype.description = function()
  */
 ED.MattressSuture = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
 {
+    // Set classname
+	this.className = "MattressSuture";
+    
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
-	
-	// Set classname
-	this.className = "MattressSuture";
 }
 
 /**
@@ -3226,6 +3252,18 @@ ED.MattressSuture.prototype.setParameterDefaults = function()
     
     // The radius property is changed by movement in rotatable doodles
     this.radius = this.defaultRadius;
+    
+    // Make it 20 degress to last one of same class
+    var angle = 20 * Math.PI/180;
+    var doodle = this.drawing.lastDoodleOfClass(this.className);
+    if (doodle)
+    {
+        this.rotation = doodle.rotation + angle;
+    }
+    else
+    {
+        this.rotation = -angle/2;
+    }
 }
 
 /**
@@ -3318,11 +3356,11 @@ ED.MattressSuture.prototype.description = function()
  */
 ED.CornealSuture = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
 {
-	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
-	
 	// Set classname
 	this.className = "CornealSuture";
+    
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
 }
 
 /**
