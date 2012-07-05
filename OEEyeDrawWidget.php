@@ -395,6 +395,7 @@ class DoodleInfo
         "LaserCircle" => "Circle of laser photocoagulation",
         "LasikFlap" => "LASIK flap",
         "Lattice" => "Lattice",
+				"LimbalRelaxingIncision" => "Limbal relaxing incision",
         "MacularHole" => "Macular hole",
         "MattressSuture" => "Mattress suture",
         "Molteno" => "Molteno tube",

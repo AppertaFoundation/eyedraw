@@ -25,7 +25,7 @@
 		</div>
 		<div class="ed_toolbar">
 			<?php foreach ($doodleToolBarArray as $i => $item) {?>
-				<?php if ($i>0 && $i%5 == 0) {?>
+				<?php if ($i>0 && $i%6 == 0) {?>
 					</div>
 					<div class="ed_toolbar">
 				<?php }?>
