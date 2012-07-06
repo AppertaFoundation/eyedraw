@@ -219,6 +219,12 @@ class OEEyeDrawWidget extends CWidget
 	public $to_image = false;
 
 	/**
+	 * Whether the eyedraw should be rendered with a div wrapper
+	 * @var boolean
+	 */
+	public $no_wrapper = false;
+	
+	/**
 	 * Initializes the widget.
 	 * This method registers all needed client scripts and renders the EyeDraw content
 	 */
@@ -389,6 +395,7 @@ class DoodleInfo
         "LaserCircle" => "Circle of laser photocoagulation",
         "LasikFlap" => "LASIK flap",
         "Lattice" => "Lattice",
+				"LimbalRelaxingIncision" => "Limbal relaxing incision",
         "MacularHole" => "Macular hole",
         "MattressSuture" => "Mattress suture",
         "Molteno" => "Molteno tube",
