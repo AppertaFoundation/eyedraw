@@ -2333,6 +2333,7 @@ ED.PhakoIncision.prototype.setPropertyDefaults = function()
 	this.isMoveable = false;
 	this.isRotatable = true;
     this.isArcSymmetrical = true;
+    this.animationArray = ['incisionLength', 'incisionMeridian'];
     this.rangeOfArc = new ED.Range(0, Math.PI);
 	this.rangeOfApexX = new ED.Range(-0, +0);
 	this.rangeOfApexY = new ED.Range(-334, -300);
@@ -2546,13 +2547,13 @@ ED.PhakoIncision.prototype.getParameter = function(_parameter)
     
     switch (_parameter)
     {
-            // Incision site (CND 5.13)
+        // Incision site (CND 5.13)
         case 'incisionSite':
             if (this.radius > 428) returnValue = 'Scleral';
             else if (this.radius > 344) returnValue = 'Limbal';
             else returnValue = 'Corneal';
             break;
-            // Incision length (CND 5.14)
+        // Incision length (CND 5.14)
         case 'incisionLength':
             // Calculate length of arc in mm
             var length = this.radius * this.arc * 6/this.defaultRadius;
@@ -2565,13 +2566,13 @@ ED.PhakoIncision.prototype.getParameter = function(_parameter)
             
             returnValue = length.toFixed(1);
             break;
-            // Incision Meridian (CND 5.15)
+        // Incision Meridian (CND 5.15)
         case 'incisionMeridian':
             var angle = (((Math.PI * 2 - this.rotation + Math.PI/2) * 180/Math.PI) + 360) % 360;
             if (angle == 360) angle = 0;
             returnValue = angle.toFixed(0);
             break;
-            // Incision Type (Not in CND but infers type of operation)
+        // Incision Type (Not in CND but infers type of operation)
         case 'incisionType':
             returnValue = this.apexYDelta == 0?"Pocket":"Section";
             break;
@@ -2594,41 +2595,40 @@ ED.PhakoIncision.prototype.setParameter = function(_parameter, _value)
 {
     switch (_parameter)
     {
-            // Incision site (CND 5.13)
+        // Incision site (CND 5.13)
         case 'incisionSite':
             switch (_value)
-        {
-            case 'Scleral':
-                this.radius = 428;
-                break;
-            case 'Limbal':
-                this.radius = 376;
-                break;
-            case 'Corneal':
-                this.radius = 330;
-                break;
-            default:
-                break;
-        }
+            {
+                case 'Scleral':
+                    this.radius = 428;
+                    break;
+                case 'Limbal':
+                    this.radius = 376;
+                    break;
+                case 'Corneal':
+                    this.radius = 330;
+                    break;
+                default:
+                    break;
+            }
             
             // Correct for change in arc as incision moves
             this.arc = this.length * this.defaultRadius/(6 * this.radius);
-            
             break;
             
-            // Incision length (CND 5.14)
+        // Incision length (CND 5.14)
         case 'incisionLength':
             this.length = _value;
             this.arc = this.length * this.defaultRadius/(6 * this.radius);
             break;
             
-            // Incision Meridian
+        // Incision Meridian
         case 'incisionMeridian':
             var angle = ((90 - _value) + 360) % 360;
             this.rotation = angle * Math.PI/180;
             break;
             
-            // Incision type
+        // Incision type
         case 'incisionType':
             if (_value == "Pocket")
             {
@@ -3684,3 +3684,311 @@ ED.CapsularTensionRing.prototype.description = function()
 	return returnValue;
 }
 
+/**
+ * Trial Frame
+ *
+ * @class TrialFrame
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Int} _originX
+ * @param {Int} _originY
+ * @param {Float} _radius
+ * @param {Int} _apexX
+ * @param {Int} _apexY
+ * @param {Float} _scaleX
+ * @param {Float} _scaleY
+ * @param {Float} _arc
+ * @param {Float} _rotation
+ * @param {Int} _order
+ */
+ED.TrialFrame = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+{
+	// Set classname
+	this.className = "TrialFrame";
+    
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.TrialFrame.prototype = new ED.Doodle;
+ED.TrialFrame.prototype.constructor = ED.TrialFrame;
+ED.TrialFrame.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets default dragging attributes
+ */
+ED.TrialFrame.prototype.setPropertyDefaults = function()
+{
+	this.isSelectable = false;
+	this.isOrientated = false;
+	this.isScaleable = false;
+	this.isSqueezable = false;
+	this.isMoveable = false;
+	this.isRotatable = false;
+    this.isUnique = true;
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.TrialFrame.prototype.draw = function(_point)
+{
+	// Get context
+	var ctx = this.drawing.context;
+	
+	// Call draw method in superclass
+	ED.TrialFrame.superclass.draw.call(this, _point);
+	
+	// Boundary path
+	ctx.beginPath();
+    
+    // Settings
+    var ro = 420;
+    var rt = 340;
+    var ri = 300;
+    var d = 20;
+    var height = 50;  
+    
+    // Angles, phi gives a little extra at both ends of the frame
+    var phi = -Math.PI/20;
+	var arcStart = 0 + phi;
+	var arcEnd = Math.PI - phi;
+    
+	// Boundary path
+	ctx.beginPath();
+    
+	// Arc across 
+	ctx.arc(0, 0, ro, arcStart, arcEnd, false);
+    
+	// Arc back
+	ctx.arc(0, 0, ri, arcEnd, arcStart, true);
+        
+    ctx.closePath();
+    
+    // Colour of fill is white but with transparency
+    ctx.fillStyle = "rgba(230,230,230,1)";
+    
+	// Set line attributes
+	ctx.lineWidth = 4;
+    
+    // Colour of outer line is dark gray
+    ctx.strokeStyle = "darkgray";
+	
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+	
+	// Other stuff here
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
+	{
+        // Set font and colour      
+        ctx.font = height + "px sans-serif";
+        ctx.fillStyle = "blue";
+        
+        ctx.beginPath();
+        
+        var theta = 0;
+        
+        // Points for each line
+        var pi = new ED.Point(0,0);
+        var pj = new ED.Point(0,0);
+        var pt = new ED.Point(0,0);
+        var po = new ED.Point(0,0);
+        var pp = new ED.Point(0,0);
+        
+        for (var i = 0; i < 19; i++)
+        {
+            var text = i.toFixed(0);
+            theta = (-90 - i * 10) * Math.PI/180;
+            
+            pi.setWithPolars(ri, theta);
+            pj.setWithPolars(ri + d, theta);
+            pt.setWithPolars(rt, theta);
+            pp.setWithPolars(ro - d, theta);
+            po.setWithPolars(ro, theta);
+            
+            ctx.moveTo(pi.x, pi.y);
+            ctx.lineTo(pj.x, pj.y);
+            ctx.moveTo(pp.x, pp.y);
+            ctx.lineTo(po.x, po.y);
+            
+            ctx.save();
+            ctx.translate(pt.x, pt.y);
+            ctx.rotate(Math.PI + theta);
+            ctx.textAlign = "center";
+            ctx.fillText(text, 0, 80/2);
+            ctx.restore();
+        }
+        
+        ctx.moveTo(-20, 0);
+        ctx.lineTo(20, 0);
+        ctx.moveTo(0, -20);
+        ctx.lineTo(0, 20);
+        
+        ctx.stroke();        
+	}
+	
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+	
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+
+/**
+ * Scleral TrialLens
+ *
+ * @class TrialLens
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Int} _originX
+ * @param {Int} _originY
+ * @param {Float} _radius
+ * @param {Int} _apexX
+ * @param {Int} _apexY
+ * @param {Float} _scaleX
+ * @param {Float} _scaleY
+ * @param {Float} _arc
+ * @param {Float} _rotation
+ * @param {Int} _order
+ */
+ED.TrialLens = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+{    
+	// Set classname
+	this.className = "TrialLens";
+    
+	// Call super-class constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order); 
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.TrialLens.prototype = new ED.Doodle;
+ED.TrialLens.prototype.constructor = ED.TrialLens;
+ED.TrialLens.superclass = ED.Doodle.prototype;
+
+
+/**
+ * Sets default dragging attributes
+ */
+ED.TrialLens.prototype.setPropertyDefaults = function()
+{
+	this.isSelectable = true;
+    this.isShowHighlight = false;
+	this.isOrientated = false;
+	this.isScaleable = false;
+	this.isSqueezable = false;
+	this.isMoveable = false;
+	this.isRotatable = true;
+    this.addAtBack = true;
+    this.animationArray = ['axis'];
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.TrialLens.prototype.draw = function(_point)
+{
+	// Get context
+	var ctx = this.drawing.context;
+	
+	// Call draw method in superclass
+	ED.TrialLens.superclass.draw.call(this, _point);
+    
+	// Radius of outer curve just inside ora on right and left fundus diagrams
+	var ro = 360;
+    var ri = 180;
+    
+	// Boundary path
+	ctx.beginPath();
+    
+	// Arc across to mirror image point on the other side
+	ctx.arc(0, 0, ro, 0, 2 * Math.PI, true);
+    
+    // Move to start of next arc
+    ctx.moveTo(ri, 0);
+    
+	// Arc back to mirror image point on the other side
+	ctx.arc(0, 0, ri, 2 * Math.PI, 0, false);
+    
+	// Close path
+	//ctx.closePath();
+	
+	// Set line attributes
+	ctx.lineWidth = 4;	
+	ctx.fillStyle = "rgba(255,100,100,1)";
+	ctx.strokeStyle = "gray";
+	
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+	
+	// Other paths and drawing here
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
+	{
+        var d = 20;
+        ctx.beginPath();
+        ctx.moveTo(ro - d,0);
+        ctx.lineTo(ri + d,0);
+        ctx.moveTo(-ro + d,0);
+        ctx.lineTo(-ri - d,0);
+        
+        ctx.lineWidth = 16;
+        ctx.strokeStyle = "black";
+        ctx.stroke();
+	}
+    
+	// Return value indicating successful hit test
+	return this.isClicked;
+}
+
+/**
+ * Returns parameters
+ *
+ * @returns {String} value of parameter
+ */
+ED.TrialLens.prototype.getParameter = function(_parameter)
+{
+    var returnValue;
+    
+    switch (_parameter)
+    {
+        // Axis
+        case 'axis':
+            returnValue = (360 - this.degrees()) % 180;
+            break;
+        default:
+            returnValue = "";
+            break;
+    }
+    
+    return returnValue;
+}
+
+/**
+ * Sets derived parameters for this doodle
+ *
+ * @param {String} _parameter Name of parameter
+ * @param {String} _value New value of parameter
+ */
+ED.TrialLens.prototype.setParameter = function(_parameter, _value)
+{
+    switch (_parameter)
+    {
+        // Axis
+        case 'axis':
+            //var angle = ((90 - _value) + 360) % 360;
+            var angle = _value;
+            this.rotation = (180 - angle)  * Math.PI/180;
+            break;            
+        default:
+            break
+    }
+}

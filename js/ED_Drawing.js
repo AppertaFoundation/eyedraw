@@ -1455,7 +1455,6 @@ ED.Drawing.prototype.selectNextDoodle = function(_value)
 /**
  * Marks the doodle as 'unmodified' so we can catch an event when it gets modified by the user
  */
-
 ED.Drawing.prototype.isReady = function() {
 	this.modified = false;
 	if(this.convertToImage)
@@ -1700,7 +1699,6 @@ ED.Drawing.prototype.deleteDoodlesOfClass = function(_className)
 	this.repaint();
 }
 
-
 /**
  * Updates a doodle with a vew value of a parameter
  *
@@ -1725,7 +1723,7 @@ ED.Drawing.prototype.setParameterForDoodle = function(_doodle, _parameter, _valu
 }
 
 /**
- * Updates a doodle of class with a vew value of a parameter. Use if one one member of class exists
+ * Updates a doodle of class with a vew value of a parameter. Use if only one member of a class exists
  *
  * @param {String} _className The name of the doodle class to be updated
  * @param {String} _parameter Name of the parameter
@@ -1736,15 +1734,19 @@ ED.Drawing.prototype.setParameterForDoodleOfClass = function(_className, _parame
     // Get pointer to doodle
     var doodle = this.firstDoodleOfClass(_className);
     
-    // Determine whether doodle exists
-    if (typeof(doodle[_parameter]) != 'undefined')
-    {
-        doodle[_parameter] = +_value;
-    }
-    else
-    {
-        doodle.setParameter(_parameter, _value);
-    }
+    // Set parameter for the doodle
+    doodle.setParameterWithAnimation(_parameter, _value);
+    
+    // Determine whether doodle parameter can be accessed directly
+//    if (typeof(doodle[_parameter]) != 'undefined')
+//    {
+//        doodle[_parameter] = +_value;
+//    }
+//    else
+//    {
+//        //doodle.setParameter(_parameter, _value);
+//        doodle.setParameterWithAnimation(_parameter, _value);
+//    }
     
     // Refresh drawing
     this.repaint();								
@@ -2334,6 +2336,9 @@ ED.Report.prototype.isMacOff = function()
  * @property {Bool} isClicked Hit test flag
  * @property {Enum} drawFunctionMode Mode for boundary path
  * @property {Bool} isFilled True if boundary path is filled as well as stroked
+ * @property {Array} animationArray Collection of parameter names as strings which can be animated
+ * @property {Timer} animationTimer Timer for animations
+ * @property {Int} frameCounter Keeps track of how many animation frames have been drawn
  * @property {Array} handleArray Array containing handles to be rendered
  * @property {Point} leftExtremity Point at left most extremity of doodle (used to calculate arc)
  * @property {Point} rightExtremity Point at right most extremity of doodle (used to calculate arc)
@@ -2453,6 +2458,9 @@ ED.Doodle = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _sca
 		this.isClicked = false;
 		this.drawFunctionMode = ED.drawFunctionMode.Draw;
         this.isFilled = true;
+        this.animationArray = new Array();
+        this.animationTimer = null;
+        this.frameCounter = 0;
         
         // Array of points to snap to
         this.pointsArray = new Array();
@@ -2832,6 +2840,85 @@ ED.Doodle.prototype.diagnosticHierarchy = function()
 }
 
 /**
+ * Attempts to animate a change in value of a parameter
+ *
+ * @param {String} _parameter Name of parameter
+ * @param {String} _value New value of parameter
+ */
+ED.Doodle.prototype.setParameterWithAnimation = function(_parameter, _value)
+{
+    // Can doodle animate this parameter?
+    if (this.animationArray.indexOf(_parameter) >= 0)
+    {
+        // Set some animation values
+        this.frameCounter = 0;
+        var frameRate = 25;
+        var duration = 0.5;
+        
+        // Calculate frames and delta
+        var frames = Math.floor(frameRate * duration);
+        var delta = (_value - this.getParameter(_parameter))/frames;
+        
+        // Call animation method
+        this.increment(_parameter, _value, delta, frames, frameRate);
+    }
+    // Otherwise just set it in the normal way
+    else
+    {
+        console.log('no animation');
+        this.setParameter(_parameter, _value);
+    }
+}
+
+/**
+ * Set the value of a doodle's parameter (overridden by subclasses)
+ *
+ * @param {String} _parameter Name of parameter
+ * @param {String} _value New value of parameter
+ */
+ED.Doodle.prototype.setParameter = function(_parameter, _value)
+{
+}
+
+/**
+ * Uses a timeout to call itself and produce animation
+ *
+ * @param {String} _parameter Name of parameter
+ * @param {String} _value New value of parameter
+ * @param {String} _delta amount of value to change for each frame
+ * @param {String} _frames Number of frames required
+ * @param {String} _frameRate Frames per second
+ */
+ED.Doodle.prototype.increment = function(_parameter, _value, _delta, _frames, _frameRate)
+{
+    // Increment parameter and framecounter
+    var currentValue = this.getParameter(_parameter);
+    this.setParameter(_parameter, +currentValue + _delta);
+    this.frameCounter++;
+    
+    // Calculate animation interval
+    var interval = 1000/_frameRate;
+    
+    if (this.frameCounter == _frames)
+    {
+        // Set  parameter to exact value
+        this.setParameter(_parameter, +_value);
+        
+        // Stop timer
+        clearTimeout(this.animationTimer);
+    }
+    else
+    {
+        // Start timer 
+        var doodle = this;
+        this.animationTimer = setTimeout(function() {doodle.increment(_parameter, _value, _delta, _frames, _frameRate);}, interval);
+    }
+    
+    // Update drawing
+    this.drawing.repaint();
+}
+
+/**
  * Returns the position converted to clock hours
  *
  * @returns {Int} Clock hour from 1 to 12
@@ -2854,6 +2941,31 @@ ED.Doodle.prototype.clockHour = function()
     clockHour = clockHour.toFixed(0);
     if (clockHour == 0) clockHour = 12;				 
     return clockHour
+}
+
+/**
+ * Returns the position converted to degrees
+ *
+ * @returns {Int} Degrees from 0 to 360
+ */
+ED.Doodle.prototype.degrees = function()
+{
+    var degrees;
+    
+    if (this.isRotatable && !this.isMoveable)
+    {
+        degrees = ((this.rotation * 180/Math.PI) + 360) % 360;
+    }
+    else
+    {
+        var twelvePoint = new ED.Point(0,-100);
+        var thisPoint = new ED.Point(this.originX, this.originY);
+        degrees = ((twelvePoint.clockwiseAngleTo(thisPoint) * 180/Math.PI) + 360) % 360;
+    }
+    
+    degrees = degrees.toFixed(0);
+    if (degrees == 0) degrees = 0;				 
+    return degrees;
 }
 
 /**
