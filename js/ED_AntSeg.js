@@ -85,6 +85,7 @@ ED.AntSeg.prototype.setPropertyDefaults = function()
 	this.isMoveable = false;
 	this.isRotatable = false;
     this.isUnique = true;
+    this.animationArray = ['apexY'];
 	this.rangeOfScale = new ED.Range(+1, +4);
 	this.rangeOfArc = new ED.Range(Math.PI/6, Math.PI*2);
 	this.rangeOfApexX = new ED.Range(-0, +0);
@@ -182,52 +183,120 @@ ED.AntSeg.prototype.draw = function(_point)
 	return this.isClicked;
 }
 
+///**
+// * Returns size of pupil
+// *
+// * @returns {String} Grade of cataract
+// */
+//ED.AntSeg.prototype.getGrade = function()
+//{
+//    var returnValue = "";
+//    if (this.apexY < -200) returnValue = 'Large';
+//    else if (this.apexY < -100) returnValue = 'Medium';
+//    else returnValue = 'Small';
+//    
+//    return returnValue;
+//}
+//
+///**
+// * Sets size of pupil
+// *
+// * @param {String} Size of pupil
+// */
+//ED.AntSeg.prototype.setGrade = function(_grade)
+//{
+//    switch (_grade)
+//    {
+//        case 'Small':
+//            this.apexY = -100;
+//            break;
+//        case 'Medium':
+//            this.apexY = -200;
+//            break;
+//        case 'Large':
+//            this.apexY = -260;
+//            break;
+//        default:
+//            break;
+//    }
+//}
+
+///**
+// * Sets PXE state
+// *
+// * @param {Bool} Whether PXE is present or not
+// */
+//ED.AntSeg.prototype.setPXE = function(_value)
+//{
+//    this.hasPXE = _value;
+//}
+
 /**
- * Returns size of pupil
+ * Returns parameters
  *
- * @returns {String} Grade of cataract
+ * @returns {String} value of parameter
  */
-ED.AntSeg.prototype.getGrade = function()
+ED.AntSeg.prototype.getParameter = function(_parameter)
 {
-    var returnValue = "";
-    if (this.apexY < -200) returnValue = 'Large';
-    else if (this.apexY < -100) returnValue = 'Medium';
-    else returnValue = 'Small';
+    var returnValue;
+    
+    switch (_parameter)
+    {
+        // Grade of cataract
+        case 'grade':
+            if (this.apexY < -200) returnValue = 'Large';
+            else if (this.apexY < -100) returnValue = 'Medium';
+            else returnValue = 'Small';
+            break;
+        case 'apexY':
+            returnValue = this.apexY;
+            break;
+        default:
+            returnValue = "";
+            break;
+    }
     
     return returnValue;
 }
 
 /**
- * Sets size of pupil
+ * Sets parameters for this doodle
  *
- * @param {String} Size of pupil
+ * @param {String} _parameter Name of parameter
+ * @param {String} _value New value of parameter
  */
-ED.AntSeg.prototype.setGrade = function(_grade)
+ED.AntSeg.prototype.setParameter = function(_parameter, _value)
 {
-    switch (_grade)
+    switch (_parameter)
     {
-        case 'Small':
-            this.apexY = -100;
+        case 'grade':
+            switch (_value)
+            {
+                case 'Small':
+                    //this.apexY = -100;
+                    this.setParameterWithAnimation('apexY', -100);
+                    break;
+                case 'Medium':
+                    //this.apexY = -200;
+                    this.setParameterWithAnimation('apexY', -200);
+                    break;
+                case 'Large':
+                    //this.apexY = -260;
+                    this.setParameterWithAnimation('apexY', -260);
+                    break;
+                default:
+                    break;
+            }
             break;
-        case 'Medium':
-            this.apexY = -200;
-            break;
-        case 'Large':
-            this.apexY = -260;
+        case 'pxe':
+            this.hasPXE = _value;
+            break
+        case 'apexY':
+            this.apexY = _value;
             break;
         default:
-            break;
+            break
     }
-}
-
-/**
- * Sets PXE state
- *
- * @param {Bool} Whether PXE is present or not
- */
-ED.AntSeg.prototype.setPXE = function(_value)
-{
-    this.hasPXE = _value;
 }
 
 /**
@@ -237,7 +306,7 @@ ED.AntSeg.prototype.setPXE = function(_value)
  */
 ED.AntSeg.prototype.description = function()
 {
-    var returnString = this.getGrade() + " pupil";
+    var returnString = this.getParameter('grade') + " pupil";
     
     if (this.hasPXE) returnString += " with pseudoexfoliation";
 	
@@ -298,6 +367,7 @@ ED.NuclearCataract.prototype.setPropertyDefaults = function()
 	this.isMoveable = false;
 	this.isRotatable = false;
     this.isUnique = true;
+    this.animationArray = ['apexY'];
 	this.rangeOfApexX = new ED.Range(-0, +0);
 	this.rangeOfApexY = new ED.Range(-180, 0);
 }
@@ -367,41 +437,106 @@ ED.NuclearCataract.prototype.draw = function(_point)
 	return this.isClicked;
 }
 
+///**
+// * Returns grade of cataract
+// *
+// * @returns {String} Grade of cataract
+// */
+//ED.NuclearCataract.prototype.getGrade = function()
+//{
+//    var returnValue = "";
+//    if (this.apexY < -120) returnValue = 'Mild';
+//    else if (this.apexY < -60) returnValue = 'Moderate';
+//    else returnValue = 'Brunescent';
+//    
+//    return returnValue;
+//}
+//
+///**
+// * Sets grade of cataract
+// *
+// * @param {String} Grade of cataract
+// */
+//ED.NuclearCataract.prototype.setGrade = function(_grade)
+//{
+//    switch (_grade)
+//    {
+//        case 'Mild':
+//            this.apexY = -180;
+//            break;
+//        case 'Moderate':
+//            this.apexY = -100;
+//            break;
+//        case 'Brunescent':
+//            this.apexY = 0;
+//            break;
+//        default:
+//            break;
+//    }
+//}
+
 /**
- * Returns grade of cataract
+ * Returns parameters
  *
- * @returns {String} Grade of cataract
+ * @returns {String} value of parameter
  */
-ED.NuclearCataract.prototype.getGrade = function()
+ED.NuclearCataract.prototype.getParameter = function(_parameter)
 {
-    var returnValue = "";
-    if (this.apexY < -120) returnValue = 'Mild';
-    else if (this.apexY < -60) returnValue = 'Moderate';
-    else returnValue = 'Brunescent';
+    var returnValue;
+    
+    switch (_parameter)
+    {
+            // Grade of cataract
+        case 'grade':
+            if (this.apexY < -120) returnValue = 'Mild';
+            else if (this.apexY < -60) returnValue = 'Moderate';
+            else returnValue = 'Brunescent';
+            break;
+        case 'apexY':
+            returnValue = this.apexY;
+            break;
+        default:
+            returnValue = "";
+            break;
+    }
     
     return returnValue;
 }
 
 /**
- * Sets grade of cataract
+ * Sets parameters for this doodle
  *
- * @param {String} Grade of cataract
+ * @param {String} _parameter Name of parameter
+ * @param {String} _value New value of parameter
  */
-ED.NuclearCataract.prototype.setGrade = function(_grade)
+ED.NuclearCataract.prototype.setParameter = function(_parameter, _value)
 {
-    switch (_grade)
+    switch (_parameter)
     {
-        case 'Mild':
-            this.apexY = -180;
+        case 'grade':
+            switch (_value)
+            {
+                case 'Mild':
+                    //this.apexY = -180;
+                    this.setParameterWithAnimation('apexY', -180);
+                    break;
+                case 'Moderate':
+                    //this.apexY = -100;
+                    this.setParameterWithAnimation('apexY', -100);
+                    break;
+                case 'Brunescent':
+                    //this.apexY = 0;
+                    this.setParameterWithAnimation('apexY', 0);
+                    break;
+                default:
+                    break;
+            }
             break;
-        case 'Moderate':
-            this.apexY = -100;
-            break;
-        case 'Brunescent':
-            this.apexY = 0;
+        case 'apexY':
+            this.apexY = _value;
             break;
         default:
-            break;
+            break
     }
 }
 
@@ -412,7 +547,7 @@ ED.NuclearCataract.prototype.setGrade = function(_grade)
  */
 ED.NuclearCataract.prototype.description = function()
 {
-	return this.getGrade() + " nuclear cataract";
+	return this.getParameter('grade') + " nuclear cataract";
 }
 
 /**
@@ -489,8 +624,9 @@ ED.CorticalCataract.prototype.setPropertyDefaults = function()
 	this.isMoveable = false;
 	this.isRotatable = false;
     this.isUnique = true;
+    this.animationArray = ['apexY'];
 	this.rangeOfApexX = new ED.Range(-0, +0);
-	this.rangeOfApexY = new ED.Range(-180, 0);
+	this.rangeOfApexY = new ED.Range(-180, -20);
 }
 
 /**
@@ -571,41 +707,106 @@ ED.CorticalCataract.prototype.draw = function(_point)
 	return this.isClicked;
 }
 
+///**
+// * Returns grade of cataract
+// *
+// * @returns {String} Grade of cataract
+// */
+//ED.CorticalCataract.prototype.getGrade = function()
+//{
+//    var returnValue = "";
+//    if (this.apexY < -120) returnValue = 'Mild';
+//    else if (this.apexY < -60) returnValue = 'Moderate';
+//    else returnValue = 'White';
+//    
+//    return returnValue;
+//}
+//
+///**
+// * Sets grade of cataract
+// *
+// * @param {String} Grade of cataract
+// */
+//ED.CorticalCataract.prototype.setGrade = function(_grade)
+//{
+//    switch (_grade)
+//    {
+//        case 'Mild':
+//            this.apexY = -180;
+//            break;
+//        case 'Moderate':
+//            this.apexY = -100;
+//            break;
+//        case 'White':
+//            this.apexY = 0;
+//            break;
+//        default:
+//            break;
+//    }
+//}
+
 /**
- * Returns grade of cataract
+ * Returns parameters
  *
- * @returns {String} Grade of cataract
+ * @returns {String} value of parameter
  */
-ED.CorticalCataract.prototype.getGrade = function()
+ED.CorticalCataract.prototype.getParameter = function(_parameter)
 {
-    var returnValue = "";
-    if (this.apexY < -120) returnValue = 'Mild';
-    else if (this.apexY < -60) returnValue = 'Moderate';
-    else returnValue = 'White';
+    var returnValue;
+    
+    switch (_parameter)
+    {
+        // Grade of cataract
+        case 'grade':
+            if (this.apexY < -120) returnValue = 'Mild';
+            else if (this.apexY < -60) returnValue = 'Moderate';
+            else returnValue = 'White';
+            break;
+        case 'apexY':
+            returnValue = this.apexY;
+            break;
+        default:
+            returnValue = "";
+            break;
+    }
     
     return returnValue;
 }
 
 /**
- * Sets grade of cataract
+ * Sets parameters for this doodle
  *
- * @param {String} Grade of cataract
+ * @param {String} _parameter Name of parameter
+ * @param {String} _value New value of parameter
  */
-ED.CorticalCataract.prototype.setGrade = function(_grade)
+ED.CorticalCataract.prototype.setParameter = function(_parameter, _value)
 {
-    switch (_grade)
+    switch (_parameter)
     {
-        case 'Mild':
-            this.apexY = -180;
+        case 'grade':
+            switch (_value)
+            {
+                case 'Mild':
+                    //this.apexY = -180;
+                    this.setParameterWithAnimation('apexY', -180);
+                    break;
+                case 'Moderate':
+                    //this.apexY = -100;
+                    this.setParameterWithAnimation('apexY', -100);
+                    break;
+                case 'White':
+                    //this.apexY = 0;
+                    this.setParameterWithAnimation('apexY', -20);
+                    break;
+                default:
+                    break;
+            }
             break;
-        case 'Moderate':
-            this.apexY = -100;
-            break;
-        case 'White':
-            this.apexY = 0;
+        case 'apexY':
+            this.apexY = _value;
             break;
         default:
-            break;
+            break
     }
 }
 
@@ -616,7 +817,7 @@ ED.CorticalCataract.prototype.setGrade = function(_grade)
  */
 ED.CorticalCataract.prototype.description = function()
 {
-	return this.getGrade() + " cortical cataract";
+	return this.getParameter('grade') + " cortical cataract";
 }
 
 /**
@@ -3988,6 +4189,328 @@ ED.TrialLens.prototype.setParameter = function(_parameter, _value)
             var angle = _value;
             this.rotation = (180 - angle)  * Math.PI/180;
             break;            
+        default:
+            break
+    }
+}
+
+/**
+ * Anterior Segment Cross Section
+ *
+ * @class AntSegCrossSection
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Int} _originX
+ * @param {Int} _originY
+ * @param {Float} _radius
+ * @param {Int} _apexX
+ * @param {Int} _apexY
+ * @param {Float} _scaleX
+ * @param {Float} _scaleY
+ * @param {Float} _arc
+ * @param {Float} _rotation
+ * @param {Int} _order
+ */
+ED.AntSegCrossSection = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+{
+	// Set classname
+	this.className = "AntSegCrossSection";
+    
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.AntSegCrossSection.prototype = new ED.Doodle;
+ED.AntSegCrossSection.prototype.constructor = ED.AntSegCrossSection;
+ED.AntSegCrossSection.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets default dragging attributes
+ */
+ED.AntSegCrossSection.prototype.setPropertyDefaults = function()
+{
+	this.isSelectable = false;
+	this.isOrientated = false;
+	this.isScaleable = false;
+	this.isSqueezable = false;
+	this.isMoveable = false;
+	this.isRotatable = false;
+}
+
+/**
+ * Sets default parameters
+ */
+ED.AntSegCrossSection.prototype.setParameterDefaults = function()
+{
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.AntSegCrossSection.prototype.draw = function(_point)
+{
+	// Get context
+	var ctx = this.drawing.context;
+	
+	// Call draw method in superclass
+	ED.AntSegCrossSection.superclass.draw.call(this, _point);
+	
+	// Height of cross section (half value of ro in AntSeg doodle)
+	var h = 380;
+    
+    // Arbitray radius of curvature
+    var r = 500;
+    
+    // Displacement of cornea and lens from centre
+    var cd = -200;
+    var ld = 0;
+    
+    // Thickness of cornea
+    var ct = 100;
+    
+    // Angle of arc
+    var theta = Math.asin(h/r);
+    
+    // X coordinate of centre of circle
+    var x = r * Math.cos(theta);
+    
+    // Boundary path
+	ctx.beginPath();
+    
+    // Draw lens with two sections of circumference of circle
+    ctx.arc(ld - x, 0, r, theta, -theta, true);
+    ctx.arc(ld + x, 0, r, Math.PI + theta, Math.PI - theta, true);
+    
+    // Draw cornea in similar way
+//    ctx.moveTo(cd, h);
+//    ctx.arc(cd + x, 0, r, Math.PI - theta, Math.PI + theta, false);
+//    r = r - ct;
+//    var x1 = r * Math.cos(theta);
+//    ctx.lineTo(cd + (x - x1), -r * Math.sin(theta));
+//    ctx.arc(cd + x, 0, r, Math.PI + theta, Math.PI - theta, true);
+//    ctx.lineTo(cd, h);
+
+	// Set line attributes
+	ctx.lineWidth = 4;
+	ctx.fillStyle = "rgba(245, 245, 245, 0.5)";
+	ctx.strokeStyle = "gray";
+	
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+    	
+	// Other stuff here
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
+    {
+	}
+    
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+	
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * Cortical Cataract Cross Section
+ *
+ * @class CorticalCataractCrossSection
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Int} _originX
+ * @param {Int} _originY
+ * @param {Float} _radius
+ * @param {Int} _apexX
+ * @param {Int} _apexY
+ * @param {Float} _scaleX
+ * @param {Float} _scaleY
+ * @param {Float} _arc
+ * @param {Float} _rotation
+ * @param {Int} _order
+ */
+ED.CorticalCataractCrossSection = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+{
+	// Set classname
+	this.className = "CorticalCataractCrossSection";
+    
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.CorticalCataractCrossSection.prototype = new ED.Doodle;
+ED.CorticalCataractCrossSection.prototype.constructor = ED.CorticalCataractCrossSection;
+ED.CorticalCataractCrossSection.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.CorticalCataractCrossSection.prototype.setHandles = function()
+{
+	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+}
+
+/**
+ * Sets default dragging attributes
+ */
+ED.CorticalCataractCrossSection.prototype.setPropertyDefaults = function()
+{
+	this.isSelectable = true;
+	this.isOrientated = false;
+	this.isScaleable = false;
+	this.isSqueezable = false;
+	this.isMoveable = false;
+	this.isRotatable = false;
+}
+
+/**
+ * Sets default parameters
+ */
+ED.CorticalCataractCrossSection.prototype.setParameterDefaults = function()
+{
+    this.apexY = -180;
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.CorticalCataractCrossSection.prototype.draw = function(_point)
+{
+	// Get context
+	var ctx = this.drawing.context;
+	
+	// Call draw method in superclass
+	ED.CorticalCataractCrossSection.superclass.draw.call(this, _point);
+	
+	// Height of cross section (half value of ro in AntSeg doodle)
+	var h = 380;
+    
+    // Radius of curvature of lens
+    var r = 500;
+    
+    // Displacement lens from centre
+    var ld = 0;
+    
+    // Thickness of lens
+    var lt = 100;
+    
+    // Angle of arc
+    var theta = Math.asin(h/r);
+    
+    // X coordinate of centre of circle
+    var x = r * Math.cos(theta);
+    
+    // Measurements of cortical cataract
+    var rco = r - 40;
+    
+    // Calculate cataract angles
+    var phio = Math.acos(x/rco);
+    var phii = Math.asin(-this.apexY/rco);
+    
+    // Boundary path
+	ctx.beginPath();
+    
+    // Draw cataract with two sections of circumference of circle
+    ctx.arc(ld - x, 0, rco, phii, phio, false);
+    ctx.arc(ld + x, 0, rco, Math.PI - phio, Math.PI - phii, false);
+    
+    // Move to upper half and draw it
+    var l = rco * Math.cos(phii);
+    ctx.moveTo(ld - x + l, this.apexY);
+    ctx.arc(ld - x, 0, rco, -phii, -phio, true);
+    ctx.arc(ld + x, 0, rco, Math.PI + phio, Math.PI + phii, true);
+    
+	// Set line attributes
+	ctx.lineWidth = 48;
+	ctx.fillStyle = "rgba(0, 0, 0, 0)";
+	ctx.strokeStyle = "rgba(200,200,200,0.75)";
+	
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+    
+	// Other stuff here
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
+    {
+	}
+    
+    // Coordinates of handles (in canvas plane)
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(ld, this.apexY));
+    
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+	
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * Returns parameters
+ *
+ * @returns {String} value of parameter
+ */
+ED.CorticalCataractCrossSection.prototype.getParameter = function(_parameter)
+{
+    var returnValue;
+    
+    switch (_parameter)
+    {
+            // Grade of cataract
+        case 'grade':
+            if (this.apexY < -120) returnValue = 'Mild';
+            else if (this.apexY < -60) returnValue = 'Moderate';
+            else returnValue = 'White';
+            break;
+        case 'apexY':
+            returnValue = this.apexY;
+            break;
+        default:
+            returnValue = "";
+            break;
+    }
+    
+    return returnValue;
+}
+
+/**
+ * Sets parameters for this doodle
+ *
+ * @param {String} _parameter Name of parameter
+ * @param {String} _value New value of parameter
+ */
+ED.CorticalCataractCrossSection.prototype.setParameter = function(_parameter, _value)
+{
+    switch (_parameter)
+    {
+        case 'grade':
+            switch (_value)
+            {
+                case 'Mild':
+                    //this.apexY = -180;
+                    this.setParameterWithAnimation('apexY', -180);
+                    break;
+                case 'Moderate':
+                    //this.apexY = -100;
+                    this.setParameterWithAnimation('apexY', -100);
+                    break;
+                case 'White':
+                    //this.apexY = 0;
+                    this.setParameterWithAnimation('apexY', -20);
+                    break;
+                default:
+                    break;
+            }
+            break;
+        case 'apexY':
+            this.apexY = _value;
+            break;
         default:
             break
     }

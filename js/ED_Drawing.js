@@ -2865,7 +2865,6 @@ ED.Doodle.prototype.setParameterWithAnimation = function(_parameter, _value)
     // Otherwise just set it in the normal way
     else
     {
-        console.log('no animation');
         this.setParameter(_parameter, _value);
     }
 }
