@@ -98,7 +98,10 @@ function eyeDrawInit(_properties)
 	        eDparameterListener(window[_properties.drawingName]);
 	        
 	        // Save changes to value of hidden element
-	        document.getElementById(_properties.inputId).value = window[_properties.drawingName].save();
+	        var input = document.getElementById(_properties.inputId);
+	        if(input) {
+		        input.value = window[_properties.drawingName].save();
+	        }
 	    }
     
     }
