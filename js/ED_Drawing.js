@@ -1990,7 +1990,7 @@ ED.Drawing.prototype.repaint = function()
         this.modified = true;
     }
     
-    // Call to optional method to notify changes in doodle parametes
+    // Call to optional method to notify changes in doodle parameters
     if (typeof(this.parameterListener) != 'undefined') this.parameterListener();
 }
 
@@ -2848,19 +2848,30 @@ ED.Doodle.prototype.diagnosticHierarchy = function()
 ED.Doodle.prototype.setParameterWithAnimation = function(_parameter, _value)
 {
     // Can doodle animate this parameter?
-    if (this.animationArray.indexOf(_parameter) >= 0)
+    if (_parameter in this.animationArray)
     {
+        // Read delta (units per frame)
+        var delta = parseFloat(this.animationArray[_parameter]);
+        
+        // Calculate 'distance'
+        var distance = _value - this.getParameter(_parameter);
+        
+        // Calculate sign and apply to delta
+        var sign = distance < 0?-1:1;
+        delta = delta * sign;
+        
         // Set some animation values
         this.frameCounter = 0;
         var frameRate = 25;
-        var duration = 0.5;
         
-        // Calculate frames and delta
-        var frames = Math.floor(frameRate * duration);
-        var delta = (_value - this.getParameter(_parameter))/frames;
-        
+        // Calculate frames
+        var frames = Math.abs(Math.floor(distance/delta));
+
         // Call animation method
-        this.increment(_parameter, _value, delta, frames, frameRate);
+        if (frames > 0)
+        {
+            this.increment(_parameter, _value, delta, frames, frameRate);
+        }
     }
     // Otherwise just set it in the normal way
     else

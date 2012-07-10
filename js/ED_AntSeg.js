@@ -85,7 +85,7 @@ ED.AntSeg.prototype.setPropertyDefaults = function()
 	this.isMoveable = false;
 	this.isRotatable = false;
     this.isUnique = true;
-    this.animationArray = ['apexY'];
+    this.animationArray = {apexY: "10"};
 	this.rangeOfScale = new ED.Range(+1, +4);
 	this.rangeOfArc = new ED.Range(Math.PI/6, Math.PI*2);
 	this.rangeOfApexX = new ED.Range(-0, +0);
@@ -367,7 +367,7 @@ ED.NuclearCataract.prototype.setPropertyDefaults = function()
 	this.isMoveable = false;
 	this.isRotatable = false;
     this.isUnique = true;
-    this.animationArray = ['apexY'];
+    this.animationArray = {apexY: "10"};
 	this.rangeOfApexX = new ED.Range(-0, +0);
 	this.rangeOfApexY = new ED.Range(-180, 0);
 }
@@ -624,7 +624,7 @@ ED.CorticalCataract.prototype.setPropertyDefaults = function()
 	this.isMoveable = false;
 	this.isRotatable = false;
     this.isUnique = true;
-    this.animationArray = ['apexY'];
+    this.animationArray = {apexY: "10"};
 	this.rangeOfApexX = new ED.Range(-0, +0);
 	this.rangeOfApexY = new ED.Range(-180, -20);
 }
@@ -2534,7 +2534,7 @@ ED.PhakoIncision.prototype.setPropertyDefaults = function()
 	this.isMoveable = false;
 	this.isRotatable = true;
     this.isArcSymmetrical = true;
-    this.animationArray = ['incisionLength', 'incisionMeridian'];
+    this.animationArray = {incisionLength: "1.2", incisionMeridian: "16", radius: "20"};
     this.rangeOfArc = new ED.Range(0, Math.PI);
 	this.rangeOfApexX = new ED.Range(-0, +0);
 	this.rangeOfApexY = new ED.Range(-334, -300);
@@ -2600,17 +2600,18 @@ ED.PhakoIncision.prototype.draw = function(_point)
     {
         this.length = this.arc * (6 * this.radius)/this.defaultRadius;
     }
-    // Otherwise change arc for constant incision length
-    else if (this.drawing.mode == ED.Mode.Move)
-    {
-        this.arc = this.length * this.defaultRadius/(6 * this.radius);
-        this.apexY = -this.radius - this.apexYDelta;
-        this.rangeOfApexY = new ED.Range(-this.radius, -this.radius + 34);
-    }
     // Changing type of incision
     else if (this.drawing.mode == ED.Mode.Apex)
     {
         this.apexYDelta = - this.apexY - this.radius; 
+    }
+    // Otherwise change arc for constant incision length (use the drawFunctionMode test since can also be moved by an animation)
+    //else if (this.drawing.mode == ED.Mode.Move)
+    else if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
+    {
+        this.arc = this.length * this.defaultRadius/(6 * this.radius);
+        this.apexY = -this.radius - this.apexYDelta;
+        this.rangeOfApexY = new ED.Range(-this.radius, -this.radius + 34);
     }
     
     // Limit incision length to range allowed in CND, but with minimum of 1
@@ -2750,8 +2751,8 @@ ED.PhakoIncision.prototype.getParameter = function(_parameter)
     {
         // Incision site (CND 5.13)
         case 'incisionSite':
-            if (this.radius > 428) returnValue = 'Scleral';
-            else if (this.radius > 344) returnValue = 'Limbal';
+            if (this.radius >= 428) returnValue = 'Scleral';
+            else if (this.radius >= 344) returnValue = 'Limbal';
             else returnValue = 'Corneal';
             break;
         // Incision length (CND 5.14)
@@ -2777,6 +2778,10 @@ ED.PhakoIncision.prototype.getParameter = function(_parameter)
         case 'incisionType':
             returnValue = this.apexYDelta == 0?"Pocket":"Section";
             break;
+        // Radius
+        case 'radius':
+            returnValue = this.radius;
+            break;
         default:
             returnValue = "";
             break;
@@ -2801,13 +2806,13 @@ ED.PhakoIncision.prototype.setParameter = function(_parameter, _value)
             switch (_value)
             {
                 case 'Scleral':
-                    this.radius = 428;
+                    this.setParameterWithAnimation('radius', 428);
                     break;
                 case 'Limbal':
-                    this.radius = 376;
+                    this.setParameterWithAnimation('radius', 376);
                     break;
                 case 'Corneal':
-                    this.radius = 330;
+                    this.setParameterWithAnimation('radius', 330);
                     break;
                 default:
                     break;
@@ -2840,6 +2845,11 @@ ED.PhakoIncision.prototype.setParameter = function(_parameter, _value)
                 this.apexYDelta = -34;
             }
             this.apexY = -this.radius - this.apexYDelta;
+            break;
+        
+        // Radius
+        case 'radius':
+            this.radius = _value;
             break;
             
         default:
@@ -4088,7 +4098,7 @@ ED.TrialLens.prototype.setPropertyDefaults = function()
 	this.isMoveable = false;
 	this.isRotatable = true;
     this.addAtBack = true;
-    this.animationArray = ['axis'];
+    this.animationArray = {axis: "10"};
 }
 
 /**
@@ -4285,6 +4295,17 @@ ED.AntSegCrossSection.prototype.draw = function(_point)
     // Draw lens with two sections of circumference of circle
     ctx.arc(ld - x, 0, r, theta, -theta, true);
     ctx.arc(ld + x, 0, r, Math.PI + theta, Math.PI - theta, true);
+    
+    // Measurements of nucleus
+    var rn = r - 80;
+    
+    // Calculate cataract angles
+    var phi = Math.acos(x/rn);
+    
+    // Draw lens with two sections of circumference of circle
+    ctx.moveTo(ld, rn * Math.sin(phi));
+    ctx.arc(ld - x, 0, rn, phi, -phi, true);
+    ctx.arc(ld + x, 0, rn, Math.PI + phi, Math.PI - phi, true);
     
     // Draw cornea in similar way
 //    ctx.moveTo(cd, h);
@@ -4507,6 +4528,207 @@ ED.CorticalCataractCrossSection.prototype.setParameter = function(_parameter, _v
                 default:
                     break;
             }
+            break;
+        case 'apexY':
+            this.apexY = _value;
+            break;
+        default:
+            break
+    }
+}
+
+/**
+ * Nuclear Cataract Cross Section
+ *
+ * @class NuclearCataractCrossSection
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Int} _originX
+ * @param {Int} _originY
+ * @param {Float} _radius
+ * @param {Int} _apexX
+ * @param {Int} _apexY
+ * @param {Float} _scaleX
+ * @param {Float} _scaleY
+ * @param {Float} _arc
+ * @param {Float} _rotation
+ * @param {Int} _order
+ */
+ED.NuclearCataractCrossSection = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+{
+	// Set classname
+	this.className = "NuclearCataractCrossSection";
+    
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.NuclearCataractCrossSection.prototype = new ED.Doodle;
+ED.NuclearCataractCrossSection.prototype.constructor = ED.NuclearCataractCrossSection;
+ED.NuclearCataractCrossSection.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.NuclearCataractCrossSection.prototype.setHandles = function()
+{
+	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+}
+
+/**
+ * Sets default dragging attributes
+ */
+ED.NuclearCataractCrossSection.prototype.setPropertyDefaults = function()
+{
+	this.isSelectable = true;
+	this.isOrientated = false;
+	this.isScaleable = false;
+	this.isSqueezable = false;
+	this.isMoveable = false;
+	this.isRotatable = false;
+}
+
+/**
+ * Sets default parameters
+ */
+ED.NuclearCataractCrossSection.prototype.setParameterDefaults = function()
+{
+    this.apexY = -180;
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.NuclearCataractCrossSection.prototype.draw = function(_point)
+{
+	// Get context
+	var ctx = this.drawing.context;
+	
+	// Call draw method in superclass
+	ED.NuclearCataractCrossSection.superclass.draw.call(this, _point);
+	
+	// Height of cross section (half value of ro in AntSeg doodle)
+	var h = 380;
+    
+    // Radius of curvature of lens
+    var r = 500;
+    
+    // Displacement lens from centre
+    var ld = 0;
+    
+    // Thickness of lens
+    var lt = 100;
+    
+    // Angle of arc
+    var theta = Math.asin(h/r);
+    
+    // X coordinate of centre of circle
+    var x = r * Math.cos(theta);
+    
+    // Measurements of nuclear cataract
+    var rco = r - 80;
+    
+    // Calculate cataract angles
+    var phi = Math.acos(x/rco);
+
+    // Boundary path
+	ctx.beginPath();
+    
+    // Draw lens with two sections of circumference of circle
+    ctx.arc(ld - x, 0, rco, phi, -phi, true);
+    ctx.arc(ld + x, 0, rco, Math.PI + phi, Math.PI - phi, true);
+    
+    // Colors for gradient
+    var yellowColour = "rgba(255, 255, 0, 0.75)";
+    var brownColour = "rgba(" + Math.round(120 - this.apexY/2) + ", " + Math.round(60 - this.apexY/2) + ", 0, 0.75)";
+    
+    // Radial gradient
+    var gradient = ctx.createRadialGradient(0, 0, 210, 0, 0, 50);
+    gradient.addColorStop(0, yellowColour);
+    gradient.addColorStop(1, brownColour);
+    
+	ctx.fillStyle = gradient;
+	ctx.strokeStyle = "rgba(0,0,0,0)";
+	
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+    
+	// Other stuff here
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
+    {
+	}
+    
+    // Coordinates of handles (in canvas plane)
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(ld, this.apexY));
+    
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+	
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * Returns parameters
+ *
+ * @returns {String} value of parameter
+ */
+ED.NuclearCataractCrossSection.prototype.getParameter = function(_parameter)
+{
+    var returnValue;
+    
+    switch (_parameter)
+    {
+            // Grade of cataract
+        case 'grade':
+            if (this.apexY < -120) returnValue = 'Mild';
+            else if (this.apexY < -60) returnValue = 'Moderate';
+            else returnValue = 'White';
+            break;
+        case 'apexY':
+            returnValue = this.apexY;
+            break;
+        default:
+            returnValue = "";
+            break;
+    }
+    
+    return returnValue;
+}
+
+/**
+ * Sets parameters for this doodle
+ *
+ * @param {String} _parameter Name of parameter
+ * @param {String} _value New value of parameter
+ */
+ED.NuclearCataractCrossSection.prototype.setParameter = function(_parameter, _value)
+{
+    switch (_parameter)
+    {
+        case 'grade':
+            switch (_value)
+        {
+            case 'Mild':
+                //this.apexY = -180;
+                this.setParameterWithAnimation('apexY', -180);
+                break;
+            case 'Moderate':
+                //this.apexY = -100;
+                this.setParameterWithAnimation('apexY', -100);
+                break;
+            case 'White':
+                //this.apexY = 0;
+                this.setParameterWithAnimation('apexY', -20);
+                break;
+            default:
+                break;
+        }
             break;
         case 'apexY':
             this.apexY = _value;
