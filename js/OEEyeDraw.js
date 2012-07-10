@@ -90,15 +90,16 @@ function eyeDrawInit(_properties)
 			
         // Mark the drawing unmodified
         window[_properties.drawingName]["isReady"]();
-    }
     
-    // Detects changes in doodle parameters (eg from mouse dragging)
-    window[_properties.drawingName].parameterListener = function()
-    {
-    	// Pass drawing object to user function        
-        eDparameterListener(window[_properties.drawingName]);
-        
-        // Save changes to value of hidden element
-        document.getElementById(_properties.inputId).value = window[_properties.drawingName].save();
+	    // Detects changes in doodle parameters (eg from mouse dragging)
+	    window[_properties.drawingName].parameterListener = function()
+	    {
+	    	// Pass drawing object to user function        
+	        eDparameterListener(window[_properties.drawingName]);
+	        
+	        // Save changes to value of hidden element
+	        document.getElementById(_properties.inputId).value = window[_properties.drawingName].save();
+	    }
+    
     }
 }

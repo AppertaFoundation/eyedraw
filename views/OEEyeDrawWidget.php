@@ -28,6 +28,8 @@
     <!-- Uncomment following line to re-enable doodle hover tooltips once layer bug is fixed (OE-1583) -->
     <!-- <span id="canvasTooltip"></span> -->
 	<canvas id="<?php echo $canvasId?>" class="<?php if ($isEditable) { echo 'edit'; } else { echo 'display'; }?>" width="<?php echo $size?>" height="<?php echo $size?>" tabindex="1"<?php if ($canvasStyle) {?> style="<?php echo $canvasStyle?>"<?php }?>></canvas>
+	<?php if($inputId) { ?>
 	<input type="hidden" id="<?php echo $inputId?>" name="<?php echo $inputName?>" value='<?php echo $this->model[$this->attribute]?>' />
+	<?php } ?>
 <?php if(!$no_wrapper) {?></div><?php } ?>
 	
