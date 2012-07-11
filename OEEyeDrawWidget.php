@@ -420,7 +420,7 @@ class DoodleInfo
         "Retinoschisis" => "Retinoschisis",
         "RK" => "Radial keratotomy",
         "RoundHole" => "Round hole",
-        "Rrd" => "Rhegmatogenous retinal detachment",
+        "RRD" => "Rhegmatogenous retinal detachment",
         "Shading" => "Shading",
         "SidePort" => "Side port",
         "Slider" => "Slider",
