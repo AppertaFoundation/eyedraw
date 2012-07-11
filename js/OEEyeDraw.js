@@ -84,6 +84,12 @@ function eyeDrawInit(_properties)
 			
       // Mark the drawing unmodified
       window[_properties.drawingName]["isReady"]();
+
+      // Initialise hidden input
+      var input = document.getElementById(_properties.inputId);
+      if(input) {
+        input.value = window[_properties.drawingName].save();
+      }
     
 	    // Detects changes in doodle parameters (eg from mouse dragging)
 	    window[_properties.drawingName].parameterListener = function()
