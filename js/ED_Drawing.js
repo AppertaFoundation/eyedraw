@@ -897,6 +897,7 @@ ED.Drawing.prototype.mousemove = function(_point)
 			}
             
 			// Refresh drawing
+            if (typeof(this.parameterListener) != 'undefined') this.parameterListener();
 			this.repaint();				
 		}
 		
@@ -1991,7 +1992,7 @@ ED.Drawing.prototype.repaint = function()
     }
     
     // Call to optional method to notify changes in doodle parameters
-    if (typeof(this.parameterListener) != 'undefined') this.parameterListener();
+    //if (typeof(this.parameterListener) != 'undefined') this.parameterListener();
 }
 
 /**
