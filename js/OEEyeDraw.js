@@ -75,21 +75,15 @@ function eyeDrawInit(_properties)
 	            // Get function name
 	            var func = _properties.onLoadedCommandArray[i][0];
 	            
-	            // Get arguments into a string
-	            var args = "";
-	            for (var j = 0; j < _properties.onLoadedCommandArray[i][1].length; j++)
-	            {
-	                args += _properties.onLoadedCommandArray[i][1][j] + ","; // ***TODO*** will this work >1 one argument?
-	            }
-	            
-				args = args.replace(/,$/,'').split(',');
+	            // Get arguments
+	            var args = _properties.onLoadedCommandArray[i][1];
 
-				window[_properties.drawingName][func].apply(window[_properties.drawingName], args);
+	            window[_properties.drawingName][func].apply(window[_properties.drawingName], args);
 	        }
     	}
 			
-        // Mark the drawing unmodified
-        window[_properties.drawingName]["isReady"]();
+      // Mark the drawing unmodified
+      window[_properties.drawingName]["isReady"]();
     
 	    // Detects changes in doodle parameters (eg from mouse dragging)
 	    window[_properties.drawingName].parameterListener = function()
