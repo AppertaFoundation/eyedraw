@@ -4098,7 +4098,7 @@ ED.TrialLens.prototype.setPropertyDefaults = function()
 	this.isMoveable = false;
 	this.isRotatable = true;
     this.addAtBack = true;
-    this.animationArray = {axis: "10"};
+    //this.animationArray = {axis: "10"};
 }
 
 /**

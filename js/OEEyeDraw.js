@@ -109,7 +109,7 @@ function eyeDrawInit(_properties)
 				// Pass drawing object to user function				 
                 eDparameterListener(window[_properties.drawingName]);
 					
-                // Save changes to value of hidden element ***TODO*** clean this up since duplicated, maybe call from EyeDraw
+                // Save changes to value of hidden element ***TODO*** clean this up since duplicated in next function, maybe create a new EyeDraw method.
                 var input = document.getElementById(_properties.inputId);
                 if(input) {
                     input.value = window[_properties.drawingName].save();
