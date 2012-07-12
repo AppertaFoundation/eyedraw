@@ -896,7 +896,7 @@ ED.Drawing.prototype.mousemove = function(_point)
 					break;		
 			}
             
-			// Refresh drawing
+			// Call parameter listener and refresh drawing
             if (typeof(this.parameterListener) != 'undefined') this.parameterListener();
 			this.repaint();				
 		}
@@ -1046,6 +1046,7 @@ ED.Drawing.prototype.keydown = function(e)
         }
         
         // Redraw doodle
+        if (typeof(this.parameterListener) != 'undefined') this.parameterListener();
         this.repaint();
         
         // Prevent key stroke bubbling up (***TODO*** may need cross browser handling)
@@ -1213,6 +1214,7 @@ ED.Drawing.prototype.moveToFront = function()
 		}
 		
 		// Refresh canvas
+        if (typeof(this.parameterListener) != 'undefined') this.parameterListener();
 		this.repaint();
 	}
 }
@@ -1238,6 +1240,7 @@ ED.Drawing.prototype.moveToBack = function()
 		}
 		
 		// Refresh canvas
+        if (typeof(this.parameterListener) != 'undefined') this.parameterListener();
 		this.repaint();
 	}
 }
@@ -1254,6 +1257,7 @@ ED.Drawing.prototype.flipVer = function()
         this.selectedDoodle.scaleY = this.selectedDoodle.scaleY * -1;
         
 		// Refresh canvas
+        if (typeof(this.parameterListener) != 'undefined') this.parameterListener();
 		this.repaint();
 	}
 }
@@ -1270,6 +1274,7 @@ ED.Drawing.prototype.flipHor = function()
         this.selectedDoodle.scaleX = this.selectedDoodle.scaleX * -1;
         
 		// Refresh canvas
+        if (typeof(this.parameterListener) != 'undefined') this.parameterListener();
 		this.repaint();
 	}
 }
@@ -1302,6 +1307,7 @@ ED.Drawing.prototype.deleteDoodle = function()
 		}
         
 		// Refresh canvas
+        if (typeof(this.parameterListener) != 'undefined') this.parameterListener();
 		this.repaint();
 	}
 }
@@ -1528,6 +1534,7 @@ ED.Drawing.prototype.addDoodle = function(_className, rotation)
         }
         else
         {
+            if (typeof(this.parameterListener) != 'undefined') this.parameterListener();
             this.repaint();
         }
         
@@ -1662,6 +1669,7 @@ ED.Drawing.prototype.deleteAllDoodles = function()
     }
     
 	// Refresh canvas
+    if (typeof(this.parameterListener) != 'undefined') this.parameterListener();
 	this.repaint();
 }
 
@@ -1697,6 +1705,7 @@ ED.Drawing.prototype.deleteDoodlesOfClass = function(_className)
     }
     
 	// Refresh canvas
+    if (typeof(this.parameterListener) != 'undefined') this.parameterListener();
 	this.repaint();
 }
 
@@ -1991,7 +2000,7 @@ ED.Drawing.prototype.repaint = function()
         this.modified = true;
     }
     
-    // Call to optional method to notify changes in doodle parameters
+    // Call to optional method to notify changes in doodle parameters - NB moved this call to the mousemove and other methods to avoid race conditions
     //if (typeof(this.parameterListener) != 'undefined') this.parameterListener();
 }
 
@@ -2022,6 +2031,7 @@ ED.Drawing.prototype.togglePointInLine = function()
         this.newPointOnClick = false;
         this.completeLine = true;
         this.deselectDoodles();
+        if (typeof(this.parameterListener) != 'undefined') this.parameterListener();
         this.repaint();
     }
     else
