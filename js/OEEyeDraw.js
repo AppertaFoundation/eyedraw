@@ -89,6 +89,11 @@ function eyeDrawInit(_properties)
 					}
 			}
 			
+			// Load params
+			for (var i = 0; i < _properties.onLoadedParamsArray.length; i++) {
+				window[_properties.drawingName]['setParameterForDoodleOfClass'].apply(window[_properties.drawingName], _properties.onLoadedParamsArray[i]);
+			}
+			
 			// Mark the drawing unmodified
 			window[_properties.drawingName]["isReady"]();
 

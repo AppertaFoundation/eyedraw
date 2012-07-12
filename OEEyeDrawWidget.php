@@ -123,6 +123,13 @@ class OEEyeDrawWidget extends CWidget
     public $onLoadedCommandArray = array();
 	
 	/**
+	 * Array of params to apply to doodles once the drawing is initialised
+	 * Unlike onLoadedCommandArray, this gets processed when the dataElement is loaded
+	 * @var array
+	 */
+    public $onLoadedParamsArray = array();
+	
+   /**
 	 * Paths for the subdirectories for javascript, css and images
 	 * @var string
 	 */
@@ -320,6 +327,7 @@ class OEEyeDrawWidget extends CWidget
             'graphicsPath'=>$this->imgPath,
             'inputId'=>$this->inputId,
             'onLoadedCommandArray'=>$this->onLoadedCommandArray,
+						'onLoadedParamsArray'=>$this->onLoadedParamsArray,
             'offset_x'=>$this->offset_x,
             'offset_y'=>$this->offset_y,
             'to_image'=>$this->to_image,
