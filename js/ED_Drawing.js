@@ -1710,7 +1710,7 @@ ED.Drawing.prototype.deleteDoodlesOfClass = function(_className)
 }
 
 /**
- * Updates a doodle with a vew value of a parameter
+ * Updates a doodle with a new value of a parameter
  *
  * @param {Doodle} _doodle The doodle to be updated
  * @param {String} _parameter Name of the parameter
@@ -1728,7 +1728,8 @@ ED.Drawing.prototype.setParameterForDoodle = function(_doodle, _parameter, _valu
         _doodle.setParameter(_parameter, _value);
     }
     
-    // Refresh drawing
+    // Save to hidden input, if exists, and refresh drawing
+    if (typeof(this.saveToInputElement) != 'undefined') this.saveToInputElement();
     this.repaint();								
 }
 
@@ -1747,18 +1748,8 @@ ED.Drawing.prototype.setParameterForDoodleOfClass = function(_className, _parame
     // Set parameter for the doodle
     doodle.setParameterWithAnimation(_parameter, _value);
     
-    // Determine whether doodle parameter can be accessed directly
-//    if (typeof(doodle[_parameter]) != 'undefined')
-//    {
-//        doodle[_parameter] = +_value;
-//    }
-//    else
-//    {
-//        //doodle.setParameter(_parameter, _value);
-//        doodle.setParameterWithAnimation(_parameter, _value);
-//    }
-    
-    // Refresh drawing
+    // Save to hidden input, if exists, and refresh drawing
+    if (typeof(this.saveToInputElement) != 'undefined') this.saveToInputElement();
     this.repaint();								
 }
 
