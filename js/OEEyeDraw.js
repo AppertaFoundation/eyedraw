@@ -39,70 +39,77 @@
  */
 function eyeDrawInit(_properties)
 {
-    // Get reference to the canvas
-    var canvas = document.getElementById(_properties.canvasId);
+		// Get reference to the canvas
+		var canvas = document.getElementById(_properties.canvasId);
 
-    // Create drawing
-    window[_properties.drawingName] = new ED.Drawing(canvas, _properties.eye, _properties.idSuffix, _properties.isEditable, _properties.offset_x, _properties.offset_y, _properties.to_image);
-    
-    // Preload any images
-    window[_properties.drawingName].preLoadImagesFrom(_properties.graphicsPath);
-    
-    // Set focus to the canvas element
-    if (_properties.focus)
-    {
-        canvas.focus();
-    }
+		// Create drawing
+		window[_properties.drawingName] = new ED.Drawing(canvas, _properties.eye, _properties.idSuffix, _properties.isEditable, _properties.offset_x, _properties.offset_y, _properties.to_image);
+		
+		// Preload any images
+		window[_properties.drawingName].preLoadImagesFrom(_properties.graphicsPath);
+		
+		// Set focus to the canvas element
+		if (_properties.focus)
+		{
+				canvas.focus();
+		}
 	
-    // Wait for the drawing object to be ready before adding objects or other commands
-    window[_properties.drawingName].onLoaded = function()
-    {
-    	// Check for an element containing data
-    	var dataElement = document.getElementById(_properties.inputId);
-    	
-    	// If dataElement exists and contains data, load it into the drawing
-    	if (dataElement != null && dataElement.value.length > 0)
-    	{
-    		window[_properties.drawingName].loadDoodles(_properties.inputId);
-    		window[_properties.drawingName].drawAllDoodles();
-    	}
-        
-    	// Otherwise iterate through the command array, constructing argument string and running them
-    	else
-    	{
-	        for (var i = 0; i < _properties.onLoadedCommandArray.length; i++)
-	        {
-	            // Get function name
-	            var func = _properties.onLoadedCommandArray[i][0];
-	            
-	            // Get arguments into a string
-	            var args = "";
-	            for (var j = 0; j < _properties.onLoadedCommandArray[i][1].length; j++)
-	            {
-	                args += _properties.onLoadedCommandArray[i][1][j] + ","; // ***TODO*** will this work >1 one argument?
-	            }
-	            
-				args = args.replace(/,$/,'').split(',');
-
-				window[_properties.drawingName][func].apply(window[_properties.drawingName], args);
-	        }
-    	}
+		// Wait for the drawing object to be ready before adding objects or other commands
+		window[_properties.drawingName].onLoaded = function()
+		{
+			// Check for an element containing data
+			var dataElement = document.getElementById(_properties.inputId);
 			
-        // Mark the drawing unmodified
-        window[_properties.drawingName]["isReady"]();
-    
-	    // Detects changes in doodle parameters (eg from mouse dragging)
-	    window[_properties.drawingName].parameterListener = function()
-	    {
-	    	// Pass drawing object to user function        
-	        eDparameterListener(window[_properties.drawingName]);
-	        
-	        // Save changes to value of hidden element
-	        var input = document.getElementById(_properties.inputId);
-	        if(input) {
-		        input.value = window[_properties.drawingName].save();
-	        }
-	    }
-    
-    }
+			// If dataElement exists and contains data, load it into the drawing
+			if (dataElement != null && dataElement.value.length > 0)
+			{
+				window[_properties.drawingName].loadDoodles(_properties.inputId);
+				window[_properties.drawingName].drawAllDoodles();
+			}
+				
+			// Otherwise iterate through the command array, constructing argument string and running them
+			else
+			{
+					for (var i = 0; i < _properties.onLoadedCommandArray.length; i++)
+					{
+						// Get function name
+						var func = _properties.onLoadedCommandArray[i][0];
+							
+						// Get arguments
+						//var args = _properties.onLoadedCommandArray[i][1];
+						var args = "";
+			
+						for (var j = 0; j < _properties.onLoadedCommandArray[i][1].length; j++) {
+							 args += _properties.onLoadedCommandArray[i][1][j] + ","; // ***TODO*** will this work >1 one argument?
+						}
+
+						args = args.replace(/,$/,'').split(',');
+
+						window[_properties.drawingName][func].apply(window[_properties.drawingName], args);
+					}
+			}
+			
+			// Mark the drawing unmodified
+			window[_properties.drawingName]["isReady"]();
+
+			// Initialise hidden input
+			var input = document.getElementById(_properties.inputId);
+			if(input) {
+				input.value = window[_properties.drawingName].save();
+			}
+		
+			// Detects changes in doodle parameters (eg from mouse dragging)
+			window[_properties.drawingName].parameterListener = function()
+			{
+				// Pass drawing object to user function				 
+					eDparameterListener(window[_properties.drawingName]);
+					
+					// Save changes to value of hidden element
+					var input = document.getElementById(_properties.inputId);
+					if(input) {
+						input.value = window[_properties.drawingName].save();
+					}
+			}
+		
+		}
 }
