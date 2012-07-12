@@ -2956,7 +2956,7 @@ ED.Doodle.prototype.clockHour = function()
 }
 
 /**
- * Returns the position converted to degrees
+ * Returns the rotation converted to degrees
  *
  * @returns {Int} Degrees from 0 to 360
  */
