@@ -29,6 +29,10 @@ require_once(dirname(__FILE__)."/OEEyeDrawWidget.php");
 class OEEyeDrawWidgetCataract extends OEEyeDrawWidget {
 	public $doodleToolBarArray = array('PhakoIncision','SidePort','IrisHook','PCIOL','ACIOL','PI','MattressSuture','CapsularTensionRing','CornealSuture','ToricPCIOL','LimbalRelaxingIncision');
 	public $size = 300;
+	public $offset_x = 10;
+	public $offset_y = 10;
+	public $touch_offset_x = -200;
+	public $touch_offset_y = -400;
 
 	public $onLoadedCommandArray = array(
 		array('addDoodle', array('AntSeg')),

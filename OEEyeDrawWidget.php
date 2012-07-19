@@ -212,6 +212,9 @@ class OEEyeDrawWidget extends CWidget
 	 */
 	public $offset_y = 0;
 	
+	public $touch_offset_x = 0;
+	public $touch_offset_y = 0;
+
 	/**
 	 * Convert canvas to image
 	 * @var bool
@@ -322,6 +325,8 @@ class OEEyeDrawWidget extends CWidget
             'onLoadedCommandArray'=>$this->onLoadedCommandArray,
             'offset_x'=>$this->offset_x,
             'offset_y'=>$this->offset_y,
+						'touch_offset_x'=>$this->touch_offset_x,
+						'touch_offset_y'=>$this->touch_offset_y,
             'to_image'=>$this->to_image,
 		);
 		

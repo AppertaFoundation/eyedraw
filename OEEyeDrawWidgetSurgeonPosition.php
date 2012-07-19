@@ -36,4 +36,8 @@ class OEEyeDrawWidgetSurgeonPosition extends OEEyeDrawWidget {
 	public $identifier = 'Position';
 	public $size = 140;
 	public $toolbar = false;
+	public $offset_x = 10;
+	public $offset_y = 10;
+	public $touch_offset_x = -200;
+	public $touch_offset_y = -400;
 }
