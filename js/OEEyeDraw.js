@@ -43,7 +43,7 @@ function eyeDrawInit(_properties)
     var canvas = document.getElementById(_properties.canvasId);
 
     // Create drawing
-    window[_properties.drawingName] = new ED.Drawing(canvas, _properties.eye, _properties.idSuffix, _properties.isEditable, _properties.offset_x, _properties.offset_y, _properties.touch_offset_x, _properties.touch_offset_y, _properties.to_image);
+    window[_properties.drawingName] = new ED.Drawing(canvas, _properties.eye, _properties.idSuffix, _properties.isEditable, _properties.offset_x, _properties.offset_y, _properties.to_image);
     
     // Preload any images
     window[_properties.drawingName].preLoadImagesFrom(_properties.graphicsPath);

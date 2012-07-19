@@ -170,7 +170,7 @@ ED.isFirefox = function()
  * @param {String} _IDSuffix String suffix to identify HTML elements related to this drawing
  * @param {Bool} _isEditable Flag indicating whether canvas is editable or not
  */
-ED.Drawing = function(_canvas, _eye, _IDSuffix, _isEditable, offset_x, offset_y, touch_offset_x, touch_offset_y, _to_image)
+ED.Drawing = function(_canvas, _eye, _IDSuffix, _isEditable, offset_x, offset_y, _to_image)
 {
 	// Properties
 	this.canvas = _canvas;
@@ -292,8 +292,9 @@ ED.Drawing = function(_canvas, _eye, _IDSuffix, _isEditable, offset_x, offset_y,
 				
 				// iOS listeners
 				this.canvas.addEventListener('touchstart', function(e) { 
-																		 var x = parseInt(e.targetTouches[0].pageX) - parseInt(this.offsetLeft) + touch_offset_x;
-																		 var y = parseInt(e.targetTouches[0].pageY) - parseInt(this.offsetTop) + touch_offset_y;
+																		var offset = ED.findOffset(this, offset_x, offset_y);
+																		 var x = parseInt(e.targetTouches[0].pageX) - offset.x;
+																		 var y = parseInt(e.targetTouches[0].pageY) - offset.y;
 																			var point = new ED.Point(x,y);
 
 																		 e.preventDefault();
@@ -301,16 +302,18 @@ ED.Drawing = function(_canvas, _eye, _IDSuffix, _isEditable, offset_x, offset_y,
 																		 }, false);
 				
 				this.canvas.addEventListener('touchend', function(e) { 
-																		 var x = parseInt(e.changedTouches[0].pageX) - parseInt(this.offsetLeft) + touch_offset_x;
-																		 var y = parseInt(e.changedTouches[0].pageY) - parseInt(this.offsetTop) + touch_offset_y;
+																		var offset = ED.findOffset(this, offset_x, offset_y);
+																		 var x = parseInt(e.changedTouches[0].pageX) - offset.x;
+																		 var y = parseInt(e.changedTouches[0].pageY) - offset.y;
 																			var point = new ED.Point(x,y);
 
 																			e.preventDefault();
 																			 drawing.mouseup(point); 
 																		 }, false);
 				this.canvas.addEventListener('touchmove', function(e) { 
-																			var x = parseInt(e.targetTouches[0].pageX) - parseInt(this.offsetLeft) + touch_offset_x;
-																			var y = parseInt(e.targetTouches[0].pageY) - parseInt(this.offsetTop) + touch_offset_x;
+																			var offset = ED.findOffset(this, offset_x, offset_y);
+																			var x = parseInt(e.targetTouches[0].pageX) - offset.x;
+																			var y = parseInt(e.targetTouches[0].pageY) - offset.y;
 																			var point = new ED.Point(x,y);
 
 																			e.preventDefault();
