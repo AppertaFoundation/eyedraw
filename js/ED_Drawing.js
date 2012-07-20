@@ -297,8 +297,11 @@ ED.Drawing = function(_canvas, _eye, _IDSuffix, _isEditable, offset_x, offset_y,
 																		 var y = parseInt(e.targetTouches[0].pageY) - offset.y;
 																			var point = new ED.Point(x,y);
 
-																		 e.preventDefault();
-																		 drawing.mousedown(point); 
+																		if (drawing.mousedown(point)) {
+																			 e.preventDefault();
+																		} else {
+																			return true;
+																		}
 																		 }, false);
 				
 				this.canvas.addEventListener('touchend', function(e) { 
@@ -307,8 +310,11 @@ ED.Drawing = function(_canvas, _eye, _IDSuffix, _isEditable, offset_x, offset_y,
 																		 var y = parseInt(e.changedTouches[0].pageY) - offset.y;
 																			var point = new ED.Point(x,y);
 
-																			e.preventDefault();
-																			 drawing.mouseup(point); 
+																		if (drawing.mouseup(point)) {
+																				e.preventDefault();
+																		} else {
+																			return true;
+																		}
 																		 }, false);
 				this.canvas.addEventListener('touchmove', function(e) { 
 																			var offset = ED.findOffset(this, offset_x, offset_y);
@@ -316,8 +322,11 @@ ED.Drawing = function(_canvas, _eye, _IDSuffix, _isEditable, offset_x, offset_y,
 																			var y = parseInt(e.targetTouches[0].pageY) - offset.y;
 																			var point = new ED.Point(x,y);
 
-																			e.preventDefault();
-																		 drawing.mousemove(point); 
+																		 if (drawing.mousemove(point)) {
+																			 e.preventDefault();
+																		 } else {
+																			 return true;
+																		 }
 																		 }, false);
 				
 				// Keyboard listener
@@ -656,6 +665,8 @@ ED.Drawing.prototype.mousedown = function(_point)
 	
 	// Repaint
 	this.repaint();
+
+	return found;
 }
 
 /**
@@ -916,6 +927,8 @@ ED.Drawing.prototype.mousemove = function(_point)
 		// Store mouse position
 		this.lastMousePosition = _point;
 	}
+
+	return (this.selectedDoodle != null);
 }
 
 /**
@@ -952,6 +965,8 @@ ED.Drawing.prototype.mouseup = function(_point)
 			this.doodleArray[i].drawing.repaint();
 		}
 	}
+
+	return (this.selectedDoodle != null);
 }
 
 /**
