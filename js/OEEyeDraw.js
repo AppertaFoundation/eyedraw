@@ -38,7 +38,8 @@
  *          Path to folder containing EyeDraw graphics, - onLoadedCommandArray
  *          Array of commands and arguments to be run when images are loaded
  */
-function eyeDrawInit(_properties) {
+function eyeDrawInit(_properties)
+{
 	// Get reference to the canvas
 	var canvas = document.getElementById(_properties.canvasId);
 

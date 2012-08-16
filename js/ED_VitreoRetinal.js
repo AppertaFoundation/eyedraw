@@ -367,6 +367,7 @@ ED.UTear.prototype.setPropertyDefaults = function()
 	this.rangeOfArc = new ED.Range(Math.PI/6, Math.PI*2);
 	this.rangeOfApexX = new ED.Range(-0, +0);
 	this.rangeOfApexY = new ED.Range(-40, +30);
+    this.animationArray = {originX: 10, scaleY: 0.1};
 }
 
 /**

@@ -3,7 +3,7 @@
  * Contains a Yii widget for EyeDraw
  * @package EyeDraw
  * @author Bill Aylward <bill.aylward@openeyes.org>
- * @version 0.9
+ * @version 1.0
  * @link http://www.openeyes.org.uk/
  * @copyright Copyright (c) 2012 OpenEyes Foundation
  * @license http://www.yiiframework.com/license/
@@ -36,7 +36,7 @@
  * <code>
  * <?php
  * $this->widget('application.modules.eyedraw.OEEyeDrawWidget', array(
- *	'identifier'=> 'PS',
+ *	'idSuffix'=> 'PS',
  *	'side'=>'R',
  *	'mode'=>'edit',
  *	'size'=>300,
@@ -51,7 +51,7 @@
  * ?>
  * </code>
  * The ED.Drawing object can be accessed from Javascript in two ways;
- * 1. Using the variable name derived from the side and identifier, for example 'ed_drawing_edit_RPS'
+ * 1. Using the variable name derived from the side and idSuffix, for example 'ed_drawing_edit_RPS'
  * 2. Passed as a parameter to the eDparameterListener function as in the following code snippet;
  * <code>
  * function eDparameterListener(_drawing)
@@ -64,7 +64,7 @@
  * </code> 
  * @package EyeDraw
  * @author Bill Aylward <bill.aylward@openeyes.org>
- * @version 0.9
+ * @version 1.0
  */
 class OEEyeDrawWidget extends CWidget
 {
@@ -75,16 +75,16 @@ class OEEyeDrawWidget extends CWidget
     public $template = 'default';
 
 	/**
-	 * Unique identifier (eg PS for posterior segment drawing)
+	 * Unique identifier (eg RPS for right posterior segment drawing)
 	 * @var string
 	 */
-    public $identifier = 'PS';
+    public $idSuffix = 'RPS';
 
 	/**
 	 * Side (R or L)
 	 * @var string
 	 */
-    public $side = "R";
+    public $side = 'R';
 
 	/**
 	 * Mode ('edit' or 'display')
@@ -139,19 +139,19 @@ class OEEyeDrawWidget extends CWidget
 
 	/**
 	 * Array of EyeDraw script files required
-	 * @todo Seach model attribute and contents of doodleToolBarArray to determine subset of files to register
+	 * @todo Search model attribute and contents of doodleToolBarArray to determine subset of files to register
 	 * @var array
 	 */
     private $scriptArray = array('Adnexal', 'AntSeg', 'Glaucoma', 'MedicalRetina', 'Strabismus', 'VitreoRetinal');
 		
 	/**
-	 * Concatenation of side and idSuffix used to identify control buttons and other related elements
+	 * Unique idSuffix used to identify control buttons and other related elements
 	 * @var string
 	 */	
 	private $idSuffix;
 
 	/**
-	 * Unique name for the EyeDraw drawing object ('ed_drawing_'.$mode.'_'.$side.$identifier).
+	 * Unique name for the EyeDraw drawing object ('ed_drawing_'.$mode.'_'.$idSuffix).
 	 * For example, ed_drawing_edit_RPS
 	 * @var string
 	 */	
@@ -241,9 +241,12 @@ class OEEyeDrawWidget extends CWidget
         $this->cssPath = Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('application.modules.eyedraw.css'));
         $this->jsPath = Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('application.modules.eyedraw.js'));
         $this->imgPath = Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('application.modules.eyedraw.graphics')).'/';
-        $this->idSuffix = $this->identifier;
+        
+        // Create a unique and descriptive variable name for the drawing object and the corresponding canvas element
         $this->drawingName = 'ed_drawing_'.$this->mode.'_'.$this->idSuffix;
         $this->canvasId = 'ed_canvas_'.$this->mode.'_'.$this->idSuffix;
+        
+        // Create matching name and id in 'Yii' format for loading and saving using POST
         if (isset($this->model) && isset($this->attribute))
         {
             $this->inputName = get_class($this->model).'['. $this->attribute.']';
@@ -255,31 +258,35 @@ class OEEyeDrawWidget extends CWidget
             }
         }
 
-        $this->eye = $this->side == "R"?0:1;		// ***TODO*** may require additional options
+        // Numeric flag corresponding to EyeDraw ED.eye  ***TODO*** may require additional options
+        $this->eye = $this->side == "R"?0:1;
+        
+        // Flag indicating whether the drawing is editable or not (normally corresponded to edit and view mode)
         $this->isEditable = $this->mode == 'edit'?true:false;
 
         // Register the chosen scripts and CSS file
         $this->registerScripts();
         $this->registerCss();
 
-        // Iterate through button array
-        foreach($this->doodleToolBarArray as $i => $doodle)
+        // Iterate through any button array
+        foreach($this->doodleToolBarArray as $i => $doodleClassName)
         {
             // Get title attribute from language specific array
-            if (array_key_exists($doodle, DoodleInfo::$titles))
+            if (array_key_exists($doodleClassName, DoodleInfo::$titles))
             {
-                $title = DoodleInfo::$titles[$doodle];
+                $title = DoodleInfo::$titles[$doodleClassName];
             }
             else
             {
-                $title = "No description available for this doodle";
+                $title = DoodleInfo::$titles['NONE'];
             }
             $this->doodleToolBarArray[$i] = array(
                 'title' => $title,
-                'classname' => $doodle
+                'classname' => $doodleClassName
             );
         }
 
+        // Render the widget
         $this->render(get_class($this),get_object_vars($this));
 	}
 
@@ -327,7 +334,7 @@ class OEEyeDrawWidget extends CWidget
             'graphicsPath'=>$this->imgPath,
             'inputId'=>$this->inputId,
             'onLoadedCommandArray'=>$this->onLoadedCommandArray,
-						'onLoadedParamsArray'=>$this->onLoadedParamsArray,
+            'onLoadedParamsArray'=>$this->onLoadedParamsArray,
             'offset_x'=>$this->offset_x,
             'offset_y'=>$this->offset_y,
             'to_image'=>$this->to_image,
@@ -361,6 +368,7 @@ class DoodleInfo
 	 * @static array
 	 */
 	public static $titles = array (
+        "NONE" => "No description available for this doodle",
         "ACIOL" => "Anterior chamber IOL",
         "AdnexalEye" => "Adnexal eye template",
         "Ahmed" => "Ahmed tube",

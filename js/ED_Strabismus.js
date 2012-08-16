@@ -818,15 +818,15 @@ ED.VPattern.prototype.description = function()
  */
 ED.Rectus = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
 {
-	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
-	
-	// Set classname
+    // Set classname
 	this.className = "Rectus";
     
     // Specific properties
     this.insertionY = -200;
     this.hangback = false;
+    
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
 }
 
 /**
@@ -884,7 +884,6 @@ ED.Rectus.prototype.draw = function(_point)
     else
     {
         this.rangeOfApexX = new ED.Range(0, 0);
-
     }
 
     // Adjust ranges of apexY
@@ -948,59 +947,59 @@ ED.Rectus.prototype.draw = function(_point)
         }
         
         // Suture
-        if (!(this.apexX == 0 && this.recession() == "0.0"))
-        {
-            var margin = 15;
-            var sutureLength = 15;
-            var indent = 10;
-            var bite = 20;
-            
-            // Y coordinate of muscle bite
-            var ym;
-            if (this.insertionY > this.apexY)
-            {
-                ym = this.apexY;
-            }
-            else
-            {
-                ym = this.insertionY;
-            }
-            
-            // Y coordinate of knot
-            var yk;
-            if (!this.hangback && this.insertionY > this.apexY)
-            {
-                yk = this.apexY + margin;
-            }
-            else
-            {
-                yk = this.insertionY + margin;
-            }
-            
-            // X coordinate
-            var x = this.apexX;
-
-            ctx.beginPath();
-            ctx.moveTo(x, yk);
-            ctx.lineTo(x - sutureLength, yk + sutureLength);
-            ctx.moveTo(x + sutureLength, yk + sutureLength);
-            ctx.lineTo(x, yk);
-            ctx.arc(x, yk, 4, 0, Math.PI*2, true);            
-            ctx.moveTo(x, yk);
-            ctx.lineTo(x - muscleHalfWidth + indent, yk);
-            ctx.lineTo(x - muscleHalfWidth + indent, ym);
-            ctx.moveTo(x - muscleHalfWidth + indent, ym - margin);
-            ctx.lineTo(x - muscleHalfWidth + indent + bite, ym - margin);
-            ctx.moveTo(x + muscleHalfWidth - indent - bite, ym - margin);
-            ctx.lineTo(x + muscleHalfWidth - indent, ym - margin);
-            ctx.moveTo(x + muscleHalfWidth - indent, ym);  
-            ctx.lineTo(x + muscleHalfWidth - indent, yk);             
-            ctx.lineTo(x, yk);      
-            
-            ctx.lineWidth = 4;
-            ctx.strokeStyle = "black";
-            ctx.stroke();
-        }
+//        if (!(this.apexX == 0 && this.recession() == "0.0"))
+//        {
+//            var margin = 15;
+//            var sutureLength = 15;
+//            var indent = 10;
+//            var bite = 20;
+//            
+//            // Y coordinate of muscle bite
+//            var ym;
+//            if (this.insertionY > this.apexY)
+//            {
+//                ym = this.apexY;
+//            }
+//            else
+//            {
+//                ym = this.insertionY;
+//            }
+//            
+//            // Y coordinate of knot
+//            var yk;
+//            if (!this.hangback && this.insertionY > this.apexY)
+//            {
+//                yk = this.apexY + margin;
+//            }
+//            else
+//            {
+//                yk = this.insertionY + margin;
+//            }
+//            
+//            // X coordinate
+//            var x = this.apexX;
+//
+//            ctx.beginPath();
+//            ctx.moveTo(x, yk);
+//            ctx.lineTo(x - sutureLength, yk + sutureLength);
+//            ctx.moveTo(x + sutureLength, yk + sutureLength);
+//            ctx.lineTo(x, yk);
+//            ctx.arc(x, yk, 4, 0, Math.PI*2, true);            
+//            ctx.moveTo(x, yk);
+//            ctx.lineTo(x - muscleHalfWidth + indent, yk);
+//            ctx.lineTo(x - muscleHalfWidth + indent, ym);
+//            ctx.moveTo(x - muscleHalfWidth + indent, ym - margin);
+//            ctx.lineTo(x - muscleHalfWidth + indent + bite, ym - margin);
+//            ctx.moveTo(x + muscleHalfWidth - indent - bite, ym - margin);
+//            ctx.lineTo(x + muscleHalfWidth - indent, ym - margin);
+//            ctx.moveTo(x + muscleHalfWidth - indent, ym);  
+//            ctx.lineTo(x + muscleHalfWidth - indent, yk);             
+//            ctx.lineTo(x, yk);      
+//            
+//            ctx.lineWidth = 4;
+//            ctx.strokeStyle = "black";
+//            ctx.stroke();
+//        }
 	}
 	
 	// Coordinates of handles (in canvas plane)
