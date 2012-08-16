@@ -39,11 +39,6 @@ canvas.ed_canvas_display {
 	margin: 0px;
 }
 
-/* Stop canvas being highlighted on mouse click */
-canvas:focus {
-	outline: none;
-}
-
 /* Div containing control buttons */
 div.ed_toolbar {
 	margin-top: 10px;

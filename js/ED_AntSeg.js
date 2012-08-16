@@ -47,14 +47,14 @@ if (ED == null || typeof(ED) != "object") { var ED = new Object();}
  */
 ED.AntSeg = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
 {
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	
 	// Set classname
 	this.className = "AntSeg";
     
     // Class specific property
     this.hasPXE = false;
-    
-	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
 }
 
 /**
@@ -85,8 +85,7 @@ ED.AntSeg.prototype.setPropertyDefaults = function()
 	this.isMoveable = false;
 	this.isRotatable = false;
     this.isUnique = true;
-    this.specialParametersArray = {grade:'apexY'};
-    this.animationDeltaArray = {grade: 5};
+    this.animationArray = {apexY: "10"};
 	this.rangeOfScale = new ED.Range(+1, +4);
 	this.rangeOfArc = new ED.Range(Math.PI/6, Math.PI*2);
 	this.rangeOfApexX = new ED.Range(-0, +0);
@@ -184,18 +183,63 @@ ED.AntSeg.prototype.draw = function(_point)
 	return this.isClicked;
 }
 
+///**
+// * Returns size of pupil
+// *
+// * @returns {String} Grade of cataract
+// */
+//ED.AntSeg.prototype.getGrade = function()
+//{
+//    var returnValue = "";
+//    if (this.apexY < -200) returnValue = 'Large';
+//    else if (this.apexY < -100) returnValue = 'Medium';
+//    else returnValue = 'Small';
+//    
+//    return returnValue;
+//}
+//
+///**
+// * Sets size of pupil
+// *
+// * @param {String} Size of pupil
+// */
+//ED.AntSeg.prototype.setGrade = function(_grade)
+//{
+//    switch (_grade)
+//    {
+//        case 'Small':
+//            this.apexY = -100;
+//            break;
+//        case 'Medium':
+//            this.apexY = -200;
+//            break;
+//        case 'Large':
+//            this.apexY = -260;
+//            break;
+//        default:
+//            break;
+//    }
+//}
+
+///**
+// * Sets PXE state
+// *
+// * @param {Bool} Whether PXE is present or not
+// */
+//ED.AntSeg.prototype.setPXE = function(_value)
+//{
+//    this.hasPXE = _value;
+//}
+
 /**
  * Returns parameters
  *
- * @param {String} _parameter Name of parameter
- * @returns {Undefined} Value of parameter
+ * @returns {String} value of parameter
  */
 ED.AntSeg.prototype.getParameter = function(_parameter)
 {
-    // Call setParameter method in superclass to get regular parameters
-	var returnValue = ED.AntSeg.superclass.getParameter.call(this, _parameter);
+    var returnValue;
     
-    // Get special parameters
     switch (_parameter)
     {
         // Grade of cataract
@@ -204,64 +248,55 @@ ED.AntSeg.prototype.getParameter = function(_parameter)
             else if (this.apexY < -100) returnValue = 'Medium';
             else returnValue = 'Small';
             break;
+        case 'apexY':
+            returnValue = this.apexY;
+            break;
+        default:
+            returnValue = "";
+            break;
     }
     
     return returnValue;
 }
 
 /**
- * Set the value of a doodle's parameter
+ * Sets parameters for this doodle
  *
  * @param {String} _parameter Name of parameter
- * @param {Undefined} _value New value of parameter
+ * @param {String} _value New value of parameter
  */
 ED.AntSeg.prototype.setParameter = function(_parameter, _value)
 {
-    // Set special parameters
-    switch (_parameter)
-    {
-        case 'grade':
-            this.apexY = this.numericValueForParameter(_parameter, _value);
-            break;
-        case 'pxe':
-            this.hasPXE = _value;
-            break;
-    }
-    
-    // Call setParameter method in superclass to set common parameters and repaint drawing
-	ED.AntSeg.superclass.setParameter.call(this, _parameter, _value);
-}
-
-/**
- * Set the value of a doodle's parameter
- *
- * @param {String} _parameter Name of parameter
- * @param {Undefined} _value New value of parameter
- */
-ED.AntSeg.prototype.numericValueForParameter = function(_parameter, _value)
-{
-    var returnValue;
-    
-    //
     switch (_parameter)
     {
         case 'grade':
             switch (_value)
             {
                 case 'Small':
-                    returnValue = -100;
+                    //this.apexY = -100;
+                    this.setParameterWithAnimation('apexY', -100);
                     break;
                 case 'Medium':
-                    returnValue = -200;
+                    //this.apexY = -200;
+                    this.setParameterWithAnimation('apexY', -200);
                     break;
                 case 'Large':
-                    returnValue = -260;
+                    //this.apexY = -260;
+                    this.setParameterWithAnimation('apexY', -260);
+                    break;
+                default:
                     break;
             }
             break;
+        case 'pxe':
+            this.hasPXE = _value;
+            break
+        case 'apexY':
+            this.apexY = _value;
+            break;
+        default:
+            break
     }
-
-    return returnValue;
 }
 
 /**
@@ -332,7 +367,7 @@ ED.NuclearCataract.prototype.setPropertyDefaults = function()
 	this.isMoveable = false;
 	this.isRotatable = false;
     this.isUnique = true;
-    this.animationDeltaArray = {apexY: "10"};
+    this.animationArray = {apexY: "10"};
 	this.rangeOfApexX = new ED.Range(-0, +0);
 	this.rangeOfApexY = new ED.Range(-180, 0);
 }
@@ -443,22 +478,25 @@ ED.NuclearCataract.prototype.draw = function(_point)
 /**
  * Returns parameters
  *
- * @param {String} _parameter Name of parameter
- * @returns {Undefined} Value of parameter
+ * @returns {String} value of parameter
  */
 ED.NuclearCataract.prototype.getParameter = function(_parameter)
 {
-    // Call setParameter method in superclass to get regular parameters
-	var returnValue = ED.NuclearCataract.superclass.getParameter.call(this, _parameter);
+    var returnValue;
     
-    // Get special parameters
     switch (_parameter)
     {
-        // Grade of cataract
+            // Grade of cataract
         case 'grade':
             if (this.apexY < -120) returnValue = 'Mild';
             else if (this.apexY < -60) returnValue = 'Moderate';
             else returnValue = 'Brunescent';
+            break;
+        case 'apexY':
+            returnValue = this.apexY;
+            break;
+        default:
+            returnValue = "";
             break;
     }
     
@@ -466,26 +504,28 @@ ED.NuclearCataract.prototype.getParameter = function(_parameter)
 }
 
 /**
- * Set the value of a doodle's parameter
+ * Sets parameters for this doodle
  *
  * @param {String} _parameter Name of parameter
- * @param {Undefined} _value New value of parameter
+ * @param {String} _value New value of parameter
  */
 ED.NuclearCataract.prototype.setParameter = function(_parameter, _value)
 {
-    // Set special parameters
     switch (_parameter)
     {
         case 'grade':
             switch (_value)
             {
                 case 'Mild':
+                    //this.apexY = -180;
                     this.setParameterWithAnimation('apexY', -180);
                     break;
                 case 'Moderate':
+                    //this.apexY = -100;
                     this.setParameterWithAnimation('apexY', -100);
                     break;
                 case 'Brunescent':
+                    //this.apexY = 0;
                     this.setParameterWithAnimation('apexY', 0);
                     break;
                 default:
@@ -495,10 +535,9 @@ ED.NuclearCataract.prototype.setParameter = function(_parameter, _value)
         case 'apexY':
             this.apexY = _value;
             break;
+        default:
+            break
     }
-
-    // Call setParameter method in superclass to set common parameters and repaint drawing
-	ED.NuclearCataract.superclass.setParameter.call(this, _parameter, _value);
 }
 
 /**
@@ -585,7 +624,7 @@ ED.CorticalCataract.prototype.setPropertyDefaults = function()
 	this.isMoveable = false;
 	this.isRotatable = false;
     this.isUnique = true;
-    this.animationDeltaArray = {apexY: "10"};
+    this.animationArray = {apexY: "10"};
 	this.rangeOfApexX = new ED.Range(-0, +0);
 	this.rangeOfApexY = new ED.Range(-180, -20);
 }
@@ -709,15 +748,12 @@ ED.CorticalCataract.prototype.draw = function(_point)
 /**
  * Returns parameters
  *
- * @param {String} _parameter Name of parameter
- * @returns {Undefined} Value of parameter
+ * @returns {String} value of parameter
  */
 ED.CorticalCataract.prototype.getParameter = function(_parameter)
 {
-    // Call setParameter method in superclass to get regular parameters
-	var returnValue = ED.CorticalCataract.superclass.getParameter.call(this, _parameter);
+    var returnValue;
     
-    // Get special parameters
     switch (_parameter)
     {
         // Grade of cataract
@@ -729,32 +765,37 @@ ED.CorticalCataract.prototype.getParameter = function(_parameter)
         case 'apexY':
             returnValue = this.apexY;
             break;
+        default:
+            returnValue = "";
+            break;
     }
     
     return returnValue;
 }
 
 /**
- * Set the value of a doodle's parameter
+ * Sets parameters for this doodle
  *
  * @param {String} _parameter Name of parameter
- * @param {Undefined} _value New value of parameter
+ * @param {String} _value New value of parameter
  */
 ED.CorticalCataract.prototype.setParameter = function(_parameter, _value)
 {
-    // Set special parameters
     switch (_parameter)
     {
         case 'grade':
             switch (_value)
             {
                 case 'Mild':
+                    //this.apexY = -180;
                     this.setParameterWithAnimation('apexY', -180);
                     break;
                 case 'Moderate':
+                    //this.apexY = -100;
                     this.setParameterWithAnimation('apexY', -100);
                     break;
                 case 'White':
+                    //this.apexY = 0;
                     this.setParameterWithAnimation('apexY', -20);
                     break;
                 default:
@@ -764,10 +805,9 @@ ED.CorticalCataract.prototype.setParameter = function(_parameter, _value)
         case 'apexY':
             this.apexY = _value;
             break;
+        default:
+            break
     }
-    
-    // Call setParameter method in superclass to set common parameters and repaint drawing
-	ED.CorticalCataract.superclass.setParameter.call(this, _parameter, _value);
 }
 
 /**
@@ -2130,11 +2170,11 @@ ED.LasikFlap.prototype.description = function()
  */
 ED.Fuchs = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
 {
-	// Set classname
-	this.className = "Fuchs";
-    
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	
+	// Set classname
+	this.className = "Fuchs";
 }
 
 /**
@@ -2494,7 +2534,7 @@ ED.PhakoIncision.prototype.setPropertyDefaults = function()
 	this.isMoveable = false;
 	this.isRotatable = true;
     this.isArcSymmetrical = true;
-    this.animationDeltaArray = {rotation:0.05, incisionLength: "1.2", incisionMeridian: "16", radius: "20"};
+    this.animationArray = {incisionLength: "1.2", incisionMeridian: "16", radius: "20"};
     this.rangeOfArc = new ED.Range(0, Math.PI);
 	this.rangeOfApexX = new ED.Range(-0, +0);
 	this.rangeOfApexY = new ED.Range(-334, -300);
@@ -2701,15 +2741,12 @@ ED.PhakoIncision.prototype.description = function()
 /**
  * Returns parameters
  *
- * @param {String} _parameter Name of parameter
- * @returns {Undefined} Value of parameter
+ * @returns {String} value of parameter
  */
 ED.PhakoIncision.prototype.getParameter = function(_parameter)
 {
-    // Call setParameter method in superclass to get regular parameters
-	var returnValue = ED.PhakoIncision.superclass.getParameter.call(this, _parameter);
+    var returnValue;
     
-    // Get special parameters
     switch (_parameter)
     {
         // Incision site (CND 5.13)
@@ -2745,20 +2782,23 @@ ED.PhakoIncision.prototype.getParameter = function(_parameter)
         case 'radius':
             returnValue = this.radius;
             break;
+        default:
+            returnValue = "";
+            break;
+            
     }
     
     return returnValue;
 }
 
 /**
- * Set the value of a doodle's parameter
+ * Sets derived parameters for this doodle
  *
  * @param {String} _parameter Name of parameter
- * @param {Undefined} _value New value of parameter
+ * @param {String} _value New value of parameter
  */
 ED.PhakoIncision.prototype.setParameter = function(_parameter, _value)
 {
-    // Set special parameters
     switch (_parameter)
     {
         // Incision site (CND 5.13)
@@ -2815,9 +2855,6 @@ ED.PhakoIncision.prototype.setParameter = function(_parameter, _value)
         default:
             break
     }
-    
-    // Call setParameter method in superclass to set common parameters and repaint drawing
-	ED.PhakoIncision.superclass.setParameter.call(this, _parameter, _value);
 }
 
 /**
@@ -2872,7 +2909,6 @@ ED.SidePort.prototype.setPropertyDefaults = function()
 	this.isMoveable = false;
 	this.isRotatable = true;
     this.isArcSymmetrical = true;
-    this.animationDeltaArray = {rotation:0.05};
     this.rangeOfArc = new ED.Range(0, Math.PI);
 	this.rangeOfApexX = new ED.Range(-0, +0);
 	this.rangeOfApexY = new ED.Range(-334, -300);
@@ -3150,15 +3186,12 @@ ED.LimbalRelaxingIncision.prototype.description = function()
 /**
  * Returns parameters
  *
- * @param {String} _parameter Name of parameter
- * @returns {Undefined} Value of parameter
+ * @returns {String} value of parameter
  */
 ED.LimbalRelaxingIncision.prototype.getParameter = function(_parameter)
 {
-    // Call setParameter method in superclass to get regular parameters
-	var returnValue = ED.LimbalRelaxingIncision.superclass.getParameter.call(this, _parameter);
+    var returnValue;
     
-    // Get special parameters
     switch (_parameter)
     {
         // Incision length (CND 5.14)
@@ -3174,30 +3207,31 @@ ED.LimbalRelaxingIncision.prototype.getParameter = function(_parameter)
             
             returnValue = length.toFixed(1);
             break;
+        default:
+            returnValue = "";
+            break;
     }
     
     return returnValue;
 }
 
 /**
- * Set the value of a doodle's parameter
+ * Sets derived parameters for this doodle
  *
  * @param {String} _parameter Name of parameter
- * @param {Undefined} _value New value of parameter
+ * @param {String} _value New value of parameter
  */
 ED.LimbalRelaxingIncision.prototype.setParameter = function(_parameter, _value)
 {
-    // Set special parameters
     switch (_parameter)
     {
         case 'incisionLength':
             this.length = _value;
             this.arc = this.length * this.defaultRadius/(6 * this.radius);
-            break;
+            break;            
+        default:
+            break
     }
-    
-    // Call setParameter method in superclass to set common parameters and repaint drawing
-	ED.LimbalRelaxingIncision.superclass.setParameter.call(this, _parameter, _value);
 }
 
 
@@ -4064,8 +4098,7 @@ ED.TrialLens.prototype.setPropertyDefaults = function()
 	this.isMoveable = false;
 	this.isRotatable = true;
     this.addAtBack = true;
-    this.animationDeltaArray = {axis: 10, originX: 2, scaleY: 0.02, rotation:0.2};
-    this.rangeOfOriginX = new ED.Range(-500, +500);
+    //this.animationArray = {axis: "10"};
 }
 
 /**
@@ -4130,20 +4163,20 @@ ED.TrialLens.prototype.draw = function(_point)
 /**
  * Returns parameters
  *
- * @param {String} _parameter Name of parameter
- * @returns {Undefined} Value of parameter
+ * @returns {String} value of parameter
  */
 ED.TrialLens.prototype.getParameter = function(_parameter)
 {
-    // Call setParameter method in superclass to get regular parameters
-	var returnValue = ED.TrialLens.superclass.getParameter.call(this, _parameter);
+    var returnValue;
     
-    // Get special parameters
     switch (_parameter)
     {
         // Axis
         case 'axis':
             returnValue = (360 - this.degrees()) % 180;
+            break;
+        default:
+            returnValue = "";
             break;
     }
     
@@ -4151,27 +4184,24 @@ ED.TrialLens.prototype.getParameter = function(_parameter)
 }
 
 /**
- * Set the value of a doodle's parameter
+ * Sets derived parameters for this doodle
  *
  * @param {String} _parameter Name of parameter
- * @param {Undefined} _value New value of parameter
+ * @param {String} _value New value of parameter
  */
 ED.TrialLens.prototype.setParameter = function(_parameter, _value)
 {
-    // Set special parameters
     switch (_parameter)
     {
         // Axis
         case 'axis':
+            //var angle = ((90 - _value) + 360) % 360;
             var angle = _value;
             this.rotation = (180 - angle)  * Math.PI/180;
             break;            
         default:
             break
     }
-    
-    // Call setParameter method in superclass to set common parameters and repaint drawing
-	ED.TrialLens.superclass.setParameter.call(this, _parameter, _value);
 }
 
 /**
@@ -4445,22 +4475,25 @@ ED.CorticalCataractCrossSection.prototype.draw = function(_point)
 /**
  * Returns parameters
  *
- * @param {String} _parameter Name of parameter
- * @returns {Undefined} Value of parameter
+ * @returns {String} value of parameter
  */
 ED.CorticalCataractCrossSection.prototype.getParameter = function(_parameter)
 {
-    // Call setParameter method in superclass to get regular parameters
-	var returnValue = ED.CorticalCataractCrossSection.superclass.getParameter.call(this, _parameter);
+    var returnValue;
     
-    // Get special parameters
     switch (_parameter)
     {
-        // Grade of cataract
+            // Grade of cataract
         case 'grade':
             if (this.apexY < -120) returnValue = 'Mild';
             else if (this.apexY < -60) returnValue = 'Moderate';
             else returnValue = 'White';
+            break;
+        case 'apexY':
+            returnValue = this.apexY;
+            break;
+        default:
+            returnValue = "";
             break;
     }
     
@@ -4468,37 +4501,40 @@ ED.CorticalCataractCrossSection.prototype.getParameter = function(_parameter)
 }
 
 /**
- * Set the value of a doodle's parameter
+ * Sets parameters for this doodle
  *
  * @param {String} _parameter Name of parameter
- * @param {Undefined} _value New value of parameter
+ * @param {String} _value New value of parameter
  */
 ED.CorticalCataractCrossSection.prototype.setParameter = function(_parameter, _value)
 {
-    // Set special parameters
     switch (_parameter)
     {
         case 'grade':
             switch (_value)
             {
                 case 'Mild':
+                    //this.apexY = -180;
                     this.setParameterWithAnimation('apexY', -180);
                     break;
                 case 'Moderate':
+                    //this.apexY = -100;
                     this.setParameterWithAnimation('apexY', -100);
                     break;
                 case 'White':
+                    //this.apexY = 0;
                     this.setParameterWithAnimation('apexY', -20);
+                    break;
+                default:
                     break;
             }
             break;
         case 'apexY':
             this.apexY = _value;
             break;
+        default:
+            break
     }
-    
-    // Call setParameter method in superclass to set common parameters and repaint drawing
-	ED.CorticalCataractCrossSection.superclass.setParameter.call(this, _parameter, _value);
 }
 
 /**
@@ -4640,18 +4676,15 @@ ED.NuclearCataractCrossSection.prototype.draw = function(_point)
 /**
  * Returns parameters
  *
- * @param {String} _parameter Name of parameter
- * @returns {Undefined} Value of parameter
+ * @returns {String} value of parameter
  */
 ED.NuclearCataractCrossSection.prototype.getParameter = function(_parameter)
 {
-    // Call setParameter method in superclass to get regular parameters
-	var returnValue = ED.NuclearCataractCrossSection.superclass.getParameter.call(this, _parameter);
+    var returnValue;
     
-    // Get special parameters
     switch (_parameter)
     {
-        // Grade of cataract
+            // Grade of cataract
         case 'grade':
             if (this.apexY < -120) returnValue = 'Mild';
             else if (this.apexY < -60) returnValue = 'Moderate';
@@ -4660,40 +4693,47 @@ ED.NuclearCataractCrossSection.prototype.getParameter = function(_parameter)
         case 'apexY':
             returnValue = this.apexY;
             break;
+        default:
+            returnValue = "";
+            break;
     }
     
     return returnValue;
 }
 
 /**
- * Set the value of a doodle's parameter
+ * Sets parameters for this doodle
  *
  * @param {String} _parameter Name of parameter
- * @param {Undefined} _value New value of parameter
+ * @param {String} _value New value of parameter
  */
 ED.NuclearCataractCrossSection.prototype.setParameter = function(_parameter, _value)
 {
-    // Set special parameters
     switch (_parameter)
     {
         case 'grade':
             switch (_value)
-            {
-                case 'Mild':
-                    this.setParameterWithAnimation('apexY', -180);
-                    break;
-                case 'Moderate':
-                    this.setParameterWithAnimation('apexY', -100);
-                    break;
-                case 'White':
-                    this.setParameterWithAnimation('apexY', -20);
-                    break;
-                default:
-                    break;
-            }
+        {
+            case 'Mild':
+                //this.apexY = -180;
+                this.setParameterWithAnimation('apexY', -180);
+                break;
+            case 'Moderate':
+                //this.apexY = -100;
+                this.setParameterWithAnimation('apexY', -100);
+                break;
+            case 'White':
+                //this.apexY = 0;
+                this.setParameterWithAnimation('apexY', -20);
+                break;
+            default:
+                break;
+        }
             break;
+        case 'apexY':
+            this.apexY = _value;
+            break;
+        default:
+            break
     }
-    
-    // Call setParameter method in superclass to set common parameters and repaint drawing
-	ED.NuclearCataractCrossSection.superclass.setParameter.call(this, _parameter, _value);
 }
