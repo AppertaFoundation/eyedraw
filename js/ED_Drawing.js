@@ -1,7 +1,7 @@
 /**
  * @fileOverview Contains the core classes for EyeDraw
  * @author <a href="mailto:bill.aylward@mac.com">Bill Aylward</a>
- * @version 0.94
+ * @version 1.2
  *
  * Modification date: 28th March 2012
  * Copyright 2011 OpenEyes
@@ -198,6 +198,7 @@ ED.Drawing = function(_canvas, _eye, _IDSuffix, _isEditable, offset_x, offset_y,
     this.completeLine = false;
     this.globalScaleFactor = 1;
     this.scrollValue = 0;
+    this.lastDoodleId = 0;
     
     // Array of objects requesting notifications
     this.notificationArray = new Array();
@@ -324,15 +325,17 @@ ED.Drawing = function(_canvas, _eye, _IDSuffix, _isEditable, offset_x, offset_y,
     }
     
     // Pre-load images
-    this.preLoadImagesFrom('graphics/');
+    //this.preLoadImagesFrom('graphics/');
 }
 
 /**
  * Replaces the canvas element inline with a PNG image, useful for printing
  */
 ED.Drawing.prototype.replaceWithImage = function()
-{	
+{
+    // Create a new image element
 	var img = document.createElement("img");
+    
 	// Base64 encoded PNG version of the canvas element
 	img.setAttribute('src', this.canvas.toDataURL('image/png'));
 	
@@ -405,10 +408,17 @@ ED.Drawing.prototype.checkAllLoaded = function()
 /**
  * Registers an object to receive notifications
  *
- * @param {object} _object The object requesting notification
+ * @param {Object} _object The object requesting notification
+ * @param {String} _methodName The method in the receiving object which is called for a notification. Defaults to 'callBack'
+ * @param {Array} _notificationList Array of strings listing the notifications the object is interested in. If empty, receives all.
  */
 ED.Drawing.prototype.registerForNotifications = function(_object, _methodName, _notificationList)
 {
+    // Put in default values for optional parameters
+    if (typeof(_methodName) == 'undefined')
+    {
+        _methodName = 'callBack';
+    }
     if (typeof(_notificationList) == 'undefined')
     {
         _notificationList = new Array();
@@ -419,7 +429,7 @@ ED.Drawing.prototype.registerForNotifications = function(_object, _methodName, _
 }
 
 /**
- * Unregisters an object for notifications
+ * Unregisters an object for notifications  ***TODO*** Need method of identifying objects for this to work
  *
  * @param {object} _object The object requesting notification
  */
@@ -427,12 +437,13 @@ ED.Drawing.prototype.unRegisterForNotifications = function(_object)
 {
     // Get index of object in array
     var index = this.notificationArray.indexOf(_object);
+    console.log("removing object at index: " + index);
     
     // If its there, remove it
     if (index >= 0)
     {
         this.notificationArray.splice(index, 1);
-        //console.log(this.notificationArray);
+        console.log("array:" + this.notificationArray);
     }
 }
 
@@ -452,8 +463,8 @@ ED.Drawing.prototype.notify = function(_eventName, _object)
     // Call method on each registered object
     for (var i = 0; i < this.notificationArray.length; i++)
     {
-        // Check that event is in notification list for this object
-        if (this.notificationArray[i]['notificationList'].indexOf(_eventName) >= 0)
+        // Check that event is in notification list for this object, or empty array for all notifications 
+        if (this.notificationArray[i]['notificationList'].length ==0 || this.notificationArray[i]['notificationList'].indexOf(_eventName) >= 0)
         {
             // Call registered object using specified method, and passing message array
             this.notificationArray[i]['object'][this.notificationArray[i]['methodName']].apply(this.notificationArray[i]['object'],[messageArray]);
@@ -970,10 +981,8 @@ ED.Drawing.prototype.mousemove = function(_point)
 					break;		
 			}
             
-			// Call parameter listener and refresh drawing
+			// Update any bindings and refresh drawing
             this.updateBindings();
-            
-            //if (typeof(this.parameterListener) != 'undefined') this.parameterListener();
 			this.repaint();				
 		}
 		
@@ -981,7 +990,7 @@ ED.Drawing.prototype.mousemove = function(_point)
 		this.lastMousePosition = _point;
         
         // Notify
-        this.notify("mousedrag", _point);
+        this.notify("mouseDragged", _point);
 	}
 }
 
@@ -1031,7 +1040,8 @@ ED.Drawing.prototype.mouseup = function(_point)
  */  
 ED.Drawing.prototype.mouseover = function(_point)
 {
-    //console.log('mouseover');
+    // Notify
+    this.notify("mouseover", _point);
 }
 
 /**
@@ -1061,6 +1071,9 @@ ED.Drawing.prototype.mouseout = function(_point)
             this.drawAllDoodles();
         }
 	}
+    
+    // Notify
+    this.notify("mouseout", _point);
 }
 
 /**
@@ -1126,8 +1139,7 @@ ED.Drawing.prototype.keydown = function(e)
             this.selectedDoodle.addLetter(code);
         }
         
-        // Redraw doodle
-        if (typeof(this.parameterListener) != 'undefined') this.parameterListener();
+        // Refresh canvas
         this.repaint();
         
         // Prevent key stroke bubbling up (***TODO*** may need cross browser handling)
@@ -1187,6 +1199,9 @@ ED.Drawing.prototype.stopHoverTimer = function()
 ED.Drawing.prototype.hover = function(_point)
 {
     this.showTooltip(_point);
+    
+    // Notify
+    this.notify("hover", _point);
 }
 
 /**
@@ -1267,7 +1282,7 @@ ED.Drawing.prototype.showTooltip = function(_point)
 }
 
 /**
- * Shows a tooltip
+ * Hides a tooltip
  *
  * @event
  */
@@ -1297,9 +1312,11 @@ ED.Drawing.prototype.moveToFront = function()
 		}
 		
 		// Refresh canvas
-        if (typeof(this.parameterListener) != 'undefined') this.parameterListener();
 		this.repaint();
 	}
+    
+    // Notify
+    this.notify("moveToFront", this.selectedDoodle);
 }
 
 /**
@@ -1323,9 +1340,11 @@ ED.Drawing.prototype.moveToBack = function()
 		}
 		
 		// Refresh canvas
-        if (typeof(this.parameterListener) != 'undefined') this.parameterListener();
 		this.repaint();
 	}
+    
+    // Notify
+    this.notify("moveToBack", this.selectedDoodle);
 }
 
 /**
@@ -1340,9 +1359,11 @@ ED.Drawing.prototype.flipVer = function()
         this.selectedDoodle.scaleY = this.selectedDoodle.scaleY * -1;
         
 		// Refresh canvas
-        if (typeof(this.parameterListener) != 'undefined') this.parameterListener();
 		this.repaint();
 	}
+    
+    // Notify
+    this.notify("flipVer", this.selectedDoodle);
 }
 
 /**
@@ -1357,9 +1378,11 @@ ED.Drawing.prototype.flipHor = function()
         this.selectedDoodle.scaleX = this.selectedDoodle.scaleX * -1;
         
 		// Refresh canvas
-        if (typeof(this.parameterListener) != 'undefined') this.parameterListener();
 		this.repaint();
 	}
+    
+    // Notify
+    this.notify("flipHor", this.selectedDoodle);
 }
 
 /**
@@ -1367,9 +1390,14 @@ ED.Drawing.prototype.flipHor = function()
  */
 ED.Drawing.prototype.deleteDoodle = function()
 {
+    var deletedClassName = null;
+    
 	// Should only be called if a doodle is selected, but check anyway
 	if (this.selectedDoodle != null && this.selectedDoodle.canDelete)
 	{
+        // Store class name for notification
+        deletedClassName = this.selectedDoodle.className;
+        
 		// Go through doodles removing any that are selected (should be just one)
 		for (var i = 0; i < this.doodleArray.length; i++)
 		{
@@ -1390,9 +1418,11 @@ ED.Drawing.prototype.deleteDoodle = function()
 		}
         
 		// Refresh canvas
-        if (typeof(this.parameterListener) != 'undefined') this.parameterListener();
 		this.repaint();
 	}
+    
+    // Notify
+    this.notify("deleteDoodle", deletedClassName);
 }
 
 /**
@@ -1432,32 +1462,6 @@ ED.Drawing.prototype.unlock = function()
 	
 	// Refresh canvas
 	this.repaint();
-}
-
-/**
- * Adds a doodle to the drawing
- *
- * @param {String} _parameter Name of parameter
- * @param {String} _className Classname of doodle
- * @param {String} _value New value of parameter
- */
-ED.Drawing.prototype.setParameterValueForClass= function(_parameter, _value, _className)
-{
-    // Go through doodle array (backwards because of splice function) looking for doodles of passed className
-	for (var i = this.doodleArray.length - 1; i >= 0; i--)
-	{
-        // Find doodles of given class name
-        if (this.doodleArray[i].className == _className)
-        {
-            var doodle = this.doodleArray[i];
-            
-            // Objects are also associative arrays!
-            doodle[_parameter] =	_value;
-        }
-	}
-    
-    // Refresh drawing
-    this.repaint();
 }
 
 /**
@@ -1545,9 +1549,10 @@ ED.Drawing.prototype.selectNextDoodle = function(_value)
 /**
  * Marks the doodle as 'unmodified' so we can catch an event when it gets modified by the user
  */
-ED.Drawing.prototype.isReady = function() {
+ED.Drawing.prototype.isReady = function()
+{
 	this.modified = false;
-	if(this.convertToImage)
+	if (this.convertToImage)
 	{
 		this.replaceWithImage();
 	}
@@ -1606,11 +1611,10 @@ ED.Drawing.prototype.addDoodle = function(_className, _parameterDefaults, _param
             newDoodle.isForDrawing = true;
         }
         
-        newDoodle.id = this.doodleArray.length;
+        //newDoodle.id = this.doodleArray.length;
         
         // Add to array
-        var doodleIndex = this.doodleArray.length;
-        this.doodleArray[doodleIndex] = newDoodle;
+        this.doodleArray[this.doodleArray.length] = newDoodle;
         
         if (newDoodle.addAtBack)
         {
@@ -1618,8 +1622,7 @@ ED.Drawing.prototype.addDoodle = function(_className, _parameterDefaults, _param
         }
         else
         {
-            // ***TODO*** Is this call necessary?
-            //if (typeof(this.parameterListener) != 'undefined') this.parameterListener();
+            // Refresh drawing
             this.repaint();
         }
         
@@ -1629,20 +1632,13 @@ ED.Drawing.prototype.addDoodle = function(_className, _parameterDefaults, _param
             for (var key in _parameterBindings)
             {
                 //console.log('addDoodle - Key: ' + key + ' Value: ' + _parameterBindings[key]);
-                // Add each binding to the doodle array
-                newDoodle.bindingsArray[key] = _parameterBindings[key];
-                
-                // Get reference to HTML element
-                var element = document.getElementById(_parameterBindings[key]);
-                
-                // Set initial value
-                newDoodle.setParameter(key, element.value);
-                
-                // Attach (ie replace) onchange event of element with a function which calls the drawing event handler
-                var drawing = this;
-                element.onchange = function onchange(event) {drawing.eventHandler('onchange', doodleIndex, this.id, this.value);};
+                // Add binding to the doodle
+                newDoodle.addBinding(key, _parameterBindings[key]);
             }
         }
+        
+        // Notify
+        this.notify("doodleAdded", newDoodle);
         
         // Return doodle
         return newDoodle;
@@ -1657,34 +1653,37 @@ ED.Drawing.prototype.addDoodle = function(_className, _parameterDefaults, _param
  * Called by events attached to HTML elements such as <input>
  *
  * @param {String} _type Type of event, only onchange is currently implemented
- * @param {Int} _index The index of the doodle containing the binding in the drawing object's doodle array
- * @param {String} _Id The id attribute of the element
+ * @param {Int} _doodleId The id of the doodle containing the binding
+ * @param {String} _elementId The id attribute of the element
  * @returns {Value} The current value of the element
  */
-ED.Drawing.prototype.eventHandler = function(_type, _index, _id, _value)
+ED.Drawing.prototype.eventHandler = function(_type, _doodleId, _elementId, _value)
 {
-    console.log("Event " + _type + ":" + _index + ":" + _id + ":" + _value);
+    //console.log("Event " + _type + ":" + _doodleId + ":" + _elementId + ":" + _value);
     switch (_type)
     {
         // Onchange event
         case 'onchange':
             // Get reference to associated doodle
-            var doodle = this.doodleArray[_index];
+            var doodle = this.doodleOfId(_doodleId);
             
-            // Find key associated with the element id
-            var bindingsKey;
-            for (var key in doodle.bindingsArray)
+            if (doodle)
             {
-                if (doodle.bindingsArray[key] == _id)
+                // Find key associated with the element id
+                var parameter;
+                for (var key in doodle.bindingArray)
                 {
-                    bindingsKey = key;
+                    if (doodle.bindingArray[key] == _elementId)
+                    {
+                        parameter = key;
+                    }
                 }
-            }
-            
-            // Set parameter to new value
-            if (typeof(bindingsKey) != 'undefined')
-            {
-                doodle.setParameterWithAnimation(bindingsKey, _value);
+                
+                // Set parameter to new value
+                if (typeof(parameter) != 'undefined')
+                {
+                    doodle.setParameterWithAnimation(parameter, _value);
+                }
             }
             break;
         default:
@@ -1693,7 +1692,7 @@ ED.Drawing.prototype.eventHandler = function(_type, _index, _id, _value)
 }
 
 /**
- * Updates any bindings of the selected doodle. Called my methods which change parameter values
+ * Updates value of bound elements to the selected doodle. Called by methods which change parameter values
  */
 ED.Drawing.prototype.updateBindings = function()
 {
@@ -1701,9 +1700,9 @@ ED.Drawing.prototype.updateBindings = function()
     if (this.selectedDoodle != null)
     {
         // Iterate through this doodle's bindings array and alter value of HTML element
-        for (var key in this.selectedDoodle.bindingsArray)
+        for (var key in this.selectedDoodle.bindingArray)
         {
-            document.getElementById(this.selectedDoodle.bindingsArray[key]).value = this.selectedDoodle.getParameter(key);
+            document.getElementById(this.selectedDoodle.bindingArray[key]).value = this.selectedDoodle.getParameter(key);
         }
     }
 }
@@ -1799,6 +1798,54 @@ ED.Drawing.prototype.allDoodlesOfClass = function(_className)
 	return returnValue;
 }
 
+/**
+ * Sets a parameter value for all doodles of this class
+ *
+ * @param {String} _parameter Name of parameter
+ * @param {String} _className Classname of doodle
+ * @param {String} _value New value of parameter
+ */
+ED.Drawing.prototype.setParameterValueForClass= function(_parameter, _value, _className)
+{
+    // Go through doodle array (backwards because of splice function) looking for doodles of passed className
+	for (var i = this.doodleArray.length - 1; i >= 0; i--)
+	{
+        // Find doodles of given class name
+        if (this.doodleArray[i].className == _className)
+        {
+            var doodle = this.doodleArray[i];
+            
+            // Set parameter
+            doodle.setParameterWithAnimation(_parameter, _value);
+        }
+	}
+    
+    // Refresh drawing
+    this.repaint();
+}
+
+/**
+ * Returns the doodle with the corresponding id
+ *
+ * @param {Int} Id Id of doodle
+ * @returns {Doodle} The doodle with the passed id
+ */
+ED.Drawing.prototype.doodleOfId = function(_id)
+{
+    var doodle = false;
+    
+	// Go through doodle array looking for the corresponding doodle
+	for (var i = 0; i < this.doodleArray.length; i++)
+	{
+        if (this.doodleArray[i].id == _id)
+        {
+            doodle = this.doodleArray[i];
+            break;
+        }
+	}
+
+	return doodle;
+}
 
 /**
  * Deletes all doodles that are deletable
@@ -1830,7 +1877,6 @@ ED.Drawing.prototype.deleteAllDoodles = function()
     }
     
 	// Refresh canvas
-    if (typeof(this.parameterListener) != 'undefined') this.parameterListener();
 	this.repaint();
 }
 
@@ -1866,12 +1912,11 @@ ED.Drawing.prototype.deleteDoodlesOfClass = function(_className)
     }
     
 	// Refresh canvas
-    if (typeof(this.parameterListener) != 'undefined') this.parameterListener();
 	this.repaint();
 }
 
 /**
- * Updates a doodle with a new value of a parameter
+ * Updates a doodle with a new value of a parameter ***TODO** These two methods need updating with new notification system
  *
  * @param {Doodle} _doodle The doodle to be updated
  * @param {String} _parameter Name of the parameter
@@ -2149,12 +2194,10 @@ ED.Drawing.prototype.repaint = function()
         }
     }
     
-    if (!this.modified) {
+    if (!this.modified)
+    {
         this.modified = true;
     }
-    
-    // Call to optional method to notify changes in doodle parameters - NB moved this call to the mousemove and other methods to avoid race conditions
-    //if (typeof(this.parameterListener) != 'undefined') this.parameterListener();
 }
 
 /**
@@ -2184,7 +2227,6 @@ ED.Drawing.prototype.togglePointInLine = function()
         this.newPointOnClick = false;
         this.completeLine = true;
         this.deselectDoodles();
-        if (typeof(this.parameterListener) != 'undefined') this.parameterListener();
         this.repaint();
     }
     else
@@ -2192,6 +2234,17 @@ ED.Drawing.prototype.togglePointInLine = function()
         this.newPointOnClick = true;
         this.completeLine = false;
     }
+}
+
+/**
+ * Generates a numeric id guaranteed to be unique for the lifetime of the drawing object
+ * (Index of doodleArray can be repeated if a doodle is deleted before adding another)
+ * 
+ * @returns {Int} Id of next doodle
+ */
+ED.Drawing.prototype.nextDoodleId = function()
+{
+    return this.lastDoodleId++;
 }
 
 
@@ -2527,6 +2580,9 @@ ED.Doodle = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _sca
 	{
 		// Drawing containing this doodle
 		this.drawing = _drawing;
+        
+        // Unique ID of doodle within this drawing
+        this.id = this.drawing.nextDoodleId();
 		
 		// New doodle (constructor called with _drawing parameter only)
 		if (typeof(_originX) == 'undefined')
@@ -2631,7 +2687,7 @@ ED.Doodle = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _sca
         this.pointsArray = new Array();
         
         // Bindings to HTML element values
-        this.bindingsArray = new Array();
+        this.bindingArray = new Array();
         
 		// Array of 5 handles
 		this.handleArray = new Array();
@@ -3024,6 +3080,11 @@ ED.Doodle.prototype.setParameterWithAnimation = function(_parameter, _value)
         {
             var parameter = this.specialParametersArray[_parameter];
             value = this.numericValueForParameter(_parameter, _value);
+            // If no parameter exists, just set it to existing value
+            if (value == null)
+            {
+                value = this.getParameter(parameter);
+            }
         }
         else
         {
@@ -3219,6 +3280,48 @@ ED.Doodle.prototype.increment = function(_parameter, _value)
         // Start timer and set to call this function again after interval
         var doodle = this;
         this.animationDataArray[_parameter]['timer'] = setTimeout(function() {doodle.increment(_parameter, _value);}, interval);
+    }
+}
+
+/**
+ * Set the value of a doodle's parameter - overridden in subclassees
+ *
+ * @param {String} _parameter Name of parameter
+ * @param {Undefined} _value New value of parameter
+ */
+ED.Doodle.prototype.numericValueForParameter = function(_parameter, _value)
+{
+    return null;
+}
+
+/**
+ * Adds a binding to the doodle
+ *
+ */
+ED.Doodle.prototype.addBinding = function(_param, _id)
+{
+    //console.log(_param + " : " + _id);
+    // Add binding to array
+    this.bindingArray[_param] = _id;
+    
+    // Get reference to HTML element
+    var element = document.getElementById(_id);
+    
+    if (element != null)
+    {
+        // Set parameter to value of element
+        this.setParameter(_param, element.value);
+        
+        // Attach onchange event of element with a function which calls the drawing event handler
+        var drawing = this.drawing;
+        var id = this.id;
+//        element.addEventListener('change',function (event) {
+//                                 drawing.eventHandler('onchange', id, this.id, this.value);
+//                                 },false);
+//        $("#axisTextBox").click(function() {
+//                                alert("Hello");
+//                                });
+        console.log('binding added');
     }
 }
 

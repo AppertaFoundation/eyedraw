@@ -4,7 +4,7 @@
  * @link http://www.openeyes.org.uk/
  * @copyright Copyright &copy; 2012 OpenEyes Foundation
  * @license http://www.yiiframework.com/license/
- * Modification date: 9th February 2012
+ * Modification date: 17th August 2012
  * 
  * This file is part of OpenEyes.
  * 
@@ -22,7 +22,7 @@
  * along with OpenEyes.  If not, see <http://www.gnu.org/licenses/>.
  * @package EyeDraw
  * @author Bill Aylward <bill.aylward@openeyes.org>
- * @version 0.9
+ * @version 0.95
  */
 
 /**
@@ -40,24 +40,175 @@
  */
 function eyeDrawInit(_properties)
 {
-	// Get reference to the canvas
+	// Get reference to the drawing canvas
 	var canvas = document.getElementById(_properties.canvasId);
 
-	// Create drawing
+	// Create a drawing linked to the canvas
 	window[_properties.drawingName] = new ED.Drawing(canvas, _properties.eye,
 			_properties.idSuffix, _properties.isEditable, _properties.offset_x,
 			_properties.offset_y, _properties.to_image);
 
+    // Instantiate a controller object and register it for notifications
+    var controller = new eyeDrawController(window[_properties.drawingName]);
+    
 	// Preload any images
 	window[_properties.drawingName].preLoadImagesFrom(_properties.graphicsPath);
+    
+    // Controller class (need _idSuffix?)
+    function eyeDrawController(_drawing)
+    {
+        // Assign controller properties
+        this.drawing = _drawing;
+        //this.idSuffix = _idSuffix;
+        
+        // Call back function
+        this.callBack = callBack;
+        
+        // Register for notifications with drawing object
+        this.drawing.registerForNotifications(this, 'callBack', ['loaded', 'doodleAdded', 'mouseDragged']);
+        
+        // Method called for notification
+        function callBack(_messageArray)
+        {
+            console.log("Event: " + _messageArray['eventName']);
+            // Get reference to hidden input element
+            var input = document.getElementById(_properties.inputId);
+            
+            // Handle events by name
+            switch (_messageArray['eventName'])
+            {
+                // Image files all loaded
+                case 'loaded':
+                    // If input contains data, load it into the drawing
+                    if (input.value.length > 0)
+                    {
+                        // Load drawing data from input element
+                        window[_properties.drawingName].loadDoodles(_properties.inputId);
+                        
+                        // Apply bindings
+                        for ( var i = 0; i < _properties.bindingArray.length; i++)
+                        {
+                            // Doodle className
+                            var className = _properties.bindingArray[i][0];
+                            
+                            // Binding
+                            var binding = translateParameter(_properties.bindingArray[i][1]);
+                            
+                            // Get key of first and only element
+                            for (var key in binding)
+                            {
+                            }
+                            
+                            // Get doodle corresponding to this class
+                            var doodle = window[_properties.drawingName].firstDoodleOfClass(className);
+                            if (doodle)
+                            {
+                                doodle.addBinding(key, binding[key]);
+                            }
+                        }
+                        
+                        // Draw doodles
+                        window[_properties.drawingName].drawAllDoodles();
+                    }
+                    // Otherwise run commands in onLoadedCommand array
+                    else
+                    {
+                        for ( var i = 0; i < _properties.onLoadedCommandArray.length; i++)
+                        {
+                            // Get method name
+                            var method = _properties.onLoadedCommandArray[i][0];
+                            
+                            // Construct array containing arguments
+                            var args = new Array();
+                            for (var j = 0; j < _properties.onLoadedCommandArray[i][1].length; j++)
+                            {
+                                arg = translateParameter(_properties.onLoadedCommandArray[i][1][j]);
+                                args[j] = arg;
+                            }
+
+                            // Run method with arguments
+                            window[_properties.drawingName][method].apply(window[_properties.drawingName], args);
+                        }
+                    }
+                    
+                    // Initialise hidden input
+                    input.value = window[_properties.drawingName].save();
+                    
+                    break;
+                case 'doodleAdded':
+                    // Save drawing to hidden input
+                    input.value = window[_properties.drawingName].save();
+                    break;
+                case 'mouseDragged':
+                    // Save drawing to hidden input
+                    input.value = window[_properties.drawingName].save();
+                    break;
+                default:
+                    console.log('Unhandled notification for message: ' + _messageArray['eventName']);
+                    break;
+            }
+        }
+    }    
+}
+
+// Translates strings into arrays if appropriate
+function translateParameter(_arg)
+{
+    switch (_arg.charAt(0))
+    {
+        // Regular array
+        case "[":
+            console.log("Call to translateParameter function for regular array ***TODO***");
+            return _arg // ***TODO*** deal with regular array
+            break;
+            
+        // Associative array
+        case "{":
+            // Create a new associative array
+            var associativeArray = new Array();
+            
+            // Strip {} characters (***TODO*** should be able to do this with a grep expression)
+            var arg = _arg.replace('{','');
+            arg = arg.replace('}','');
+            
+            // Strip out white space
+            arg = arg.replace(/\s/,'');
+            
+            // Split into individual members each of format key:value
+            var members = arg.split(',');
+            
+            // Go through elements creating an associative array member for each
+            for (var i = 0; i < members.length; i++)
+            {
+                // Break each couplet into two parts
+                var parts = members[i].split(':');
+                
+                // Strip out any quotation marks from second part
+                var secondPart = parts[1].replace(/("|')/g, "");
+                associativeArray[parts[0]] = secondPart;
+            }
+                                                    
+            return associativeArray;
+            break;
+                                                    
+        // String
+        default:
+            return _arg;
+            break;
+    }
+}
+
 
 	// Set focus to the canvas element
-	if (_properties.focus) {
-		canvas.focus();
-	}
+//	if (_properties.focus) {
+//		canvas.focus();
+//	}
 
+    
+    
 	// Wait for the drawing object to be ready before adding objects or other
 	// commands
+/*
 	window[_properties.drawingName].onLoaded = function() {
 		// Check for an element containing data
 		var dataElement = document.getElementById(_properties.inputId);
@@ -126,6 +277,6 @@ function eyeDrawInit(_properties)
 				input.value = window[_properties.drawingName].save();
 			}
 		}
-
 	}
-}
+ */
+    

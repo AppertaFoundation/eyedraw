@@ -72,7 +72,7 @@ class OEEyeDrawWidget extends CWidget
     * Template to use to render the eyeDraw, this allows multiple different layouts
     * @var string
     */
-    public $template = 'default';
+    public $template = 'OEEyeDrawWidgetBasic';
 
 	/**
 	 * Unique identifier (eg RPS for right posterior segment drawing)
@@ -105,7 +105,7 @@ class OEEyeDrawWidget extends CWidget
     public $model;
 
 	/**
-	 * Name of the attribute, and also of the corresponding hidden input field
+	 * Name of the attribute
 	 * @var string
 	 */
     public $attribute;
@@ -121,6 +121,12 @@ class OEEyeDrawWidget extends CWidget
 	 * @var array
 	 */
     public $onLoadedCommandArray = array();
+    
+	/**
+	 * Array of bindings to apply to doodles, applied after onLoaded commands.
+	 * @var array
+	 */
+    public $bindingArray = array();
 	
 	/**
 	 * Array of params to apply to doodles once the drawing is initialised
@@ -143,12 +149,6 @@ class OEEyeDrawWidget extends CWidget
 	 * @var array
 	 */
     private $scriptArray = array('Adnexal', 'AntSeg', 'Glaucoma', 'MedicalRetina', 'Strabismus', 'VitreoRetinal');
-		
-	/**
-	 * Unique idSuffix used to identify control buttons and other related elements
-	 * @var string
-	 */	
-	private $idSuffix;
 
 	/**
 	 * Unique name for the EyeDraw drawing object ('ed_drawing_'.$mode.'_'.$idSuffix).
@@ -198,7 +198,6 @@ class OEEyeDrawWidget extends CWidget
 	 * Optional boolean that determines whether to show the toolbar or not
 	 * @var boolean
 	 */
-	
 	public $toolbar = true;
 
 	/**
@@ -287,7 +286,10 @@ class OEEyeDrawWidget extends CWidget
         }
 
         // Render the widget
-        $this->render(get_class($this),get_object_vars($this));
+        error_log($this->template);
+        //$this->render(get_class($this),get_object_vars($this));
+        $this->render($this->template, get_object_vars($this));
+        //$this->render('application.modules.OphMiTesteyedrawwidget.views.custom.create_custom', get_object_vars($this));
 	}
 
 	/**
@@ -334,6 +336,7 @@ class OEEyeDrawWidget extends CWidget
             'graphicsPath'=>$this->imgPath,
             'inputId'=>$this->inputId,
             'onLoadedCommandArray'=>$this->onLoadedCommandArray,
+            'bindingArray'=>$this->bindingArray,
             'onLoadedParamsArray'=>$this->onLoadedParamsArray,
             'offset_x'=>$this->offset_x,
             'offset_y'=>$this->offset_y,
@@ -356,7 +359,7 @@ class OEEyeDrawWidget extends CWidget
 }
 
 /**
- * Language specific doodle descriptions (used for title attributes of doodle selection buttons)
+ * Language specific doodle descriptions (used for title attributes of doodle toolbar buttons)
  * 
  * @package EyeDraw
  * @author Bill Aylward <bill.aylward@openeyes.org>

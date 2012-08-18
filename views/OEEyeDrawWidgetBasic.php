@@ -1,4 +1,5 @@
 <?php if(!$no_wrapper) {?><div class="EyeDrawWidget"><?php } ?>
+    <p>OEEyeDrawWidgetBasic.php template</p>
 	<?php if ($isEditable && $toolbar) {?>
 		<div class="ed_toolbar">
 			<button class="ed_img_button" disabled='disabled' id="moveToFront<?php echo $idSuffix?>" title="Move to front" onclick="<?php echo $drawingName?>.moveToFront(); return false;">
@@ -29,7 +30,8 @@
     <!-- <span id="canvasTooltip"></span> -->
 	<canvas id="<?php echo $canvasId?>" class="<?php if ($isEditable) { echo 'edit'; } else { echo 'display'; }?>" width="<?php echo $size?>" height="<?php echo $size?>" tabindex="1"<?php if ($canvasStyle) {?> style="<?php echo $canvasStyle?>"<?php }?>></canvas>
 	<?php if($inputId) { ?>
-	<input type="hidden" id="<?php echo $inputId?>" name="<?php echo $inputName?>" value='<?php echo $this->model[$this->attribute]?>' />
+	<input type="text" id="<?php echo $inputId?>" name="<?php echo $inputName?>" value='<?php echo $this->model[$this->attribute]?>' />
 	<?php } ?>
+    <input type="text" id="axisTextBox" value=90 />
 <?php if(!$no_wrapper) {?></div><?php } ?>
 	

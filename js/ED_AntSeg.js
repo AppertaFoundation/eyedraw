@@ -4064,7 +4064,7 @@ ED.TrialLens.prototype.setPropertyDefaults = function()
 	this.isMoveable = false;
 	this.isRotatable = true;
     this.addAtBack = true;
-    this.animationDeltaArray = {axis: 10, originX: 2, scaleY: 0.02, rotation:0.2};
+    this.animationDeltaArray = {axis: 4, originX: 2, scaleY: 0.02, rotation:0.2};
     this.rangeOfOriginX = new ED.Range(-500, +500);
 }
 
