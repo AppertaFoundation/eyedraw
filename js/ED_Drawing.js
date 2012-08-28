@@ -140,6 +140,23 @@ ED.isFirefox = function()
     }
 }
 
+ED.Mod = function Mod(_x, _y)
+{
+    return _x - Math.floor(_x/_y) * _y;
+}
+
+/**
+ * Error handler
+ *
+ * @param {String} _class Class
+ * @param {String} _method Method 
+ * @param {String} _message Error message 
+ */
+ED.errorHandler = function(_class, _method, _message)
+{
+    console.log('EYEDRAW ERROR! class: [' + _class + '] method: [' + _method + '] message: [' + _message + ']');
+}
+
 /**
  * A Drawing consists of one canvas element displaying one or more doodles;
  * Doodles are drawn in the 'doodle plane' consisting of a 1001 pixel square grid -500 to 500) with central origin, and negative Y upwards;
@@ -172,17 +189,13 @@ ED.isFirefox = function()
  */
 ED.Drawing = function(_canvas, _eye, _IDSuffix, _isEditable, offset_x, offset_y, _to_image)
 {
-	// Properties
+	// Initialise properties
 	this.canvas = _canvas;
 	this.eye = _eye;
 	this.IDSuffix = _IDSuffix;
     this.isEditable = _isEditable;
     this.hoverTimer = null;
-	
 	this.convertToImage = (_to_image && !this.isEditable) ? true : false;
-	// Grab the canvas parent element
-	this.canvasParent = this.canvas.parentElement;
-	
 	this.context = this.canvas.getContext('2d');
 	this.doodleArray = new Array();
 	this.transform = new ED.AffineTransform();
@@ -199,6 +212,9 @@ ED.Drawing = function(_canvas, _eye, _IDSuffix, _isEditable, offset_x, offset_y,
     this.globalScaleFactor = 1;
     this.scrollValue = 0;
     this.lastDoodleId = 0;
+    
+    // Grab the canvas parent element
+	this.canvasParent = this.canvas.parentElement;
     
     // Array of objects requesting notifications
     this.notificationArray = new Array();
@@ -455,7 +471,7 @@ ED.Drawing.prototype.unRegisterForNotifications = function(_object)
  */
 ED.Drawing.prototype.notify = function(_eventName, _object)
 {
-    console.log("Notifying for event: " + _eventName);
+    //console.log("Notifying for event: " + _eventName);
     
     // Create array containing useful information
     var messageArray = {eventName:_eventName, selectedDoodle:this.selectedDoodle, object:_object};
@@ -463,11 +479,24 @@ ED.Drawing.prototype.notify = function(_eventName, _object)
     // Call method on each registered object
     for (var i = 0; i < this.notificationArray.length; i++)
     {
-        // Check that event is in notification list for this object, or empty array for all notifications 
-        if (this.notificationArray[i]['notificationList'].length ==0 || this.notificationArray[i]['notificationList'].indexOf(_eventName) >= 0)
+        // Assign to variables to make code easier to read
+        var list = this.notificationArray[i]['notificationList'];
+        var object = this.notificationArray[i]['object'];
+        var methodName = this.notificationArray[i]['methodName'];
+        
+        // Check that event is in notification list for this object, or array is empty implying all notifications 
+        if (list.length == 0 || list.indexOf(_eventName) >= 0)
         {
-            // Call registered object using specified method, and passing message array
-            this.notificationArray[i]['object'][this.notificationArray[i]['methodName']].apply(this.notificationArray[i]['object'],[messageArray]);
+            // Check method exists
+            if (typeof(object[methodName]) != 'undefined')
+            {
+                // Call registered object using specified method, and passing message array
+                object[methodName].apply(object, [messageArray]);
+            }
+            else
+            {
+                ED.errorHandler('ED.Drawing', 'notify', 'Attempt to call undefined callback method');
+            }
         }
     }
 }
@@ -830,16 +859,42 @@ ED.Drawing.prototype.mousemove = function(_point)
 							// Work out difference, and change doodle's angle of rotation by this amount
 							var deltaAngle = newAngle - oldAngle;
                             
-                            // Force numeric value of rotation ***TODO*** do this more generically
-							this.selectedDoodle.rotation += deltaAngle;
+                            // Get validation
+                            //this.selectedDoodle.parameterValidationArray['rotation']
+                            
+                            // Calculate new value of rotation
+                            var newRotation = this.selectedDoodle.rotation + deltaAngle;
+                            
+                            
+                            //console.log(deltaAngle, this.selectedDoodle.rotation, this.selectedDoodle.parameterValidationArray['rotation']['range'].constrain(newRotation));
+                            
+                            // Restrict to allowable range
+                            this.selectedDoodle.rotation = this.selectedDoodle.parameterValidationArray['rotation']['range'].constrainToAngularRange(newRotation, false);
+                            
+                            // Update dependencies
+                            this.selectedDoodle.updateDependentParameters('rotation');
+
+                            //this.selectedDoodle.rotation = newRotation;
+                            
+                            // TEMP
+//                            if (this.selectedDoodle.rotation > 2 * Math.PI)
+//                            {
+//                                this.selectedDoodle.rotation = this.selectedDoodle.rotation - 2 * Math.PI;
+//                            }
+//                            if (this.selectedDoodle.rotation < 0)
+//                            {
+//                                this.selectedDoodle.rotation = this.selectedDoodle.rotation + 2 * Math.PI;
+//                            }
                             
                             // Adjust radius property
                             var oldRadius = Math.sqrt(lastMousePosDoodlePlane.x * lastMousePosDoodlePlane.x + lastMousePosDoodlePlane.y * lastMousePosDoodlePlane.y);
                             var newRadius = Math.sqrt(mousePosDoodlePlane.x * mousePosDoodlePlane.x + mousePosDoodlePlane.y * mousePosDoodlePlane.y);
-                            this.selectedDoodle.radius += (newRadius - oldRadius);
+                            //this.selectedDoodle.radius += (newRadius - oldRadius);
                             
                             // Keep within bounds
-                            this.selectedDoodle.radius = this.selectedDoodle.rangeOfRadius.constrain(this.selectedDoodle.radius);
+                            //this.selectedDoodle.radius = this.selectedDoodle.rangeOfRadius.constrain(this.selectedDoodle.radius);
+                            
+                            //this.selectedDoodle.setParameter('radius', this.selectedDoodle.radius + (newRadius - oldRadius));
 						}
 					}
 					break;
@@ -892,27 +947,30 @@ ED.Drawing.prototype.mousemove = function(_point)
                     // Arc left or right depending on which handle is dragging
                     if (this.selectedDoodle.draggingHandleIndex < 2)
                     {
-                        deltaAngle =	-deltaAngle;
+                        deltaAngle = -deltaAngle;
                         rotationCorrection = -1;
                     }
                     
-                    // Clamp to permitted range and stop dragging if exceeded
-                    if (this.selectedDoodle.rangeOfArc.isBelow(this.selectedDoodle.arc + deltaAngle))
+                    // Check for permitted range and stop dragging if exceeded
+                    if (this.selectedDoodle.rangeArray['arc'].isBelow(this.selectedDoodle.arc + deltaAngle))
                     {
-                        deltaAngle = this.selectedDoodle.rangeOfArc.min - this.selectedDoodle.arc;
-                        this.selectedDoodle.arc = this.selectedDoodle.rangeOfArc.min;
+                        //deltaAngle = this.selectedDoodle.rangeArray['arc'].min - this.selectedDoodle.arc;
+                        //this.selectedDoodle.arc = this.selectedDoodle.rangeArray['arc'].min;
                         this.mode = ED.Mode.None;
                     }
-                    else if (this.selectedDoodle.rangeOfArc.isAbove(this.selectedDoodle.arc + deltaAngle))
+                    else if (this.selectedDoodle.rangeArray['arc'].isAbove(this.selectedDoodle.arc + deltaAngle))
                     {
-                        deltaAngle = this.selectedDoodle.rangeOfArc.max - this.selectedDoodle.arc;
-                        this.selectedDoodle.arc = this.selectedDoodle.rangeOfArc.max;
+                        
+                        //deltaAngle = this.selectedDoodle.rangeArray['arc'].max - this.selectedDoodle.arc;
+                        //this.selectedDoodle.arc = this.selectedDoodle.rangeArray['arc'].max;
                         this.mode = ED.Mode.None;
                     }
                     else
                     {
-                        this.selectedDoodle.arc += deltaAngle;
+                        //this.selectedDoodle.arc += deltaAngle;
                     }
+                    
+                    this.selectedDoodle.setParameter('arc', this.selectedDoodle.arc + deltaAngle);
                     
                     // Correct rotation with counter-rotation
                     if (!this.selectedDoodle.isArcSymmetrical)
@@ -950,7 +1008,7 @@ ED.Drawing.prototype.mousemove = function(_point)
                     
                     // TEMP testing constraining radius
                     var p = this.selectedDoodle.squiggleArray[0].pointsArray[i];
-                    if (p.length() < this.selectedDoodle.rangeOfRadius.max)
+                    if (p.length() < this.selectedDoodle.rangeArray['radius'].max)
                     {
                         this.selectedDoodle.squiggleArray[0].pointsArray[i].x += (mousePosSelectedDoodlePlane.x - lastMousePosSelectedDoodlePlane.x);
                         this.selectedDoodle.squiggleArray[0].pointsArray[i].y += (mousePosSelectedDoodlePlane.y - lastMousePosSelectedDoodlePlane.y);
@@ -981,9 +1039,9 @@ ED.Drawing.prototype.mousemove = function(_point)
 					break;		
 			}
             
-			// Update any bindings and refresh drawing
+			// Refresh drawing and update any bindings - order is important since draw method may alter value of parameters 
+            this.repaint();	
             this.updateBindings();
-			this.repaint();				
 		}
 		
 		// Store mouse position
@@ -1588,13 +1646,21 @@ ED.Drawing.prototype.addDoodle = function(_className, _parameterDefaults, _param
             this.doodleArray[i].isSelected = false;
         }
 
-        // Set common paremeters for this doodle
+        // Set parameters for this doodle
         if (typeof(_parameterDefaults) != 'undefined')
         {
             for (var key in _parameterDefaults)
             {
                 //console.log('addDoodle - Key: ' + key + ' Value: ' + _parameterDefaults[key]);
-                newDoodle.setParameter(key, _parameterDefaults[key]);
+                var res = newDoodle.validateParameter(key, _parameterDefaults[key]);
+                if (res.valid)
+                {
+                    newDoodle.setParameter(key, res.value);
+                }
+                else
+                {
+                    ED.errorHandler('ED.Drawing', 'addDoodle', 'ParameterDefaults array contains an invalid value for parameter ' + key);
+                }
             }
         }
         
@@ -1616,22 +1682,12 @@ ED.Drawing.prototype.addDoodle = function(_className, _parameterDefaults, _param
         // Add to array
         this.doodleArray[this.doodleArray.length] = newDoodle;
         
-        if (newDoodle.addAtBack)
-        {
-            this.moveToBack();
-        }
-        else
-        {
-            // Refresh drawing
-            this.repaint();
-        }
-        
         // Deal with bindings
         if (typeof(_parameterBindings) != 'undefined')
         {
             for (var key in _parameterBindings)
             {
-                //console.log('addDoodle - Key: ' + key + ' Value: ' + _parameterBindings[key]);
+                console.log('addDoodle - Key: ' + key + ' Value: ' + _parameterBindings[key]);
                 // Add binding to the doodle
                 newDoodle.addBinding(key, _parameterBindings[key]);
             }
@@ -1639,6 +1695,18 @@ ED.Drawing.prototype.addDoodle = function(_className, _parameterDefaults, _param
         
         // Notify
         this.notify("doodleAdded", newDoodle);
+        
+        // Place doodle and refresh drawing
+        if (newDoodle.addAtBack)
+        {
+            // This method also calls the repaint method
+            this.moveToBack();
+        }
+        else
+        {
+            // Refresh drawing
+            this.repaint();
+        }
         
         // Return doodle
         return newDoodle;
@@ -1659,7 +1727,8 @@ ED.Drawing.prototype.addDoodle = function(_className, _parameterDefaults, _param
  */
 ED.Drawing.prototype.eventHandler = function(_type, _doodleId, _elementId, _value)
 {
-    //console.log("Event " + _type + ":" + _doodleId + ":" + _elementId + ":" + _value);
+    console.log("Event " + _type + ":" + _doodleId + ":" + _elementId + ":" + _value);
+    //var value;
     switch (_type)
     {
         // Onchange event
@@ -1679,16 +1748,35 @@ ED.Drawing.prototype.eventHandler = function(_type, _doodleId, _elementId, _valu
                     }
                 }
                 
-                // Set parameter to new value
-                if (typeof(parameter) != 'undefined')
+                // Check validity of new value
+                var validityArray = doodle.validateParameter(parameter, _value);
+                
+                // If new value is valid, set it
+                if (validityArray.valid)
                 {
-                    doodle.setParameterWithAnimation(parameter, _value);
+                    doodle.setParameterWithAnimation(parameter, validityArray.value);
+                }
+                else
+                {
+                    ED.errorHandler('ED.Drawing', 'eventHandler', 'Attempt to change HTML element value to an invalid value for parameter ' + parameter);
+                }
+
+                // Apply new value to element if necessary
+                if (_value != validityArray.value)
+                {
+                    document.getElementById(_elementId).value = validityArray.value;
                 }
             }
             break;
         default:
             break;
     }
+}
+
+// Checks that the value is numeric http://stackoverflow.com/questions/18082/validate-numbers-in-javascript-isnumeric
+ED.isNumeric = function(_value)
+{
+    return (_value - 0) == _value && _value.length > 0;
 }
 
 /**
@@ -2137,7 +2225,6 @@ ED.Drawing.prototype.clear = function()
  */
 ED.Drawing.prototype.repaint = function()
 {
-    //console.log("Drawing.repaint()");
 	// Clear canvas
 	this.clear();
     
@@ -2583,7 +2670,103 @@ ED.Doodle = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _sca
         
         // Unique ID of doodle within this drawing
         this.id = this.drawing.nextDoodleId();
+
+        
+        // Optional rray of squiggles
+        this.squiggleArray = new Array();
 		
+		// Transform used to draw doodle (includes additional transforms specific to the doodle)
+		this.transform = new ED.AffineTransform();
+		this.inverseTransform = new ED.AffineTransform();
+		
+		// Dragging defaults - set individual values in subclasses
+        this.isLocked = false;
+		this.isSelectable = true;
+        this.isShowHighlight = true;
+		this.isDeletable = true;
+		this.isOrientated = false;
+		this.isScaleable = true;
+		this.isSqueezable = false;
+		this.isMoveable = true;
+		this.isRotatable = true;
+        this.isDrawable = false;
+        this.isUnique = false;
+        this.isArcSymmetrical = false;
+        this.addAtBack = false;
+        this.isPointInLine = false;
+        this.snapToGrid = false;
+        this.snapToQuadrant = false;
+        this.snapToPoints = false;
+        this.willReport = true;
+        
+        // Permitted ranges
+        this.rangeArray = {
+            originX:new ED.Range(-1000, +1000),
+            originY:new ED.Range(-1000, +1000),
+            radius:new ED.Range(100, 450),
+            apexX:new ED.Range(-500, +500),
+            apexY:new ED.Range(-500, +500),
+            scaleX:new ED.Range(+0.5, +4.0),
+            scaleY:new ED.Range(+0.5, +4.0),
+            arc:new ED.Range(Math.PI/6, Math.PI * 2),
+            rotation:new ED.Range(0, Math.PI * 2),
+        };
+        //console.log("here: ", this.rangeArray['apexX']);
+        
+        this.rangeOfOriginX = new ED.Range(-1000, +1000);
+        this.rangeOfOriginY = new ED.Range(-1000, +1000);
+		this.rangeOfScale = new ED.Range(+0.5, +4.0);
+		this.rangeOfArc = new ED.Range(Math.PI/6, Math.PI*2);
+		this.rangeOfApexX = new ED.Range(-500, +500);
+		this.rangeOfApexY = new ED.Range(-500, +500);
+        this.rangeOfHandlesXArray = new Array();
+        this.rangeOfHandlesXArray[0] = new ED.Range(-500, +500);
+        this.rangeOfHandlesXArray[1] = new ED.Range(-500, +500);
+        this.rangeOfHandlesXArray[2] = new ED.Range(-500, +500);
+        this.rangeOfHandlesXArray[3] = new ED.Range(-500, +500);
+        this.rangeOfHandlesYArray = new Array();
+        this.rangeOfHandlesYArray[0] = new ED.Range(-500, +500);
+        this.rangeOfHandlesYArray[1] = new ED.Range(-500, +500);
+        this.rangeOfHandlesYArray[2] = new ED.Range(-500, +500);
+        this.rangeOfHandlesYArray[3] = new ED.Range(-500, +500);
+        this.rangeOfRadius = new ED.Range(100, 450);
+        this.gridSpacing = 100;
+		
+		// Flags and other properties
+		this.isBeingDragged = false;
+		this.draggingHandleIndex = null;
+		this.draggingHandleRing = null;
+		this.isClicked = false;
+		this.drawFunctionMode = ED.drawFunctionMode.Draw;
+        this.isFilled = true;
+        this.derivedParametersArray = new Array();  // Array relating special parameters to corresponding common parameter
+        this.animationFrameRate = 30;           // Frames per second
+        this.animationDeltaArray = new Array();
+        this.animationDataArray = new Array();   // Associative array. key = parameter name, value = array with animation info
+        
+        // Array of points to snap to
+        this.pointsArray = new Array();
+        
+        // Bindings to HTML element values
+        this.bindingArray = new Array();
+        
+		// Array of 5 handles
+		this.handleArray = new Array();
+		this.handleArray[0] = new ED.Handle(new ED.Point(-50, 50), false, ED.Mode.Scale, false);
+		this.handleArray[1] = new ED.Handle(new ED.Point(-50, -50), false, ED.Mode.Scale, false);
+		this.handleArray[2] = new ED.Handle(new ED.Point(50, -50), false, ED.Mode.Scale, false);
+		this.handleArray[3] = new ED.Handle(new ED.Point(50, 50), false, ED.Mode.Scale, false);
+		this.handleArray[4] = new ED.Handle(new ED.Point(this.apexX, this.apexY), false, ED.Mode.Apex, false);
+		this.setHandles();
+        
+        // Extremities
+        this.leftExtremity = new ED.Point(-100,-100);
+        this.rightExtremity = new ED.Point(0,-100);
+        
+		// Set dragging default settings
+		this.setPropertyDefaults();
+        
+        
 		// New doodle (constructor called with _drawing parameter only)
 		if (typeof(_originX) == 'undefined')
 		{
@@ -2623,87 +2806,6 @@ ED.Doodle = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _sca
 			this.isSelected = false;
             this.isForDrawing = false;
 		}
-        
-        // Optional rray of squiggles
-        this.squiggleArray = new Array();
-		
-		// Transform used to draw doodle (includes additional transforms specific to the doodle)
-		this.transform = new ED.AffineTransform();
-		this.inverseTransform = new ED.AffineTransform();
-		
-		// Dragging defaults - set individual values in subclasses
-        this.isLocked = false;
-		this.isSelectable = true;
-        this.isShowHighlight = true;
-		this.isDeletable = true;
-		this.isOrientated = false;
-		this.isScaleable = true;
-		this.isSqueezable = false;
-		this.isMoveable = true;
-		this.isRotatable = true;
-        this.isDrawable = false;
-        this.isUnique = false;
-        this.isArcSymmetrical = false;
-        this.addAtBack = false;
-        this.isPointInLine = false;
-        this.snapToGrid = false;
-        this.snapToQuadrant = false;
-        this.snapToPoints = false;
-        this.willReport = true;
-        
-        // Permitted ranges
-        this.rangeOfOriginX = new ED.Range(-1000, +1000);
-        this.rangeOfOriginY = new ED.Range(-1000, +1000);
-		this.rangeOfScale = new ED.Range(+0.5, +4.0);
-		this.rangeOfArc = new ED.Range(Math.PI/6, Math.PI*2);
-		this.rangeOfApexX = new ED.Range(-500, +500);
-		this.rangeOfApexY = new ED.Range(-500, +500);
-        this.rangeOfHandlesXArray = new Array();
-        this.rangeOfHandlesXArray[0] = new ED.Range(-500, +500);
-        this.rangeOfHandlesXArray[1] = new ED.Range(-500, +500);
-        this.rangeOfHandlesXArray[2] = new ED.Range(-500, +500);
-        this.rangeOfHandlesXArray[3] = new ED.Range(-500, +500);
-        this.rangeOfHandlesYArray = new Array();
-        this.rangeOfHandlesYArray[0] = new ED.Range(-500, +500);
-        this.rangeOfHandlesYArray[1] = new ED.Range(-500, +500);
-        this.rangeOfHandlesYArray[2] = new ED.Range(-500, +500);
-        this.rangeOfHandlesYArray[3] = new ED.Range(-500, +500);
-        this.rangeOfRadius = new ED.Range(100, 450);
-        this.gridSpacing = 100;
-		
-		// Flags and other properties
-		this.isBeingDragged = false;
-		this.draggingHandleIndex = null;
-		this.draggingHandleRing = null;
-		this.isClicked = false;
-		this.drawFunctionMode = ED.drawFunctionMode.Draw;
-        this.isFilled = true;
-        this.specialParametersArray = new Array();  // Array relating special parameters to corresponding common parameter
-        this.animationFrameRate = 30;           // Frames per second
-        this.animationDeltaArray = new Array();
-        this.animationDataArray = new Array();   // Associative array. key = parameter name, value = array with animation info
-        
-        // Array of points to snap to
-        this.pointsArray = new Array();
-        
-        // Bindings to HTML element values
-        this.bindingArray = new Array();
-        
-		// Array of 5 handles
-		this.handleArray = new Array();
-		this.handleArray[0] = new ED.Handle(new ED.Point(-50, 50), false, ED.Mode.Scale, false);
-		this.handleArray[1] = new ED.Handle(new ED.Point(-50, -50), false, ED.Mode.Scale, false);
-		this.handleArray[2] = new ED.Handle(new ED.Point(50, -50), false, ED.Mode.Scale, false);
-		this.handleArray[3] = new ED.Handle(new ED.Point(50, 50), false, ED.Mode.Scale, false);
-		this.handleArray[4] = new ED.Handle(new ED.Point(this.apexX, this.apexY), false, ED.Mode.Apex, false);
-		this.setHandles();
-        
-        // Extremities
-        this.leftExtremity = new ED.Point(-100,-100);
-        this.rightExtremity = new ED.Point(0,-100);
-        
-		// Set dragging default settings
-		this.setPropertyDefaults();
 	}
 }
 
@@ -3064,6 +3166,146 @@ ED.Doodle.prototype.diagnosticHierarchy = function()
 }
 
 /**
+ * Validates the value of a parameter, and returns it in appropriate format
+ * If value is invalid, returns a constrained value or the original value
+ * Called by event handlers of HTML elements
+ *
+ * @param {String} _parameter Name of the parameter
+ * @param {Undefined} _value Value of the parameter to validate
+ * @returns {Array} A bool indicating validity, and the correctly formatted value of the parameter
+ */
+ED.Doodle.prototype.validateParameter = function(_parameter, _value)
+{
+    // Retrieve validation object for this doodle
+    var validation = this.parameterValidationArray[_parameter];
+    
+    // Set return value;
+    var value = "";
+    
+    if (validation)
+    {
+        // Validity flag
+        var valid = false;
+        
+        // Enforce string type and trim it
+        value = _value.toString().trim();
+        
+        switch (validation.type)
+        {
+            case 'string':
+                
+                // Check that its in list of valid values
+                if (validation.list.indexOf(value) >= 0)
+                {
+                    valid = true;
+                }
+                else
+                {
+                    console.log('TEMP ERROR - string not in validation list');
+                }
+                break;
+                
+            case 'float':
+                
+                // Test that value is a number
+                if (ED.isNumeric(value))
+                {
+                    // Convert string to float value
+                    value = parseFloat(value);
+                    
+                    // Constrain value to allowable range
+                    value = validation.range.constrain(value);
+                    
+                    // Convert back to string, applying any formatting
+                    value = value.toFixed(validation.precision);
+                    
+                    valid = true;
+                }
+                else
+                {
+                    console.log('TEMP ERROR - value not numeric');
+                }
+                break;
+                
+            case 'int':
+                
+                // Test that value is a number, and if not reset to current value of doodle
+                if (ED.isNumeric(value))
+                {
+                    // Convert string to float value
+                    value = parseInt(value);
+                    
+                    // Constrain value to allowable range
+                    value = validation.range.constrain(value);
+                    
+                    // Convert back to string, applying any formatting
+                    value = value.toFixed(0);
+                    
+                    valid = true;
+                }
+                else
+                {
+                    console.log('TEMP ERROR - value not numeric');
+                }
+                break;
+                
+            case 'mod':
+                
+                // Test that value is a number, and if not reset to current value of doodle
+                if (ED.isNumeric(value))
+                {
+                    // Convert string to float value
+                    value = parseInt(value);
+                    
+                    // Constrain value to allowable range
+                    value = validation.range.constrain(value);
+                    
+                    // Deal with crossover
+                    if (validation.clock == 'top')
+                    {
+                        if (value == validation.range.min) value = validation.range.max;
+                    }
+                    else if (validation.clock == 'bottom')
+                    {
+                        if (value == validation.range.max) value = validation.range.min;
+                    }
+                    
+                    // Convert back to string, applying any formatting
+                    value = value.toFixed(0);
+                    
+                    valid = true;
+                }
+                else
+                {
+                    console.log('TEMP ERROR - value not numeric');
+                }
+                break;
+            default:
+                ED.errorHandler('ED.Drawing', 'eventHandler', 'Illegal validation type');
+                break;
+        }
+    }
+    else
+    {
+        ED.errorHandler('ED.Doodle', 'validateParameter', 'Unknown parameter name');
+    }
+    
+    
+    // If not valid, get current value
+    if (!valid)
+    {
+        value = this.getParameter(_parameter);
+    }
+    
+    // Return value
+    var returnArray = new Array();
+    returnArray['valid'] = valid;
+    returnArray['value'] = value;
+    
+    return returnArray;
+}
+
+/**
  * Attempts to animate a change in value of a parameter
  *
  * @param {String} _parameter Name of parameter
@@ -3072,48 +3314,106 @@ ED.Doodle.prototype.diagnosticHierarchy = function()
 ED.Doodle.prototype.setParameterWithAnimation = function(_parameter, _value)
 {
     // Can doodle animate this parameter?
-    if (_parameter in this.animationDeltaArray)
+    if (this.parameterValidationArray[_parameter]['animate'])
     {
-        // Ensure _value is a number, or query doodle for corresponding common parameter
-        var value = parseFloat(_value);
-        if (isNaN(value))
+        console.log('animate');
+        
+        var valueArray = this.dependentParameterValues(_parameter, _value);
+        for (var parameter in valueArray)
         {
-            var parameter = this.specialParametersArray[_parameter];
-            value = this.numericValueForParameter(_parameter, _value);
-            // If no parameter exists, just set it to existing value
-            if (value == null)
+            console.log(parameter, valueArray[parameter]);
+            //this.setParameter(_parameter, _value);
+            
+            // Read delta in units per frame
+            var delta = this.parameterValidationArray[parameter]['delta'];
+            
+            // Calculate 'distance' to go
+            var distance = valueArray[parameter] - this[parameter];
+            
+            // Calculate sign and apply to delta
+            if (parameter == 'rotation')
             {
-                value = this.getParameter(parameter);
+                // This formula works out correct distance and direction on a radians 'clock face' (ie the shortest way round)
+                var sign = ((Math.PI - Math.abs(distance)) * distance) < 0?-1:1;
+                distance = distance * sign;
+                if (distance < 0) distance += 2 * Math.PI;
+            }
+            else
+            {
+                var sign = distance < 0?-1:1;
+            }
+            delta = delta * sign;
+            
+            // Calculate number of frames to animate
+            var frames = Math.abs(Math.floor(distance/delta));
+            
+            // Put results into an associative array for this parameter
+            var array = {timer:null, delta:delta, frames:frames, frameCounter:0};
+            this.animationDataArray[parameter] = array;
+            
+            // Call animation method
+            if (frames > 0)
+            {
+                this.increment(parameter, valueArray[parameter]);
             }
         }
-        else
-        {
-            var parameter = _parameter;
-        }
-        
-        // Read delta in units per frame (Value in array is of corresponding common parameter)
-        var delta = parseFloat(this.animationDeltaArray[_parameter]);
 
-        // Calculate 'distance' to go
-        var distance = value - this.getParameter(parameter);
-       
-        // Calculate sign and apply to delta
-        var sign = distance < 0?-1:1;
-        delta = delta * sign;
-        
-        // Calculate number of frames to animate
-        var frames = Math.abs(Math.floor(distance/delta));
-        
-        // Put results into an associative array for this parameter
-        var array = {timer:null, delta:delta, frames:frames, frameCounter:0};
-        this.animationDataArray[parameter] = array;
-
-        // Call animation method
-        if (frames > 0)
-        {
-            this.increment(parameter, value);
-        }
     }
+    
+//    if (_parameter in this.animationDeltaArray)
+//    {
+        
+
+//        // Determine whether its a derived parameter
+//        var value = parseFloat(_value);
+//        if (isNaN(value))
+//        {
+//            var parameter = this.derivedParametersArray[_parameter];
+//            value = this.getCommonParameterValueForDerivedParameter(_parameter, _value);
+//            // If no parameter exists, just set it to existing value
+//            if (value == null)
+//            {
+//                value = this.getParameter(parameter);
+//            }
+//        }
+//        else
+//        {
+//            var parameter = _parameter;
+//        }
+//        
+//        // Read delta in units per frame (Value in array is of corresponding common parameter)
+//        var delta = parseFloat(this.animationDeltaArray[_parameter]);
+//
+//        // Calculate 'distance' to go
+//        var distance = value - this.getParameter(parameter);
+//       
+//        // Calculate sign and apply to delta
+//        if (_parameter == 'rotation')
+//        {
+//            // This formula works out correct distance and direction on a radians 'clock face' (ie the shortest way round)
+//            var sign = ((Math.PI - Math.abs(distance)) * distance) < 0?-1:1;
+//            distance = distance * sign;
+//            if (distance < 0) distance += 2 * Math.PI;
+//        }
+//        else 
+//        {
+//            var sign = distance < 0?-1:1;
+//        }
+//        delta = delta * sign;
+//        
+//        // Calculate number of frames to animate
+//        var frames = Math.abs(Math.floor(distance/delta));
+//        
+//        // Put results into an associative array for this parameter
+//        var array = {timer:null, delta:delta, frames:frames, frameCounter:0};
+//        this.animationDataArray[parameter] = array;
+//
+//        // Call animation method
+//        if (frames > 0)
+//        {
+//            this.increment(parameter, value);
+//        }
+//    }
     // Otherwise just set it directly
     else
     {
@@ -3125,128 +3425,114 @@ ED.Doodle.prototype.setParameterWithAnimation = function(_parameter, _value)
  * Set the value of a doodle's parameter
  *
  * @param {String} _parameter Name of parameter
- * @param {Undefined} _value New value of parameter
+ * @param {String} _value New value of parameter
  */
 ED.Doodle.prototype.setParameter = function(_parameter, _value)
 {
-    var value;
-    switch (_parameter)
+    // Check type of passed value variable
+    var type = typeof(_value);
+    if (type != 'string')
     {
-        // originX
-        case 'originX':
-            value = parseInt(_value);
-            if (!isNaN(value))
-            {
-                // Use the move event to ensure correct behaviour for doodles with isOrientated set
-                this.move(this.rangeOfOriginX.constrain(value) - this.originX, 0);
-            }
-            else
-            {
-                console.log('Error: attempt to pass NaN to ' + _parameter);
-            }
-            break;
-        // originy
-        case 'originY':
-            value = parseInt(_value);
-            if (!isNaN(value))
-            {
-                // Use the move event to ensure correct behaviour for doodles with isOrientated set
-                this.move(this.rangeOfOriginY.constrain(value) - this.originY, 0);
-            }
-            else
-            {
-                console.log('Error: attempt to pass NaN to ' + _parameter);
-            }
-            break;
-        // apexX
-        case 'apexX':
-            value = parseInt(_value);
-            if (!isNaN(value))
-            {
-                this.apexX = this.rangeOfApexX.constrain(value);
-            }
-            else
-            {
-                console.log('Error: attempt to pass NaN to ' + _parameter);
-            }
-            break;
-        // apexY
-        case 'apexY':
-            value = parseInt(_value);
-            if (!isNaN(value))
-            {
-                this.apexY = this.rangeOfApexY.constrain(value);
-            }
-            else
-            {
-                console.log('Error: attempt to pass NaN to ' + _parameter);
-            }
-            break;
-        // scaleX
-        case 'scaleX':
-            value = parseFloat(_value);
-            if (!isNaN(value))
-            {
-                this.scaleX = this.rangeOfScale.constrain(value);
-            }
-            else
-            {
-                console.log('Error: attempt to pass NaN to ' + _parameter);
-            }
-            break;
-        // scaleY
-        case 'scaleY':
-            value = parseFloat(_value);
-            if (!isNaN(value))
-            {
-                this.scaleY = this.rangeOfScale.constrain(value);
-            }
-            else
-            {
-                console.log('Error: attempt to pass NaN to ' + _parameter);
-            }
-            break;
-        // arc
-        case 'arc':
-            value = parseFloat(_value);
-            if (!isNaN(value))
-            {
-                this.arc = this.rangeOfArc.constrain(value);
-            }
-            else
-            {
-                console.log('Error: attempt to pass NaN to ' + _parameter);
-            }
-            break;
-        // rotation
-        case 'rotation':
-            value = parseFloat(_value);
-            if (!isNaN(value))
-            {
-                this.rotation = value;
-            }
-            else
-            {
-                console.log('Error: attempt to pass NaN to ' + _parameter);
-            }
-            break;
-        default:
-            break
+        ED.errorHandler('ED.Doodle', 'setParameter', '_value parameter should be of type string, not ' + type);
     }
     
+    // Retrieve validation object for this doodle
+    var validation = this.parameterValidationArray[_parameter];
+    
+    if (validation)
+    {
+        // Set value according to type of parameter
+        switch (validation.type)
+        {
+            case 'string':
+                this[_parameter] = _value;
+                break;
+            case 'float':
+                this[_parameter] = parseFloat(_value);
+                break;
+            case 'int':
+                this[_parameter] = parseInt(_value);
+                break;
+            case 'mod':
+                this[_parameter] = parseInt(_value);
+                break;
+            default:
+                ED.errorHandler('ED.Doodle', 'setParameter', 'Illegal validation type: ' + validation.type);
+                break;
+        }
+        
+        // Update dependencies
+        this.updateDependentParameters(_parameter);
+//        var valueArray = this.dependentParameterValues(_parameter);
+//        for (var parameter in valueArray)
+//        {
+//            console.log(parameter, valueArray[parameter]);
+//            this[parameter] = valueArray[parameter];
+//        }
+    }
+    else
+    {
+        ED.errorHandler('ED.Doodle', 'setParameter', 'No item in parameterValidationArray corresponding to parameter: ' + _parameter);
+    }
+
     // Refresh drawing
+    //console.log(this);
     this.drawing.repaint();
 }
 
 /**
- * Returns parameters
+ * Returns parameter values in validated string format
  *
  * @param {String} _parameter Name of parameter
- * @returns {Undefined} Value of parameter
+ * @returns {String} Value of parameter
  */
 ED.Doodle.prototype.getParameter = function(_parameter)
 {
-    return this[_parameter];
+    // Retrieve validation object for this doodle
+    var validation = this.parameterValidationArray[_parameter];
+    
+    // Set return value;
+    var value = "";
+    
+    if (validation)
+    {
+        switch (validation.type)
+        {
+            case 'string':
+                
+                value = this[_parameter];
+                break;
+                
+            case 'float':
+
+                // Convert to string, applying any formatting
+                value = this[_parameter].toFixed(validation.precision);
+                break;
+
+            case 'int':
+                
+                // Convert to string, applying any formatting
+                value = this[_parameter].toFixed(0);
+                break;
+                
+            case 'mod':
+                
+                // Convert to string, applying any formatting
+                value = this[_parameter].toFixed(0);
+                break;
+
+            default:
+                ED.errorHandler('ED.Doodle', 'getParameter', 'Illegal validation type');
+                break;
+        }
+    }
+    else
+    {
+        ED.errorHandler('ED.Doodle', 'getParameter', 'No entry in parameterValidationArray corresponding to parameter: ' + _parameter);
+    }
+    
+    // Return value
+    return value;
 }
 
 /**
@@ -3258,16 +3544,17 @@ ED.Doodle.prototype.getParameter = function(_parameter)
 ED.Doodle.prototype.increment = function(_parameter, _value)
 {
     // Increment parameter and framecounter
-    var currentValue = this.getParameter(_parameter);
+    var currentValue = this[_parameter];
     this.animationDataArray[_parameter]['frameCounter']++;
     
     // Calculate interval between frames in milliseconds
-    var interval = 1000/this.frameRate;
+    var interval = 1000/this.animationFrameRate;
     
     if (this.animationDataArray[_parameter]['frameCounter'] == this.animationDataArray[_parameter]['frames'])
     {
         // Set  parameter to exact value
-        this.setParameter(_parameter, +_value);
+        //this.setParameter(_parameter, _value);
+        this[_parameter] = _value;
         
         // Stop timer
         clearTimeout(this.animationDataArray[_parameter]['timer']);
@@ -3275,21 +3562,25 @@ ED.Doodle.prototype.increment = function(_parameter, _value)
     else
     {
         // Set parameter to new value
-        this.setParameter(_parameter, +currentValue + this.animationDataArray[_parameter]['delta']);
+        //this.setParameter(_parameter, +currentValue + this.animationDataArray[_parameter]['delta']);
+        this[_parameter] = currentValue + this.animationDataArray[_parameter]['delta'];
         
         // Start timer and set to call this function again after interval
         var doodle = this;
         this.animationDataArray[_parameter]['timer'] = setTimeout(function() {doodle.increment(_parameter, _value);}, interval);
     }
+    
+    // Refresh drawing
+    this.drawing.repaint();
 }
 
 /**
  * Set the value of a doodle's parameter - overridden in subclassees
  *
  * @param {String} _parameter Name of parameter
- * @param {Undefined} _value New value of parameter
+ * @param {String} _value New value of parameter
  */
-ED.Doodle.prototype.numericValueForParameter = function(_parameter, _value)
+ED.Doodle.prototype.getCommonParameterValueForDerivedParameter = function(_parameter, _value)
 {
     return null;
 }
@@ -3297,12 +3588,16 @@ ED.Doodle.prototype.numericValueForParameter = function(_parameter, _value)
 /**
  * Adds a binding to the doodle
  *
+ * @param {String} _parameter Name of parameter to be bound
+ * @param {String} _id Id of bound HTML element
  */
-ED.Doodle.prototype.addBinding = function(_param, _id)
+ED.Doodle.prototype.addBinding = function(_parameter, _id)
 {
+    
+//console.log('jquery?');
     //console.log(_param + " : " + _id);
     // Add binding to array
-    this.bindingArray[_param] = _id;
+    this.bindingArray[_parameter] = _id;
     
     // Get reference to HTML element
     var element = document.getElementById(_id);
@@ -3310,18 +3605,22 @@ ED.Doodle.prototype.addBinding = function(_param, _id)
     if (element != null)
     {
         // Set parameter to value of element
-        this.setParameter(_param, element.value);
+        this.setParameter(_parameter, element.value);
         
         // Attach onchange event of element with a function which calls the drawing event handler
         var drawing = this.drawing;
         var id = this.id;
-//        element.addEventListener('change',function (event) {
-//                                 drawing.eventHandler('onchange', id, this.id, this.value);
-//                                 },false);
+        element.addEventListener('change',function (event) {
+                                 drawing.eventHandler('onchange', id, this.id, this.value);
+                                 },false);
+
+        //console.log($(this));
 //        $("#axisTextBox").click(function() {
 //                                alert("Hello");
 //                                });
-        console.log('binding added');
+//        document.getElementById('Element_OphMiTesteyedrawwidget_Values_intvalue').addEventListener('change',function (event) {
+//                                 drawing.eventHandler('onchange', id, this.id, this.value);
+//                                 },false);;
     }
 }
 
@@ -3582,6 +3881,7 @@ ED.Doodle.prototype.debug = function()
     console.log('arc: ' + this.arc * 180/Math.PI);
 }
 
+
 /**
  * Represents a control handle on the doodle
  *
@@ -3624,6 +3924,19 @@ ED.Handle = function(_location, _isVisible, _mode, _isRotatable)
 ED.Range = function(_min, _max)
 {
 	// Properties
+	this.min = _min;
+	this.max = _max;
+}
+
+/**
+ * Set min and max with one function call
+ *
+ * @param {Float} _min
+ * @param {Float} _max
+ */
+ED.Range.prototype.setMinAndMax = function(_min, _max)
+{
+	// Set properties
 	this.min = _min;
 	this.max = _max;
 }
@@ -3702,6 +4015,89 @@ ED.Range.prototype.constrain = function(_num)
 	{
 		return _num;
 	}
+}
+
+/**
+ * Returns true if the parameter is within the 'clockface' range represented by the min and max values
+ *
+ * @param {Float} _angle Angle to test
+ * @param {Bool} _isDegrees Flag indicating range is in degrees rather than radians
+ * @returns {Bool} True if the parameter is within the range
+ */
+ED.Range.prototype.includesInAngularRange = function(_angle, _isDegrees)
+{
+    // Arbitrary radius
+    var r = 100;
+    
+    // Points representing vectos of angles within range
+    var min = new ED.Point(0,0);
+    var max = new ED.Point(0,0);
+    var angle = new ED.Point(0,0);
+    
+    // Convert to radians
+    if (!_isDegrees)
+    {
+        min.setWithPolars(r, this.min);
+        max.setWithPolars(r, this.max);
+        angle.setWithPolars(r, _angle);
+    }
+    else
+    {
+        min.setWithPolars(r, this.min * Math.PI/180);
+        max.setWithPolars(r, this.max * Math.PI/180);
+        angle.setWithPolars(r, _angle * Math.PI/180);
+    }
+    
+    return (min.clockwiseAngleTo(angle) <= min.clockwiseAngleTo(max));
+}
+
+/**
+ * Constrains a value to the limits of the angular range
+ *
+ * @param {Float} _angle Angle to test
+ * @param {Bool} _isDegrees Flag indicating range is in degrees rather than radians
+ * @returns {Float} The constrained value
+ */
+ED.Range.prototype.constrainToAngularRange = function(_angle, _isDegrees)
+{
+    // Arbitrary radius
+    var r = 100;
+    
+    // Points representing vectos of angles within range
+    var min = new ED.Point(0,0);
+    var max = new ED.Point(0,0);
+    var angle = new ED.Point(0,0);
+    
+    // Convert to radians
+    if (!_isDegrees)
+    {
+        min.setWithPolars(r, this.min);
+        max.setWithPolars(r, this.max);
+        angle.setWithPolars(r, _angle);
+    }
+    else
+    {
+        min.setWithPolars(r, this.min * Math.PI/180);
+        max.setWithPolars(r, this.max * Math.PI/180);
+        angle.setWithPolars(r, _angle * Math.PI/180);
+    }
+    
+    // Return appropriate value depending on relationshipt to range
+    if (min.clockwiseAngleTo(angle) <= min.clockwiseAngleTo(max))
+    {
+        return _angle;
+    }
+    else
+    {
+        if (angle.clockwiseAngleTo(min) < max.clockwiseAngleTo(angle))
+        {
+            return this.min;
+        }
+        else
+        {
+            return this.max;
+        }
+    }
 }
 
 /**

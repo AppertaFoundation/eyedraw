@@ -346,6 +346,9 @@ class OEEyeDrawWidget extends CWidget
 		// Encode parameters and pass to a javascript function to set up canvas
 		$properties = CJavaScript::encode($properties);
 		$cs->registerScript('scr_'.$this->canvasId, "eyeDrawInit($properties)", CClientScript::POS_LOAD);
+        Yii::app()->clientScript->registerScript('helloscript',"
+                                                 console.log('hello');
+                                                 ",CClientScript::POS_READY);
 	}
 
 	/**

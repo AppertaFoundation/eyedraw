@@ -40,6 +40,7 @@
  */
 function eyeDrawInit(_properties)
 {
+    console.log(_properties.bindingArray);
 	// Get reference to the drawing canvas
 	var canvas = document.getElementById(_properties.canvasId);
 
@@ -71,6 +72,7 @@ function eyeDrawInit(_properties)
         function callBack(_messageArray)
         {
             console.log("Event: " + _messageArray['eventName']);
+            console.log($(this));
             // Get reference to hidden input element
             var input = document.getElementById(_properties.inputId);
             
@@ -94,7 +96,7 @@ function eyeDrawInit(_properties)
                             // Binding
                             var binding = translateParameter(_properties.bindingArray[i][1]);
                             
-                            // Get key of first and only element
+                            // Get key of first and only element (more elegant way of doing this?)
                             for (var key in binding)
                             {
                             }
@@ -113,6 +115,7 @@ function eyeDrawInit(_properties)
                     // Otherwise run commands in onLoadedCommand array
                     else
                     {
+                        console.log(_properties.bindingArray);
                         for ( var i = 0; i < _properties.onLoadedCommandArray.length; i++)
                         {
                             // Get method name
@@ -127,7 +130,8 @@ function eyeDrawInit(_properties)
                             }
 
                             // Run method with arguments
-                            window[_properties.drawingName][method].apply(window[_properties.drawingName], args);
+                            var dood = window[_properties.drawingName][method].apply(window[_properties.drawingName], args);
+                            console.log(dood);
                         }
                     }
                     

@@ -1,0 +1,36 @@
+Drawing.addDoodle
+	Doodle Subclass constructor
+		Doodle Class constructor
+			Doodle subclass setParameterDefaults (new doodles only)
+			Doodle subclass setPropertyDefaults
+
+
+	Doodle subclass setParameter (from parameter defaults array)
+		Doodle class setParameter
+		
+
+Parameters can be set in the following ways;
+
+	Mouse dragging (only affects simple parameters)
+		calls validateParameter for range only
+		set parameter calls update dependencies
+		
+	HTML events can affect all parameters
+	
+	
+Validation method ensures that value is in correct format and always outputs a string
+It takes a parameter of any type, and returns the validated value
+
+set parameter takes a validated string value, and sets type appropriately
+
+SetParameterWithAnimation
+
+	Get list of simple parameters involved
+	Work out their target values
+	Start an animation for each one
+			
+			
+			Next task: Add a value to dependentParameterValues = function(_parameter) to calculate future values
+
+
+	
