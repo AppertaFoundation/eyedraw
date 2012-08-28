@@ -280,6 +280,8 @@ class OEEyeDrawWidget extends CWidget
             );
         }
 
+				$this->side = $this->side == 'R' ? 'right' : 'left';
+
         $this->render(get_class($this),get_object_vars($this));
 	}
 
