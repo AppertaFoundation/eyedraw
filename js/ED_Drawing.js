@@ -286,6 +286,9 @@ ED.Drawing = function(_canvas, _eye, _IDSuffix, _isEditable, offset_x, offset_y,
                                      }, false);
         
         this.canvas.addEventListener('mousewheel', function(e) {
+																		 if (drawing.selectedDoodle == null) {
+																			 return true;
+																		 }
                                      e.preventDefault();
                                      drawing.selectNextDoodle(e.wheelDelta);
                                      }, false);
