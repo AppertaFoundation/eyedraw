@@ -140,6 +140,13 @@ ED.isFirefox = function()
     }
 }
 
+/**
+ * Returns 'true' remainder of a number divided by a modulus (i.e. always positive, unlike x%y)
+ *
+ * @param {Float} _x number
+ * @param {Float} _y modulus
+ * @returns {Float} True modulus of _x/_y
+ */
 ED.Mod = function Mod(_x, _y)
 {
     return _x - Math.floor(_x/_y) * _y;
@@ -305,10 +312,10 @@ ED.Drawing = function(_canvas, _eye, _IDSuffix, _isEditable, offset_x, offset_y,
                                      drawing.mouseout(point); 
                                      }, false);
         
-        this.canvas.addEventListener('mousewheel', function(e) {
-                                     e.preventDefault();
-                                     drawing.selectNextDoodle(e.wheelDelta);
-                                     }, false);
+//        this.canvas.addEventListener('mousewheel', function(e) {
+//                                     e.preventDefault();
+//                                     drawing.selectNextDoodle(e.wheelDelta);
+//                                     }, false);
         
         // iOS listeners
         this.canvas.addEventListener('touchstart', function(e) {
@@ -770,14 +777,17 @@ ED.Drawing.prototype.mousemove = function(_point)
     // Start the hover timer (also resets it)
     this.startHoverTimer(_point);
     
+    // Get selected doodle
+    var doodle = this.selectedDoodle;
+    
 	// Only drag if mouse already down and a doodle selected
-	if (this.mouseDown && this.selectedDoodle != null)
+	if (this.mouseDown && doodle != null)
 	{
 		// Dragging not started
-		if (!this.selectedDoodle.isBeingDragged)
+		if (!doodle.isBeingDragged)
 		{
 			// Flag start of dragging manoeuvre
-			this.selectedDoodle.isBeingDragged = true;
+			doodle.isBeingDragged = true;
 		}
 		// Dragging in progress
 		else
@@ -787,8 +797,8 @@ ED.Drawing.prototype.mousemove = function(_point)
 			var lastMousePosDoodlePlane = this.inverseTransform.transformPoint(this.lastMousePosition);
 			
 			// Get mouse positions in selected doodle's plane
-			var mousePosSelectedDoodlePlane = this.selectedDoodle.inverseTransform.transformPoint(_point);
-			var lastMousePosSelectedDoodlePlane = this.selectedDoodle.inverseTransform.transformPoint(this.lastMousePosition);
+			var mousePosSelectedDoodlePlane = doodle.inverseTransform.transformPoint(_point);
+			var lastMousePosSelectedDoodlePlane = doodle.inverseTransform.transformPoint(this.lastMousePosition);
 			
 			// Get mouse positions in canvas plane relative to centre
 			var mousePosRelCanvasCentre = new ED.Point(_point.x - this.canvas.width/2, _point.y - this.canvas.height/2);
@@ -799,10 +809,10 @@ ED.Drawing.prototype.mousemove = function(_point)
 			var canvasTop = new ED.Point(0, -100);
 			
 			// Get coordinates of origin of doodle in doodle plane
-			var doodleOrigin = new ED.Point(this.selectedDoodle.originX, this.selectedDoodle.originY);
+			var doodleOrigin = new ED.Point(doodle.originX, doodle.originY);
             
 			// Get position of point vertically above doodle origin in doodle plane
-			var doodleTop = new ED.Point(this.selectedDoodle.originX, this.selectedDoodle.originY - 100);
+			var doodleTop = new ED.Point(doodle.originX, doodle.originY - 100);
 			
 			// Effect of dragging depends on mode
 			switch (this.mode)
@@ -811,46 +821,46 @@ ED.Drawing.prototype.mousemove = function(_point)
 					break;
 				case ED.Mode.Move:
 					// If isMoveable is true, move doodle
-					if (this.selectedDoodle.isMoveable)
+					if (doodle.isMoveable)
 					{
                         // Enforce snap to quadrant
-                        if (this.selectedDoodle.snapToQuadrant)
+                        if (doodle.snapToQuadrant)
                         {
                             if (mousePosDoodlePlane.x != 0)
                             {
-                                this.selectedDoodle.originX = this.selectedDoodle.quadrantPoint.x * mousePosDoodlePlane.x/Math.abs(mousePosDoodlePlane.x);
+                                doodle.originX = doodle.quadrantPoint.x * mousePosDoodlePlane.x/Math.abs(mousePosDoodlePlane.x);
                             }
                             if (mousePosDoodlePlane.y != 0)
                             {
-                                this.selectedDoodle.originY = this.selectedDoodle.quadrantPoint.y * mousePosDoodlePlane.y/Math.abs(mousePosDoodlePlane.y);
+                                doodle.originY = doodle.quadrantPoint.y * mousePosDoodlePlane.y/Math.abs(mousePosDoodlePlane.y);
                             }
                             
                             // Doodle's move method sets orientation, pass origin deltas as zero, since explicity set above
-                            this.selectedDoodle.move(0,0);
+                            doodle.move(0,0);
                         }
                         // Enforce snap to points
-                        else if (this.selectedDoodle.snapToPoints)
+                        else if (doodle.snapToPoints)
                         {
-                            this.selectedDoodle.originX = this.selectedDoodle.nearestPointTo(mousePosDoodlePlane).x;
-                            this.selectedDoodle.originY = this.selectedDoodle.nearestPointTo(mousePosDoodlePlane).y;
+                            doodle.originX = doodle.nearestPointTo(mousePosDoodlePlane).x;
+                            doodle.originY = doodle.nearestPointTo(mousePosDoodlePlane).y;
                             
                             // Doodle's move method sets orientation, pass origin deltas as zero, since explicity set above
-                            this.selectedDoodle.move(0,0);
+                            doodle.move(0,0);
                         }
                         // Normal move
                         else
                         {
-                            this.selectedDoodle.move(mousePosDoodlePlane.x - lastMousePosDoodlePlane.x, mousePosDoodlePlane.y - lastMousePosDoodlePlane.y);
+                            doodle.move(mousePosDoodlePlane.x - lastMousePosDoodlePlane.x, mousePosDoodlePlane.y - lastMousePosDoodlePlane.y);
                             
                             // Enforce bounds
-                            this.selectedDoodle.originX = this.selectedDoodle.rangeOfOriginX.constrain(this.selectedDoodle.originX);
-                            this.selectedDoodle.originY = this.selectedDoodle.rangeOfOriginY.constrain(this.selectedDoodle.originY);
+                            doodle.originX = doodle.parameterValidationArray['originX']['range'].constrain(doodle.originX);
+                            doodle.originY = doodle.parameterValidationArray['originY']['range'].constrain(doodle.originY);
                         }
 					}
 					// Otherwise rotate it (if isRotatable)
 					else 
 					{
-						if (this.selectedDoodle.isRotatable)
+						if (doodle.isRotatable)
 						{
 							// Calculate angles from centre to mouse positions relative to north
 							var oldAngle = this.innerAngle(canvasTop, canvasCentre, lastMousePosRelCanvasCentre);
@@ -859,58 +869,41 @@ ED.Drawing.prototype.mousemove = function(_point)
 							// Work out difference, and change doodle's angle of rotation by this amount
 							var deltaAngle = newAngle - oldAngle;
                             
-                            // Get validation
-                            //this.selectedDoodle.parameterValidationArray['rotation']
-                            
                             // Calculate new value of rotation
-                            var newRotation = this.selectedDoodle.rotation + deltaAngle;
-                            
-                            
-                            //console.log(deltaAngle, this.selectedDoodle.rotation, this.selectedDoodle.parameterValidationArray['rotation']['range'].constrain(newRotation));
+                            var newRotation = doodle.rotation + deltaAngle;
                             
                             // Restrict to allowable range
-                            this.selectedDoodle.rotation = this.selectedDoodle.parameterValidationArray['rotation']['range'].constrainToAngularRange(newRotation, false);
+                            doodle.rotation = doodle.parameterValidationArray['rotation']['range'].constrainToAngularRange(newRotation, false);
                             
                             // Update dependencies
-                            this.selectedDoodle.updateDependentParameters('rotation');
+                            doodle.updateDependentParameters('rotation');
 
-                            //this.selectedDoodle.rotation = newRotation;
-                            
-                            // TEMP
-//                            if (this.selectedDoodle.rotation > 2 * Math.PI)
-//                            {
-//                                this.selectedDoodle.rotation = this.selectedDoodle.rotation - 2 * Math.PI;
-//                            }
-//                            if (this.selectedDoodle.rotation < 0)
-//                            {
-//                                this.selectedDoodle.rotation = this.selectedDoodle.rotation + 2 * Math.PI;
-//                            }
-                            
                             // Adjust radius property
                             var oldRadius = Math.sqrt(lastMousePosDoodlePlane.x * lastMousePosDoodlePlane.x + lastMousePosDoodlePlane.y * lastMousePosDoodlePlane.y);
                             var newRadius = Math.sqrt(mousePosDoodlePlane.x * mousePosDoodlePlane.x + mousePosDoodlePlane.y * mousePosDoodlePlane.y);
-                            //this.selectedDoodle.radius += (newRadius - oldRadius);
+                            doodle.radius += (newRadius - oldRadius);
                             
                             // Keep within bounds
-                            //this.selectedDoodle.radius = this.selectedDoodle.rangeOfRadius.constrain(this.selectedDoodle.radius);
+                            doodle.radius = doodle.parameterValidationArray['radius']['range'].constrain(doodle.radius);
                             
-                            //this.selectedDoodle.setParameter('radius', this.selectedDoodle.radius + (newRadius - oldRadius));
+                            // Update dependencies
+                            doodle.updateDependentParameters('radius');
 						}
 					}
 					break;
 				case ED.Mode.Scale:
-					if (this.selectedDoodle.isScaleable)
+					if (doodle.isScaleable)
 					{
 						// Get sign of scale (negative scales create horizontal and vertical flips)
-						var signX = this.selectedDoodle.scaleX/Math.abs(this.selectedDoodle.scaleX);
-						var signY = this.selectedDoodle.scaleY/Math.abs(this.selectedDoodle.scaleY);
+						var signX = doodle.scaleX/Math.abs(doodle.scaleX);
+						var signY = doodle.scaleY/Math.abs(doodle.scaleY);
                         
 						// Calculate change in scale (sign change indicates mouse has moved across central axis)
 						var changeX = mousePosSelectedDoodlePlane.x/lastMousePosSelectedDoodlePlane.x;
 						var changeY = mousePosSelectedDoodlePlane.y/lastMousePosSelectedDoodlePlane.y;
 						
 						// Ensure scale change is same if not squeezable
-						if (!this.selectedDoodle.isSqueezable)
+						if (!doodle.isSqueezable)
 						{
 							if (changeX > changeY) changeY = changeX;
 							else changeY = changeX;
@@ -920,12 +913,12 @@ ED.Drawing.prototype.mousemove = function(_point)
 						if (changeX > 0 && changeY > 0)
 						{
 							// Now do scaling
-							this.selectedDoodle.scaleX = this.selectedDoodle.scaleX * changeX;
-							this.selectedDoodle.scaleY = this.selectedDoodle.scaleY * changeY;
+							doodle.scaleX = doodle.scaleX * changeX;
+							doodle.scaleY = doodle.scaleY * changeY;
 							
 							// Constrain scale
-							this.selectedDoodle.scaleX = this.selectedDoodle.rangeOfScale.constrain(Math.abs(this.selectedDoodle.scaleX)) * signX;
-							this.selectedDoodle.scaleY = this.selectedDoodle.rangeOfScale.constrain(Math.abs(this.selectedDoodle.scaleY)) * signY;
+							doodle.scaleX = doodle.rangeOfScale.constrain(Math.abs(doodle.scaleX)) * signX;
+							doodle.scaleY = doodle.rangeOfScale.constrain(Math.abs(doodle.scaleY)) * signY;
 						}
 						else
 						{
@@ -941,47 +934,48 @@ ED.Drawing.prototype.mousemove = function(_point)
                     
                     // Work out difference, and sign of rotation correction
                     var deltaAngle = newAngle - oldAngle;
-                    if (this.selectedDoodle.isArcSymmetrical) deltaAngle = 2 * deltaAngle;
+                    if (doodle.isArcSymmetrical) deltaAngle = 2 * deltaAngle;
                     rotationCorrection = 1;
                     
                     // Arc left or right depending on which handle is dragging
-                    if (this.selectedDoodle.draggingHandleIndex < 2)
+                    if (doodle.draggingHandleIndex < 2)
                     {
                         deltaAngle = -deltaAngle;
                         rotationCorrection = -1;
                     }
                     
                     // Check for permitted range and stop dragging if exceeded
-                    if (this.selectedDoodle.rangeArray['arc'].isBelow(this.selectedDoodle.arc + deltaAngle))
+                    if (doodle.parameterValidationArray['arc']['range'].isBelow(doodle.arc + deltaAngle))
                     {
-                        //deltaAngle = this.selectedDoodle.rangeArray['arc'].min - this.selectedDoodle.arc;
-                        //this.selectedDoodle.arc = this.selectedDoodle.rangeArray['arc'].min;
+                        deltaAngle = doodle.parameterValidationArray['arc']['range'].min - doodle.arc;
+                        doodle.arc = doodle.parameterValidationArray['arc']['range'].min;
                         this.mode = ED.Mode.None;
                     }
-                    else if (this.selectedDoodle.rangeArray['arc'].isAbove(this.selectedDoodle.arc + deltaAngle))
+                    else if (doodle.parameterValidationArray['arc']['range'].isAbove(doodle.arc + deltaAngle))
                     {
                         
-                        //deltaAngle = this.selectedDoodle.rangeArray['arc'].max - this.selectedDoodle.arc;
-                        //this.selectedDoodle.arc = this.selectedDoodle.rangeArray['arc'].max;
+                        deltaAngle = doodle.parameterValidationArray['arc']['range'].max - doodle.arc;
+                        doodle.arc = doodle.parameterValidationArray['arc']['range'].max;
                         this.mode = ED.Mode.None;
                     }
                     else
                     {
-                        //this.selectedDoodle.arc += deltaAngle;
+                        doodle.arc += deltaAngle;
                     }
                     
-                    this.selectedDoodle.setParameter('arc', this.selectedDoodle.arc + deltaAngle);
-                    
+                    // Update dependencies
+                    doodle.updateDependentParameters('arc');
+                   
                     // Correct rotation with counter-rotation
-                    if (!this.selectedDoodle.isArcSymmetrical)
+                    if (!doodle.isArcSymmetrical)
                     {
                         rotationCorrection = rotationCorrection * deltaAngle/2;
-                        this.selectedDoodle.rotation += rotationCorrection;
+                        doodle.rotation += rotationCorrection;
                     }
                     
 					break;
 				case ED.Mode.Rotate:
-					if (this.selectedDoodle.isRotatable)
+					if (doodle.isRotatable)
 					{
 						// Calculate angles from centre to mouse positions relative to north
 						var oldAngle = this.innerAngle(doodleTop, doodleOrigin, lastMousePosDoodlePlane);
@@ -989,29 +983,34 @@ ED.Drawing.prototype.mousemove = function(_point)
 						
 						// Work out difference, and change doodle's angle of rotation by this amount
 						var deltaAngle = newAngle - oldAngle;
-						this.selectedDoodle.rotation = this.selectedDoodle.rotation + deltaAngle;
+						doodle.rotation = doodle.rotation + deltaAngle;
 					}
 					break;
+                    
 				case ED.Mode.Apex:
 					// Move apex to new position
-					this.selectedDoodle.apexX += (mousePosSelectedDoodlePlane.x - lastMousePosSelectedDoodlePlane.x);
-					this.selectedDoodle.apexY += (mousePosSelectedDoodlePlane.y - lastMousePosSelectedDoodlePlane.y);
+					doodle.apexX += (mousePosSelectedDoodlePlane.x - lastMousePosSelectedDoodlePlane.x);
+					doodle.apexY += (mousePosSelectedDoodlePlane.y - lastMousePosSelectedDoodlePlane.y);
 					
 					// Enforce bounds
-					this.selectedDoodle.apexX = this.selectedDoodle.rangeOfApexX.constrain(this.selectedDoodle.apexX);
-					this.selectedDoodle.apexY = this.selectedDoodle.rangeOfApexY.constrain(this.selectedDoodle.apexY);
+					doodle.apexX = doodle.parameterValidationArray['apexX']['range'].constrain(doodle.apexX);
+					doodle.apexY = doodle.parameterValidationArray['apexY']['range'].constrain(doodle.apexY);
+                    
+                    // Update dependencies
+                    doodle.updateDependentParameters('apexY');
 					break;
+                    
 				case ED.Mode.Handles:
 					// Move handles to new position (Stored in a squiggle)
-                    var i = this.selectedDoodle.draggingHandleIndex;
+                    var i = doodle.draggingHandleIndex;
                     
                     
                     // TEMP testing constraining radius
-                    var p = this.selectedDoodle.squiggleArray[0].pointsArray[i];
-                    if (p.length() < this.selectedDoodle.rangeArray['radius'].max)
+                    var p = doodle.squiggleArray[0].pointsArray[i];
+                    if (p.length() < doodle.rangeArray['radius'].max)
                     {
-                        this.selectedDoodle.squiggleArray[0].pointsArray[i].x += (mousePosSelectedDoodlePlane.x - lastMousePosSelectedDoodlePlane.x);
-                        this.selectedDoodle.squiggleArray[0].pointsArray[i].y += (mousePosSelectedDoodlePlane.y - lastMousePosSelectedDoodlePlane.y);
+                        doodle.squiggleArray[0].pointsArray[i].x += (mousePosSelectedDoodlePlane.x - lastMousePosSelectedDoodlePlane.x);
+                        doodle.squiggleArray[0].pointsArray[i].y += (mousePosSelectedDoodlePlane.y - lastMousePosSelectedDoodlePlane.y);
                     }
                     else
                     {
@@ -1028,12 +1027,12 @@ ED.Drawing.prototype.mousemove = function(_point)
                     }
                     
                     // Enforce bounds
-					this.selectedDoodle.squiggleArray[0].pointsArray[i].x = this.selectedDoodle.rangeOfHandlesXArray[i].constrain(this.selectedDoodle.squiggleArray[0].pointsArray[i].x);
-					this.selectedDoodle.squiggleArray[0].pointsArray[i].y = this.selectedDoodle.rangeOfHandlesYArray[i].constrain(this.selectedDoodle.squiggleArray[0].pointsArray[i].y);
+					doodle.squiggleArray[0].pointsArray[i].x = doodle.rangeOfHandlesXArray[i].constrain(doodle.squiggleArray[0].pointsArray[i].x);
+					doodle.squiggleArray[0].pointsArray[i].y = doodle.rangeOfHandlesYArray[i].constrain(doodle.squiggleArray[0].pointsArray[i].y);
 					break;
                 case ED.Mode.Draw:
                     var p = new ED.Point(mousePosSelectedDoodlePlane.x,mousePosSelectedDoodlePlane.y);
-                    this.selectedDoodle.addPointToSquiggle(p);
+                    doodle.addPointToSquiggle(p);
                     break;
 				default:
 					break;		
@@ -1651,7 +1650,6 @@ ED.Drawing.prototype.addDoodle = function(_className, _parameterDefaults, _param
         {
             for (var key in _parameterDefaults)
             {
-                //console.log('addDoodle - Key: ' + key + ' Value: ' + _parameterDefaults[key]);
                 var res = newDoodle.validateParameter(key, _parameterDefaults[key]);
                 if (res.valid)
                 {
@@ -1677,8 +1675,6 @@ ED.Drawing.prototype.addDoodle = function(_className, _parameterDefaults, _param
             newDoodle.isForDrawing = true;
         }
         
-        //newDoodle.id = this.doodleArray.length;
-        
         // Add to array
         this.doodleArray[this.doodleArray.length] = newDoodle;
         
@@ -1687,7 +1683,6 @@ ED.Drawing.prototype.addDoodle = function(_className, _parameterDefaults, _param
         {
             for (var key in _parameterBindings)
             {
-                console.log('addDoodle - Key: ' + key + ' Value: ' + _parameterBindings[key]);
                 // Add binding to the doodle
                 newDoodle.addBinding(key, _parameterBindings[key]);
             }
@@ -1727,7 +1722,7 @@ ED.Drawing.prototype.addDoodle = function(_className, _parameterDefaults, _param
  */
 ED.Drawing.prototype.eventHandler = function(_type, _doodleId, _elementId, _value)
 {
-    console.log("Event " + _type + ":" + _doodleId + ":" + _elementId + ":" + _value);
+    //console.log("Event " + _type + ":" + _doodleId + ":" + _elementId + ":" + _value);
     //var value;
     switch (_type)
     {
@@ -2671,7 +2666,6 @@ ED.Doodle = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _sca
         // Unique ID of doodle within this drawing
         this.id = this.drawing.nextDoodleId();
 
-        
         // Optional rray of squiggles
         this.squiggleArray = new Array();
 		
@@ -2713,23 +2707,36 @@ ED.Doodle = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _sca
         };
         //console.log("here: ", this.rangeArray['apexX']);
         
-        this.rangeOfOriginX = new ED.Range(-1000, +1000);
-        this.rangeOfOriginY = new ED.Range(-1000, +1000);
-		this.rangeOfScale = new ED.Range(+0.5, +4.0);
-		this.rangeOfArc = new ED.Range(Math.PI/6, Math.PI*2);
-		this.rangeOfApexX = new ED.Range(-500, +500);
-		this.rangeOfApexY = new ED.Range(-500, +500);
-        this.rangeOfHandlesXArray = new Array();
-        this.rangeOfHandlesXArray[0] = new ED.Range(-500, +500);
-        this.rangeOfHandlesXArray[1] = new ED.Range(-500, +500);
-        this.rangeOfHandlesXArray[2] = new ED.Range(-500, +500);
-        this.rangeOfHandlesXArray[3] = new ED.Range(-500, +500);
-        this.rangeOfHandlesYArray = new Array();
-        this.rangeOfHandlesYArray[0] = new ED.Range(-500, +500);
-        this.rangeOfHandlesYArray[1] = new ED.Range(-500, +500);
-        this.rangeOfHandlesYArray[2] = new ED.Range(-500, +500);
-        this.rangeOfHandlesYArray[3] = new ED.Range(-500, +500);
-        this.rangeOfRadius = new ED.Range(100, 450);
+        // Parameter validation array
+        this.parameterValidationArray = {
+            originX:{kind:'simple', type:'int', range:new ED.Range(-1000,+1000), delta:10},
+            originY:{kind:'simple', type:'int', range:new ED.Range(-1000,+1000), delta:10},
+            radius:{kind:'simple', type:'float', range:new ED.Range(+100,+450), precision:6, delta:10},
+            apexX:{kind:'simple', type:'int', range:new ED.Range(-500,+500), delta:10},
+            apexY:{kind:'simple', type:'int', range:new ED.Range(-500,+500), delta:10},
+            scaleX:{kind:'simple', type:'float', range:new ED.Range(+0.5,+4.0), precision:6, delta:0.1},
+            scaleY:{kind:'simple', type:'float', range:new ED.Range(+0.5,+4.0), precision:6, delta:0.1},
+            arc:{kind:'simple', type:'float', range:new ED.Range(Math.PI/12, Math.PI * 2), precision:6, delta:0.1},
+            rotation:{kind:'simple', type:'float', range:new ED.Range(0, 2 * Math.PI), precision:6, delta:0.1},
+        };
+        
+//        this.rangeOfOriginX = new ED.Range(-1000, +1000);
+//        this.rangeOfOriginY = new ED.Range(-1000, +1000);
+//		this.rangeOfScale = new ED.Range(+0.5, +4.0);
+//		this.rangeOfArc = new ED.Range(Math.PI/6, Math.PI*2);
+//		this.rangeOfApexX = new ED.Range(-500, +500);
+//		this.rangeOfApexY = new ED.Range(-500, +500);
+//        this.rangeOfHandlesXArray = new Array();
+//        this.rangeOfHandlesXArray[0] = new ED.Range(-500, +500);
+//        this.rangeOfHandlesXArray[1] = new ED.Range(-500, +500);
+//        this.rangeOfHandlesXArray[2] = new ED.Range(-500, +500);
+//        this.rangeOfHandlesXArray[3] = new ED.Range(-500, +500);
+//        this.rangeOfHandlesYArray = new Array();
+//        this.rangeOfHandlesYArray[0] = new ED.Range(-500, +500);
+//        this.rangeOfHandlesYArray[1] = new ED.Range(-500, +500);
+//        this.rangeOfHandlesYArray[2] = new ED.Range(-500, +500);
+//        this.rangeOfHandlesYArray[3] = new ED.Range(-500, +500);
+//        this.rangeOfRadius = new ED.Range(100, 450);
         this.gridSpacing = 100;
 		
 		// Flags and other properties
@@ -2773,7 +2780,7 @@ ED.Doodle = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _sca
 			// Default set of parameters (Note use of unary + operator to type convert to numbers)
 			this.originX = +0;
 			this.originY = +0;
-            this.radius = +0;
+            this.radius = +100;
 			this.apexX = +0;
 			this.apexY = +0;
 			this.scaleX = +1;
@@ -3166,13 +3173,28 @@ ED.Doodle.prototype.diagnosticHierarchy = function()
 }
 
 /**
+ * Updates dependent parameters
+ *
+ * @param {String} _parameter Name of parameter for which dependent parameters will be updated
+ */
+ED.Doodle.prototype.updateDependentParameters = function(_parameter)
+{
+    // Retrieve list of dependent parameters and set them
+    var valueArray = this.dependentParameterValues(_parameter, this[_parameter]);
+    for (var parameter in valueArray)
+    {
+        this[parameter] = valueArray[parameter];
+    }
+}
+
+/**
  * Validates the value of a parameter, and returns it in appropriate format
  * If value is invalid, returns a constrained value or the original value
  * Called by event handlers of HTML elements
  *
  * @param {String} _parameter Name of the parameter
  * @param {Undefined} _value Value of the parameter to validate
- * @returns {Array} A bool indicating validity, and the correctly formatted value of the parameter
+ * @returns {Array} Array containing a bool indicating validity, and the correctly formatted value of the parameter
  */
 ED.Doodle.prototype.validateParameter = function(_parameter, _value)
 {
@@ -3199,10 +3221,6 @@ ED.Doodle.prototype.validateParameter = function(_parameter, _value)
                 {
                     valid = true;
                 }
-                else
-                {
-                    console.log('TEMP ERROR - string not in validation list');
-                }
                 break;
                 
             case 'float':
@@ -3221,10 +3239,6 @@ ED.Doodle.prototype.validateParameter = function(_parameter, _value)
                     
                     valid = true;
                 }
-                else
-                {
-                    console.log('TEMP ERROR - value not numeric');
-                }
                 break;
                 
             case 'int':
@@ -3242,10 +3256,6 @@ ED.Doodle.prototype.validateParameter = function(_parameter, _value)
                     value = value.toFixed(0);
                     
                     valid = true;
-                }
-                else
-                {
-                    console.log('TEMP ERROR - value not numeric');
                 }
                 break;
                 
@@ -3275,10 +3285,6 @@ ED.Doodle.prototype.validateParameter = function(_parameter, _value)
                     
                     valid = true;
                 }
-                else
-                {
-                    console.log('TEMP ERROR - value not numeric');
-                }
                 break;
             default:
                 ED.errorHandler('ED.Drawing', 'eventHandler', 'Illegal validation type');
@@ -3290,18 +3296,17 @@ ED.Doodle.prototype.validateParameter = function(_parameter, _value)
         ED.errorHandler('ED.Doodle', 'validateParameter', 'Unknown parameter name');
     }
     
-    
-    // If not valid, get current value
+    // If not valid, get current value of parameter
     if (!valid)
     {
         value = this.getParameter(_parameter);
+        ED.errorHandler('ED.Doodle', 'validateParameter', 'Validation failure for parameter: ' + _parameter + ' with value: ' + _value);
     }
     
-    // Return value
+    // Return validity and value
     var returnArray = new Array();
     returnArray['valid'] = valid;
     returnArray['value'] = value;
-    
     return returnArray;
 }
 
@@ -3316,14 +3321,9 @@ ED.Doodle.prototype.setParameterWithAnimation = function(_parameter, _value)
     // Can doodle animate this parameter?
     if (this.parameterValidationArray[_parameter]['animate'])
     {
-        console.log('animate');
-        
         var valueArray = this.dependentParameterValues(_parameter, _value);
         for (var parameter in valueArray)
         {
-            console.log(parameter, valueArray[parameter]);
-            //this.setParameter(_parameter, _value);
-            
             // Read delta in units per frame
             var delta = this.parameterValidationArray[parameter]['delta'];
             
@@ -3359,61 +3359,6 @@ ED.Doodle.prototype.setParameterWithAnimation = function(_parameter, _value)
         }
 
     }
-    
-//    if (_parameter in this.animationDeltaArray)
-//    {
-        
-
-//        // Determine whether its a derived parameter
-//        var value = parseFloat(_value);
-//        if (isNaN(value))
-//        {
-//            var parameter = this.derivedParametersArray[_parameter];
-//            value = this.getCommonParameterValueForDerivedParameter(_parameter, _value);
-//            // If no parameter exists, just set it to existing value
-//            if (value == null)
-//            {
-//                value = this.getParameter(parameter);
-//            }
-//        }
-//        else
-//        {
-//            var parameter = _parameter;
-//        }
-//        
-//        // Read delta in units per frame (Value in array is of corresponding common parameter)
-//        var delta = parseFloat(this.animationDeltaArray[_parameter]);
-//
-//        // Calculate 'distance' to go
-//        var distance = value - this.getParameter(parameter);
-//       
-//        // Calculate sign and apply to delta
-//        if (_parameter == 'rotation')
-//        {
-//            // This formula works out correct distance and direction on a radians 'clock face' (ie the shortest way round)
-//            var sign = ((Math.PI - Math.abs(distance)) * distance) < 0?-1:1;
-//            distance = distance * sign;
-//            if (distance < 0) distance += 2 * Math.PI;
-//        }
-//        else 
-//        {
-//            var sign = distance < 0?-1:1;
-//        }
-//        delta = delta * sign;
-//        
-//        // Calculate number of frames to animate
-//        var frames = Math.abs(Math.floor(distance/delta));
-//        
-//        // Put results into an associative array for this parameter
-//        var array = {timer:null, delta:delta, frames:frames, frameCounter:0};
-//        this.animationDataArray[parameter] = array;
-//
-//        // Call animation method
-//        if (frames > 0)
-//        {
-//            this.increment(parameter, value);
-//        }
-//    }
     // Otherwise just set it directly
     else
     {
@@ -3422,7 +3367,7 @@ ED.Doodle.prototype.setParameterWithAnimation = function(_parameter, _value)
 }
 
 /**
- * Set the value of a doodle's parameter
+ * Set the value of a doodle's parameter from a string format
  *
  * @param {String} _parameter Name of parameter
  * @param {String} _value New value of parameter
@@ -3463,12 +3408,17 @@ ED.Doodle.prototype.setParameter = function(_parameter, _value)
         
         // Update dependencies
         this.updateDependentParameters(_parameter);
-//        var valueArray = this.dependentParameterValues(_parameter);
-//        for (var parameter in valueArray)
-//        {
-//            console.log(parameter, valueArray[parameter]);
-//            this[parameter] = valueArray[parameter];
-//        }
+        
+        // Update child dependencies of any derived parameters
+        if (this.parameterValidationArray[_parameter]['kind'] == 'derived')
+        {
+            var valueArray = this.dependentParameterValues(_parameter, _value);
+            for (var parameter in valueArray)
+            {
+                // Update dependencies
+                this.updateDependentParameters(parameter);
+            }
+        }
     }
     else
     {
@@ -3476,7 +3426,6 @@ ED.Doodle.prototype.setParameter = function(_parameter, _value)
     }
 
     // Refresh drawing
-    //console.log(this);
     this.drawing.repaint();
 }
 
@@ -3517,8 +3466,21 @@ ED.Doodle.prototype.getParameter = function(_parameter)
                 
             case 'mod':
                 
-                // Convert to string, applying any formatting
-                value = this[_parameter].toFixed(0);
+                // Round to integer applying any formatting
+                value = Math.round(this[_parameter]);
+                
+                // Deal with crossover
+                if (validation.clock == 'top')
+                {
+                    if (value == validation.range.min) value = validation.range.max;
+                }
+                else if (validation.clock == 'bottom')
+                {
+                    if (value == validation.range.max) value = validation.range.min;
+                }
+                
+                // Convert to string
+                value = value.toFixed(0);
                 break;
 
             default:
@@ -3536,7 +3498,7 @@ ED.Doodle.prototype.getParameter = function(_parameter)
 }
 
 /**
- * Uses a timeout to call itself and produce animation
+ * Uses a timeout to call itself and produce the animation
  *
  * @param {String} _parameter Name of parameter
  * @param {String} _value New value of parameter
@@ -3550,11 +3512,14 @@ ED.Doodle.prototype.increment = function(_parameter, _value)
     // Calculate interval between frames in milliseconds
     var interval = 1000/this.animationFrameRate;
     
+    // Complete or continue animation
     if (this.animationDataArray[_parameter]['frameCounter'] == this.animationDataArray[_parameter]['frames'])
     {
         // Set  parameter to exact value
-        //this.setParameter(_parameter, _value);
         this[_parameter] = _value;
+        
+        // Update dependencies
+        this.updateDependentParameters(_parameter);
         
         // Stop timer
         clearTimeout(this.animationDataArray[_parameter]['timer']);
@@ -3562,8 +3527,10 @@ ED.Doodle.prototype.increment = function(_parameter, _value)
     else
     {
         // Set parameter to new value
-        //this.setParameter(_parameter, +currentValue + this.animationDataArray[_parameter]['delta']);
         this[_parameter] = currentValue + this.animationDataArray[_parameter]['delta'];
+        
+        // Update dependencies
+        this.updateDependentParameters(_parameter);
         
         // Start timer and set to call this function again after interval
         var doodle = this;
@@ -3575,27 +3542,13 @@ ED.Doodle.prototype.increment = function(_parameter, _value)
 }
 
 /**
- * Set the value of a doodle's parameter - overridden in subclassees
- *
- * @param {String} _parameter Name of parameter
- * @param {String} _value New value of parameter
- */
-ED.Doodle.prototype.getCommonParameterValueForDerivedParameter = function(_parameter, _value)
-{
-    return null;
-}
-
-/**
- * Adds a binding to the doodle
+ * Adds a binding to the doodle. Only derived parameters can be bound
  *
  * @param {String} _parameter Name of parameter to be bound
  * @param {String} _id Id of bound HTML element
  */
 ED.Doodle.prototype.addBinding = function(_parameter, _id)
 {
-    
-//console.log('jquery?');
-    //console.log(_param + " : " + _id);
     // Add binding to array
     this.bindingArray[_parameter] = _id;
     
@@ -3613,14 +3566,6 @@ ED.Doodle.prototype.addBinding = function(_parameter, _id)
         element.addEventListener('change',function (event) {
                                  drawing.eventHandler('onchange', id, this.id, this.value);
                                  },false);
-
-        //console.log($(this));
-//        $("#axisTextBox").click(function() {
-//                                alert("Hello");
-//                                });
-//        document.getElementById('Element_OphMiTesteyedrawwidget_Values_intvalue').addEventListener('change',function (event) {
-//                                 drawing.eventHandler('onchange', id, this.id, this.value);
-//                                 },false);;
     }
 }
 

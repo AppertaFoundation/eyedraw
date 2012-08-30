@@ -50,8 +50,11 @@ ED.AntSeg = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _sca
 	// Set classname
 	this.className = "AntSeg";
     
-    // Class specific property
+    // Private parameters
     this.hasPXE = false;
+
+    // Derived parameters
+    this.grade;
     
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
@@ -85,12 +88,13 @@ ED.AntSeg.prototype.setPropertyDefaults = function()
 	this.isMoveable = false;
 	this.isRotatable = false;
     this.isUnique = true;
-    this.derivedParametersArray = {grade:'apexY'};
-    this.animationDeltaArray = {grade: 5};
-	this.rangeOfScale = new ED.Range(+1, +4);
-	this.rangeArray['arc'] = new ED.Range(Math.PI/6, Math.PI*2);
-	this.rangeOfApexX = new ED.Range(-0, +0);
-	this.rangeOfApexY = new ED.Range(-280, -60);
+    
+    // Update component of validation array for simple parameters
+    this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
+    this.parameterValidationArray['apexY']['range'].setMinAndMax(-280, -60);
+    
+    // Add complete validation arrays for derived parameters
+    this.parameterValidationArray['grade'] = {kind:'derived', type:'string', list:['Large', 'Medium', 'Small'], animate:true};
 }
 
 /**
@@ -98,7 +102,7 @@ ED.AntSeg.prototype.setPropertyDefaults = function()
  */
 ED.AntSeg.prototype.setParameterDefaults = function()
 {
-	this.apexY = -260;
+    this.setParameter('grade', 'Large');
 }
 
 /**
@@ -117,7 +121,6 @@ ED.AntSeg.prototype.draw = function(_point)
 	// Radius of limbus
 	var ro = 380;
     var ri = -this.apexY;
-    //var r = ri + (ro - ri)/2;
 	
 	// Calculate parameters for arcs
 	var arcStart = 0;
@@ -185,83 +188,42 @@ ED.AntSeg.prototype.draw = function(_point)
 }
 
 /**
- * Returns parameters
+ * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
+ * The returned parameters are animated if their 'animate' property is set to true
  *
- * @param {String} _parameter Name of parameter
- * @returns {Undefined} Value of parameter
+ * @param {String} _parameter Name of parameter that has changed
+ * @value {Undefined} _value Value of parameter to calculate
+ * @returns {Array} Associative array of values of dependent parameters
  */
-ED.AntSeg.prototype.getParameter = function(_parameter)
+ED.AntSeg.prototype.dependentParameterValues = function(_parameter, _value)
 {
-    // Call setParameter method in superclass to get regular parameters
-	var returnValue = ED.AntSeg.superclass.getParameter.call(this, _parameter);
+    var returnArray = new Array();
     
-    // Get special parameters
     switch (_parameter)
     {
-        // Grade of cataract
-        case 'grade':
-            if (this.apexY < -200) returnValue = 'Large';
-            else if (this.apexY < -100) returnValue = 'Medium';
-            else returnValue = 'Small';
+        case 'apexY':
+            if (_value < -200) returnArray['grade'] = 'Large';
+            else if (_value < -100) returnArray['grade'] = 'Medium';
+            else returnArray['grade']  = 'Small';
             break;
-    }
-    
-    return returnValue;
-}
-
-/**
- * Set the value of a doodle's parameter
- *
- * @param {String} _parameter Name of parameter
- * @param {Undefined} _value New value of parameter
- */
-ED.AntSeg.prototype.setParameter = function(_parameter, _value)
-{
-    // Set special parameters
-    switch (_parameter)
-    {
-        case 'grade':
-            this.apexY = this.numericValueForParameter(_parameter, _value);
-            break;
-        case 'pxe':
-            this.hasPXE = _value;
-            break;
-    }
-    
-    // Call setParameter method in superclass to set simple parameters and repaint drawing
-	ED.AntSeg.superclass.setParameter.call(this, _parameter, _value);
-}
-
-/**
- * Returns a number corresponding to a string value of the parameter
- *
- * @param {String} _parameter Name of parameter
- * @param {Undefined} _value Value of parameter as a string
- */
-ED.AntSeg.prototype.numericValueForParameter = function(_parameter, _value)
-{
-    var returnValue;
-    
-    // Values for each parameter
-    switch (_parameter)
-    {
+            
         case 'grade':
             switch (_value)
-            {
-                case 'Small':
-                    returnValue = -100;
-                    break;
-                case 'Medium':
-                    returnValue = -200;
-                    break;
-                case 'Large':
-                    returnValue = -260;
-                    break;
-            }
+                {
+                    case 'Large':
+                        returnArray['apexY'] = -260;
+                        break;
+                    case 'Medium':
+                        returnArray['apexY'] = -200;
+                        break;
+                    case 'Small':
+                        returnArray['apexY'] = -100;
+                        break;
+                }
             break;
     }
-
-    return returnValue;
+    
+    return returnArray;
 }
 
 /**
@@ -2452,9 +2414,10 @@ ED.PhakoIncision = function(_drawing, _originX, _originY, _radius, _apexX, _apex
 	// Set classname
 	this.className = "PhakoIncision";
     
-    // Set default values for new or loaded doodle (NB These are set before calling superclass constructor since latter calls setParameterDefaults method
-    this.defaultRadius = 334;
+    // Private parameters
+    this.defaultRadius = 330;
     this.sutureSeparation = 1.5;
+    this.apexYDelta = 0;
     
     // Derived parameters
     this.incisionMeridian;
@@ -2463,12 +2426,6 @@ ED.PhakoIncision = function(_drawing, _originX, _originY, _radius, _apexX, _apex
     
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
-
-    // Private property to store value of incisionLength in order to adjust arc when radius is changed
-    //this.incisionLength = this.incisionLengthFromArc(this.arc);
-    
-    // Set initial value of apexYDelta according to loaded apexY amd radius value  (set here since calculated for both new and saved parameters)
-    this.apexYDelta = - this.apexY - this.radius;
 }
 
 /**
@@ -2500,98 +2457,49 @@ ED.PhakoIncision.prototype.setPropertyDefaults = function()
 	this.isRotatable = true;
     this.isArcSymmetrical = true;
     
-
-//    this.incisionSite = 'Scleral';
+    // Update component of validation array for simple parameters
+    this.parameterValidationArray['radius']['range'].setMinAndMax(250, 450);
+    this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
     
-//    this.derivedParametersArray = {incisionMeridian:['rotation'], incisionSite:['radius'], incisionLength:['arc']};
-//    this.validationArray = {
-//        incisionMeridian:{type:'mod', range:new ED.Range(0, 360), clock:'bottom'},
-//        incisionLength:{type:'float', range:new ED.Range(1, 9.9), precision:1},
-//        incisionSite:{type:'string', list:['Corneal', 'Limbal', 'Scleral']},
-//        group:{type:'string', list:['One', 'Two']}
-//    };
-    
-    this.parameterValidationArray = {
-        originX:{kind:'simple', type:'int', range:new ED.Range(-1000,+1000)},
-        originY:{kind:'simple', type:'int', range:new ED.Range(-1000,+1000)},
-        radius:{kind:'simple', type:'float', range:new ED.Range(+100,+450), precision:6},
-        apexX:{kind:'simple', type:'int', range:new ED.Range(-500,+500)},
-        apexY:{kind:'simple', type:'int', range:new ED.Range(-500,+500)},
-        scaleX:{kind:'simple', type:'float', range:new ED.Range(+0.5,+4.0), precision:6},
-        scaleY:{kind:'simple', type:'float', range:new ED.Range(+0.5,+4.0), precision:6},
-        arc:{kind:'simple', type:'float', range:new ED.Range(Math.PI/6, Math.PI * 2), precision:6, delta:0.1},
-        rotation:{kind:'simple', type:'float', range:new ED.Range(0, Math.PI/2), precision:6, delta:0.1},
-        incisionMeridian:{kind:'derived', type:'int', range:new ED.Range(0, 90), clock:'bottom', animate:true},
-        incisionLength:{kind:'derived', type:'float', range:new ED.Range(1, 9.9), precision:1},
-        incisionSite:{kind:'derived', type:'string', list:['Corneal', 'Limbal', 'Scleral']},
-    };
-    
-    //this.animationDeltaArray = {radius: "10", rotation: "0.1", arc: "0.1"};
-    this.rangeArray['apexX'].setMinAndMax(-0, +0);
-    this.rangeArray['apexY'].setMinAndMax(-334, -300);
-    this.rangeArray['radius'].setMinAndMax(250, 450);
-//    this.rangeArray['arc'].min = this.arcFromIncisionLength(this.validationArray['incisionLength']['range'].min);
-//    this.rangeArray['arc'].max = this.arcFromIncisionLength(this.validationArray['incisionLength']['range'].max);
-//    this.rangeOfApexX = new ED.Range(-0, +0);
-//	this.rangeOfApexY = new ED.Range(-334, -300);
-//    this.rangeOfRadius = new ED.Range(250, 450);
+    // Add complete validation arrays for derived parameters
+    this.parameterValidationArray['incisionMeridian'] = {kind:'derived', type:'mod', range:new ED.Range(0, 360), clock:'bottom', animate:true};
+    this.parameterValidationArray['incisionLength'] = {kind:'derived', type:'float', range:new ED.Range(1, 9.9), precision:1, animate:true};
+    this.parameterValidationArray['incisionSite'] = {kind:'derived', type:'string', list:['Corneal', 'Limbal', 'Scleral'], animate:true};
 }
 
 /**
  * Sets default parameters (Only called for new doodles)
+ * Use the setParameter function for derived parameters, as this will also update dependent variables
  */
 ED.PhakoIncision.prototype.setParameterDefaults = function()
 {
-    // The radius property is changed by movement in rotatable doodles
-    this.radius = this.defaultRadius;
-    
-    // Default is standard corneal phako wound
-    this.incisionLength = 2.8;
-    this.arc = 27 * Math.PI/180;
-    this.updateDependentParameters('incisionLength');
-    
-    // ApexY needs to change with radius on movement, so keep a record of the change
-    this.apexY = -this.defaultRadius;
+    this.setParameter('incisionSite', 'Corneal');
+    this.setParameter('incisionLength', '3.5');
 
-    // Make subsequent incisions 90 degress to the last one of the same class
-    var angle = Math.PI/2;
+    // Default is temporal side, or 90 degrees to the last one
     var doodle = this.drawing.lastDoodleOfClass(this.className);
     if (doodle)
     {
-        this.rotation = doodle.rotation + angle;
+        if (this.drawing.eye == ED.eye.Right)
+        {
+            this.setParameter('incisionMeridian', ED.Mod(doodle.incisionMeridian - 90, 360).toFixed(0));
+        }
+        else
+        {
+            this.setParameter('incisionMeridian', ED.Mod(doodle.incisionMeridian + 90, 360).toFixed(0));
+        }
     }
     else
     {
         // First incision is usually temporal
         if (this.drawing.eye == ED.eye.Right)
         {
-            this.rotation = -Math.PI/2;
+            this.setParameter('incisionMeridian', '180');
         }
         else
         {
-            this.rotation = Math.PI/2;
+            this.setParameter('incisionMeridian', '0');
         }
-    }
-    this.updateDependentParameters('rotation');
-}
-
-/**
- * Overrides addBinding method in order to store correct value of incisionLength (may be different due to binding value)
- *
- * @param {String} _parameter Name of parameter to be bound
- * @param {String} _id Id of bound HTML element
- */
-ED.PhakoIncision.prototype.addBinding = function(_parameter, _id)
-{
-	// Call superclass method
-    ED.PhakoIncision.superclass.addBinding.call(this, _parameter, _id);
-    
-    // Set new value of incisionLength
-    if (_parameter == 'incisionLength')
-    {
-        this.incisionLength = this.incisionLengthFromArc(this.arc);
-//        this.rangeArray['arc'].min = this.arcFromIncisionLength(this.validationArray['incisionLength']['range'].min);
-//        this.rangeArray['arc'].max = this.arcFromIncisionLength(this.validationArray['incisionLength']['range'].max);
     }
 }
 
@@ -2602,75 +2510,18 @@ ED.PhakoIncision.prototype.addBinding = function(_parameter, _id)
  */
 ED.PhakoIncision.prototype.draw = function(_point)
 {
-    //console.log('incisionLength: ', this.incisionLength);
-
-//    this.rangeArray['arc'].min = this.arcFromIncisionLength(this.validationArray['incisionLength']['range'].min);
-//    this.rangeArray['arc'].max = this.arcFromIncisionLength(this.validationArray['incisionLength']['range'].max);
-    
-    //console.log(this.radius, this.length, this.arc);
+    //console.log(this.incisionMeridian, this.incisionLength, this.incisionSite, this.apexYDelta);
 	// Get context
 	var ctx = this.drawing.context;
 	
 	// Call draw method in superclass
 	ED.PhakoIncision.superclass.draw.call(this, _point);
 	
-    // Radius
+    // Radii
     var r =  this.radius;
     var d = 40;
     var ro = r + d;
     var ri = r - d;
-    
-    // Value of incisionLength should change with arc, so save value
-    if (this.drawing.mode == ED.Mode.Arc)
-    {
-        //this.incisionLength = this.incisionLengthFromArc(this.arc);
-        //this.arc = this.length/((6 * this.radius)/this.defaultRadius);
-        //console.log("resetting arc: ", this.arc);
-    }
-    else
-    {
-        //this.arc = this.arcFromIncisionLength(this.incisionLength);
-    }
-
-    //console.log(this.rangeArray['arc'].max, this.arc);
-    
-    // For movements of incision, set arc according to current value of incisionLength
-//    if (this.drawing.mode == ED.Mode.Move)
-//    {
-//        this.arc = this.arcFromIncisionLength(this.incisionLength);
-//
-//        this.rangeArray['arc'].min = this.arcFromIncisionLength(this.validationArray['incisionLength']['range'].min);
-//        this.rangeArray['arc'].max = this.arcFromIncisionLength(this.validationArray['incisionLength']['range'].max);
-//    }
-    
-    // Changing type of incision
-    if (this.drawing.mode == ED.Mode.Apex)
-    {
-        this.apexYDelta = - this.apexY - this.radius; 
-    }
-    // Otherwise change arc for constant incision length (use the drawFunctionMode test since it can also be moved by an animation)
-    //else if (this.drawing.mode == ED.Mode.Move)
-    else if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
-    {
-        //this.arc = this.length * this.defaultRadius/(6 * this.radius);
-        this.apexY = -this.radius - this.apexYDelta;
-        this.rangeOfApexY = new ED.Range(-this.radius, -this.radius + 34);
-    }
-    
-    // Limit incision length to range allowed in CND, but with minimum of 1
-//    if (this.length > 9.9)
-//    {
-//        this.length = 9.9;
-//    }
-//    if (this.length < 1.0)
-//    {
-//        this.length = 1.0;
-//    }
-//    this.arc = this.length * this.defaultRadius/(6 * this.radius);
-    
-    // Limit meridian to values in CND (nnn.n 000.5 to 180.0 degrees)
-    //if (this.rotation < -0.5 * Math.PI && this.rotation > -1 * Math.PI) this.rotation = -0.5 * Math.PI;
-    //if (this.rotation > -1.5 * Math.PI && this.rotation < -1 * Math.PI) this.rotation = -1.5 * Math.PI;
     
     // Boundary path
 	ctx.beginPath();
@@ -2689,6 +2540,7 @@ ED.PhakoIncision.prototype.draw = function(_point)
     
     // Pocket
     if (this.apexYDelta == 0)
+    //if (this.apexY + this.radius == 0)
     {
         // Colour of fill
         ctx.fillStyle = "rgba(200,200,200,0.75)";
@@ -2720,6 +2572,7 @@ ED.PhakoIncision.prototype.draw = function(_point)
     {
         // Section with sutures
         if (this.apexYDelta != 0)
+        //if (this.apexY + this.radius != 0)
         {
             // New path
             ctx.beginPath();
@@ -2751,10 +2604,7 @@ ED.PhakoIncision.prototype.draw = function(_point)
             // Draw incision
             ctx.stroke();
         }
-        
-        // Save length
-        //this.length = this.arc * (6 * this.radius)/this.defaultRadius;
-        //console.log("saving length: ", this.length);
+
 	}
     
     // Coordinates of handles (in canvas plane)
@@ -2785,7 +2635,7 @@ ED.PhakoIncision.prototype.description = function()
     else returnString = 'Corneal ';
     
     // Incision type
-    returnString += this.apexYDelta == 0?"pocket ":"section "
+    returnString += this.apexY + this.radius == 0?"pocket ":"section "
     returnString += "incision at ";
     returnString += this.clockHour() + " o'clock";
     
@@ -2793,91 +2643,8 @@ ED.PhakoIncision.prototype.description = function()
 }
 
 /**
- * Updates parameters derived parameters  ***TODO*** Move to superclass
- *
- * @param {String} _parameter Name of parameter that has changed
- */
-ED.PhakoIncision.prototype.updateDependentParameters = function(_parameter)
-{
-    // Calculate values for current value of parameter
-    var valueArray = this.dependentParameterValues(_parameter, this[_parameter]);
-    for (var parameter in valueArray)
-    {
-        this[parameter] = valueArray[parameter];
-        
-        // Check validity of new value
-//        var validityArray = this.validateParameter(parameter, valueArray[parameter]);
-//        
-//        // If new value is valid, set it
-//        if (validityArray.valid)
-//        {
-//            //doodle.setParameter(parameter, validityArray.value);
-//        }
-//        else
-//        {
-//            ED.errorHandler('ED.Doodle', 'updateDependentParameters', 'Attempt to set ' + parameter + ' to an invalid value');
-//        }
-    }
-    
-//    switch (_parameter)
-//    {
-//        // Incision site (CND 5.13)
-//        case 'radius':
-//            if (this.radius >= 428) this.incisionSite = 'Scleral';
-//            else if (this.radius >= 344) this.incisionSite = 'Limbal';
-//            else this.incisionSite = 'Corneal';
-//            break;
-//            
-//        // Incision length (CND 5.14)
-//        case 'arc':
-//            this.incisionLength = this.arc * (6 * this.radius)/this.defaultRadius;
-//            break;
-// 
-//        // Incision length (CND 5.14)
-//        case 'radius':
-//            this.incisionLength = this.arc * (6 * this.radius)/this.defaultRadius;
-//            break;
-//            
-//        // Incision Meridian (CND 5.15)
-//        case 'rotation':
-//            var angle = (((Math.PI * 2 - this.rotation + Math.PI/2) * 180/Math.PI) + 360) % 360;
-//            if (angle == 360) angle = 0;
-//            this.incisionMeridian = angle;
-//            break;
-//            
-//        // Incision Type (Not in CND but infers type of operation)
-////        case 'incisionType':
-////            this.incisionType = this.apexYDelta == 0?"Pocket":"Section";
-////            break;
-//
-//        case 'incisionLength':
-//            this.arc = this.incisionLength * this.defaultRadius/(6 * this.radius);
-//            break;
-//            
-//        case 'incisionMeridian':
-//            this.rotation = (((90 - this.incisionMeridian) + 360) % 360) * Math.PI/180;
-//            break;
-//
-//        case 'incisionSite':
-//            switch (this.incisionSite)
-//            {
-//                case 'Scleral':
-//                    this.radius = +428;
-//                    break;
-//                case 'Limbal':
-//                    this.radius = +376;
-//                    break;
-//                case 'Corneal':
-//                    this.radius = +330;
-//                    break;
-//            }
-//            break;
-//    }
-}
-
-
-/**
  * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
+ * The returned parameters are animated if their 'animate' property is set to true
  *
  * @param {String} _parameter Name of parameter that has changed
  * @value {Undefined} _value Value of parameter to calculate
@@ -2889,16 +2656,62 @@ ED.PhakoIncision.prototype.dependentParameterValues = function(_parameter, _valu
     
     switch (_parameter)
     {
-        // Incision Meridian (CND 5.15)
         case 'rotation':
             var angle = (((Math.PI * 2 - _value + Math.PI/2) * 180/Math.PI) + 360) % 360;
             if (angle == 360) angle = 0;
             returnArray['incisionMeridian'] = angle;
+            //  returnArray['arc'] = _value/2;
+            break;
+
+        case 'arc':
+            returnArray['incisionLength'] = _value * (6 * this.radius)/this.defaultRadius;
             break;
             
+        case 'radius':
+            if (_value >= 428) returnArray['incisionSite'] = 'Scleral';
+            else if (_value >= 344) returnArray['incisionSite'] = 'Limbal';
+            else returnArray['incisionSite']  = 'Corneal';
+            
+            // Incision length should remain constant despite changes in radius
+            returnArray['arc'] =  this.incisionLength * this.defaultRadius/(6 * _value);
+            this.updateArcRange();
+            
+            // Move apexY as radius changes and adjust range
+            returnArray['apexY'] = this.apexYDelta - _value;
+            this.parameterValidationArray['apexY']['range'].setMinAndMax(-_value, -_value + 34);
+            break;
+            
+        case 'apexY':
+            returnArray['apexYDelta'] = this.radius + _value;
+            break;
+
+        // Incision Meridian (CND 5.15)
         case 'incisionMeridian':
             returnArray['rotation'] = (((90 - _value) + 360) % 360) * Math.PI/180;
+            // Example of animating two simple parameters simultaneously
             //returnArray['arc'] = (1 + _value/90) * Math.PI/12;
+            break;
+
+        // Incision length (CND 5.14)
+        case 'incisionLength':
+            returnArray['arc'] = _value * this.defaultRadius/(6 * this.radius);
+            this.updateArcRange();
+            break;
+            
+        // Incision site (CND 5.13)
+        case 'incisionSite':
+            switch (_value)
+            {
+                case 'Scleral':
+                    returnArray['radius'] = +428;
+                    break;
+                case 'Limbal':
+                    returnArray['radius'] = +376;
+                    break;
+                case 'Corneal':
+                    returnArray['radius'] = +330;
+                    break;
+            }
             break;
     }
     
@@ -2906,241 +2719,21 @@ ED.PhakoIncision.prototype.dependentParameterValues = function(_parameter, _valu
 }
 
 /**
- * Set the value of a doodle's parameter
- *
- * @param {String} _parameter Name of parameter
- * @param {String} _value New value of parameter
+ * Private method to update range of arc parameter to account for values changing with radius and incisionSite
  */
-//ED.PhakoIncision.prototype.setParameter = function(_parameter, _value)
-//{
-//    console.log('setParameter ', _parameter, _value);
-    
-    //var value = this.validateParameter(
-    // Is _parameter a derived one?
-//    if (typeof(this.derivedParametersArray[_parameter]) != 'undefined')
-//    {
-//        for (var i = 0; i < this.derivedParametersArray[_parameter].length; i++)
-//        {
-//            var simpleParameter = this.derivedParametersArray[_parameter][i];
-//            this[simpleParameter] = this.getsimpleParameterValueForDerivedParameter(simpleParameter, _parameter, _value);
-//        }
-//    }
-//    else
-//    {
-//        ED.errorHandler('ED.Doodle', 'setParameter', 'Attempt to set a parameter (' + _parameter + ') which does not exist');
-//    }
-
-    
-    /*
-    // Set special parameters
-    switch (_parameter)
+ED.PhakoIncision.prototype.updateArcRange = function()
+{
+    if (this.radius > 0)
     {
-        // Incision site (CND 5.13)
-        case 'incisionSite':
-            this.radius = this.numericValueForParameter(_parameter, _value)
-            
-            // Correct for change in arc as incision moves
-            this.arc = this.length * this.defaultRadius/(6 * this.radius);
-            break;
-            
-        // Incision length (CND 5.14)
-        case 'incisionLength':
-            this.length = parseFloat(_value);
-            console.log(this.length + ":" + this.getsimpleValueForDerivedParameter('length', 'incisionLength', _value));
-            this.arc = this.length * this.defaultRadius/(6 * this.radius);
-            break;
-            
-        // Incision Meridian
-        case 'incisionMeridian':
-            //var angle = ((90 - _value) + 360) % 360;
-            //this.rotation = angle * Math.PI/180;
-            this.rotation = this.getsimpleValueForDerivedParameter('rotation', 'incisionMeridian', _value);
-            break;
-            
-        // Incision type
-        case 'incisionType':
-            if (_value == "Pocket")
-            {
-                this.apexYDelta = 0;
-            }
-            else
-            {
-                this.apexYDelta = -34;
-            }
-            this.apexY = -this.radius - this.apexYDelta;
-            break;
-        
-        // Radius
-        case 'radius':
-            this.radius = _value;
-            break;
-            
-        default:
-            break
+    this.parameterValidationArray['arc']['range'].min = this.parameterValidationArray['incisionLength']['range'].min * this.defaultRadius/(6 * this.radius);
+    this.parameterValidationArray['arc']['range'].max = this.parameterValidationArray['incisionLength']['range'].max * this.defaultRadius/(6 * this.radius);
     }
-     */
-    
-//    // Call setParameter method in superclass to set simple parameters and repaint drawing
-//	ED.PhakoIncision.superclass.setParameter.call(this, _parameter, _value);
-    
-    
-//    if (_parameter == 'incisionSite' || _parameter == 'radius')
-//    {
-//        console.log('radius changing to', this.radius);
-//        this.arc = this.arcFromIncisionLength(this.incisionLength);
-//        this.rangeArray['arc'].min = this.arcFromIncisionLength(this.validationArray['incisionLength']['range'].min);
-//        this.rangeArray['arc'].max = this.arcFromIncisionLength(this.validationArray['incisionLength']['range'].max);
-//    }
-//    
-//    if (_parameter == 'arc')
-//    {
-//        this.incisionLength = this.incisionLengthFromArc(this.arc);
-//        console.log('arc changing to', this.arc);
-//        //this.arc = this.arcFromIncisionLength(this.incisionLength);
-//    }
-//}
+    else
+    {
+        ED.errorHandler('ED.PhakoIncision', 'updateArcRange', 'Attempt to calculate a range of arc using an illegal value of radius: ' + this.radius);
+    }
+}
 
-/**
- *
- * @returns {Number}
- */
-//ED.PhakoIncision.prototype.getsimpleParameterValueForDerivedParameter = function(_simpleParameter, _derivedParameter, _value)
-//{
-//    // Enforce string type for passed value
-//    var value = _value.toString();
-//    
-//    var returnValue;
-//    
-//    //console.log(_simpleParameter, _derivedParameter, _value);
-//    
-//    // Values for each parameter
-//    switch (_derivedParameter)
-//    {
-//        case 'incisionLength':
-//            switch (_simpleParameter)
-//            {
-//                case 'arc':
-//                    returnValue = parseFloat(value) * this.defaultRadius/(6 * this.radius);
-//                    break;
-//            }
-//            break;
-//        case 'incisionMeridian':
-//            switch (_simpleParameter)
-//            {
-//                case 'rotation':
-//                    value = parseInt(value);
-//                    returnValue = (((90 - value) + 360) % 360) * Math.PI/180;
-//                    break;
-//            }
-//            break;
-//        case 'incisionSite':
-//            switch (_simpleParameter)
-//            {
-//                case 'radius':
-//                    switch (value)
-//                    {
-//                        case 'Scleral':
-//                            returnValue = +428;
-//                            break;
-//                        case 'Limbal':
-//                            returnValue = +376;
-//                            break;
-//                        case 'Corneal':
-//                            returnValue = +330;
-//                            break;
-//                    }
-//                    break;
-////                case 'arc':
-////                    var oldLength = this.arc/(this.defaultRadius/(6 * this.radius));
-////                    returnValue = this.length * this.defaultRadius/(6 * this.radius);
-////                    break;
-//            }
-//            break;
-//    }
-//    
-//    return returnValue;
-//}
-
-/**
- * Returns a number corresponding to a string value of the parameter
- *
- * @param {String} _parameter Name of parameter
- * @param {Undefined} _value Value of parameter as a string
- */
-//ED.PhakoIncision.prototype.numericValueForParameter = function(_parameter, _value)
-//{
-//    var returnValue;
-//    
-//    // Values for each parameter
-//    switch (_parameter)
-//    {
-//        case 'incisionSite':
-//            switch (_value)
-//            {
-//                case 'Scleral':
-//                    returnValue = +428;
-//                    break;
-//                case 'Limbal':
-//                    returnValue = +376;
-//                    break;
-//                case 'Corneal':
-//                    returnValue = +330;
-//                    break;
-//            }
-//            break;
-//    }
-//    
-//    return returnValue;
-//}
-//
-//ED.PhakoIncision.prototype.numericValuesForParameter = function(_specialParameter, _value, _simpleParameter)
-//{
-//    var returnValue = 3;
-//    
-//    // Values for each parameter
-//    switch (_specialParameter)
-//    {
-//        case 'group':
-//            switch (_value)
-//            {
-//                case 'One':
-//                    console.log(this[_simpleParameter]);
-//                    if (_simpleParameter == 'rotation') returnValue = Math.PI/2;
-//                    if (_simpleParameter == 'arc') returnValue = 1.0;
-//                    break;
-//                case 'Two':
-//                    console.log(this[_simpleParameter]);
-//                    if (_simpleParameter == 'rotation') returnValue = Math.PI;
-//                    if (_simpleParameter == 'arc') returnValue = 2;
-//                    break;
-//            }
-//            break;
-//    }
-//    
-//    return returnValue;
-//}
-
-/**
- * Returns an arc value based on the incisionLength value for the current radius
- *
- * @param {Float} _incisionLength Current float value of the incisionLength
- * @returns {Float} The arc value
- */
-//ED.PhakoIncision.prototype.arcFromIncisionLength = function(_incisionLength)
-//{
-//    return _incisionLength * this.defaultRadius/(6 * this.radius);
-//}
-//
-///**
-// * Returns an incisionLength value based on the arc value for the current radius
-// *
-// * @param {Float} _arc Current float value of the arc
-// * @returns {Float} The incisionLength value
-// */
-//ED.PhakoIncision.prototype.incisionLengthFromArc = function(_arc)
-//{
-//    return _arc * (6 * this.radius)/this.defaultRadius;
-//}
 
 /**
  * SidePort

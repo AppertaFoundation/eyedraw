@@ -1,25 +1,101 @@
-Drawing.addDoodle
-	Doodle Subclass constructor
-		Doodle Class constructor
-			Doodle subclass setParameterDefaults (new doodles only)
-			Doodle subclass setPropertyDefaults
 
-
-	Doodle subclass setParameter (from parameter defaults array)
-		Doodle class setParameter
 		
+There are three types of parameter for each doodle
 
-Parameters can be set in the following ways;
+					Simple					Derived
+					
+Type				Numeric					Any
+
+Persistent store	JSON object				OE Elements
+
+Changed				Mouse/keyboard intcn	HTML elements
+
+
+Initialisation		Doodle constructor,		Doodle subclass constructor
+					Doodle subclass constructor
+
+					Parameter array			Parameter array
+					
+											Binding
+											
+Third type is 'Private' which are numeric, not saved, or exposed
+										
+Notes.
+Initialisation with parameter array is done by passing an optional second parameter to the addDoodle method consisting of an associative array, for example paramArray = {incisionMeridian:"45"};										
+											
+
+Drawing.addDoodle method:
+
+	Calls Doodle Subclass constructor. (NB set any extra parameters here before calling superclass constructor, since latter calls setParameterDefaults method). Derived parameters are declared here
+
+	Calls Doodle Class constructor
+		This method sets generic values of all parameters and properties
+
+		The  setPropertyDefaults method (which is usually overidden by subclasses) is called
+		
+		For new doodles, simple parameters are set, and then the setParameterDefaults method is called which is overridden and sets specific values for the subclass
+		
+		For saved doodles simple parameters are loaded from the saved JSON string
+
+	Set values of any extra parameters which depend on new or loaded values of simple parameters (eg this.apexYDelta in PhakoIncision doodle)
+	
+	If the optional parameterDefaults array has been passed, this is then iterated and values of the parameters (simple or derived)
+	
+	If the optional parameterBindings array has been passed, this is then iterated and bindings to derived parameters are initialised
+	
+	A 'doodleAdded' notification is sent
+	
+	The doodle is then placed (position according to value of addAtBack property, and the drawing is repainted
+	
+	The doodle object is returned
+	
+
+Drawing.eventHandler method	(onChange handler for an HTML element)
+
+	Retrieves bound doodle using the doodleId value
+	
+	Extracts the name of the bound parameter from the doodle bindings array
+	
+	Calls the validateParameter method
+	
+		Extracts a validation from the parameterValidationArray for the doodle
+		The validation constrains according to the range, sets the desired format
+		Invalid values are replaced with the current value of the parameter
+		Returns an array with the validity and the value
+		
+	If the value is valid, setParameterWithAnimation is called
+	
+		The dependentParameterValues method is called which returns an associative array of simple parameters to animate for this change
+		
+		The animation is set up for each simple parameter and run
+	
+	If the value is valid and not exactly equal to the value in the HTML element, the latter is replaced with the new value
+	
+
+Mouse/keyboard interaction
+
+These interactions result in direct changes in the numeric values of the simple parameters. The following example describes the processing of a mouse dragging action on a rotatable parameter (ie the value of the rotation parameter is changed)
+
+Drawing.mousemove method is called
+
+	The new value of the rotation from the interaction is calculated
+	The range value from the parameterValidationArray is then used to constrain the value if required, and the validated value is assigned to the parameter
+	
+	The Doodle.updateDependentParameters method is then called for the appropriate simple parameter (rotation), which results in adjustment of any dependent derived parameters
+	
+	The Drawing repaint method is called to refresh the drawing
+	
+	The updateBindings method is called to refresh the values of any bound HTML elements. The latter calls the doodle.getParameter method, which ensures correct formatting of the value.
+											
 
 	Mouse dragging (only affects simple parameters)
 		calls validateParameter for range only
 		set parameter calls update dependencies
 		
-	HTML events can affect all parameters
 	
 	
 Validation method ensures that value is in correct format and always outputs a string
-It takes a parameter of any type, and returns the validated value
+It takes a derived parameter, and returns the validated value
 
 set parameter takes a validated string value, and sets type appropriately
 
@@ -28,9 +104,20 @@ SetParameterWithAnimation
 	Get list of simple parameters involved
 	Work out their target values
 	Start an animation for each one
+
+NB need to call update dependent parameters for doodles loaded from JSON object? (maybe not since the values of derived parameters may be saved independently?
 			
 			
-			Next task: Add a value to dependentParameterValues = function(_parameter) to calculate future values
+NB- Animation. Only derived parameters can be animated. Need to ensure that there are no recursive relationships in the dependentParameterValues function.
+
+If you want to animate a simple parameter, link it to a derived one with a one to one relationship
+
+Troubleshooting
+
+Doodles 'jumping' on first movement is probably a mismatch between the intial setting of a parameter and its range
+
+NB manually merge in Mark's change to the scrollwheel listener
+
 
 
 	
