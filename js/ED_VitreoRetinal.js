@@ -49,21 +49,17 @@ if (ED == null || typeof(ED) != "object") { var ED = new Object();}
  */
 ED.Square = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
 {
-	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
-	
 	// Set classname
 	this.className = "Square";
     
-    // Lable width and height
+    // Private parameters
     this.lableWidth = 0;
     this.lableHeight = 80;
-    
-    // Lable font
     this.lableFont = "50px sans-serif";
-    
-    // Horizontal padding between lable and boundary path
     this.padding = 10;
+    
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
 }
 
 /**
@@ -87,17 +83,37 @@ ED.Square.prototype.setHandles = function()
  */
 ED.Square.prototype.setPropertyDefaults = function()
 {
-	this.isSelectable = true;
-	this.isOrientated = false;
-	this.isScaleable = false;
+	this.isScaleable = true;
 	this.isSqueezable = false;
 	this.isMoveable = true;
-	this.isRotatable = false;
-	this.rangeOfScale = new ED.Range(+1, +4);
-	this.rangeOfArc = new ED.Range(Math.PI/6, Math.PI*2);
-	this.rangeOfApexX = new ED.Range(-0, +0);
-	this.rangeOfApexY = new ED.Range(-400, +100);
-    this.snapToGrid = true;
+	this.isRotatable = true;
+    //this.snapToPoints = true;
+    //this.isOrientated = true;
+    
+    // Array of points to snap to
+    var point = new ED.Point(0, -300);
+    this.pointsArray.push(point);
+    var point = new ED.Point(212, -212);
+    this.pointsArray.push(point);
+    var point = new ED.Point(300, 0);
+    this.pointsArray.push(point);
+    var point = new ED.Point(212, 212);
+    this.pointsArray.push(point);
+    var point = new ED.Point(0,300);
+    this.pointsArray.push(point);
+    var point = new ED.Point(-212, 212);
+    this.pointsArray.push(point);
+    var point = new ED.Point(-300,0);
+    this.pointsArray.push(point);
+    var point = new ED.Point(-212, -212);
+    this.pointsArray.push(point);
+    
+    // Update component of validation array for simple parameters
+    this.parameterValidationArray['scaleX']['range'].setMinAndMax(+1, +4);
+    this.parameterValidationArray['scaleY']['range'].setMinAndMax(+1, +4);
+    this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
+    this.parameterValidationArray['apexY']['range'].setMinAndMax(-400, +100);
+    this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
 }
 
 /**
@@ -105,7 +121,12 @@ ED.Square.prototype.setPropertyDefaults = function()
  */
 ED.Square.prototype.setParameterDefaults = function()
 {
-	this.originY = -300;
+	//this.originY = -300;
+    this.gridSpacing = 200;
+    this.gridDisplacementX = 0;
+    this.gridDisplacementY = 0;
+    
+    
 }
 
 /**
@@ -134,39 +155,39 @@ ED.Square.prototype.draw = function(_point)
 	ctx.beginPath();
 	
 	// Square
-	ctx.rect(-50, -50, 100, 100);
+	ctx.rect(-100, -100, 200, 200);
 	
 	// Close path
 	ctx.closePath();
 	
 	// Set line attributes
 	ctx.lineWidth = 2;
-	ctx.fillStyle = "green";
+	ctx.fillStyle = "lightgray";
 	ctx.strokeStyle = "blue";
 	
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 	
-	// Other stuff here
+	// Non boundary drawing here
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
 	{
-		ctx.beginPath();
-		ctx.rect(-40, -20, 20, 20);
-		ctx.lineWidth = 2;
-		ctx.fillStyle = "red";
-		ctx.strokeStyle = "blue";
-		ctx.fill();
-		ctx.stroke();
+//		ctx.beginPath();
+//		ctx.rect(-40, -20, 20, 20);
+//		ctx.lineWidth = 2;
+//		ctx.fillStyle = "red";
+//		ctx.strokeStyle = "blue";
+//		ctx.fill();
+//		ctx.stroke();
         
         // Draw text
-        ctx.fillText(this.lableText, -this.lableWidth/2 + this.padding, this.lableHeight/6);
+        //ctx.fillText(this.lableText, -this.lableWidth/2 + this.padding, this.lableHeight/6);
 	}
 	
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[0].location = this.transform.transformPoint(new ED.Point(-50, 50));
-	this.handleArray[1].location = this.transform.transformPoint(new ED.Point(-50, -50));
-	this.handleArray[2].location = this.transform.transformPoint(new ED.Point(50, -50));
-	this.handleArray[3].location = this.transform.transformPoint(new ED.Point(50, 50));
+	this.handleArray[0].location = this.transform.transformPoint(new ED.Point(-100, 100));
+	this.handleArray[1].location = this.transform.transformPoint(new ED.Point(-100, -100));
+	this.handleArray[2].location = this.transform.transformPoint(new ED.Point(100, -100));
+	this.handleArray[3].location = this.transform.transformPoint(new ED.Point(100, 100));
 	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 	
 	// Draw handles if selected
@@ -248,7 +269,7 @@ ED.Fundus.prototype.draw = function(_point)
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 	
-	// Other stuff here
+	// Non boundary drawing here
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
 	{
 		// These values different for right and left side
@@ -413,7 +434,7 @@ ED.UTear.prototype.draw = function(_point)
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 	
-	// Other stuff here
+	// Non boundary drawing here
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
 	{
 	}
@@ -552,7 +573,7 @@ ED.RoundHole.prototype.draw = function(_point)
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 	
-	// Other stuff here
+	// Non boundary drawing here
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
 	{
 	}
@@ -767,7 +788,7 @@ ED.RRD.prototype.draw = function(_point)
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 	
-	// Other stuff here
+	// Non boundary drawing here
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
 	{
 	}
@@ -1113,7 +1134,7 @@ ED.Dialysis.prototype.draw = function(_point)
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 	
-	// Other stuff here
+	// Non boundary drawing here
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
 	{
 	}
@@ -1309,7 +1330,7 @@ ED.GRT.prototype.draw = function(_point)
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 	
-	// Other stuff here
+	// Non boundary drawing here
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
 	{
         ctx.beginPath();
@@ -1472,7 +1493,7 @@ ED.MacularHole.prototype.draw = function(_point)
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 	
-	// Other stuff here
+	// Non boundary drawing here
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
 	{
         ctx.beginPath();
@@ -1636,7 +1657,7 @@ ED.StarFold.prototype.draw = function(_point)
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 	
-	// Other stuff here
+	// Non boundary drawing here
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
 	{
 	}
@@ -1813,7 +1834,7 @@ ED.Lattice.prototype.draw = function(_point)
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 	
-	// Other stuff here
+	// Non boundary drawing here
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
 	{
 	}
@@ -1963,7 +1984,7 @@ ED.Cryo.prototype.draw = function(_point)
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 	
-	// Other stuff here
+	// Non boundary drawing here
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
 	{
 	}
@@ -2093,7 +2114,7 @@ ED.LaserCircle.prototype.draw = function(_point)
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 	
-	// Other stuff here
+	// Non boundary drawing here
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
 	{
         // Set line attributes
@@ -2455,7 +2476,7 @@ ED.Retinoschisis.prototype.draw = function(_point)
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 	
-	// Other stuff here
+	// Non boundary drawing here
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
 	{
 	}
@@ -2618,7 +2639,7 @@ ED.OuterLeafBreak.prototype.draw = function(_point)
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 	
-	// Other stuff here
+	// Non boundary drawing here
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
 	{
 	}
@@ -2761,7 +2782,7 @@ ED.InnerLeafBreak.prototype.draw = function(_point)
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 	
-	// Other stuff here
+	// Non boundary drawing here
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
 	{
 	}
@@ -2871,7 +2892,7 @@ ED.BuckleOperation.prototype.draw = function(_point)
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 	
-	// Other stuff here
+	// Non boundary drawing here
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
 	{
         // Recti
@@ -3274,7 +3295,7 @@ ED.BuckleSuture.prototype.draw = function(_point)
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 	
-	// Other stuff here
+	// Non boundary drawing here
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
 	{
         // Calculate location of suture
@@ -3571,7 +3592,7 @@ ED.DrainageSite.prototype.draw = function(_point)
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 	
-	// Other stuff here
+	// Non boundary drawing here
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
 	{
 	}
@@ -3707,7 +3728,7 @@ ED.RadialSponge.prototype.draw = function(_point)
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 	
-	// Other stuff here
+	// Non boundary drawing here
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
 	{
         ctx.beginPath();

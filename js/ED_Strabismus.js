@@ -108,7 +108,7 @@ ED.OrthopticEye.prototype.draw = function(_point)
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 	
-	// Other stuff here
+	// Non boundary drawing here
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
 	{
         // Set line attributes
@@ -222,7 +222,7 @@ ED.Shading.prototype.draw = function(_point)
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 	
-	// Other stuff here
+	// Non boundary drawing here
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
 	{
         ctx.beginPath();
@@ -352,7 +352,7 @@ ED.UpShoot.prototype.draw = function(_point)
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 	
-	// Other stuff here
+	// Non boundary drawing here
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
 	{
         // Arrow shaft
@@ -493,7 +493,7 @@ ED.UpDrift.prototype.draw = function(_point)
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 	
-	// Other stuff here
+	// Non boundary drawing here
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
 	{
         // Arrow body
@@ -642,7 +642,7 @@ ED.APattern.prototype.draw = function(_point)
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 	
-	// Other stuff here
+	// Non boundary drawing here
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
 	{
 	}
@@ -774,7 +774,7 @@ ED.VPattern.prototype.draw = function(_point)
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 	
-	// Other stuff here
+	// Non boundary drawing here
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
 	{
 	}
@@ -925,7 +925,7 @@ ED.Rectus.prototype.draw = function(_point)
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 	
-	// Other stuff here
+	// Non boundary drawing here
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
 	{
         // Indicate a recession by continuing muscle beyond insertion with different fill
@@ -1160,7 +1160,7 @@ ED.StrabOpTemplate.prototype.draw = function(_point)
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 	
-	// Other stuff here
+	// Non boundary drawing here
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
 	{
         // Pupil

@@ -132,7 +132,7 @@ ED.Breasts.prototype.draw = function(_point)
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 	
-	// Other stuff here
+	// Non boundary drawing here
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
 	{
         // Areola
@@ -291,7 +291,7 @@ ED.Scar.prototype.draw = function(_point)
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 	
-	// Other stuff here
+	// Non boundary drawing here
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
 	{
         ctx.beginPath();
@@ -443,7 +443,7 @@ ED.Lump.prototype.draw = function(_point)
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 	
-	// Other stuff here
+	// Non boundary drawing here
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
 	{
         ctx.beginPath();

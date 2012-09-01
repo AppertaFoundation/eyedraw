@@ -50,11 +50,12 @@ ED.AntSeg = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _sca
 	// Set classname
 	this.className = "AntSeg";
     
-    // Private parameters
-    this.hasPXE = false;
+    // Private parameters (NB. this private parameter is not saved, so MUST be bound via a derived parameter)
+    this.hasPXE;
 
     // Derived parameters
     this.grade;
+    this.pxe;
     
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
@@ -94,7 +95,8 @@ ED.AntSeg.prototype.setPropertyDefaults = function()
     this.parameterValidationArray['apexY']['range'].setMinAndMax(-280, -60);
     
     // Add complete validation arrays for derived parameters
-    this.parameterValidationArray['grade'] = {kind:'derived', type:'string', list:['Large', 'Medium', 'Small'], animate:true};
+    this.parameterValidationArray['grade'] = {kind:'derived', type:'string', list:['Large', 'Medium', 'Small'], animate:false};
+    this.parameterValidationArray['pxe'] = {kind:'derived', type:'bool'};
 }
 
 /**
@@ -102,7 +104,55 @@ ED.AntSeg.prototype.setPropertyDefaults = function()
  */
 ED.AntSeg.prototype.setParameterDefaults = function()
 {
-    this.setParameter('grade', 'Large');
+    this.setParameterFromString('grade', 'Large');
+    this.setParameterFromString('pxe', 'false');
+}
+
+/**
+ * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
+ * The returned parameters are animated if their 'animate' property is set to true
+ *
+ * @param {String} _parameter Name of parameter that has changed
+ * @value {Undefined} _value Value of parameter to calculate
+ * @returns {Array} Associative array of values of dependent parameters
+ */
+ED.AntSeg.prototype.dependentParameterValues = function(_parameter, _value)
+{
+    var returnArray = new Array();
+    
+    switch (_parameter)
+    {
+        case 'apexY':
+            if (_value < -200) returnArray['grade'] = 'Large';
+            else if (_value < -100) returnArray['grade'] = 'Medium';
+            else returnArray['grade']  = 'Small';
+            break;
+            
+        case 'hasPXE':
+            returnArray['pxe'] = _value;
+            break;
+            
+        case 'grade':
+            switch (_value)
+            {
+                case 'Large':
+                    returnArray['apexY'] = -260;
+                    break;
+                case 'Medium':
+                    returnArray['apexY'] = -200;
+                    break;
+                case 'Small':
+                    returnArray['apexY'] = -100;
+                    break;
+            }
+            break;
+            
+        case 'pxe':
+            returnArray['hasPXE'] = _value;
+            break;
+    }
+    
+    return returnArray;
 }
 
 /**
@@ -185,45 +235,6 @@ ED.AntSeg.prototype.draw = function(_point)
     
 	// Return value indicating successful hit test
 	return this.isClicked;
-}
-
-/**
- * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
- * The returned parameters are animated if their 'animate' property is set to true
- *
- * @param {String} _parameter Name of parameter that has changed
- * @value {Undefined} _value Value of parameter to calculate
- * @returns {Array} Associative array of values of dependent parameters
- */
-ED.AntSeg.prototype.dependentParameterValues = function(_parameter, _value)
-{
-    var returnArray = new Array();
-    
-    switch (_parameter)
-    {
-        case 'apexY':
-            if (_value < -200) returnArray['grade'] = 'Large';
-            else if (_value < -100) returnArray['grade'] = 'Medium';
-            else returnArray['grade']  = 'Small';
-            break;
-            
-        case 'grade':
-            switch (_value)
-                {
-                    case 'Large':
-                        returnArray['apexY'] = -260;
-                        break;
-                    case 'Medium':
-                        returnArray['apexY'] = -200;
-                        break;
-                    case 'Small':
-                        returnArray['apexY'] = -100;
-                        break;
-                }
-            break;
-    }
-    
-    return returnArray;
 }
 
 /**
@@ -349,7 +360,7 @@ ED.NuclearCataract.prototype.draw = function(_point)
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 	
-	// Other stuff here
+	// Non boundary drawing here
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
 	{
 	}
@@ -593,7 +604,7 @@ ED.CorticalCataract.prototype.draw = function(_point)
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 	
-	// Other stuff here
+	// Non boundary drawing here
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
 	{
         // Parameters
@@ -862,7 +873,7 @@ ED.PostSubcapCataract.prototype.draw = function(_point)
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 	
-	// Other stuff here
+	// Non boundary drawing here
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
 	{
 	}
@@ -1029,7 +1040,7 @@ ED.PCIOL.prototype.draw = function(_point)
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 	
-	// Other stuff here
+	// Non boundary drawing here
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
 	{
 	}
@@ -1226,7 +1237,7 @@ ED.ACIOL.prototype.draw = function(_point)
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 	
-	// Other stuff here
+	// Non boundary drawing here
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
 	{
 	}
@@ -1405,7 +1416,7 @@ ED.ToricPCIOL.prototype.draw = function(_point)
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 	
-	// Other stuff here
+	// Non boundary drawing here
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
 	{
         // Lines for toric IOL
@@ -1591,7 +1602,7 @@ ED.Bleb.prototype.draw = function(_point)
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 	
-	// Other stuff here
+	// Non boundary drawing here
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
 	{
         ctx.beginPath();
@@ -1727,7 +1738,7 @@ ED.PI.prototype.draw = function(_point)
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 	
-	// Other stuff here
+	// Non boundary drawing here
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
 	{
 	}
@@ -1867,7 +1878,7 @@ ED.RK.prototype.draw = function(_point)
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 	
-	// Other stuff here
+	// Non boundary drawing here
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
 	{
         var theta = 2 * Math.PI/n;	// Angle between radii
@@ -2020,7 +2031,7 @@ ED.LasikFlap.prototype.draw = function(_point)
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 	
-	// Other stuff here
+	// Non boundary drawing here
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
 	{
 	}
@@ -2169,7 +2180,7 @@ ED.Fuchs.prototype.draw = function(_point)
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 	
-	// Other stuff here
+	// Non boundary drawing here
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
 	{
 	}
@@ -2324,7 +2335,7 @@ ED.CornealScar.prototype.draw = function(_point)
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 	
-	// Other stuff here
+	// Non boundary drawing here
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
 	{
         // Work out whether visual axis is involved
@@ -2460,7 +2471,7 @@ ED.PhakoIncision.prototype.setPropertyDefaults = function()
     // Update component of validation array for simple parameters
     this.parameterValidationArray['radius']['range'].setMinAndMax(250, 450);
     this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
-    
+
     // Add complete validation arrays for derived parameters
     this.parameterValidationArray['incisionMeridian'] = {kind:'derived', type:'mod', range:new ED.Range(0, 360), clock:'bottom', animate:true};
     this.parameterValidationArray['incisionLength'] = {kind:'derived', type:'float', range:new ED.Range(1, 9.9), precision:1, animate:true};
@@ -2473,8 +2484,8 @@ ED.PhakoIncision.prototype.setPropertyDefaults = function()
  */
 ED.PhakoIncision.prototype.setParameterDefaults = function()
 {
-    this.setParameter('incisionSite', 'Corneal');
-    this.setParameter('incisionLength', '3.5');
+    this.setParameterFromString('incisionSite', 'Corneal');
+    this.setParameterFromString('incisionLength', '3.5');
 
     // Default is temporal side, or 90 degrees to the last one
     var doodle = this.drawing.lastDoodleOfClass(this.className);
@@ -2482,11 +2493,11 @@ ED.PhakoIncision.prototype.setParameterDefaults = function()
     {
         if (this.drawing.eye == ED.eye.Right)
         {
-            this.setParameter('incisionMeridian', ED.Mod(doodle.incisionMeridian - 90, 360).toFixed(0));
+            this.setParameterFromString('incisionMeridian', ED.Mod(doodle.incisionMeridian - 90, 360).toFixed(0));
         }
         else
         {
-            this.setParameter('incisionMeridian', ED.Mod(doodle.incisionMeridian + 90, 360).toFixed(0));
+            this.setParameterFromString('incisionMeridian', ED.Mod(doodle.incisionMeridian + 90, 360).toFixed(0));
         }
     }
     else
@@ -2494,12 +2505,104 @@ ED.PhakoIncision.prototype.setParameterDefaults = function()
         // First incision is usually temporal
         if (this.drawing.eye == ED.eye.Right)
         {
-            this.setParameter('incisionMeridian', '180');
+            this.setParameterFromString('incisionMeridian', '180');
         }
         else
         {
-            this.setParameter('incisionMeridian', '0');
+            this.setParameterFromString('incisionMeridian', '0');
         }
+    }
+}
+
+/**
+ * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
+ * The returned parameters are animated if their 'animate' property is set to true
+ *
+ * @param {String} _parameter Name of parameter that has changed
+ * @value {Undefined} _value Value of parameter to calculate
+ * @returns {Array} Associative array of values of dependent parameters
+ */
+ED.PhakoIncision.prototype.dependentParameterValues = function(_parameter, _value)
+{
+    var returnArray = new Array();
+    
+    switch (_parameter)
+    {
+        case 'rotation':
+            var angle = (((Math.PI * 2 - _value + Math.PI/2) * 180/Math.PI) + 360) % 360;
+            if (angle == 360) angle = 0;
+            returnArray['incisionMeridian'] = angle;
+            //  returnArray['arc'] = _value/2;
+            break;
+            
+        case 'arc':
+            returnArray['incisionLength'] = _value * (6 * this.radius)/this.defaultRadius;
+            break;
+            
+        case 'radius':
+            if (_value >= 428) returnArray['incisionSite'] = 'Scleral';
+            else if (_value >= 344) returnArray['incisionSite'] = 'Limbal';
+            else returnArray['incisionSite']  = 'Corneal';
+            
+            // Incision length should remain constant despite changes in radius
+            returnArray['arc'] =  this.incisionLength * this.defaultRadius/(6 * _value);
+            this.updateArcRange();
+            
+            // Move apexY as radius changes and adjust range
+            returnArray['apexY'] = this.apexYDelta - _value;
+            this.parameterValidationArray['apexY']['range'].setMinAndMax(-_value, -_value + 34);
+            break;
+            
+        case 'apexY':
+            returnArray['apexYDelta'] = this.radius + _value;
+            break;
+            
+            // Incision Meridian (CND 5.15)
+        case 'incisionMeridian':
+            returnArray['rotation'] = (((90 - _value) + 360) % 360) * Math.PI/180;
+            // Example of animating two simple parameters simultaneously
+            //returnArray['arc'] = (1 + _value/90) * Math.PI/12;
+            break;
+            
+            // Incision length (CND 5.14)
+        case 'incisionLength':
+            returnArray['arc'] = _value * this.defaultRadius/(6 * this.radius);
+            this.updateArcRange();
+            break;
+            
+            // Incision site (CND 5.13)
+        case 'incisionSite':
+            switch (_value)
+        {
+            case 'Scleral':
+                returnArray['radius'] = +428;
+                break;
+            case 'Limbal':
+                returnArray['radius'] = +376;
+                break;
+            case 'Corneal':
+                returnArray['radius'] = +330;
+                break;
+        }
+            break;
+    }
+    
+    return returnArray;
+}
+
+/**
+ * Private method to update range of arc parameter to account for values changing with radius and incisionSite
+ */
+ED.PhakoIncision.prototype.updateArcRange = function()
+{
+    if (this.radius > 0)
+    {
+        this.parameterValidationArray['arc']['range'].min = this.parameterValidationArray['incisionLength']['range'].min * this.defaultRadius/(6 * this.radius);
+        this.parameterValidationArray['arc']['range'].max = this.parameterValidationArray['incisionLength']['range'].max * this.defaultRadius/(6 * this.radius);
+    }
+    else
+    {
+        ED.errorHandler('ED.PhakoIncision', 'updateArcRange', 'Attempt to calculate a range of arc using an illegal value of radius: ' + this.radius);
     }
 }
 
@@ -2567,7 +2670,7 @@ ED.PhakoIncision.prototype.draw = function(_point)
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 	
-	// Other stuff here
+	// Non boundary drawing here
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
     {
         // Section with sutures
@@ -2642,98 +2745,6 @@ ED.PhakoIncision.prototype.description = function()
 	return returnString;
 }
 
-/**
- * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
- * The returned parameters are animated if their 'animate' property is set to true
- *
- * @param {String} _parameter Name of parameter that has changed
- * @value {Undefined} _value Value of parameter to calculate
- * @returns {Array} Associative array of values of dependent parameters
- */
-ED.PhakoIncision.prototype.dependentParameterValues = function(_parameter, _value)
-{
-    var returnArray = new Array();
-    
-    switch (_parameter)
-    {
-        case 'rotation':
-            var angle = (((Math.PI * 2 - _value + Math.PI/2) * 180/Math.PI) + 360) % 360;
-            if (angle == 360) angle = 0;
-            returnArray['incisionMeridian'] = angle;
-            //  returnArray['arc'] = _value/2;
-            break;
-
-        case 'arc':
-            returnArray['incisionLength'] = _value * (6 * this.radius)/this.defaultRadius;
-            break;
-            
-        case 'radius':
-            if (_value >= 428) returnArray['incisionSite'] = 'Scleral';
-            else if (_value >= 344) returnArray['incisionSite'] = 'Limbal';
-            else returnArray['incisionSite']  = 'Corneal';
-            
-            // Incision length should remain constant despite changes in radius
-            returnArray['arc'] =  this.incisionLength * this.defaultRadius/(6 * _value);
-            this.updateArcRange();
-            
-            // Move apexY as radius changes and adjust range
-            returnArray['apexY'] = this.apexYDelta - _value;
-            this.parameterValidationArray['apexY']['range'].setMinAndMax(-_value, -_value + 34);
-            break;
-            
-        case 'apexY':
-            returnArray['apexYDelta'] = this.radius + _value;
-            break;
-
-        // Incision Meridian (CND 5.15)
-        case 'incisionMeridian':
-            returnArray['rotation'] = (((90 - _value) + 360) % 360) * Math.PI/180;
-            // Example of animating two simple parameters simultaneously
-            //returnArray['arc'] = (1 + _value/90) * Math.PI/12;
-            break;
-
-        // Incision length (CND 5.14)
-        case 'incisionLength':
-            returnArray['arc'] = _value * this.defaultRadius/(6 * this.radius);
-            this.updateArcRange();
-            break;
-            
-        // Incision site (CND 5.13)
-        case 'incisionSite':
-            switch (_value)
-            {
-                case 'Scleral':
-                    returnArray['radius'] = +428;
-                    break;
-                case 'Limbal':
-                    returnArray['radius'] = +376;
-                    break;
-                case 'Corneal':
-                    returnArray['radius'] = +330;
-                    break;
-            }
-            break;
-    }
-    
-    return returnArray;
-}
-
-/**
- * Private method to update range of arc parameter to account for values changing with radius and incisionSite
- */
-ED.PhakoIncision.prototype.updateArcRange = function()
-{
-    if (this.radius > 0)
-    {
-    this.parameterValidationArray['arc']['range'].min = this.parameterValidationArray['incisionLength']['range'].min * this.defaultRadius/(6 * this.radius);
-    this.parameterValidationArray['arc']['range'].max = this.parameterValidationArray['incisionLength']['range'].max * this.defaultRadius/(6 * this.radius);
-    }
-    else
-    {
-        ED.errorHandler('ED.PhakoIncision', 'updateArcRange', 'Attempt to calculate a range of arc using an illegal value of radius: ' + this.radius);
-    }
-}
-
 
 /**
  * SidePort
@@ -2757,6 +2768,9 @@ ED.SidePort = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _s
 	// Set classname
 	this.className = "SidePort";
     
+    // Derived parameters
+    this.incisionMeridian;
+    
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
 }
@@ -2769,61 +2783,79 @@ ED.SidePort.prototype.constructor = ED.SidePort;
 ED.SidePort.superclass = ED.Doodle.prototype;
 
 /**
- * Sets handle attributes
- */
-ED.SidePort.prototype.setHandles = function()
-{
-}
-
-/**
- * Sets default dragging attributes
+ * Sets default properties
  */
 ED.SidePort.prototype.setPropertyDefaults = function()
 {
-	this.isSelectable = true;
-	this.isOrientated = false;
 	this.isScaleable = false;
-	this.isSqueezable = false;
 	this.isMoveable = false;
-	this.isRotatable = true;
-    this.isArcSymmetrical = true;
-    this.animationDeltaArray = {rotation:0.05};
-    this.rangeArray['arc'] = new ED.Range(0, Math.PI);
-	this.rangeOfApexX = new ED.Range(-0, +0);
-	this.rangeOfApexY = new ED.Range(-334, -300);
-    this.rangeOfRadius = new ED.Range(250, 450);
+    
+    // Add complete validation arrays for derived parameters
+    this.parameterValidationArray['incisionMeridian'] = {kind:'derived', type:'mod', range:new ED.Range(0, 360), clock:'bottom', animate:true};
 }
 
 /**
- * Sets default parameters
+ * Sets default parameters (Only called for new doodles)
+ * Use the setParameter function for derived parameters, as this will also update dependent variables
  */
 ED.SidePort.prototype.setParameterDefaults = function()
 {
-    // Default is standard corneal phako wound
-    this.incisionLength = 1.5;
-    
     // Incision length based on an average corneal radius of 6mm
-    this.arc = this.incisionLength/6;
+    this.arc = 3.5/6;
     
-    // Make a subsequent incision 90 degress to last one of same class
-    var angle = Math.PI/2;
+    // Default is temporal side, or 90 degrees to the last one
     var doodle = this.drawing.lastDoodleOfClass(this.className);
     if (doodle)
     {
-        this.rotation = doodle.rotation + angle;
-    }
-    else
-    {
-        // New sideports usually temporal
         if (this.drawing.eye == ED.eye.Right)
         {
-            this.rotation = -Math.PI/2;
+            this.setParameterFromString('incisionMeridian', ED.Mod(doodle.incisionMeridian - 90, 360).toFixed(0));
         }
         else
         {
-            this.rotation = Math.PI/2;
+            this.setParameterFromString('incisionMeridian', ED.Mod(doodle.incisionMeridian + 90, 360).toFixed(0));
         }
     }
+    else
+    {
+        // First incision is usually temporal
+        if (this.drawing.eye == ED.eye.Right)
+        {
+            this.setParameterFromString('incisionMeridian', '180');
+        }
+        else
+        {
+            this.setParameterFromString('incisionMeridian', '0');
+        }
+    }
+}
+
+/**
+ * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
+ * The returned parameters are animated if their 'animate' property is set to true
+ *
+ * @param {String} _parameter Name of parameter that has changed
+ * @value {Undefined} _value Value of parameter to calculate
+ * @returns {Array} Associative array of values of dependent parameters
+ */
+ED.SidePort.prototype.dependentParameterValues = function(_parameter, _value)
+{
+    var returnArray = new Array();
+    
+    switch (_parameter)
+    {
+        case 'rotation':
+            var angle = (((Math.PI * 2 - _value + Math.PI/2) * 180/Math.PI) + 360) % 360;
+            if (angle == 360) angle = 0;
+            returnArray['incisionMeridian'] = angle;
+            break;
+            
+        case 'incisionMeridian':
+            returnArray['rotation'] = (((90 - _value) + 360) % 360) * Math.PI/180;
+            break;
+    }
+    
+    return returnArray;
 }
 
 /**
@@ -2872,13 +2904,10 @@ ED.SidePort.prototype.draw = function(_point)
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 	
-	// Other stuff here
+	// Non boundary drawing here
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
     {
 	}
-    
-	// Draw handles if selected
-	//if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
 	
 	// Return value indicating successful hittest
 	return this.isClicked;
@@ -2891,11 +2920,7 @@ ED.SidePort.prototype.draw = function(_point)
  */
 ED.SidePort.prototype.description = function()
 {
-    var returnString = "Sideport at ";
-    
-    returnString += this.clockHour() + " o'clock";
-    
-	return returnString;
+	return "Sideport at " + this.clockHour() + " o'clock";;
 }
 
 /**
@@ -3032,7 +3057,7 @@ ED.LimbalRelaxingIncision.prototype.draw = function(_point)
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 	
-	// Other stuff here
+	// Non boundary drawing here
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
     {
 	}
@@ -3226,7 +3251,7 @@ ED.IrisHook.prototype.draw = function(_point)
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 	
-	// Other stuff here
+	// Non boundary drawing here
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
 	{
         // Drawing path
@@ -3391,7 +3416,7 @@ ED.MattressSuture.prototype.draw = function(_point)
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 	
-	// Other stuff here
+	// Non boundary drawing here
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
 	{
         ctx.beginPath();
@@ -3539,7 +3564,7 @@ ED.CornealSuture.prototype.draw = function(_point)
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 	
-	// Other stuff here
+	// Non boundary drawing here
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
 	{
         ctx.beginPath();
@@ -3752,7 +3777,7 @@ ED.CapsularTensionRing.prototype.draw = function(_point)
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 	
-	// Other stuff here
+	// Non boundary drawing here
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
 	{
 	}
@@ -3874,7 +3899,7 @@ ED.TrialFrame.prototype.draw = function(_point)
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 	
-	// Other stuff here
+	// Non boundary drawing here
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
 	{
         // Set font and colour      
@@ -4209,7 +4234,7 @@ ED.AntSegCrossSection.prototype.draw = function(_point)
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
     	
-	// Other stuff here
+	// Non boundary drawing here
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
     {
 	}
@@ -4342,7 +4367,7 @@ ED.CorticalCataractCrossSection.prototype.draw = function(_point)
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
     
-	// Other stuff here
+	// Non boundary drawing here
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
     {
 	}
@@ -4537,7 +4562,7 @@ ED.NuclearCataractCrossSection.prototype.draw = function(_point)
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
     
-	// Other stuff here
+	// Non boundary drawing here
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
     {
 	}

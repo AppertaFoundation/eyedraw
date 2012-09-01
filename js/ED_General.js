@@ -1152,27 +1152,6 @@ ED.Surgeon.prototype.setParameter = function(_parameter, _value)
     }
 }
 
-ED.Surgeon.prototype.nearestPointTo = function(_point)
-{
-    var min = 10000000; // Greater than square of maximum separation in doodle plane
-    var index = 0;
-    
-    // Iterate through points array to find nearest point
-    for (var i = 0; i < this.pointsArray.length; i++)
-    {
-        var p = this.pointsArray[i];
-        var d = (_point.x - p.x) * (_point.x - p.x) + (_point.y - p.y) * (_point.y - p.y);
-        
-        if (d < min)
-        {
-            min = d;
-            index = i;
-        }
-    }
-    
-    return this.pointsArray[index];
-}
-
 /**
  *  OperatingTable
  *
@@ -1190,7 +1169,7 @@ ED.Surgeon.prototype.nearestPointTo = function(_point)
  * @param {Float} _rotation
  * @param {Int} _order
  */
-ED. OperatingTable = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+ED.OperatingTable = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
 {
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
@@ -1394,7 +1373,7 @@ ED.Slider2D.prototype.draw = function(_point)
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 	
-	// Other stuff here
+	// Non boundary drawing here
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
 	{
 	}
@@ -1550,7 +1529,7 @@ ED.GraphAxes.prototype.draw = function(_point)
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 	
-	// Other stuff here
+	// Non boundary drawing here
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
 	{
         ctx.beginPath();
