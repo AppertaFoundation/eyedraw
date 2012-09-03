@@ -1,7 +1,6 @@
 <!-- Uncomment following line to re-enable doodle hover tooltips once layer bug is fixed (OE-1583) -->
 <!-- <span id="canvasTooltip"></span> -->
 <div data-side="<?php echo $side?>">
-	<canvas id="<?php echo $canvasId?>" class="<?php if ($isEditable) { echo 'edit'; } else { echo 'display'; }?>" width="<?php echo $size?>" height="<?php echo $size?>" tabindex="1"<?php if ($canvasStyle) {?> style="<?php echo $canvasStyle?>"<?php }?>></canvas>
 	<input type="hidden" id="<?php echo $inputId?>" name="<?php echo $inputName?>" value='<?php echo $this->model[$this->attribute]?>' />
 	<?php if ($isEditable && $toolbar) {?>
 		<div style="float: left">
@@ -24,10 +23,6 @@
 			</div>
 			<div class="ed_toolbar">
 				<?php foreach ($doodleToolBarArray as $i => $item) {?>
-					<?php if ($i>0 && $i%6 == 0) {?>
-						</div>
-						<div class="ed_toolbar">
-					<?php }?>
 					<button class="ed_img_button" id="<?php echo $item['classname'].$idSuffix?>" title="<?php echo $item['title']?>" onclick="<?php echo $drawingName?>.addDoodle('<?php echo $item['classname']?>'); return false;">
 						<img src="<?php echo $imgPath.$item['classname']?>.gif" />
 					</button>
@@ -35,50 +30,54 @@
 			</div>
 		</div>
 	<?php }?>
+		<canvas id="<?php echo $canvasId?>" class="<?php if ($isEditable) { echo 'edit'; } else { echo 'display'; }?>" width="<?php echo $size?>" height="<?php echo $size?>" tabindex="1"<?php if ($canvasStyle) {?> style="<?php echo $canvasStyle?>"<?php }?>></canvas>
 	<?php if ($isEditable) {?>
 		<div class="eyedrawFields">
 			<div>
 				<div class="label">
-					<?php echo $model->getAttributeLabel($side.'_sphere'); ?>
-					:
-				</div>
-				<div class="data segmented">
-					<?php Yii::app()->getController()->renderPartial('_segmented_field', array('element' => $model, 'field' => $side.'_sphere'), false, false)?>
-				</div>
-			</div>
-			<div>
-				<div class="label">
-					<?php echo $model->getAttributeLabel($side.'_cylinder'); ?>
-					:
-				</div>
-				<div class="data segmented">
-					<?php Yii::app()->getController()->renderPartial('_segmented_field', array('element' => $model, 'field' => $side.'_cylinder'), false, false)?>
-				</div>
-			</div>
-			<div>
-				<div class="label">
-					<?php echo $model->getAttributeLabel($side.'_axis'); ?>
+					<?php echo $element->getAttributeLabel($side.'_description'); ?>
 					:
 				</div>
 				<div class="data">
-					<?php echo CHtml::activeTextField($model, $side.'_axis', array('class' => 'axis')) ?>
+					<?php echo CHtml::activeTextArea($element, $side.'_description', array('rows' => "2", 'cols' => "20", 'class' => 'autosize')) ?>
 				</div>
 			</div>
 			<div>
 				<div class="label">
-					<?php echo $model->getAttributeLabel($side.'_type_id'); ?>
+					<?php echo $element->getAttributeLabel($side.'_diagnosis_id'); ?>
 					:
 				</div>
 				<div class="data">
-					<?php echo CHtml::activeDropDownList($model, $side.'_type_id', CHtml::listData(OphCiExamination_Refraction_Type::model()->findAll(array('order'=>'display_order')),'id','name')) ?>
+					<?php echo CHtml::activeTextField($element, $side.'_diagnosis_id') ?>
 				</div>
 			</div>
+			<button class="ed_report">Report</button>
+			<button class="ed_clear">Clear</button>
 		</div>
 	<?php }else{?>
 		<div class="eyedrawFields view">
 			<div>
 				<div class="data">
-					<?php echo $model->getCombined($side)?>
+					<?php echo $side == 'right' ? $element->right_description : $element->left_description ?>
+				</div>
+			</div>
+			<div>
+				<div class="data">
+					<?php echo $element->getAttributeLabel($side.'_diagnosis_id') ?>
+					:
+					<?php if ($side == 'right') {
+						if ($element->right_diagnosis) {
+							echo $element->right_diagnosis->term;
+						} else {
+							echo 'None';
+						}
+					} else {
+						if($element->left_diagnosis) {
+							echo $element->left_diagnosis->term;
+						} else {
+							echo 'None';
+						}
+					}?>
 				</div>
 			</div>
 		</div>
