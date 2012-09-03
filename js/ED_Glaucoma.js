@@ -1816,11 +1816,11 @@ ED.OpticCup.prototype.setHandleProperties = function()
  */
 ED.NerveFibreDefect = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
 {
-	// Call super-class constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order); 
-	
 	// Set classname
 	this.className = "NerveFibreDefect";
+    
+	// Call super-class constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order); 
 }
 
 /**
@@ -1864,8 +1864,32 @@ ED.NerveFibreDefect.prototype.setParameterDefaults = function()
 {
     this.arc = 20 * Math.PI/180;
     this.apexY = -460;
-    //this.rotation = (this.drawing.eye == ED.eye.Right)?-Math.PI/4:Math.PI/4;
-    this.rotation = Math.PI/4;
+    
+    // Deal with position of first and subsequent doodles
+    var doodle = this.drawing.lastDoodleOfClass(this.className);
+    if (doodle)
+    {
+        // First incision is usually temporal
+        if (this.drawing.eye == ED.eye.Right)
+        {
+            this.rotation = doodle.rotation + Math.PI/2;
+        }
+        else
+        {
+            this.rotation = doodle.rotation - Math.PI/2;
+        }
+    }
+    else
+    {
+        if (this.drawing.eye == ED.eye.Right)
+        {
+            this.rotation = 5 * Math.PI/4;
+        }
+        else
+        {
+            this.rotation = 3 * Math.PI/4;
+        }
+    }
 }
 
 /**
@@ -1978,11 +2002,11 @@ ED.NerveFibreDefect.prototype.description = function()
  */
 ED.DiskHaemorrhage = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
 {
+    // Set classname
+	this.className = "DiskHaemorrhage";
+    
 	// Call super-class constructor
 	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order); 
-	
-	// Set classname
-	this.className = "DiskHaemorrhage";
 }
 
 /**
@@ -2017,15 +2041,30 @@ ED.DiskHaemorrhage.prototype.setParameterDefaults = function()
     this.arc = 10 * Math.PI/180;
     this.apexY = -350;
     
-    // Make it 30 degress to last one of same class
+    // Deal with position of first and subsequent doodles
     var doodle = this.drawing.lastDoodleOfClass(this.className);
     if (doodle)
     {
-        this.rotation = doodle.rotation + Math.PI/6;
+        // First incision is usually temporal
+        if (this.drawing.eye == ED.eye.Right)
+        {
+            this.rotation = doodle.rotation + Math.PI/2;
+        }
+        else
+        {
+            this.rotation = doodle.rotation - Math.PI/2;
+        }
     }
     else
     {
-        this.rotation = (this.drawing.eye == ED.eye.Right)?-Math.PI/4:Math.PI/4;
+        if (this.drawing.eye == ED.eye.Right)
+        {
+            this.rotation = 5 * Math.PI/4;
+        }
+        else
+        {
+            this.rotation = 3 * Math.PI/4;
+        }
     }
 }
 
