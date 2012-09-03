@@ -40,7 +40,6 @@
  */
 function eyeDrawInit(_properties)
 {
-    console.log(_properties.bindingArray);
 	// Get reference to the drawing canvas
 	var canvas = document.getElementById(_properties.canvasId);
 
@@ -49,13 +48,13 @@ function eyeDrawInit(_properties)
 			_properties.idSuffix, _properties.isEditable, _properties.offset_x,
 			_properties.offset_y, _properties.to_image);
 
-    // Instantiate a controller object and register it for notifications
+    // Instantiate a controller object
     var controller = new eyeDrawController(window[_properties.drawingName]);
     
 	// Preload any images
 	window[_properties.drawingName].preLoadImagesFrom(_properties.graphicsPath);
     
-    // Controller class (need _idSuffix?)
+    // Controller class
     function eyeDrawController(_drawing)
     {
         // Assign controller properties
@@ -66,13 +65,13 @@ function eyeDrawInit(_properties)
         this.callBack = callBack;
         
         // Register for notifications with drawing object
-        this.drawing.registerForNotifications(this, 'callBack', ['loaded', 'doodleAdded', 'mouseDragged']);
+        this.drawing.registerForNotifications(this, 'callBack', ['loaded', 'doodleAdded', 'mouseDragged', 'rotation']);
         
         // Method called for notification
         function callBack(_messageArray)
         {
-            console.log("Event: " + _messageArray['eventName']);
-            console.log($(this));
+            //console.log("Event: ", _properties.idSuffix, _messageArray['eventName']);
+            //console.log($(this));
             // Get reference to hidden input element
             var input = document.getElementById(_properties.inputId);
             
@@ -85,55 +84,27 @@ function eyeDrawInit(_properties)
                     if (input.value.length > 0)
                     {
                         // Load drawing data from input element
-                        window[_properties.drawingName].loadDoodles(_properties.inputId);
-                        
-                        // Apply bindings
-                        for ( var i = 0; i < _properties.bindingArray.length; i++)
-                        {
-                            // Doodle className
-                            var className = _properties.bindingArray[i][0];
-                            
-                            // Binding
-                            var binding = translateParameter(_properties.bindingArray[i][1]);
-                            
-                            // Get key of first and only element (more elegant way of doing this?)
-                            for (var key in binding)
-                            {
-                            }
-                            
-                            // Get doodle corresponding to this class
-                            var doodle = window[_properties.drawingName].firstDoodleOfClass(className);
-                            if (doodle)
-                            {
-                                doodle.addBinding(key, binding[key]);
-                            }
-                        }
+                        this.drawing.loadDoodles(_properties.inputId);
                         
                         // Draw doodles
-                        window[_properties.drawingName].drawAllDoodles();
+                        this.drawing.drawAllDoodles();
                     }
                     // Otherwise run commands in onLoadedCommand array
                     else
                     {
-                        console.log(_properties.bindingArray);
                         for ( var i = 0; i < _properties.onLoadedCommandArray.length; i++)
                         {
                             // Get method name
                             var method = _properties.onLoadedCommandArray[i][0];
-                            
-                            // Construct array containing arguments
-                            var args = new Array();
-                            for (var j = 0; j < _properties.onLoadedCommandArray[i][1].length; j++)
-                            {
-                                arg = translateParameter(_properties.onLoadedCommandArray[i][1][j]);
-                                args[j] = arg;
-                            }
+                            var argumentArray = _properties.onLoadedCommandArray[i][1];
 
                             // Run method with arguments
-                            var dood = window[_properties.drawingName][method].apply(window[_properties.drawingName], args);
-                            console.log(dood);
+                            var dood = this.drawing[method].apply(this.drawing, argumentArray);
                         }
                     }
+                    
+                    // Apply bindings
+                    this.drawing.addBindings(_properties.bindingArray);
                     
                     // Initialise hidden input
                     input.value = window[_properties.drawingName].save();
@@ -141,11 +112,29 @@ function eyeDrawInit(_properties)
                     break;
                 case 'doodleAdded':
                     // Save drawing to hidden input
-                    input.value = window[_properties.drawingName].save();
+                    input.value = this.drawing.save();
                     break;
                 case 'mouseDragged':
                     // Save drawing to hidden input
-                    input.value = window[_properties.drawingName].save();
+                    input.value = this.drawing.save();
+                    break;
+                case 'rotation':
+                    if (this.drawing.IDSuffix == 'LPS')
+                    {
+                        console.log('rotation: ', this.drawing.selectedDoodle.rotation);
+                        var doodle1 = this.drawing.selectedDoodle;
+                        var doodle2 = window['ed_drawing_edit_RPS'].firstDoodleOfClass('PhakoIncision');
+                        if (doodle2)
+                        {
+                            doodle2.setSimpleParameter('rotation', doodle1.rotation);
+                            window['ed_drawing_edit_RPS'].repaint();
+                            
+                            // Update dependencies
+                            doodle2.updateDependentParameters('rotation');
+                            
+                            window['ed_drawing_edit_RPS'].updateBindings(doodle2);
+                        }
+                    }
                     break;
                 default:
                     console.log('Unhandled notification for message: ' + _messageArray['eventName']);
@@ -154,54 +143,6 @@ function eyeDrawInit(_properties)
         }
     }    
 }
-
-// Translates strings into arrays if appropriate
-function translateParameter(_arg)
-{
-    switch (_arg.charAt(0))
-    {
-        // Regular array
-        case "[":
-            console.log("Call to translateParameter function for regular array ***TODO***");
-            return _arg // ***TODO*** deal with regular array
-            break;
-            
-        // Associative array
-        case "{":
-            // Create a new associative array
-            var associativeArray = new Array();
-            
-            // Strip {} characters (***TODO*** should be able to do this with a grep expression)
-            var arg = _arg.replace('{','');
-            arg = arg.replace('}','');
-            
-            // Strip out white space
-            arg = arg.replace(/\s/,'');
-            
-            // Split into individual members each of format key:value
-            var members = arg.split(',');
-            
-            // Go through elements creating an associative array member for each
-            for (var i = 0; i < members.length; i++)
-            {
-                // Break each couplet into two parts
-                var parts = members[i].split(':');
-                
-                // Strip out any quotation marks from second part
-                var secondPart = parts[1].replace(/("|')/g, "");
-                associativeArray[parts[0]] = secondPart;
-            }
-                                                    
-            return associativeArray;
-            break;
-                                                    
-        // String
-        default:
-            return _arg;
-            break;
-    }
-}
-
 
 	// Set focus to the canvas element
 //	if (_properties.focus) {

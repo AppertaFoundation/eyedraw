@@ -2432,7 +2432,7 @@ ED.PhakoIncision = function(_drawing, _originX, _originY, _radius, _apexX, _apex
     
     // Derived parameters
     this.incisionMeridian;
-    this.incisionLength;
+    this.incisionLength = (_arc * Math.PI/180) * (6 * _radius)/this.defaultRadius;
     this.incisionSite;
     
 	// Call superclass constructor
@@ -2613,7 +2613,7 @@ ED.PhakoIncision.prototype.updateArcRange = function()
  */
 ED.PhakoIncision.prototype.draw = function(_point)
 {
-    //console.log(this.incisionMeridian, this.incisionLength, this.incisionSite, this.apexYDelta);
+    //console.log(this.parameterValidationArray['arc']['range'].max);
 	// Get context
 	var ctx = this.drawing.context;
 	

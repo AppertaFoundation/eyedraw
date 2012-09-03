@@ -29,7 +29,7 @@
 canvas.ed_canvas_edit {
 	border: 1px solid gray;
     cursor: pointer;
-	margin-top: 10px;
+	margin-top: 50px;
 }
 
 /* Canvas element in display mode */

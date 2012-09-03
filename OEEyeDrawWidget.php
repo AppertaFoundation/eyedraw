@@ -69,7 +69,7 @@
 class OEEyeDrawWidget extends CWidget
 {
     /**
-    * Template to use to render the eyeDraw, this allows multiple different layouts
+    * View file for rendering the eyeDraw
     * @var string
     */
     public $template = 'OEEyeDrawWidgetBasic';
@@ -286,7 +286,6 @@ class OEEyeDrawWidget extends CWidget
         }
 
         // Render the widget
-        error_log($this->template);
         //$this->render(get_class($this),get_object_vars($this));
         $this->render($this->template, get_object_vars($this));
         //$this->render('application.modules.OphMiTesteyedrawwidget.views.custom.create_custom', get_object_vars($this));

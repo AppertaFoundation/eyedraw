@@ -619,7 +619,7 @@ ED.Drawing.prototype.json = function()
 
 /**
  * Draws all doodles for this drawing
- */ 
+ */
 ED.Drawing.prototype.drawAllDoodles = function()
 {
     // Draw any connecting lines
@@ -995,6 +995,9 @@ ED.Drawing.prototype.mousemove = function(_point)
                     {
                         rotationCorrection = rotationCorrection * deltaAngle/2;
                         doodle.setSimpleParameter('rotation', doodle.rotation + rotationCorrection);
+                        
+                        // Update dependencies
+                        doodle.updateDependentParameters('rotation');
                     }
                     
 					break;
@@ -1009,6 +1012,9 @@ ED.Drawing.prototype.mousemove = function(_point)
 						// Work out difference, and change doodle's angle of rotation by this amount
 						var deltaAngle = newAngle - oldAngle;
                         doodle.setSimpleParameter('rotation', doodle.rotation + deltaAngle);
+                        
+                        // Update dependencies
+                        doodle.updateDependentParameters('rotation');
 					}
 					break;
                     
@@ -1737,7 +1743,40 @@ ED.Drawing.prototype.addDoodle = function(_className, _parameterDefaults, _param
     }
     else
     {
+        ED.errorHandler('ED.Drawing', 'addDoodle', 'Attempt to add a second unique doodle of class ' + _className);
         return null;
+    }
+}
+
+
+/**
+ * Takes array of bindings, and adds them to the corresponding doodles
+ *
+ * @param {Array} _bindingArray Associative 2d array. Index is className, and each entry is an array with key: parameter name value: elementId
+ */
+ED.Drawing.prototype.addBindings = function(_bindingArray)
+{
+    if (this.doodleArray.length > 0)
+    {
+        for (var i = 0; i < this.doodleArray.length; i++)
+        {
+            var doodle = this.doodleArray[i];
+            
+            // Retrieve bindings for this doodle
+            var bindings = _bindingArray[doodle.className];
+            if(bindings)
+            {
+                // Apply them
+                for (var parameter in bindings)
+                {
+                    doodle.addBinding(parameter, bindings[parameter]);
+                }
+            }
+        }
+    }
+    else
+    {
+        ED.errorHandler('ED.Drawing', 'addBindings', 'Function called with empty bindings array');
     }
 }
 
@@ -1805,17 +1844,31 @@ ED.isNumeric = function(_value)
 
 /**
  * Updates value of bound elements to the selected doodle. Called by methods which change parameter values
+ *
+ * @param {ED.Doodle} _doodle Optional doodle object to update drawings without a selected doodle
  */
-ED.Drawing.prototype.updateBindings = function()
+ED.Drawing.prototype.updateBindings = function(_doodle)
 {
-    // There must be a selected doodle to activate binding
-    if (this.selectedDoodle != null)
+    var doodle = _doodle;
+    
+    // Check for an argument, otherwise take selected doodle for this drawing
+    if (typeof(doodle) == 'undefined')
+    {
+        doodle = this.selectedDoodle;
+    }
+    
+    // No argment, so there must be a selected doodle to activate binding
+    if (doodle != null)
     {
         // Iterate through this doodle's bindings array and alter value of HTML element
-        for (var key in this.selectedDoodle.bindingArray)
+        for (var key in doodle.bindingArray)
         {
-            document.getElementById(this.selectedDoodle.bindingArray[key]).value = this.selectedDoodle.getParameter(key);
+            document.getElementById(doodle.bindingArray[key]).value = doodle.getParameter(key);
         }
+    }
+    else
+    {
+        ED.errorHandler('ED.Drawing', 'updateBindings', 'Attempt to update bindings on null doodle');
     }
 }
 
@@ -2739,11 +2792,11 @@ ED.Doodle = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _sca
         
         // Parameter validation array
         this.parameterValidationArray = {
-            originX:{kind:'simple', type:'int', range:new ED.Range(-1000,+1000), delta:10},
-            originY:{kind:'simple', type:'int', range:new ED.Range(-1000,+1000), delta:10},
-            radius:{kind:'simple', type:'float', range:new ED.Range(+100,+450), precision:6, delta:10},
-            apexX:{kind:'simple', type:'int', range:new ED.Range(-500,+500), delta:10},
-            apexY:{kind:'simple', type:'int', range:new ED.Range(-500,+500), delta:10},
+            originX:{kind:'simple', type:'int', range:new ED.Range(-1000,+1000), delta:15},
+            originY:{kind:'simple', type:'int', range:new ED.Range(-1000,+1000), delta:15},
+            radius:{kind:'simple', type:'float', range:new ED.Range(+100,+450), precision:6, delta:15},
+            apexX:{kind:'simple', type:'int', range:new ED.Range(-500,+500), delta:15},
+            apexY:{kind:'simple', type:'int', range:new ED.Range(-500,+500), delta:15},
             scaleX:{kind:'simple', type:'float', range:new ED.Range(+0.5,+4.0), precision:6, delta:0.1},
             scaleY:{kind:'simple', type:'float', range:new ED.Range(+0.5,+4.0), precision:6, delta:0.1},
             arc:{kind:'simple', type:'float', range:new ED.Range(Math.PI/12, Math.PI * 2), precision:6, delta:0.1},
@@ -2763,8 +2816,7 @@ ED.Doodle = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _sca
         this.isFilled = true;
         this.derivedParametersArray = new Array();  // Array relating special parameters to corresponding common parameter
         this.animationFrameRate = 30;           // Frames per second
-        this.animationDeltaArray = new Array();
-        this.animationDataArray = new Array();   // Associative array. key = parameter name, value = array with animation info
+        this.animationDataArray = new Array();   // Associative array, key = parameter name, value = array with animation info
         
         // Array of points to snap to
         this.pointsArray = new Array();
@@ -2789,7 +2841,6 @@ ED.Doodle = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _sca
 		// Set dragging default settings
 		this.setPropertyDefaults();
         
-        
 		// New doodle (constructor called with _drawing parameter only)
 		if (typeof(_originX) == 'undefined')
 		{
@@ -2807,7 +2858,7 @@ ED.Doodle = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _sca
 			
 			this.setParameterDefaults();
 			
-			// Selected
+			// Newly added doodles are selected
 			this.isSelected = true;
 		}
 		// Doodle with passed parameters
@@ -2825,7 +2876,17 @@ ED.Doodle = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _sca
 			this.rotation = _rotation * Math.PI/180;
 			this.order = +_order;
             
-			// Not selected
+            // Update any derived parameters
+            for (var parameter in this.parameterValidationArray)
+            {
+                var validation = this.parameterValidationArray[parameter];
+                if (validation.kind == 'simple')
+                {
+                    this.updateDependentParameters(parameter);
+                }
+            }
+            
+			// Loaded doodles are not selected
 			this.isSelected = false;
             this.isForDrawing = false;
 		}
@@ -4072,7 +4133,7 @@ ED.Range.prototype.includesInAngularRange = function(_angle, _isDegrees)
     var max = new ED.Point(0,0);
     var angle = new ED.Point(0,0);
     
-    // Convert to radians
+    // Set points using polar coordinates
     if (!_isDegrees)
     {
         min.setWithPolars(r, this.min);
@@ -4098,8 +4159,8 @@ ED.Range.prototype.includesInAngularRange = function(_angle, _isDegrees)
  */
 ED.Range.prototype.constrainToAngularRange = function(_angle, _isDegrees)
 {
-    // No point unless range is less than 360 degrees!
-    if ((this.max - this.min) < 2 * Math.PI)
+    // No point in constraining unless range is less than 360 degrees!
+    if ((this.max - this.min) < (_isDegrees?360:(2 * Math.PI)))
     {
         // Arbitrary radius
         var r = 100;
@@ -4109,7 +4170,7 @@ ED.Range.prototype.constrainToAngularRange = function(_angle, _isDegrees)
         var max = new ED.Point(0,0);
         var angle = new ED.Point(0,0);
         
-        // Convert to radians
+        // Set points using polar coordinates
         if (!_isDegrees)
         {
             min.setWithPolars(r, this.min);
