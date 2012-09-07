@@ -70,7 +70,7 @@
 					:
 				</div>
 				<div class="data">
-					<?php echo CHtml::activeDropDownList($model, $side.'_type_id', CHtml::listData(OphCiExamination_Refraction_Type::model()->findAll(array('order'=>'display_order')),'id','name')) ?>
+					<?php echo CHtml::activeDropDownList($model, $side.'_type_id', $refraction_types)?>
 				</div>
 			</div>
 		</div>

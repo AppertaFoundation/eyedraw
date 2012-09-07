@@ -41,6 +41,8 @@ class OEEyeDrawWidgetRefraction extends OEEyeDrawWidget {
 
 	public $identifier = 'Refraction';
 
+	public $refraction_types;
+
 	public function init() {
 		$this->identifier .= $this->side;
 
