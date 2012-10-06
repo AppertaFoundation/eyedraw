@@ -242,9 +242,6 @@ ED.Drawing = function(_canvas, _eye, _IDSuffix, _isEditable, offset_x, offset_y,
     // Array of objects requesting notifications
     this.notificationArray = new Array();
     
-    // Array of syncronisation objects
-    this.slaveArray = new Array();
-    
     // Optional tooltip (this property will be null is a span element with this id not found
     this.canvasTooltip = document.getElementById('canvasTooltip');
     
@@ -2433,29 +2430,6 @@ ED.Drawing.prototype.nextDoodleId = function()
     return this.lastDoodleId++;
 }
 
-/**
- * Slaves are objects which hold information about syncronising simple parameters between doodles
- *
- * @class Slave
- * @property {Drawing} drawing The drawing to which the syncronisation applies
- * @property {Doodle} doodle The doodle to which the syncronisation applies
- * @property {Array} parameterArray Array of simple parameters to be synced
- * @param {Drawing} _drawing
- * @param {Doodle} _doodle
- * @param {Array} _parameterArray
- */
-ED.Slave = function(_drawing, _doodle, _parameterArray)
-{
-    this.drawing = _drawing;
-    this.doodle = _doodle;
-    this.parameterArray = _parameterArray;
-}
-
-ED.Slave.prototype.callBack = function(_messageArray)
-{
-    console.log('Slave called back with message: ', _messageArray);
-}
-    
 
 /**
  * An object of the Report class is used to extract data for the Royal College of Ophthalmologists retinal detachment dataset.

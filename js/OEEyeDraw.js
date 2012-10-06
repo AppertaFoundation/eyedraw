@@ -123,6 +123,7 @@ function eyeDrawInit(_properties)
                     input.value = this.drawing.save();
                     break;
                 case 'parameter':
+                    console.log(this.drawing.IDSuffix);
                     // Iterate through sync array
                     for (var idSuffix in _properties.syncArray)
                     {
@@ -148,10 +149,11 @@ function eyeDrawInit(_properties)
                                 if (masterDoodle && slaveDoodle)
                                 {
                                     slaveDoodle.syncParameter(_messageArray.object.parameter, masterDoodle[_messageArray.object.parameter]);
+                                    
+                                    // Update any bindings to slave doodle
+                                    window[slaveDrawingName].updateBindings(slaveDoodle);
                                 }
-                                
-                                // Update any bindings to slave doodle
-                                window[slaveDrawingName].updateBindings(slaveDoodle);
+
                             }
                         }
                     }
@@ -164,87 +166,4 @@ function eyeDrawInit(_properties)
     }    
 }
 
-
-
-
-	// Set focus to the canvas element
-//	if (_properties.focus) {
-//		canvas.focus();
-//	}
-
-    
-    
-	// Wait for the drawing object to be ready before adding objects or other
-	// commands
-/*
-	window[_properties.drawingName].onLoaded = function() {
-		// Check for an element containing data
-		var dataElement = document.getElementById(_properties.inputId);
-
-		// If dataElement exists and contains data, load it into the drawing
-		if (dataElement != null && dataElement.value.length > 0) {
-			window[_properties.drawingName].loadDoodles(_properties.inputId);
-			window[_properties.drawingName].drawAllDoodles();
-		}
-
-		// Otherwise iterate through the command array, constructing argument string
-		// and running them
-		else {
-			for ( var i = 0; i < _properties.onLoadedCommandArray.length; i++) {
-				// Get function name
-				var func = _properties.onLoadedCommandArray[i][0];
-
-				// Get arguments
-				// var args = _properties.onLoadedCommandArray[i][1];
-				var args = "";
-
-				for ( var j = 0; j < _properties.onLoadedCommandArray[i][1].length; j++) {
-					// ***TODO*** will this work >1 one argument?
-					args += _properties.onLoadedCommandArray[i][1][j] + ",";
-				}
-
-				args = args.replace(/,$/, '').split(',');
-
-				window[_properties.drawingName][func].apply(
-						window[_properties.drawingName], args);
-			}
-		}
-
-		// Load params
-		for ( var i = 0; i < _properties.onLoadedParamsArray.length; i++) {
-			window[_properties.drawingName]['setParameterForDoodleOfClass'].apply(
-					window[_properties.drawingName], _properties.onLoadedParamsArray[i]);
-		}
-
-		// Mark the drawing unmodified
-		window[_properties.drawingName]["isReady"]();
-
-		// Initialise hidden input
-		var input = document.getElementById(_properties.inputId);
-		if (input) {
-			input.value = window[_properties.drawingName].save();
-		}
-
-		// Detects changes in doodle parameters (eg from mouse dragging)
-		window[_properties.drawingName].parameterListener = function() {
-			// Pass drawing object to user function
-			eDparameterListener(window[_properties.drawingName]);
-
-			// Save changes to value of hidden element ***TODO*** clean this up since
-			// duplicated in next function, maybe create a new EyeDraw method.
-			var input = document.getElementById(_properties.inputId);
-			if (input) {
-				input.value = window[_properties.drawingName].save();
-			}
-		}
-
-		// Save changes to value of hidden element
-		window[_properties.drawingName].saveToInputElement = function() {
-			var input = document.getElementById(_properties.inputId);
-			if (input) {
-				input.value = window[_properties.drawingName].save();
-			}
-		}
-	}
- */
     

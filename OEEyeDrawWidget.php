@@ -68,6 +68,13 @@
  */
 class OEEyeDrawWidget extends CWidget
 {
+	/**
+	 * Array of EyeDraw script files required (defaults to all available files)
+	 * @todo Search model attribute and contents of doodleToolBarArray to determine subset of files to register
+	 * @var array
+	 */
+    public $scriptArray = array();
+    
     /**
     * View file for rendering the eyeDraw
     * @var string
@@ -148,13 +155,6 @@ class OEEyeDrawWidget extends CWidget
 	private $jsPath;
 	private $cssPath;
 	private $imgPath;
-
-	/**
-	 * Array of EyeDraw script files required
-	 * @todo Search model attribute and contents of doodleToolBarArray to determine subset of files to register
-	 * @var array
-	 */
-    private $scriptArray = array('Adnexal', 'AntSeg', 'Glaucoma', 'MedicalRetina', 'Strabismus', 'VitreoRetinal');
 
 	/**
 	 * Unique name for the EyeDraw drawing object ('ed_drawing_'.$mode.'_'.$idSuffix).
@@ -242,10 +242,27 @@ class OEEyeDrawWidget extends CWidget
 	 */
     public function init()
     {
-        // Set values of derived properties
+        // Set values of paths
         $this->cssPath = Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('application.modules.eyedraw.css'));
         $this->jsPath = Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('application.modules.eyedraw.js'));
         $this->imgPath = Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('application.modules.eyedraw.graphics')).'/';
+        
+        // If script array is empty, just load all the ED_.js files (with exception of two mandatory files)
+        if (empty($this->scriptArray))
+        {
+            foreach (new DirectoryIterator($this->jsPath ) as $file)
+            {
+                if ($file->isFile() === TRUE && $file->getFilename() !== 'ED_Drawing.js' && $file->getBasename() !== 'OEEyeDraw.js')
+                {
+                    if ($file->getExtension() == "js")
+                    {
+                        error_log($file->getFilename());
+                        array_push ($this->scriptArray, $file->getFilename());
+                    }
+                }
+            }
+        }
+
         
         // Create a unique and descriptive variable name for the drawing object and the corresponding canvas element
         $this->drawingName = 'ed_drawing_'.$this->mode.'_'.$this->idSuffix;
@@ -269,7 +286,7 @@ class OEEyeDrawWidget extends CWidget
         // Flag indicating whether the drawing is editable or not (normally corresponded to edit and view mode)
         $this->isEditable = $this->mode == 'edit'?true:false;
 
-        // Register the chosen scripts and CSS file
+        // Register the chosen scripts and CSS files
         $this->registerScripts();
         $this->registerCss();
 
@@ -292,9 +309,7 @@ class OEEyeDrawWidget extends CWidget
         }
 
         // Render the widget
-        //$this->render(get_class($this),get_object_vars($this));
         $this->render($this->template, get_object_vars($this));
-        //$this->render('application.modules.OphMiTesteyedrawwidget.views.custom.create_custom', get_object_vars($this));
 	}
 
 	/**
@@ -306,7 +321,6 @@ class OEEyeDrawWidget extends CWidget
 
 	/**
 	 * Registers all necessary javascript files
-	 * @todo Seach model attribute and contents of doodleToolBarArray to determine subset of files to register
 	 */			
 	protected function registerScripts()
 	{
@@ -316,21 +330,17 @@ class OEEyeDrawWidget extends CWidget
         // Register the EyeDraw mandatory scripts
 		$cs->registerScriptFile($this->jsPath.'/OEEyeDraw.js', CClientScript::POS_HEAD);
 		$cs->registerScriptFile($this->jsPath.'/ED_Drawing.js', CClientScript::POS_HEAD);
-		$cs->registerScriptFile($this->jsPath.'/ED_General.js', CClientScript::POS_HEAD);
         
-        // For languages other than english this needs utf8 so should be put in a view file as in the following line
+        // For languages that require utf8, use the following line in the view file (***TODO*** should be possible using Yii function)
         // <script language="JavaScript" src="js/ED_Tooltips.js" type="text/javascript" charset="utf-8"></script>
 		$cs->registerScriptFile($this->jsPath.'/ED_Tooltips.js', CClientScript::POS_HEAD);
         
         // Register the specified optional sub-specialty scripts
         for ($i = 0; $i < count($this->scriptArray); $i++)
         {
-                $cs->registerScriptFile($this->jsPath.'/ED_'.$this->scriptArray[$i].'.js', CClientScript::POS_HEAD);
+            $cs->registerScriptFile($this->jsPath.'/'.$this->scriptArray[$i], CClientScript::POS_HEAD);
         }
-		
-        // Make drawing var global so can be accessed by tool bar
-        //$cs->registerScript('ano-id', 'var ed_drawing_edit_PS;', CClientScript::POS_HEAD);
-				
+
 		// Create array of parameters to pass to the javascript function which runs on page load
 		$properties = array(
             'drawingName'=>$this->drawingName,
@@ -352,9 +362,9 @@ class OEEyeDrawWidget extends CWidget
 		// Encode parameters and pass to a javascript function to set up canvas
 		$properties = CJavaScript::encode($properties);
 		$cs->registerScript('scr_'.$this->canvasId, "eyeDrawInit($properties)", CClientScript::POS_LOAD);
-        Yii::app()->clientScript->registerScript('helloscript',"
-                                                 console.log('hello');
-                                                 ",CClientScript::POS_READY);
+        
+        // Test registration of a script
+        //Yii::app()->clientScript->registerScript('helloscript',"console.log('hello');",CClientScript::POS_READY);
 	}
 
 	/**
