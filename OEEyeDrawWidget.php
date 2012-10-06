@@ -134,7 +134,13 @@ class OEEyeDrawWidget extends CWidget
 	 * @var array
 	 */
     public $onLoadedParamsArray = array();
-	
+
+    /**
+	 * Array of syncs to apply to doodles, applied after bindings commands.
+	 * @var array
+	 */
+    public $syncArray = array();
+    
    /**
 	 * Paths for the subdirectories for javascript, css and images
 	 * @var string
@@ -336,6 +342,7 @@ class OEEyeDrawWidget extends CWidget
             'inputId'=>$this->inputId,
             'onLoadedCommandArray'=>$this->onLoadedCommandArray,
             'bindingArray'=>$this->bindingArray,
+            'syncArray'=>$this->syncArray,
             'onLoadedParamsArray'=>$this->onLoadedParamsArray,
             'offset_x'=>$this->offset_x,
             'offset_y'=>$this->offset_y,

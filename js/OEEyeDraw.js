@@ -65,7 +65,7 @@ function eyeDrawInit(_properties)
         this.callBack = callBack;
         
         // Register for notifications with drawing object
-        this.drawing.registerForNotifications(this, 'callBack', ['loaded', 'doodleAdded', 'mouseDragged', 'rotation']);
+        this.drawing.registerForNotifications(this, 'callBack', ['loaded', 'doodleAdded', 'mouseDragged', 'parameter']);
         
         // Method called for notification
         function callBack(_messageArray)
@@ -74,6 +74,7 @@ function eyeDrawInit(_properties)
             //console.log($(this));
             // Get reference to hidden input element
             var input = document.getElementById(_properties.inputId);
+
             
             // Handle events by name
             switch (_messageArray['eventName'])
@@ -104,8 +105,11 @@ function eyeDrawInit(_properties)
                     }
                     
                     // Apply bindings
-                    this.drawing.addBindings(_properties.bindingArray);
-                    
+                    if (ED.objectIsEmpty(_properties.bindingArray.length))
+                    {
+                        this.drawing.addBindings(_properties.bindingArray);
+                    }
+
                     // Initialise hidden input
                     input.value = window[_properties.drawingName].save();
                     
@@ -118,21 +122,37 @@ function eyeDrawInit(_properties)
                     // Save drawing to hidden input
                     input.value = this.drawing.save();
                     break;
-                case 'rotation':
-                    if (this.drawing.IDSuffix == 'LPS')
+                case 'parameter':
+                    // Iterate through sync array
+                    for (var idSuffix in _properties.syncArray)
                     {
-                        console.log('rotation: ', this.drawing.selectedDoodle.rotation);
-                        var doodle1 = this.drawing.selectedDoodle;
-                        var doodle2 = window['ed_drawing_edit_RPS'].firstDoodleOfClass('PhakoIncision');
-                        if (doodle2)
+                        // Iterate through each specified className
+                        for (var className in _properties.syncArray[idSuffix])
                         {
-                            doodle2.setSimpleParameter('rotation', doodle1.rotation);
-                            window['ed_drawing_edit_RPS'].repaint();
+                            // Get array of specified slave doodle class names
+                            var slaveClassNameArray = _properties.syncArray[idSuffix][className];
                             
-                            // Update dependencies
-                            doodle2.updateDependentParameters('rotation');
-                            
-                            window['ed_drawing_edit_RPS'].updateBindings(doodle2);
+                            // Iterate through it, 
+                            for (var i = 0; i < slaveClassNameArray.length; i++)
+                            {
+                                // Derive name of drawing to sync to
+                                var slaveDrawingName = 'ed_drawing_edit_' + idSuffix;
+
+                                // Master doodle
+                                var masterDoodle = this.drawing.selectedDoodle;
+                                
+                                // Slave doodle (uses first doodle in the drawing matching the className)
+                                var slaveDoodle = window[slaveDrawingName].firstDoodleOfClass(slaveClassNameArray[i]);
+
+                                // If both are defined, enact sync for the changed parameter
+                                if (masterDoodle && slaveDoodle)
+                                {
+                                    slaveDoodle.syncParameter(_messageArray.object.parameter, masterDoodle[_messageArray.object.parameter]);
+                                }
+                                
+                                // Update any bindings to slave doodle
+                                window[slaveDrawingName].updateBindings(slaveDoodle);
+                            }
                         }
                     }
                     break;
@@ -143,6 +163,9 @@ function eyeDrawInit(_properties)
         }
     }    
 }
+
+
+
 
 	// Set focus to the canvas element
 //	if (_properties.focus) {

@@ -78,14 +78,14 @@ HitTest:1
  */
 ED.Mode = 
 {
-None:0,
-Move:1,
-Scale:2,
-Arc:3,
-Rotate:4,
-Apex:5,
-Handles:6,
-Draw:7
+    None:0,
+    Move:1,
+    Scale:2,
+    Arc:3,
+    Rotate:4,
+    Apex:5,
+    Handles:6,
+    Draw:7
 }
 
 /**
@@ -117,6 +117,22 @@ ED.findOffset = function(obj, curleft, curtop)
         } while (obj = obj.offsetParent);
         return { x: curleft, y: curtop };
     }
+}
+
+/*
+ * Function to test whether a Javascript object is empty
+ *
+ * @param {Object} _object Object to apply test to
+ * @returns {Bool} Indicates whether object is empty or not
+ */
+ED.objectIsEmpty = function (_object)
+{
+    for (var property in _object)
+    {
+        if (_object.hasOwnProperty(property)) return false;
+    }
+    
+    return true;
 }
 
 /*
@@ -225,6 +241,9 @@ ED.Drawing = function(_canvas, _eye, _IDSuffix, _isEditable, offset_x, offset_y,
     
     // Array of objects requesting notifications
     this.notificationArray = new Array();
+    
+    // Array of syncronisation objects
+    this.slaveArray = new Array();
     
     // Optional tooltip (this property will be null is a span element with this id not found
     this.canvasTooltip = document.getElementById('canvasTooltip');
@@ -1162,6 +1181,9 @@ ED.Drawing.prototype.mouseout = function(_point)
             this.drawAllDoodles();
         }
 	}
+    
+    // Deselect all doodles
+    this.deselectDoodles();
     
     // Notify
     this.notify("mouseout", _point);
@@ -2411,7 +2433,29 @@ ED.Drawing.prototype.nextDoodleId = function()
     return this.lastDoodleId++;
 }
 
+/**
+ * Slaves are objects which hold information about syncronising simple parameters between doodles
+ *
+ * @class Slave
+ * @property {Drawing} drawing The drawing to which the syncronisation applies
+ * @property {Doodle} doodle The doodle to which the syncronisation applies
+ * @property {Array} parameterArray Array of simple parameters to be synced
+ * @param {Drawing} _drawing
+ * @param {Doodle} _doodle
+ * @param {Array} _parameterArray
+ */
+ED.Slave = function(_drawing, _doodle, _parameterArray)
+{
+    this.drawing = _drawing;
+    this.doodle = _doodle;
+    this.parameterArray = _parameterArray;
+}
 
+ED.Slave.prototype.callBack = function(_messageArray)
+{
+    console.log('Slave called back with message: ', _messageArray);
+}
+    
 
 /**
  * An object of the Report class is used to extract data for the Royal College of Ophthalmologists retinal detachment dataset.
@@ -3257,11 +3301,12 @@ ED.Doodle.prototype.updateDependentParameters = function(_parameter)
     var valueArray = this.dependentParameterValues(_parameter, this[_parameter]);
     for (var parameter in valueArray)
     {
+        this.setSimpleParameter(parameter, valueArray[parameter]);
         // Assign new value
-        this[parameter] = valueArray[parameter];
+        //this[parameter] = valueArray[parameter];
         
         // Notify change
-        this.drawing.notify(parameter, valueArray[parameter]);
+        //this.drawing.notify(parameter, valueArray[parameter]);
     }
 }
 
@@ -3464,8 +3509,16 @@ ED.Doodle.prototype.setParameterWithAnimation = function(_parameter, _value)
  */
 ED.Doodle.prototype.setSimpleParameter = function(_parameter, _value)
 {
+    // Set parameter
     this[_parameter] = _value;
-    this.drawing.notify(_parameter, _value);
+    
+    // Create notification message var messageArray = {eventName:_eventName, selectedDoodle:this.selectedDoodle, object:_object};
+    var message = new Object;
+    message.parameter = _parameter;
+    message.value = _value;
+    
+    // Trigger notification
+    this.drawing.notify('parameter', message);
 }
 
 /**
@@ -3980,6 +4033,14 @@ ED.Doodle.prototype.debug = function()
     console.log('arc: ' + this.arc * 180/Math.PI);
 }
 
+/**
+ * Enacts a predefined sync action in response to a change in a simple parameter
+ *
+ * @param _parameter The parameter that has been changed in the master doodle
+ */
+ED.Doodle.prototype.syncParameter = function(_parameterName, _parameterValue)
+{
+}
 
 /**
  * Represents a control handle on the doodle
