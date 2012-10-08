@@ -904,8 +904,15 @@ ED.Drawing.prototype.mousemove = function(_point)
 							// Work out difference, and change doodle's angle of rotation by this amount
 							var angleDelta = newAngle - oldAngle;
                             
-                            // Calculate new value of rotation
-                            var newRotation = ED.Mod(doodle.rotation + angleDelta, 2 * Math.PI);
+                            // Calculate new value of rotation                            
+                            if (doodle.snapToAngles)
+                            {
+                                var newRotation = doodle.nearestAngleTo(newAngle);
+                            }
+                            else
+                            {
+                                var newRotation = ED.Mod(doodle.rotation + angleDelta, 2 * Math.PI);
+                            }
                             
                             // Restrict to allowable range
                             doodle.setSimpleParameter('rotation', doodle.parameterValidationArray['rotation']['range'].constrainToAngularRange(newRotation, false));
@@ -2717,8 +2724,11 @@ ED.Report.prototype.isMacOff = function()
  * @property {Bool} snapToGrid True if doodle should snap to a grid in doodle plane
  * @property {Bool} snapToQuadrant True if doodle should snap to a specific position in quadrant (defined in subclass)
  * @property {Bool} snapToPoints True if doodle should snap to one of a set of specific points
+ * @property {Bool} snapToAngles True if doodle should snap to one of a set of specific rotation values
  * @property {Array} pointsArray Array of points to snap to
+ * @property {Array} anglesArray Array of angles to snap to
  * @property {Bool} willReport True if doodle responds to a report request (can be used to suppress reports when not needed)
+ * @property {Bool} willSync Flag used to indicate whether doodle will synchronise with another doodle  
  * @property {Float} radius Distance from centre of doodle space, calculated for doodles with isRotable true
  * @property {Range} rangeOfOriginX Range of allowable scales
  * @property {Range} rangeOfOriginY Range of allowable scales
@@ -2793,7 +2803,9 @@ ED.Doodle = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _sca
         this.snapToGrid = false;
         this.snapToQuadrant = false;
         this.snapToPoints = false;
+        this.snapToAngles = false;
         this.willReport = true;
+        this.willSync = true;
         
         // Permitted ranges
         this.rangeArray = {
@@ -2838,6 +2850,7 @@ ED.Doodle = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _sca
         
         // Array of points to snap to
         this.pointsArray = new Array();
+        this.anglesArray = new Array();
         this.quadrantPoint = new ED.Point(200, 200);
         
         // Bindings to HTML element values
@@ -2957,6 +2970,10 @@ ED.Doodle.prototype.move = function(_x, _y)
         // Move doodle to new position
         if (x != 0) this.setSimpleParameter('originX', newOriginX);
         if (y != 0) this.setSimpleParameter('originY', newOriginY);
+
+        // Update dependencies
+        doodle.updateDependentParameters('originX');
+        doodle.updateDependentParameters('originY');
         
         // Only need to change rotation if doodle has moved
         if (x != 0 || y != 0)
@@ -2972,33 +2989,10 @@ ED.Doodle.prototype.move = function(_x, _y)
                 
                 // Alter orientation of doodle
                 this.setSimpleParameter('rotation', angle);
+                
+                // Update dependencies
+                doodle.updateDependentParameters('rotation');
             }
-            
-            // Snap to quadrant position is set in drawing.move method, but set orientation here  ***TODO*** not sure why this was necessary?
-//            if (this.snapToQuadrant)
-//            {
-//                // Alter orientation of doodle
-//                if (this.isOrientated)
-//                {
-//                    // This quantity give a unique number for each quadrant
-//                    var quadrantIdentifier = 2 * this.originX/Math.abs(this.originX) + this.originY/Math.abs(this.originY);
-//                    switch (quadrantIdentifier)
-//                    {
-//                        case -3:
-//                            this.setSimpleParameter('rotation', -Math.PI/4);
-//                            break;
-//                        case 1:
-//                            this.setSimpleParameter('rotation', Math.PI/4);
-//                            break;										
-//                        case 3:
-//                            this.setSimpleParameter('rotation', 3 * Math.PI/4);
-//                            break;
-//                        case -1:
-//                            this.setSimpleParameter('rotation', -3 * Math.PI/4);
-//                            break;
-//                    }
-//                }
-//            }
         }
     }
 }
@@ -3265,6 +3259,19 @@ ED.Doodle.prototype.diagnosticHierarchy = function()
 }
 
 /**
+ * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
+ * The returned parameters are animated if their 'animate' property is set to true
+ *
+ * @param {String} _parameter Name of parameter that has changed
+ * @value {Undefined} _value Value of parameter to calculate
+ * @returns {Array} Associative array of values of dependent parameters
+ */
+ED.Doodle.prototype.dependentParameterValues = function(_parameter, _value)
+{
+    return new Array();
+}
+
+/**
  * Updates dependent parameters
  *
  * @param {String} _parameter Name of parameter for which dependent parameters will be updated
@@ -3487,12 +3494,13 @@ ED.Doodle.prototype.setSimpleParameter = function(_parameter, _value)
     this[_parameter] = _value;
     
     // Create notification message var messageArray = {eventName:_eventName, selectedDoodle:this.selectedDoodle, object:_object};
-    var message = new Object;
-    message.parameter = _parameter;
-    message.value = _value;
+    var object = new Object;
+    object.doodle = this;
+    object.parameter = _parameter;
+    object.value = _value;
     
     // Trigger notification
-    this.drawing.notify('parameter', message);
+    this.drawing.notify('parameter', object);
 }
 
 /**
@@ -3924,6 +3932,44 @@ ED.Doodle.prototype.nearestPointTo = function(_point)
     {
         ED.errorHandler('ED.Doodle', 'nearestPointTo', 'Attempt to calculate nearest points with an empty points array');
         return _point;
+    }
+}
+
+/**
+ * Finds the nearest angle in the doodle anglesArray
+ *
+ * @param {Float} _angle The angle to test
+ * @returns {Float} The nearest angle
+ */
+ED.Doodle.prototype.nearestAngleTo = function(_angle)
+{
+    // Check that anglesArray has content
+    if (this.anglesArray.length > 0)
+    {
+        var min = 2 * Math.PI; // Greater than one complete rotation
+        var index = 0;
+        
+        // Iterate through angles array to find nearest point
+        for (var i = 0; i < this.anglesArray.length; i++)
+        {
+            var p = this.anglesArray[i];
+            
+            var d = Math.abs(p - _angle);
+
+            if (d < min)
+            {
+                min = d;
+                index = i;
+            }
+        }
+        
+        return this.anglesArray[index];
+    }
+    // Otherwise generate error and return passed angle
+    else
+    {
+        ED.errorHandler('ED.Doodle', 'nearestAngleTo', 'Attempt to calculate nearest angle with an empty angles array');
+        return _angle;
     }
 }
 

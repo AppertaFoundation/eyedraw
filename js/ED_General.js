@@ -50,6 +50,9 @@ ED.Surgeon = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _sc
     // Set classname
 	this.className = "Surgeon";
     
+    // Derived parameters
+    this.surgeonPosition;
+    
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
 }
@@ -66,37 +69,20 @@ ED.Surgeon.superclass = ED.Doodle.prototype;
  */
 ED.Surgeon.prototype.setPropertyDefaults = function()
 {
-	this.isSelectable = true;
-    this.isShowHighlight = true;
-	this.isOrientated = true;
 	this.isScaleable = false;
-	this.isSqueezable = false;
-	this.isMoveable = true;
-	this.isRotatable = true;
-    this.snapToPoints = true;
+	this.isMoveable = false;
+    this.snapToAngles = true;
 
     // Update component of validation array for simple parameters
     this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
     this.parameterValidationArray['apexY']['range'].setMinAndMax(+100, +500);
+    
+    // Add complete validation arrays for derived parameters
+    this.parameterValidationArray['surgeonPosition'] = {kind:'derived', type:'string', list:['Superior', 'Supero-temporal', 'Temporal', 'Infero-temporal', 'Inferior', 'Infero-nasal', 'Nasal', 'Supero-nasal'], animate:true};
 
-    // Array of points to snap to
-    this.pointsArray = new Array();
-    var point = new ED.Point(0, -300);
-    this.pointsArray.push(point);
-    var point = new ED.Point(212, -212);
-    this.pointsArray.push(point);
-    var point = new ED.Point(300, 0);
-    this.pointsArray.push(point);
-    var point = new ED.Point(212, 212);
-    this.pointsArray.push(point);
-    var point = new ED.Point(0,300);
-    this.pointsArray.push(point);
-    var point = new ED.Point(-212, 212);
-    this.pointsArray.push(point);
-    var point = new ED.Point(-300,0);
-    this.pointsArray.push(point);
-    var point = new ED.Point(-212, -212);
-    this.pointsArray.push(point);
+    // Array of angles to snap to
+    var phi = Math.PI/4;
+    this.anglesArray = [0, phi, phi * 2, phi * 3, phi * 4, phi * 5, phi * 6, phi * 7];
 }
 
 /**
@@ -105,20 +91,86 @@ ED.Surgeon.prototype.setPropertyDefaults = function()
  */
 ED.Surgeon.prototype.setParameterDefaults = function()
 {
-    this.originY = -300;
+    this.rotation = 0;
+}
+
+/**
+ * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
+ * The returned parameters are animated if their 'animate' property is set to true
+ *
+ * @param {String} _parameter Name of parameter that has changed
+ * @value {Undefined} _value Value of parameter to calculate
+ * @returns {Array} Associative array of values of dependent parameters
+ */
+ED.Surgeon.prototype.dependentParameterValues = function(_parameter, _value)
+{
+    var returnArray = new Array();
     
-    if (this.drawing.eye == ED.eye.Left)
+    var isRE = (this.drawing.eye == ED.eye.Right);
+    var dial = 2 * Math.PI;
+    
+    switch (_parameter)
     {
-        this.originX = 300;
-        this.originY = 0;
-        this.rotation = 2 * Math.PI/4;
+        // Surgeon position
+        case 'rotation':
+            if (isRE)
+            {
+                if (_value < dial/16 ) returnArray['surgeonPosition'] = 'Superior';
+                else if (_value < 3 * dial/16 ) returnArray['surgeonPosition'] = 'Supero-nasal';
+                else if (_value < 5 * dial/16 ) returnArray['surgeonPosition'] = 'Nasal';
+                else if (_value < 7 * dial/16 ) returnArray['surgeonPosition'] = 'Infero-nasal';
+                else if (_value < 9 * dial/16 ) returnArray['surgeonPosition'] = 'Inferior';
+                else if (_value < 11 * dial/16) returnArray['surgeonPosition'] = 'Infero-temporal';
+                else if (_value < 13 * dial/16) returnArray['surgeonPosition'] = 'Temporal';
+                else if (_value < 15 * dial/16) returnArray['surgeonPosition'] = 'Supero-temporal';
+                else returnArray['surgeonPosition'] = 'Superior';
+            }
+            else
+            {
+                if (_value < dial/16 ) returnArray['surgeonPosition'] = 'Superior';
+                else if (_value < 3 * dial/16 ) returnArray['surgeonPosition'] = 'Supero-temporal';
+                else if (_value < 5 * dial/16) returnArray['surgeonPosition'] = 'Temporal';
+                else if (_value < 7 * dial/16) returnArray['surgeonPosition'] = 'Infero-temporal';
+                else if (_value < 9 * dial/16) returnArray['surgeonPosition'] = 'Inferior';
+                else if (_value < 11 * dial/16) returnArray['surgeonPosition'] = 'Infero-nasal';
+                else if (_value < 13 * dial/16) returnArray['surgeonPosition'] = 'Nasal';
+                else if (_value < 15 * dial/16) returnArray['surgeonPosition'] = 'Supero-nasal';
+                else returnArray['surgeonPosition'] = 'Superior';
+            }
+            break;
+
+        case 'surgeonPosition':
+            switch (_value)
+            {
+                case 'Superior':
+                    returnArray['rotation'] = 0;
+                    break;
+                case 'Supero-temporal':
+                    returnArray['rotation'] = isRE?7 * Math.PI/4:1 * Math.PI/4;
+                    break;
+                case 'Temporal':
+                    returnArray['rotation'] = isRE?6 * Math.PI/4:2 * Math.PI/4;
+                    break;
+                case 'Infero-temporal':
+                    returnArray['rotation'] = isRE?5 * Math.PI/4:3 * Math.PI/4;
+                    break;
+                case 'Inferior':
+                    returnArray['rotation'] = Math.PI;
+                    break;
+                case 'Infero-nasal':
+                    returnArray['rotation'] = isRE?3 * Math.PI/4:5 * Math.PI/4;
+                    break;
+                case 'Nasal':
+                    returnArray['rotation'] = isRE?2 * Math.PI/4:6 * Math.PI/4;
+                    break;
+                case 'Supero-nasal':
+                    returnArray['rotation'] = isRE?1 * Math.PI/4:7 * Math.PI/4;
+                    break;
+            }
+            break;
     }
-    else
-    {
-        this.originX = -300;
-        this.originY = 0;
-        this.rotation = 6 * Math.PI/4;
-    }
+    
+    return returnArray;
 }
 
 /**
@@ -140,32 +192,35 @@ ED.Surgeon.prototype.draw = function(_point)
     // Scaling factor
     var s = 0.2;
     
+    // Shift up y-axis
+    var y = -300;
+    
     // Surgeon
-    ctx.moveTo(0 * s, -200 * s);
-    ctx.bezierCurveTo( -100 * s, -250 * s, -145 * s, -190 * s, -200 * s, -180 * s);
-    ctx.bezierCurveTo( -310 * s, -160 * s, -498 * s, -75 * s, -500 * s, 0 * s);
-    ctx.bezierCurveTo( -500 * s, 50 * s, -500 * s, 460 * s, -470 * s, 700 * s);
-    ctx.bezierCurveTo( -470 * s, 710 * s, -500 * s, 770 * s, -500 * s, 810 * s);
-    ctx.bezierCurveTo( -500 * s, 840 * s, -440 * s, 850 * s, -420 * s, 840 * s);
-    ctx.bezierCurveTo( -390 * s, 830 * s, -380 * s, 710 * s, -380 * s, 700 * s);
-    ctx.bezierCurveTo( -370 * s, 700 * s, -360 * s, 780 * s, -350 * s, 780 * s);
-    ctx.bezierCurveTo( -330 * s, 780 * s, -340 * s, 730 * s, -340 * s, 700 * s);
-    ctx.bezierCurveTo( -340 * s, 690 * s, -350 * s, 680 * s, -350 * s, 670 * s);
-    ctx.bezierCurveTo( -350 * s, 590 * s, -385 * s, 185 * s, -300 * s, 100 * s);
+    ctx.moveTo(0 * s, y - 200 * s);
+    ctx.bezierCurveTo( -100 * s, y - 250 * s, -145 * s, y-190 * s, -200 * s, y - 180 * s);
+    ctx.bezierCurveTo( -310 * s, y - 160 * s, -498 * s, y - 75 * s, -500 * s, y + 0 * s);
+    ctx.bezierCurveTo( -500 * s, y + 50 * s, -500 * s, y + 460 * s, -470 * s, y + 700 * s);
+    ctx.bezierCurveTo( -470 * s, y + 710 * s, -500 * s, y + 770 * s, -500 * s, y + 810 * s);
+    ctx.bezierCurveTo( -500 * s, y + 840 * s, -440 * s, y + 850 * s, -420 * s, y + 840 * s);
+    ctx.bezierCurveTo( -390 * s, y + 830 * s, -380 * s, y + 710 * s, -380 * s, y + 700 * s);
+    ctx.bezierCurveTo( -370 * s, y + 700 * s, -360 * s, y + 780 * s, -350 * s, y + 780 * s);
+    ctx.bezierCurveTo( -330 * s, y + 780 * s, -340 * s, y + 730 * s, -340 * s, y + 700 * s);
+    ctx.bezierCurveTo( -340 * s, y + 690 * s, -350 * s, y + 680 * s, -350 * s, y + 670 * s);
+    ctx.bezierCurveTo( -350 * s, y + 590 * s, -385 * s, y + 185 * s, -300 * s, y + 100 * s);
     
-    ctx.bezierCurveTo( -150 * s, 140 * s, -250 * s, 200 * s, 0 * s, 300 * s);
+    ctx.bezierCurveTo( -150 * s, y + 140 * s, -250 * s, y + 200 * s, 0 * s, y + 300 * s);
     
-    ctx.bezierCurveTo( 250 * s, 200 * s, 150 * s, 140 * s, 300 * s, 100 * s);
-    ctx.bezierCurveTo( 380 * s, 180 * s, 350 * s, 590 * s, 350 * s, 670 * s);
-    ctx.bezierCurveTo( 350 * s, 680 * s, 340 * s, 690 * s, 340 * s, 700 * s);
-    ctx.bezierCurveTo( 340 * s, 730 * s, 330 * s, 780 * s, 350 * s, 780 * s);
-    ctx.bezierCurveTo( 360 * s, 780 * s, 370 * s, 700 * s, 380 * s, 700 * s);
-    ctx.bezierCurveTo( 380 * s, 710 * s, 390 * s, 830 * s, 420 * s, 840 * s);
-    ctx.bezierCurveTo( 430 * s, 845 * s, 505 * s, 840 * s, 505 * s, 810 * s);
-    ctx.bezierCurveTo( 505 * s, 760 * s, 470 * s, 710 * s, 470 * s, 700 * s);
-    ctx.bezierCurveTo( 500 * s, 460 * s, 499 * s, 45 * s, 500 * s, 0 * s);
-    ctx.bezierCurveTo( 498 * s, -78 * s, 308 * s, -164 * s, 200 * s, -182 * s);
-    ctx.bezierCurveTo( 145 * s, -190 * s, 100 * s, -250 * s, 0 * s, -200 * s);
+    ctx.bezierCurveTo( 250 * s, y + 200 * s, 150 * s, y + 140 * s, 300 * s, y + 100 * s);
+    ctx.bezierCurveTo( 380 * s, y + 180 * s, 350 * s, y + 590 * s, 350 * s, y + 670 * s);
+    ctx.bezierCurveTo( 350 * s, y + 680 * s, 340 * s, y + 690 * s, 340 * s, y + 700 * s);
+    ctx.bezierCurveTo( 340 * s, y + 730 * s, 330 * s, y + 780 * s, 350 * s, y + 780 * s);
+    ctx.bezierCurveTo( 360 * s, y + 780 * s, 370 * s, y + 700 * s, 380 * s, y + 700 * s);
+    ctx.bezierCurveTo( 380 * s, y + 710 * s, 390 * s, y + 830 * s, 420 * s, y + 840 * s);
+    ctx.bezierCurveTo( 430 * s, y + 845 * s, 505 * s, y + 840 * s, 505 * s, y + 810 * s);
+    ctx.bezierCurveTo( 505 * s, y + 760 * s, 470 * s, y + 710 * s, 470 * s, y + 700 * s);
+    ctx.bezierCurveTo( 500 * s, y + 460 * s, 499 * s, y + 45 * s, 500 * s, y + 0 * s);
+    ctx.bezierCurveTo( 498 * s, y - 78 * s, 308 * s, y - 164 * s, 200 * s, y - 182 * s);
+    ctx.bezierCurveTo( 145 * s, y - 190 * s, 100 * s, y - 250 * s, 0 * s, y - 200 * s);
     
     // Set Attributes
     ctx.lineWidth = 4;
@@ -182,23 +237,24 @@ ED.Surgeon.prototype.draw = function(_point)
 	// Non boundary paths here
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
 	{
+        // Head
         ctx.beginPath();
         
-        ctx.moveTo(0 * s, -250 * s);
-        ctx.bezierCurveTo( -100 * s, -250 * s, -180 * s, -200 * s, -200 * s, -170 * s);
-        ctx.bezierCurveTo( -209 * s, -157 * s, -220 * s, -100 * s, -230 * s, -50 * s);
-        ctx.bezierCurveTo( -260 * s, -70 * s, -260 * s, -20 * s, -260 * s, 0 * s);
-        ctx.bezierCurveTo( -260 * s, 20 * s, -260 * s, 80 * s, -230 * s, 60 * s);
-        ctx.bezierCurveTo( -230 * s, 90 * s, -220 * s, 141 * s, -210 * s, 160 * s);
-        ctx.bezierCurveTo( -190 * s, 200 * s, -100 * s, 280 * s, -40 * s, 300 * s);
-        ctx.bezierCurveTo( -34 * s, 303 * s, -20 * s, 350 * s, 0 * s, 350 * s);
-        ctx.bezierCurveTo( 20 * s, 350 * s, 34 * s, 300 * s, 40 * s, 300 * s);
-        ctx.bezierCurveTo( 100 * s, 280 * s, 190 * s, 200 * s, 210 * s, 160 * s);
-        ctx.bezierCurveTo( 218 * s, 143 * s, 230 * s, 90 * s, 230 * s, 60 * s);
-        ctx.bezierCurveTo( 260 * s, 80 * s, 260 * s, 20 * s, 260 * s, 0 * s);
-        ctx.bezierCurveTo( 260 * s, -20 * s, 260 * s, -70 * s, 230 * s, -50 * s);
-        ctx.bezierCurveTo( 220 * s, -100 * s, 208 * s, -158 * s, 200 * s, -170 * s);
-        ctx.bezierCurveTo( 180 * s, -200 * s, 100 * s, -250 * s, 0 * s, -250 * s);
+        ctx.moveTo(0 * s, y - 250 * s);
+        ctx.bezierCurveTo( -100 * s, y - 250 * s, -180 * s, y - 200 * s, -200 * s, y - 170 * s);
+        ctx.bezierCurveTo( -209 * s, y - 157 * s, -220 * s, y - 100 * s, -230 * s, y - 50 * s);
+        ctx.bezierCurveTo( -260 * s, y - 70 * s, -260 * s, y - 20 * s, -260 * s, y + 0 * s);
+        ctx.bezierCurveTo( -260 * s, y + 20 * s, -260 * s, y + 80 * s, -230 * s, y + 60 * s);
+        ctx.bezierCurveTo( -230 * s, y + 90 * s, -220 * s, y + 141 * s, -210 * s, y + 160 * s);
+        ctx.bezierCurveTo( -190 * s, y + 200 * s, -100 * s, y + 280 * s, -40 * s, y + 300 * s);
+        ctx.bezierCurveTo( -34 * s, y + 303 * s, -20 * s, y + 350 * s, 0 * s, y + 350 * s);
+        ctx.bezierCurveTo( 20 * s, y + 350 * s, 34 * s, y + 300 * s, 40 * s, y + 300 * s);
+        ctx.bezierCurveTo( 100 * s, y + 280 * s, 190 * s, y + 200 * s, 210 * s, y + 160 * s);
+        ctx.bezierCurveTo( 218 * s, y + 143 * s, 230 * s, y + 90 * s, 230 * s, y + 60 * s);
+        ctx.bezierCurveTo( 260 * s, y + 80 * s, 260 * s, y + 20 * s, 260 * s, y + 0 * s);
+        ctx.bezierCurveTo( 260 * s, y - 20 * s, 260 * s, y - 70 * s, 230 * s, y - 50 * s);
+        ctx.bezierCurveTo( 220 * s, y - 100 * s, 208 * s, y - 158 * s, 200 * s, y - 170 * s);
+        ctx.bezierCurveTo( 180 * s, y - 200 * s, 100 * s, y - 250 * s, 0 * s, y - 250 * s);
         
         ctx.fill();
         ctx.stroke();
@@ -215,188 +271,22 @@ ED.Surgeon.prototype.draw = function(_point)
 }
 
 /**
- * Returns parameters
+ * Enacts a predefined sync action in response to a change in a simple parameter
  *
- * @returns {String} value of parameter
+ * @param _parameterName The name of the parameter that has been changed in the master doodle
+ * @param _parameterValue The value of the parameter that has been changed in the master doodle
  */
-ED.Surgeon.prototype.getParameter = function(_parameter)
+ED.Surgeon.prototype.syncParameter = function(_parameterName, _parameterValue)
 {
-    var returnValue;
-    var isRE = (this.drawing.eye == ED.eye.Right);
-    
-    var dial = 2 * Math.PI;
-    
-    switch (_parameter)
+    switch (_parameterName)
     {
-            // Surgeon position
-        case 'surgeonPosition':
-            if (isRE)
-            {
-                if (this.rotation < dial/16 ) returnValue = 'Superior';
-                else if (this.rotation < 3 * dial/16 ) returnValue = 'Supero-nasal';
-                else if (this.rotation < 5 * dial/16 ) returnValue = 'Nasal';
-                else if (this.rotation < 7 * dial/16 ) returnValue = 'Infero-nasal';
-                else if (this.rotation < 9 * dial/16 ) returnValue = 'Inferior';
-                else if (this.rotation < 11 * dial/16) returnValue = 'Infero-temporal';
-                else if (this.rotation < 13 * dial/16) returnValue = 'Temporal';
-                else if (this.rotation < 15 * dial/16) returnValue = 'Supero-temporal';
-                else returnValue = 'Superior';
-            }
-            else
-            {
-                if (this.rotation < dial/16 ) returnValue = 'Superior';
-                else if (this.rotation < 3 * dial/16 ) returnValue = 'Supero-temporal';
-                else if (this.rotation < 5 * dial/16) returnValue = 'Temporal';
-                else if (this.rotation < 7 * dial/16) returnValue = 'Infero-temporal';
-                else if (this.rotation < 9 * dial/16) returnValue = 'Inferior';
-                else if (this.rotation < 11 * dial/16) returnValue = 'Infero-nasal';
-                else if (this.rotation < 13 * dial/16) returnValue = 'Nasal';
-                else if (this.rotation < 15 * dial/16) returnValue = 'Supero-nasal';
-                else returnValue = 'Superior';
-            }
-            break;
-            
-        default:
-            returnValue = "";
+        case 'rotation':
+            this.setSimpleParameter(_parameterName, _parameterValue);
+            this.updateDependentParameters(_parameterName);
             break;
     }
     
-    return returnValue;
+    // Redraw
+    this.drawing.repaint();
 }
 
-/**
- * Sets derived parameters for this doodle
- *
- * @param {String} _parameter Name of parameter
- * @param {String} _value New value of parameter
- */
-ED.Surgeon.prototype.setParameter = function(_parameter, _value)
-{
-    var isRE = (this.drawing.eye == ED.eye.Right);
-    switch (_parameter)
-    {
-            // Surgeon position
-        case 'surgeonPosition':
-            switch (_value)
-        {
-            case 'Superior':
-                if (isRE)
-                {
-                    this.originX = 0;
-                    this.originY = -300;
-                    this.rotation = 0;
-                }
-                else
-                {
-                    this.originX = 0;
-                    this.originY = -300;
-                    this.rotation = 0;
-                }
-                break;
-            case 'Supero-temporal':
-                if (isRE)
-                {
-                    this.originX = -212;
-                    this.originY = -212;
-                    this.rotation = 7 * Math.PI/4;
-                }
-                else
-                {
-                    this.originX = 212;
-                    this.originY = -212;
-                    this.rotation = Math.PI/4;
-                }
-                break;
-            case 'Temporal':
-                if (isRE)
-                {
-                    this.originX = -300;
-                    this.originY = 0;
-                    this.rotation =  6 * Math.PI/4;
-                }
-                else
-                {
-                    this.originX = 300;
-                    this.originY = 0;
-                    this.rotation = Math.PI/2;
-                }
-                break;
-            case 'Infero-temporal':
-                if (isRE)
-                {
-                    this.originX = -212;
-                    this.originY = 212;
-                    this.rotation = 5 * Math.PI/4;
-                }
-                else
-                {
-                    this.originX = 212;
-                    this.originY = 212;
-                    this.rotation = 3 * Math.PI/4;
-                }
-                break;
-            case 'Inferior':
-                if (isRE)
-                {
-                    this.originX = 0;
-                    this.originY = 300;
-                    this.rotation = Math.PI;
-                }
-                else
-                {
-                    this.originX = 0;
-                    this.originY = 300;
-                    this.rotation = Math.PI;
-                }
-                break;
-            case 'Infero-nasal':
-                if (isRE)
-                {
-                    this.originX = 212;
-                    this.originY = 212;
-                    this.rotation = 3 * Math.PI/4;
-                }
-                else
-                {
-                    this.originX = -212;
-                    this.originY = 212;
-                    this.rotation = 5 * Math.PI/4;
-                }
-                break;
-            case 'Nasal':
-                if (isRE)
-                {
-                    this.originX = 300;
-                    this.originY = 0;
-                    this.rotation = 2 * Math.PI/4;
-                }
-                else
-                {
-                    this.originX = -300;
-                    this.originY = 0;
-                    this.rotation = 6 * Math.PI/4;
-                }
-                break;
-            case 'Supero-nasal':
-                if (isRE)
-                {
-                    this.originX = 212;
-                    this.originY = -212;
-                    this.rotation = 1 * Math.PI/4;
-                }
-                else
-                {
-                    this.originX = -212;
-                    this.originY = -212;
-                    this.rotation = 7 * Math.PI/4;
-                }
-                break;
-            default:
-                break;
-        }
-            break;
-            
-        default:
-            break
-    }
-}

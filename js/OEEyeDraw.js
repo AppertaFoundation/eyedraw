@@ -123,7 +123,15 @@ function eyeDrawInit(_properties)
                     input.value = this.drawing.save();
                     break;
                 case 'parameter':
-                    console.log(this.drawing.IDSuffix);
+                    // TEMP stop syncing if slave moves phako incision
+                    if (_messageArray.selectedDoodle != null)
+                    {
+                        if (_messageArray.selectedDoodle.className == 'PhakoIncision')
+                        {
+                            stopSync(_messageArray.selectedDoodle);
+                        }
+                    }
+                    
                     // Iterate through sync array
                     for (var idSuffix in _properties.syncArray)
                     {
@@ -140,13 +148,14 @@ function eyeDrawInit(_properties)
                                 var slaveDrawingName = 'ed_drawing_edit_' + idSuffix;
 
                                 // Master doodle
-                                var masterDoodle = this.drawing.selectedDoodle;
+                                //var masterDoodle = this.drawing.selectedDoodle;
+                                var masterDoodle = _messageArray['object'].doodle;
                                 
                                 // Slave doodle (uses first doodle in the drawing matching the className)
                                 var slaveDoodle = window[slaveDrawingName].firstDoodleOfClass(slaveClassNameArray[i]);
 
                                 // If both are defined, enact sync for the changed parameter
-                                if (masterDoodle && slaveDoodle)
+                                if (masterDoodle && slaveDoodle && slaveDoodle.willSync)
                                 {
                                     slaveDoodle.syncParameter(_messageArray.object.parameter, masterDoodle[_messageArray.object.parameter]);
                                     
@@ -166,4 +175,13 @@ function eyeDrawInit(_properties)
     }    
 }
 
-    
+/*
+ * Stops syncing for passed doodle
+ * ***TODO*** Need to take this out of widget and put in app code somewhere
+ */
+function stopSync(_doodle)
+{
+    _doodle.willSync = false;
+}
+
+
