@@ -5,16 +5,16 @@
 	<?php if ($isEditable && $toolbar) {?>
 		<div style="float: left">
 			<div class="ed_toolbar">
-				<button class="ed_img_button" disabled=true id="moveToFront<?php echo $idSuffix?>" title="Move to front" onclick="<?php echo $drawingName?>.moveToFront(); return false;">
+				<button class="ed_img_button" disabled="disabled" id="moveToFront<?php echo $idSuffix?>" title="Move to front" onclick="<?php echo $drawingName?>.moveToFront(); return false;">
 					<img src="<?php echo $imgPath?>moveToFront.gif" />
 				</button>
-				<button class="ed_img_button" disabled=true id="moveToBack<?php echo $idSuffix?>" title="Move to back" onclick="<?php echo $drawingName?>.moveToBack(); return false;">
+				<button class="ed_img_button" disabled="disabled" id="moveToBack<?php echo $idSuffix?>" title="Move to back" onclick="<?php echo $drawingName?>.moveToBack(); return false;">
 					<img src="<?php echo $imgPath?>moveToBack.gif" />
 				</button>
-				<button class="ed_img_button" disabled=true id="deleteDoodle<?php echo $idSuffix?>" title="Delete" onclick="<?php echo $drawingName?>.deleteDoodle(); return false;">
+				<button class="ed_img_button" disabled="disabled" id="deleteDoodle<?php echo $idSuffix?>" title="Delete" onclick="<?php echo $drawingName?>.deleteDoodle(); return false;">
 					<img src="<?php echo $imgPath?>deleteDoodle.gif" />
 				</button>
-				<button class="ed_img_button" disabled=true id="lock<?php echo $idSuffix?>" title="Lock" onclick="<?php echo $drawingName?>.lock(); return false;">
+				<button class="ed_img_button" disabled="disabled" id="lock<?php echo $idSuffix?>" title="Lock" onclick="<?php echo $drawingName?>.lock(); return false;">
 					<img src="<?php echo $imgPath?>lock.gif" />
 				</button>
 				<button class="ed_img_button" id="unlock<?php echo $idSuffix?>" title="Unlock" onclick="<?php echo $drawingName?>.unlock(); return false;">
@@ -35,20 +35,54 @@
 		<div class="eyedrawFields">
 			<div>
 				<div class="label">
-					<?php echo $element->getAttributeLabel($side.'_description'); ?>
+					<?php echo $model->getAttributeLabel($side.'_pupil_id'); ?>
 					:
 				</div>
 				<div class="data">
-					<?php echo CHtml::activeTextArea($element, $side.'_description', array('rows' => "2", 'cols' => "20", 'class' => 'autosize')) ?>
+					<?php echo CHtml::activeDropDownList($model, $side.'_pupil_id', CHtml::listData(OphCiExamination_AnteriorSegment_Pupil::model()->findAll(array('order'=>'display_order')),'id','name'))?>
 				</div>
 			</div>
 			<div>
 				<div class="label">
-					<?php echo $element->getAttributeLabel($side.'_diagnosis_id'); ?>
+					<?php echo $model->getAttributeLabel($side.'_nuclear_id'); ?>
 					:
 				</div>
 				<div class="data">
-					<?php echo CHtml::activeTextField($element, $side.'_diagnosis_id') ?>
+					<?php echo CHtml::activeDropDownList($model, $side.'_nuclear_id', CHtml::listData(OphCiExamination_AnteriorSegment_Nuclear::model()->findAll(array('order'=>'display_order')),'id','name'))?>
+				</div>
+			</div>
+			<div>
+				<div class="label">
+					<?php echo $model->getAttributeLabel($side.'_cortical_id'); ?>
+					:
+				</div>
+				<div class="data">
+					<?php echo CHtml::activeDropDownList($model, $side.'_cortical_id', CHtml::listData(OphCiExamination_AnteriorSegment_Cortical::model()->findAll(array('order'=>'display_order')),'id','name'))?>
+				</div>
+			</div>
+			<div>
+				<div class="label">
+					<?php echo $model->getAttributeLabel($side.'_description'); ?>
+					:
+				</div>
+				<div class="data">
+					<?php echo CHtml::activeTextArea($model, $side.'_description', array('rows' => "2", 'cols' => "20", 'class' => 'autosize')) ?>
+				</div>
+			</div>
+			<div>
+				<div class="data">
+					<?php echo CHtml::activeCheckBox($model, $side.'_pxe') ?>
+				</div>
+				<div class="label">
+					<?php echo $model->getAttributeLabel($side.'_pxe'); ?>
+				</div>
+			</div>
+			<div>
+				<div class="data">
+					<?php echo CHtml::activeCheckBox($model, $side.'_phako') ?>
+				</div>
+				<div class="label">
+					<?php echo $model->getAttributeLabel($side.'_phako'); ?>
 				</div>
 			</div>
 			<button class="ed_report">Report</button>
@@ -58,28 +92,44 @@
 		<div class="eyedrawFields view">
 			<div>
 				<div class="data">
-					<?php echo $side == 'right' ? $element->right_description : $element->left_description ?>
+					<?php echo $model->{$side.'_description'} ?>
 				</div>
 			</div>
 			<div>
 				<div class="data">
-					<?php echo $element->getAttributeLabel($side.'_diagnosis_id') ?>
+					<?php echo $model->getAttributeLabel($side.'_pupil_id') ?>
 					:
-					<?php if ($side == 'right') {
-						if ($element->right_diagnosis) {
-							echo $element->right_diagnosis->term;
-						} else {
-							echo 'None';
-						}
-					} else {
-						if($element->left_diagnosis) {
-							echo $element->left_diagnosis->term;
-						} else {
-							echo 'None';
-						}
-					}?>
+					<?php echo $model->{$side.'_pupil'}->name ?>
 				</div>
 			</div>
+			<div>
+				<div class="data">
+					<?php echo $model->getAttributeLabel($side.'_nuclear_id') ?>
+					:
+					<?php echo $model->{$side.'_nuclear'}->name ?>
+				</div>
+			</div>
+			<div>
+				<div class="data">
+					<?php echo $model->getAttributeLabel($side.'_cortical_id') ?>
+					:
+					<?php echo $model->{$side.'_cortical'}->name ?>
+				</div>
+			</div>
+			<?php if($model->{$side.'_pxe'}) { ?>
+			<div>
+				<div class="data">
+					<?php echo $model->getAttributeLabel($side.'_pxe') ?>
+				</div>
+			</div>
+			<?php } ?>
+			<?php if($model->{$side.'_phako'}) { ?>
+			<div>
+				<div class="data">
+					<?php echo $model->getAttributeLabel($side.'_phako') ?>
+				</div>
+			</div>
+			<?php } ?>
 		</div>
 	<?php }?>
 </div>
