@@ -306,9 +306,11 @@ ED.AntSeg.prototype.setParameter = function(_parameter, _value)
  */
 ED.AntSeg.prototype.description = function()
 {
-    var returnString = this.getParameter('grade') + " pupil";
+    //var returnString = this.getParameter('grade') + " pupil";
     
-    if (this.hasPXE) returnString += " with pseudoexfoliation";
+    //if (this.hasPXE) returnString += " with pseudoexfoliation";
+    
+    var returnString = this.drawing.doodleArray.length == 1?"No abnormality":"";
 	
 	return returnString;
 }
