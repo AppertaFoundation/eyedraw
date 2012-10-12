@@ -82,10 +82,10 @@ class OEEyeDrawWidget extends CWidget
     public $template = 'OEEyeDrawWidgetBasic';
 
 	/**
-	 * Unique identifier (eg RPS for right posterior segment drawing)
+	 * Unique identifier for the drawing on the current page
 	 * @var string
 	 */
-    public $idSuffix = 'RPS';
+    public $idSuffix = 'EDI';
 
 	/**
 	 * Side (R or L)
@@ -103,7 +103,7 @@ class OEEyeDrawWidget extends CWidget
 	 * Size of canvas element in pixels
 	 * @var int
 	 */
-    public $size = 400;
+    public $size = 300;
 
 	/**
 	 * The model possessing an attribute to store JSON data
@@ -250,13 +250,12 @@ class OEEyeDrawWidget extends CWidget
         // If script array is empty, just load all the ED_.js files (with exception of two mandatory files)
         if (empty($this->scriptArray))
         {
-            foreach (new DirectoryIterator($this->jsPath ) as $file)
+            foreach (new DirectoryIterator(Yii::app()->getAssetManager()->basePath."/".basename($this->jsPath)) as $file)
             {
                 if ($file->isFile() === TRUE && $file->getFilename() !== 'ED_Drawing.js' && $file->getBasename() !== 'OEEyeDraw.js')
                 {
                     if ($file->getExtension() == "js")
                     {
-                        error_log($file->getFilename());
                         array_push ($this->scriptArray, $file->getFilename());
                     }
                 }

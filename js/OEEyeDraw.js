@@ -70,19 +70,16 @@ function eyeDrawInit(_properties)
         // Method called for notification
         function callBack(_messageArray)
         {
-            //console.log("Event: ", _properties.idSuffix, _messageArray['eventName']);
-            //console.log($(this));
             // Get reference to hidden input element
             var input = document.getElementById(_properties.inputId);
 
-            
             // Handle events by name
             switch (_messageArray['eventName'])
             {
                 // Image files all loaded
                 case 'loaded':
-                    // If input contains data, load it into the drawing
-                    if (input.value.length > 0)
+                    // If input exists and contains data, load it into the drawing
+                    if (input != null && input.value.length > 0)
                     {
                         // Load drawing data from input element
                         this.drawing.loadDoodles(_properties.inputId);
@@ -104,31 +101,41 @@ function eyeDrawInit(_properties)
                         }
                     }
                     
-                    // Apply bindings
-                    if (ED.objectIsEmpty(_properties.bindingArray.length))
+                    // Apply bindings (some weirdness here, sometimes interpreted as an array, sometimes as an object
+                    //if (_properties.bindingArray.length > 0)
+                    if (!ED.objectIsEmpty(_properties.bindingArray))
                     {
                         this.drawing.addBindings(_properties.bindingArray);
                     }
 
                     // Initialise hidden input
-                    input.value = window[_properties.drawingName].save();
+                    if (input != null)
+                    {
+                        input.value = window[_properties.drawingName].save();
+                    }
                     
                     break;
                 case 'doodleAdded':
                     // Save drawing to hidden input
-                    input.value = this.drawing.save();
+                    if (input != null && input.value.length > 0)
+                    {
+                        input.value = this.drawing.save();
+                    }
                     break;
                 case 'mouseDragged':
                     // Save drawing to hidden input
-                    input.value = this.drawing.save();
+                    if (input != null && input.value.length > 0)
+                    {
+                        input.value = this.drawing.save();
+                    }
                     break;
                 case 'parameter':
-                    // TEMP stop syncing if slave moves phako incision
+                    // TEMP stop syncing if slave moves phako incision - put somewhere else
                     if (_messageArray.selectedDoodle != null)
                     {
                         if (_messageArray.selectedDoodle.className == 'PhakoIncision')
                         {
-                            stopSync(_messageArray.selectedDoodle);
+                            //stopSync(_messageArray.selectedDoodle);
                         }
                     }
                     
@@ -148,14 +155,13 @@ function eyeDrawInit(_properties)
                                 var slaveDrawingName = 'ed_drawing_edit_' + idSuffix;
 
                                 // Master doodle
-                                //var masterDoodle = this.drawing.selectedDoodle;
                                 var masterDoodle = _messageArray['object'].doodle;
                                 
                                 // Slave doodle (uses first doodle in the drawing matching the className)
                                 var slaveDoodle = window[slaveDrawingName].firstDoodleOfClass(slaveClassNameArray[i]);
 
-                                // If both are defined, enact sync for the changed parameter
-                                if (masterDoodle && slaveDoodle && slaveDoodle.willSync)
+                                // If master is being driven, both are defined, and slave doodle is set to sync, enact sync for the changed parameter
+                                if (masterDoodle && slaveDoodle && slaveDoodle.willSync && masterDoodle.drawing.isActive)
                                 {
                                     slaveDoodle.syncParameter(_messageArray.object.parameter, masterDoodle[_messageArray.object.parameter]);
                                     

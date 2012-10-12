@@ -421,17 +421,17 @@ ED.PhakoIncision.prototype.dependentParameterValues = function(_parameter, _valu
             // Incision site (CND 5.13)
         case 'incisionSite':
             switch (_value)
-        {
-            case 'Scleral':
-                returnArray['radius'] = +428;
-                break;
-            case 'Limbal':
-                returnArray['radius'] = +376;
-                break;
-            case 'Corneal':
-                returnArray['radius'] = +330;
-                break;
-        }
+            {
+                case 'Scleral':
+                    returnArray['radius'] = +428;
+                    break;
+                case 'Limbal':
+                    returnArray['radius'] = +376;
+                    break;
+                case 'Corneal':
+                    returnArray['radius'] = +330;
+                    break;
+            }
             break;
     }
     

@@ -204,7 +204,9 @@ ED.errorHandler = function(_class, _method, _message)
  * @property {Bool} completeLine Flag indicating whether to draw an additional line to the first PointInLine doodle
  * @property {Float} scale Scaling of transformation from canvas to doodle planes, preserving aspect ratio and maximising doodle plnae
  * @property {Float} globalScaleFactor Factor used to scale all added doodles to this drawing, defaults to 1
- * @property {Int} Current value of scrollFactor
+ * @property {Int} scrollValue Current value of scrollFactor
+ * @property {Int} lastDoodleId id of last doodle to be added
+ * @property {Bool} isActive Flag indicating that the mouse is interacting with the drawing
  * @param {Canvas} _canvas Canvas element 
  * @param {Eye} _eye Right or left eye
  * @param {String} _IDSuffix String suffix to identify HTML elements related to this drawing
@@ -235,6 +237,7 @@ ED.Drawing = function(_canvas, _eye, _IDSuffix, _isEditable, offset_x, offset_y,
     this.globalScaleFactor = 1;
     this.scrollValue = 0;
     this.lastDoodleId = 0;
+    this.isActive = false;
     
     // Grab the canvas parent element
 	this.canvasParent = this.canvas.parentElement;
@@ -1154,6 +1157,9 @@ ED.Drawing.prototype.mouseup = function(_point)
  */  
 ED.Drawing.prototype.mouseover = function(_point)
 {
+    // Make drawing active
+    this.isActive = true;
+    
     // Notify
     this.notify("mouseover", _point);
 }
@@ -1166,6 +1172,9 @@ ED.Drawing.prototype.mouseover = function(_point)
  */  
 ED.Drawing.prototype.mouseout = function(_point)
 {
+    // Make drawing inactive
+    this.isActive = false;
+    
     // Stop the hover timer
     this.stopHoverTimer();
     
@@ -1185,9 +1194,6 @@ ED.Drawing.prototype.mouseout = function(_point)
             this.drawAllDoodles();
         }
 	}
-    
-    // Deselect all doodles
-    this.deselectDoodles();
     
     // Notify
     this.notify("mouseout", _point);
@@ -1827,6 +1833,9 @@ ED.Drawing.prototype.eventHandler = function(_type, _doodleId, _elementId, _valu
             
             if (doodle)
             {
+                // Set state of drawing to be active to allow synchronisation to work when changed by bound element
+                doodle.drawing.isActive = true;
+                
                 // Find key associated with the element id
                 var parameter;
                 for (var key in doodle.bindingArray)
@@ -1855,6 +1864,9 @@ ED.Drawing.prototype.eventHandler = function(_type, _doodleId, _elementId, _valu
                 {
                     document.getElementById(_elementId).value = validityArray.value;
                 }
+                
+                // ***TODO*** Need to reset state of drawing elsewhere, since this gets called before animation finished.
+                //doodle.drawing.isActive = false;
             }
             break;
         default:
