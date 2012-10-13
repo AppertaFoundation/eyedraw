@@ -39,8 +39,9 @@ class OEEyeDrawWidgetAnteriorSegment extends OEEyeDrawWidget {
 	public $no_wrapper = true;
 
 	public function init() {
+		$side = ($this->side == 'R') ? 'right' : 'left'; 
 		$this->onLoadedParamsArray = array(
-			array('AntSeg', 'pxe', (bool) $this->model->right_pxe),
+			array('AntSeg', 'pxe', (bool) $this->model->{$side.'_pxe'}),
 		);
 
 		if ($this->mode == 'view') {
