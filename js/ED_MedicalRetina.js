@@ -645,7 +645,7 @@ ED.CNV.superclass = ED.Doodle.prototype;
 ED.CNV.prototype.setHandles = function()
 {
     this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, false);
-	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+	//this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
 }
 
 /**
@@ -657,7 +657,7 @@ ED.CNV.prototype.setPropertyDefaults = function()
 	this.isOrientated = false;
 	this.isScaleable = true;
 	this.isSqueezable = false;
-	this.isMoveable = false;
+	this.isMoveable = true;
 	this.isRotatable = false;
     this.isUnique = true;
 	this.rangeOfScale = new ED.Range(+0.5, +2);
@@ -670,7 +670,6 @@ ED.CNV.prototype.setPropertyDefaults = function()
  */
 ED.CNV.prototype.setParameterDefaults = function()
 {
-	this.apexY = -80;
 }
 
 /**
@@ -690,18 +689,67 @@ ED.CNV.prototype.draw = function(_point)
 	ctx.beginPath();
     
     // Radius of CNV
-    var rb = 125;
+    var r = 125;
+
+    // Parameters of random curve
+    var n = 16;
+    var phi = 2 * Math.PI/n;
+    var th = 0.5 * Math.PI/n;
+    var b = 4;
+    var point = new ED.Point(0,0);
     
-    // Circle
-    ctx.arc(0, 0, rb, 0, 2 * Math.PI, false);
+    // First point
+    var fp = new ED.Point(0,0);
+    fp.setWithPolars(r, 0);
+    ctx.moveTo(fp.x, fp.y);
+    var rl = r;
+    
+    for (var i = 0; i < n; i++)
+    {
+        // Get radius of next point
+        var rn = r * (b + ED.randomArray[i])/b;
+        
+        // Control point 1
+        var cp1 = new ED.Point(0,0);
+        cp1.setWithPolars(rl, i * phi + th);
+        
+        // Control point 2
+        var cp2 = new ED.Point(0,0);
+        cp2.setWithPolars(rn, (i + 1) * phi - th);
+        
+        // Next point
+        var pn = new ED.Point(0,0);
+        pn.setWithPolars(rn, (i + 1) * phi);
+        
+        // Assign next point
+        rl = rn;
+        
+        // Next point
+        if (i == n - 1)
+        {
+            ctx.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, fp.x, fp.y);
+        }
+        else
+        {
+            ctx.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, pn.x, pn.y);
+        }
+        
+        // Control handle point
+        if (i == 1)
+        {
+            point.x = pn.x;
+            point.y = pn.y;
+        }
+    }
+    
     
     // Close path
     ctx.closePath();
 
 	// Set attributes
-	ctx.lineWidth = 4;	
-    ctx.fillStyle = "rgba(200,200,0,0)";
-	ctx.strokeStyle = "rgba(100,100,100,0)";
+	ctx.lineWidth = 0;
+    ctx.fillStyle = "red";
+	ctx.strokeStyle = "red";
 	
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
@@ -709,60 +757,34 @@ ED.CNV.prototype.draw = function(_point)
 	// Other paths and drawing here
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
 	{
-        // Parameters
-        var ro = 100;
-        var rh = this.apexY < 0?((this.apexY + 80)/4):20;
-        var nh = 8;
-        var ne = 20;
-        
-        // Point objects
-        var cp = new ED.Point(0, 0);
-        var ep = new ED.Point(0, 0);
-        
-        // Loop through making haemorrhages
-        ctx.fillStyle = "rgba(200,0,0,0.8)";
-        var phi = 2 * Math.PI/nh;
-        var i;
-        for (i = 0; i < nh; i++)
-        {
-            ctx.beginPath();
-            cp.setWithPolars(ro, i * phi);
-            ctx.arc(cp.x, cp.y, rh, 0, 2 * Math.PI, false);
-            ctx.closePath();
-            ctx.fill();
-        }
-
         // Yellow centre
         ctx.beginPath();
-        ctx.arc(0, 0, ro, 0, 2 * Math.PI, false);
+        ctx.arc(0, 0, r * 0.8, 0, 2 * Math.PI, false);
         ctx.closePath();
-        ctx.fillStyle = "rgba(160,160,0,1)";
+        ctx.fillStyle = "rgba(255,255,190,1)";
         ctx.fill();
         
         // Exudates
-        /*
-        phi = 2 * Math.PI/ne;
-        var el = this.apexY > 0?(this.apexY/3):0;
-        for (i = 0; i < ne; i++)
-        {
-            ctx.beginPath();
-            cp.setWithPolars(ro + 10, i * phi);
-            ep.setWithPolars(ro + 10 + el, i * phi);
-            ctx.moveTo(cp.x, cp.y);
-            ctx.lineTo(ep.x, ep.y);
-            ctx.closePath();
-            ctx.lineWidth = 18;
-            ctx.strokeStyle = "rgba(220,220,0,1)";
-            ctx.stroke();
-        }
-         */
+
+//        phi = 2 * Math.PI/ne;
+//        var el = this.apexY > 0?(this.apexY/3):0;
+//        for (i = 0; i < ne; i++)
+//        {
+//            ctx.beginPath();
+//            cp.setWithPolars(ro + 10, i * phi);
+//            ep.setWithPolars(ro + 10 + el, i * phi);
+//            ctx.moveTo(cp.x, cp.y);
+//            ctx.lineTo(ep.x, ep.y);
+//            ctx.closePath();
+//            ctx.lineWidth = 18;
+//            ctx.strokeStyle = "rgba(220,220,0,1)";
+//            ctx.stroke();
+//        }
 	}
     
 	// Coordinates of handles (in canvas plane)
-    point = new ED.Point(0, 0);
-    point.setWithPolars(rb, Math.PI/4);
 	this.handleArray[2].location = this.transform.transformPoint(point);
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
+	//this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 	
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -1302,3 +1324,345 @@ ED.Circinate.prototype.description = function()
     return returnString;
 }
 
+/**
+ * Hard Drusen
+ *
+ * @class HardDrusen
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Int} _originX
+ * @param {Int} _originY
+ * @param {Float} _radius
+ * @param {Int} _apexX
+ * @param {Int} _apexY
+ * @param {Float} _scaleX
+ * @param {Float} _scaleY
+ * @param {Float} _arc
+ * @param {Float} _rotation
+ * @param {Int} _order
+ */
+ED.HardDrusen = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+{
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	
+	// Set classname
+	this.className = "HardDrusen";
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.HardDrusen.prototype = new ED.Doodle;
+ED.HardDrusen.prototype.constructor = ED.HardDrusen;
+ED.HardDrusen.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.HardDrusen.prototype.setHandles = function()
+{
+	this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, false);
+	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+}
+
+/**
+ * Sets default dragging attributes
+ */
+ED.HardDrusen.prototype.setPropertyDefaults = function()
+{
+	this.isSelectable = true;
+	this.isOrientated = false;
+	this.isScaleable = true;
+	this.isSqueezable = false;
+	this.isMoveable = false;
+	this.isRotatable = false;
+	this.rangeOfScale = new ED.Range(+0.5, +1.5);
+	this.rangeOfArc = new ED.Range(Math.PI/6, Math.PI*2);
+	this.rangeOfApexX = new ED.Range(-0, +0);
+	this.rangeOfApexY = new ED.Range(-160, +0);
+}
+
+/**
+ * Sets default parameters
+ */
+ED.HardDrusen.prototype.setParameterDefaults = function()
+{
+    this.originY = 0;
+    if (this.drawing.hasDoodleOfClass('PostPole'))
+    {
+        this.originX = 0;
+    }
+    else
+    {
+        this.originX = this.drawing.eye == ED.eye.Right?-100:100;
+    }
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.HardDrusen.prototype.draw = function(_point)
+{
+	// Get context
+	var ctx = this.drawing.context;
+	
+	// Call draw method in superclass
+	ED.HardDrusen.superclass.draw.call(this, _point);
+	
+	// Boundary path
+	ctx.beginPath();
+	
+	// Invisible boundary
+    var r = 200;
+	ctx.arc(0,0,r,0,Math.PI*2,true);
+    
+	// Close path
+	ctx.closePath();
+	
+	// Set line attributes
+	ctx.lineWidth = 0;
+	ctx.fillStyle = "rgba(0, 0, 0, 0)";
+	ctx.strokeStyle = "rgba(0, 0, 0, 0)";
+	
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+    
+	// Other stuff here
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
+	{
+        // Colours
+        var fill = "yellow";
+        
+        var dr = 10/this.scaleX;
+        
+        var p = new ED.Point(0,0);
+        var n = 20 + Math.abs(Math.floor(this.apexY/2));
+        for (var i = 0; i < n; i++)
+        {
+            p.setWithPolars(r * ED.randomArray[i], 2 * Math.PI * ED.randomArray[i + 100]);
+            this.drawSpot(ctx, p.x, p.y, dr, fill);
+        }
+	}
+	
+	// Coordinates of handles (in canvas plane)
+	this.handleArray[2].location = this.transform.transformPoint(new ED.Point(r * 0.7, -r * 0.7));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
+	
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+	
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.HardDrusen.prototype.description = function()
+{
+    var returnString = "Signficant numbers of ";
+    if (this.apexY > -100) returnString = "Moderate numbers of ";
+    if (this.apexY > -50) returnString = "Several ";
+	
+	return returnString + "hard drusen";
+}
+
+
+/**
+ * Returns the SnoMed code of the doodle
+ *
+ * @returns {Int} SnoMed code of entity representated by doodle
+ */
+ED.HardDrusen.prototype.snomedCode = function()
+{
+	return 193387007;
+}
+
+/**
+ * Returns a number indicating position in a hierarchy of diagnoses from 0 to 9 (highest)
+ *
+ * @returns {Int} Position in diagnostic hierarchy
+ */
+ED.HardDrusen.prototype.diagnosticHierarchy = function()
+{
+	return 2;
+}
+
+
+/**
+ * PRP (Poterior pole)
+ *
+ * @class PRPPostPole
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Int} _originX
+ * @param {Int} _originY
+ * @param {Float} _radius
+ * @param {Int} _apexX
+ * @param {Int} _apexY
+ * @param {Float} _scaleX
+ * @param {Float} _scaleY
+ * @param {Float} _arc
+ * @param {Float} _rotation
+ * @param {Int} _order
+ */
+ED.PRPPostPole = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+{
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	
+	// Set classname
+	this.className = "PRPPostPole";
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.PRPPostPole.prototype = new ED.Doodle;
+ED.PRPPostPole.prototype.constructor = ED.PRPPostPole;
+ED.PRPPostPole.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets default dragging attributes
+ */
+ED.PRPPostPole.prototype.setPropertyDefaults = function()
+{
+	this.isScaleable = false;
+	this.isMoveable = false;
+	this.isRotatable = false;
+    this.addAtBack = true;
+	this.rangeOfScale = new ED.Range(+0.5, +1.5);
+	this.rangeOfArc = new ED.Range(Math.PI/6, Math.PI*2);
+	this.rangeOfApexX = new ED.Range(-0, +0);
+	this.rangeOfApexY = new ED.Range(-160, +0);
+}
+
+/**
+ * Sets default parameters
+ */
+ED.PRPPostPole.prototype.setParameterDefaults = function()
+{
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.PRPPostPole.prototype.draw = function(_point)
+{
+	// Get context
+	var ctx = this.drawing.context;
+	
+	// Call draw method in superclass
+	ED.PRPPostPole.superclass.draw.call(this, _point);
+    	
+	// Boundary path
+	ctx.beginPath();
+	
+	// Invisible boundary
+    ctx.rect(-480, -480, 960, 960);
+    var r = 320;
+    ctx.moveTo(r,0);
+	ctx.arc(0,0,r,0,Math.PI*2,true);
+    
+	// Close path
+	ctx.closePath();
+	
+	// Set line attributes (NB Note strokeStyle in order to get a highlight when selected
+	ctx.lineWidth = 4;
+	ctx.fillStyle = "rgba(0, 0, 0, 0)";
+	ctx.strokeStyle = "rgba(255, 255, 255, 1)";
+	
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+    
+	// Other stuff here
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
+	{
+        // PRP spot data
+        var sr = 15;
+        var si = 30;
+        var ss = 48;
+        var n = (1000 - 2 * ss)/(2 * sr + si);
+        var sd = (2 * sr + si);
+        var st = 10;
+        
+        // Draw spots
+        for (var i = 0; i < n; i++)
+        {
+            for (var j = 0; j < n; j++)
+            {
+                // Calculate coordinates with a random element
+                var x = -500 + ss + i * sd + Math.round((-0.5 + ED.randomArray[i + j]) * 20);
+                var y = -500 + ss + j * sd + Math.round((-0.5 + ED.randomArray[i + j + 100]) * 20);
+                
+                // Avoid macula
+                if ((x * x + y * y) > r * r)
+                {
+                    // Avoid disk
+                    if (this.drawing.eye == ED.eye.Right)
+                    {
+                        if (!((i == 13 && (j == 6 || j == 7 || j == 8 || j == 9)) || (i == 14) && (j == 7 || j == 8)))
+                        {
+                            this.drawCircle(ctx, x, y, sr, "Yellow", st, "rgba(255, 128, 0, 1)");
+                        }
+                    }
+                    else
+                    {
+                        if (!((i == 2 && (j == 6 || j == 7 || j == 8 || j == 9)) || (i == 1) && (j == 7 || j == 8)))
+                        {
+                            this.drawCircle(ctx, x, y, sr, "Yellow", st, "rgba(255, 128, 0, 1)");
+                        }
+                    }
+                }
+            }
+        }
+	}
+	
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+	
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.PRPPostPole.prototype.description = function()
+{
+    var returnString = "Signficant numbers of ";
+    if (this.apexY > -100) returnString = "Moderate numbers of ";
+    if (this.apexY > -50) returnString = "Several ";
+	
+	return returnString + "hard drusen";
+}
+
+
+/**
+ * Returns the SnoMed code of the doodle
+ *
+ * @returns {Int} SnoMed code of entity representated by doodle
+ */
+ED.PRPPostPole.prototype.snomedCode = function()
+{
+	return 193387007;
+}
+
+/**
+ * Returns a number indicating position in a hierarchy of diagnoses from 0 to 9 (highest)
+ *
+ * @returns {Int} Position in diagnostic hierarchy
+ */
+ED.PRPPostPole.prototype.diagnosticHierarchy = function()
+{
+	return 2;
+}
