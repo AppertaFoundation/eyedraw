@@ -1474,27 +1474,6 @@ ED.HardDrusen.prototype.description = function()
 
 
 /**
- * Returns the SnoMed code of the doodle
- *
- * @returns {Int} SnoMed code of entity representated by doodle
- */
-ED.HardDrusen.prototype.snomedCode = function()
-{
-	return 193387007;
-}
-
-/**
- * Returns a number indicating position in a hierarchy of diagnoses from 0 to 9 (highest)
- *
- * @returns {Int} Position in diagnostic hierarchy
- */
-ED.HardDrusen.prototype.diagnosticHierarchy = function()
-{
-	return 2;
-}
-
-
-/**
  * PRP (Poterior pole)
  *
  * @class PRPPostPole
@@ -1639,30 +1618,5 @@ ED.PRPPostPole.prototype.draw = function(_point)
  */
 ED.PRPPostPole.prototype.description = function()
 {
-    var returnString = "Signficant numbers of ";
-    if (this.apexY > -100) returnString = "Moderate numbers of ";
-    if (this.apexY > -50) returnString = "Several ";
-	
-	return returnString + "hard drusen";
-}
-
-
-/**
- * Returns the SnoMed code of the doodle
- *
- * @returns {Int} SnoMed code of entity representated by doodle
- */
-ED.PRPPostPole.prototype.snomedCode = function()
-{
-	return 193387007;
-}
-
-/**
- * Returns a number indicating position in a hierarchy of diagnoses from 0 to 9 (highest)
- *
- * @returns {Int} Position in diagnostic hierarchy
- */
-ED.PRPPostPole.prototype.diagnosticHierarchy = function()
-{
-	return 2;
+	return "Panretinal photocoagulation";
 }
