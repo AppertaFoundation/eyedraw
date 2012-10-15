@@ -27,7 +27,7 @@
 require_once(dirname(__FILE__)."/OEEyeDrawWidget.php");
 
 class OEEyeDrawWidgetPosteriorSegment extends OEEyeDrawWidget {
-	public $doodleToolBarArray = array('Geographic','VitreousOpacity','DiabeticNV','CNV','Circinate');
+	public $doodleToolBarArray = array('Geographic','VitreousOpacity','DiabeticNV','CNV','Circinate','CystoidMacularOedema','EpiretinalMembrane','HardDrusen','PRPPostPole','MacularHole');
 	public $size = 300;
 
 	public $onLoadedCommandArray = array(
