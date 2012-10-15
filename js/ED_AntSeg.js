@@ -1027,7 +1027,7 @@ ED.PCIOL.superclass = ED.Doodle.prototype;
  */
 ED.PCIOL.prototype.setHandles = function()
 {
-    this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, true);
+    this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Rotate, false);
 }
 
 /**
@@ -1038,7 +1038,7 @@ ED.PCIOL.prototype.setPropertyDefaults = function()
 	this.isSelectable = true;
     this.addAtBack = true;
 	this.isOrientated = false;
-	this.isScaleable = true;
+	this.isScaleable = false;
 	this.isSqueezable = false;
 	this.isMoveable = true;
 	this.isRotatable = true;
@@ -1206,7 +1206,7 @@ ED.ACIOL.superclass = ED.Doodle.prototype;
  */
 ED.ACIOL.prototype.setHandles = function()
 {
-    this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, true);
+    this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Rotate, false);
 }
 
 /**
@@ -1216,7 +1216,7 @@ ED.ACIOL.prototype.setPropertyDefaults = function()
 {
 	this.isSelectable = true;
 	this.isOrientated = false;
-	this.isScaleable = true;
+	this.isScaleable = false;
 	this.isSqueezable = false;
 	this.isMoveable = true;
 	this.isRotatable = true;
@@ -1403,7 +1403,7 @@ ED.ToricPCIOL.superclass = ED.Doodle.prototype;
  */
 ED.ToricPCIOL.prototype.setHandles = function()
 {
-    this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, true);
+    this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Rotate, false);
 }
 
 /**
@@ -1414,7 +1414,7 @@ ED.ToricPCIOL.prototype.setPropertyDefaults = function()
 	this.isSelectable = true;
     this.addAtBack = true;
 	this.isOrientated = false;
-	this.isScaleable = true;
+	this.isScaleable = false;
 	this.isSqueezable = false;
 	this.isMoveable = true;
 	this.isRotatable = true;
