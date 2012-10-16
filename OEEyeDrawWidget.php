@@ -380,7 +380,7 @@ class DoodleInfo
         "BuckleOperation" => "Buckle operation",
         "BuckleSuture" => "Buckle suture",
         "CapsularTensionRing" => "Capsular Tension Ring",                                   
-        "Circinate" => "Circinate retinopathy",
+        "Circinate" => "Circinate maculopathy",
         "CircumferentialBuckle" => "Circumferential buckle",
         "CNV" => "Choroidal new vessels",
         "CornealScar" => "Corneal scar",
