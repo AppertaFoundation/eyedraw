@@ -33,28 +33,25 @@
 		<canvas id="<?php echo $canvasId?>" class="<?php if ($isEditable) { echo 'edit'; } else { echo 'display'; }?>" width="<?php echo $size?>" height="<?php echo $size?>" tabindex="1"<?php if ($canvasStyle) {?> style="<?php echo $canvasStyle?>"<?php }?>></canvas>
 	<?php if ($isEditable) {?>
 		<div class="eyedrawFields">
-			<div>
+			<div class="aligned">
 				<div class="label">
-					<?php echo $model->getAttributeLabel($side.'_pupil_id'); ?>
-					:
+					<?php echo $model->getAttributeLabel($side.'_pupil_id'); ?>:
 				</div>
 				<div class="data">
 					<?php echo CHtml::activeDropDownList($model, $side.'_pupil_id', CHtml::listData(OphCiExamination_AnteriorSegment_Pupil::model()->findAll(array('order'=>'display_order')),'id','name'))?>
 				</div>
 			</div>
-			<div>
+			<div class="aligned">
 				<div class="label">
-					<?php echo $model->getAttributeLabel($side.'_nuclear_id'); ?>
-					:
+					<?php echo $model->getAttributeLabel($side.'_nuclear_id'); ?>:
 				</div>
 				<div class="data">
 					<?php echo CHtml::activeDropDownList($model, $side.'_nuclear_id', CHtml::listData(OphCiExamination_AnteriorSegment_Nuclear::model()->findAll(array('order'=>'display_order')),'id','name'))?>
 				</div>
 			</div>
-			<div>
+			<div class="aligned">
 				<div class="label">
-					<?php echo $model->getAttributeLabel($side.'_cortical_id'); ?>
-					:
+					<?php echo $model->getAttributeLabel($side.'_cortical_id'); ?>:
 				</div>
 				<div class="data">
 					<?php echo CHtml::activeDropDownList($model, $side.'_cortical_id', CHtml::listData(OphCiExamination_AnteriorSegment_Cortical::model()->findAll(array('order'=>'display_order')),'id','name'))?>
@@ -62,8 +59,7 @@
 			</div>
 			<div>
 				<div class="label">
-					<?php echo $model->getAttributeLabel($side.'_description'); ?>
-					:
+					<?php echo $model->getAttributeLabel($side.'_description'); ?>:
 				</div>
 				<div class="data">
 					<?php echo CHtml::activeTextArea($model, $side.'_description', array('rows' => "2", 'cols' => "20", 'class' => 'autosize')) ?>
@@ -90,29 +86,34 @@
 		</div>
 	<?php }else{?>
 		<div class="eyedrawFields view">
+			<?php if($description = $model->{$side.'_description'}) { ?>
 			<div>
 				<div class="data">
-					<?php echo $model->{$side.'_description'} ?>
+					<?php echo $description ?>
 				</div>
 			</div>
-			<div>
+			<?php } ?>
+			<div class="aligned">
+				<div class="label">
+					<?php echo $model->getAttributeLabel($side.'_pupil_id') ?>:
+				</div>
 				<div class="data">
-					<?php echo $model->getAttributeLabel($side.'_pupil_id') ?>
-					:
 					<?php echo $model->{$side.'_pupil'}->name ?>
 				</div>
 			</div>
-			<div>
+			<div class="aligned">
+				<div class="label">
+					<?php echo $model->getAttributeLabel($side.'_nuclear_id') ?>:
+				</div>
 				<div class="data">
-					<?php echo $model->getAttributeLabel($side.'_nuclear_id') ?>
-					:
 					<?php echo $model->{$side.'_nuclear'}->name ?>
 				</div>
 			</div>
-			<div>
+			<div class="aligned">
+				<div class="label">
+					<?php echo $model->getAttributeLabel($side.'_cortical_id') ?>:
+				</div>
 				<div class="data">
-					<?php echo $model->getAttributeLabel($side.'_cortical_id') ?>
-					:
 					<?php echo $model->{$side.'_cortical'}->name ?>
 				</div>
 			</div>

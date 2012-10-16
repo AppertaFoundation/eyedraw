@@ -52,7 +52,7 @@
 	<?php }?>
 	<?php if ($isEditable) {?>
 	<div class="eyedrawFields">
-		<div>
+		<div class="aligned">
 			<div class="label">
 				<?php echo $model->getAttributeLabel($side.'_sphere'); ?>
 				:
@@ -61,7 +61,7 @@
 				<?php Yii::app()->getController()->renderPartial('_segmented_field', array('element' => $model, 'field' => $side.'_sphere'), false, false)?>
 			</div>
 		</div>
-		<div>
+		<div class="aligned">
 			<div class="label">
 				<?php echo $model->getAttributeLabel($side.'_cylinder'); ?>
 				:
@@ -70,7 +70,7 @@
 				<?php Yii::app()->getController()->renderPartial('_segmented_field', array('element' => $model, 'field' => $side.'_cylinder'), false, false)?>
 			</div>
 		</div>
-		<div>
+		<div class="aligned">
 			<div class="label">
 				<?php echo $model->getAttributeLabel($side.'_axis'); ?>
 				:
@@ -79,7 +79,7 @@
 				<?php echo CHtml::activeTextField($model, $side.'_axis', array('class' => 'axis')) ?>
 			</div>
 		</div>
-		<div>
+		<div class="aligned">
 			<div class="label">
 				<?php echo $model->getAttributeLabel($side.'_type_id'); ?>
 				:
