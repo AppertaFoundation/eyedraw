@@ -44,8 +44,6 @@ class OEEyeDrawWidgetRefraction extends OEEyeDrawWidget {
 	public $refraction_types;
 
 	public function init() {
-		$this->identifier .= $this->side;
-
 		if ($this->mode == 'view') {
 			$this->size = $this->view_size;
 			$this->doodleToolBarArray = array();
