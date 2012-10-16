@@ -2148,7 +2148,7 @@ ED.LasikFlap.prototype.description = function()
     if (s < c && as > ac) quadrant = isRightSide?"temporal":"nasal";
     if (s < c && as < ac) quadrant = "superior";
     
-	returnString = "Lasik flap with " + quadrant + " hinge";
+	returnString = "LASIK flap with " + quadrant + " hinge";
     
 	return returnString;
 }
