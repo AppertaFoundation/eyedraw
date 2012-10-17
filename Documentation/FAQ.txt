@@ -1,0 +1,7 @@
+Q:  How do I slow down an animation for a particular doodle?
+
+A:  Animation rates are set for simple parameters, but this can be overidden using the following code in the setPropertyDefaults method
+    this.parameterValidationArray['apexY']['delta'] = 1;
+    Default values can be found in the doodle constructor method
+    
+EG: PostPole
