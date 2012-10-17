@@ -299,12 +299,12 @@ ED.HardExudate.prototype.setPropertyDefaults = function()
  */
 ED.HardExudate.prototype.setParameterDefaults = function()
 {
-    var doodle = this.drawing.lastDoodleOfClass(this.className);
-    if (doodle)
-    {
-        this.originX = doodle.originX + 20;
-        this.originY = doodle.originY + 20;
-    }
+//    var doodle = this.drawing.lastDoodleOfClass(this.className);
+//    if (doodle)
+//    {
+//        this.originX = doodle.originX + 50;
+//        this.originY = doodle.originY + 50;
+//    }
 }
 
 /**
@@ -326,27 +326,16 @@ ED.HardExudate.prototype.draw = function(_point)
 	// Boundary path
 	ctx.beginPath();
     
-	// Optic disk
+	// Exudate
 	ctx.arc(0, 0, r, 0, 2 * Math.PI, true);
     
 	// Set attributes
 	ctx.lineWidth = 1;
-	ctx.strokeStyle = "yellow";
-    ctx.fillStyle = "yellow";
+	ctx.strokeStyle = "rgba(220,220,35,1)";
+    ctx.fillStyle = "rgba(220,220,35,1)";
 	
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
-	
-	// Non boundary drawing here
-	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
-	{
-	}
-
-    // Coordinates of handles (in canvas plane)
-    //this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
-	
-	// Draw handles if selected
-	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
     
 	// Return value indicating successful hittest
 	return this.isClicked;
@@ -361,16 +350,223 @@ ED.HardExudate.prototype.description = function()
 {
 	var returnString = "";
     
-    var postPole = this.drawing.lastDoodleOfClass('PostPole');
-    if (postPole && postPole.isWithinDiskDiametersOfFovea(this, 1))
-    {
-        returnString =  'YES';
-    }
-    else
-    {
-        returnString =  'No';
-    }
+//    var postPole = this.drawing.lastDoodleOfClass('PostPole');
+//    if (postPole && postPole.isWithinDiskDiametersOfFovea(this, 1))
+//    {
+//        returnString =  'YES';
+//    }
+//    else
+//    {
+//        returnString =  'No';
+//    }
     
 	return returnString;
 }
+
+/**
+ * DiabeticNV template with disk and arcades
+ *
+ * @class DiabeticNV
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Int} _originX
+ * @param {Int} _originY
+ * @param {Float} _radius
+ * @param {Int} _apexX
+ * @param {Int} _apexY
+ * @param {Float} _scaleX
+ * @param {Float} _scaleY
+ * @param {Float} _arc
+ * @param {Float} _rotation
+ * @param {Int} _order
+ */
+ED.DiabeticNV = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+{
+	// Set classname
+	this.className = "DiabeticNV";
+    
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.DiabeticNV.prototype = new ED.Doodle;
+ED.DiabeticNV.prototype.constructor = ED.DiabeticNV;
+ED.DiabeticNV.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.DiabeticNV.prototype.setHandles = function()
+{
+    this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, false);
+}
+
+/**
+ * Set default properties
+ */
+ED.DiabeticNV.prototype.setPropertyDefaults = function()
+{
+	this.isSelectable = true;
+	this.isOrientated = false;
+	this.isScaleable = true;
+	this.isSqueezable = false;
+	this.isMoveable = true;
+	this.isRotatable = false;
+    this.isUnique = false;
+//	this.rangeOfScale = new ED.Range(+0.5, +2);
+//	this.rangeOfArc = new ED.Range(Math.PI/6, Math.PI*2);
+//	this.rangeOfApexX = new ED.Range(-0, +0);
+//	this.rangeOfApexY = new ED.Range(-200, 0);
+}
+
+/**
+ * Sets default parameters
+ */
+ED.DiabeticNV.prototype.setParameterDefaults = function()
+{
+    if (this.drawing.eye == ED.eye.Right) this.originX = 300;
+    else this.originX = -300;
+    this.originY = -100;
+    
+    var doodle = this.drawing.lastDoodleOfClass(this.className);
+    if (doodle)
+    {
+        this.originX = doodle.originX - 100;
+    }
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.DiabeticNV.prototype.draw = function(_point)
+{
+	// Get context
+	var ctx = this.drawing.context;
+    
+	// Call draw method in superclass
+	ED.DiabeticNV.superclass.draw.call(this, _point);
+    
+	// Boundary path
+	ctx.beginPath();
+    
+    // Radius of NV
+    var r = 60;
+    var c = r/2;
+    var phi = 0;
+    var theta = Math.PI/8;
+    var n = 8;
+    
+	// Do a vessel
+    var cp1 = new ED.Point(0, 0);
+    var cp2 = new ED.Point(0, 0);
+    var tip = new ED.Point(0, 0);
+    var cp3 = new ED.Point(0, 0);
+    var cp4 = new ED.Point(0, 0);
+    
+    // Move to centre
+    ctx.moveTo(0,0);
+    
+    // Loop through making petals
+    var i;
+    for (i = 0; i < n; i++)
+    {
+        phi = i * 2 * Math.PI/n;
+        
+        cp1.setWithPolars(c, phi - theta);
+        cp2.setWithPolars(r, phi - theta);
+        tip.setWithPolars(r, phi);
+        cp3.setWithPolars(r, phi + theta);
+        cp4.setWithPolars(c, phi + theta);
+        
+        // Draw petal
+        ctx.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, tip.x, tip.y);
+        ctx.bezierCurveTo(cp3.x, cp3.y, cp4.x, cp4.y, 0, 0);
+    }
+    
+    // Transparent fill
+    ctx.fillStyle = "rgba(100, 100, 100, 0)";
+	
+	// Set attributes
+	ctx.lineWidth = 3;
+	ctx.strokeStyle =  "red";
+	
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+	
+	// Other stuff here
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
+	{
+	}
+    
+    // Coordinates of handles (in canvas plane)
+    point = new ED.Point(0, 0);
+    point.setWithPolars(r, Math.PI/4);
+	this.handleArray[2].location = this.transform.transformPoint(point);
+	
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+    
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * Returns a String which, if not empty, determines the root descriptions of multiple instances of the doodle
+ *
+ * @returns {String} Group description
+ */
+ED.DiabeticNV.prototype.groupDescription = function()
+{
+	return "Diabetic new vessels ";
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.DiabeticNV.prototype.description = function()
+{
+	returnString = "";
+    
+    var locationString = "";
+    
+    // Right eye
+    if(this.drawing.eye == ED.eye.Right)
+    {
+        if (this.originX > 180 && this.originX < 420 && this.originY > -120 && this.originY < 120)
+        {
+            locationString = "at the disk";
+        }
+        else
+        {
+            locationString += this.originY <= 0?"supero":"infero";
+            locationString += this.originX <= 300?"temporally":"nasally";
+        }
+    }
+    // Left eye
+    else
+    {
+        if (this.originX < -180 && this.originX > -420 && this.originY > -120 && this.originY < 120)
+        {
+            locationString = "at the disk";
+        }
+        else
+        {
+            locationString += this.originY <= 0?"supero":"infero";
+            locationString += this.originX >= -300?"temporally":"nasally";
+        }
+    }
+    
+    returnString += locationString;
+    
+    return returnString;
+}
+
+
 
