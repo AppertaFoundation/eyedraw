@@ -1301,6 +1301,8 @@ ED.Drawing.prototype.deleteDoodle = function()
 		{
 			if (this.doodleArray[i].isSelected && this.doodleArray[i].isDeletable)
 			{
+				this.deletedDoodle = this.selectedDoodle.className;
+
                 // Deselect doodle
                 this.selectedDoodle = null;
                 
