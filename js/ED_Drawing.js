@@ -1546,7 +1546,7 @@ ED.Drawing.prototype.deleteDoodle = function()
 	}
     
     // Notify
-    this.notify("deleteDoodle", deletedClassName);
+    this.notify("doodleDeleted", deletedClassName);
 }
 
 /**
@@ -2977,16 +2977,16 @@ ED.Doodle.prototype.move = function(_x, _y)
     if (this.isMoveable)
     {
         // Enforce bounds
-        var newOriginX = doodle.parameterValidationArray['originX']['range'].constrain(doodle.originX + x);
-        var newOriginY = doodle.parameterValidationArray['originY']['range'].constrain(doodle.originY + y);
+        var newOriginX = this.parameterValidationArray['originX']['range'].constrain(this.originX + x);
+        var newOriginY = this.parameterValidationArray['originY']['range'].constrain(this.originY + y);
         
         // Move doodle to new position
         if (x != 0) this.setSimpleParameter('originX', newOriginX);
         if (y != 0) this.setSimpleParameter('originY', newOriginY);
 
         // Update dependencies
-        doodle.updateDependentParameters('originX');
-        doodle.updateDependentParameters('originY');
+        this.updateDependentParameters('originX');
+        this.updateDependentParameters('originY');
         
         // Only need to change rotation if doodle has moved
         if (x != 0 || y != 0)
@@ -3004,7 +3004,7 @@ ED.Doodle.prototype.move = function(_x, _y)
                 this.setSimpleParameter('rotation', angle);
                 
                 // Update dependencies
-                doodle.updateDependentParameters('rotation');
+                this.updateDependentParameters('rotation');
             }
         }
     }

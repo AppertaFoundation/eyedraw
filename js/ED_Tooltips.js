@@ -49,3 +49,6 @@ ED.trans['PhakoIncision'] = 'Phako incision<br/><br/>Click to select<br/>Drag th
 ED.trans['PI'] = 'Iridectomía periférica';
 ED.trans['SidePort'] = 'Side port<br/><br/>Click to select<br/>Drag to move';
 ED.trans['LimbalRelaxingIncision'] = 'Limbal relaxing incision<br/><br/>Click to select<br/>Drag to move';
+ED.trans['HardExudate'] = 'Hard exudate';
+ED.trans['BlotHaemorrhage'] = 'Blot haemorrhage';
+ED.trans['PostPole'] = 'Posterior pole<br/><br/>The disk cup can be edited by clicking on the disk, and dragging the yellow handle<br/>The gray circle represents one disk diameter from the fovea';
