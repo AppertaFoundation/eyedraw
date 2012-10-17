@@ -82,11 +82,10 @@ ED.PostPole.prototype.setPropertyDefaults = function()
 	this.isMoveable = false;
 	this.isRotatable = false;
     this.isUnique = true;
-	this.rangeOfApexX = new ED.Range(-0, +0);
-	this.rangeOfApexY = new ED.Range(-80, -8);
     
     // Update component of validation array for simple parameterss
-    this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
+    var apexX = this.drawing.eye == ED.eye.Right?300:-300;
+    this.parameterValidationArray['apexX']['range'].setMinAndMax(apexX, apexX);
     this.parameterValidationArray['apexY']['range'].setMinAndMax(-80, -8);
     
     // Add complete validation arrays for derived parameters
@@ -103,16 +102,7 @@ ED.PostPole.prototype.setPropertyDefaults = function()
 ED.PostPole.prototype.setParameterDefaults = function()
 {
     this.setParameterFromString('cdRatio', '0.5');
-    
-    // Put macula in middle
-    if(this.drawing.eye != ED.eye.Right)
-    {
-        this.originX = -300;
-    }
-    else
-    {
-        this.originX = 300;
-    }
+    this.apexX = this.drawing.eye == ED.eye.Right?300:-300;
 }
 
 /**
@@ -156,12 +146,13 @@ ED.PostPole.prototype.draw = function(_point)
     
     // Disk radius
     var rd = 84;
+    var x = this.drawing.eye == ED.eye.Right?300:-300;
     
 	// Boundary path
 	ctx.beginPath();
     
 	// Optic disk
-	ctx.arc(0, 0, rd, 0, 2 * Math.PI, true);
+	ctx.arc(x, 0, rd, 0, 2 * Math.PI, true);
     
 	// Set attributes
 	ctx.lineWidth = 4;
@@ -174,41 +165,29 @@ ED.PostPole.prototype.draw = function(_point)
 	// Non boundary drawing here
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
 	{
-        ctx.beginPath();
-        
         // Optic cup
-        ctx.arc(0, 0, -this.apexY, 2 * Math.PI, 0, false);
+        ctx.beginPath();
+        ctx.arc(x, 0, -this.apexY, 2 * Math.PI, 0, false);
         ctx.fillStyle = "white";
-        ctx.fill();
+        var ptrn = ctx.createPattern(this.drawing.imageArray['CribriformPatternSmall'],'repeat');
+        ctx.fillStyle = ptrn;
         ctx.lineWidth = 4;
+        ctx.fill();
 		ctx.stroke();
         
         // Arcades
         ctx.beginPath();
         
-        // These values different for right and left side
-        if (this.drawing.eye != ED.eye.Right)
-        {
-            var startX = 600;
-            var midX1 = 350;
-            var midX2 = 0;
-            var midX3 = 0;
-            var endX1 = 0;
-            var endX2 = -50;
-            var endX3 = -100;
-            var foveaX = 300;
-        }
-        else
-        {
-            var startX = -600;
-            var midX1 = -350;
-            var midX2 = 0;
-            var midX3 = 0;
-            var endX1 = 0;
-            var endX2 = 50;
-            var endX3 = 100;
-            var foveaX = -300;
-        }
+        // Coordinates
+        var sign = this.drawing.eye == ED.eye.Right?1:-1;
+        var startX = -300 * sign;
+        var midX1 = -50 * sign;
+        var midX2 = 300 * sign;
+        var midX3 = 300 * sign;
+        var endX1 = 300 * sign;
+        var endX2 = 350 * sign;
+        var endX3 = 400 * sign;
+        var foveaX = 0;
         
         // Superior arcades
         ctx.moveTo(startX, -100);
@@ -228,17 +207,17 @@ ED.PostPole.prototype.draw = function(_point)
 		ctx.lineTo(foveaX + crossLength, 0);
 		
 		// Draw arcades
-        ctx.lineWidth = 24;
-        ctx.line
+        ctx.lineWidth = 8;
+        ctx.lineCap = "round";
         ctx.strokeStyle = "red";
 		ctx.stroke();
         
         // One disk diameter
-//        ctx.beginPath();
-//        ctx.arc(0, 0, rd, 2 * Math.PI, 0, false);
-//        ctx.lineWidth = 8;
-//        ctx.strokeStyle = "gray";
-//        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(0, 0, 2 * rd, 2 * Math.PI, 0, false);
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = "gray";
+        ctx.stroke();
 	}
 
     // Coordinates of handles (in canvas plane)
@@ -259,5 +238,139 @@ ED.PostPole.prototype.draw = function(_point)
 ED.PostPole.prototype.description = function()
 {
 	return "Cup-disk ratio of " + this.getParameter('cdRatio');
+}
+
+/**
+ * Tests whether passed doodle is within a number of disk diameters of fovea
+ *
+ * @param {Doodle} _doodle The doodle to test
+ * @param {Int} _diameters The number of disk diameters to test
+ * @returns {Bool} True if doodle is within the passed number of disk diameters of fovea
+ */
+ED.PostPole.prototype.isWithinDiskDiametersOfFovea = function(_doodle, _diameters)
+{
+	return (_doodle.originX * _doodle.originX + _doodle.originY * _doodle.originY) < 4 * 84 * 84;
+}
+
+/**
+ * Hard exudate
+ *
+ * @class HardExudate
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Int} _originX
+ * @param {Int} _originY
+ * @param {Float} _radius
+ * @param {Int} _apexX
+ * @param {Int} _apexY
+ * @param {Float} _scaleX
+ * @param {Float} _scaleY
+ * @param {Float} _arc
+ * @param {Float} _rotation
+ * @param {Int} _order
+ */
+ED.HardExudate = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+{
+	// Set classname
+	this.className = "HardExudate";
+    
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.HardExudate.prototype = new ED.Doodle;
+ED.HardExudate.prototype.constructor = ED.HardExudate;
+ED.HardExudate.superclass = ED.Doodle.prototype;
+
+/**
+ * Set default properties
+ */
+ED.HardExudate.prototype.setPropertyDefaults = function()
+{
+	//this.isRotatable = false;
+}
+
+/**
+ * Sets default parameters (Only called for new doodles)
+ * Use the setParameter function for derived parameters, as this will also update dependent variables
+ */
+ED.HardExudate.prototype.setParameterDefaults = function()
+{
+    var doodle = this.drawing.lastDoodleOfClass(this.className);
+    if (doodle)
+    {
+        this.originX = doodle.originX + 20;
+        this.originY = doodle.originY + 20;
+    }
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.HardExudate.prototype.draw = function(_point)
+{
+	// Get context
+	var ctx = this.drawing.context;
+	
+	// Call draw method in superclass
+	ED.HardExudate.superclass.draw.call(this, _point);
+    
+    // Exudate radius
+    var r = 20;
+    
+	// Boundary path
+	ctx.beginPath();
+    
+	// Optic disk
+	ctx.arc(0, 0, r, 0, 2 * Math.PI, true);
+    
+	// Set attributes
+	ctx.lineWidth = 1;
+	ctx.strokeStyle = "yellow";
+    ctx.fillStyle = "yellow";
+	
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+	
+	// Non boundary drawing here
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
+	{
+	}
+
+    // Coordinates of handles (in canvas plane)
+    //this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
+	
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+    
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.HardExudate.prototype.description = function()
+{
+	var returnString = "";
+    
+    var postPole = this.drawing.lastDoodleOfClass('PostPole');
+    if (postPole && postPole.isWithinDiskDiametersOfFovea(this, 1))
+    {
+        returnString =  'YES';
+    }
+    else
+    {
+        returnString =  'No';
+    }
+    
+	return returnString;
 }
 

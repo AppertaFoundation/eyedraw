@@ -262,6 +262,7 @@ ED.Drawing = function(_canvas, _eye, _IDSuffix, _isEditable, offset_x, offset_y,
     this.imageArray = new Array();
     this.imageArray['LatticePattern'] = new Image();
     this.imageArray['CribriformPattern'] = new Image();
+    this.imageArray['CribriformPatternSmall'] = new Image();
     this.imageArray['CryoPattern'] = new Image();
     this.imageArray['AntPVRPattern'] = new Image();
     this.imageArray['LaserPattern'] = new Image();
