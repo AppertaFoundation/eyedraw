@@ -237,7 +237,7 @@ ED.PostPole.prototype.draw = function(_point)
  */
 ED.PostPole.prototype.description = function()
 {
-	return "Cup-disk ratio of " + this.getParameter('cdRatio');
+    return this.drawing.doodleArray.length == 1?"No abnormality":"";
 }
 
 /**

@@ -244,11 +244,7 @@ ED.AntSeg.prototype.draw = function(_point)
  */
 ED.AntSeg.prototype.description = function()
 {
-    var returnString = this.getParameter('grade') + " pupil";
-    
-    if (this.hasPXE) returnString += " with pseudoexfoliation";
-	
-	return returnString;
+    return this.drawing.doodleArray.length == 1?"No abnormality":"";
 }
 
 /**
