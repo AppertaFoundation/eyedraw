@@ -253,6 +253,108 @@ ED.PostPole.prototype.isWithinDiskDiametersOfFovea = function(_doodle, _diameter
 }
 
 /**
+ * Microaneurysm
+ *
+ * @class Microaneurysm
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Int} _originX
+ * @param {Int} _originY
+ * @param {Float} _radius
+ * @param {Int} _apexX
+ * @param {Int} _apexY
+ * @param {Float} _scaleX
+ * @param {Float} _scaleY
+ * @param {Float} _arc
+ * @param {Float} _rotation
+ * @param {Int} _order
+ */
+ED.Microaneurysm = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+{
+	// Set classname
+	this.className = "Microaneurysm";
+    
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.Microaneurysm.prototype = new ED.Doodle;
+ED.Microaneurysm.prototype.constructor = ED.Microaneurysm;
+ED.Microaneurysm.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets default parameters (Only called for new doodles)
+ * Use the setParameter function for derived parameters, as this will also update dependent variables
+ */
+ED.Microaneurysm.prototype.setParameterDefaults = function()
+{
+    // Displacement from fovea
+    var d = -50;
+    this.originX = d;
+    this.originY = d;
+    
+    var doodle = this.drawing.lastDoodleOfClass(this.className);
+    if (doodle)
+    {
+        var point = new ED.Point(doodle.originX, doodle.originY);
+        var direction = point.direction() + Math.PI/4;
+        var distance = point.length();
+        var np = new ED.Point(0,0);
+        np.setWithPolars(distance, direction);
+        
+        this.originX = np.x;
+        this.originY = np.y;
+    }
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.Microaneurysm.prototype.draw = function(_point)
+{
+	// Get context
+	var ctx = this.drawing.context;
+	
+	// Call draw method in superclass
+	ED.Microaneurysm.superclass.draw.call(this, _point);
+    
+    // Microaneurysm radius
+    var r = 14;
+    
+	// Boundary path
+	ctx.beginPath();
+    
+	// Microaneurysm
+	ctx.arc(0, 0, r, 0, 2 * Math.PI, true);
+    
+	// Set attributes
+	ctx.lineWidth = 1;
+	ctx.strokeStyle = "red";
+    ctx.fillStyle = "red";
+	
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+    
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.Microaneurysm.prototype.description = function()
+{
+	return "";
+}
+
+/**
  * Hard exudate
  *
  * @class HardExudate
@@ -291,7 +393,7 @@ ED.HardExudate.superclass = ED.Doodle.prototype;
  */
 ED.HardExudate.prototype.setParameterDefaults = function()
 {
-    // Displacement from fovea, and from last doodle
+    // Displacement from fovea
     var d = 50;
     this.originX = d;
     this.originY = d;
@@ -352,6 +454,281 @@ ED.HardExudate.prototype.draw = function(_point)
 ED.HardExudate.prototype.description = function()
 {
 	return "";
+}
+
+/**
+ * Cotton Wool Spot
+ *
+ * @class CottonWoolSpot
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Int} _originX
+ * @param {Int} _originY
+ * @param {Float} _radius
+ * @param {Int} _apexX
+ * @param {Int} _apexY
+ * @param {Float} _scaleX
+ * @param {Float} _scaleY
+ * @param {Float} _arc
+ * @param {Float} _rotation
+ * @param {Int} _order
+ */
+ED.CottonWoolSpot = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+{
+	// Set classname
+	this.className = "CottonWoolSpot";
+    
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.CottonWoolSpot.prototype = new ED.Doodle;
+ED.CottonWoolSpot.prototype.constructor = ED.CottonWoolSpot;
+ED.CottonWoolSpot.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.CottonWoolSpot.prototype.setHandles = function()
+{
+    this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, false);
+}
+
+/**
+ * Set default properties
+ */
+ED.CottonWoolSpot.prototype.setPropertyDefaults = function()
+{
+    this.isSqueezable = true;
+    this.isOrientated = true;
+
+    this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.5, +1.5);
+    this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.5, +1.5);
+}
+
+/**
+ * Sets default parameters (Only called for new doodles)
+ * Use the setParameter function for derived parameters, as this will also update dependent variables
+ */
+ED.CottonWoolSpot.prototype.setParameterDefaults = function()
+{
+    this.originX = 0;
+    this.originY = -200;
+    
+    var doodle = this.drawing.lastDoodleOfClass(this.className);
+    if (doodle)
+    {
+        this.originX = doodle.originX -100;
+    }
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.CottonWoolSpot.prototype.draw = function(_point)
+{
+	// Get context
+	var ctx = this.drawing.context;
+	
+	// Call draw method in superclass
+	ED.CottonWoolSpot.superclass.draw.call(this, _point);
+    
+    // Dimensions of haemorrhage
+    var r = 80;
+    var h = 50;
+    var d = h/3;
+    
+	// Boundary path
+	ctx.beginPath();
+    
+	// Cotton wool spot
+    ctx.moveTo(-r,-h);
+    ctx.lineTo(-r + d, -h + 1 * d);
+    ctx.lineTo(-r, -h + 2 * d);
+    ctx.lineTo(-r + d, -h + 3 * d);
+    ctx.lineTo(-r, -h + 4 * d);
+    ctx.lineTo(-r + d, -h + 5 * d);
+    ctx.lineTo(-r, -h + 6 * d);
+    ctx.bezierCurveTo(-r + d, -h + 7 * d, r - d, -h + 7 * d, r, -h + 6 * d);
+    ctx.lineTo(r - d, -h + 5 * d);
+    ctx.lineTo(r, -h + 4 * d);
+    ctx.lineTo(r - d, -h + 3 * d);
+    ctx.lineTo(r, -h + 2 * d);
+    ctx.lineTo(r - d, -h + 1 * d);
+    ctx.lineTo(r, -h);
+    ctx.bezierCurveTo(r - d, -h - d, -r + d, -h - d, -r, -h);
+    
+    // Close path
+    ctx.closePath();
+    
+	// Set attributes
+	ctx.lineWidth = 4;
+	ctx.strokeStyle = "gray";
+    ctx.fillStyle = "rgba(220,220,220,0.5)";
+	
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+    
+    // Coordinates of handles (in canvas plane)
+    this.handleArray[2].location = this.transform.transformPoint(new ED.Point(r, -h));
+	
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+    
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.CottonWoolSpot.prototype.description = function()
+{
+    return "Cotton wool spot";
+}
+
+/**
+ * Pre-retinal Haemorrhage
+ *
+ * @class PreRetinalHaemorrhage
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Int} _originX
+ * @param {Int} _originY
+ * @param {Float} _radius
+ * @param {Int} _apexX
+ * @param {Int} _apexY
+ * @param {Float} _scaleX
+ * @param {Float} _scaleY
+ * @param {Float} _arc
+ * @param {Float} _rotation
+ * @param {Int} _order
+ */
+ED.PreRetinalHaemorrhage = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+{
+	// Set classname
+	this.className = "PreRetinalHaemorrhage";
+    
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.PreRetinalHaemorrhage.prototype = new ED.Doodle;
+ED.PreRetinalHaemorrhage.prototype.constructor = ED.PreRetinalHaemorrhage;
+ED.PreRetinalHaemorrhage.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.PreRetinalHaemorrhage.prototype.setHandles = function()
+{
+    this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, false);
+    this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+}
+
+/**
+ * Set default properties
+ */
+ED.PreRetinalHaemorrhage.prototype.setPropertyDefaults = function()
+{
+    this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
+    this.parameterValidationArray['apexY']['range'].setMinAndMax(50, 200);
+    this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.5, +2.0);
+    this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.5, +2.0);
+}
+
+/**
+ * Sets default parameters (Only called for new doodles)
+ * Use the setParameter function for derived parameters, as this will also update dependent variables
+ */
+ED.PreRetinalHaemorrhage.prototype.setParameterDefaults = function()
+{
+    this.apexY = 200;
+    // Displacement from fovea, and from last doodle
+    var d = 50;
+    this.originX = d;
+    this.originY = d;
+    
+    var doodle = this.drawing.lastDoodleOfClass(this.className);
+    if (doodle)
+    {        
+        this.originX = doodle.originX + d;
+        this.originY = doodle.originY + d;
+    }
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.PreRetinalHaemorrhage.prototype.draw = function(_point)
+{
+	// Get context
+	var ctx = this.drawing.context;
+	
+	// Call draw method in superclass
+	ED.PreRetinalHaemorrhage.superclass.draw.call(this, _point);
+    
+    // Dimensions of haemorrhage
+    var r = 100;
+    var f = 0.6;
+    
+	// Boundary path
+	ctx.beginPath();
+    
+	// Haemorrhage
+    ctx.moveTo(r,0);
+    ctx.lineTo(-r,0);
+    ctx.bezierCurveTo(-r * f, 0, -r * f, this.apexY, 0, this.apexY);
+    ctx.bezierCurveTo(r * f, this.apexY, r * f, 0, r, 0);
+    
+    // Close path
+    ctx.closePath();
+
+	// Set attributes
+	ctx.lineWidth = 1;
+	ctx.strokeStyle = "red";
+    ctx.fillStyle = "red";
+	
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+
+    // Non boundary drawing here
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
+	{
+
+	}
+    
+    // Coordinates of handles (in canvas plane)
+    this.handleArray[2].location = this.transform.transformPoint(new ED.Point(100, 0));
+    this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
+	
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+    
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.PreRetinalHaemorrhage.prototype.description = function()
+{
+    return "Pre-retinal haemorrage";
 }
 
 /**
@@ -717,6 +1094,12 @@ ED.Circinate.prototype.setParameterDefaults = function()
 {
     this.originX = this.drawing.eye == ED.eye.Right?-40:40;
     this.originY = -40;
+    
+    var doodle = this.drawing.lastDoodleOfClass(this.className);
+    if (doodle)
+    {
+        this.originX = doodle.originX -150;
+    }
 }
 
 /**
@@ -747,8 +1130,7 @@ ED.Circinate.prototype.draw = function(_point)
 	// Set attributes
 	ctx.lineWidth = 4;
     ctx.fillStyle = "rgba(200,200,0,0)";
-    ctx.strokeStyle = "white";
-	//ctx.strokeStyle = "rgba(100,100,100,0)";
+	ctx.strokeStyle = "rgba(100,100,100,0)";
 	
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
