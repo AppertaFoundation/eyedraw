@@ -58,3 +58,4 @@ ED.trans['Microaneurysm'] = 'Microaneurysm';
 ED.trans['CottonWoolSpot'] = 'Cotton wool spot';
 ED.trans['DiabeticNV'] = 'Diabetic new vessels';
 ED.trans['PRPPostPole'] = 'Pan-retinal photocoagulation';
+ED.trans['FibrousProliferation'] = 'Fibrous Proliferation';
