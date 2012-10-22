@@ -1206,9 +1206,9 @@ ED.AngleGrade.prototype.setParameter = function(_parameter, _value)
 }
 
 /**
- * The optic disk (used in conjunection with the optic cup)
+ * Peripapillary atrophy
  *
- * @class OpticDisk
+ * @class PeripapillaryAtrophy
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
  * @param {Int} _originX
@@ -1222,13 +1222,13 @@ ED.AngleGrade.prototype.setParameter = function(_parameter, _value)
  * @param {Float} _rotation
  * @param {Int} _order
  */
-ED.OpticDisk = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+ED.PeripapillaryAtrophy = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
 {
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
 	
 	// Set classname
-	this.className = "OpticDisk";
+	this.className = "PeripapillaryAtrophy";
     
     // Create a squiggle to store the four corner points
     var squiggle = new ED.Squiggle(this, new ED.Colour(100, 100, 100, 1), 4, true);
@@ -1237,7 +1237,7 @@ ED.OpticDisk = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _
     this.squiggleArray.push(squiggle);
     
     // Add four points to the squiggle
-    this.addPointToSquiggle(new ED.Point(-this.radius, 0));
+    this.addPointToSquiggle(new ED.Point(-this.radius - 100, 0));
     this.addPointToSquiggle(new ED.Point(0, -this.radius));
     this.addPointToSquiggle(new ED.Point(this.radius, 0));
     this.addPointToSquiggle(new ED.Point(0, this.radius));
@@ -1246,14 +1246,14 @@ ED.OpticDisk = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _
 /**
  * Sets superclass and constructor
  */
-ED.OpticDisk.prototype = new ED.Doodle;
-ED.OpticDisk.prototype.constructor = ED.OpticDisk;
-ED.OpticDisk.superclass = ED.Doodle.prototype;
+ED.PeripapillaryAtrophy.prototype = new ED.Doodle;
+ED.PeripapillaryAtrophy.prototype.constructor = ED.PeripapillaryAtrophy;
+ED.PeripapillaryAtrophy.superclass = ED.Doodle.prototype;
 
 /**
  * Sets handle attributes
  */
-ED.OpticDisk.prototype.setHandles = function()
+ED.PeripapillaryAtrophy.prototype.setHandles = function()
 {
     this.handleArray[0] = new ED.Handle(null, true, ED.Mode.Handles, false);
     this.handleArray[1] = new ED.Handle(null, true, ED.Mode.Handles, false);
@@ -1264,7 +1264,7 @@ ED.OpticDisk.prototype.setHandles = function()
 /**
  * Sets default dragging attributes
  */
-ED.OpticDisk.prototype.setPropertyDefaults = function()
+ED.PeripapillaryAtrophy.prototype.setPropertyDefaults = function()
 {
 	this.isSelectable = true;
 	this.isOrientated = false;
@@ -1272,7 +1272,7 @@ ED.OpticDisk.prototype.setPropertyDefaults = function()
 	this.isSqueezable = false;
 	this.isMoveable = false;
 	this.isRotatable = true;
-    this.isDeletable = false;
+    this.addAtBack = true;
     
     var max = this.radius * 1.5;
     var min = this.radius;
@@ -1289,9 +1289,9 @@ ED.OpticDisk.prototype.setPropertyDefaults = function()
 /**
  * Sets default parameters
  */
-ED.OpticDisk.prototype.setParameterDefaults = function()
-{    
-    this.radius = 300;
+ED.PeripapillaryAtrophy.prototype.setParameterDefaults = function()
+{
+    this.radius = 340;
 }
 
 /**
@@ -1299,18 +1299,18 @@ ED.OpticDisk.prototype.setParameterDefaults = function()
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.OpticDisk.prototype.draw = function(_point)
+ED.PeripapillaryAtrophy.prototype.draw = function(_point)
 {
 	// Get context
 	var ctx = this.drawing.context;
 	
 	// Call draw method in superclass
-	ED.OpticDisk.superclass.draw.call(this, _point);
+	ED.PeripapillaryAtrophy.superclass.draw.call(this, _point);
     
 	// Boundary path
 	ctx.beginPath();
 	
-	// OpticDisk
+	// PeripapillaryAtrophy
     var f = 0.55;   // Gives a circular bezier curve
     var fromX;
     var fromY;
@@ -1330,7 +1330,7 @@ ED.OpticDisk.prototype.draw = function(_point)
     fromY = toY;
     toX = this.squiggleArray[0].pointsArray[2].x;
     toY = this.squiggleArray[0].pointsArray[2].y;
-    ctx.bezierCurveTo(-fromY * f, fromY, toX, -toX * f, toX, toY);    
+    ctx.bezierCurveTo(-fromY * f, fromY, toX, -toX * f, toX, toY);
     
     // Bottom right curve
     fromX = toX;
@@ -1345,7 +1345,7 @@ ED.OpticDisk.prototype.draw = function(_point)
     toX = this.squiggleArray[0].pointsArray[0].x;
     toY = this.squiggleArray[0].pointsArray[0].y;
     ctx.bezierCurveTo(-fromY * f, fromY, toX, -toX * f, toX, toY);
-
+    
     // Only fill to margin, to allow cup to sit behind giving disk margin
     ctx.moveTo(280, 00);
     ctx.arc(0, 0, 280, 0, Math.PI*2, true);
@@ -1366,6 +1366,269 @@ ED.OpticDisk.prototype.draw = function(_point)
 	// Other stuff here
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
 	{
+	}
+    
+	// Coordinates of handles (in canvas plane)
+	this.handleArray[0].location = this.transform.transformPoint(this.squiggleArray[0].pointsArray[0]);
+	this.handleArray[1].location = this.transform.transformPoint(this.squiggleArray[0].pointsArray[1]);
+	this.handleArray[2].location = this.transform.transformPoint(this.squiggleArray[0].pointsArray[2]);
+	this.handleArray[3].location = this.transform.transformPoint(this.squiggleArray[0].pointsArray[3]);
+    
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+	
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.PeripapillaryAtrophy.prototype.description = function()
+{
+    var returnString = "";
+	
+    // Get distances of control points from centre
+    var left = - this.squiggleArray[0].pointsArray[0].x;
+    var top = - this.squiggleArray[0].pointsArray[1].y;
+    var right = this.squiggleArray[0].pointsArray[2].x;
+    var bottom = this.squiggleArray[0].pointsArray[3].y;
+    
+    // Get maximum control point, and its sector
+    var sector = "";
+    var max = this.radius;
+    if (left > max)
+    {
+        max = left;
+        sector = (this.drawing.eye == ED.eye.Right)?"temporally":"nasally";
+    }
+    if (top > max)
+    {
+        max = top;
+        sector = "superiorly";
+    }
+    if (right > max)
+    {
+        max = right;
+        sector = (this.drawing.eye == ED.eye.Right)?"nasally":"temporally";
+    }
+    if (bottom > max)
+    {
+        max = bottom;
+        sector = "inferiorly";
+    }
+    
+    // Grade degree of atrophy
+    if (max > this.radius)
+    {
+        var degree = "Mild";
+        if (max > 350) degree = "Moderate";
+        if (max > 400) degree = "Signficant";
+        returnString += degree;
+        returnString += " peri-papillary atrophy, maximum ";
+        returnString += sector;
+    }
+	
+	return returnString;
+}
+
+/**
+ * The optic cup (used in conjunection with the optic disk
+ *
+ * @class OpticDisk
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Int} _originX
+ * @param {Int} _originY
+ * @param {Float} _radius
+ * @param {Int} _apexX
+ * @param {Int} _apexY
+ * @param {Float} _scaleX
+ * @param {Float} _scaleY
+ * @param {Float} _arc
+ * @param {Float} _rotation
+ * @param {Int} _order
+ */
+ED.OpticDisk = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+{
+    // Number of handles (set before superclass call because superclass calles setHandles())
+    this.numberOfHandles = 8;
+    
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	
+	// Set classname
+	this.className = "OpticDisk";
+    
+    // Create a squiggle to store the handles points
+    var squiggle = new ED.Squiggle(this, new ED.Colour(100, 100, 100, 1), 4, true);
+    
+    // Add it to squiggle array
+    this.squiggleArray.push(squiggle);
+    
+    // Flag to simplify sizing of cup
+    this.isBasic = true;
+    
+    // Toggle function loads points if required
+    this.setHandleProperties();
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.OpticDisk.prototype = new ED.Doodle;
+ED.OpticDisk.prototype.constructor = ED.OpticDisk;
+ED.OpticDisk.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.OpticDisk.prototype.setHandles = function()
+{
+    // Array of handles for expert mode
+    for (var i = 0; i < this.numberOfHandles; i++)
+    {
+        this.handleArray[i] = new ED.Handle(null, true, ED.Mode.Handles, false);
+    }
+    
+    // Apex handle for basic mode
+    this.handleArray[this.numberOfHandles] = new ED.Handle(null, true, ED.Mode.Apex, false);
+}
+
+/**
+ * Sets default dragging attributes
+ */
+ED.OpticDisk.prototype.setPropertyDefaults = function()
+{
+	this.isSelectable = true;
+	this.isOrientated = false;
+	this.isScaleable = true;
+	this.isMoveable = false;
+	this.isRotatable = false;
+    this.isDeletable = false;
+    this.rangeOfApexY = new ED.Range(-280, -20);
+    this.rangeOfRadius = new ED.Range(50, 280);
+    
+    // Create ranges for handle array
+    for (var i = 0; i < this.numberOfHandles; i++)
+    {
+        this.rangeOfHandlesXArray[i] = new ED.Range(-500, +500);
+        this.rangeOfHandlesYArray[i] = new ED.Range(-500, +500);
+    }
+}
+
+/**
+ * Sets default parameters
+ */
+ED.OpticDisk.prototype.setParameterDefaults = function()
+{
+    this.radius = 200;
+    this.apexY = -150;
+    /*
+     this.rangeOfRadius = new ED.Range(50, 280);
+     this.rangeOfApexY = new ED.Range(-280, -20);
+     */
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.OpticDisk.prototype.draw = function(_point)
+{
+	// Get context
+	var ctx = this.drawing.context;
+	
+	// Call draw method in superclass
+	ED.OpticDisk.superclass.draw.call(this, _point);
+    
+	// Radius of disk
+	var ro = 300;
+    var ri = -this.apexY;
+	
+	// Calculate parameters for arcs
+	var arcStart = 0;
+	var arcEnd = 2 * Math.PI;
+    
+	// Boundary path
+	ctx.beginPath();
+    
+	// Do a 360 arc
+	ctx.arc(0, 0, ro, arcStart, arcEnd, true);
+	
+	// Close path
+	ctx.closePath();
+    
+    // Set attributes
+	ctx.lineWidth = 2;
+    var ptrn = ctx.createPattern(this.drawing.imageArray['CribriformPattern'],'repeat');
+    ctx.fillStyle = ptrn;
+	ctx.strokeStyle = "gray";
+    
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+    
+	// Non boundary drawing
+    if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
+	{
+		// Begin path
+		ctx.beginPath();
+        
+		// Do a 360 arc
+		ctx.arc(0, 0, ro, arcStart, arcEnd, true);
+		
+	    if (this.isBasic)
+	    {
+	        // Move to inner circle
+		    ctx.moveTo(ri, 0);
+		    
+			// Arc back the other way
+			ctx.arc(0, 0, ri, arcEnd, arcStart, false);
+	    }
+	    else
+	    {
+	        // Bezier points
+	        var fp;
+	        var tp;
+	        var cp1;
+	        var cp2;
+            
+	        // Angle of control point from radius line to point (this value makes path a circle Math.PI/12 for 8 points
+	        var phi = 2 * Math.PI/(3 * this.numberOfHandles);
+            
+	        // Start curve
+	        ctx.moveTo(this.squiggleArray[0].pointsArray[0].x, this.squiggleArray[0].pointsArray[0].y);
+	        
+	        // Complete curve segments
+	        for (var i = 0; i < this.numberOfHandles; i++)
+	        {
+	            // From and to points
+	            fp = this.squiggleArray[0].pointsArray[i];
+	            var toIndex = (i < this.numberOfHandles - 1)?i + 1:0;
+	            tp = this.squiggleArray[0].pointsArray[toIndex];
+	            
+	            // Control points
+	            cp1 = fp.tangentialControlPoint(+phi);
+	            cp2 = tp.tangentialControlPoint(-phi);
+	            
+	            // Draw Bezier curve
+	            ctx.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, tp.x, tp.y);
+	        }
+	    }
+        
+        ctx.closePath();
+        
+	    // Set margin attributes
+	    var colour = new ED.Colour(0,0,0,1);
+	    colour.setWithHexString('FFA83C');  // Taken from disk margin of a fundus photo
+	    ctx.fillStyle = colour.rgba();
+        
+        // Draw disk margin
+        ctx.fill();
+        
         // Disc vessels
         ctx.beginPath();
         
@@ -1447,252 +1710,7 @@ ED.OpticDisk.prototype.draw = function(_point)
         
         // Draw line
         ctx.stroke();
-	}
-    
-	// Coordinates of handles (in canvas plane)
-	this.handleArray[0].location = this.transform.transformPoint(this.squiggleArray[0].pointsArray[0]);
-	this.handleArray[1].location = this.transform.transformPoint(this.squiggleArray[0].pointsArray[1]);
-	this.handleArray[2].location = this.transform.transformPoint(this.squiggleArray[0].pointsArray[2]);
-	this.handleArray[3].location = this.transform.transformPoint(this.squiggleArray[0].pointsArray[3]);
-    
-	// Draw handles if selected
-	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
-	
-	// Return value indicating successful hittest
-	return this.isClicked;
-}
-
-/**
- * Returns a string containing a text description of the doodle
- *
- * @returns {String} Description of doodle
- */
-ED.OpticDisk.prototype.description = function()
-{
-    var returnString = "";
-	
-    // Get distances of control points from centre
-    var left = - this.squiggleArray[0].pointsArray[0].x;
-    var top = - this.squiggleArray[0].pointsArray[1].y;
-    var right = this.squiggleArray[0].pointsArray[2].x;
-    var bottom = this.squiggleArray[0].pointsArray[3].y;
-    
-    // Get maximum control point, and its sector
-    var sector = "";
-    var max = this.radius;
-    if (left > max)
-    {
-        max = left;
-        sector = (this.drawing.eye == ED.eye.Right)?"temporally":"nasally";
     }
-    if (top > max)
-    {
-        max = top;
-        sector = "superiorly";
-    }
-    if (right > max)
-    {
-        max = right;
-        sector = (this.drawing.eye == ED.eye.Right)?"nasally":"temporally";
-    }
-    if (bottom > max)
-    {
-        max = bottom;
-        sector = "inferiorly";
-    }  
-    
-    // Grade degree of atrophy
-    if (max > this.radius)
-    {
-        var degree = "Mild";
-        if (max > 350) degree = "Moderate";
-        if (max > 400) degree = "Signficant";
-        returnString += degree;
-        returnString += " peri-papillary atrophy, maximum ";
-        returnString += sector;
-    }
-	
-	return returnString;
-}
-
-/**
- * The optic cup (used in conjunection with the optic disk
- *
- * @class OpticCup
- * @property {String} className Name of doodle subclass
- * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
- */
-ED.OpticCup = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
-{
-    // Number of handles (set before superclass call because superclass calles setHandles())
-    this.numberOfHandles = 8;
-    
-	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
-	
-	// Set classname
-	this.className = "OpticCup";
-    
-    // Create a squiggle to store the handles points
-    var squiggle = new ED.Squiggle(this, new ED.Colour(100, 100, 100, 1), 4, true);
-    
-    // Add it to squiggle array
-    this.squiggleArray.push(squiggle);
-
-    // Flag to simplify sizing of cup
-    this.isBasic = true;
-    
-    // Toggle function loads points if required
-    this.setHandleProperties();
-}
-
-/**
- * Sets superclass and constructor
- */
-ED.OpticCup.prototype = new ED.Doodle;
-ED.OpticCup.prototype.constructor = ED.OpticCup;
-ED.OpticCup.superclass = ED.Doodle.prototype;
-
-/**
- * Sets handle attributes
- */
-ED.OpticCup.prototype.setHandles = function()
-{
-    // Array of handles for expert mode
-    for (var i = 0; i < this.numberOfHandles; i++)
-    {
-        this.handleArray[i] = new ED.Handle(null, true, ED.Mode.Handles, false);
-    }
-    
-    // Apex handle for basic mode
-    this.handleArray[this.numberOfHandles] = new ED.Handle(null, true, ED.Mode.Apex, false);
-}
-
-/**
- * Sets default dragging attributes
- */
-ED.OpticCup.prototype.setPropertyDefaults = function()
-{
-	this.isSelectable = true;
-	this.isOrientated = false;
-	this.isScaleable = true;
-	this.isMoveable = false;
-	this.isRotatable = false;
-    this.isDeletable = false;
-
-    // Create ranges for handle array
-    for (var i = 0; i < this.numberOfHandles; i++)
-    {
-        this.rangeOfHandlesXArray[i] = new ED.Range(-500, +500);
-        this.rangeOfHandlesYArray[i] = new ED.Range(-500, +500);
-    }
-}
-
-/**
- * Sets default parameters
- */
-ED.OpticCup.prototype.setParameterDefaults = function()
-{    
-    this.radius = 200;
-    this.apexY = -150;
-    this.rangeOfRadius = new ED.Range(50, 280);
-    this.rangeOfApexY = new ED.Range(-280, -20);
-}
-
-/**
- * Draws doodle or performs a hit test if a Point parameter is passed
- *
- * @param {Point} _point Optional point in canvas plane, passed if performing hit test
- */
-ED.OpticCup.prototype.draw = function(_point)
-{
-	// Get context
-	var ctx = this.drawing.context;
-	
-	// Call draw method in superclass
-	ED.OpticCup.superclass.draw.call(this, _point);
-
-    // Draw background first
-    if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
-	{
-        // Disk margin
-        ctx.beginPath();
-        ctx.arc(0, 0, 300, 0, Math.PI*2, true);
-        ctx.closePath();
-        
-        // Set attributes
-        ctx.lineWidth = 2;
-        var colour = new ED.Colour(0,0,0,1);
-        colour.setWithHexString('FFA83C');  // Taken from disk margin of a fundus photo
-        ctx.fillStyle = colour.rgba();
-        ctx.strokeStyle = "gray";
-        
-        // Draw disk margin
-        ctx.fill();
-        ctx.stroke();
-    }
-
-	// Boundary path
-	ctx.beginPath();
-	
-    if (this.isBasic)
-    {
-        // Round cup
-        ctx.arc(0, 0, -this.apexY, 0, Math.PI*2, true);        
-    }
-    else
-    {
-        // Bezier points
-        var fp;
-        var tp;
-        var cp1;
-        var cp2;
-
-        // Angle of control point from radius line to point (this value makes path a circle Math.PI/12 for 8 points
-        var phi = 2 * Math.PI/(3 * this.numberOfHandles);
-
-        // Start curve
-        ctx.moveTo(this.squiggleArray[0].pointsArray[0].x, this.squiggleArray[0].pointsArray[0].y);
-        
-        // Complete curve segments
-        for (var i = 0; i < this.numberOfHandles; i++)
-        {
-            // From and to points
-            fp = this.squiggleArray[0].pointsArray[i];
-            var toIndex = (i < this.numberOfHandles - 1)?i + 1:0;
-            tp = this.squiggleArray[0].pointsArray[toIndex];
-            
-            // Control points
-            cp1 = fp.tangentialControlPoint(+phi);
-            cp2 = tp.tangentialControlPoint(-phi);
-            
-            // Draw Bezier curve
-            ctx.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, tp.x, tp.y);
-        }
-    }
-    
-    
-	// Close path
-	ctx.closePath();
-    
-	// Set line attributes
-	ctx.lineWidth = 2;
-    var ptrn = ctx.createPattern(this.drawing.imageArray['CribriformPattern'],'repeat');
-    ctx.fillStyle = ptrn;
-	ctx.strokeStyle = "gray";
-	
-	// Draw boundary path (also hit testing)
-	this.drawBoundary(_point);
     
 	// Coordinates of handles (in canvas plane)
     if (this.isBasic)
@@ -1720,7 +1738,7 @@ ED.OpticCup.prototype.draw = function(_point)
  *
  * @returns {String} Description of doodle
  */
-ED.OpticCup.prototype.description = function()
+ED.OpticDisk.prototype.description = function()
 {
     var returnString = "";
     var ratio = 0;
@@ -1736,11 +1754,11 @@ ED.OpticCup.prototype.description = function()
         // Sum distances of control points from centre
         var sum = 0;
         for (var i = 0; i < this.numberOfHandles; i++)
-        {            
+        {
             sum += this.squiggleArray[0].pointsArray[i].length();
         }
         
-        // 
+        //
         ratio = Math.round(10 * sum/(300 * this.numberOfHandles))/10;
     }
     
@@ -1752,7 +1770,7 @@ ED.OpticCup.prototype.description = function()
 /**
  * Toggles state of doodle from basic to expert mode, setting handle visibility and coordinates accordingly
  */
-ED.OpticCup.prototype.toggleMode = function()
+ED.OpticDisk.prototype.toggleMode = function()
 {
     // Toggle value
     this.isBasic = this.isBasic?false:true;
@@ -1761,7 +1779,7 @@ ED.OpticCup.prototype.toggleMode = function()
 /**
  * Defines handles coordinates and visibility
  */
-ED.OpticCup.prototype.setHandleProperties = function()
+ED.OpticDisk.prototype.setHandleProperties = function()
 {
     // Going from basic to expert
     if (!this.isBasic)
@@ -1793,7 +1811,7 @@ ED.OpticCup.prototype.setHandleProperties = function()
         {
             this.handleArray[i].isVisible = false;
         }
-        this.handleArray[this.numberOfHandles].isVisible = true;        
+        this.handleArray[this.numberOfHandles].isVisible = true;
     }
 }
 
@@ -1818,9 +1836,9 @@ ED.NerveFibreDefect = function(_drawing, _originX, _originY, _radius, _apexX, _a
 {
 	// Set classname
 	this.className = "NerveFibreDefect";
-    
+	
 	// Call super-class constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order); 
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
 }
 
 /**
@@ -1865,30 +1883,22 @@ ED.NerveFibreDefect.prototype.setParameterDefaults = function()
     this.arc = 20 * Math.PI/180;
     this.apexY = -460;
     
-    // Deal with position of first and subsequent doodles
     var doodle = this.drawing.lastDoodleOfClass(this.className);
     if (doodle)
     {
-        // First incision is usually temporal
-        if (this.drawing.eye == ED.eye.Right)
-        {
-            this.rotation = doodle.rotation + Math.PI/2;
-        }
-        else
-        {
-            this.rotation = doodle.rotation - Math.PI/2;
-        }
+    	if (this.drawing.eye == ED.eye.Right)
+    	{
+    		this.rotation = doodle.rotation + 2/3 * Math.PI;
+    	}
+    	else
+    	{
+	    	this.rotation = doodle.rotation - 2/3 * Math.PI;
+    	}
+        
     }
     else
     {
-        if (this.drawing.eye == ED.eye.Right)
-        {
-            this.rotation = 5 * Math.PI/4;
-        }
-        else
-        {
-            this.rotation = 3 * Math.PI/4;
-        }
+    	this.rotation = (this.drawing.eye == ED.eye.Right)?(7 * Math.PI/6):(5 * Math.PI/6);
     }
 }
 
@@ -1934,7 +1944,7 @@ ED.NerveFibreDefect.prototype.draw = function(_point)
 	ctx.closePath();
 	
 	// Set line attributes
-	ctx.lineWidth = 4;	
+	ctx.lineWidth = 4;
 	ctx.fillStyle = "rgba(200, 200, 200, 0.75)";
 	ctx.strokeStyle = "gray";
 	
@@ -2002,11 +2012,11 @@ ED.NerveFibreDefect.prototype.description = function()
  */
 ED.DiskHaemorrhage = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
 {
-    // Set classname
+	// Set classname
 	this.className = "DiskHaemorrhage";
-    
+	
 	// Call super-class constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order); 
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
 }
 
 /**
@@ -2041,30 +2051,22 @@ ED.DiskHaemorrhage.prototype.setParameterDefaults = function()
     this.arc = 10 * Math.PI/180;
     this.apexY = -350;
     
-    // Deal with position of first and subsequent doodles
     var doodle = this.drawing.lastDoodleOfClass(this.className);
     if (doodle)
     {
-        // First incision is usually temporal
-        if (this.drawing.eye == ED.eye.Right)
-        {
-            this.rotation = doodle.rotation + Math.PI/2;
-        }
-        else
-        {
-            this.rotation = doodle.rotation - Math.PI/2;
-        }
+    	if (this.drawing.eye == ED.eye.Right)
+    	{
+    		this.rotation = doodle.rotation + 2/3 * Math.PI;
+    	}
+    	else
+    	{
+	    	this.rotation = doodle.rotation - 2/3 * Math.PI;
+    	}
+        
     }
     else
     {
-        if (this.drawing.eye == ED.eye.Right)
-        {
-            this.rotation = 5 * Math.PI/4;
-        }
-        else
-        {
-            this.rotation = 3 * Math.PI/4;
-        }
+    	this.rotation = (this.drawing.eye == ED.eye.Right)?(7 * Math.PI/6):(5 * Math.PI/6);
     }
 }
 
@@ -2110,7 +2112,7 @@ ED.DiskHaemorrhage.prototype.draw = function(_point)
 	ctx.closePath();
 	
 	// Set line attributes
-	ctx.lineWidth = 4;	
+	ctx.lineWidth = 4;
 	ctx.fillStyle = "red";
 	ctx.strokeStyle = "red";
 	
@@ -2155,7 +2157,7 @@ ED.DiskHaemorrhage.prototype.description = function()
 }
 
 /**
- * A nuclear cataract
+ * Papilloedema
  *
  * @class Papilloedema
  * @property {String} className Name of doodle subclass
