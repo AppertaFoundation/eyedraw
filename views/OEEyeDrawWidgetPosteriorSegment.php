@@ -37,8 +37,6 @@
 				<div class="label">
 					<?php echo $model->getAttributeLabel($side.'_cd_ratio_id'); ?>
 					:
-				</div>
-				<div class="data">
 					<?php echo CHtml::activeDropDownList($model, $side.'_cd_ratio_id', CHtml::listData(OphCiExamination_PosteriorSegment_CDRatio::model()->findAll(array('order'=>'display_order')),'id','name'))?>
 				</div>
 			</div>
@@ -66,8 +64,6 @@
 			<div>
 				<div class="label aligned">
 					<?php echo $model->getAttributeLabel($side.'_cd_ratio_id') ?>:
-				</div>
-				<div class="data">
 					<?php echo $model->{$side.'_cd_ratio'}->name ?>
 				</div>
 			</div>
