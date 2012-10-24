@@ -1426,6 +1426,7 @@ ED.MacularHole.prototype.setPropertyDefaults = function()
 	this.isSqueezable = false;
 	this.isMoveable = false;
 	this.isRotatable = false;
+    this.isUnique = true;
 	this.rangeOfScale = new ED.Range(+0.5, +1.5);
 	this.rangeOfArc = new ED.Range(Math.PI/6, Math.PI*2);
 	this.rangeOfApexX = new ED.Range(-0, +0);
