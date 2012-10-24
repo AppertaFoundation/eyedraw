@@ -4083,6 +4083,19 @@ ED.Doodle.prototype.drawLine = function(_ctx, _x1, _y1, _x2, _y2, _w, _colour)
     _ctx.stroke();		
 }
 
+
+/**
+ * Draws a laser spot
+ *
+ * @param {Object} _ctx Context of canvas
+ * @param {Float} _x X-coordinate of origin
+ * @param {Float} _y Y-coordinate of origin
+ */
+ED.Doodle.prototype.drawLaserSpot = function(_ctx, _x, _y)
+{
+    this.drawCircle(_ctx, _x, _y, 15, "Yellow", 10, "rgba(255, 128, 0, 1)");
+}
+
 /**
  * Outputs doodle information to the console
  */

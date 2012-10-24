@@ -1575,7 +1575,7 @@ ED.PRPPostPole.prototype.draw = function(_point)
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
     
-	// Non boundary drawing here
+	// Non boundary drawing
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
 	{
         // PRP spot data
