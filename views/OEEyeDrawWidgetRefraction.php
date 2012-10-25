@@ -86,7 +86,9 @@
 			</div>
 			<div class="data">
 				<?php echo CHtml::activeDropDownList($model, $side.'_type_id', $refraction_types, array('class' => 'refractionType'))?>
-				<?php echo CHtml::activeTextField($model, $side.'_type_other')?>
+				<?php if ($model->hasProperty($side.'_type_other')) {?>
+					<?php echo CHtml::activeTextField($model, $side.'_type_other')?>
+				<?php }?>
 			</div>
 		</div>
 	</div>
