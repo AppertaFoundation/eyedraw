@@ -254,8 +254,8 @@ ED.Drawing = function(_canvas, _eye, _IDSuffix, _isEditable, offset_x, offset_y,
     // Optional tooltip (this property will be null is a span element with this id not found
     this.canvasTooltip = document.getElementById('canvasTooltip');
     
-    // Fit canvas making maximum use of doodle plane
-    if (this.canvas.width >= this.canvas.height)
+    // Make sure doodle plane fits within canvas
+    if (this.canvas.width < this.canvas.height)
     {
         this.scale = this.canvas.width/1001;
     }
@@ -372,9 +372,6 @@ ED.Drawing = function(_canvas, _eye, _IDSuffix, _isEditable, offset_x, offset_y,
         // Stop browser stealing double click to select text
         this.canvas.onselectstart = function () { return false; }
     }
-    
-    // Pre-load images
-    //this.preLoadImagesFrom('graphics/');
 }
 
 /**
@@ -2827,21 +2824,21 @@ ED.Doodle = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _sca
         this.willSync = true;
         
         // Permitted ranges
-        this.rangeArray = {
-            originX:new ED.Range(-1000, +1000),
-            originY:new ED.Range(-1000, +1000),
-            radius:new ED.Range(100, 450),
-            apexX:new ED.Range(-500, +500),
-            apexY:new ED.Range(-500, +500),
-            scaleX:new ED.Range(+0.5, +4.0),
-            scaleY:new ED.Range(+0.5, +4.0),
-            arc:new ED.Range(Math.PI/6, Math.PI * 2),
-            rotation:new ED.Range(0, Math.PI * 2),
-        };
+//        this.rangeArray = {
+//            originX:new ED.Range(-1000, +1000),
+//            originY:new ED.Range(-1000, +1000),
+//            radius:new ED.Range(100, 450),
+//            apexX:new ED.Range(-500, +500),
+//            apexY:new ED.Range(-500, +500),
+//            scaleX:new ED.Range(+0.5, +4.0),
+//            scaleY:new ED.Range(+0.5, +4.0),
+//            arc:new ED.Range(Math.PI/6, Math.PI * 2),
+//            rotation:new ED.Range(0, Math.PI * 2),
+//        };
         
         // Parameter validation array
         this.parameterValidationArray = {
-            originX:{kind:'simple', type:'int', range:new ED.Range(-1000,+1000), delta:15},
+            originX:{kind:'simple', type:'int', range:new ED.Range(-500,+1000), delta:15},
             originY:{kind:'simple', type:'int', range:new ED.Range(-1000,+1000), delta:15},
             radius:{kind:'simple', type:'float', range:new ED.Range(+100,+450), precision:6, delta:15},
             apexX:{kind:'simple', type:'int', range:new ED.Range(-500,+500), delta:15},
@@ -2852,6 +2849,7 @@ ED.Doodle = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _sca
             rotation:{kind:'simple', type:'float', range:new ED.Range(0, 2 * Math.PI), precision:6, delta:0.1},
         };
 
+        // Grid properties
         this.gridSpacing = 200;
         this.gridDisplacementX = 0;
         this.gridDisplacementY = 0;
@@ -2965,7 +2963,7 @@ ED.Doodle.prototype.setParameterDefaults = function()
 }
 
 /**
- * Moves doodle and adjusts rotation
+ * Moves doodle and adjusts rotation as appropriate
  *
  * @param {Float} _x Distance to move along x axis in doodle plane
  * @param {Float} _y Distance to move along y axis in doodle plane
@@ -3129,8 +3127,7 @@ ED.Doodle.prototype.drawHandles = function(_point)
 					}
 				}
 			}
-			
-            
+
 			// Draw handles
 			if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
 			{
