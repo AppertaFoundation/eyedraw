@@ -312,7 +312,7 @@ ED.PhakoIncision.prototype.setPropertyDefaults = function()
 	this.isRotatable = true;
     this.isArcSymmetrical = true;
     
-    // Update component of validation array for simple parameters
+    // Update validation array for simple parameters
     this.parameterValidationArray['radius']['range'].setMinAndMax(250, 450);
     this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
     
@@ -487,11 +487,10 @@ ED.PhakoIncision.prototype.draw = function(_point)
     
     // Pocket
     if (this.apexYDelta == 0)
-        //if (this.apexY + this.radius == 0)
     {
         // Colour of fill
         ctx.fillStyle = "rgba(200,200,200,0.75)";
-        
+
         // Set line attributes
         ctx.lineWidth = 4;
         
@@ -519,7 +518,6 @@ ED.PhakoIncision.prototype.draw = function(_point)
     {
         // Section with sutures
         if (this.apexYDelta != 0)
-            //if (this.apexY + this.radius != 0)
         {
             // New path
             ctx.beginPath();

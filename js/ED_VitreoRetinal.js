@@ -69,6 +69,7 @@ ED.Fundus.prototype.setPropertyDefaults = function()
 {
 	this.isSelectable = false;
     this.isDeletable = false;
+    this.isFilled = false;
 }
 
 /**
@@ -95,7 +96,6 @@ ED.Fundus.prototype.draw = function(_point)
 	
 	// Set line attributes
 	ctx.lineWidth = 2;
-	this.isFilled = false;
 	ctx.strokeStyle = "red";
 	
 	// Draw boundary path (also hit testing)
@@ -212,7 +212,8 @@ ED.CystoidMacularOedema.prototype.setPropertyDefaults = function()
 	this.isMoveable = false;
 	this.isRotatable = false;
     this.isUnique = true;
-    
+
+    // Update validation array for simple parameters
     this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.5, +1.5);
     this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.5, +1.5);
 }
@@ -540,7 +541,7 @@ ED.PRP.superclass = ED.Doodle.prototype;
  */
 ED.PRP.prototype.setHandles = function()
 {
-    this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, false);
+    //this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, false);
 	//this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
 }
 
@@ -568,6 +569,7 @@ ED.PRP.prototype.setParameterDefaults = function()
     this.originX = 0;
 	this.originY = 0;
     this.apexY = -50;
+    this.arc = 2 * Math.PI;
 }
 
 /**
@@ -581,78 +583,79 @@ ED.PRP.prototype.draw = function(_point)
 	var ctx = this.drawing.context;
 	
 	// Call draw method in superclass
-	ED.PRP.superclass.draw.call(this, _point);
+	ED.SectorPRP.superclass.draw.call(this, _point);
+    
+	// Radius of outer curve just inside ora on right and left fundus diagrams
+	var ro = 952/2;
+    var ri = -this.apexY;
+    var r = ri + (ro - ri)/2;
 	
+	// Calculate parameters for arcs
+	var theta = this.arc/2;
+	var arcStart = - Math.PI/2 + theta;
+	var arcEnd = - Math.PI/2 - theta;
+    
+    // Coordinates of 'corners' of SectorPRP
+	var topRightX = r * Math.sin(theta);
+	var topRightY = - r * Math.cos(theta);
+	var topLeftX = - r * Math.sin(theta);
+	var topLeftY = topRightY;
+    
 	// Boundary path
 	ctx.beginPath();
     
-	// PRP
-    var ro = 400;
-    var ri = 140;
-    
-    // Arc across to mirror image point on the other side
-	ctx.arc(0, 0, ro, 0, 2 * Math.PI, true);
+	// Arc across to mirror image point on the other side
+	ctx.arc(0, 0, ro, arcStart, arcEnd, true);
     
 	// Arc back to mirror image point on the other side
-	ctx.arc(-80, 0, ri, 2 * Math.PI, 0, false);
+	ctx.arc(0, 0, ri, arcEnd, arcStart, false);
     
 	// Close path
 	ctx.closePath();
-    
-    // Create fill pattern
-    ctx.fillStyle = "rgba(100,100,100,0)";
-    
-    // Transparent stroke
-	ctx.strokeStyle = "rgba(100,100,100,0)";
-    //ctx.strokeStyle = "red";
+	
+	// Set line attributes
+	ctx.lineWidth = 40;
+	ctx.fillStyle = "rgba(255,255,255,0)";
+	ctx.strokeStyle = "rgba(255,255,255,0)";
 	
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 	
-	// Other stuff here
+	// Non boundary drawing
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
 	{
-        var sep = 60;
-        var rows = 12;
-        var d = ro * 2/rows;
-        var i;
+        // PRP spot data
+        var si = 30;
+        var sd = (30 + si);
         
-        this.rowOfBurns(-90, -360, 4, sep);
-        this.rowOfBurns(-180, -300, 7, sep);
-        this.rowOfBurns(-270, -240, 10, sep);
-        this.rowOfBurns(-300, -180, 11, sep);
+        // Array of number of spots for each radius value
+        var count = [47,41,35,28,22,15];
         
-        this.rowOfBurns(-330, -120, 5, sep);
-        this.rowOfBurns(-30, -120, 7, sep);
-        
-        this.rowOfBurns(-360, -60, 3, sep);
-        this.rowOfBurns(60, -60, 6, sep);
-        
-        this.rowOfBurns(-320, 0, 2, sep);
-        this.rowOfBurns(90, 0, 5, sep);
-        
-        this.rowOfBurns(-360, 60, 3, sep);
-        this.rowOfBurns(60, 60, 6, sep);
-        
-        this.rowOfBurns(-330, 120, 3, sep);
-        this.rowOfBurns(30, 120, 6, sep);
-        
-        this.rowOfBurns(-180, 300, 7, sep);
-        this.rowOfBurns(-270, 240, 10, sep);
-        this.rowOfBurns(-300, 180, 11, sep);
-        this.rowOfBurns(-90, 360, 4, sep);
+        // Iterate through radius and angle to draw sector
+        var i = 0;
+        for (var r = ro - si; r > ri; r -= sd)
+        {
+            var j = 0;
+            
+            for (var a = -Math.PI/2 - arcStart; a < this.arc - Math.PI/2 - arcStart; a += sd/r )
+            {
+                a = -Math.PI/2 - arcStart + j * 2 * Math.PI/count[i];
+                
+                var p = new ED.Point(0,0);
+                p.setWithPolars(r, a);
+                this.drawLaserSpot(ctx, p.x, p.y);
+                
+                j++;
+            }
+            
+            i++;
+        }
 	}
-	
-	// Coordinates of handles (in canvas plane)
-    var point = new ED.Point(0, 0);
-    point.setWithPolars(ro, Math.PI/4);
-	this.handleArray[2].location = this.transform.transformPoint(point);
-    //this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
-	
+    
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
-	
-	// Return value indicating successful hittest
+    
+	// Return value indicating successful hit test
 	return this.isClicked;
 }
 
@@ -810,10 +813,8 @@ ED.SectorPRP.prototype.draw = function(_point)
 	
 	// Set line attributes
 	ctx.lineWidth = 40;
-	ctx.fillStyle = "rgba(255,255,255,1)";
+	ctx.fillStyle = "rgba(255,255,255,0)";
 	ctx.strokeStyle = "rgba(255,255,255,0)";
-    //ctx.fillStyle = "blue";
-    //ctx.strokeStyle = "blue";
 	
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
@@ -822,15 +823,13 @@ ED.SectorPRP.prototype.draw = function(_point)
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
 	{
         // PRP spot data
-        var sr = 15;
         var si = 30;
-        var ss = 48;
-        var n = (1000 - 2 * ss)/(2 * sr + si);
-        var sd = (2 * sr + si);
-        var st = 10;
+        var sd = (30 + si);
         
-        // Draw spots
+        // Array of number of spots for each radius value
         var count = [47,41,35,28,22,15];
+        
+        // Iterate through radius and angle to draw sector
         var i = 0;
         for (var r = ro - si; r > ri; r -= sd)
         {
@@ -842,8 +841,7 @@ ED.SectorPRP.prototype.draw = function(_point)
                 
                 var p = new ED.Point(0,0);
                 p.setWithPolars(r, a);
-
-                this.drawCircle(ctx, p.x, p.y, sr, "Yellow", st, "rgba(255, 128, 0, 1)");
+                this.drawLaserSpot(ctx, p.x, p.y);
                 
                 j++;
             }
@@ -937,8 +935,7 @@ ED.LaserCircle.prototype.setParameterDefaults = function()
     }
     else
     {
-        doodle = this.drawing.lastDoodleOfClass('UTear');
-        this.move(doodle.originX, doodle.originY);
+        this.move((this.drawing.eye == ED.eye.Right?-1:1) * 200, -300);
     }
 }
 
@@ -984,7 +981,6 @@ ED.LaserCircle.prototype.draw = function(_point)
         // Difference indicating aspect ratio
         var d = this.apexX + this.apexY;
         
-
         // Radius and displacement of semicircle
         if (d < 0)
         {
@@ -1077,6 +1073,625 @@ ED.LaserCircle.prototype.description = function()
 	
 	return returnString;
 }
+
+/**
+ * Laser Demarcation
+ *
+ * @class LaserDemarcation
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Int} _originX
+ * @param {Int} _originY
+ * @param {Float} _radius
+ * @param {Int} _apexX
+ * @param {Int} _apexY
+ * @param {Float} _scaleX
+ * @param {Float} _scaleY
+ * @param {Float} _arc
+ * @param {Float} _rotation
+ * @param {Int} _order
+ */
+ED.LaserDemarcation = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+{
+	// Set classname
+	this.className = "LaserDemarcation";
+    
+	// Call super-class constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.LaserDemarcation.prototype = new ED.Doodle;
+ED.LaserDemarcation.prototype.constructor = ED.LaserDemarcation;
+ED.LaserDemarcation.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.LaserDemarcation.prototype.setHandles = function()
+{
+	this.handleArray[0] = new ED.Handle(null, true, ED.Mode.Arc, false);
+	this.handleArray[3] = new ED.Handle(null, true, ED.Mode.Arc, false);
+	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+}
+
+/**
+ * Sets default properties
+ */
+ED.LaserDemarcation.prototype.setPropertyDefaults = function()
+{
+	this.isMoveable = false;
+    
+    // Update component of validation array for simple parameters
+    this.parameterValidationArray['arc']['range'].setMinAndMax(Math.PI/4, 2 * Math.PI);
+    this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
+    this.parameterValidationArray['apexY']['range'].setMinAndMax(-400, -300);
+}
+
+/**
+ * Sets default parameters
+ */
+ED.LaserDemarcation.prototype.setParameterDefaults = function()
+{
+    this.arc = 120 * Math.PI/180;
+    this.apexY = -350;
+    
+    var doodle = this.drawing.lastDoodleOfClass(this.className);
+    if (doodle)
+    {
+        if (this.drawing.eye == ED.eye.Right)
+        {
+            
+        }
+    }
+    else
+    {
+        if (this.drawing.eye == ED.eye.Right)
+        {
+            this.rotation = -0.8 * Math.PI;
+        }
+        else
+        {
+            this.rotation = 0.8 * Math.PI;
+        }
+    }
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.LaserDemarcation.prototype.draw = function(_point)
+{
+	// Get context
+	var ctx = this.drawing.context;
+	
+	// Call draw method in superclass
+	ED.LaserDemarcation.superclass.draw.call(this, _point);
+    
+	// Radius of outer curve just inside ora on right and left fundus diagrams
+	var ro = 952/2;
+    var ri = -this.apexY;
+    var r = ri + (ro - ri)/2;
+	
+	// Calculate parameters for arcs
+	var theta = this.arc/2;
+	var arcStart = - Math.PI/2 + theta;
+	var arcEnd = - Math.PI/2 - theta;
+    
+    // Coordinates of 'corners' of LaserDemarcation
+	var topRightX = r * Math.sin(theta);
+	var topRightY = - r * Math.cos(theta);
+	var topLeftX = - r * Math.sin(theta);
+	var topLeftY = topRightY;
+    
+	// Boundary path
+	ctx.beginPath();
+    
+	// Arc across to mirror image point on the other side
+	ctx.arc(0, 0, ro, arcStart, arcEnd, true);
+    
+	// Arc back to mirror image point on the other side
+	ctx.arc(0, 0, ri, arcEnd, arcStart, false);
+    
+	// Close path
+	ctx.closePath();
+	
+	// Set line attributes
+	ctx.lineWidth = 4;
+	ctx.fillStyle = "rgba(255,255,255,0)";
+	ctx.strokeStyle = "rgba(255,255,255,0)";
+	
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+	
+	// Other paths and drawing here
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
+	{
+        // Spot separation
+        var ss = 25;
+        
+        // Location of laser spot
+        var p = new ED.Point(0,0);
+        
+        // Unless 360, go out to the ora with an elegant semicircle
+        if (this.arc < 1.9 * Math.PI)
+        {
+            // Radius of quarter circle
+            var rc = ro - ri;
+            
+            // Angle of quarter circle (not quite a quarter)
+            var quad = Math.PI/2;
+            
+            // Number of spots in a quarter circle
+            var n = (Math.round(quad/(ss/rc)));
+            
+            // Centre of first quarter circle
+            var c1 = new ED.Point(- ro * Math.sin(theta - rc/ro),- ro * Math.cos(theta - rc/ro));
+            
+            // Draw first quarter circle, including adjustment for improved junction
+            for (var i = 0; i < n; i++)
+            {
+                p.setWithPolars(rc, arcEnd + 0.5 * (rc/ro) - i * quad/n);
+                this.drawLaserSpot(ctx, c1.x + p.x, c1.y + p.y);
+            }
+            
+            // Angle of main arc, with adjustment to make junction with semicircles look better
+            var mainArc = this.arc - 2 * rc/ro;
+            
+            // Number of spots in the main arc
+            var m = (Math.round(mainArc/(ss/ri)));
+            
+            // Draw main arc
+            var mainStart = c1.direction();
+            for (var i = 0; i < m + 1; i++)
+            {
+                p.setWithPolars(ri, mainStart + i * mainArc/m);
+                this.drawLaserSpot(ctx, p.x, p.y);
+            }
+            
+            // Centre of second quarter circle
+            var c2 = new ED.Point(- ro * Math.sin(- theta + rc/ro), - ro * Math.cos(- theta + rc/ro));
+            
+            // Draw second quarter circle, including adjustment for improved junction
+            for (var i = 0; i < n; i++)
+            {
+                p.setWithPolars(rc, arcStart + Math.PI - 0.5 * (rc/ro) + i * quad/n);
+                this.drawLaserSpot(ctx, c2.x + p.x, c2.y + p.y);
+            }
+        }
+        else
+        {
+            // Number of spots in the main arc
+            var n = (Math.round(2 * Math.PI/(ss/ri)));
+            
+            // Draw main arc
+            for (var i = 0; i < n; i++)
+            {
+                p.setWithPolars(ri, i * 2 * Math.PI/n);
+                this.drawLaserSpot(ctx, p.x, p.y);
+            }
+        }
+	}
+    
+	// Coordinates of handles (in canvas plane)
+	this.handleArray[0].location = this.transform.transformPoint(new ED.Point(topLeftX, topLeftY));
+	this.handleArray[3].location = this.transform.transformPoint(new ED.Point(topRightX, topRightY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
+	
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+    
+	// Return value indicating successful hit test
+	return this.isClicked;
+}
+
+/**
+ * Retinal detachment
+ *
+ * @class RRD
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Int} _originX
+ * @param {Int} _originY
+ * @param {Float} _radius
+ * @param {Int} _apexX
+ * @param {Int} _apexY
+ * @param {Float} _scaleX
+ * @param {Float} _scaleY
+ * @param {Float} _arc
+ * @param {Float} _rotation
+ * @param {Int} _order
+ */
+ED.RRD = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+{
+	// Set classname
+	this.className = "RRD";
+    
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.RRD.prototype = new ED.Doodle;
+ED.RRD.prototype.constructor = ED.RRD;
+ED.RRD.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.RRD.prototype.setHandles = function()
+{
+	this.handleArray[1] = new ED.Handle(null, true, ED.Mode.Arc, false);
+	this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Arc, false);
+	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+}
+
+/**
+ * Sets default properties
+ */
+ED.RRD.prototype.setPropertyDefaults = function()
+{
+	this.isMoveable = false;
+    
+    // Update component of validation array for simple parameters
+    this.parameterValidationArray['scaleX']['range'].setMinAndMax(+1, +4);
+    this.parameterValidationArray['scaleY']['range'].setMinAndMax(+1, +4);
+    this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
+    this.parameterValidationArray['apexY']['range'].setMinAndMax(-400, +400);
+}
+
+/**
+ * Sets default parameters
+ */
+ED.RRD.prototype.setParameterDefaults = function()
+{
+    this.arc = 120 * Math.PI/180;
+    this.apexY = -100;
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.RRD.prototype.draw = function(_point)
+{
+	// Get context
+	var ctx = this.drawing.context;
+	
+	// Call draw method in superclass
+	ED.RRD.superclass.draw.call(this, _point);
+	
+	// Fit outer curve just inside ora on right and left fundus diagrams
+	var r = 952/2;
+    
+	// Calculate parameters for arcs
+	var theta = this.arc/2;
+	var arcStart = - Math.PI/2 + theta;
+	var arcEnd = - Math.PI/2 - theta;
+	
+	// Coordinates of corners of arc
+	var topRightX = r * Math.sin(theta);
+	var topRightY = - r * Math.cos(theta);
+	var topLeftX = - r * Math.sin(theta);
+	var topLeftY = topRightY;
+	
+	// Boundary path
+	ctx.beginPath();
+	
+	// Arc across from top right to to mirror image point on the other side
+	ctx.arc(0, 0, r, arcStart, arcEnd, true);
+	
+	// Connect across the bottom via the apex point
+	var bp = +0.6;
+	
+	// Radius of disk (from Fundus doodle)
+	var dr = +25;
+	
+	// RD above optic disk
+	if (this.apexY < -dr)
+	{
+		ctx.bezierCurveTo(topLeftX, topLeftY, bp * topLeftX, this.apexY, this.apexX, this.apexY);
+		ctx.bezierCurveTo(-bp * topLeftX, this.apexY, topRightX, topRightY, topRightX, topRightY);
+	}
+	// RRD involves optic disk
+	else if (this.apexY < dr)
+	{
+		// Angle from origin to intersection of disk margin with a horizontal line through apexY
+		var phi = Math.acos((0 - this.apexY)/dr);
+		
+		// Curve to disk, curve around it, then curve out again
+		var xd = dr * Math.sin(phi);
+		ctx.bezierCurveTo(topLeftX, topLeftY, bp * topLeftX, this.apexY, -xd, this.apexY);
+		ctx.arc(0, 0, dr, -Math.PI/2 - phi, -Math.PI/2 + phi, false);
+		ctx.bezierCurveTo(-bp * topLeftX, this.apexY, topRightX, topRightY, topRightX, topRightY);
+	}
+	// RRD beyond optic disk
+	else
+	{
+		ctx.bezierCurveTo(topLeftX, topLeftY, bp * topLeftX, this.apexY, 0, 25);
+		ctx.arc(0, 0, dr, Math.PI/2, 2.5*Math.PI, false);
+		ctx.bezierCurveTo(-bp * topLeftX, this.apexY, topRightX, topRightY, topRightX, topRightY);
+	}
+	
+	// Set line attributes
+	ctx.lineWidth = 4;
+	ctx.fillStyle = "rgba(0, 0, 255, 0.75)";
+	ctx.strokeStyle = "blue";
+	
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+	
+	// Coordinates of handles (in canvas plane)
+	this.handleArray[1].location = this.transform.transformPoint(new ED.Point(topLeftX, topLeftY));
+	this.handleArray[2].location = this.transform.transformPoint(new ED.Point(topRightX, topRightY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
+	
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+	
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.RRD.prototype.description = function()
+{
+	// Construct description
+	var returnString = "";
+	
+	// Use trigonometry on rotation field to determine quadrant
+	returnString = returnString + (Math.cos(this.rotation) > 0?"Supero":"Infero");
+	returnString = returnString + (Math.sin(this.rotation) > 0?(this.drawing.eye == ED.eye.Right?"nasal":"temporal"):(this.drawing.eye == ED.eye.Right?"temporal":"nasal"));
+	returnString = returnString + " retinal detachment";
+	returnString = returnString + (this.isMacOff()?" (macula off)":" (macula on)");
+	
+	// Return description
+	return returnString;
+}
+
+/**
+ * Returns the SnoMed code of the doodle
+ *
+ * @returns {Int} SnoMed code of entity representated by doodle
+ */
+ED.RRD.prototype.snomedCode = function()
+{
+	return (this.isMacOff()?232009009:232008001);
+}
+
+/**
+ * Returns a number indicating position in a hierarchy of diagnoses from 0 to 9 (highest)
+ *
+ * @returns {Int} Position in diagnostic hierarchy
+ */
+ED.RRD.prototype.diagnosticHierarchy = function()
+{
+	return (this.isMacOff()?10:9);
+}
+
+/**
+ * Determines whether the macula is off or not
+ *
+ * @returns {Bool} True if macula is off
+ */
+ED.RRD.prototype.isMacOff = function()
+{
+	// Get coordinates of macula in doodle plane
+	if(this.drawing.eye == ED.eye.Right)
+	{
+		var macula = new ED.Point(-100,0);
+	}
+	else
+	{
+		var macula = new ED.Point(100,0);
+	}
+	
+	// Convert to canvas plane
+	var maculaCanvas = this.drawing.transform.transformPoint(macula);
+	
+	// Determine whether macula is off or not
+	if (this.draw(maculaCanvas)) return true;
+	else return false;
+}
+
+/**
+ * Peripheral RRD
+ *
+ * @class PeripheralRRD
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Int} _originX
+ * @param {Int} _originY
+ * @param {Float} _radius
+ * @param {Int} _apexX
+ * @param {Int} _apexY
+ * @param {Float} _scaleX
+ * @param {Float} _scaleY
+ * @param {Float} _arc
+ * @param {Float} _rotation
+ * @param {Int} _order
+ */
+ED.PeripheralRRD = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+{
+	// Set classname
+	this.className = "PeripheralRRD";
+    
+	// Call super-class constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.PeripheralRRD.prototype = new ED.Doodle;
+ED.PeripheralRRD.prototype.constructor = ED.PeripheralRRD;
+ED.PeripheralRRD.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.PeripheralRRD.prototype.setHandles = function()
+{
+	this.handleArray[0] = new ED.Handle(null, true, ED.Mode.Arc, false);
+	this.handleArray[3] = new ED.Handle(null, true, ED.Mode.Arc, false);
+	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+}
+
+/**
+ * Sets default properties
+ */
+ED.PeripheralRRD.prototype.setPropertyDefaults = function()
+{
+	this.isMoveable = false;
+    
+    // Update component of validation array for simple parameters
+    this.parameterValidationArray['arc']['range'].setMinAndMax(Math.PI/4, 2 * Math.PI);
+    this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
+    this.parameterValidationArray['apexY']['range'].setMinAndMax(-400, -300);
+}
+
+/**
+ * Sets default parameters
+ */
+ED.PeripheralRRD.prototype.setParameterDefaults = function()
+{
+    this.arc = 112 * Math.PI/180;
+    this.apexY = -380;
+    
+    var doodle = this.drawing.lastDoodleOfClass(this.className);
+    if (doodle)
+    {
+        if (this.drawing.eye == ED.eye.Right)
+        {
+            
+        }
+    }
+    else
+    {
+        if (this.drawing.eye == ED.eye.Right)
+        {
+            this.rotation = -0.8 * Math.PI;
+        }
+        else
+        {
+            this.rotation = 0.8 * Math.PI;
+        }
+    }
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.PeripheralRRD.prototype.draw = function(_point)
+{
+	// Get context
+	var ctx = this.drawing.context;
+	
+	// Call draw method in superclass
+	ED.PeripheralRRD.superclass.draw.call(this, _point);
+    
+	// Radius of outer curve just inside ora on right and left fundus diagrams
+	var ro = 952/2;
+    var ri = -this.apexY;
+    var r = ri + (ro - ri)/2;
+    
+    // Radius of quarter circle
+    var rc = ro - ri;
+	
+	// Calculate parameters for arcs
+	var theta = this.arc/2;
+	var arcStart = - Math.PI/2 + theta;
+	var arcEnd = - Math.PI/2 - theta;
+    
+    // Coordinates of 'corners' of PeripheralRRD
+	var topRightX = r * Math.sin(theta);
+	var topRightY = - r * Math.cos(theta);
+	var topLeftX = - r * Math.sin(theta);
+	var topLeftY = topRightY;
+    
+    // Centre of first quarter circle
+    var c1 = new ED.Point(0,0);
+    c1.x = - ro * Math.sin(theta - rc/ro);
+    c1.y = - ro * Math.cos(theta - rc/ro);
+    
+    // Centre of second quarter circle
+    var c2 = new ED.Point(0,0);
+    c2.x = - ro * Math.sin(- theta + rc/ro);
+    c2.y = - ro * Math.cos(- theta + rc/ro);
+    
+	// Boundary path
+	ctx.beginPath();
+    
+	// Arc from right to left
+	ctx.arc(0, 0, ro, arcStart, arcEnd, true);
+
+    // Arc round first quarter circle (slightly less than 90 degrees)
+    var phi = arcEnd - Math.PI/2;
+    ctx.arc(c1.x, c1.y, rc, phi, phi - Math.PI/2 + rc/ro, true);
+    
+    // Arc back to the right
+    ctx.arc(0, 0, ri, c1.direction() - Math.PI/2, c2.direction() - Math.PI/2, false);
+    
+    // Arc round second quarter circle (slightly less than 90 degrees)
+    phi = arcStart + Math.PI/2;
+    ctx.arc(c2.x, c2.y, rc, phi + Math.PI/2 - rc/ro, phi, true);
+    
+	// Close path
+	ctx.closePath();
+	
+	// Set line attributes
+	ctx.lineWidth = 4;
+	ctx.fillStyle = "rgba(0, 0, 255, 0.75)";
+	ctx.strokeStyle = "blue";
+	
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+    
+	// Coordinates of handles (in canvas plane)
+	this.handleArray[0].location = this.transform.transformPoint(new ED.Point(topLeftX, topLeftY));
+	this.handleArray[3].location = this.transform.transformPoint(new ED.Point(topRightX, topRightY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
+	
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+    
+	// Return value indicating successful hit test
+	return this.isClicked;
+}
+
+/**
+ * Returns the SnoMed code of the doodle
+ *
+ * @returns {Int} SnoMed code of entity representated by doodle
+ */
+ED.PeripheralRRD.prototype.snomedCode = function()
+{
+	return 232008001;
+}
+
+/**
+ * Returns a number indicating position in a hierarchy of diagnoses from 0 to 9 (highest)
+ *
+ * @returns {Int} Position in diagnostic hierarchy
+ */
+ED.PeripheralRRD.prototype.diagnosticHierarchy = function()
+{
+	return 8;
+}
+
 
 /**
  * 'U' tear
