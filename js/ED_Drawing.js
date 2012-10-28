@@ -255,14 +255,15 @@ ED.Drawing = function(_canvas, _eye, _IDSuffix, _isEditable, offset_x, offset_y,
     this.canvasTooltip = document.getElementById('canvasTooltip');
     
     // Make sure doodle plane fits within canvas
-    if (this.canvas.width < this.canvas.height)
-    {
-        this.scale = this.canvas.width/1001;
-    }
-    else
-    {
-        this.scale = this.canvas.height/1001;
-    }
+//    if (this.canvas.width >= this.canvas.height)
+//    {
+//        this.scale = this.canvas.width/1001;
+//    }
+//    else
+//    {
+//        this.scale = this.canvas.height/1001;
+//    }
+    this.scale = this.canvas.height/1001;
     
     // Array of images to be preloaded
     this.imageArray = new Array();
