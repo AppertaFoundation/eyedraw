@@ -264,7 +264,7 @@ ED.AntSegCrossSection = function(_drawing, _originX, _originY, _radius, _apexX, 
 {
 	// Set classname
 	this.className = "AntSegCrossSection";
-
+    
     // Derived parameters
     this.grade;
     
@@ -298,7 +298,7 @@ ED.AntSegCrossSection.prototype.setPropertyDefaults = function()
     this.isUnique = true;
     
     // Update component of validation array for simple parameters
-    this.parameterValidationArray['apexX']['range'].setMinAndMax(-160, -40);
+    //this.parameterValidationArray['apexX']['range'].setMinAndMax(-140, 0);
     this.parameterValidationArray['apexY']['range'].setMinAndMax(-280, -60);
     
     // Add complete validation arrays for derived parameters
@@ -311,7 +311,7 @@ ED.AntSegCrossSection.prototype.setPropertyDefaults = function()
 ED.AntSegCrossSection.prototype.setParameterDefaults = function()
 {
     this.setParameterFromString('grade', 'Small');
-    this.apexX = -40;
+    this.apexX = 0;
     this.originX = 44;
 }
 
@@ -330,6 +330,11 @@ ED.AntSegCrossSection.prototype.dependentParameterValues = function(_parameter, 
     switch (_parameter)
     {
         case 'apexY':
+            // Set apexX and its limits for apexX according to value of apexY (prevents collisions with cornea and lens)
+            this.parameterValidationArray['apexX']['range'].setMinAndMax(-40 - (140/220) * (this.apexY + 280), 32 - (72/220) * (this.apexY + 280));
+            var newOriginX = this.parameterValidationArray['apexX']['range'].constrain(this.apexX);
+            this.setSimpleParameter('apexX', newOriginX);
+            
             if (_value < -200) returnArray['grade'] = 'Large';
             else if (_value < -100) returnArray['grade'] = 'Medium';
             else returnArray['grade']  = 'Small';
@@ -367,11 +372,138 @@ ED.AntSegCrossSection.prototype.draw = function(_point)
 	// Call draw method in superclass
 	ED.AntSegCrossSection.superclass.draw.call(this, _point);
     
+    // If lens there, take account of pupil size
+    var marginX = this.apexX;
+//    var doodle = this.drawing.lastDoodleOfClass("LensCrossSection");
+//    if (doodle) marginX -= 44 - doodle.originX;
+    
+    // Boundary path
+	ctx.beginPath();
+    
+    // Bottom cut away
+    ctx.moveTo(60, 480);
+    ctx.lineTo(140, 480);
+    ctx.lineTo(140, 380);
+    
+    // Bottom ciliary body
+    ctx.bezierCurveTo(120, 340, 120, 340, 100, 380);
+    ctx.bezierCurveTo(80, 340, 80, 340, 60, 380);
+    
+    // Bottom pupil and angle
+    var f = Math.abs(marginX) * 0.15;
+    ctx.bezierCurveTo(40, 460, marginX + 60 + f, -this.apexY, marginX, -this.apexY);
+    ctx.bezierCurveTo(marginX - 60 - f, -this.apexY, -21, 317, 0, 380);
+    
+    // Top cut away
+    ctx.moveTo(60, -480);
+    ctx.lineTo(140, -480);
+    ctx.lineTo(140, -380);
+    
+    // Bottom ciliary body
+    ctx.bezierCurveTo(120, -340, 120, -340, 100, -380);
+    ctx.bezierCurveTo(80, -340, 80, -340, 60, -380);
+    
+    // Bottom pupil and angle
+    ctx.bezierCurveTo(40, -460, marginX + 60 + f, this.apexY, marginX, this.apexY);
+    ctx.bezierCurveTo(marginX - 60 - f, this.apexY, -21, -317, 0, -380);
+
+    // Close path
+    ctx.closePath();
+    
+	// Set line attributes
+	ctx.lineWidth = 4;
+	ctx.fillStyle = "rgba(255, 160, 40, 1)";
+	ctx.strokeStyle = "gray";
+	
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+    
+	// Non boundary drawing
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
+    {
+	}
+    
+	// Coordinates of handles (in canvas plane)
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
+    
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+	
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * Cornea Cross Section
+ *
+ * @class CorneaCrossSection
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Int} _originX
+ * @param {Int} _originY
+ * @param {Float} _radius
+ * @param {Int} _apexX
+ * @param {Int} _apexY
+ * @param {Float} _scaleX
+ * @param {Float} _scaleY
+ * @param {Float} _arc
+ * @param {Float} _rotation
+ * @param {Int} _order
+ */
+ED.CorneaCrossSection = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+{
+	// Set classname
+	this.className = "CorneaCrossSection";
+    
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.CorneaCrossSection.prototype = new ED.Doodle;
+ED.CorneaCrossSection.prototype.constructor = ED.CorneaCrossSection;
+ED.CorneaCrossSection.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets default dragging attributes
+ */
+ED.CorneaCrossSection.prototype.setPropertyDefaults = function()
+{
+    this.isSelectable = false;
+    this.isDeletable = false;
+	this.isMoveable = false;
+	this.isRotatable = false;
+    this.isUnique = true;
+}
+
+/**
+ * Sets default parameters
+ */
+ED.CorneaCrossSection.prototype.setParameterDefaults = function()
+{
+    this.originX = 44;
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.CorneaCrossSection.prototype.draw = function(_point)
+{
+	// Get context
+	var ctx = this.drawing.context;
+	
+	// Call draw method in superclass
+	ED.CorneaCrossSection.superclass.draw.call(this, _point);
+    
     // Boundary path
 	ctx.beginPath();
     
     // Top cut away
-    ctx.moveTo(140, -480);
+    ctx.moveTo(60, -480);
     ctx.lineTo(-80, -480);
     
     // Front of cornea
@@ -381,31 +513,152 @@ ED.AntSegCrossSection.prototype.draw = function(_point)
     ctx.bezierCurveTo(-100, 440, -100, 440, -80, 480);
     
     // Bottom cut away
-    ctx.lineTo(140, 480);
-    ctx.lineTo(140, 280);
-    
-    // Bottom ciliary body
-    ctx.bezierCurveTo(120, 240, 120, 240, 100, 280);
-    ctx.bezierCurveTo(80, 240, 80, 240, 60, 280);
-    
-    // Bottom pupil
-    ctx.bezierCurveTo(40, 360, this.apexX + 60, -this.apexY, this.apexX, -this.apexY);
+    ctx.lineTo(60, 480);
+    ctx.lineTo(0, 380);
     
     // Back of cornea
-    ctx.bezierCurveTo(this.apexX - 60, -this.apexY, -21, 317, 0, 380);
     ctx.bezierCurveTo(-80, 260, -220, 180, -220, 0);
     ctx.bezierCurveTo(-220, -180, -80, -260, 0, -380);
-    
-    // Top pupil
-    ctx.bezierCurveTo(-21, -317, this.apexX - 60, this.apexY, this.apexX, this.apexY);
-
-    // Top ciliary body
-    ctx.bezierCurveTo(this.apexX + 60, this.apexY, 40, -360, 60, -280);
-    ctx.bezierCurveTo(80, -240, 80, -240, 100, -280);
-    ctx.bezierCurveTo(120, -240, 120, -240, 140, -280);
 
     // Close path
     ctx.closePath();
+    
+	// Set path attributes
+	ctx.lineWidth = 4;
+	ctx.fillStyle = "rgba(245, 245, 245, 0.5)";
+	ctx.strokeStyle = "gray";
+	
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+    
+	// Non boundary drawing
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
+    {
+        // Top sclera
+        ctx.beginPath();
+        ctx.moveTo(56, -478);
+        ctx.lineTo(-78, -478);
+        ctx.bezierCurveTo(-98, -440, -96, -440, -118, -378);
+        ctx.lineTo(-4, -378);
+        ctx.lineTo(56, -478);
+        
+        // Bottom scleral
+        ctx.moveTo(56, 478);
+        ctx.lineTo(-78, 478);
+        ctx.bezierCurveTo(-98, 440, -96, 440, -118, 378);
+        ctx.lineTo(-4, 378);
+        ctx.closePath();
+        
+        ctx.fillStyle = "rgba(255,255,185,1)";
+        ctx.fill();
+	}
+	
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * Lens Cross Section
+ *
+ * @class LensCrossSection
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Int} _originX
+ * @param {Int} _originY
+ * @param {Float} _radius
+ * @param {Int} _apexX
+ * @param {Int} _apexY
+ * @param {Float} _scaleX
+ * @param {Float} _scaleY
+ * @param {Float} _arc
+ * @param {Float} _rotation
+ * @param {Int} _order
+ */
+ED.LensCrossSection = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+{
+	// Set classname
+	this.className = "LensCrossSection";
+    
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.LensCrossSection.prototype = new ED.Doodle;
+ED.LensCrossSection.prototype.constructor = ED.LensCrossSection;
+ED.LensCrossSection.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets default dragging attributes
+ */
+ED.LensCrossSection.prototype.setPropertyDefaults = function()
+{
+    this.isUnique = true;
+    this.addAtBack = true;
+    
+    // Update component of validation array for simple parameters
+    this.parameterValidationArray['originX']['range'].setMinAndMax(-50, +77);
+    this.parameterValidationArray['originY']['range'].setMinAndMax(-60, +60);
+}
+
+/**
+ * Sets default parameters
+ */
+ED.LensCrossSection.prototype.setParameterDefaults = function()
+{
+    this.originX = 44;
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.LensCrossSection.prototype.draw = function(_point)
+{
+	// Get context
+	var ctx = this.drawing.context;
+	
+	// Call draw method in superclass
+	ED.LensCrossSection.superclass.draw.call(this, _point);
+
+    // Height of cross section (half value of ro in AntSeg doodle)
+    var h = 240;
+    
+    // Arbitrary radius of curvature
+    var r = 300;
+    
+    // Displacement of lens from centre
+    var ld = 100;
+    
+    // Angle of arc
+    var theta = Math.asin(h/r);
+    
+    // X coordinate of centre of circle
+    var x = r * Math.cos(theta);
+    
+    // Measurements of nucleus
+    var rn = r - 60;
+    
+    // Calculate cataract angles
+    var phi = Math.acos(x/rn);
+    
+    // Lens
+    ctx.beginPath();
+
+    // Draw lens with two sections of circumference of circle
+    ctx.arc(ld - x, 0, r, theta, -theta, true);
+    ctx.arc(ld + x, 0, r, Math.PI + theta, Math.PI - theta, true);
+
+    // Draw lens with two sections of circumference of circle
+    ctx.moveTo(ld, rn * Math.sin(phi));
+    ctx.arc(ld - x, 0, rn, phi, -phi, true);
+    ctx.arc(ld + x, 0, rn, Math.PI + phi, Math.PI - phi, true);
+
+    // Draw it
+    ctx.stroke();
     
 	// Set line attributes
 	ctx.lineWidth = 4;
@@ -418,46 +671,36 @@ ED.AntSegCrossSection.prototype.draw = function(_point)
 	// Non boundary drawing
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
     {
-        // Height of cross section (half value of ro in AntSeg doodle)
-        var h = 240;
-        
-        // Arbitrary radius of curvature
-        var r = 300;
-        
-        // Displacement of lens from centre
-        var ld = 100;
-        
-        // Angle of arc
-        var theta = Math.asin(h/r);
-        
-        // X coordinate of centre of circle
-        var x = r * Math.cos(theta);
-        
-        // Measurements of nucleus
-        var rn = r - 60;
-        
-        // Calculate cataract angles
-        var phi = Math.acos(x/rn);
-        
-        // Lens
+        // Zonules
         ctx.beginPath();
         
-        // Draw lens with two sections of circumference of circle
-        ctx.arc(ld - x, 0, r, theta, -theta, true);
-        ctx.arc(ld + x, 0, r, Math.PI + theta, Math.PI - theta, true);
+        // Top zonules
+        ctx.moveTo(44 - this.originX + 80, - this.originY -349);
+        ctx.lineTo(64, -207);
+        ctx.moveTo(44 - this.originX + 80, - this.originY -349);
+        ctx.lineTo(138, -207);
+        ctx.moveTo(44 - this.originX + 120, - this.originY -349);
+        ctx.lineTo(64, -207);
+        ctx.moveTo(44 - this.originX + 120, - this.originY -349);
+        ctx.lineTo(138, -207);
+
+        // Bottom zonules
+        ctx.moveTo(44 - this.originX + 80, - this.originY + 349);
+        ctx.lineTo(64, 207);
+        ctx.moveTo(44 - this.originX + 80, - this.originY + 349);
+        ctx.lineTo(138, 207);
+        ctx.moveTo(44 - this.originX + 120, - this.originY + 349);
+        ctx.lineTo(64, 207);
+        ctx.moveTo(44 - this.originX + 120, - this.originY + 349);
+        ctx.lineTo(138, 207);
         
-        // Draw lens with two sections of circumference of circle
-        ctx.moveTo(ld, rn * Math.sin(phi));
-        ctx.arc(ld - x, 0, rn, phi, -phi, true);
-        ctx.arc(ld + x, 0, rn, Math.PI + phi, Math.PI - phi, true);
-        
-        // Draw it
+        ctx.lineWidth = 2;
         ctx.stroke();
 	}
     
 	// Coordinates of handles (in canvas plane)
 	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
-
+    
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
 	

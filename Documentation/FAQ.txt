@@ -5,3 +5,10 @@ A:  Animation rates are set for simple parameters, but this can be overidden usi
     Default values can be found in the doodle constructor method
     
 EG: PostPole
+
+
+Q:  How can I constrain a parameter to a range which is dependent on another parameter?
+
+A:  Any change in a parameter either by user interaction with the mouse, or during an animation, results in a call to the doodle's 'dependentParameterValues' function. Put code in this function to change the range and the value of any such parameters
+    
+EG: AntSegCrossSection
