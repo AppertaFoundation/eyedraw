@@ -13,8 +13,8 @@
 			<button class="ed_img_button" disabled=true id="moveToBack<?php echo $idSuffix?>" title="Move to back" onclick="<?php echo $drawingName?>.moveToBack(); return false;">
 				<img src="<?php echo $imgPath?>moveToBack.gif" />
 			</button>
-			<button class="ed_img_button" disabled=true id="deleteDoodle<?php echo $idSuffix?>" title="Delete" onclick="<?php echo $drawingName?>.deleteDoodle(); return false;">
-				<img src="<?php echo $imgPath?>deleteDoodle.gif" />
+			<button class="ed_img_button" disabled=true id="deleteSelectedDoodle<?php echo $idSuffix?>" title="Delete" onclick="<?php echo $drawingName?>.deleteSelectedDoodle(); return false;">
+				<img src="<?php echo $imgPath?>deleteSelectedDoodle.gif" />
 			</button>
 			<button class="ed_img_button" disabled=true id="lock<?php echo $idSuffix?>" title="Lock" onclick="<?php echo $drawingName?>.lock(); return false;">
 				<img src="<?php echo $imgPath?>lock.gif" />

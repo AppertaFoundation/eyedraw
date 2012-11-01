@@ -245,6 +245,9 @@ ED.Drawing = function(_canvas, _eye, _IDSuffix, _isEditable, offset_x, offset_y,
     this.lastDoodleId = 0;
     this.isActive = false;
     
+    // Associative array of bound element no doodle values (ie value associated with deleted doodle)
+    this.boundElementDeleteValueArray = new Array();
+    
     // Grab the canvas parent element
 	this.canvasParent = this.canvas.parentElement;
     
@@ -295,7 +298,7 @@ ED.Drawing = function(_canvas, _eye, _IDSuffix, _isEditable, offset_x, offset_y,
 	this.moveToBackButton = document.getElementById('moveToBack' + this.IDSuffix);
 	this.flipVerButton = document.getElementById('flipVer' + this.IDSuffix);
 	this.flipHorButton = document.getElementById('flipHor' + this.IDSuffix);
-	this.deleteDoodleButton = document.getElementById('deleteDoodle' + this.IDSuffix);
+	this.deleteSelectedDoodleButton = document.getElementById('deleteSelectedDoodle' + this.IDSuffix);
 	this.lockButton = document.getElementById('lock' + this.IDSuffix);
 	this.unlockButton = document.getElementById('unlock' + this.IDSuffix);
     this.squiggleSpan = document.getElementById('squiggleSpan' + this.IDSuffix);
@@ -1218,7 +1221,7 @@ ED.Drawing.prototype.keydown = function(e)
         // Delete or move doodle
         switch (e.keyCode) {
             case 8:			// Backspace
-                this.deleteDoodle();
+                this.deleteSelectedDoodle();
                 break;
             case 37:		// Left arrow
                 this.selectedDoodle.move(-ED.arrowDelta,0);
@@ -1514,43 +1517,110 @@ ED.Drawing.prototype.flipHor = function()
 }
 
 /**
- * Deletes selected doodle
+ * Deletes a doodle
+ *
+ * @param {Doodle} The doodle to be deleted
  */
-ED.Drawing.prototype.deleteDoodle = function()
+ED.Drawing.prototype.deleteDoodle = function(_doodle)
 {
-    var deletedClassName = null;
+    // Class name and flag for successful deletion
+    var deletedClassName = false;
     
-	// Should only be called if a doodle is selected, but check anyway
-	if (this.selectedDoodle != null && this.selectedDoodle.canDelete)
-	{
-        // Store class name for notification
-        deletedClassName = this.selectedDoodle.className;
-        
-		// Go through doodles removing any that are selected (should be just one)
-		for (var i = 0; i < this.doodleArray.length; i++)
-		{
-			if (this.doodleArray[i].isSelected && this.doodleArray[i].isDeletable)
-			{
-                // Deselect doodle
-                this.selectedDoodle = null;
+    var errorMessage = 'Attempt to delete a doodle that does not exist';
+
+    // Iterate through doodle array looking for doodle
+    for (var i = 0; i < this.doodleArray.length; i++)
+    {
+        if (this.doodleArray[i].id == _doodle.id)
+        {
+            if (this.doodleArray[i].isDeletable)
+            {
+                deletedClassName = _doodle.className;
                 
-                // Reset array
-				this.doodleArray.splice(i,1);
-			}
-		}
-		
-		// Re-assign ordinal numbers to array
-		for (var i = 0; i < this.doodleArray.length; i++)
-		{
-			this.doodleArray[i].order = i;
-		}
-        
-		// Refresh canvas
-		this.repaint();
+                // If its selected, deselect it
+                if (this.selectedDoodle != null && this.selectedDoodle.id == _doodle.id)
+                {
+                    this.selectedDoodle = null;
+                }
+
+                
+                // Remove bindings and reset values of bound elements
+                for (var parameter in _doodle.bindingArray)
+                {
+                    //console.log('removing binding', parameter, _doodle.bindingArray[parameter]);
+                    var element = document.getElementById(_doodle.bindingArray[parameter]);
+                    if (element != null)
+                    {
+                        // Set new value of element
+                        element.value = this.boundElementDeleteValueArray[_doodle.bindingArray[parameter]];
+                        
+                        // Remove binding from doodle (also removes event listener from element)
+                        _doodle.removeBinding(parameter);
+                    }
+                }
+                    
+                // Remove it from array
+                this.doodleArray.splice(i,1);
+            }
+            else
+            {
+                errorMessage = 'Attempt to delete a doodle that is not deletable, className: ' + _doodle.className;
+            }
+        }
 	}
     
-    // Notify
-    this.notify("doodleDeleted", deletedClassName);
+    // If successfully deleted, tidy up
+    if (deletedClassName)
+    {
+        // Re-assign ordinal numbers within array
+        for (var i = 0; i < this.doodleArray.length; i++)
+        {
+            this.doodleArray[i].order = i;
+        }
+
+        // Refresh canvas
+        this.repaint();
+        
+        // Notify
+        this.notify("doodleDeleted", deletedClassName);
+    }
+    else
+    {
+        ED.errorHandler('ED.Drawing', 'deleteDoodle', errorMessage);
+    }
+}
+
+/**
+ * Deletes currently selected doodle
+ */
+ED.Drawing.prototype.deleteSelectedDoodle = function()
+{
+	// Should only be called if a doodle is selected, but check anyway
+	if (this.selectedDoodle != null)
+	{
+        this.deleteDoodle(this.selectedDoodle);
+    }
+    else
+    {
+        ED.errorHandler('ED.Drawing', 'deleteSelectedDoodle', 'Attempt to delete selected doodle, when none selected');
+    }
+}
+
+/**
+ * Deletes doodle with selected id
+ */
+ED.Drawing.prototype.deleteDoodleOfId = function(_id)
+{
+    var doodle = this.doodleOfId(_id);
+    
+    if (doodle)
+    {
+        this.deleteDoodle(doodle);
+    }
+    else
+    {
+        ED.errorHandler('ED.Drawing', 'deleteDoodleOfId', 'Attempt to delete doodle with invalid id');
+    }
 }
 
 /**
@@ -1787,33 +1857,40 @@ ED.Drawing.prototype.addDoodle = function(_className, _parameterDefaults, _param
 
 
 /**
- * Takes array of bindings, and adds them to the corresponding doodles
+ * Takes array of bindings, and adds them to the corresponding doodles. If doodle does not exist, adds event listener to create one
  *
- * @param {Array} _bindingArray Associative 2d array. Index is className, and each entry is an array with key: parameter name value: elementId
+ * @param {Array} _bindingArray Associative array. Key is className, and each value is an array with key: parameter name, value: elementId
  */
 ED.Drawing.prototype.addBindings = function(_bindingArray)
 {
-    if (this.doodleArray.length > 0)
+    // Get reference to this drawing object (for inner function)
+    var drawing = this;
+    
+    // Iterate through classNames
+    for (var className in _bindingArray)
     {
-        for (var i = 0; i < this.doodleArray.length; i++)
+        // Look for the first doodle of this class to bind to
+        var doodle = this.firstDoodleOfClass(className);
+        
+        // Iterate through bindings for this className
+        for (parameter in _bindingArray[className])
         {
-            var doodle = this.doodleArray[i];
-            
-            // Retrieve bindings for this doodle
-            var bindings = _bindingArray[doodle.className];
-            if(bindings)
+            // Add an event listener to the element to create a doodle on change, if it does not exist
+            var element = document.getElementById(_bindingArray[className][parameter]);
+            element.addEventListener('change', function (event) {
+                 if (!drawing.hasDoodleOfClass(className))
+                 {
+                     console.log('element onchange adding doodle');
+                     drawing.addDoodle(className, {}, _bindingArray[className]);
+                 }
+            },false);
+
+            // Add binding to doodle if it does exist
+            if (doodle)
             {
-                // Apply them
-                for (var parameter in bindings)
-                {
-                    doodle.addBinding(parameter, bindings[parameter]);
-                }
+                doodle.addBinding(parameter, _bindingArray[className][parameter]);
             }
         }
-    }
-    else
-    {
-        ED.errorHandler('ED.Drawing', 'addBindings', 'Function called with empty bindings array');
     }
 }
 
@@ -1822,12 +1899,14 @@ ED.Drawing.prototype.addBindings = function(_bindingArray)
  *
  * @param {String} _type Type of event, only onchange is currently implemented
  * @param {Int} _doodleId The id of the doodle containing the binding
+ * @param {String} _className The class name of the doodle containing the binding (for recreation if deleted)
  * @param {String} _elementId The id attribute of the element
  * @returns {Value} The current value of the element
  */
-ED.Drawing.prototype.eventHandler = function(_type, _doodleId, _elementId, _value)
+ED.Drawing.prototype.eventHandler = function(_type, _doodleId, _className, _elementId, _value)
 {
     //console.log("Event " + _type + ":" + _doodleId + ":" + _elementId + ":" + _value);
+
     //var value;
     switch (_type)
     {
@@ -1836,42 +1915,56 @@ ED.Drawing.prototype.eventHandler = function(_type, _doodleId, _elementId, _valu
             // Get reference to associated doodle
             var doodle = this.doodleOfId(_doodleId);
             
+            // Process event
             if (doodle)
             {
-                // Set state of drawing to be active to allow synchronisation to work when changed by bound element
-                doodle.drawing.isActive = true;
-                
-                // Find key associated with the element id
-                var parameter;
-                for (var key in doodle.bindingArray)
+                // Look for value in boundElementDeleteValueArray
+                if (this.boundElementDeleteValueArray[_elementId] == _value)
                 {
-                    if (doodle.bindingArray[key] == _elementId)
-                    {
-                        parameter = key;
-                    }
-                }
-                
-                // Check validity of new value
-                var validityArray = doodle.validateParameter(parameter, _value);
-                
-                // If new value is valid, set it
-                if (validityArray.valid)
-                {
-                    doodle.setParameterWithAnimation(parameter, validityArray.value);
+                    this.deleteDoodleOfId(_doodleId);                    
                 }
                 else
                 {
-                    ED.errorHandler('ED.Drawing', 'eventHandler', 'Attempt to change HTML element value to an invalid value for parameter ' + parameter);
+                    // Set state of drawing to be active to allow synchronisation to work when changed by bound element
+                    doodle.drawing.isActive = true;
+                    
+                    // Find key associated with the element id
+                    var parameter;
+                    for (var key in doodle.bindingArray)
+                    {
+                        if (doodle.bindingArray[key] == _elementId)
+                        {
+                            parameter = key;
+                        }
+                    }
+                    
+                    // Check validity of new value
+                    var validityArray = doodle.validateParameter(parameter, _value);
+                    
+                    // If new value is valid, set it
+                    if (validityArray.valid)
+                    {
+                        doodle.setParameterWithAnimation(parameter, validityArray.value);
+                    }
+                    else
+                    {
+                        ED.errorHandler('ED.Drawing', 'eventHandler', 'Attempt to change HTML element value to an invalid value for parameter ' + parameter);
+                    }
+                    
+                    // Apply new value to element if necessary
+                    if (_value != validityArray.value)
+                    {
+                        document.getElementById(_elementId).value = validityArray.value;
+                    }
+                    
+                    
+                    // ***TODO*** Need to reset state of drawing elsewhere, since this gets called before animation finished.
+                    //doodle.drawing.isActive = false;
                 }
-
-                // Apply new value to element if necessary
-                if (_value != validityArray.value)
-                {
-                    document.getElementById(_elementId).value = validityArray.value;
-                }
-                
-                // ***TODO*** Need to reset state of drawing elsewhere, since this gets called before animation finished.
-                //doodle.drawing.isActive = false;
+            }
+            else
+            {
+                ED.errorHandler('ED.Drawing', 'eventHandler', 'Doodle of id: ' + _doodleId + ' no longer exists');
             }
             break;
         default:
@@ -2063,29 +2156,12 @@ ED.Drawing.prototype.deleteAllDoodles = function()
 	// Go through doodle array (backwards because of splice function)
 	for (var i = this.doodleArray.length - 1; i >= 0; i--)
 	{
-        // Find doodles of given class name
+        // Only delete deletable ones
         if (this.doodleArray[i].isDeletable)
         {
-            // If it happens to be selected, deselect it
-            if (this.doodleArray[i].isSelected)
-            {
-                // Deselect doodle
-                this.selectedDoodle = null;
-            }
-            
-            // Remove item for removal
-            this.doodleArray.splice(i,1);
+            this.deleteDoodle(this.doodleArray[i]);
         }
 	}
-    
-    // Re-assign ordinal numbers to array
-    for (var i = 0; i < this.doodleArray.length; i++)
-    {
-        this.doodleArray[i].order = i;
-    }
-    
-	// Refresh canvas
-	this.repaint();
 }
 
 /**
@@ -2101,26 +2177,9 @@ ED.Drawing.prototype.deleteDoodlesOfClass = function(_className)
         // Find doodles of given class name
         if (this.doodleArray[i].className == _className)
         {
-            // If it happens to be selected, deselect it
-            if (this.doodleArray[i].isSelected && this.doodleArray[i].isDeletable)
-            {
-                // Deselect doodle
-                this.selectedDoodle = null;
-            }
-            
-            // Remove item for removal
-            this.doodleArray.splice(i,1);
+            this.deleteDoodle(this.doodleArray[i]);
         }
 	}
-    
-    // Re-assign ordinal numbers to array
-    for (var i = 0; i < this.doodleArray.length; i++)
-    {
-        this.doodleArray[i].order = i;
-    }
-    
-	// Refresh canvas
-	this.repaint();
 }
 
 /**
@@ -2373,7 +2432,7 @@ ED.Drawing.prototype.repaint = function()
 		if (this.moveToBackButton !== null) this.moveToBackButton.disabled = false;
 		if (this.flipVerButton !== null) this.flipVerButton.disabled = false;
 		if (this.flipHorButton !== null) this.flipHorButton.disabled = false;				 
-		if (this.deleteDoodleButton !== null) this.deleteDoodleButton.disabled = false;
+		if (this.deleteSelectedDoodleButton !== null) this.deleteSelectedDoodleButton.disabled = false;
 		if (this.lockButton !== null) this.lockButton.disabled = false;
         if (this.squiggleSpan !== null && this.selectedDoodle.isDrawable) this.squiggleSpan.style.display = "inline-block";
 	}
@@ -2383,7 +2442,7 @@ ED.Drawing.prototype.repaint = function()
 		if (this.moveToBackButton !== null) this.moveToBackButton.disabled = true;
 		if (this.flipVerButton !== null) this.flipVerButton.disabled = true;
 		if (this.flipHorButton !== null) this.flipHorButton.disabled = true;	 
-		if (this.deleteDoodleButton !== null) this.deleteDoodleButton.disabled = true;
+		if (this.deleteSelectedDoodleButton !== null) this.deleteSelectedDoodleButton.disabled = true;
 		if (this.lockButton !== null) this.lockButton.disabled = true;
         if (this.squiggleSpan !== null) this.squiggleSpan.style.display = "none";
 	}
@@ -2784,8 +2843,6 @@ ED.Report.prototype.isMacOff = function()
  */
 ED.Doodle = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
 {
-	this.canDelete = true;
-
 	// Function called as part of prototype assignment has no parameters passed
 	if (typeof(_drawing) != 'undefined')
 	{
@@ -2871,8 +2928,9 @@ ED.Doodle = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _sca
         this.anglesArray = new Array();
         this.quadrantPoint = new ED.Point(200, 200);
         
-        // Bindings to HTML element values
-        this.bindingArray = new Array();
+        // Bindings to HTML element values. Associative arrays with parameter name as key
+        this.bindingArray = new Array();    
+        this.listenerArray = new Array();
         
 		// Array of 5 handles
 		this.handleArray = new Array();
@@ -3711,31 +3769,77 @@ ED.Doodle.prototype.increment = function(_parameter, _value)
  */
 ED.Doodle.prototype.addBinding = function(_parameter, _id)
 {
-    // Add binding to array
-    this.bindingArray[_parameter] = _id;
-    
-    // Get reference to HTML element
-    var element = document.getElementById(_id);
-    
-    if (element != null)
+    // Check that doodle has a parameter of this name
+    if (typeof(this[_parameter]) != 'undefined')
     {
-        // Set parameter to value of element
-        this.setParameterFromString(_parameter, element.value);
+        // Get reference to HTML element
+        var element = document.getElementById(_id);
         
-        // Attach onchange event of element with a function which calls the drawing event handler
-        var drawing = this.drawing;
-        var id = this.id;
-        element.addEventListener('change',function (event) {
-                                 if (this.type == 'checkbox')
-                                 {
-                                    drawing.eventHandler('onchange', id, this.id, this.checked.toString());
-                                 }
-                                 else
-                                 {
-                                    drawing.eventHandler('onchange', id, this.id, this.value);
-                                 }
-                                 },false);
+        // Check element exists
+        if (element != null)
+        {
+            // Add binding to array
+            this.bindingArray[_parameter] = _id;
+            
+            // Set parameter to value of element
+            this.setParameterFromString(_parameter, element.value);
+            
+            // Attach onchange event of element with a function which calls the drawing event handler
+            var drawing = this.drawing;
+            var id = this.id;
+            var className = this.className;
+            var listener;
+            element.addEventListener('change', listener = function (event) {
+                                     if (this.type == 'checkbox')
+                                     {
+                                        drawing.eventHandler('onchange', id, className, this.id, this.checked.toString());
+                                     }
+                                     else
+                                     {
+                                        drawing.eventHandler('onchange', id, className, this.id, this.value);
+                                     }
+                                     },false);
+            
+            // Add listener to array
+            this.listenerArray[_parameter] = listener;
+        }
+        else
+        {
+            ED.errorHandler('ED.Doodle', 'addBinding', 'Failed to add binding. DOM has no element with id: ' + _id);
+        }
     }
+    else
+    {
+        ED.errorHandler('ED.Doodle', 'addBinding', 'Failed to add binding. Doodle of class: ' + this.className + ' has no parameter of name: ' + _parameter);
+    }
+}
+
+/**
+ * Removes a binding from a doodle
+ *
+ * @param {String} _parameter Name of parameter whosse binding is to be removed
+ */
+ED.Doodle.prototype.removeBinding = function(_parameter)
+{
+    // Get id of corresponding element
+    var elementId;
+    for (parameter in this.bindingArray)
+    {
+        if (parameter == _parameter)
+        {
+            elementId = this.bindingArray[_parameter];
+        }
+    }
+    
+    // Remove entry in binding array
+    delete this.bindingArray[_parameter];
+    
+    // Remove event listener
+    var element = document.getElementById(elementId);
+    element.removeEventListener('change', this.listenerArray[parameter], false);
+    
+    // Remove entry in listener array
+    delete this.listenerArray[_parameter];
 }
 
 /**

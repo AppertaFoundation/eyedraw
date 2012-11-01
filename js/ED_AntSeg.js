@@ -310,7 +310,7 @@ ED.AntSegCrossSection.prototype.setPropertyDefaults = function()
  */
 ED.AntSegCrossSection.prototype.setParameterDefaults = function()
 {
-    this.setParameterFromString('grade', 'Small');
+    this.setParameterFromString('grade', 'Large');
     this.apexX = 0;
     this.originX = 44;
 }
