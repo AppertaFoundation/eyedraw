@@ -543,6 +543,40 @@ ED.NuclearCataract.prototype.setParameter = function(_parameter, _value)
 }
 
 /**
+ * Sets parameters for this doodle
+ *
+ * @param {String} _parameter Name of parameter
+ * @param {String} _value New value of parameter
+ */
+ED.NuclearCataract.prototype.setParameterWithoutAnimation = function(_parameter, _value)
+{
+    switch (_parameter)
+    {
+        case 'grade':
+            switch (_value)
+            {
+                case 'Mild':
+                    this.apexY = -180;
+                    break;
+                case 'Moderate':
+                    this.apexY = -100;
+                    break;
+                case 'Brunescent':
+                    this.apexY = 0;
+                    break;
+                default:
+                    break;
+            }
+            break;
+        case 'apexY':
+            this.apexY = _value;
+            break;
+        default:
+            break
+    }
+}
+
+/**
  * Returns a string containing a text description of the doodle
  *
  * @returns {String} Description of doodle
@@ -799,6 +833,40 @@ ED.CorticalCataract.prototype.setParameter = function(_parameter, _value)
                 case 'White':
                     //this.apexY = 0;
                     this.setParameterWithAnimation('apexY', -20);
+                    break;
+                default:
+                    break;
+            }
+            break;
+        case 'apexY':
+            this.apexY = _value;
+            break;
+        default:
+            break
+    }
+}
+
+/**
+ * Sets parameters for this doodle
+ *
+ * @param {String} _parameter Name of parameter
+ * @param {String} _value New value of parameter
+ */
+ED.CorticalCataract.prototype.setParameterWithoutAnimation = function(_parameter, _value)
+{
+    switch (_parameter)
+    {
+        case 'grade':
+            switch (_value)
+            {
+                case 'Mild':
+                    this.apexY = -180;
+                    break;
+                case 'Moderate':
+                    this.apexY = -100;
+                    break;
+                case 'White':
+                    this.apexY = -20;
                     break;
                 default:
                     break;

@@ -1523,7 +1523,7 @@ ED.Drawing.prototype.addDoodle = function(_className, rotation, grade)
  
  				if (typeof grade != 'undefined')
 				{
-					newDoodle.setParameter('grade',grade);
+					newDoodle.setParameterWithoutAnimation('grade',grade);
 				}
 
         // New doodles are selected by default
