@@ -65,7 +65,7 @@ function eyeDrawInit(_properties)
         this.callBack = callBack;
         
         // Register for notifications with drawing object
-        this.drawing.registerForNotifications(this, 'callBack', ['loaded', 'doodleAdded', 'mouseDragged', 'parameter']);
+        this.drawing.registerForNotifications(this, 'callBack', ['loaded', 'doodleAdded', 'mousedragged', 'parameter']);
         
         // Method called for notification
         function callBack(_messageArray)
@@ -122,7 +122,7 @@ function eyeDrawInit(_properties)
                         input.value = this.drawing.save();
                     }
                     break;
-                case 'mouseDragged':
+                case 'mousedragged':
                     // Save drawing to hidden input
                     if (input != null && input.value.length > 0)
                     {

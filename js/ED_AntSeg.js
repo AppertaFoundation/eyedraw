@@ -54,7 +54,7 @@ ED.AntSeg = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _sca
     this.hasPXE;
     
     // Derived parameters
-    this.grade;
+    this.pupilSize;
     this.pxe;
     
 	// Call superclass constructor
@@ -91,7 +91,7 @@ ED.AntSeg.prototype.setPropertyDefaults = function()
     this.parameterValidationArray['apexY']['range'].setMinAndMax(-280, -60);
     
     // Add complete validation arrays for derived parameters
-    this.parameterValidationArray['grade'] = {kind:'derived', type:'string', list:['Large', 'Medium', 'Small'], animate:true};
+    this.parameterValidationArray['pupilSize'] = {kind:'derived', type:'string', list:['Large', 'Medium', 'Small'], animate:true};
     this.parameterValidationArray['pxe'] = {kind:'derived', type:'bool'};
 }
 
@@ -100,7 +100,7 @@ ED.AntSeg.prototype.setPropertyDefaults = function()
  */
 ED.AntSeg.prototype.setParameterDefaults = function()
 {
-    this.setParameterFromString('grade', 'Large');
+    this.setParameterFromString('pupilSize', 'Large');
     this.setParameterFromString('pxe', 'false');
 }
 
@@ -119,16 +119,16 @@ ED.AntSeg.prototype.dependentParameterValues = function(_parameter, _value)
     switch (_parameter)
     {
         case 'apexY':
-            if (_value < -200) returnArray['grade'] = 'Large';
-            else if (_value < -100) returnArray['grade'] = 'Medium';
-            else returnArray['grade']  = 'Small';
+            if (_value < -200) returnArray['pupilSize'] = 'Large';
+            else if (_value < -100) returnArray['pupilSize'] = 'Medium';
+            else returnArray['pupilSize']  = 'Small';
             break;
             
         case 'hasPXE':
             returnArray['pxe'] = _value;
             break;
             
-        case 'grade':
+        case 'pupilSize':
             switch (_value)
             {
                 case 'Large':
@@ -186,7 +186,8 @@ ED.AntSeg.prototype.draw = function(_point)
 	
 	// Set line attributes
 	ctx.lineWidth = 4;
-	ctx.fillStyle = "rgba(100, 200, 250, 0.5)";
+	//ctx.fillStyle = "rgba(100, 200, 250, 0.5)";
+	ctx.fillStyle = "rgba(255, 160, 40, 1)";
 	ctx.strokeStyle = "gray";
 	
 	// Draw boundary path (also hit testing)
@@ -234,6 +235,26 @@ ED.AntSeg.prototype.draw = function(_point)
 }
 
 /**
+ * Enacts a predefined sync action in response to a change in a simple parameter
+ *
+ * @param _parameterName The name of the parameter that has been changed in the master doodle
+ * @param _parameterValue The value of the parameter that has been changed in the master doodle
+ */
+ED.AntSeg.prototype.syncParameter = function(_parameterName, _parameterValue)
+{
+    switch (_parameterName)
+    {
+        case 'apexY':
+            this.setSimpleParameter(_parameterName, _parameterValue);
+            this.updateDependentParameters(_parameterName);
+            break;
+    }
+    
+    // Redraw
+    this.drawing.repaint();
+}
+
+/**
  * Returns a string containing a text description of the doodle
  *
  * @returns {String} Description of doodle
@@ -266,7 +287,7 @@ ED.AntSegCrossSection = function(_drawing, _originX, _originY, _radius, _apexX, 
 	this.className = "AntSegCrossSection";
     
     // Derived parameters
-    this.grade;
+    this.pupilSize;
     
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
@@ -302,7 +323,7 @@ ED.AntSegCrossSection.prototype.setPropertyDefaults = function()
     this.parameterValidationArray['apexY']['range'].setMinAndMax(-280, -60);
     
     // Add complete validation arrays for derived parameters
-    this.parameterValidationArray['grade'] = {kind:'derived', type:'string', list:['Large', 'Medium', 'Small'], animate:true};
+    this.parameterValidationArray['pupilSize'] = {kind:'derived', type:'string', list:['Large', 'Medium', 'Small'], animate:true};
 }
 
 /**
@@ -310,7 +331,7 @@ ED.AntSegCrossSection.prototype.setPropertyDefaults = function()
  */
 ED.AntSegCrossSection.prototype.setParameterDefaults = function()
 {
-    this.setParameterFromString('grade', 'Large');
+    this.setParameterFromString('pupilSize', 'Large');
     this.apexX = 0;
     this.originX = 44;
 }
@@ -335,12 +356,12 @@ ED.AntSegCrossSection.prototype.dependentParameterValues = function(_parameter, 
             var newOriginX = this.parameterValidationArray['apexX']['range'].constrain(this.apexX);
             this.setSimpleParameter('apexX', newOriginX);
             
-            if (_value < -200) returnArray['grade'] = 'Large';
-            else if (_value < -100) returnArray['grade'] = 'Medium';
-            else returnArray['grade']  = 'Small';
+            if (_value < -200) returnArray['pupilSize'] = 'Large';
+            else if (_value < -100) returnArray['pupilSize'] = 'Medium';
+            else returnArray['pupilSize']  = 'Small';
             break;
             
-        case 'grade':
+        case 'pupilSize':
             switch (_value)
             {
                 case 'Large':

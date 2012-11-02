@@ -262,7 +262,6 @@ class OEEyeDrawWidget extends CWidget
             }
         }
 
-        
         // Create a unique and descriptive variable name for the drawing object and the corresponding canvas element
         $this->drawingName = 'ed_drawing_'.$this->mode.'_'.$this->idSuffix;
         $this->canvasId = 'ed_canvas_'.$this->mode.'_'.$this->idSuffix;

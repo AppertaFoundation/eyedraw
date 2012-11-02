@@ -217,16 +217,36 @@ ED.randomArray = [0.6570,0.2886,0.7388,0.1621,0.9896,0.0434,0.1695,0.9099,0.1948
  * @param {Eye} _eye Right or left eye
  * @param {String} _IDSuffix String suffix to identify HTML elements related to this drawing
  * @param {Bool} _isEditable Flag indicating whether canvas is editable or not
+ * @param {Array} _options Associative array of optional parameters 
  */
-ED.Drawing = function(_canvas, _eye, _IDSuffix, _isEditable, offset_x, offset_y, _to_image)
+//ED.Drawing = function(_canvas, _eye, _IDSuffix, _isEditable, _offset_x, _offset_y, _to_image)
+ED.Drawing = function(_canvas, _eye, _IDSuffix, _isEditable, _options)
 {
+    // Defaults for optional parameters
+    var offset_x = 0;
+    var offset_y = 0;
+    var to_image = false;
+    this.controllerFunctionName = 'eyeDrawController';
+    this.graphicsPath = 'graphics/';
+    
+    // If optional parameters exist, use them instead
+    if (typeof(_options) != 'undefined')
+    {
+        if (_options['offset_x']) offset_x = _options['offset_x'];
+        if (_options['offset_y']) offset_y = _options['offset_y'];
+        if (_options['to_image']) toImage = _options['to_image'];
+        if (_options['controllerFunctionName']) this.controllerFunctionName = _options['controllerFunctionName'];
+        if (_options['graphicsPath']) this.graphicsPath = _options['graphicsPath'];
+    }
+
+
 	// Initialise properties
 	this.canvas = _canvas;
 	this.eye = _eye;
 	this.IDSuffix = _IDSuffix;
     this.isEditable = _isEditable;
     this.hoverTimer = null;
-	this.convertToImage = (_to_image && !this.isEditable) ? true : false;
+	this.convertToImage = (to_image && !this.isEditable) ? true : false;
 	this.context = this.canvas.getContext('2d');
 	this.doodleArray = new Array();
 	this.transform = new ED.AffineTransform();
@@ -376,6 +396,23 @@ ED.Drawing = function(_canvas, _eye, _IDSuffix, _isEditable, offset_x, offset_y,
         // Stop browser stealing double click to select text
         this.canvas.onselectstart = function () { return false; }
     }
+    
+    // Instantiate main controller
+    if (typeof(window[this.controllerFunctionName]) != 'undefined')
+    {
+        // Create a controller object for this drawing
+        this.controller = new window[this.controllerFunctionName](this);
+        
+        // Register controller for notifications
+        this.registerForNotifications(this.controller, 'notificationHandler', []);
+
+        // Start loading of texture images (will send loaded notification when ready)
+        this.preLoadImagesFrom(this.graphicsPath);
+    }
+    else
+    {
+        ED.errorHandler('ED.Drawing', 'Constructor', 'Expected controller function: ' + this.controllerFunctionName + ' does not exist');
+    }
 }
 
 /**
@@ -419,6 +456,14 @@ ED.Drawing.prototype.preLoadImagesFrom = function(_path)
         {
             drawing.checkAllLoaded();
         }
+        
+        // Error handling
+        this.imageArray[key].onerror = function()
+        {
+            ED.errorHandler('ED.Drawing', 'preLoadImagesFrom', 'Error loading image files from directory: ' + _path);
+        }
+
+        // Attempt to load image file
         this.imageArray[key].src = _path + key + '.gif';
     }
 }
@@ -459,7 +504,7 @@ ED.Drawing.prototype.checkAllLoaded = function()
  * Registers an object to receive notifications
  *
  * @param {Object} _object The object requesting notification
- * @param {String} _methodName The method in the receiving object which is called for a notification. Defaults to 'callBack'
+ * @param {String} _methodName The method in the receiving object which is called for a notification. Defaults to 'notificationHandler'
  * @param {Array} _notificationList Array of strings listing the notifications the object is interested in. If empty, receives all.
  */
 ED.Drawing.prototype.registerForNotifications = function(_object, _methodName, _notificationList)
@@ -467,7 +512,7 @@ ED.Drawing.prototype.registerForNotifications = function(_object, _methodName, _
     // Put in default values for optional parameters
     if (typeof(_methodName) == 'undefined')
     {
-        _methodName = 'callBack';
+        _methodName = 'notificationHandler';
     }
     if (typeof(_notificationList) == 'undefined')
     {
@@ -487,13 +532,11 @@ ED.Drawing.prototype.unRegisterForNotifications = function(_object)
 {
     // Get index of object in array
     var index = this.notificationArray.indexOf(_object);
-    console.log("removing object at index: " + index);
     
     // If its there, remove it
     if (index >= 0)
     {
         this.notificationArray.splice(index, 1);
-        console.log("array:" + this.notificationArray);
     }
 }
 
@@ -529,7 +572,7 @@ ED.Drawing.prototype.notify = function(_eventName, _object)
             }
             else
             {
-                ED.errorHandler('ED.Drawing', 'notify', 'Attempt to call undefined callback method');
+                ED.errorHandler('ED.Drawing', 'notify', 'Attempt to call undefined notification handler method');
             }
         }
     }
@@ -1115,7 +1158,7 @@ ED.Drawing.prototype.mousemove = function(_point)
 		this.lastMousePosition = _point;
         
         // Notify
-        this.notify("mouseDragged", _point);
+        this.notify("mousedragged", _point);
 	}
 }
 
@@ -1447,7 +1490,7 @@ ED.Drawing.prototype.moveToFront = function()
 	}
     
     // Notify
-    this.notify("moveToFront", this.selectedDoodle);
+    this.notify("moveToFront");
 }
 
 /**
@@ -1475,7 +1518,7 @@ ED.Drawing.prototype.moveToBack = function()
 	}
     
     // Notify
-    this.notify("moveToBack", this.selectedDoodle);
+    this.notify("moveToBack");
 }
 
 /**
@@ -1494,7 +1537,7 @@ ED.Drawing.prototype.flipVer = function()
 	}
     
     // Notify
-    this.notify("flipVer", this.selectedDoodle);
+    this.notify("flipVer");
 }
 
 /**
@@ -1513,7 +1556,7 @@ ED.Drawing.prototype.flipHor = function()
 	}
     
     // Notify
-    this.notify("flipHor", this.selectedDoodle);
+    this.notify("flipHor");
 }
 
 /**
@@ -1891,6 +1934,19 @@ ED.Drawing.prototype.addBindings = function(_bindingArray)
                 doodle.addBinding(parameter, _bindingArray[className][parameter]);
             }
         }
+    }
+}
+
+/**
+ * Takes an array of key value pairs and adds them to the boundElementDeleteValueArray
+ *
+ * @param {Array} _deleteValuesArray Associative array. Key is elementId, and value the value corresponding to an absent doodle
+ */
+ED.Drawing.prototype.addDeleteValues = function(_deleteValuesArray)
+{
+    for (elementId in _deleteValuesArray)
+    {
+        this.boundElementDeleteValueArray[elementId] = _deleteValuesArray[elementId];
     }
 }
 
