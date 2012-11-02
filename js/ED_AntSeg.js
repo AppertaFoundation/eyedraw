@@ -310,7 +310,7 @@ ED.AntSeg.prototype.description = function()
     
     //if (this.hasPXE) returnString += " with pseudoexfoliation";
     
-    var returnString = this.drawing.doodleArray.length == 1?"No abnormality":"";
+    var returnString = this.drawing.doodleArray.length == 1?"no abnormality":"";
 	
 	return returnString;
 }
@@ -549,7 +549,7 @@ ED.NuclearCataract.prototype.setParameter = function(_parameter, _value)
  */
 ED.NuclearCataract.prototype.description = function()
 {
-	return this.getParameter('grade') + " nuclear cataract";
+	return this.getParameter('grade').toLowerCase() + " nuclear cataract";
 }
 
 /**
@@ -819,7 +819,7 @@ ED.CorticalCataract.prototype.setParameter = function(_parameter, _value)
  */
 ED.CorticalCataract.prototype.description = function()
 {
-	return this.getParameter('grade') + " cortical cataract";
+	return this.getParameter('grade').toLowerCase() + " cortical cataract";
 }
 
 /**
@@ -966,7 +966,7 @@ ED.PostSubcapCataract.prototype.draw = function(_point)
  */
 ED.PostSubcapCataract.prototype.description = function()
 {
-	return "Posterior subcapsular cataract";
+	return "posterior subcapsular cataract";
 }
 
 /**
@@ -1133,7 +1133,7 @@ ED.PCIOL.prototype.draw = function(_point)
  */
 ED.PCIOL.prototype.description = function()
 {
-    var returnValue = "Posterior chamber IOL";
+    var returnValue = "posterior chamber IOL";
     
     // Displacement limit
     var limit = 40;
@@ -1330,7 +1330,7 @@ ED.ACIOL.prototype.draw = function(_point)
  */
 ED.ACIOL.prototype.description = function()
 {
-    var returnValue = "Anterior chamber IOL";
+    var returnValue = "anterior chamber IOL";
     
     // Displacement limit
     var limit = 40;
@@ -1696,7 +1696,7 @@ ED.Bleb.prototype.draw = function(_point)
  */
 ED.Bleb.prototype.description = function()
 {
-    var returnString = "Trabeculectomy bleb at ";
+    var returnString = "trabeculectomy bleb at ";
     
     returnString += this.clockHour() + " o'clock";
     
@@ -1826,7 +1826,7 @@ ED.PI.prototype.draw = function(_point)
  */
 ED.PI.prototype.description = function()
 {
-    var returnString = "Peripheral iridectomy at ";
+    var returnString = "peripheral iridectomy at ";
     
     returnString += this.clockHour() + " o'clock";
     
@@ -1990,7 +1990,7 @@ ED.RK.prototype.draw = function(_point)
  */
 ED.RK.prototype.description = function()
 {
-    var returnString = "Radial keratotomy";
+    var returnString = "radial keratotomy";
     
 	return returnString;
 }
@@ -2273,7 +2273,7 @@ ED.Fuchs.prototype.draw = function(_point)
  */
 ED.Fuchs.prototype.description = function()
 {
-    var returnString = "Fuch's Endothelial Dystrophy";
+    var returnString = "Fuch's endothelial dystrophy";
     
 	return returnString;
 }
@@ -2441,9 +2441,9 @@ ED.CornealScar.prototype.description = function()
     var averageScale = this.scaleX + this.scaleY;
     
     // Arbitrary cutoffs
-    if (averageScale < 2) returnString = "Small ";
-    else if (averageScale < 4) returnString = "Medium ";
-    else returnString = "Large ";
+    if (averageScale < 2) returnString = "small ";
+    else if (averageScale < 4) returnString = "medium ";
+    else returnString = "large ";
     
     returnString += "corneal scar";
     
@@ -2728,9 +2728,9 @@ ED.PhakoIncision.prototype.description = function()
     var returnString = "";
     
     // Incision site
-    if (this.radius > 428) returnString = 'Scleral ';
-    else if (this.radius > 344) returnString = 'Limbal ';
-    else returnString = 'Corneal ';
+    if (this.radius > 428) returnString = 'scleral ';
+    else if (this.radius > 344) returnString = 'limbal ';
+    else returnString = 'corneal ';
     
     // Incision type
     returnString += this.apexYDelta == 0?"pocket ":"section "
@@ -3014,7 +3014,7 @@ ED.SidePort.prototype.draw = function(_point)
  */
 ED.SidePort.prototype.description = function()
 {
-    var returnString = "Sideport at ";
+    var returnString = "sideport at ";
     
     returnString += this.clockHour() + " o'clock";
     
@@ -3179,7 +3179,7 @@ ED.LimbalRelaxingIncision.prototype.draw = function(_point)
  */
 ED.LimbalRelaxingIncision.prototype.description = function()
 {
-    var returnString = "Limbal relaxing incision " + (this.arc * 180/Math.PI).toFixed(0) + " degrees at ";
+    var returnString = "limbal relaxing incision " + (this.arc * 180/Math.PI).toFixed(0) + " degrees at ";
     returnString += this.clockHour() + " o'clock";
     
 	return returnString;
@@ -3543,7 +3543,7 @@ ED.MattressSuture.prototype.draw = function(_point)
  */
 ED.MattressSuture.prototype.description = function()
 {
-    var returnString = "Mattress suture at ";
+    var returnString = "mattress suture at ";
     
     returnString += this.clockHour() + " o'clock";
     
@@ -3694,7 +3694,7 @@ ED.CornealSuture.prototype.draw = function(_point)
  */
 ED.CornealSuture.prototype.description = function()
 {
-    var returnString = "Corneal suture at ";
+    var returnString = "corneal suture at ";
     
     returnString += this.clockHour() + " o'clock";
     

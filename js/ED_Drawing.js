@@ -1834,14 +1834,14 @@ ED.Drawing.prototype.report = function()
                 // If its not an empty string, add to the return
                 if (description.length > 0)
                 {
-                    // If text there already, make it lower case and add a comma before
+                    // If text there already, add a comma before
                     if (returnString.length == 0)
                     {
-                        returnString += description;
+                        returnString += description.charAt(0).toUpperCase() + description.substr(1);
                     }
                     else
                     {
-                        returnString = returnString + ", " + description.firstLetterToLowerCase();
+                        returnString = returnString + ", " + description;
                     }
                 }
             }
