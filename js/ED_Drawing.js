@@ -45,9 +45,9 @@ ED.arrowDelta = 4;
  */
 ED.squiggleWidth = 
 {
-Thin:4,
-Medium:12,
-Thick:20
+    Thin:4,
+    Medium:12,
+    Thick:20
 }
 
 /**
@@ -60,8 +60,8 @@ ED.recentClick = false;
  */
 ED.eye = 
 {
-Right:0,
-Left:1
+    Right:0,
+    Left:1
 }
 
 /**
@@ -69,8 +69,8 @@ Left:1
  */
 ED.drawFunctionMode = 
 {
-Draw:0,
-HitTest:1
+    Draw:0,
+    HitTest:1
 }
 
 /**
@@ -93,8 +93,8 @@ ED.Mode =
  */
 ED.handleRing =
 {
-Inner:0,
-Outer:1
+    Inner:0,
+    Outer:1
 }
 
 /**
@@ -219,26 +219,25 @@ ED.randomArray = [0.6570,0.2886,0.7388,0.1621,0.9896,0.0434,0.1695,0.9099,0.1948
  * @param {Bool} _isEditable Flag indicating whether canvas is editable or not
  * @param {Array} _options Associative array of optional parameters 
  */
-//ED.Drawing = function(_canvas, _eye, _IDSuffix, _isEditable, _offset_x, _offset_y, _to_image)
+//ED.Drawing = function(_canvas, _eye, _IDSuffix, _isEditable, _offsetX, _offsetY, _toImage)
 ED.Drawing = function(_canvas, _eye, _IDSuffix, _isEditable, _options)
 {
     // Defaults for optional parameters
-    var offset_x = 0;
-    var offset_y = 0;
-    var to_image = false;
+    var offsetX = 0;
+    var offsetY = 0;
+    var toImage = false;
     this.controllerFunctionName = 'eyeDrawController';
     this.graphicsPath = 'graphics/';
     
     // If optional parameters exist, use them instead
     if (typeof(_options) != 'undefined')
     {
-        if (_options['offset_x']) offset_x = _options['offset_x'];
-        if (_options['offset_y']) offset_y = _options['offset_y'];
-        if (_options['to_image']) toImage = _options['to_image'];
+        if (_options['offsetX']) offsetX = _options['offsetX'];
+        if (_options['offsetY']) offsetY = _options['offsetY'];
+        if (_options['toImage']) toImage = _options['toImage'];
         if (_options['controllerFunctionName']) this.controllerFunctionName = _options['controllerFunctionName'];
         if (_options['graphicsPath']) this.graphicsPath = _options['graphicsPath'];
     }
-
 
 	// Initialise properties
 	this.canvas = _canvas;
@@ -246,9 +245,11 @@ ED.Drawing = function(_canvas, _eye, _IDSuffix, _isEditable, _options)
 	this.IDSuffix = _IDSuffix;
     this.isEditable = _isEditable;
     this.hoverTimer = null;
-	this.convertToImage = (to_image && !this.isEditable) ? true : false;
+	this.convertToImage = (toImage && !this.isEditable) ? true : false;
 	this.context = this.canvas.getContext('2d');
 	this.doodleArray = new Array();
+    this.bindingArray = new Array();
+    this.listenerArray = new Array();
 	this.transform = new ED.AffineTransform();
 	this.inverseTransform = new ED.AffineTransform();
 	this.selectedDoodle = null;
@@ -257,7 +258,7 @@ ED.Drawing = function(_canvas, _eye, _IDSuffix, _isEditable, _options)
 	this.mode = ED.Mode.None;
 	this.lastMousePosition = new ED.Point(0, 0);
     this.doubleClickMilliSeconds = 250;
-    this.loadedNotificationSent = false;
+    this.readyNotificationSent = false;
     this.newPointOnClick = false;
     this.completeLine = false;
     this.globalScaleFactor = 1;
@@ -333,31 +334,31 @@ ED.Drawing = function(_canvas, _eye, _IDSuffix, _isEditable, _options)
         
         // Mouse listeners
         this.canvas.addEventListener('mousedown', function(e) {
-                                     var offset = ED.findOffset(this, offset_x, offset_y);
+                                     var offset = ED.findOffset(this, offsetX, offsetY);
                                      var point = new ED.Point(e.pageX-offset.x,e.pageY-offset.y);
                                      drawing.mousedown(point);
                                      }, false);
         
         this.canvas.addEventListener('mouseup', function(e) { 
-                                     var offset = ED.findOffset(this, offset_x, offset_y);
+                                     var offset = ED.findOffset(this, offsetX, offsetY);
                                      var point = new ED.Point(e.pageX-offset.x,e.pageY-offset.y);
                                      drawing.mouseup(point); 
                                      }, false);
         
         this.canvas.addEventListener('mousemove', function(e) { 
-                                     var offset = ED.findOffset(this, offset_x, offset_y);
+                                     var offset = ED.findOffset(this, offsetX, offsetY);
                                      var point = new ED.Point(e.pageX-offset.x,e.pageY-offset.y);
                                      drawing.mousemove(point); 
                                      }, false);
 
         this.canvas.addEventListener('mouseover', function(e) {
-                                     var offset = ED.findOffset(this, offset_x, offset_y);
+                                     var offset = ED.findOffset(this, offsetX, offsetY);
                                      var point = new ED.Point(e.pageX-offset.x,e.pageY-offset.y);
                                      drawing.mouseover(point);
                                      }, false);
         
         this.canvas.addEventListener('mouseout', function(e) { 
-                                     var offset = ED.findOffset(this, offset_x, offset_y);
+                                     var offset = ED.findOffset(this, offsetX, offsetY);
                                      var point = new ED.Point(e.pageX-offset.x,e.pageY-offset.y);
                                      drawing.mouseout(point); 
                                      }, false);
@@ -396,23 +397,15 @@ ED.Drawing = function(_canvas, _eye, _IDSuffix, _isEditable, _options)
         // Stop browser stealing double click to select text
         this.canvas.onselectstart = function () { return false; }
     }
-    
-    // Instantiate main controller
-    if (typeof(window[this.controllerFunctionName]) != 'undefined')
-    {
-        // Create a controller object for this drawing
-        this.controller = new window[this.controllerFunctionName](this);
-        
-        // Register controller for notifications
-        this.registerForNotifications(this.controller, 'notificationHandler', []);
+}
 
-        // Start loading of texture images (will send loaded notification when ready)
-        this.preLoadImagesFrom(this.graphicsPath);
-    }
-    else
-    {
-        ED.errorHandler('ED.Drawing', 'Constructor', 'Expected controller function: ' + this.controllerFunctionName + ' does not exist');
-    }
+/**
+ * Carries out initialisation of drawing (called after a controller has been instantiated to ensure notification)
+ */
+ED.Drawing.prototype.init = function()
+{
+    // Start loading of texture images (will send ready notification when ready)
+    this.preLoadImagesFrom(this.graphicsPath);
 }
 
 /**
@@ -446,7 +439,7 @@ ED.Drawing.prototype.replaceWithImage = function()
 ED.Drawing.prototype.preLoadImagesFrom = function(_path)
 {
     var drawing = this;
-    var loaded = false;
+    var ready = false;
     
     // Iterate through array loading each image, calling checking function from onload event
     for (var key in this.imageArray)
@@ -489,13 +482,13 @@ ED.Drawing.prototype.checkAllLoaded = function()
     // If all are loaded, send notification
     if (allLoaded)
     {
-        if (!this.loadedNotificationSent)
+        if (!this.readyNotificationSent)
         {
-            //this.onLoaded();
-            this.loadedNotificationSent = true;
+            //this.onready();
+            this.readyNotificationSent = true;
             
             // Notify
-            this.notify("loaded");
+            this.notify("ready");
         }
     }
 }
@@ -1809,6 +1802,9 @@ ED.Drawing.prototype.isReady = function()
  */
 ED.Drawing.prototype.addDoodle = function(_className, _parameterDefaults, _parameterBindings)
 {
+    // Set flag to indicate whether a doodle of this className already exists
+    var exists = this.hasDoodleOfClass(_className);
+    
     // Check that class exists, and create a new doodle
     if (ED.hasOwnProperty(_className))
     {
@@ -1863,7 +1859,24 @@ ED.Drawing.prototype.addDoodle = function(_className, _parameterDefaults, _param
         // Add to array
         this.doodleArray[this.doodleArray.length] = newDoodle;
         
-        // Deal with bindings
+        // Pre-existing binding
+        if (!exists)
+        {
+            for (var parameter in this.bindingArray[_className])
+            {
+                // Value of element will be delete value (by definition), so use default value of doodle
+                var value = newDoodle[parameter];
+
+                // Add binding to the doodle (NB this will set value of new doodle to the value of the element)
+                newDoodle.addBinding(parameter, this.bindingArray[_className][parameter]);
+
+                // Trigger binding by setting parameter to itself
+                newDoodle.setSimpleParameter(parameter, value);
+                this.updateBindings(newDoodle);
+            }
+        }
+        
+        // Binding passed as an argument to this method
         if (typeof(_parameterBindings) != 'undefined')
         {
             for (var key in _parameterBindings)
@@ -1900,12 +1913,15 @@ ED.Drawing.prototype.addDoodle = function(_className, _parameterDefaults, _param
 
 
 /**
- * Takes array of bindings, and adds them to the corresponding doodles. If doodle does not exist, adds event listener to create one
+ * Takes array of bindings, and adds them to the corresponding doodles. Adds andevent listener to create a doodle if it does not exist
  *
  * @param {Array} _bindingArray Associative array. Key is className, and each value is an array with key: parameter name, value: elementId
  */
 ED.Drawing.prototype.addBindings = function(_bindingArray)
 {
+    // Store binding array as part of drawing object in order to restore bindings to doodles that are deleted and added again
+    this.bindingArray = _bindingArray;
+    
     // Get reference to this drawing object (for inner function)
     var drawing = this;
     
@@ -1923,12 +1939,11 @@ ED.Drawing.prototype.addBindings = function(_bindingArray)
             element.addEventListener('change', function (event) {
                  if (!drawing.hasDoodleOfClass(className))
                  {
-                     console.log('element onchange adding doodle');
-                     drawing.addDoodle(className, {}, _bindingArray[className]);
+                     drawing.addDoodle(className);
                  }
             },false);
 
-            // Add binding to doodle if it does exist
+            // Add binding to doodle if it exists
             if (doodle)
             {
                 doodle.addBinding(parameter, _bindingArray[className][parameter]);
@@ -1961,7 +1976,7 @@ ED.Drawing.prototype.addDeleteValues = function(_deleteValuesArray)
  */
 ED.Drawing.prototype.eventHandler = function(_type, _doodleId, _className, _elementId, _value)
 {
-    //console.log("Event " + _type + ":" + _doodleId + ":" + _elementId + ":" + _value);
+    //console.log("Event " + _type + ":" + _doodleId + ":" + _className + ":" + _elementId + ":" + _value);
 
     //var value;
     switch (_type)
@@ -2487,8 +2502,8 @@ ED.Drawing.prototype.repaint = function()
 		if (this.moveToFrontButton !== null) this.moveToFrontButton.disabled = false;
 		if (this.moveToBackButton !== null) this.moveToBackButton.disabled = false;
 		if (this.flipVerButton !== null) this.flipVerButton.disabled = false;
-		if (this.flipHorButton !== null) this.flipHorButton.disabled = false;				 
-		if (this.deleteSelectedDoodleButton !== null) this.deleteSelectedDoodleButton.disabled = false;
+		if (this.flipHorButton !== null) this.flipHorButton.disabled = false;
+		if (this.deleteSelectedDoodleButton !== null && this.selectedDoodle.isDeletable) this.deleteSelectedDoodleButton.disabled = false;
 		if (this.lockButton !== null) this.lockButton.disabled = false;
         if (this.squiggleSpan !== null && this.selectedDoodle.isDrawable) this.squiggleSpan.style.display = "inline-block";
 	}
@@ -2568,7 +2583,6 @@ ED.Drawing.prototype.nextDoodleId = function()
 {
     return this.lastDoodleId++;
 }
-
 
 /**
  * An object of the Report class is used to extract data for the Royal College of Ophthalmologists retinal detachment dataset.
@@ -2984,9 +2998,8 @@ ED.Doodle = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _sca
         this.anglesArray = new Array();
         this.quadrantPoint = new ED.Point(200, 200);
         
-        // Bindings to HTML element values. Associative arrays with parameter name as key
-        this.bindingArray = new Array();    
-        this.listenerArray = new Array();
+        // Bindings to HTML element values. Associative array with parameter name as key
+        this.bindingArray = new Array();
         
 		// Array of 5 handles
 		this.handleArray = new Array();
@@ -3857,7 +3870,9 @@ ED.Doodle.prototype.addBinding = function(_parameter, _id)
                                      },false);
             
             // Add listener to array
-            this.listenerArray[_parameter] = listener;
+            var array = new Array();
+            array[_parameter] = listener;
+            this.drawing.listenerArray[this.id] = array;
         }
         else
         {
@@ -3892,10 +3907,10 @@ ED.Doodle.prototype.removeBinding = function(_parameter)
     
     // Remove event listener
     var element = document.getElementById(elementId);
-    element.removeEventListener('change', this.listenerArray[parameter], false);
+    element.removeEventListener('change', this.drawing.listenerArray[this.id][parameter], false);
     
     // Remove entry in listener array
-    delete this.listenerArray[_parameter];
+    delete this.drawing.listenerArray[this.id];
 }
 
 /**

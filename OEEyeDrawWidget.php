@@ -30,41 +30,26 @@
  * - When in edit mode, toolbars are displayed with control buttons and the doodle buttons specified in the optional 'doodleToolBarArray'.
  * - Data is stored and loaded from a hidden input element the name of which corresponds to the attribute of the data model
  * - The attribute should be stored as a TEXT data type in the database
- * - If the input element is empty, a template can be produced by placing EyeDraw commands in the optional 'onLoadedCommandArray.'
+ * - If the input element is empty, a template can be produced by placing EyeDraw commands in the optional 'onReadyCommandArray.'
  *
  * Usage:
  * <code>
- * <?php
  * $this->widget('application.modules.eyedraw.OEEyeDrawWidget', array(
  *	'idSuffix'=> 'PS',
  *	'side'=>'R',
  *	'mode'=>'edit',
- *	'size'=>300,
  *	'model'=>$model,
  *	'attribute'=>'eyeDraw1',
  *	'doodleToolBarArray'=>array('RRD', 'UTear'),
- *	'onLoadedCommandArray'=>array(
+ *	'onReadyCommandArray'=>array(
  *		array('addDoodle', array('Fundus')),
  *		array('deselectDoodles', array()),
  *		),
  *	));
- * ?>
  * </code>
- * The ED.Drawing object can be accessed from Javascript in two ways;
- * 1. Using the variable name derived from the side and idSuffix, for example 'ed_drawing_edit_RPS'
- * 2. Passed as a parameter to the eDparameterListener function as in the following code snippet;
- * <code>
- * function eDparameterListener(_drawing)
- * {
- *	if (_drawing.selectedDoodle != null)
- *	{
- *		console.log(_drawing.IDSuffix);
- *	}
- * }
- * </code> 
  * @package EyeDraw
  * @author Bill Aylward <bill.aylward@openeyes.org>
- * @version 1.0
+ * @version 1.1
  */
 class OEEyeDrawWidget extends CWidget
 {
@@ -94,16 +79,22 @@ class OEEyeDrawWidget extends CWidget
     public $side = 'R';
 
 	/**
-	 * Mode ('edit' or 'display')
+	 * Mode ('edit' or 'view')
 	 * @var string
 	 */
 	public $mode = 'edit';
 
 	/**
-	 * Size of canvas element in pixels
+	 * Width of canvas element in pixels
 	 * @var int
 	 */
-    public $size = 300;
+    public $width = 300;
+    
+	/**
+	 * Height of canvas element in pixels
+	 * @var int
+	 */
+    public $height = 300;
 
 	/**
 	 * The model possessing an attribute to store JSON data
@@ -127,26 +118,67 @@ class OEEyeDrawWidget extends CWidget
 	 * Array of commands to apply to the drawing object once images have loaded
 	 * @var array
 	 */
-    public $onLoadedCommandArray = array();
+    public $onReadyCommandArray = array();
     
 	/**
-	 * Array of bindings to apply to doodles, applied after onLoaded commands.
+	 * Array of bindings to apply to doodles, applied after onLoaded commands
 	 * @var array
 	 */
     public $bindingArray = array();
-	
+    
 	/**
-	 * Array of params to apply to doodles once the drawing is initialised
-	 * Unlike onLoadedCommandArray, this gets processed when the dataElement is loaded
+	 * Array of delete values to apply to doodles, applied after bindings commands
 	 * @var array
 	 */
-    public $onLoadedParamsArray = array();
+    public $deleteValueArray = array();
 
     /**
-	 * Array of syncs to apply to doodles, applied after bindings commands.
+	 * Array of syncs to apply to doodles, applied after bindings commands
 	 * @var array
 	 */
     public $syncArray = array();
+    
+	/**
+	 * Optional inline styling for the canvas element
+	 * @var string
+	 */
+	public $canvasStyle;
+    
+	/**
+	 * Whether to show the toolbar or not
+	 * @var boolean
+	 */
+	public $toolbar = true;
+    
+	/**
+	 * Whether to focus the canvas element after rendering it on the page
+	 * @var boolean
+	 */
+	public $focus = false;
+    
+	/**
+	 * x offset
+	 * @var integer
+	 */
+	public $offsetX = 0;
+    
+	/**
+	 * y offset
+	 * @var integer
+	 */
+	public $offsetY = 0;
+	
+	/**
+	 * Whether to convert the canvas to an image
+	 * @var bool
+	 */
+	public $toImage = false;
+    
+	/**
+	 * Whether the eyedraw should be rendered with a div wrapper
+	 * @var boolean
+	 */
+	public $divWrapper = true;
     
    /**
 	 * Paths for the subdirectories for javascript, css and images
@@ -192,49 +224,6 @@ class OEEyeDrawWidget extends CWidget
 	 * @var bool
 	 */
 	private $isEditable;
-	
-	/**
-	 * Optional inline styling for the canvas element
-	 * @var string
-	 */
-
-	public $canvasStyle;
-
-	/**
-	 * Optional boolean that determines whether to show the toolbar or not
-	 * @var boolean
-	 */
-	public $toolbar = true;
-
-	/**
-	 * Whether to focus the canvas element after rendering it on the page
-	 * @var boolean
-	 */
-	public $focus = false;
-
-	/**
-	 * x offset
-	 * @var integer
-	 */
-	public $offset_x = 0;
-
-	/**
-	 * y offset
-	 * @var integer
-	 */
-	public $offset_y = 0;
-	
-	/**
-	 * Convert canvas to image
-	 * @var bool
-	 */
-	public $to_image = false;
-
-	/**
-	 * Whether the eyedraw should be rendered with a div wrapper
-	 * @var boolean
-	 */
-	public $no_wrapper = false;
 	
 	/**
 	 * Initializes the widget.
@@ -346,15 +335,16 @@ class OEEyeDrawWidget extends CWidget
             'eye'=>$this->eye,
             'idSuffix'=>$this->idSuffix,
             'isEditable'=>$this->isEditable,
+            'focus'=>$this->focus,
             'graphicsPath'=>$this->imgPath,
             'inputId'=>$this->inputId,
-            'onLoadedCommandArray'=>$this->onLoadedCommandArray,
+            'onReadyCommandArray'=>$this->onReadyCommandArray,
             'bindingArray'=>$this->bindingArray,
+            'deleteValueArray'=>$this->deleteValueArray,
             'syncArray'=>$this->syncArray,
-            'onLoadedParamsArray'=>$this->onLoadedParamsArray,
-            'offset_x'=>$this->offset_x,
-            'offset_y'=>$this->offset_y,
-            'to_image'=>$this->to_image,
+            'offsetX'=>$this->offsetX,
+            'offsetY'=>$this->offsetY,
+            'toImage'=>$this->toImage,
 		);
 		
 		// Encode parameters and pass to a javascript function to set up canvas

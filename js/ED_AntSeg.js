@@ -754,12 +754,13 @@ ED.PhakoIncision = function(_drawing, _originX, _originY, _radius, _apexX, _apex
     // Private parameters
     this.defaultRadius = 330;
     this.sutureSeparation = 1.5;
-    this.apexYDelta = 0;
+    this.apexYDelta = _radius + _apexY;
     
     // Derived parameters
-    this.incisionMeridian;
     this.incisionLength = (_arc * Math.PI/180) * (6 * _radius)/this.defaultRadius;
     this.incisionSite;
+    this.incisionType;
+    this.incisionMeridian;
     
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
@@ -802,16 +803,18 @@ ED.PhakoIncision.prototype.setPropertyDefaults = function()
     this.parameterValidationArray['incisionMeridian'] = {kind:'derived', type:'mod', range:new ED.Range(0, 360), clock:'bottom', animate:true};
     this.parameterValidationArray['incisionLength'] = {kind:'derived', type:'float', range:new ED.Range(1, 9.9), precision:1, animate:true};
     this.parameterValidationArray['incisionSite'] = {kind:'derived', type:'string', list:['Corneal', 'Limbal', 'Scleral'], animate:true};
+    this.parameterValidationArray['incisionType'] = {kind:'derived', type:'string', list:['Pocket', 'Section'], animate:false};
 }
 
 /**
- * Sets default parameters (Only called for new doodles)
+ * Sets default parameters (only called for new doodles)
  * Use the setParameter function for derived parameters, as this will also update dependent variables
  */
 ED.PhakoIncision.prototype.setParameterDefaults = function()
 {
     this.setParameterFromString('incisionSite', 'Corneal');
     this.setParameterFromString('incisionLength', '3.5');
+    this.setParameterFromString('incisionType', 'Pocket');
     
     // Default is temporal side, or 90 degrees to the last one
     var doodle = this.drawing.lastDoodleOfClass(this.className);
@@ -881,22 +884,23 @@ ED.PhakoIncision.prototype.dependentParameterValues = function(_parameter, _valu
             
         case 'apexY':
             returnArray['apexYDelta'] = this.radius + _value;
+            returnArray['incisionType'] = this.radius + _value > 0?'Section':'Pocket';
             break;
             
-            // Incision Meridian (CND 5.15)
+        // Incision Meridian (CND 5.15)
         case 'incisionMeridian':
             returnArray['rotation'] = (((90 - _value) + 360) % 360) * Math.PI/180;
             // Example of animating two simple parameters simultaneously
             //returnArray['arc'] = (1 + _value/90) * Math.PI/12;
             break;
             
-            // Incision length (CND 5.14)
+        // Incision length (CND 5.14)
         case 'incisionLength':
             returnArray['arc'] = _value * this.defaultRadius/(6 * this.radius);
             this.updateArcRange();
             break;
             
-            // Incision site (CND 5.13)
+        // Incision site (CND 5.13)
         case 'incisionSite':
             switch (_value)
             {
@@ -911,6 +915,19 @@ ED.PhakoIncision.prototype.dependentParameterValues = function(_parameter, _valu
                     break;
             }
             break;
+            
+        case 'incisionType':
+            switch (_value)
+            {
+                case 'Pocket':
+                    returnArray['apexYDelta'] = +0;
+                    returnArray['apexY'] = -this.radius;
+                    break;
+                case 'Section':
+                    returnArray['apexYDelta'] = +34;
+                    returnArray['apexY'] = +34 - this.radius;
+                    break;
+            }
     }
     
     return returnArray;
@@ -939,7 +956,6 @@ ED.PhakoIncision.prototype.updateArcRange = function()
  */
 ED.PhakoIncision.prototype.draw = function(_point)
 {
-    //console.log(this.parameterValidationArray['arc']['range'].max);
 	// Get context
 	var ctx = this.drawing.context;
 	

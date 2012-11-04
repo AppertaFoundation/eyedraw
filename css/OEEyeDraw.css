@@ -29,7 +29,7 @@
 canvas.ed_canvas_edit {
 	border: 1px solid gray;
     cursor: pointer;
-	margin-top: 50px;
+	margin-top: 5px;
 }
 
 /* Canvas element in display mode */
@@ -46,7 +46,7 @@ canvas:focus {
 
 /* Div containing control buttons */
 div.ed_toolbar {
-	margin-top: 10px;
+	margin-top: 5px;
 	border: none;
 }
 

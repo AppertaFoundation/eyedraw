@@ -1,4 +1,4 @@
-<?php if(!$no_wrapper) {?><div class="EyeDrawWidget"><?php } ?>
+<?php if($divWrapper) {?><div class="EyeDrawWidget"><?php } ?>
     <p>OEEyeDrawWidgetBasic.php template</p>
 	<?php if ($isEditable && $toolbar) {?>
 		<div class="ed_toolbar">
@@ -18,6 +18,8 @@
 				<img src="<?php echo $imgPath?>unlock.gif" />
 			</button>
 		</div>
+	<?php }?>
+    <?php if ($isEditable && count($doodleToolBarArray) > 0) {?>
 		<div class="ed_toolbar">
 			<?php foreach ($doodleToolBarArray as $item) {?>
 				<button class="ed_img_button" id="<?php echo $item['classname'].$idSuffix?>" title="<?php echo $item['title']?>" onclick="<?php echo $drawingName?>.addDoodle('<?php echo $item['classname']?>'); return false;">
@@ -26,11 +28,10 @@
 			<?php }?>
 		</div>
 	<?php }?>
-    <!-- Uncomment following line to re-enable doodle hover tooltips once layer bug is fixed (OE-1583) -->
-    <!-- <span id="canvasTooltip"></span> -->
-	<canvas id="<?php echo $canvasId?>" class="<?php if ($isEditable) { echo 'ed_canvas_edit'; } else { echo 'ed_canvas_display'; }?>" width="<?php echo $size?>" height="<?php echo $size?>" tabindex="1"<?php if ($canvasStyle) {?> style="<?php echo $canvasStyle?>"<?php }?>></canvas>
+    <span id="canvasTooltip"></span>
+	<canvas id="<?php echo $canvasId?>" class="<?php if ($isEditable) { echo 'ed_canvas_edit'; } else { echo 'ed_canvas_display'; }?>" width="<?php echo $width?>" height="<?php echo $height?>" tabindex="1"<?php if ($canvasStyle) {?> style="<?php echo $canvasStyle?>"<?php }?>></canvas>
 	<?php if($inputId) { ?>
 	<input type="hidden" id="<?php echo $inputId?>" name="<?php echo $inputName?>" value='<?php echo $this->model[$this->attribute]?>' />
 	<?php } ?>
-<?php if(!$no_wrapper) {?></div><?php } ?>
+<?php if($divWrapper) {?></div><?php } ?>
 	

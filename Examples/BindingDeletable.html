@@ -15,24 +15,33 @@
             
             // Assign a global variable to the drawing
             var drawingEdit;
-            
+
             // Runs on page load
             function init()
             {
                 // Create a drawing linked to the canvas
                 drawingEdit = new ED.Drawing(document.getElementById('canvasEdit'), ED.eye.Right, 'RPS', true, {graphicsPath:"../graphics/"});
+                
+                // Create a controller object for this drawing
+                var controller = new eyeDrawController(drawingEdit);
+                
+                // Initialise drawing
+                drawingEdit.init();
             }
             
-            // Main Controller class
+            // Controller class
             function eyeDrawController(_drawing)
             {
-                // Function called for notification
-                this.notificationHandler = function (_messageArray)
+                // Register controller for notifications
+                _drawing.registerForNotifications(this, 'notificationHandler', ['ready']);
+                
+                // Method called for notification
+                this.notificationHandler = function(_messageArray)
                 {
                     switch (_messageArray['eventName'])
                     {
-                        // Loaded notification
-                        case 'loaded':
+                        // Ready notification
+                        case 'ready':
                             _drawing.addDoodle('AntSeg');
                             _drawing.addBindings({CorticalCataract:{grade:'gradeSelect'}});
                             _drawing.addDeleteValues({gradeSelect:'None'});
@@ -44,6 +53,11 @@
             </script>
     </head>
     <body onload="init();">
+        
+        <!-- doodle button to delete or add a doodle -->
+        <button class="imgbutton" disabled="true" id="deleteSelectedDoodleRPS" title="Delete" onclick="drawingEdit.deleteSelectedDoodle(); return false;" ><img src="../graphics/deleteSelectedDoodle.gif" /></button>
+        <button class="imgbutton" onclick="drawingEdit.addDoodle('CorticalCataract'); return false;" ><img src="../graphics/CorticalCataract.gif" /></button>
+        </br >
         
         <!-- Canvas element -->
         <canvas id="canvasEdit" class="ed_canvas_edit" width="300" height="300" tabindex="1"></canvas>

@@ -16,18 +16,29 @@
             // Assign a global variable to the drawing
             var drawingEdit1;
             var drawingEdit2;
-            
+
             // Runs on page load
             function init()
             {
                 // Create two drawings linked to each canvas
                 drawingEdit1 = new ED.Drawing(document.getElementById('canvasEdit1'), ED.eye.Right, 'RPS', true, {graphicsPath:"../graphics/"});
                 drawingEdit2 = new ED.Drawing(document.getElementById('canvasEdit2'), ED.eye.Left, 'LPS', true, {graphicsPath:"../graphics/"});
+                
+                // Create a controller object for this drawing
+                var controller1 = new eyeDrawController(drawingEdit1);
+                var controller2 = new eyeDrawController(drawingEdit2);
+                
+                // Initialise drawings
+                drawingEdit1.init();
+                drawingEdit2.init();
             }
             
-            // Main Controller class
+            // Controller class
             function eyeDrawController(_drawing)
             {
+                // Register controller for notifications
+                _drawing.registerForNotifications(this, 'notificationHandler', ['ready', 'parameter']);
+                
                 // Create an array of synchronisations
                 var syncArray = new Array();
                 if (_drawing.IDSuffix == 'RPS')
@@ -35,13 +46,13 @@
                     syncArray['LPS'] = {AntSeg:['AntSeg']};
                 }
                 
-                // Function called for notification
-                this.notificationHandler = function (_messageArray)
+                // Method called for notification
+                this.notificationHandler = function(_messageArray)
                 {
                     switch (_messageArray['eventName'])
                     {
-                        // Loaded notification
-                        case 'loaded':
+                        // Ready notification
+                        case 'ready':
                             _drawing.addDoodle('AntSeg');
                             break;
                         

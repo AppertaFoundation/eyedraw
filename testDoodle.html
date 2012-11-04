@@ -15,113 +15,45 @@
             
             // Assign a global variable to the drawing
             var drawingEdit;
-            var drawingEdit2;
             
             // Runs on page load
             function init()
             {                
                 // Create a drawing linked to the canvas
                 drawingEdit = new ED.Drawing(document.getElementById('canvasEdit'), ED.eye.Right, 'RPS', true);
-                drawingEdit2 = new ED.Drawing(document.getElementById('canvasEdit2'), ED.eye.Right, 'RPS2', true);
+
+                // Create a controller object for this drawing
+                var controller = new eyeDrawController(drawingEdit);
                 
-                // Instantiate a controller object
-                //var controller = new myController(drawingEdit);
+                // Initialise drawing
+                drawingEdit.init();
             }
             
-            // Main Controller class
+            // Controller class
             function eyeDrawController(_drawing)
             {
-                // Specify call back function
-                this.notificationHandler = notificationHandler;
-
-                // Create an array of synchronisations
-                var syncArray = new Array();
-                if (_drawing.IDSuffix == 'RPS')
-                {
-                    syncArray['RPS2'] = {AntSeg:['AntSeg']};
-                }
+                // Register controller for notifications
+                _drawing.registerForNotifications(this, 'notificationHandler', ['ready']);
                 
                 // Method called for notification
-                function notificationHandler(_messageArray)
+                this.notificationHandler = function(_messageArray)
                 {
                     switch (_messageArray['eventName'])
                     {
-                        // Loaded notification
-                        case 'loaded':
+                        // Ready notification
+                        case 'ready':
                             _drawing.addDoodle('AntSeg');
                             break;
-                        // Loaded notification
-                        case 'parameter':
-                            // Iterate through syncArray
-                            for (var idSuffix in syncArray)
-                            {
-                                // Iterate through each specified className
-                                for (var className in syncArray[idSuffix])
-                                {
-                                    // Get array of specified slave doodle class names
-                                    var slaveClassNameArray = syncArray[idSuffix][className];
-                                    
-                                    // Iterate through it,
-                                    for (var i = 0; i < slaveClassNameArray.length; i++)
-                                    {
-                                        // Derive name of drawing to sync to
-                                        var slaveDrawingName = 'ed_drawing_edit_' + idSuffix;
-                                        
-                                        // Master doodle
-                                        var masterDoodle = _messageArray['object'].doodle;
-                                        
-                                        // Slave doodle (uses first doodle in the drawing matching the className)
-                                        var slaveDoodle = drawingEdit2.firstDoodleOfClass(slaveClassNameArray[i]);
-                                        
-                                        // If master is being driven, both are defined, and slave doodle is set to sync, enact sync for the changed parameter
-                                        if (masterDoodle && slaveDoodle && slaveDoodle.willSync && masterDoodle.drawing.isActive)
-                                        {
-                                            // Sync is handled by a method of the slave doodle object
-                                            slaveDoodle.syncParameter(_messageArray.object.parameter, masterDoodle[_messageArray.object.parameter]);
-                                            
-                                            // Update any bindings associated with the slave doodle
-                                            drawingEdit2.updateBindings(slaveDoodle);
-                                        }
-                                    }
-                                }
-                            }
-                            break;
                     }
                 }
             }
             
-            // Other controller class
-            function myController(_drawing)
-            {
-                // Register for notifications with drawing object
-                _drawing.registerForNotifications(this, 'notificationHandler', []);
-                
-                // Specify call back function
-                this.notificationHandler = notificationHandler;
-                
-                // Method called for notification
-                function notificationHandler(_messageArray)
-                {
-                    switch (_messageArray['eventName'])
-                    {
-                        // Eye draw image files all loaded
-                        case 'loaded':
-                            console.log('LLloaded');
-                            break;
-                    }
-                }
-            }
-            
-            
-
-            </script>
+             </script>
     </head>
     <body onload="init();">
                             
         <!-- Canvas element -->
         <canvas id="canvasEdit" class="ed_canvas_edit" width="300" height="300" tabindex="1"></canvas>
-        <canvas id="canvasEdit2" class="ed_canvas_edit" width="300" height="300" tabindex="2"></canvas>
-
 
     </body>
 </html>

@@ -35,7 +35,7 @@
  *          this better - idSuffix A suffix for DOM elements to distinguish
  *          those associated with this drawing object - isEditable Flag
  *          indicating whether drawing object is editable or not - graphicsPath
- *          Path to folder containing EyeDraw graphics, - onLoadedCommandArray
+ *          Path to folder containing EyeDraw graphics, - onReadyCommandArray
  *          Array of commands and arguments to be run when images are loaded
  */
 function eyeDrawInit(_properties)
@@ -43,41 +43,42 @@ function eyeDrawInit(_properties)
 	// Get reference to the drawing canvas
 	var canvas = document.getElementById(_properties.canvasId);
 
-	// Create a drawing linked to the canvas
-	window[_properties.drawingName] = new ED.Drawing(canvas, _properties.eye,
-			_properties.idSuffix, _properties.isEditable, _properties.offset_x,
-			_properties.offset_y, _properties.to_image);
-
-    // Instantiate a controller object
+    // Options array for drawing object
+    var options = new Array();
+    options['offsetX'] = _properties.offsetX;
+    options['offsetY'] = _properties.offsetY;
+    options['toImage'] = _properties.toImage;
+    options['graphicsPath'] = _properties.graphicsPath;
+    
+    // Create a drawing linked to the canvas
+	window[_properties.drawingName] = new ED.Drawing(canvas, _properties.eye, _properties.idSuffix, _properties.isEditable, options);
+    
+    // Create a controller object for this drawing
     var controller = new eyeDrawController(window[_properties.drawingName]);
     
-	// Preload any images
-	window[_properties.drawingName].preLoadImagesFrom(_properties.graphicsPath);
+    // Initialise drawing
+    window[_properties.drawingName].init();
     
     // Controller class
     function eyeDrawController(_drawing)
     {
         // Assign controller properties
         this.drawing = _drawing;
-        //this.idSuffix = _idSuffix;
         
-        // Call back function
-        this.callBack = callBack;
-        
-        // Register for notifications with drawing object
-        this.drawing.registerForNotifications(this, 'callBack', ['loaded', 'doodleAdded', 'mousedragged', 'parameter']);
+        // Register controller for notifications
+        _drawing.registerForNotifications(this, 'notificationHandler', []);
         
         // Method called for notification
-        function callBack(_messageArray)
+        this.notificationHandler = function(_messageArray)
         {
             // Get reference to hidden input element
             var input = document.getElementById(_properties.inputId);
-
+            
             // Handle events by name
             switch (_messageArray['eventName'])
             {
-                // Image files all loaded
-                case 'loaded':
+                // Drawing object ready
+                case 'ready':
                     // If input exists and contains data, load it into the drawing
                     if (input != null && input.value.length > 0)
                     {
@@ -90,12 +91,12 @@ function eyeDrawInit(_properties)
                     // Otherwise run commands in onLoadedCommand array
                     else
                     {
-                        for ( var i = 0; i < _properties.onLoadedCommandArray.length; i++)
+                        for ( var i = 0; i < _properties.onReadyCommandArray.length; i++)
                         {
                             // Get method name
-                            var method = _properties.onLoadedCommandArray[i][0];
-                            var argumentArray = _properties.onLoadedCommandArray[i][1];
-
+                            var method = _properties.onReadyCommandArray[i][0];
+                            var argumentArray = _properties.onReadyCommandArray[i][1];
+                            
                             // Run method with arguments
                             var dood = this.drawing[method].apply(this.drawing, argumentArray);
                         }
@@ -105,16 +106,32 @@ function eyeDrawInit(_properties)
                     //if (_properties.bindingArray.length > 0)
                     if (!ED.objectIsEmpty(_properties.bindingArray))
                     {
+                        console.log('adding bindings');
                         this.drawing.addBindings(_properties.bindingArray);
                     }
 
+                    // Apply delete values
+                    if (!ED.objectIsEmpty(_properties.deleteValueArray))
+                    {
+                        console.log('adding elete vlues');
+                        this.drawing.addDeleteValues(_properties.deleteValueArray);
+                    }
+                    
                     // Initialise hidden input
                     if (input != null)
                     {
                         input.value = window[_properties.drawingName].save();
                     }
                     
+                    // Optionally make canvas element focussed
+                    if (_properties.focus)
+                    {
+                        console.log('focus');
+                        canvas.focus();
+                    }
+                    
                     break;
+                    
                 case 'doodleAdded':
                     // Save drawing to hidden input
                     if (input != null && input.value.length > 0)
@@ -122,6 +139,7 @@ function eyeDrawInit(_properties)
                         input.value = this.drawing.save();
                     }
                     break;
+                    
                 case 'mousedragged':
                     // Save drawing to hidden input
                     if (input != null && input.value.length > 0)
@@ -129,15 +147,16 @@ function eyeDrawInit(_properties)
                         input.value = this.drawing.save();
                     }
                     break;
+                    
                 case 'parameter':
                     // TEMP stop syncing if slave moves phako incision - put somewhere else
-                    if (_messageArray.selectedDoodle != null)
-                    {
-                        if (_messageArray.selectedDoodle.className == 'PhakoIncision')
-                        {
-                            //stopSync(_messageArray.selectedDoodle);
-                        }
-                    }
+                    //                    if (_messageArray.selectedDoodle != null)
+                    //                    {
+                    //                        if (_messageArray.selectedDoodle.className == 'PhakoIncision')
+                    //                        {
+                    //                            //stopSync(_messageArray.selectedDoodle);
+                    //                        }
+                    //                    }
                     
                     // Iterate through sync array
                     for (var idSuffix in _properties.syncArray)
@@ -148,18 +167,18 @@ function eyeDrawInit(_properties)
                             // Get array of specified slave doodle class names
                             var slaveClassNameArray = _properties.syncArray[idSuffix][className];
                             
-                            // Iterate through it, 
+                            // Iterate through it,
                             for (var i = 0; i < slaveClassNameArray.length; i++)
                             {
                                 // Derive name of drawing to sync to
                                 var slaveDrawingName = 'ed_drawing_edit_' + idSuffix;
-
+                                
                                 // Master doodle
                                 var masterDoodle = _messageArray['object'].doodle;
                                 
                                 // Slave doodle (uses first doodle in the drawing matching the className)
                                 var slaveDoodle = window[slaveDrawingName].firstDoodleOfClass(slaveClassNameArray[i]);
-
+                                
                                 // If master is being driven, both are defined, and slave doodle is set to sync, enact sync for the changed parameter
                                 if (masterDoodle && slaveDoodle && slaveDoodle.willSync && masterDoodle.drawing.isActive)
                                 {
@@ -168,18 +187,20 @@ function eyeDrawInit(_properties)
                                     // Update any bindings to slave doodle
                                     window[slaveDrawingName].updateBindings(slaveDoodle);
                                 }
-
+                                
                             }
                         }
                     }
                     break;
+                
                 default:
-                    console.log('Unhandled notification for message: ' + _messageArray['eventName']);
+                    //console.log(_messageArray['eventName']);
                     break;
             }
         }
-    }    
+    }
 }
+
 
 /*
  * Stops syncing for passed doodle
