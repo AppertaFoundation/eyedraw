@@ -1,5 +1,4 @@
 <?php if($divWrapper) {?><div class="EyeDrawWidget"><?php } ?>
-    <p>OEEyeDrawWidgetBasic.php template</p>
 	<?php if ($isEditable && $toolbar) {?>
 		<div class="ed_toolbar">
 			<button class="ed_img_button" disabled='disabled' id="moveToFront<?php echo $idSuffix?>" title="Move to front" onclick="<?php echo $drawingName?>.moveToFront(); return false;">

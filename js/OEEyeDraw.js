@@ -178,7 +178,7 @@ function eyeDrawInit(_properties)
                                 
                                 // Slave doodle (uses first doodle in the drawing matching the className)
                                 var slaveDoodle = window[slaveDrawingName].firstDoodleOfClass(slaveClassNameArray[i]);
-                                
+
                                 // If master is being driven, both are defined, and slave doodle is set to sync, enact sync for the changed parameter
                                 if (masterDoodle && slaveDoodle && slaveDoodle.willSync && masterDoodle.drawing.isActive)
                                 {
@@ -187,10 +187,10 @@ function eyeDrawInit(_properties)
                                     // Update any bindings to slave doodle
                                     window[slaveDrawingName].updateBindings(slaveDoodle);
                                 }
-                                
                             }
                         }
                     }
+
                     break;
                 
                 default:
