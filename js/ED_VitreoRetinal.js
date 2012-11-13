@@ -164,162 +164,6 @@ ED.Fundus.prototype.description = function()
 }
 
 /**
- * Cystoid Macular Oedema
- *
- * @class CystoidMacularOedema
- * @property {String} className Name of doodle subclass
- * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
- */
-ED.CystoidMacularOedema = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
-{
-	// Set classname
-	this.className = "CystoidMacularOedema";
-    
-	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
-}
-
-/**
- * Sets superclass and constructor
- */
-ED.CystoidMacularOedema.prototype = new ED.Doodle;
-ED.CystoidMacularOedema.prototype.constructor = ED.CystoidMacularOedema;
-ED.CystoidMacularOedema.superclass = ED.Doodle.prototype;
-
-/**
- * Sets handle attributes
- */
-ED.CystoidMacularOedema.prototype.setHandles = function()
-{
-	this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, false);
-}
-
-/**
- * Sets default dragging attributes
- */
-ED.CystoidMacularOedema.prototype.setPropertyDefaults = function()
-{
-	this.isMoveable = false;
-	this.isRotatable = false;
-    this.isUnique = true;
-
-    // Update validation array for simple parameters
-    this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.5, +1.5);
-    this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.5, +1.5);
-}
-
-/**
- * Sets default parameters
- */
-ED.CystoidMacularOedema.prototype.setParameterDefaults = function()
-{
-    this.originY = 0;
-}
-
-/**
- * Draws doodle or performs a hit test if a Point parameter is passed
- *
- * @param {Point} _point Optional point in canvas plane, passed if performing hit test
- */
-ED.CystoidMacularOedema.prototype.draw = function(_point)
-{
-	// Get context
-	var ctx = this.drawing.context;
-	
-	// Call draw method in superclass
-	ED.CystoidMacularOedema.superclass.draw.call(this, _point);
-	
-	// Boundary path
-	ctx.beginPath();
-	
-	// Invisible boundary
-	ctx.arc(0,0,120,0,Math.PI*2,true);
-    
-	// Close path
-	ctx.closePath();
-	
-	// Set line attributes
-	ctx.lineWidth = 0;
-	ctx.fillStyle = "rgba(0, 0, 0, 0)";
-	ctx.strokeStyle = "rgba(0, 0, 0, 0)";
-	
-	// Draw boundary path (also hit testing)
-	this.drawBoundary(_point);
-	
-	// Non boundary drawing here
-	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
-	{
-        // Colours
-        var fill = "rgba(255, 255, 138, 0.5)";
-        var stroke = "rgba(255, 82, 0, 0.7)";
-
-        // Peripheral cysts
-        var point = new ED.Point(0,0);
-        var n = 8;
-        for (var i = 0; i < n; i++)
-        {
-            var angle = i * 2 * Math.PI/n;
-            point.setWithPolars(80,angle);
-            this.drawCircle(ctx, point.x, point.y, 40, fill, 2, stroke);
-        }
-        
-        // Large central cyst
-        this.drawCircle(ctx, 0, 0, 60, fill, 2, stroke);
-	}
-	
-	// Coordinates of handles (in canvas plane)
-	this.handleArray[2].location = this.transform.transformPoint(new ED.Point(84, -84));
-	
-	// Draw handles if selected
-	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
-	
-	// Return value indicating successful hittest
-	return this.isClicked;
-}
-
-/**
- * Returns a string containing a text description of the doodle
- *
- * @returns {String} Description of doodle
- */
-ED.CystoidMacularOedema.prototype.description = function()
-{
-    return "Cystoid macular oedema";
-}
-
-
-/**
- * Returns the SnoMed code of the doodle
- *
- * @returns {Int} SnoMed code of entity representated by doodle
- */
-ED.CystoidMacularOedema.prototype.snomedCode = function()
-{
-	return 193387007;
-}
-
-/**
- * Returns a number indicating position in a hierarchy of diagnoses from 0 to 9 (highest)
- *
- * @returns {Int} Position in diagnostic hierarchy
- */
-ED.CystoidMacularOedema.prototype.diagnosticHierarchy = function()
-{
-	return 2;
-}
-
-
-/**
  * Epiretinal Membrane
  *
  * @class EpiretinalMembrane
@@ -378,7 +222,8 @@ ED.EpiretinalMembrane.prototype.setPropertyDefaults = function()
 }
 
 /**
- * Sets default parameters
+ * Sets default parameters (Only called for new doodles)
+ * Use the setParameter function for derived parameters, as this will also update dependent variables
  */
 ED.EpiretinalMembrane.prototype.setParameterDefaults = function()
 {
@@ -504,199 +349,6 @@ ED.EpiretinalMembrane.prototype.diagnosticHierarchy = function()
 }
 
 /**
- * PRP
- *
- * @class PRP
- * @property {String} className Name of doodle subclass
- * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
- */
-ED.PRP = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
-{
-	// Set classname
-	this.className = "PRP";
-    
-	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
-}
-
-/**
- * Sets superclass and constructor
- */
-ED.PRP.prototype = new ED.Doodle;
-ED.PRP.prototype.constructor = ED.PRP;
-ED.PRP.superclass = ED.Doodle.prototype;
-
-/**
- * Sets handle attributes
- */
-ED.PRP.prototype.setHandles = function()
-{
-    //this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, false);
-	//this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
-}
-
-/**
- * Sets default dragging attributes
- */
-ED.PRP.prototype.setPropertyDefaults = function()
-{
-	this.isSelectable = true;
-	this.isOrientated = false;
-	this.isScaleable = true;
-	this.isSqueezable = true;
-	this.isMoveable = true;
-	this.isRotatable = false;
-    this.rangeOfScale = new ED.Range(+0.5, +4);
-	this.rangeOfApexX = new ED.Range(-0, +0);
-	this.rangeOfApexY = new ED.Range(-100, -10);
-}
-
-/**
- * Sets default parameters
- */
-ED.PRP.prototype.setParameterDefaults = function()
-{
-    this.originX = 0;
-	this.originY = 0;
-    this.apexY = -50;
-    this.arc = 2 * Math.PI;
-}
-
-/**
- * Draws doodle or performs a hit test if a Point parameter is passed
- *
- * @param {Point} _point Optional point in canvas plane, passed if performing hit test
- */
-ED.PRP.prototype.draw = function(_point)
-{
-	// Get context
-	var ctx = this.drawing.context;
-	
-	// Call draw method in superclass
-	ED.SectorPRP.superclass.draw.call(this, _point);
-    
-	// Radius of outer curve just inside ora on right and left fundus diagrams
-	var ro = 952/2;
-    var ri = -this.apexY;
-    var r = ri + (ro - ri)/2;
-	
-	// Calculate parameters for arcs
-	var theta = this.arc/2;
-	var arcStart = - Math.PI/2 + theta;
-	var arcEnd = - Math.PI/2 - theta;
-    
-    // Coordinates of 'corners' of SectorPRP
-	var topRightX = r * Math.sin(theta);
-	var topRightY = - r * Math.cos(theta);
-	var topLeftX = - r * Math.sin(theta);
-	var topLeftY = topRightY;
-    
-	// Boundary path
-	ctx.beginPath();
-    
-	// Arc across to mirror image point on the other side
-	ctx.arc(0, 0, ro, arcStart, arcEnd, true);
-    
-	// Arc back to mirror image point on the other side
-	ctx.arc(0, 0, ri, arcEnd, arcStart, false);
-    
-	// Close path
-	ctx.closePath();
-	
-	// Set line attributes
-	ctx.lineWidth = 40;
-	ctx.fillStyle = "rgba(255,255,255,0)";
-	ctx.strokeStyle = "rgba(255,255,255,0)";
-	
-	// Draw boundary path (also hit testing)
-	this.drawBoundary(_point);
-	
-	// Non boundary drawing
-	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
-	{
-        // PRP spot data
-        var si = 30;
-        var sd = (30 + si);
-        
-        // Array of number of spots for each radius value
-        var count = [47,41,35,28,22,15];
-        
-        // Iterate through radius and angle to draw sector
-        var i = 0;
-        for (var r = ro - si; r > ri; r -= sd)
-        {
-            var j = 0;
-            
-            for (var a = -Math.PI/2 - arcStart; a < this.arc - Math.PI/2 - arcStart; a += sd/r )
-            {
-                a = -Math.PI/2 - arcStart + j * 2 * Math.PI/count[i];
-                
-                var p = new ED.Point(0,0);
-                p.setWithPolars(r, a);
-                this.drawLaserSpot(ctx, p.x, p.y);
-                
-                j++;
-            }
-            
-            i++;
-        }
-	}
-    
-	// Draw handles if selected
-	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
-    
-	// Return value indicating successful hit test
-	return this.isClicked;
-}
-
-/**
- * Returns a string containing a text description of the doodle
- *
- * @returns {String} Description of doodle
- */
-ED.PRP.prototype.description = function()
-{
-    var returnString = "PRP";
-    
-	return returnString;
-}
-
-/**
- * Doodle specific function to draw a row of laser spots
- */
-ED.PRP.prototype.rowOfBurns = function(_startX, _startY, _num, _sep)
-{
-    // Radius of burn
-    var r = 12;
-    
-    var ctx = this.drawing.context;
-    
-    for (i = 0; i < _num; i++)
-    {
-        // Draw laser spot
-        ctx.beginPath();
-        ctx.arc(_startX + i * _sep, _startY, r, 0, 2 * Math.PI, true);
-        //ctx.closePath();
-        ctx.fillStyle = "yellow";
-        ctx.lineWidth = 8;
-        ctx.strokeStyle = "brown";
-        ctx.fill();
-        ctx.stroke();
-    }
-}
-
-
-/**
  * Sector PRP
  *
  * @class SectorPRP
@@ -752,7 +404,8 @@ ED.SectorPRP.prototype.setPropertyDefaults = function()
 }
 
 /**
- * Sets default parameters
+ * Sets default parameters (Only called for new doodles)
+ * Use the setParameter function for derived parameters, as this will also update dependent variables
  */
 ED.SectorPRP.prototype.setParameterDefaults = function()
 {
@@ -916,7 +569,8 @@ ED.LaserCircle.prototype.setPropertyDefaults = function()
 }
 
 /**
- * Sets default parameters
+ * Sets default parameters (Only called for new doodles)
+ * Use the setParameter function for derived parameters, as this will also update dependent variables
  */
 ED.LaserCircle.prototype.setParameterDefaults = function()
 {
@@ -1131,7 +785,8 @@ ED.LaserDemarcation.prototype.setPropertyDefaults = function()
 }
 
 /**
- * Sets default parameters
+ * Sets default parameters (Only called for new doodles)
+ * Use the setParameter function for derived parameters, as this will also update dependent variables
  */
 ED.LaserDemarcation.prototype.setParameterDefaults = function()
 {
@@ -1141,10 +796,7 @@ ED.LaserDemarcation.prototype.setParameterDefaults = function()
     var doodle = this.drawing.lastDoodleOfClass(this.className);
     if (doodle)
     {
-        if (this.drawing.eye == ED.eye.Right)
-        {
-            
-        }
+        this.rotation = doodle.rotation + Math.PI/4;
     }
     else
     {
@@ -1347,7 +999,8 @@ ED.RRD.prototype.setPropertyDefaults = function()
 }
 
 /**
- * Sets default parameters
+ * Sets default parameters (Only called for new doodles)
+ * Use the setParameter function for derived parameters, as this will also update dependent variables
  */
 ED.RRD.prototype.setParameterDefaults = function()
 {
@@ -1597,7 +1250,8 @@ ED.PeripheralRRD.prototype.setPropertyDefaults = function()
 }
 
 /**
- * Sets default parameters
+ * Sets default parameters (Only called for new doodles)
+ * Use the setParameter function for derived parameters, as this will also update dependent variables
  */
 ED.PeripheralRRD.prototype.setParameterDefaults = function()
 {
@@ -1783,7 +1437,8 @@ ED.UTear.prototype.setPropertyDefaults = function()
 }
 
 /**
- * Sets default parameters
+ * Sets default parameters (Only called for new doodles)
+ * Use the setParameter function for derived parameters, as this will also update dependent variables
  */
 ED.UTear.prototype.setParameterDefaults = function()
 {
@@ -1882,5 +1537,176 @@ ED.UTear.prototype.description = function()
 	return returnString;
 }
 
+
+/**
+ * Round hole
+ *
+ * @class RoundHole
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Int} _originX
+ * @param {Int} _originY
+ * @param {Float} _radius
+ * @param {Int} _apexX
+ * @param {Int} _apexY
+ * @param {Float} _scaleX
+ * @param {Float} _scaleY
+ * @param {Float} _arc
+ * @param {Float} _rotation
+ * @param {Int} _order
+ */
+ED.RoundHole = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+{
+	// Set classname
+	this.className = "RoundHole";
+	
+    // Call superclass constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.RoundHole.prototype = new ED.Doodle;
+ED.RoundHole.prototype.constructor = ED.RoundHole;
+ED.RoundHole.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.RoundHole.prototype.setHandles = function()
+{
+	this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, false);
+}
+
+/**
+ * Sets default properties
+ */
+ED.RoundHole.prototype.setPropertyDefaults = function()
+{
+}
+
+/**
+ * Sets default parameters (Only called for new doodles)
+ * Use the setParameter function for derived parameters, as this will also update dependent variables
+ */
+ED.RoundHole.prototype.setParameterDefaults = function()
+{
+    // Displacement from fovea, and from last doodle
+    var d = 300;
+    this.originX = d;
+    this.originY = d;
+    
+    var doodle = this.drawing.lastDoodleOfClass(this.className);
+    if (doodle)
+    {
+        var point = new ED.Point(doodle.originX, doodle.originY);
+        var direction = point.direction() + Math.PI/8;
+        var distance = point.length();
+        var np = new ED.Point(0,0);
+        np.setWithPolars(distance, direction);
+        
+        this.originX = np.x;
+        this.originY = np.y;
+    }
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.RoundHole.prototype.draw = function(_point)
+{
+	// Get context
+	var ctx = this.drawing.context;
+	
+	// Call draw method in superclass
+	ED.RoundHole.superclass.draw.call(this, _point);
+	
+	// Boundary path
+	ctx.beginPath();
+	
+	// Round hole
+	ctx.arc(0,0,30,0,Math.PI*2,true);
+    
+	// Close path
+	ctx.closePath();
+	
+	// Set line attributes
+	ctx.lineWidth = 4;
+	ctx.fillStyle = "red";
+	ctx.strokeStyle = "blue";
+	
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+	
+	// Other stuff here
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
+	{
+	}
+	
+	// Coordinates of handles (in canvas plane)
+	this.handleArray[2].location = this.transform.transformPoint(new ED.Point(21, -21));
+	
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+    
+    // Calculate arc (Arc property not used naturally in this doodle ***TODO** more elegant method of doing this possible!)
+    var centre = this.transform.transformPoint(new ED.Point(0,0));
+    var oneWidthToRight = this.transform.transformPoint(new ED.Point(60,0));
+    var xco = centre.x - this.drawing.canvas.width/2;
+    var yco = centre.y - this.drawing.canvas.height/2;
+    var radius = this.scaleX * Math.sqrt(xco * xco + yco * yco);
+    var width = this.scaleX * (oneWidthToRight.x - centre.x);
+    this.arc = Math.atan(width/radius);
+    //console.log(this.arc * 180/Math.PI + " + " + this.calculateArc() * 180/Math.PI);
+	
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.RoundHole.prototype.description = function()
+{
+    var returnString = "";
+    
+    // Size description
+    if (this.scaleX < 1) returnString = "Small ";
+    if (this.scaleX > 1.5) returnString = "Large ";
+    
+    // Round hole
+	returnString += "Round hole ";
+	
+    // Location (clockhours)
+	returnString += this.clockHour() + " o'clock";
+	
+	return returnString;
+}
+
+/**
+ * Returns the SnoMed code of the doodle
+ *
+ * @returns {Int} SnoMed code of entity representated by doodle
+ */
+ED.RoundHole.prototype.snomedCode = function()
+{
+	return 302888003;
+}
+
+/**
+ * Returns a number indicating position in a hierarchy of diagnoses from 0 to 9 (highest)
+ *
+ * @returns {Int} Position in diagnostic hierarchy
+ */
+ED.RoundHole.prototype.diagnosticHierarchy = function()
+{
+	return 3;
+}
 
 

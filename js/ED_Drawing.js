@@ -85,7 +85,8 @@ ED.Mode =
     Rotate:4,
     Apex:5,
     Handles:6,
-    Draw:7
+    Draw:7,
+    Select:8
 }
 
 /**
@@ -326,6 +327,11 @@ ED.Drawing = function(_canvas, _eye, _IDSuffix, _isEditable, _options)
     this.colourPreview = document.getElementById('colourPreview' + this.IDSuffix);
     this.fillRadio = document.getElementById('fillRadio' + this.IDSuffix);
     this.thickness = document.getElementById('thicknessSelect' + this.IDSuffix);
+    
+    // Selection rectangle
+    this.selectionRectangleIsBeingDragged = false;
+    this.selectionRectangleStart = new ED.Point(0,0);
+    this.selectionRectangleEnd = new ED.Point(0,0);
     
     // Add event listeners (NB within the event listener 'this' refers to the canvas, NOT the drawing instance)
     if (this.isEditable)
@@ -812,7 +818,7 @@ ED.Drawing.prototype.mousedown = function(_point)
 		this.doodleArray[i].isBeingDragged = false;
 	}
     
-    
+    // Drawing
     if (this.newPointOnClick && !found)
     {
         var mousePosDoodlePlane = this.inverseTransform.transformPoint(_point);
@@ -821,6 +827,15 @@ ED.Drawing.prototype.mousedown = function(_point)
         newPointInLine.originX = mousePosDoodlePlane.x;
         newPointInLine.originY = mousePosDoodlePlane.y;
     }
+    
+    // Multiple Selecting
+    /*
+    if (!found)
+    {
+        this.mode = ED.Mode.Select;
+        this.selectionRectangleStart = this.inverseTransform.transformPoint(_point);
+    }
+     */
 	
 	// Repaint
 	this.repaint();
@@ -837,6 +852,20 @@ ED.Drawing.prototype.mousedown = function(_point)
  */
 ED.Drawing.prototype.mousemove = function(_point)
 {
+    // Draw selection rectangle
+    /*
+    if (this.mode == ED.Mode.Select)
+    {
+        if (!this.selectionRectangleIsBeingDragged)
+        {
+            this.selectionRectangleIsBeingDragged = true;
+        }
+        
+        this.selectionRectangleEnd = this.inverseTransform.transformPoint(_point);
+        this.repaint();
+    }
+    */
+     
     // Start the hover timer (also resets it)
     this.startHoverTimer(_point);
     
@@ -1138,6 +1167,11 @@ ED.Drawing.prototype.mousemove = function(_point)
                     doodle.addPointToSquiggle(p);
                     break;
                     
+                case ED.Mode.Select:
+                    var p = new ED.Point(mousePosSelectedDoodlePlane.x,mousePosSelectedDoodlePlane.y);
+                    console.log('Selecting ', p.x, p.y);
+                    break;
+                    
 				default:
 					break;		
 			}
@@ -1163,10 +1197,31 @@ ED.Drawing.prototype.mousemove = function(_point)
  */  
 ED.Drawing.prototype.mouseup = function(_point)
 {
+    // Multiselect - Go through doodles seeing which are within dragging rectangle
+    /*
+    for (var i = 0; i < this.doodleArray.length; i++)
+	{
+        var doodle = this.doodleArray[i];
+        var origin = new ED.Point(doodle.originX, doodle.originY);
+
+        var p = this.transform.transformPoint(origin);
+
+        // If doodle origin is in selection rectangle, select it
+        if(this.selectionRectangleIsBeingDragged && this.context.isPointInPath(p.x, p.y))
+        {
+            doodle.isSelected = true;
+        }
+	}
+
+    // TEMP - this is needed to ensure delete button is activated
+    if (doodle) this.selectedDoodle = doodle;
+     */
+    
 	// Reset flags and mode
 	this.mouseDown = false;
     this.doubleClick = false;
     this.mode = ED.Mode.None;
+    this.selectionRectangleIsBeingDragged = false;
 	
 	// Reset selected doodle's dragging flag
 	if (this.selectedDoodle != null)
@@ -1181,7 +1236,7 @@ ED.Drawing.prototype.mouseup = function(_point)
 		}
 	}
     
-	// Cycle through doodles from front to back doing hit test
+	// Cycle through doodles from front to back doing hit test  ***TODO*** ask Mark what this code is for
 	for (var i = this.doodleArray.length - 1; i > -1; i--)
 	{
 		if (this.doodleArray[i].className == 'Surgeon') {
@@ -1189,6 +1244,9 @@ ED.Drawing.prototype.mouseup = function(_point)
 			this.doodleArray[i].drawing.repaint();
 		}
 	}
+    
+    // Redraw to get rid of select rectangle
+    this.repaint();
     
     // Notify
     this.notify("mouseup", _point);
@@ -1640,6 +1698,17 @@ ED.Drawing.prototype.deleteSelectedDoodle = function()
     {
         ED.errorHandler('ED.Drawing', 'deleteSelectedDoodle', 'Attempt to delete selected doodle, when none selected');
     }
+    
+    // Multiple select
+    /*
+    for (var i = 0; i < this.doodleArray.length; i++)
+    {
+        if (this.doodleArray[i].isSelected)
+        {
+            this.deleteDoodle(this.doodleArray[i]);
+        }
+    }
+     */
 }
 
 /**
@@ -2101,6 +2170,27 @@ ED.Drawing.prototype.hasDoodleOfClass = function(_className)
     return returnValue;
 }
 
+/** Counts number of doodles of passed class
+*
+* @param {String} _className Classname of doodle
+* @returns {Int} Number of doodles of the class
+*/
+ED.Drawing.prototype.numberOfDoodlesOfClass = function(_className)
+{
+    var returnValue = 0;
+    
+	// Go through doodle array looking for doodles of passed className
+	for (var i = 0; i < this.doodleArray.length; i++)
+	{
+        if (this.doodleArray[i].className == _className)
+        {
+            returnValue++;
+        }
+	}
+    
+    return returnValue;
+}
+
 /**
  * Returns first doodle of the passed className, or false if does not exist
  *
@@ -2531,9 +2621,35 @@ ED.Drawing.prototype.repaint = function()
         }
     }
     
+    // ***TODO*** ask Mark what this code is for
     if (!this.modified)
     {
         this.modified = true;
+    }
+    
+    // Draw selection frame
+    if (this.selectionRectangleIsBeingDragged)
+    {
+        // Get context
+        var ctx = this.context;
+        
+        // Boundary path
+        ctx.beginPath();
+        
+        // Square
+        ctx.moveTo(this.selectionRectangleStart.x, this.selectionRectangleStart.y);
+        ctx.lineTo(this.selectionRectangleEnd.x, this.selectionRectangleStart.y);
+        ctx.lineTo(this.selectionRectangleEnd.x, this.selectionRectangleEnd.y);
+        ctx.lineTo(this.selectionRectangleStart.x, this.selectionRectangleEnd.y);
+                
+        // Close path
+        ctx.closePath();
+        
+        // Set line attributes
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = "gray";
+        
+        ctx.stroke();
     }
 }
 
@@ -3716,6 +3832,28 @@ ED.Doodle.prototype.setParameterFromString = function(_parameter, _value)
 
     // Refresh drawing
     this.drawing.repaint();
+}
+
+/**
+ * Set the value of a doodle's origin to avoid overlapping other doodles
+ *
+ * @param {String} _first Displacement of first doodle
+ * @param {String} _next Displacement of subsequent doodles
+ */
+ED.Doodle.prototype.setOriginWithDisplacements = function(_first, _next)
+{
+    this.originX = this.drawing.eye == ED.eye.Right?-_first:_first;
+    this.originY = -_first;
+
+    var doodle = this.drawing.lastDoodleOfClass(this.className);
+    if (doodle)
+    {
+        var newOriginX = doodle.originX - _next;
+        var newOriginY = doodle.originY - _next;
+        
+        this.originX = this.parameterValidationArray['originX']['range'].constrain(newOriginX);
+        this.originY = this.parameterValidationArray['originY']['range'].constrain(newOriginY);
+    }
 }
 
 /**

@@ -96,7 +96,8 @@ ED.AntSeg.prototype.setPropertyDefaults = function()
 }
 
 /**
- * Sets default parameters
+ * Sets default parameters (Only called for new doodles)
+ * Use the setParameter function for derived parameters, as this will also update dependent variables
  */
 ED.AntSeg.prototype.setParameterDefaults = function()
 {
@@ -327,7 +328,8 @@ ED.AntSegCrossSection.prototype.setPropertyDefaults = function()
 }
 
 /**
- * Sets default parameters
+ * Sets default parameters (Only called for new doodles)
+ * Use the setParameter function for derived parameters, as this will also update dependent variables
  */
 ED.AntSegCrossSection.prototype.setParameterDefaults = function()
 {
@@ -500,7 +502,8 @@ ED.CorneaCrossSection.prototype.setPropertyDefaults = function()
 }
 
 /**
- * Sets default parameters
+ * Sets default parameters (Only called for new doodles)
+ * Use the setParameter function for derived parameters, as this will also update dependent variables
  */
 ED.CorneaCrossSection.prototype.setParameterDefaults = function()
 {
@@ -625,7 +628,8 @@ ED.LensCrossSection.prototype.setPropertyDefaults = function()
 }
 
 /**
- * Sets default parameters
+ * Sets default parameters (Only called for new doodles)
+ * Use the setParameter function for derived parameters, as this will also update dependent variables
  */
 ED.LensCrossSection.prototype.setParameterDefaults = function()
 {
@@ -1187,7 +1191,8 @@ ED.CorticalCataract.prototype.setPropertyDefaults = function()
 }
 
 /**
- * Sets default parameters
+ * Sets default parameters (Only called for new doodles)
+ * Use the setParameter function for derived parameters, as this will also update dependent variables
  */
 ED.CorticalCataract.prototype.setParameterDefaults = function()
 {
