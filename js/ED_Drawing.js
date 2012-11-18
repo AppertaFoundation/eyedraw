@@ -1573,6 +1573,53 @@ ED.Drawing.prototype.moveToBack = function()
 }
 
 /**
+ * Moves a doodle next to the first doodle of the passed class name
+ *
+ * @param {Doodle} _doodle The doodle to move
+ * @param {String} _className Classname of doodle
+ * @param {Bool} _inFront True if doodle placed in front, otherwise behind
+ */
+ED.Drawing.prototype.moveNextTo = function(_doodle, _className, _inFront)
+{
+    // Don't assume doodle is in front, so start by putting it there
+    _doodle.order = 1000;
+    this.doodleArray.sort(function(a,b){return a.order - b.order});
+    for (var i = 0; i < this.doodleArray.length; i++)
+    {
+        this.doodleArray[i].order = i;
+    }
+    
+    // Interate through doodle array altering order
+    var offset = 0;
+    for (var i = 0; i < this.doodleArray.length - 1; i++)
+    {
+        this.doodleArray[i].order = i + offset;
+        
+        // Look for doodle of passed classname (will definitely be found first)
+        if (this.doodleArray[i].className == _className)
+        {
+            offset = 1;
+            if (_inFront)
+            {
+                _doodle.order = i + 1;
+            }
+            else
+            {
+                _doodle.order = i;
+                this.doodleArray[i].order = i + 1;
+            }
+        }
+    }
+		
+    // Sort array by order (puts back doodle first)
+    this.doodleArray.sort(function(a,b){return a.order - b.order});
+    
+    
+    // Notify
+    //this.notify("moveToBack");
+}
+
+/**
  * Flips the doodle around a vertical axis
  */
 ED.Drawing.prototype.flipVer = function()
@@ -1621,47 +1668,55 @@ ED.Drawing.prototype.deleteDoodle = function(_doodle)
     var deletedClassName = false;
     
     var errorMessage = 'Attempt to delete a doodle that does not exist';
-
-    // Iterate through doodle array looking for doodle
-    for (var i = 0; i < this.doodleArray.length; i++)
+    
+    // Check that doodle will delete
+    if (_doodle.willDelete())
     {
-        if (this.doodleArray[i].id == _doodle.id)
+        // Iterate through doodle array looking for doodle
+        for (var i = 0; i < this.doodleArray.length; i++)
         {
-            if (this.doodleArray[i].isDeletable)
+            if (this.doodleArray[i].id == _doodle.id)
             {
-                deletedClassName = _doodle.className;
-                
-                // If its selected, deselect it
-                if (this.selectedDoodle != null && this.selectedDoodle.id == _doodle.id)
+                if (this.doodleArray[i].isDeletable)
                 {
-                    this.selectedDoodle = null;
-                }
-
-                
-                // Remove bindings and reset values of bound elements
-                for (var parameter in _doodle.bindingArray)
-                {
-                    //console.log('removing binding', parameter, _doodle.bindingArray[parameter]);
-                    var element = document.getElementById(_doodle.bindingArray[parameter]);
-                    if (element != null)
-                    {
-                        // Set new value of element
-                        element.value = this.boundElementDeleteValueArray[_doodle.bindingArray[parameter]];
-                        
-                        // Remove binding from doodle (also removes event listener from element)
-                        _doodle.removeBinding(parameter);
-                    }
-                }
+                    deletedClassName = _doodle.className;
                     
-                // Remove it from array
-                this.doodleArray.splice(i,1);
-            }
-            else
-            {
-                errorMessage = 'Attempt to delete a doodle that is not deletable, className: ' + _doodle.className;
+                    // If its selected, deselect it
+                    if (this.selectedDoodle != null && this.selectedDoodle.id == _doodle.id)
+                    {
+                        this.selectedDoodle = null;
+                    }
+
+                    
+                    // Remove bindings and reset values of bound elements
+                    for (var parameter in _doodle.bindingArray)
+                    {
+                        //console.log('removing binding', parameter, _doodle.bindingArray[parameter]);
+                        var element = document.getElementById(_doodle.bindingArray[parameter]);
+                        if (element != null)
+                        {
+                            // Set new value of element
+                            element.value = this.boundElementDeleteValueArray[_doodle.bindingArray[parameter]];
+                            
+                            // Remove binding from doodle (also removes event listener from element)
+                            _doodle.removeBinding(parameter);
+                        }
+                    }
+                        
+                    // Remove it from array
+                    this.doodleArray.splice(i,1);
+                }
+                else
+                {
+                    errorMessage = 'Attempt to delete a doodle that is not deletable, className: ' + _doodle.className;
+                }
             }
         }
-	}
+    }
+    else
+    {
+        errorMessage = 'Doodle refused permission to be deleted, className: ' + _doodle.className;
+    }
     
     // If successfully deleted, tidy up
     if (deletedClassName)
@@ -1957,6 +2012,9 @@ ED.Drawing.prototype.addDoodle = function(_className, _parameterDefaults, _param
         
         // Notify
         this.notify("doodleAdded", newDoodle);
+        
+        // Position relative to other relevant doodles
+        newDoodle.position();
         
         // Place doodle and refresh drawing
         if (newDoodle.addAtBack)
@@ -3204,6 +3262,23 @@ ED.Doodle.prototype.setPropertyDefaults = function()
  */
 ED.Doodle.prototype.setParameterDefaults = function()
 {
+}
+
+/**
+ * Sets position in array relative to other relevant doodles (overridden by subclasses)
+ */
+ED.Doodle.prototype.position = function()
+{
+}
+
+/**
+ * Called on attempt to delete doodle, and returns permission (overridden by subclasses)
+ *
+ * @returns {Bool} True if OK to delete
+ */
+ED.Doodle.prototype.willDelete = function()
+{
+    return true;
 }
 
 /**

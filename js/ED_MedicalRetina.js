@@ -1742,6 +1742,8 @@ ED.PRPPostPole.prototype.setPropertyDefaults = function()
 {
     this.addAtBack = true;
     this.isUnique = true;
+    this.isMoveable = false;
+    this.isRotatable = false;
 }
 
 /**

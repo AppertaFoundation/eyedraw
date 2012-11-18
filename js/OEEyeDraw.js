@@ -180,7 +180,7 @@ function eyeDrawInit(_properties)
                                 var slaveDoodle = window[slaveDrawingName].firstDoodleOfClass(slaveClassNameArray[i]);
 
                                 // If master is being driven, both are defined, and slave doodle is set to sync, enact sync for the changed parameter
-                                if (masterDoodle && slaveDoodle && slaveDoodle.willSync && masterDoodle.drawing.isActive)
+                                if (masterDoodle && slaveDoodle && masterDoodle.className == className && slaveDoodle.willSync && masterDoodle.drawing.isActive)
                                 {
                                     slaveDoodle.syncParameter(_messageArray.object.parameter, masterDoodle[_messageArray.object.parameter]);
                                     

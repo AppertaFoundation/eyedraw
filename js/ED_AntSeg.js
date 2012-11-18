@@ -334,7 +334,7 @@ ED.AntSegCrossSection.prototype.setPropertyDefaults = function()
 ED.AntSegCrossSection.prototype.setParameterDefaults = function()
 {
     this.setParameterFromString('pupilSize', 'Large');
-    this.apexX = 0;
+    this.apexX = 24;
     this.originX = 44;
 }
 
@@ -355,9 +355,19 @@ ED.AntSegCrossSection.prototype.dependentParameterValues = function(_parameter, 
         case 'apexY':
             // Set apexX and its limits for apexX according to value of apexY (prevents collisions with cornea and lens)
             this.parameterValidationArray['apexX']['range'].setMinAndMax(-40 - (140/220) * (this.apexY + 280), 32 - (72/220) * (this.apexY + 280));
-            var newOriginX = this.parameterValidationArray['apexX']['range'].constrain(this.apexX);
+            
+            // If being synced, make sensible decision about x
+            if (!this.drawing.isActive)
+            {
+                var newOriginX = this.parameterValidationArray['apexX']['range'].max;
+            }
+            else
+            {
+                var newOriginX = this.parameterValidationArray['apexX']['range'].constrain(this.apexX);
+            }
             this.setSimpleParameter('apexX', newOriginX);
             
+            // Set pupil size value
             if (_value < -200) returnArray['pupilSize'] = 'Large';
             else if (_value < -100) returnArray['pupilSize'] = 'Medium';
             else returnArray['pupilSize']  = 'Small';
@@ -454,6 +464,26 @@ ED.AntSegCrossSection.prototype.draw = function(_point)
 	
 	// Return value indicating successful hittest
 	return this.isClicked;
+}
+
+/**
+ * Enacts a predefined sync action in response to a change in a simple parameter
+ *
+ * @param _parameterName The name of the parameter that has been changed in the master doodle
+ * @param _parameterValue The value of the parameter that has been changed in the master doodle
+ */
+ED.AntSegCrossSection.prototype.syncParameter = function(_parameterName, _parameterValue)
+{
+    switch (_parameterName)
+    {
+        case 'apexY':
+            this.setSimpleParameter(_parameterName, _parameterValue);
+            this.updateDependentParameters(_parameterName);
+            break;
+    }
+    
+    // Redraw
+    this.drawing.repaint();
 }
 
 /**
@@ -582,6 +612,165 @@ ED.CorneaCrossSection.prototype.draw = function(_point)
 }
 
 /**
+ * Lens
+ *
+ * @class Lens
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Int} _originX
+ * @param {Int} _originY
+ * @param {Float} _radius
+ * @param {Int} _apexX
+ * @param {Int} _apexY
+ * @param {Float} _scaleX
+ * @param {Float} _scaleY
+ * @param {Float} _arc
+ * @param {Float} _rotation
+ * @param {Int} _order
+ */
+ED.Lens = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+{
+	// Set classname
+	this.className = "Lens";
+    
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.Lens.prototype = new ED.Doodle;
+ED.Lens.prototype.constructor = ED.Lens;
+ED.Lens.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets default dragging attributes
+ */
+ED.Lens.prototype.setPropertyDefaults = function()
+{
+    this.isUnique = true;
+    this.addAtBack = true;
+    
+    // Update component of validation array for simple parameters
+    this.parameterValidationArray['originX']['range'].setMinAndMax(-50, +77);
+    //this.parameterValidationArray['originY']['range'].setMinAndMax(-60, +60);
+}
+
+/**
+ * Sets default parameters (Only called for new doodles)
+ * Use the setParameter function for derived parameters, as this will also update dependent variables
+ */
+ED.Lens.prototype.setParameterDefaults = function()
+{
+}
+
+/**
+ * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
+ * The returned parameters are animated if their 'animate' property is set to true
+ *
+ * @param {String} _parameter Name of parameter that has changed
+ * @value {Undefined} _value Value of parameter to calculate
+ * @returns {Array} Associative array of values of dependent parameters
+ */
+ED.Lens.prototype.dependentParameterValues = function(_parameter, _value)
+{
+    var returnArray = new Array();
+    
+    // Move in sync with cortical cataract
+    var corticalCataract = this.drawing.firstDoodleOfClass('CorticalCataract');
+    if (corticalCataract)
+    {
+        corticalCataract.setSimpleParameter('originX', this.originX);
+        corticalCataract.setSimpleParameter('originY', this.originY);
+    }
+    
+    return returnArray;
+}
+
+/**
+ * Called on attempt to delete doodle, and returns permission (overridden by subclasses)
+ *
+ * @returns {Bool} True if OK to delete
+ */
+ED.Lens.prototype.willDelete = function()
+{
+    this.drawing.deleteDoodlesOfClass('CorticalCataract');
+    
+    return true;
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.Lens.prototype.draw = function(_point)
+{
+	// Get context
+	var ctx = this.drawing.context;
+	
+	// Call draw method in superclass
+	ED.Lens.superclass.draw.call(this, _point);
+    
+    // Height of cross section (half value of ro in AntSeg doodle)
+    var ro = 240;
+    
+	// Boundary path
+	ctx.beginPath();
+    
+	// Do a 360 arc
+	ctx.arc(0, 0, ro, 0, 2 * Math.PI, true);
+    
+    // Move to inner circle
+    ctx.closePath();
+	
+	// Set line attributes
+	ctx.lineWidth = 4;
+	//ctx.fillStyle = "rgba(100, 200, 250, 0.5)";
+	ctx.fillStyle = "rgba(255, 255, 255, 0)";
+	ctx.strokeStyle = "gray";
+	
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+    
+	// Non boundary drawing
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
+    {
+        // Zonules
+        ctx.beginPath();
+        
+
+	}
+    
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+	
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * Enacts a predefined sync action in response to a change in a simple parameter
+ *
+ * @param _parameterName The name of the parameter that has been changed in the master doodle
+ * @param _parameterValue The value of the parameter that has been changed in the master doodle
+ */
+ED.Lens.prototype.syncParameter = function(_parameterName, _parameterValue)
+{
+    switch (_parameterName)
+    {
+        case 'originY':
+            this.setSimpleParameter(_parameterName, _parameterValue);
+            this.updateDependentParameters(_parameterName);
+            break;
+    }
+    
+    // Redraw
+    this.drawing.repaint();
+}
+
+/**
  * Lens Cross Section
  *
  * @class LensCrossSection
@@ -624,7 +813,7 @@ ED.LensCrossSection.prototype.setPropertyDefaults = function()
     
     // Update component of validation array for simple parameters
     this.parameterValidationArray['originX']['range'].setMinAndMax(-50, +77);
-    this.parameterValidationArray['originY']['range'].setMinAndMax(-60, +60);
+    //this.parameterValidationArray['originY']['range'].setMinAndMax(-60, +60);
 }
 
 /**
@@ -723,14 +912,31 @@ ED.LensCrossSection.prototype.draw = function(_point)
         ctx.stroke();
 	}
     
-	// Coordinates of handles (in canvas plane)
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
-    
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
 	
 	// Return value indicating successful hittest
 	return this.isClicked;
+}
+
+/**
+ * Enacts a predefined sync action in response to a change in a simple parameter
+ *
+ * @param _parameterName The name of the parameter that has been changed in the master doodle
+ * @param _parameterValue The value of the parameter that has been changed in the master doodle
+ */
+ED.LensCrossSection.prototype.syncParameter = function(_parameterName, _parameterValue)
+{
+    switch (_parameterName)
+    {
+        case 'originY':
+            this.setSimpleParameter(_parameterName, _parameterValue);
+            this.updateDependentParameters(_parameterName);
+            break;
+    }
+    
+    // Redraw
+    this.drawing.repaint();
 }
 
 /**
@@ -1164,6 +1370,14 @@ ED.CorticalCataract.prototype.constructor = ED.CorticalCataract;
 ED.CorticalCataract.superclass = ED.Doodle.prototype;
 
 /**
+ * Sets position in array relative to other relevant doodles (overridden by subclasses)
+ */
+ED.CorticalCataract.prototype.position = function()
+{
+    this.drawing.moveNextTo(this, 'Lens', true);
+}
+
+/**
  * Sets handle attributes
  */
 ED.CorticalCataract.prototype.setHandles = function()
@@ -1176,9 +1390,9 @@ ED.CorticalCataract.prototype.setHandles = function()
  */
 ED.CorticalCataract.prototype.setPropertyDefaults = function()
 {
-    this.addAtBack = true;
+    //this.addAtBack = true;
 	this.isScaleable = false;
-	this.isMoveable = false;
+	//this.isMoveable = false;
 	this.isRotatable = false;
     this.isUnique = true;
 
@@ -1233,6 +1447,14 @@ ED.CorticalCataract.prototype.dependentParameterValues = function(_parameter, _v
                     break;
             }
             break;
+    }
+    
+    // Move in sync with Lens
+    var lens = this.drawing.firstDoodleOfClass('Lens');
+    if (lens)
+    {
+        lens.setSimpleParameter('originX', this.originX);
+        lens.setSimpleParameter('originY', this.originY);
     }
     
     return returnArray;
