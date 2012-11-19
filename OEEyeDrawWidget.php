@@ -232,9 +232,9 @@ class OEEyeDrawWidget extends CWidget
     public function init()
     {
         // Set values of paths
-        $this->cssPath = Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('application.modules.eyedraw.css'));
-        $this->jsPath = Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('application.modules.eyedraw.js'));
-        $this->imgPath = Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('application.modules.eyedraw.graphics')).'/';
+        $this->cssPath = Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('application.modules.eyedraw2.css'), false, -1, YII_DEBUG);
+        $this->jsPath = Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('application.modules.eyedraw2.js'), false, -1, YII_DEBUG);
+        $this->imgPath = Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('application.modules.eyedraw2.graphics'), false, -1, YII_DEBUG).'/';
         
         // If script array is empty, just load all the ED_.js files (with exception of two mandatory files)
         if (empty($this->scriptArray))

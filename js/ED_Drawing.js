@@ -2003,8 +2003,14 @@ ED.Drawing.prototype.addBindings = function(_bindingArray)
         // Iterate through bindings for this className
         for (parameter in _bindingArray[className])
         {
-            // Add an event listener to the element to create a doodle on change, if it does not exist
-            var element = document.getElementById(_bindingArray[className][parameter]);
+        	_param = _bindingArray[className][parameter];
+        	_lkup  = 'value';
+            if (_bindingArray[className][parameter] instanceof Array) {
+            	_param = _bindingArray[className][parameter][0];
+            	_lkup  = _bindingArray[className][parameter][1];
+            } 
+        	// Add an event listener to the element to create a doodle on change, if it does not exist
+            var element = document.getElementById(_param);
             element.addEventListener('change', function (event) {
                  if (!drawing.hasDoodleOfClass(className))
                  {
@@ -2015,7 +2021,7 @@ ED.Drawing.prototype.addBindings = function(_bindingArray)
             // Add binding to doodle if it exists
             if (doodle)
             {
-                doodle.addBinding(parameter, _bindingArray[className][parameter]);
+                doodle.addBinding(parameter, _param, _lkup);
             }
         }
     }
@@ -2045,7 +2051,7 @@ ED.Drawing.prototype.addDeleteValues = function(_deleteValuesArray)
  */
 ED.Drawing.prototype.eventHandler = function(_type, _doodleId, _className, _elementId, _value)
 {
-    //console.log("Event " + _type + ":" + _doodleId + ":" + _className + ":" + _elementId + ":" + _value);
+    console.log("Event " + _type + ":" + _doodleId + ":" + _className + ":" + _elementId + ":" + _value);
 
     //var value;
     switch (_type)
@@ -2072,9 +2078,12 @@ ED.Drawing.prototype.eventHandler = function(_type, _doodleId, _className, _elem
                     var parameter;
                     for (var key in doodle.bindingArray)
                     {
-                        if (doodle.bindingArray[key] == _elementId)
+                        if (doodle.bindingArray[key] instanceof Array && doodle.bindingArray[key][0] == _elementId)
                         {
                             parameter = key;
+                        }
+                        else if (doodle.bindingArray[key] == _elementId) {
+                        	parameter = key;
                         }
                     }
                     
@@ -2084,7 +2093,7 @@ ED.Drawing.prototype.eventHandler = function(_type, _doodleId, _className, _elem
                     // If new value is valid, set it
                     if (validityArray.valid)
                     {
-                        doodle.setParameterWithAnimation(parameter, validityArray.value);
+                    	doodle.setParameterWithAnimation(parameter, validityArray.value);
                     }
                     else
                     {
@@ -2139,7 +2148,27 @@ ED.Drawing.prototype.updateBindings = function(_doodle)
         // Iterate through this doodle's bindings array and alter value of HTML element
         for (var key in doodle.bindingArray)
         {
-            document.getElementById(doodle.bindingArray[key]).value = doodle.getParameter(key);
+            if (doodle.bindingArray[key] instanceof Array) {
+            	element = document.getElementById(doodle.bindingArray[key][0]);
+            	_lkup = doodle.bindingArray[key][1];
+            	
+            	if (element.type == 'select-one') {
+            		// it's a dropdown
+            		for (var i = 0; i < element.length; i++) {
+            			if (element.options[i].getAttribute(_lkup) == doodle.getParameter(key)) {
+            				element.value = element.options[i].value;
+            				break;
+            			}
+            		}
+            	}
+            	else {
+            		element.setAttribute(_lkup, doodle.getParameter(key));
+            	}
+            }
+            else {
+	        	// old method of processing bindings, deprecated
+            	document.getElementById(doodle.bindingArray[key]).value = doodle.getParameter(key);
+            }
         }
     }
     else
@@ -2431,14 +2460,17 @@ ED.Drawing.prototype.report = function()
         // Check for a group description
         if (doodle.groupDescription().length > 0)
         {
+        	console.log("boom");
             // Create an array entry for it or add to existing
             if (typeof(groupArray[doodle.className]) == 'undefined')
             {
+            	console.log('undefined' + doodle.groupDescription());
                 groupArray[doodle.className] = doodle.groupDescription();
                 groupArray[doodle.className] += doodle.description();
             }
             else
             {
+            	console.log('defined:' + doodle.description());
                 // Only add additional detail if supplied by descripton method
                 if (doodle.description().length > 0)
                 {
@@ -2449,7 +2481,8 @@ ED.Drawing.prototype.report = function()
         }
         else
         {
-            if (doodle.willReport)
+            console.log("blast");
+        	if (doodle.willReport)
             {
                 // Get description
                 var description = doodle.description();
@@ -2476,6 +2509,7 @@ ED.Drawing.prototype.report = function()
     {
         // Get description
         var description = groupArray[className];
+        console.log(description);
         
         // Replace last comma with a comma and 'and'
         description = description.addAndAfterLastComma();
@@ -2494,6 +2528,7 @@ ED.Drawing.prototype.report = function()
             }
         }				 
     }
+    console.log(returnString);
 	
     // Return result
 	return returnString;
@@ -3973,10 +4008,12 @@ ED.Doodle.prototype.increment = function(_parameter, _value)
  *
  * @param {String} _parameter Name of parameter to be bound
  * @param {String} _id Id of bound HTML element
+ * @param {String} lkup Name of attribute on HTML element to be used for the value (defaults to value)
  */
-ED.Doodle.prototype.addBinding = function(_parameter, _id)
+ED.Doodle.prototype.addBinding = function(_parameter, _id, _lkup)
 {
-    // Check that doodle has a parameter of this name
+    if (typeof(_lkup) === 'undefined') _lkup = 'value';
+	// Check that doodle has a parameter of this name
     if (typeof(this[_parameter]) != 'undefined')
     {
         // Get reference to HTML element
@@ -3986,10 +4023,15 @@ ED.Doodle.prototype.addBinding = function(_parameter, _id)
         if (element != null)
         {
             // Add binding to array
-            this.bindingArray[_parameter] = _id;
+            this.bindingArray[_parameter] = [_id, _lkup];
             
             // Set parameter to value of element
-            this.setParameterFromString(_parameter, element.value);
+            if (element.type == "select-one") {
+            	this.setParameterFromString(_parameter, element.options[element.selectedIndex].getAttribute(_lkup));
+            }
+            else {
+            	this.setParameterFromString(_parameter, element.getAttribute(_lkup));
+            }
             
             // Attach onchange event of element with a function which calls the drawing event handler
             var drawing = this.drawing;
@@ -4001,9 +4043,13 @@ ED.Doodle.prototype.addBinding = function(_parameter, _id)
                                      {
                                         drawing.eventHandler('onchange', id, className, this.id, this.checked.toString());
                                      }
+                                     else if (this.type == 'select-one')
+                                     {
+                             			drawing.eventHandler('onchange', id, className, this.id, this.options[this.selectedIndex].getAttribute(_lkup));
+                                     }
                                      else
                                      {
-                                        drawing.eventHandler('onchange', id, className, this.id, this.value);
+                                        drawing.eventHandler('onchange', id, className, this.id, this.getAttribute(_lkup));
                                      }
                                      },false);
             
