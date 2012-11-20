@@ -473,6 +473,7 @@ ED.CottonWoolSpot.prototype.setPropertyDefaults = function()
     this.isSqueezable = true;
     this.isOrientated = true;
 
+    // Update component of validation array for simple parameters
     this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.5, +1.5);
     this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.5, +1.5);
 }
@@ -1461,11 +1462,11 @@ ED.CystoidMacularOedema.prototype.diagnosticHierarchy = function()
  */
 ED.HardDrusen = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
 {
-	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
-	
 	// Set classname
 	this.className = "HardDrusen";
+    
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
 }
 
 /**
@@ -1489,16 +1490,16 @@ ED.HardDrusen.prototype.setHandles = function()
  */
 ED.HardDrusen.prototype.setPropertyDefaults = function()
 {
-	this.isSelectable = true;
-	this.isOrientated = false;
-	this.isScaleable = true;
-	this.isSqueezable = false;
 	this.isMoveable = false;
 	this.isRotatable = false;
-	this.rangeOfScale = new ED.Range(+0.5, +1.5);
-	this.rangeOfArc = new ED.Range(Math.PI/6, Math.PI*2);
-	this.rangeOfApexX = new ED.Range(-0, +0);
-	this.rangeOfApexY = new ED.Range(-160, +0);
+    this.isUnique = true;
+    
+    // Update component of validation array for simple parameters
+    this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
+    this.parameterValidationArray['apexY']['range'].setMinAndMax(-160, +0);
+    this.parameterValidationArray['arc']['range'].setMinAndMax(Math.PI/6, Math.PI*2);
+    this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.5, +1.5);
+    this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.5, +1.5);
 }
 
 /**
@@ -1507,14 +1508,12 @@ ED.HardDrusen.prototype.setPropertyDefaults = function()
  */
 ED.HardDrusen.prototype.setParameterDefaults = function()
 {
-    this.originY = 0;
-    if (this.drawing.hasDoodleOfClass('PostPole'))
-    {
-        this.originX = 0;
-    }
-    else
+    // Hard drusen is displaced for Fundus, central for others
+    if (this.drawing.hasDoodleOfClass('Fundus'))
     {
         this.originX = this.drawing.eye == ED.eye.Right?-100:100;
+        this.scaleX = 0.5;
+        this.scaleY = 0.5;
     }
 }
 
@@ -2126,4 +2125,494 @@ ED.FocalLaser.prototype.draw = function(_point)
 	return this.isClicked;
 }
 
+/**
+ * Geographic atrophy with variabel foveal sparing
+ *
+ * @class Geographic
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Int} _originX
+ * @param {Int} _originY
+ * @param {Float} _radius
+ * @param {Int} _apexX
+ * @param {Int} _apexY
+ * @param {Float} _scaleX
+ * @param {Float} _scaleY
+ * @param {Float} _arc
+ * @param {Float} _rotation
+ * @param {Int} _order
+ */
+ED.Geographic = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+{
+	// Set classname
+	this.className = "Geographic";
+	
+    // Call superclass constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+}
 
+/**
+ * Sets superclass and constructor
+ */
+ED.Geographic.prototype = new ED.Doodle;
+ED.Geographic.prototype.constructor = ED.Geographic;
+ED.Geographic.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.Geographic.prototype.setHandles = function()
+{
+    this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, false);
+	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+}
+
+/**
+ * Set default properties
+ */
+ED.Geographic.prototype.setPropertyDefaults = function()
+{
+	this.isMoveable = false;
+	this.isRotatable = false;
+    this.isUnique = true;
+    
+    // Update component of validation array for simple parameters
+    this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.5, +1);
+    this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.5, +1);
+    this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
+    this.parameterValidationArray['apexY']['range'].setMinAndMax(-100, +0);
+}
+
+/**
+ * Sets default parameters
+ */
+ED.Geographic.prototype.setParameterDefaults = function()
+{
+	this.apexY = -100;
+    this.scaleX = 0.7;
+    this.scaleY = 0.7;
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.Geographic.prototype.draw = function(_point)
+{
+	// Get context
+	var ctx = this.drawing.context;
+    
+	// Call draw method in superclass
+	ED.Geographic.superclass.draw.call(this, _point);
+    
+	// Radius of limbus
+	var ro = 200;
+    var ri = -this.apexY;
+    var phi = -this.apexY * Math.PI/800;
+    
+    // Boundary path
+	ctx.beginPath();
+    
+    var point = new ED.Point(0, 0);
+    
+	// Outer arc
+    if (this.drawing.eye == ED.eye.Right)
+    {
+        ctx.arc(0, 0, ro, phi, 2 * Math.PI - phi, false);
+        point.setWithPolars(ri, Math.PI/2 - phi);
+        ctx.lineTo(point.x, point.y);
+        ctx.arc(0, 0, ri, 2 * Math.PI - phi, phi, true);
+    }
+    else
+    {
+        ctx.arc(0, 0, ro, Math.PI - phi, -Math.PI + phi, true);
+        point.setWithPolars(ri, phi - Math.PI/2);
+        ctx.lineTo(point.x, point.y);
+        ctx.arc(0, 0, ri, -Math.PI + phi, Math.PI - phi, false);
+    }
+    
+    // Close path
+    ctx.closePath();
+	
+	// Set attributes
+	ctx.lineWidth = 4;
+    ctx.fillStyle = "rgba(255,255,50,0.8)";
+	ctx.strokeStyle = "rgba(100,100,100,0)";
+	
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+	
+	// Other paths and drawing here
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
+	{
+	}
+    
+	// Coordinates of handles (in canvas plane)
+    point = new ED.Point(0, 0);
+    point.setWithPolars(ro, Math.PI/4);
+	this.handleArray[2].location = this.transform.transformPoint(point);
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
+	
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+    
+	// Return value indicating successful hit test
+	return this.isClicked;
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.Geographic.prototype.description = function()
+{
+	return "Geographic atrophy";
+}
+
+/**
+ * Returns the SnoMed code of the doodle
+ *
+ * @returns {Int} SnoMed code of entity representated by doodle
+ */
+ED.Geographic.prototype.snomedCode = function()
+{
+	return 414875008;
+}
+
+/**
+ * Returns a number indicating position in a hierarchy of diagnoses from 0 to 9 (highest)
+ *
+ * @returns {Int} Position in diagnostic hierarchy
+ */
+ED.Geographic.prototype.diagnosticHierarchy = function()
+{
+	return 2;
+}
+
+/**
+ * VitreousOpacity template with disk and arcades
+ *
+ * @class VitreousOpacity
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Int} _originX
+ * @param {Int} _originY
+ * @param {Float} _radius
+ * @param {Int} _apexX
+ * @param {Int} _apexY
+ * @param {Float} _scaleX
+ * @param {Float} _scaleY
+ * @param {Float} _arc
+ * @param {Float} _rotation
+ * @param {Int} _order
+ */
+ED.VitreousOpacity = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+{
+	// Set classname
+	this.className = "VitreousOpacity";
+    
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.VitreousOpacity.prototype = new ED.Doodle;
+ED.VitreousOpacity.prototype.constructor = ED.VitreousOpacity;
+ED.VitreousOpacity.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.VitreousOpacity.prototype.setHandles = function()
+{
+    this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, false);
+	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+}
+
+/**
+ * Set default properties
+ */
+ED.VitreousOpacity.prototype.setPropertyDefaults = function()
+{
+	this.isRotatable = false;
+    
+    // Update component of validation array for simple parameters
+    this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
+    this.parameterValidationArray['apexY']['range'].setMinAndMax(-100, +0);
+    this.parameterValidationArray['arc']['range'].setMinAndMax(Math.PI/6, Math.PI*2);    
+    this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.5, +4);
+    this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.5, +4);
+}
+
+/**
+ * Sets default parameters
+ */
+ED.VitreousOpacity.prototype.setParameterDefaults = function()
+{
+    this.apexY = -100;
+    this.setOriginWithDisplacements(0, -100);
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.VitreousOpacity.prototype.draw = function(_point)
+{
+	// Get context
+	var ctx = this.drawing.context;
+    
+	// Call draw method in superclass
+	ED.VitreousOpacity.superclass.draw.call(this, _point);
+    
+	// Boundary path
+	ctx.beginPath();
+    
+	// Boundary path
+	ctx.beginPath();
+    
+    // Radius of opacity
+    var ro = 200;
+    
+	// Do a 360 arc
+	ctx.arc(0, 0, ro, 0, 2 * Math.PI, true);
+    
+    // Opacity from apexY
+    var opacity = 0.3  + 0.6 * (ro + 2 * this.apexY)/ro;
+    ctx.fillStyle = "rgba(255, 0, 0," + opacity + ")";
+	
+	// Set attributes
+	ctx.lineWidth = 0;
+	ctx.strokeStyle =  "rgba(255, 0, 0, 0)";
+	
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+	
+	// Other stuff here
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
+	{
+	}
+    
+    // Coordinates of handles (in canvas plane)
+    point = new ED.Point(0, 0);
+    point.setWithPolars(ro, Math.PI/4);
+	this.handleArray[2].location = this.transform.transformPoint(point);
+    this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
+	
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+    
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.VitreousOpacity.prototype.description = function()
+{
+	return "Vitreous opacity";
+}
+
+/**
+ * CNV
+ *
+ * @class CNV
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Int} _originX
+ * @param {Int} _originY
+ * @param {Float} _radius
+ * @param {Int} _apexX
+ * @param {Int} _apexY
+ * @param {Float} _scaleX
+ * @param {Float} _scaleY
+ * @param {Float} _arc
+ * @param {Float} _rotation
+ * @param {Int} _order
+ */
+ED.CNV = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+{
+	// Set classname
+	this.className = "CNV";
+    
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.CNV.prototype = new ED.Doodle;
+ED.CNV.prototype.constructor = ED.CNV;
+ED.CNV.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.CNV.prototype.setHandles = function()
+{
+    this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, false);
+}
+
+/**
+ * Set default properties
+ */
+ED.CNV.prototype.setPropertyDefaults = function()
+{
+	this.isRotatable = false;
+    
+    // Update component of validation array for simple parameters
+    this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
+    this.parameterValidationArray['apexY']['range'].setMinAndMax(-80, +0);
+    this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.5, +2);
+    this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.5, +2);
+}
+
+/**
+ * Sets default parameters
+ */
+ED.CNV.prototype.setParameterDefaults = function()
+{
+    this.setOriginWithDisplacements(0, -100);
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.CNV.prototype.draw = function(_point)
+{
+	// Get context
+	var ctx = this.drawing.context;
+    
+	// Call draw method in superclass
+	ED.CNV.superclass.draw.call(this, _point);
+    
+    // Boundary path
+	ctx.beginPath();
+    
+    // Radius of CNV
+    var r = 80;
+    
+    // Parameters of random curve
+    var n = 16;
+    var phi = 2 * Math.PI/n;
+    var th = 0.5 * Math.PI/n;
+    var b = 4;
+    var point = new ED.Point(0,0);
+    
+    // First point
+    var fp = new ED.Point(0,0);
+    fp.setWithPolars(r, 0);
+    ctx.moveTo(fp.x, fp.y);
+    var rl = r;
+    
+    // Subsequent points
+    for (var i = 0; i < n; i++)
+    {
+        // Get radius of next point
+        var rn = r * (b + ED.randomArray[i])/b;
+        
+        // Control point 1
+        var cp1 = new ED.Point(0,0);
+        cp1.setWithPolars(rl, i * phi + th);
+        
+        // Control point 2
+        var cp2 = new ED.Point(0,0);
+        cp2.setWithPolars(rn, (i + 1) * phi - th);
+        
+        // Next point
+        var pn = new ED.Point(0,0);
+        pn.setWithPolars(rn, (i + 1) * phi);
+        
+        // Assign next point
+        rl = rn;
+        
+        // Next point
+        if (i == n - 1)
+        {
+            ctx.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, fp.x, fp.y);
+        }
+        else
+        {
+            ctx.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, pn.x, pn.y);
+        }
+        
+        // Control handle point
+        if (i == 1)
+        {
+            point.x = pn.x;
+            point.y = pn.y;
+        }
+    }
+    
+    // Close path
+    ctx.closePath();
+    
+	// Set attributes
+	ctx.lineWidth = 0;
+    ctx.fillStyle = "red";
+	ctx.strokeStyle = "red";
+	
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+	
+	// Other paths and drawing here
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
+	{
+        // Yellow centre
+        ctx.beginPath();
+        ctx.arc(0, 0, r * 0.8, 0, 2 * Math.PI, false);
+        ctx.closePath();
+        ctx.fillStyle = "rgba(255,255,190,1)";
+        ctx.fill();
+	}
+    
+	// Coordinates of handles (in canvas plane)
+	this.handleArray[2].location = this.transform.transformPoint(point);
+	
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+    
+	// Return value indicating successful hit test
+	return this.isClicked;
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.CNV.prototype.description = function()
+{
+	return "CNV";
+}
+
+/**
+ * Returns the SnoMed code of the doodle
+ *
+ * @returns {Int} SnoMed code of entity representated by doodle
+ */
+ED.CNV.prototype.snomedCode = function()
+{
+	return 314517003;
+}
+
+/**
+ * Returns a number indicating position in a hierarchy of diagnoses from 0 to 9 (highest)
+ *
+ * @returns {Int} Position in diagnostic hierarchy
+ */
+ED.CNV.prototype.diagnosticHierarchy = function()
+{
+	return 2;
+}

@@ -1709,4 +1709,505 @@ ED.RoundHole.prototype.diagnosticHierarchy = function()
 	return 3;
 }
 
+/**
+ * Cystoid Macular Oedema
+ *
+ * @class CystoidMacularOedema
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Int} _originX
+ * @param {Int} _originY
+ * @param {Float} _radius
+ * @param {Int} _apexX
+ * @param {Int} _apexY
+ * @param {Float} _scaleX
+ * @param {Float} _scaleY
+ * @param {Float} _arc
+ * @param {Float} _rotation
+ * @param {Int} _order
+ */
+ED.CystoidMacularOedema = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+{
+	// Set classname
+	this.className = "CystoidMacularOedema";
+    
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+}
 
+/**
+ * Sets superclass and constructor
+ */
+ED.CystoidMacularOedema.prototype = new ED.Doodle;
+ED.CystoidMacularOedema.prototype.constructor = ED.CystoidMacularOedema;
+ED.CystoidMacularOedema.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.CystoidMacularOedema.prototype.setHandles = function()
+{
+	this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, false);
+}
+
+/**
+ * Sets default dragging attributes
+ */
+ED.CystoidMacularOedema.prototype.setPropertyDefaults = function()
+{
+	this.isMoveable = false;
+	this.isRotatable = false;
+    this.isUnique = true;
+
+    // Update component of validation array for simple parameters
+    this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
+    this.parameterValidationArray['apexY']['range'].setMinAndMax(-40, +30);
+    this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.5, +1.5);
+    this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.5, +1.5);
+}
+
+/**
+ * Sets default parameters
+ */
+ED.CystoidMacularOedema.prototype.setParameterDefaults = function()
+{
+    // CMO is displaced for Fundus, central for others
+    if (this.drawing.hasDoodleOfClass('Fundus'))
+    {
+        this.originX = this.drawing.eye == ED.eye.Right?-100:100;
+        this.scaleX = 0.5;
+        this.scaleY = 0.5;
+    }
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.CystoidMacularOedema.prototype.draw = function(_point)
+{
+	// Get context
+	var ctx = this.drawing.context;
+	
+	// Call draw method in superclass
+	ED.CystoidMacularOedema.superclass.draw.call(this, _point);
+	
+    // Outer radius
+    var r = 100;
+    
+	// Boundary path
+	ctx.beginPath();
+	
+	// Invisible boundary
+	ctx.arc(0,0,r,0,Math.PI*2,true);
+    
+	// Close path
+	ctx.closePath();
+	
+	// Set line attributes
+	ctx.lineWidth = 0;
+	ctx.fillStyle = "rgba(0, 0, 0, 0)";
+	ctx.strokeStyle = "rgba(0, 0, 0, 0)";
+	
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+	
+	// Other stuff here
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
+	{
+        // Colours
+        var fill = "rgba(255, 255, 138, 0.5)";
+        var stroke = "rgba(255, 82, 0, 0.7)";
+        
+        // Peripheral cysts
+        var point = new ED.Point(0,0);
+        var n = 8;
+        for (var i = 0; i < n; i++)
+        {
+            var angle = i * 2 * Math.PI/n;
+            point.setWithPolars(2 * r/3,angle);
+            this.drawCircle(ctx, point.x, point.y, 40, fill, 2, stroke);
+        }
+        
+        // Large central cyst
+        this.drawCircle(ctx, 0, 0, r/2, fill, 2, stroke);
+	}
+	
+	// Coordinates of handles (in canvas plane)
+	this.handleArray[2].location = this.transform.transformPoint(new ED.Point(84, -84));
+	
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+	
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.CystoidMacularOedema.prototype.description = function()
+{
+    return "Cystoid macular oedema";
+}
+
+/**
+ * Returns the SnoMed code of the doodle
+ *
+ * @returns {Int} SnoMed code of entity representated by doodle
+ */
+ED.CystoidMacularOedema.prototype.snomedCode = function()
+{
+	return 193387007;
+}
+
+/**
+ * Returns a number indicating position in a hierarchy of diagnoses from 0 to 9 (highest)
+ *
+ * @returns {Int} Position in diagnostic hierarchy
+ */
+ED.CystoidMacularOedema.prototype.diagnosticHierarchy = function()
+{
+	return 2;
+}
+
+
+/**
+ * Epiretinal Membrane
+ *
+ * @class EpiretinalMembrane
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Int} _originX
+ * @param {Int} _originY
+ * @param {Float} _radius
+ * @param {Int} _apexX
+ * @param {Int} _apexY
+ * @param {Float} _scaleX
+ * @param {Float} _scaleY
+ * @param {Float} _arc
+ * @param {Float} _rotation
+ * @param {Int} _order
+ */
+ED.EpiretinalMembrane = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+{
+	// Set classname
+	this.className = "EpiretinalMembrane";
+
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.EpiretinalMembrane.prototype = new ED.Doodle;
+ED.EpiretinalMembrane.prototype.constructor = ED.EpiretinalMembrane;
+ED.EpiretinalMembrane.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.EpiretinalMembrane.prototype.setHandles = function()
+{
+	this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, true);
+}
+
+/**
+ * Sets default dragging attributes
+ */
+ED.EpiretinalMembrane.prototype.setPropertyDefaults = function()
+{
+	this.isSqueezable = true;
+
+    // Update component of validation array for simple parameters
+    this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
+    this.parameterValidationArray['apexY']['range'].setMinAndMax(-40, +30);
+    this.parameterValidationArray['arc']['range'].setMinAndMax(Math.PI/6, Math.PI*2);
+    this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.25, +1.5);
+    this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.25, +1.5);
+}
+
+/**
+ * Sets default parameters
+ */
+ED.EpiretinalMembrane.prototype.setParameterDefaults = function()
+{
+    this.setOriginWithDisplacements(0, -100);
+    
+    // CMO is displaced for Fundus, central for others
+    if (this.drawing.hasDoodleOfClass('Fundus'))
+    {
+        this.originX = this.drawing.eye == ED.eye.Right?-100:100;
+        this.scaleX = 0.5;
+        this.scaleY = 0.5;
+    }
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.EpiretinalMembrane.prototype.draw = function(_point)
+{
+	// Get context
+	var ctx = this.drawing.context;
+	
+	// Call draw method in superclass
+	ED.EpiretinalMembrane.superclass.draw.call(this, _point);
+	
+	// Boundary path
+	ctx.beginPath();
+	
+	// Invisible boundary
+    var r = 120;
+	ctx.arc(0,0,r,0,Math.PI*2,true);
+    
+	// Close path
+	ctx.closePath();
+	
+	// Set line attributes
+	ctx.lineWidth = 0;
+	ctx.fillStyle = "rgba(0, 0, 0, 0)";
+	ctx.strokeStyle = "rgba(0, 0, 0, 0)";
+	
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+	
+	// Other stuff here
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
+	{
+        // Greenish semi-transparent
+        ctx.strokeStyle= "rgba(0, 255, 0, 0.7)";
+        
+        // Central line
+        ctx.beginPath();
+        ctx.moveTo(-r, 0);
+        ctx.lineTo(r,0);
+        
+        // Curved lines above and below
+        var x = r * 0.9;
+        var y = -r/2;
+        var f = 0.3;
+        ctx.moveTo(-x, y);
+        ctx.bezierCurveTo(-x * f, y * f, x * f, y * f, x, y);
+        y = r/2;
+        ctx.moveTo(-x, y);
+        ctx.bezierCurveTo(-x * f, y * f, x * f, y * f, x, y);
+        x = r * 0.6;
+        y = -r * 0.8;
+        f = 0.5;
+        ctx.moveTo(-x, y);
+        ctx.bezierCurveTo(-x * f, y * f, x * f, y * f, x, y);
+        y = r * 0.8;
+        ctx.moveTo(-x, y);
+        ctx.bezierCurveTo(-x * f, y * f, x * f, y * f, x, y);
+        
+        // Round ended line
+        ctx.lineWidth = 18;
+        ctx.lineCap = "round";
+        
+        ctx.stroke();
+	}
+	
+	// Coordinates of handles (in canvas plane)
+	this.handleArray[2].location = this.transform.transformPoint(new ED.Point(r * 0.7, -r * 0.7));
+	
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+	
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.EpiretinalMembrane.prototype.description = function()
+{
+    return "Epiretinal membrane";
+}
+
+
+/**
+ * Returns the SnoMed code of the doodle
+ *
+ * @returns {Int} SnoMed code of entity representated by doodle
+ */
+ED.EpiretinalMembrane.prototype.snomedCode = function()
+{
+	return 367649002;
+}
+
+/**
+ * Returns a number indicating position in a hierarchy of diagnoses from 0 to 9 (highest)
+ *
+ * @returns {Int} Position in diagnostic hierarchy
+ */
+ED.EpiretinalMembrane.prototype.diagnosticHierarchy = function()
+{
+	return 2;
+}
+
+/**
+ * Macular hole
+ *
+ * @class MacularHole
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Int} _originX
+ * @param {Int} _originY
+ * @param {Float} _radius
+ * @param {Int} _apexX
+ * @param {Int} _apexY
+ * @param {Float} _scaleX
+ * @param {Float} _scaleY
+ * @param {Float} _arc
+ * @param {Float} _rotation
+ * @param {Int} _order
+ */
+ED.MacularHole = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+{
+	// Set classname
+	this.className = "MacularHole";
+
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.MacularHole.prototype = new ED.Doodle;
+ED.MacularHole.prototype.constructor = ED.MacularHole;
+ED.MacularHole.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.MacularHole.prototype.setHandles = function()
+{
+	this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, false);
+}
+
+/**
+ * Sets default properties
+ */
+ED.MacularHole.prototype.setPropertyDefaults = function()
+{
+	this.isMoveable = false;
+	this.isRotatable = false;
+    this.isUnique = true;
+
+    // Update component of validation array for simple parameters
+    this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
+    this.parameterValidationArray['apexY']['range'].setMinAndMax(-40, +30);
+    this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.5, +1.5);
+    this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.5, +1.5);
+}
+
+/**
+ * Sets default parameters
+ */
+ED.MacularHole.prototype.setParameterDefaults = function()
+{
+    // CMO is displaced for Fundus, central for others
+    if (this.drawing.hasDoodleOfClass('Fundus'))
+    {
+        this.originX = this.drawing.eye == ED.eye.Right?-100:100;
+        this.scaleX = 0.5;
+        this.scaleY = 0.5;
+    }
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.MacularHole.prototype.draw = function(_point)
+{
+	// Get context
+	var ctx = this.drawing.context;
+	
+	// Call draw method in superclass
+	ED.MacularHole.superclass.draw.call(this, _point);
+    
+    // Radius
+    var r = 40;
+	
+	// Boundary path
+	ctx.beginPath();
+	
+	// Large yellow circle - hole and subretinal fluid
+	ctx.arc(0,0,r,0,Math.PI*2,true);
+    
+	// Close path
+	ctx.closePath();
+	
+	// Set line attributes
+	ctx.lineWidth = 0;
+	ctx.fillStyle = "yellow";
+	ctx.strokeStyle = "red";
+	
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+	
+	// Other stuff here
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
+	{
+        ctx.beginPath();
+        ctx.arc(0,0,2*r/3,0,Math.PI*2,true);
+        ctx.closePath();
+        ctx.fillStyle = "red";
+        ctx.fill();
+	}
+	
+	// Coordinates of handles (in canvas plane)
+    point = new ED.Point(0, 0);
+    point.setWithPolars(r, Math.PI/4);
+	this.handleArray[2].location = this.transform.transformPoint(point);
+	
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+	
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.MacularHole.prototype.description = function()
+{
+    return "Macular hole";
+}
+
+
+/**
+ * Returns the SnoMed code of the doodle
+ *
+ * @returns {Int} SnoMed code of entity representated by doodle
+ */
+ED.MacularHole.prototype.snomedCode = function()
+{
+	return 232006002;
+}
+
+/**
+ * Returns a number indicating position in a hierarchy of diagnoses from 0 to 9 (highest)
+ *
+ * @returns {Int} Position in diagnostic hierarchy
+ */
+ED.MacularHole.prototype.diagnosticHierarchy = function()
+{
+	return 2;
+}

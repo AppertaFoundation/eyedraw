@@ -189,7 +189,7 @@ ED.randomArray = [0.6570,0.2886,0.7388,0.1621,0.9896,0.0434,0.1695,0.9099,0.1948
 
 /**
  * A Drawing consists of one canvas element displaying one or more doodles;
- * Doodles are drawn in the 'doodle plane' consisting of a 1001 pixel square grid -500 to 500) with central origin, and negative Y upwards;
+ * Doodles are drawn in the 'doodle plane' consisting of a (nominal) 1001 pixel square grid -500 to 500) with central origin, and negative Y upwards
  * Affine transforms are used to convert points in the doodle plane to the canvas plane, the plane of the canvas element;
  * Each doodle contains additional transforms to handle individual position, rotation, and scale.
  * 
@@ -279,16 +279,12 @@ ED.Drawing = function(_canvas, _eye, _IDSuffix, _isEditable, _options)
     // Optional tooltip (this property will be null is a span element with this id not found
     this.canvasTooltip = document.getElementById('canvasTooltip');
     
-    // Make sure doodle plane fits within canvas
-//    if (this.canvas.width >= this.canvas.height)
-//    {
-//        this.scale = this.canvas.width/1001;
-//    }
-//    else
-//    {
-//        this.scale = this.canvas.height/1001;
-//    }
+    // Make sure doodle plane fits within canvas (Height priority)
     this.scale = this.canvas.height/1001;
+    
+    // Calculate dimensions of doodle plane
+    this.doodlePlaneWidth = this.canvas.width/this.scale;
+    this.doodlePlaneHeight = this.canvas.height/this.scale;
     
     // Array of images to be preloaded
     this.imageArray = new Array();
@@ -3127,23 +3123,14 @@ ED.Doodle = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _sca
         this.willSync = true;
         this.willDeleteOnSync = true;
         
-        // Permitted ranges
-//        this.rangeArray = {
-//            originX:new ED.Range(-1000, +1000),
-//            originY:new ED.Range(-1000, +1000),
-//            radius:new ED.Range(100, 450),
-//            apexX:new ED.Range(-500, +500),
-//            apexY:new ED.Range(-500, +500),
-//            scaleX:new ED.Range(+0.5, +4.0),
-//            scaleY:new ED.Range(+0.5, +4.0),
-//            arc:new ED.Range(Math.PI/6, Math.PI * 2),
-//            rotation:new ED.Range(0, Math.PI * 2),
-//        };
+        // Calculate maximum range of origin:
+        var halfWidth = Math.round(this.drawing.doodlePlaneWidth/2);
+        var halfHeight = Math.round(this.drawing.doodlePlaneHeight/2);
         
         // Parameter validation array
         this.parameterValidationArray = {
-            originX:{kind:'simple', type:'int', range:new ED.Range(-500,+1000), delta:15},
-            originY:{kind:'simple', type:'int', range:new ED.Range(-1000,+1000), delta:15},
+            originX:{kind:'simple', type:'int', range:new ED.Range(-halfWidth,+halfWidth), delta:15},
+            originY:{kind:'simple', type:'int', range:new ED.Range(-halfHeight,+halfHeight), delta:15},
             radius:{kind:'simple', type:'float', range:new ED.Range(+100,+450), precision:6, delta:15},
             apexX:{kind:'simple', type:'int', range:new ED.Range(-500,+500), delta:15},
             apexY:{kind:'simple', type:'int', range:new ED.Range(-500,+500), delta:15},

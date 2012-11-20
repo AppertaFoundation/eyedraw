@@ -113,7 +113,7 @@ function eyeDrawInit(_properties)
                     // Apply delete values
                     if (!ED.objectIsEmpty(_properties.deleteValueArray))
                     {
-                        console.log('adding elete vlues');
+                        console.log('adding delete values');
                         this.drawing.addDeleteValues(_properties.deleteValueArray);
                     }
                     
