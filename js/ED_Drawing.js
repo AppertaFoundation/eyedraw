@@ -605,6 +605,11 @@ ED.Drawing.prototype.load = function(_doodleSet)
 	// Iterate through set of doodles and load into doodle array
 	for (var i = 0; i < _doodleSet.length; i++)
 	{
+		if (ED[_doodleSet[i].subclass] === undefined) {
+			ED.errorHandler('ED.Drawing', 'warn', 'Unrecognised doodle: ' + _doodleSet[i].subclass);
+			break;
+		}
+		
 		// Instantiate a new doodle object with parameters from doodle set
 		this.doodleArray[i] = new ED[_doodleSet[i].subclass]
 		(
@@ -2460,17 +2465,14 @@ ED.Drawing.prototype.report = function()
         // Check for a group description
         if (doodle.groupDescription().length > 0)
         {
-        	console.log("boom");
             // Create an array entry for it or add to existing
             if (typeof(groupArray[doodle.className]) == 'undefined')
             {
-            	console.log('undefined' + doodle.groupDescription());
                 groupArray[doodle.className] = doodle.groupDescription();
                 groupArray[doodle.className] += doodle.description();
             }
             else
             {
-            	console.log('defined:' + doodle.description());
                 // Only add additional detail if supplied by descripton method
                 if (doodle.description().length > 0)
                 {
@@ -2481,7 +2483,6 @@ ED.Drawing.prototype.report = function()
         }
         else
         {
-            console.log("blast");
         	if (doodle.willReport)
             {
                 // Get description
@@ -2509,7 +2510,6 @@ ED.Drawing.prototype.report = function()
     {
         // Get description
         var description = groupArray[className];
-        console.log(description);
         
         // Replace last comma with a comma and 'and'
         description = description.addAndAfterLastComma();
@@ -2528,7 +2528,6 @@ ED.Drawing.prototype.report = function()
             }
         }				 
     }
-    console.log(returnString);
 	
     // Return result
 	return returnString;
