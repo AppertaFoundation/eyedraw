@@ -3048,7 +3048,8 @@ ED.Report.prototype.isMacOff = function()
  * @property {Array} pointsArray Array of points to snap to
  * @property {Array} anglesArray Array of angles to snap to
  * @property {Bool} willReport True if doodle responds to a report request (can be used to suppress reports when not needed)
- * @property {Bool} willSync Flag used to indicate whether doodle will synchronise with another doodle  
+ * @property {Bool} willSync Flag used to indicate whether doodle will synchronise with another doodle 
+ * @property {Bool} willDeleteOnSync Flag used to indicate whether doodle will delete when its synced doodle deletes 
  * @property {Float} radius Distance from centre of doodle space, calculated for doodles with isRotable true
  * @property {Range} rangeOfOriginX Range of allowable scales
  * @property {Range} rangeOfOriginY Range of allowable scales
@@ -3124,6 +3125,7 @@ ED.Doodle = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _sca
         this.snapToAngles = false;
         this.willReport = true;
         this.willSync = true;
+        this.willDeleteOnSync = true;
         
         // Permitted ranges
 //        this.rangeArray = {
