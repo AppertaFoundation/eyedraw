@@ -188,7 +188,7 @@ ED.AntSeg.prototype.draw = function(_point)
 	// Set line attributes
 	ctx.lineWidth = 4;
 	//ctx.fillStyle = "rgba(100, 200, 250, 0.5)";
-	ctx.fillStyle = "rgba(255, 160, 40, 1)";
+	ctx.fillStyle = "rgba(255, 160, 40, 0.9)";
 	ctx.strokeStyle = "gray";
 	
 	// Draw boundary path (also hit testing)
@@ -653,8 +653,8 @@ ED.Lens.prototype.setPropertyDefaults = function()
     this.addAtBack = true;
     
     // Update component of validation array for simple parameters
-    this.parameterValidationArray['originX']['range'].setMinAndMax(-380, +380);
-    this.parameterValidationArray['originY']['range'].setMinAndMax(-380, +380);
+    this.parameterValidationArray['originX']['range'].setMinAndMax(-500, +500);
+    this.parameterValidationArray['originY']['range'].setMinAndMax(-500, +500);
 }
 
 /**
@@ -663,41 +663,6 @@ ED.Lens.prototype.setPropertyDefaults = function()
  */
 ED.Lens.prototype.setParameterDefaults = function()
 {
-}
-
-/**
- * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
- * The returned parameters are animated if their 'animate' property is set to true
- *
- * @param {String} _parameter Name of parameter that has changed
- * @value {Undefined} _value Value of parameter to calculate
- * @returns {Array} Associative array of values of dependent parameters
- */
-ED.Lens.prototype.dependentParameterValues = function(_parameter, _value)
-{
-    var returnArray = new Array();
-    
-    // Move in sync with cortical cataract
-    var corticalCataract = this.drawing.firstDoodleOfClass('CorticalCataract');
-    if (corticalCataract)
-    {
-        corticalCataract.setSimpleParameter('originX', this.originX);
-        corticalCataract.setSimpleParameter('originY', this.originY);
-    }
-    
-    return returnArray;
-}
-
-/**
- * Called on attempt to delete doodle, and returns permission (overridden by subclasses)
- *
- * @returns {Bool} True if OK to delete
- */
-ED.Lens.prototype.willDelete = function()
-{
-    this.drawing.deleteDoodlesOfClass('CorticalCataract');
-    
-    return true;
 }
 
 /**
@@ -1399,21 +1364,6 @@ ED.CorticalCataract.prototype.constructor = ED.CorticalCataract;
 ED.CorticalCataract.superclass = ED.Doodle.prototype;
 
 /**
- * Sets position in array relative to other relevant doodles (overridden by subclasses)
- */
-ED.CorticalCataract.prototype.position = function()
-{
-    if (this.drawing.hasDoodleOfClass('NuclearCataract'))
-    {
-        this.drawing.moveNextTo(this, 'NuclearCataract', true);
-    }
-    else
-    {
-        this.drawing.moveNextTo(this, 'Lens', true);
-    }
-}
-
-/**
  * Sets handle attributes
  */
 ED.CorticalCataract.prototype.setHandles = function()
@@ -1433,6 +1383,8 @@ ED.CorticalCataract.prototype.setPropertyDefaults = function()
     // Update validation array for simple parameters
     this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
     this.parameterValidationArray['apexY']['range'].setMinAndMax(-180, -20);
+    this.parameterValidationArray['originX']['range'].setMinAndMax(-500, +500);
+    this.parameterValidationArray['originY']['range'].setMinAndMax(-500, +500);
     
     // Add complete validation arrays for derived parameters
     this.parameterValidationArray['grade'] = {kind:'derived', type:'string', list:['Mild', 'Moderate', 'White'], animate:true};
@@ -1481,14 +1433,6 @@ ED.CorticalCataract.prototype.dependentParameterValues = function(_parameter, _v
                     break;
             }
             break;
-    }
-    
-    // Move in sync with Lens
-    var lens = this.drawing.firstDoodleOfClass('Lens');
-    if (lens)
-    {
-        lens.setSimpleParameter('originX', this.originX);
-        lens.setSimpleParameter('originY', this.originY);
     }
     
     return returnArray;
@@ -1837,7 +1781,7 @@ ED.CorticalCataractCrossSection.prototype.syncParameter = function(_parameterNam
 }
 
 /**
- * A nuclear cataract
+ * Nuclear cataract
  *
  * @class NuclearCataract
  * @property {String} className Name of doodle subclass
@@ -1873,14 +1817,6 @@ ED.NuclearCataract.prototype.constructor = ED.NuclearCataract;
 ED.NuclearCataract.superclass = ED.Doodle.prototype;
 
 /**
- * Sets position in array relative to other relevant doodles (overridden by subclasses)
- */
-ED.NuclearCataract.prototype.position = function()
-{
-    this.drawing.moveNextTo(this, 'Lens', true);
-}
-
-/**
  * Sets handle attributes
  */
 ED.NuclearCataract.prototype.setHandles = function()
@@ -1900,6 +1836,8 @@ ED.NuclearCataract.prototype.setPropertyDefaults = function()
     // Update validation array for simple parameters
     this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
     this.parameterValidationArray['apexY']['range'].setMinAndMax(-120, +0);
+    this.parameterValidationArray['originX']['range'].setMinAndMax(-500, +500);
+    this.parameterValidationArray['originY']['range'].setMinAndMax(-500, +500);
     
     // Add complete validation arrays for derived parameters
     this.parameterValidationArray['grade'] = {kind:'derived', type:'string', list:['Mild', 'Moderate', 'White'], animate:true};
@@ -1947,20 +1885,6 @@ ED.NuclearCataract.prototype.dependentParameterValues = function(_parameter, _va
                     break;
             }
             break;
-    }
-    
-    // Move in sync with Lens
-    var lens = this.drawing.firstDoodleOfClass('Lens');
-    if (lens)
-    {
-        lens.setSimpleParameter('originX', this.originX);
-        lens.setSimpleParameter('originY', this.originY);
-    }
-    var corticalCataract = this.drawing.firstDoodleOfClass('CorticalCataract');
-    if (corticalCataract)
-    {
-        corticalCataract.setSimpleParameter('originX', this.originX);
-        corticalCataract.setSimpleParameter('originY', this.originY);
     }
     
     return returnArray;

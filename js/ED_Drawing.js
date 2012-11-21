@@ -181,11 +181,19 @@ ED.errorHandler = function(_class, _method, _message)
     console.log('EYEDRAW ERROR! class: [' + _class + '] method: [' + _method + '] message: [' + _message + ']');
 }
 
-
 /**
  * Array of 200 random numbers
  */
 ED.randomArray = [0.6570,0.2886,0.7388,0.1621,0.9896,0.0434,0.1695,0.9099,0.1948,0.4433,0.1580,0.7392,0.8730,0.2165,0.7138,0.6316,0.3425,0.2838,0.4551,0.4153,0.7421,0.3364,0.6087,0.1986,0.5764,0.1952,0.6179,0.6699,0.0903,0.2968,0.2684,0.9383,0.2488,0.4579,0.2921,0.9085,0.7951,0.4500,0.2255,0.3366,0.6670,0.7300,0.5511,0.5623,0.1376,0.5553,0.9898,0.4317,0.5922,0.6452,0.5008,0.7077,0.0704,0.2293,0.5697,0.7415,0.1557,0.2944,0.4566,0.4129,0.2449,0.5620,0.4105,0.5486,0.8917,0.9346,0.0921,0.7998,0.7717,0.0357,0.1179,0.0168,0.1520,0.5187,0.3466,0.1663,0.5935,0.7524,0.8410,0.1859,0.6012,0.8171,0.9272,0.3367,0.8133,0.4868,0.3665,0.9625,0.7839,0.3052,0.1651,0.6414,0.7361,0.0065,0.3267,0.0554,0.3389,0.8967,0.8777,0.0557,0.9201,0.6015,0.2676,0.3365,0.2606,0.0989,0.2085,0.3526,0.8476,0.0146,0.0190,0.6896,0.5198,0.9871,0.0288,0.8037,0.6741,0.2148,0.2584,0.8447,0.8480,0.5557,0.2480,0.4736,0.8869,0.1867,0.3869,0.6871,0.1011,0.7561,0.7340,0.1525,0.9968,0.8179,0.7103,0.5462,0.4150,0.4187,0.0478,0.6511,0.0386,0.5243,0.7271,0.9093,0.4461,0.1264,0.0756,0.9405,0.7287,0.0684,0.2820,0.4059,0.3694,0.7641,0.4188,0.0498,0.7841,0.9136,0.6210,0.2249,0.9935,0.9709,0.0741,0.6218,0.3166,0.2237,0.7754,0.4191,0.2195,0.2935,0.4529,0.9112,0.9183,0.3275,0.1856,0.8345,0.0442,0.6297,0.9030,0.4689,0.9512,0.2219,0.9993,0.8981,0.1018,0.9362,0.6426,0.4563,0.1267,0.7889,0.5057,0.8588,0.4669,0.0687,0.6623,0.3681,0.8152,0.9004,0.0822,0.3652];
+
+/*
+ * Doodle groups (Collections of unique doodles that co-exist and move together)
+ * Syntax is parent:[array of children in position order]
+ */
+ED.doodleGroupArray =
+{
+    Lens:['NuclearCataract', 'CorticalCataract', 'MacularHole']
+}
 
 /**
  * A Drawing consists of one canvas element displaying one or more doodles;
@@ -276,8 +284,8 @@ ED.Drawing = function(_canvas, _eye, _IDSuffix, _isEditable, _options)
     // Array of objects requesting notifications
     this.notificationArray = new Array();
     
-    // Optional tooltip (this property will be null is a span element with this id not found
-    this.canvasTooltip = document.getElementById('canvasTooltip');
+    // Optional tooltip (this property will be null if a span element with this id not found
+    this.canvasTooltip = document.getElementById(this.canvas.id + 'Tooltip');
     
     // Make sure doodle plane fits within canvas (Height priority)
     this.scale = this.canvas.height/1001;
@@ -408,6 +416,10 @@ ED.Drawing.prototype.init = function()
 {
     // Start loading of texture images (will send ready notification when ready)
     this.preLoadImagesFrom(this.graphicsPath);
+    
+    // Register self for notification of deletion of parent and movement
+    this.registerForNotifications(this, 'deleteChildren', ['doodleDeleted']);
+    this.registerForNotifications(this, 'moveGroup', ['mousedragged']);
 }
 
 /**
@@ -861,7 +873,10 @@ ED.Drawing.prototype.mousemove = function(_point)
         this.repaint();
     }
     */
-     
+    
+    // Store action for notification
+    var action = "";
+    
     // Start the hover timer (also resets it)
     this.startHoverTimer(_point);
     
@@ -963,6 +978,8 @@ ED.Drawing.prototype.mousemove = function(_point)
                         {
                             doodle.move(mousePosDoodlePlane.x - lastMousePosDoodlePlane.x, mousePosDoodlePlane.y - lastMousePosDoodlePlane.y);
                         }
+                        
+                        action = 'move';
 					}
 					// Otherwise rotate it (if isRotatable)
 					else 
@@ -1172,8 +1189,8 @@ ED.Drawing.prototype.mousemove = function(_point)
 					break;		
 			}
             
-			// Refresh drawing and update any bindings - order is important since draw method may alter value of parameters 
-            this.repaint();	
+			// Refresh drawing and update any bindings - order is important since draw method may alter value of parameters (***TODO*** changing parameters within draw method is deprecated)
+            //this.repaint();
             this.updateBindings();
 		}
 		
@@ -1181,7 +1198,10 @@ ED.Drawing.prototype.mousemove = function(_point)
 		this.lastMousePosition = _point;
         
         // Notify
-        this.notify("mousedragged", _point);
+        this.notify("mousedragged", {point:_point, action:action});
+        
+        // Refresh
+        this.repaint();
 	}
 }
 
@@ -1735,6 +1755,54 @@ ED.Drawing.prototype.deleteDoodle = function(_doodle)
     }
 }
 
+/*
+ * Deletes any children of passed class
+ *
+ * @param {Array} _messageArray Name of parent class
+ */
+ED.Drawing.prototype.deleteChildren = function(_messageArray)
+{
+    // Get children of deleted doodle, if any
+    var children = this.groupChildrenForParent(_messageArray['object']);
+    
+    // Delete them all
+    if (children)
+    {
+        for (var i = 0; i < children.length; i++)
+        {
+            this.deleteDoodlesOfClass(children[i]);
+        }
+    }
+}
+
+/*
+ * Moves other members of group
+ *
+ * @param {Array} _messageArray Name of parent class
+ */
+ED.Drawing.prototype.moveGroup = function(_messageArray)
+{
+    // Action in message must be 'move'
+    if ( _messageArray['object'].action == 'move')
+    {
+        // Get selected doodle
+        var movedDoodle = _messageArray['selectedDoodle'];
+        
+        // Get other members of group
+        var others = this.otherMembersOfGroupContainingClass(movedDoodle.className);
+        
+        // Move them too
+        for (var i = 0; i < others.length; i++)
+        {
+            var doodle = this.firstDoodleOfClass(others[i]);
+            if (doodle)
+            {
+                doodle.move(movedDoodle.originX - doodle.originX, movedDoodle.originY - doodle.originY);
+            }
+        }
+    }
+}
+
 /**
  * Deletes currently selected doodle
  */
@@ -1913,14 +1981,189 @@ ED.Drawing.prototype.isReady = function()
 }
 
 /**
+ * Checks group array and returns group containing class
+ *
+ * @param {String} _className Class name of doodle
+ * @param {Array} Array containing other members of group
+ */
+ED.Drawing.prototype.otherMembersOfGroupContainingClass = function(_className)
+{
+    var returnArray = [];
+    
+    // Iterate through all groups looking for parent
+    for (var parentClass in ED.doodleGroupArray)
+    {
+        // Empty array and flag
+        returnArray = [];
+        var found = false;
+        
+        // Add parent to array (if not _className)
+        if (parentClass != _className)
+        {
+            returnArray.push(parentClass);
+        }
+        else
+        {
+            found = true;
+        }
+        
+        // Iterate through children
+        for (var i = 0; i < ED.doodleGroupArray[parentClass].length; i++)
+        {
+            if (ED.doodleGroupArray[parentClass][i] != _className)
+            {
+                returnArray.push(ED.doodleGroupArray[parentClass][i]);
+            }
+            else
+            {
+                found = true;
+            }
+        }
+    }
+    
+    // Return array or false if not found or array empty
+    if (found && returnArray.length > 0)
+    {
+        return returnArray;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+/**
+ * Checks group array and returns parent of group
+ *
+ * @param {String} _className Class name of doodle
+ * @returns {String} Parent class, or false if not in group
+ */
+ED.Drawing.prototype.groupParentForClass = function(_className)
+{
+    var returnValue = false;
+    
+    // Iterate through all groups looking for parent
+    for (var parentClass in ED.doodleGroupArray)
+    {
+        // If found, return ordered array of children
+        for (var i = 0; i < ED.doodleGroupArray[parentClass].length; i++)
+        {
+            if (ED.doodleGroupArray[parentClass][i] == _className)
+            {
+                var returnValue = parentClass;
+            }
+        }
+    }
+    
+    return returnValue;
+}
+
+/**
+ * Checks group array and returns parent of class if in a group
+ *
+ * @param {String} _className Class name of parent
+ * @returns {Array} Ordered array of children, or false if not in group
+ */
+ED.Drawing.prototype.groupChildrenForParent = function(_className)
+{
+    var returnValue = false;
+    
+    // Iterate through all groups looking for parent
+    for (var parentClass in ED.doodleGroupArray)
+    {
+        // If found, return ordered array of children
+        if (parentClass == _className)
+        {
+            var returnValue = ED.doodleGroupArray[parentClass];
+        }
+    }
+    
+    return returnValue;
+}
+
+/**
  * Adds a doodle to the drawing
  *
- * @param {String} _className Classname of doodle
+ * @param {String} _className Class name of doodle
  * @param {Array} _parameterDefaults Array of key value pairs containing default values or parameters
  * @param {Array} _parameterBindings Array of key value pairs. Key is element id, value is parameter to bind to
  * @returns {Doodle} The newly added doodle
  */
 ED.Drawing.prototype.addDoodle = function(_className, _parameterDefaults, _parameterBindings)
+{
+    // Create doodle
+    var doodle = this.addDoodleToDrawing(_className, _parameterDefaults, _parameterBindings);
+ 
+    // Check whether doodle is a child of a group
+    var parentClass = this.groupParentForClass(_className);
+    if (parentClass)
+    {
+        // If parent does not exist, create it and put child doodle in front
+        var parentDoodle = this.firstDoodleOfClass(parentClass);
+        if (!parentDoodle)
+        {
+            parentDoodle = this.addDoodleToDrawing(parentClass);
+            this.moveNextTo(doodle, parentClass, true);
+        }
+        // Parent exists, so position doodle in correct relation to others within group
+        else
+        {
+            // Get other children into an ordered array
+            var children = this.groupChildrenForParent(parentClass);
+            
+            // Go through children looking for added doodle
+            var lastChildDoodle = false;
+            for (var i = 0; i < children.length; i++)
+            {
+                if (doodle.className == children[i])
+                {
+                    break;
+                }
+                
+                // Record nearest child doodle
+                lastChildDoodle = this.firstDoodleOfClass(children[i]);
+            }
+            
+            // Move new doodle to position depending on presence of other children
+            if (lastChildDoodle)
+            {
+                this.moveNextTo(doodle, lastChildDoodle.className, true);
+            }
+            else
+            {
+                this.moveNextTo(doodle, parentClass, true);
+            }
+        }
+        
+        // Synchronise position ***TODO*** scaling and rotation may need syncing too
+        doodle.setSimpleParameter('originX', parentDoodle.originX);
+        doodle.setSimpleParameter('originY', parentDoodle.originY);
+        
+        // Make new doodle selected
+        doodle.isSelected = true;
+        for (var i = 0; i < this.doodleArray.length; i++)
+        {
+            this.doodleArray[i].isSelected = false;
+        }
+        this.selectedDoodle = doodle;
+        
+        // Refresh drawing
+        this.repaint();
+    }
+
+    // Return doodle
+    return doodle;
+}
+
+/**
+ * Adds a doodle to the array
+ *
+ * @param {String} _className Class name of doodle
+ * @param {Array} _parameterDefaults Array of key value pairs containing default values or parameters
+ * @param {Array} _parameterBindings Array of key value pairs. Key is element id, value is parameter to bind to
+ * @returns {Doodle} The newly added doodle
+ */
+ED.Drawing.prototype.addDoodleToDrawing = function(_className, _parameterDefaults, _parameterBindings)
 {
     // Set flag to indicate whether a doodle of this className already exists
     var exists = this.hasDoodleOfClass(_className);
@@ -2008,9 +2251,6 @@ ED.Drawing.prototype.addDoodle = function(_className, _parameterDefaults, _param
         
         // Notify
         this.notify("doodleAdded", newDoodle);
-        
-        // Position relative to other relevant doodles
-        newDoodle.position();
         
         // Place doodle and refresh drawing
         if (newDoodle.addAtBack)
@@ -2672,6 +2912,29 @@ ED.Drawing.prototype.repaint = function()
             {
                 this.unlockButton.disabled = false;
             }
+        }
+    }
+
+    // Get reference to doodle toolbar
+    var doodleToolbar = document.getElementById(this.canvas.id + 'doodleToolbar');
+    if (doodleToolbar)
+    {
+        // Iterate through all buttons activating them
+        var buttonArray = doodleToolbar.getElementsByTagName('button');
+        for (var i = 0; i < buttonArray.length; i++)
+        {
+            buttonArray[i].disabled = false;
+        }
+    }
+    
+	// Go through doodles looking for any that unique, and disable the corresponding add button
+    for (var i = 0; i < this.doodleArray.length; i++)
+    {
+        // Button ID is concatenation of class name and id suffix
+        var addButton = document.getElementById(this.doodleArray[i].className +  this.IDSuffix);
+        if (addButton)
+        {
+            addButton.disabled = this.doodleArray[i].isUnique;
         }
     }
     
@@ -5170,3 +5433,21 @@ String.prototype.addAndAfterLastComma = function()
     if (found) return this.substring(0, pos) + ", and" + this.substring(pos+1, this.length);
     else return this;
 }
+
+///**
+// * Static class to implement groups of doodles
+// *
+// * @returns {String} 
+// */
+//ED.DoodleGroups =
+//{    
+//    bar: function (val)
+//    {
+//        console.log(val);
+//    },
+//    foo: 2
+//}
+//
+//ED.DoodleGroups.foo = 4;
+
+
