@@ -1702,12 +1702,10 @@ ED.Drawing.prototype.deleteDoodle = function(_doodle)
                     {
                         this.selectedDoodle = null;
                     }
-
                     
                     // Remove bindings and reset values of bound elements
                     for (var parameter in _doodle.bindingArray)
                     {
-                        //console.log('removing binding', parameter, _doodle.bindingArray[parameter]);
                         var element = document.getElementById(_doodle.bindingArray[parameter]);
                         if (element != null)
                         {
