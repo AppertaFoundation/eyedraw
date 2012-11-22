@@ -243,7 +243,7 @@ class OEEyeDrawWidget extends CWidget
             {
                 if ($file->isFile() === TRUE && $file->getFilename() !== 'ED_Drawing.js' && $file->getBasename() !== 'OEEyeDraw.js')
                 {
-                    if ($file->getExtension() == "js")
+                    if (pathinfo($file->getFilename(), PATHINFO_EXTENSION) == "js")
                     {
                         array_push ($this->scriptArray, $file->getFilename());
                     }
