@@ -65,6 +65,14 @@ ED.Surgeon.prototype.constructor = ED.Surgeon;
 ED.Surgeon.superclass = ED.Doodle.prototype;
 
 /**
+ * Sets handle attributes
+ */
+ED.Surgeon.prototype.setHandles = function()
+{
+	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+}
+
+/**
  * Sets default dragging attributes
  */
 ED.Surgeon.prototype.setPropertyDefaults = function()
@@ -268,25 +276,5 @@ ED.Surgeon.prototype.draw = function(_point)
     
 	// Return value indicating successful hittest
 	return this.isClicked;
-}
-
-/**
- * Enacts a predefined sync action in response to a change in a simple parameter
- *
- * @param _parameterName The name of the parameter that has been changed in the master doodle
- * @param _parameterValue The value of the parameter that has been changed in the master doodle
- */
-ED.Surgeon.prototype.syncParameter = function(_parameterName, _parameterValue)
-{
-    switch (_parameterName)
-    {
-        case 'rotation':
-            this.setSimpleParameter(_parameterName, _parameterValue);
-            this.updateDependentParameters(_parameterName);
-            break;
-    }
-    
-    // Redraw
-    this.drawing.repaint();
 }
 

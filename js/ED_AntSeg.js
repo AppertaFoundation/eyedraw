@@ -236,26 +236,6 @@ ED.AntSeg.prototype.draw = function(_point)
 }
 
 /**
- * Enacts a predefined sync action in response to a change in a simple parameter
- *
- * @param _parameterName The name of the parameter that has been changed in the master doodle
- * @param _parameterValue The value of the parameter that has been changed in the master doodle
- */
-ED.AntSeg.prototype.syncParameter = function(_parameterName, _parameterValue)
-{
-    switch (_parameterName)
-    {
-        case 'apexY':
-            this.setSimpleParameter(_parameterName, _parameterValue);
-            this.updateDependentParameters(_parameterName);
-            break;
-    }
-    
-    // Redraw
-    this.drawing.repaint();
-}
-
-/**
  * Returns a string containing a text description of the doodle
  *
  * @returns {String} Description of doodle
@@ -464,26 +444,6 @@ ED.AntSegCrossSection.prototype.draw = function(_point)
 	
 	// Return value indicating successful hittest
 	return this.isClicked;
-}
-
-/**
- * Enacts a predefined sync action in response to a change in a simple parameter
- *
- * @param _parameterName The name of the parameter that has been changed in the master doodle
- * @param _parameterValue The value of the parameter that has been changed in the master doodle
- */
-ED.AntSegCrossSection.prototype.syncParameter = function(_parameterName, _parameterValue)
-{
-    switch (_parameterName)
-    {
-        case 'apexY':
-            this.setSimpleParameter(_parameterName, _parameterValue);
-            this.updateDependentParameters(_parameterName);
-            break;
-    }
-    
-    // Redraw
-    this.drawing.repaint();
 }
 
 /**
@@ -718,26 +678,6 @@ ED.Lens.prototype.draw = function(_point)
 }
 
 /**
- * Enacts a predefined sync action in response to a change in a simple parameter
- *
- * @param _parameterName The name of the parameter that has been changed in the master doodle
- * @param _parameterValue The value of the parameter that has been changed in the master doodle
- */
-ED.Lens.prototype.syncParameter = function(_parameterName, _parameterValue)
-{
-    switch (_parameterName)
-    {
-        case 'originY':
-            this.setSimpleParameter(_parameterName, _parameterValue);
-            this.updateDependentParameters(_parameterName);
-            break;
-    }
-    
-    // Redraw
-    this.drawing.repaint();
-}
-
-/**
  * Lens Cross Section
  *
  * @class LensCrossSection
@@ -911,26 +851,6 @@ ED.LensCrossSection.prototype.draw = function(_point)
 	
 	// Return value indicating successful hittest
 	return this.isClicked;
-}
-
-/**
- * Enacts a predefined sync action in response to a change in a simple parameter
- *
- * @param _parameterName The name of the parameter that has been changed in the master doodle
- * @param _parameterValue The value of the parameter that has been changed in the master doodle
- */
-ED.LensCrossSection.prototype.syncParameter = function(_parameterName, _parameterValue)
-{
-    switch (_parameterName)
-    {
-        case 'originY':
-            this.setSimpleParameter(_parameterName, _parameterValue);
-            this.updateDependentParameters(_parameterName);
-            break;
-    }
-    
-    // Redraw
-    this.drawing.repaint();
 }
 
 /**
@@ -1268,44 +1188,6 @@ ED.PhakoIncision.prototype.draw = function(_point)
 }
 
 /**
- * Enacts a predefined sync action in response to a change in a simple parameter
- *
- * @param _parameterName The name of the parameter that has been changed in the master doodle
- * @param _parameterValue The value of the parameter that has been changed in the master doodle
- */
-ED.PhakoIncision.prototype.syncParameter = function(_parameterName, _parameterValue)
-{
-//    this.setSimpleParameter(_parameterName, _parameterValue);
-//    this.updateDependentParameters(_parameterName);
-    switch (_parameterName)
-    {
-        case 'rotation':
-            this.setSimpleParameter(_parameterName, _parameterValue);
-            //this[_parameterName] = _parameterValue;
-            this.updateDependentParameters(_parameterName);
-            break;
-//        case 'arc':
-//            this.setSimpleParameter(_parameterName, _parameterValue);
-//            this.updateDependentParameters(_parameterName);
-//            break;
-//        case 'radius':
-//            this.setSimpleParameter(_parameterName, _parameterValue);
-//            this.updateDependentParameters(_parameterName);
-//            break;
-//        case 'apexY':
-//            this.setSimpleParameter(_parameterName, _parameterValue);
-//            this.updateDependentParameters(_parameterName);
-//            break;
-        default:
-            //console.log(_parameterName, _parameterValue);
-            break;
-    }
-    
-    // Redraw
-    this.drawing.repaint();
-}
-
-/**
  * Returns a string containing a text description of the doodle
  *
  * @returns {String} Description of doodle
@@ -1510,26 +1392,6 @@ ED.CorticalCataract.prototype.draw = function(_point)
 	
 	// Return value indicating successful hittest
 	return this.isClicked;
-}
-
-/**
- * Enacts a predefined sync action in response to a change in a simple parameter
- *
- * @param _parameterName The name of the parameter that has been changed in the master doodle
- * @param _parameterValue The value of the parameter that has been changed in the master doodle
- */
-ED.CorticalCataract.prototype.syncParameter = function(_parameterName, _parameterValue)
-{
-    switch (_parameterName)
-    {
-        case 'apexY':
-            this.setSimpleParameter(_parameterName, _parameterValue);
-            this.updateDependentParameters(_parameterName);
-            break;
-    }
-    
-    // Redraw
-    this.drawing.repaint();
 }
 
 /**
@@ -1758,26 +1620,6 @@ ED.CorticalCataractCrossSection.prototype.draw = function(_point)
 	
 	// Return value indicating successful hittest
 	return this.isClicked;
-}
-
-/**
- * Enacts a predefined sync action in response to a change in a simple parameter
- *
- * @param _parameterName The name of the parameter that has been changed in the master doodle
- * @param _parameterValue The value of the parameter that has been changed in the master doodle
- */
-ED.CorticalCataractCrossSection.prototype.syncParameter = function(_parameterName, _parameterValue)
-{
-    switch (_parameterName)
-    {
-        case 'apexY':
-            this.setSimpleParameter(_parameterName, _parameterValue);
-            this.updateDependentParameters(_parameterName);
-            break;
-    }
-    
-    // Redraw
-    this.drawing.repaint();
 }
 
 /**

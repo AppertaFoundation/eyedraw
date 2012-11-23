@@ -190,10 +190,10 @@ ED.randomArray = [0.6570,0.2886,0.7388,0.1621,0.9896,0.0434,0.1695,0.9099,0.1948
  * Doodle groups (Collections of unique doodles that co-exist and move together)
  * Syntax is parent:[array of children in position order]
  */
-ED.doodleGroupArray =
-{
-    Lens:['NuclearCataract', 'CorticalCataract', 'MacularHole']
-}
+//ED.doodleGroupArray =
+//{
+//    Lens:['NuclearCataract', 'CorticalCataract', 'MacularHole']
+//}
 
 /**
  * A Drawing consists of one canvas element displaying one or more doodles;
@@ -418,8 +418,8 @@ ED.Drawing.prototype.init = function()
     this.preLoadImagesFrom(this.graphicsPath);
     
     // Register self for notification of deletion of parent and movement
-    this.registerForNotifications(this, 'deleteChildren', ['doodleDeleted']);
-    this.registerForNotifications(this, 'moveGroup', ['mousedragged']);
+    //this.registerForNotifications(this, 'deleteChildren', ['doodleDeleted']);
+    //this.registerForNotifications(this, 'moveGroup', ['doodleMoved']);
 }
 
 /**
@@ -798,6 +798,9 @@ ED.Drawing.prototype.mousedown = function(_point)
 					this.selectedDoodle = this.doodleArray[i];
 					found = true;
                     
+                    // Notify
+                    this.notify("doodleSelected");
+                    
                     // If for drawing, mouse down starts a new squiggle
                     if (!this.doubleClick && this.doodleArray[i].isForDrawing)
                     {
@@ -849,7 +852,7 @@ ED.Drawing.prototype.mousedown = function(_point)
 	this.repaint();
     
     // Notify
-    this.notify("mousedown", _point);
+    this.notify("mousedown", {drawing:this, point:_point});
 }
 
 /**
@@ -860,6 +863,9 @@ ED.Drawing.prototype.mousedown = function(_point)
  */
 ED.Drawing.prototype.mousemove = function(_point)
 {
+    // Notify
+    this.notify("mousemove", {drawing:this, point:_point});
+    
     // Draw selection rectangle
     /*
     if (this.mode == ED.Mode.Select)
@@ -1780,26 +1786,45 @@ ED.Drawing.prototype.deleteChildren = function(_messageArray)
  */
 ED.Drawing.prototype.moveGroup = function(_messageArray)
 {
-    // Action in message must be 'move'
-    if ( _messageArray['object'].action == 'move')
+    console.log(_messageArray['selectedDoodle'].className);
+    // Get moved doodle (not necessarily selected)
+    var movedDoodle = _messageArray['object']['doodle'];
+    
+    // Get other members of group
+    var others = this.otherMembersOfGroupContainingClass(movedDoodle.className);
+    
+    // Move them too
+    for (var i = 0; i < others.length; i++)
     {
-        // Get selected doodle
-        var movedDoodle = _messageArray['selectedDoodle'];
-        
-        // Get other members of group
-        var others = this.otherMembersOfGroupContainingClass(movedDoodle.className);
-        
-        // Move them too
-        for (var i = 0; i < others.length; i++)
+        var doodle = this.firstDoodleOfClass(others[i]);
+        if (doodle)
         {
-            var doodle = this.firstDoodleOfClass(others[i]);
-            if (doodle)
-            {
-                doodle.move(movedDoodle.originX - doodle.originX, movedDoodle.originY - doodle.originY);
-            }
+            doodle.move(movedDoodle.originX - doodle.originX, movedDoodle.originY - doodle.originY);
         }
     }
 }
+//ED.Drawing.prototype.moveGroup = function(_messageArray)
+//{
+//    // Action in message must be 'move'
+//    if ( _messageArray['object'].action == 'move')
+//    {
+//        // Get selected doodle
+//        var movedDoodle = _messageArray['selectedDoodle'];
+//        
+//        // Get other members of group
+//        var others = this.otherMembersOfGroupContainingClass(movedDoodle.className);
+//        
+//        // Move them too
+//        for (var i = 0; i < others.length; i++)
+//        {
+//            var doodle = this.firstDoodleOfClass(others[i]);
+//            if (doodle)
+//            {
+//                doodle.move(movedDoodle.originX - doodle.originX, movedDoodle.originY - doodle.originY);
+//            }
+//        }
+//    }
+//}
 
 /**
  * Deletes currently selected doodle
@@ -3580,6 +3605,9 @@ ED.Doodle.prototype.move = function(_x, _y)
                 this.updateDependentParameters('rotation');
             }
         }
+        
+        // Notify (NB pass doodle in message array, since this is not necessarily selected)
+        this.drawing.notify("doodleMoved", {doodle:this});
     }
 }
 
@@ -4741,15 +4769,6 @@ ED.Doodle.prototype.debug = function()
     console.log('apx: ' + this.apexX + " : " + this.apexY);
     console.log('rot: ' + this.rotation * 180/Math.PI);
     console.log('arc: ' + this.arc * 180/Math.PI);
-}
-
-/**
- * Enacts a predefined sync action in response to a change in a simple parameter
- *
- * @param _parameter The parameter that has been changed in the master doodle
- */
-ED.Doodle.prototype.syncParameter = function(_parameterName, _parameterValue)
-{
 }
 
 /**
