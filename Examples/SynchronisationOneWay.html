@@ -37,7 +37,7 @@
             function eyeDrawController(_drawing)
             {
                 // Register controller for notifications
-                _drawing.registerForNotifications(this, 'notificationHandler', ['ready', 'parameter']);
+                _drawing.registerForNotifications(this, 'notificationHandler', ['ready', 'parameterChanged']);
                 
                 // Create an array of synchronisations
                 var syncArray = new Array();
@@ -57,7 +57,7 @@
                             break;
                         
                         // Parameter change notification
-                        case 'parameter':
+                        case 'parameterChanged':
                             // Get master doodle
                             var masterDoodle = _messageArray['object'].doodle;
                             

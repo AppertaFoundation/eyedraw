@@ -150,7 +150,7 @@ function eyeDrawInit(_properties)
                     
                     
                 case 'doodleSelected':
-                    // To avoid infinite loops, ensure that selecting a doodle in one drawing de-deselects the others
+                    // Ensure that selecting a doodle in one drawing de-deselects the others
                     for (var idSuffix in _properties.syncArray)
                     {
                         var drawing = window['ed_drawing_edit_' + idSuffix];
@@ -158,7 +158,7 @@ function eyeDrawInit(_properties)
                     }
                     break;
                     
-                case 'parameter':
+                case 'parameterChanged':
                     
                     // Get master doodle
                     var masterDoodle = _messageArray['object'].doodle;
@@ -187,8 +187,8 @@ function eyeDrawInit(_properties)
                                 // Slave doodle (uses first doodle in the drawing matching the className)
                                 var slaveDoodle = slaveDrawing.firstDoodleOfClass(slaveClassName);
                                 
-                                // Check that doodles exist, className matches, sync is possible, and master is driving it
-                                if (masterDoodle && masterDoodle.className == className && masterDoodle.isSelected && slaveDoodle && slaveDoodle.willSync)
+                                // Check that doodles exist, className matches, and sync is allowed
+                                if (masterDoodle && masterDoodle.className == className && slaveDoodle && slaveDoodle.willSync)
                                 {
                                     // Get array of parameters to sync
                                     var parameterArray = _properties.syncArray[idSuffix][className][slaveClassName]['parameters'];
@@ -201,21 +201,28 @@ function eyeDrawInit(_properties)
                                             // Check that parameter array member matches changed parameter
                                             if (parameterArray[i] == _messageArray.object.parameter)
                                             {
-                                                // Sync slave parameter to value of master
-                                                slaveDoodle.setSimpleParameter(_messageArray.object.parameter, masterDoodle[_messageArray.object.parameter]);
-                                                slaveDoodle.updateDependentParameters(_messageArray.object.parameter);
-                                                
-                                                // Update any bindings associated with the slave doodle
-                                                slaveDrawing.updateBindings(slaveDoodle);
-                                                
-                                                // Refresh slave drawing
-                                                slaveDrawing.repaint();
+                                                // Avoid infinite loop by checking values are not equal before setting
+                                                if (masterDoodle[_messageArray.object.parameter] != slaveDoodle[_messageArray.object.parameter])
+                                                {
+                                                    var increment = _messageArray.object.value - _messageArray.object.oldValue;
+                                                    var newValue = slaveDoodle[_messageArray.object.parameter] + increment;
+                                                    
+                                                    // Sync slave parameter to value of master
+                                                    slaveDoodle.setSimpleParameter(_messageArray.object.parameter, newValue);
+                                                    slaveDoodle.updateDependentParameters(_messageArray.object.parameter);
+                                                    
+                                                    // Update any bindings associated with the slave doodle
+                                                    slaveDrawing.updateBindings(slaveDoodle);
+                                                }
                                             }
                                         }
                                     }
                                 }
                             }
                         }
+                        
+                        // Refresh slave drawing
+                        slaveDrawing.repaint();
                     }
                      break;
                 

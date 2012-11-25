@@ -55,7 +55,7 @@
             function listener(_drawing)
             {
                 // Register this object for notifications
-                _drawing.registerForNotifications(this, 'handler', ['parameter']);
+                _drawing.registerForNotifications(this, 'handler', ['parameterChanged']);
             
                 // Function called for notification
                 this.handler = function(_messageArray)
