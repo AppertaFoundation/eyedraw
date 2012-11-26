@@ -2091,7 +2091,7 @@ ED.Drawing.prototype.eventHandler = function(_type, _doodleId, _className, _elem
                         	parameter = key;
                         }
                     }
-                    
+
                     // Check validity of new value
                     var validityArray = doodle.validateParameter(parameter, _value);
                     
@@ -4011,7 +4011,7 @@ ED.Doodle.prototype.increment = function(_parameter, _value)
  */
 ED.Doodle.prototype.addBinding = function(_parameter, _id, _lkup)
 {
-    if (typeof(_lkup) === 'undefined') _lkup = 'value';
+    if (typeof(_lkup) === 'undefined') _lkup = null;
 	// Check that doodle has a parameter of this name
     if (typeof(this[_parameter]) != 'undefined')
     {
@@ -4025,11 +4025,16 @@ ED.Doodle.prototype.addBinding = function(_parameter, _id, _lkup)
             this.bindingArray[_parameter] = [_id, _lkup];
             
             // Set parameter to value of element
-            if (element.type == "select-one") {
-            	this.setParameterFromString(_parameter, element.options[element.selectedIndex].getAttribute(_lkup));
-            }
+            if (_lkup) {
+	            if (element.type == "select-one") {
+	            	this.setParameterFromString(_parameter, element.options[element.selectedIndex].getAttribute(_lkup));
+	            }
+	            else {
+	            	this.setParameterFromString(_parameter, element.getAttribute(_lkup));
+	            }
+            } 
             else {
-            	this.setParameterFromString(_parameter, element.getAttribute(_lkup));
+            	this.setParameterFromString(_parameter, element.value)
             }
             
             // Attach onchange event of element with a function which calls the drawing event handler
@@ -4042,14 +4047,20 @@ ED.Doodle.prototype.addBinding = function(_parameter, _id, _lkup)
                                      {
                                         drawing.eventHandler('onchange', id, className, this.id, this.checked.toString());
                                      }
-                                     else if (this.type == 'select-one')
-                                     {
-                             			drawing.eventHandler('onchange', id, className, this.id, this.options[this.selectedIndex].getAttribute(_lkup));
+                                     else if (_lkup) {
+                                    	 if (this.type == 'select-one')
+                                    	 {
+                                  			drawing.eventHandler('onchange', id, className, this.id, this.options[this.selectedIndex].getAttribute(_lkup));
+                                         }
+                                         else
+                                         {
+                                            drawing.eventHandler('onchange', id, className, this.id, this.getAttribute(_lkup));
+                                         }
                                      }
-                                     else
-                                     {
-                                        drawing.eventHandler('onchange', id, className, this.id, this.getAttribute(_lkup));
+                                     else {
+                                    	 drawing.eventHandler('onchange', id, className, this.id, this.value);
                                      }
+                                     
                                      },false);
             
             // Add listener to array
