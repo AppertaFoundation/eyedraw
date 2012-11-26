@@ -1647,11 +1647,11 @@ ED.Drawing.prototype.deleteDoodle = function(_doodle)
                 for (var parameter in _doodle.bindingArray)
                 {
                     //console.log('removing binding', parameter, _doodle.bindingArray[parameter]);
-                    var element = document.getElementById(_doodle.bindingArray[parameter]);
+                    var element = document.getElementById(_doodle.bindingArray[parameter]['id']);
                     if (element != null)
                     {
                         // Set new value of element
-                        element.value = this.boundElementDeleteValueArray[_doodle.bindingArray[parameter]];
+                        element.value = this.boundElementDeleteValueArray[_doodle.bindingArray[parameter]['id']];
                         
                         // Remove binding from doodle (also removes event listener from element)
                         _doodle.removeBinding(parameter);
@@ -1942,7 +1942,9 @@ ED.Drawing.prototype.addDoodle = function(_className, _parameterDefaults, _param
                 var value = newDoodle[parameter];
 
                 // Add binding to the doodle (NB this will set value of new doodle to the value of the element)
-                newDoodle.addBinding(parameter, this.bindingArray[_className][parameter]);
+                if(this.bindingArray[_className][parameter] instanceof Array) {
+                  newDoodle.addBinding(parameter, this.bindingArray[_className][parameter]);
+                }
 
                 // Trigger binding by setting parameter to itself
                 newDoodle.setSimpleParameter(parameter, value);
@@ -2008,14 +2010,9 @@ ED.Drawing.prototype.addBindings = function(_bindingArray)
         // Iterate through bindings for this className
         for (parameter in _bindingArray[className])
         {
-        	_param = _bindingArray[className][parameter];
-        	_lkup  = 'value';
-            if (_bindingArray[className][parameter] instanceof Array) {
-            	_param = _bindingArray[className][parameter][0];
-            	_lkup  = _bindingArray[className][parameter][1];
-            } 
+        	_id = _bindingArray[className][parameter]['id'];
         	// Add an event listener to the element to create a doodle on change, if it does not exist
-            var element = document.getElementById(_param);
+            var element = document.getElementById(_id);
             element.addEventListener('change', function (event) {
                  if (!drawing.hasDoodleOfClass(className))
                  {
@@ -2026,7 +2023,7 @@ ED.Drawing.prototype.addBindings = function(_bindingArray)
             // Add binding to doodle if it exists
             if (doodle)
             {
-                doodle.addBinding(parameter, _param, _lkup);
+                doodle.addBinding(parameter, _bindingArray[className][parameter]);
             }
         }
     }
@@ -2083,12 +2080,9 @@ ED.Drawing.prototype.eventHandler = function(_type, _doodleId, _className, _elem
                     var parameter;
                     for (var key in doodle.bindingArray)
                     {
-                        if (doodle.bindingArray[key] instanceof Array && doodle.bindingArray[key][0] == _elementId)
+                        if (doodle.bindingArray[key]['id'] == _elementId)
                         {
                             parameter = key;
-                        }
-                        else if (doodle.bindingArray[key] == _elementId) {
-                        	parameter = key;
                         }
                     }
 
@@ -2154,8 +2148,8 @@ ED.Drawing.prototype.updateBindings = function(_doodle)
         for (var key in doodle.bindingArray)
         {
             if (doodle.bindingArray[key] instanceof Array) {
-            	element = document.getElementById(doodle.bindingArray[key][0]);
-            	_lkup = doodle.bindingArray[key][1];
+            	element = document.getElementById(doodle.bindingArray[key]['id']);
+            	_lkup = doodle.bindingArray[key]['attribute'];
             	
             	if (element.type == 'select-one') {
             		// it's a dropdown
@@ -2169,10 +2163,6 @@ ED.Drawing.prototype.updateBindings = function(_doodle)
             	else {
             		element.setAttribute(_lkup, doodle.getParameter(key));
             	}
-            }
-            else {
-	        	// old method of processing bindings, deprecated
-            	document.getElementById(doodle.bindingArray[key]).value = doodle.getParameter(key);
             }
         }
     }
@@ -4006,13 +3996,14 @@ ED.Doodle.prototype.increment = function(_parameter, _value)
  * Adds a binding to the doodle. Only derived parameters can be bound
  *
  * @param {String} _parameter Name of parameter to be bound
- * @param {String} _id Id of bound HTML element
- * @param {String} lkup Name of attribute on HTML element to be used for the value (defaults to value)
+ * @param {String} _fieldParameters Details of bound HTML element
  */
-ED.Doodle.prototype.addBinding = function(_parameter, _id, _lkup)
+ED.Doodle.prototype.addBinding = function(_parameter, _fieldParameters)
 {
-    if (typeof(_lkup) === 'undefined') _lkup = null;
-	// Check that doodle has a parameter of this name
+		_id = _fieldParameters['id'];
+		_lkup = _fieldParameters['attribute'];
+
+		// Check that doodle has a parameter of this name
     if (typeof(this[_parameter]) != 'undefined')
     {
         // Get reference to HTML element
@@ -4022,7 +4013,7 @@ ED.Doodle.prototype.addBinding = function(_parameter, _id, _lkup)
         if (element != null)
         {
             // Add binding to array
-            this.bindingArray[_parameter] = [_id, _lkup];
+            this.bindingArray[_parameter] = { 'id': _id, 'attribute': _lkup };
             
             // Set parameter to value of element
             if (_lkup) {
@@ -4092,7 +4083,7 @@ ED.Doodle.prototype.removeBinding = function(_parameter)
     {
         if (parameter == _parameter)
         {
-            elementId = this.bindingArray[_parameter];
+            elementId = this.bindingArray[_parameter]['id'];
         }
     }
     
