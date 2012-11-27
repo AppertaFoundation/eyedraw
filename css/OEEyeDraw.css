@@ -128,7 +128,7 @@ span.squiggle {
 }
 
 /* Canvas tooltip */
-#canvasTooltip {
+.canvasTooltip {
     display: none;
     position: absolute;
     width: auto;

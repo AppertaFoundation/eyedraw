@@ -37,17 +37,17 @@
             function eyeDrawController(_drawing)
             {
                 // Register controller for notifications
-                _drawing.registerForNotifications(this, 'notificationHandler', ['ready', 'parameter']);
+                _drawing.registerForNotifications(this, 'notificationHandler', ['ready', 'parameterChanged', 'doodleSelected']);
                 
                 // Create an array of synchronisations
                 var syncArray = new Array();
                 if (_drawing.IDSuffix == 'RPS')
                 {
-                    syncArray['LPS'] = {AntSeg:['AntSeg']};
+                    syncArray['LPS'] = {AntSeg:{AntSeg:{parameters:['apexY']}}};
                 }
                 if (_drawing.IDSuffix == 'LPS')
                 {
-                    syncArray['RPS'] = {AntSeg:['AntSeg']};
+                    syncArray['RPS'] = {AntSeg:{AntSeg:{parameters:['apexY']}}};
                 }
                 
                 // Method called for notification
@@ -58,39 +58,61 @@
                         // Ready notification
                         case 'ready':
                             _drawing.addDoodle('AntSeg');
+                            _drawing.deselectDoodles();
+                            break;
+                        
+                        case 'doodleSelected':
+                            // To avoid infinite loops, ensure that selecting a doodle in one drawing de-deselects the others
+                            var otherDrawing = (_messageArray['selectedDoodle'].drawing.IDSuffix == 'RPS')?drawingEdit2:drawingEdit1;
+                            otherDrawing.deselectDoodles();
                             break;
                         
                         // Parameter change notification
-                        case 'parameter':
+                        case 'parameterChanged':
+                            // Get master doodle
+                            var masterDoodle = _messageArray['object'].doodle;
+                            
                             // Iterate through syncArray
                             for (var idSuffix in syncArray)
                             {
+                                // Define which drawing is slave
+                                var slaveDrawing = (idSuffix == 'RPS')?drawingEdit1:drawingEdit2;
+                                
                                 // Iterate through each specified className
                                 for (var className in syncArray[idSuffix])
                                 {
-                                    // Get array of specified slave doodle class names
-                                    var slaveClassNameArray = syncArray[idSuffix][className];
-                                    
-                                    // Iterate through it,
-                                    for (var i = 0; i < slaveClassNameArray.length; i++)
+                                    // Iterate through slave class names
+                                    for (var slaveClassName in syncArray[idSuffix][className])
                                     {
-                                        // Define which drawing is slave
-                                        var slaveDrawing = idSuffix == 'RPS'?drawingEdit1:drawingEdit2;
-                                        
-                                        // Master doodle
-                                        var masterDoodle = _messageArray['object'].doodle;
-                                        
                                         // Slave doodle (uses first doodle in the drawing matching the className)
-                                        var slaveDoodle = slaveDrawing.firstDoodleOfClass(slaveClassNameArray[i]);
+                                        var slaveDoodle = slaveDrawing.firstDoodleOfClass(slaveClassName);
                                         
-                                        // If master is being driven, both are defined, and slave doodle is set to sync, enact sync for the changed parameter
-                                        if (masterDoodle && slaveDoodle && slaveDoodle.willSync && masterDoodle.drawing.isActive)
+                                        // Check that doodles exist, className matches, sync is possible, and master is driving it
+                                        if (masterDoodle && masterDoodle.className == className && masterDoodle.isSelected && slaveDoodle && slaveDoodle.willSync)
                                         {
-                                            // Sync is handled by a method of the slave doodle object
-                                            slaveDoodle.syncParameter(_messageArray.object.parameter, masterDoodle[_messageArray.object.parameter]);
+                                            // Get array of parameters to sync
+                                            var parameterArray = syncArray[idSuffix][className][slaveClassName]['parameters'];
                                             
-                                            // Update any bindings associated with the slave doodle
-                                            slaveDrawing.updateBindings(slaveDoodle);
+                                            if (typeof(parameterArray) != 'undefined')
+                                            {
+                                                // Iterate through parameters to sync
+                                                for (var i = 0; i < parameterArray.length; i++)
+                                                {
+                                                    // Check that parameter array member matches changed parameter
+                                                    if (parameterArray[i] == _messageArray.object.parameter)
+                                                    {
+                                                        // Sync slave parameter to value of master
+                                                        slaveDoodle.setSimpleParameter(_messageArray.object.parameter, masterDoodle[_messageArray.object.parameter]);
+                                                        slaveDoodle.updateDependentParameters(_messageArray.object.parameter);
+                                                        
+                                                        // Update any bindings associated with the slave doodle
+                                                        slaveDrawing.updateBindings(slaveDoodle);
+                                                        
+                                                        // Refresh slave drawing
+                                                        slaveDrawing.repaint();
+                                                    }
+                                                }
+                                            }
                                         }
                                     }
                                 }

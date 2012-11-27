@@ -18,8 +18,8 @@
 			</button>
 		</div>
 	<?php }?>
-	<?php if ($isEditable && count($doodleToolBarArray) > 0) {?>
-		<div class="ed_toolbar">
+    <?php if ($isEditable && count($doodleToolBarArray) > 0) {?>
+		<div id="<?php echo $canvasId.'doodleToolbar'?>" class="ed_toolbar">
 			<?php foreach ($doodleToolBarArray as $item) {?>
 				<button class="ed_img_button" id="<?php echo $item['classname'].$idSuffix?>" title="<?php echo $item['title']?>" onclick="<?php echo $drawingName?>.addDoodle('<?php echo $item['classname']?>'); return false;">
 					<img src="<?php echo $imgPath.$item['classname']?>.gif" />
@@ -27,10 +27,10 @@
 			<?php }?>
 		</div>
 	<?php }?>
-	<span id="canvasTooltip"></span>
+    <span class="canvasTooltip" id="<?php echo $canvasId.'Tooltip'?>"></span>
 	<canvas id="<?php echo $canvasId?>" class="<?php if ($isEditable) { echo 'ed_canvas_edit'; } else { echo 'ed_canvas_display'; }?>" width="<?php echo $width?>" height="<?php echo $height?>" tabindex="1"<?php if ($canvasStyle) {?> style="<?php echo $canvasStyle?>"<?php }?>></canvas>
 	<?php if($inputId) { ?>
 	<input type="hidden" id="<?php echo $inputId?>" name="<?php echo $inputName?>" value='<?php echo $this->model[$this->attribute]?>' />
 	<?php } ?>
 <?php if($divWrapper) {?></div><?php } ?>
-
+	

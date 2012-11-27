@@ -1,3 +1,29 @@
-.buildpath
-.project
-.settings
+# OpenEyes EyeDraw .gitignore file
+# 11 December 2011
+# Bill Aylward
+
+# Ignore this file
+.gitignore
+
+# compiled and temporary files
+*.[oa]
+*~
+temp*
+
+# OSX status files
+.DS_Store
+
+# Folders containing temporary data
+EyeDrawJS/EyeDrawJS.xcodeproj
+
+# Ignore folder containing automatic documentation
+jsdoc-toolkit/out/
+
+# Ignore testbed
+TestBed.html
+
+# Ignore folder containing old files
+js/old
+
+# Ignore the canvas cheat sheet
+Documentation/HTML5_Canvas_Cheat_Sheet.pdf
