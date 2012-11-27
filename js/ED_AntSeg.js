@@ -1655,7 +1655,7 @@ ED.NuclearCataract.prototype.setPropertyDefaults = function()
     this.parameterValidationArray['originY']['range'].setMinAndMax(-500, +500);
     
     // Add complete validation arrays for derived parameters
-    this.parameterValidationArray['grade'] = {kind:'derived', type:'string', list:['Mild', 'Moderate', 'White'], animate:true};
+    this.parameterValidationArray['grade'] = {kind:'derived', type:'string', list:['Mild', 'Moderate', 'Brunescent'], animate:true};
 }
 
 /**
@@ -1850,7 +1850,7 @@ ED.NuclearCataractCrossSection.prototype.setPropertyDefaults = function()
     this.parameterValidationArray['apexY']['range'].setMinAndMax(-180, -20);
     
     // Add complete validation arrays for derived parameters
-    this.parameterValidationArray['grade'] = {kind:'derived', type:'string', list:['Mild', 'Moderate', 'White'], animate:true};
+    this.parameterValidationArray['grade'] = {kind:'derived', type:'string', list:['Mild', 'Moderate', 'Brunescent'], animate:true};
 }
 
 /**

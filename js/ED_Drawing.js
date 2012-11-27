@@ -2015,9 +2015,7 @@ ED.Drawing.prototype.addDoodle = function(_className, _parameterDefaults, _param
                 var value = newDoodle[parameter];
 
                 // Add binding to the doodle (NB this will set value of new doodle to the value of the element)
-                if(this.bindingArray[_className][parameter] instanceof Array) {
-                  newDoodle.addBinding(parameter, this.bindingArray[_className][parameter]);
-                }
+                newDoodle.addBinding(parameter, this.bindingArray[_className][parameter]);
 
                 // Trigger binding by setting parameter to itself
                 newDoodle.setSimpleParameter(parameter, value);
@@ -2084,19 +2082,22 @@ ED.Drawing.prototype.addBindings = function(_bindingArray)
         {
         	_id = _bindingArray[className][parameter]['id'];
         	// Add an event listener to the element to create a doodle on change, if it does not exist
-            var element = document.getElementById(_id);
-            element.addEventListener('change', function (event) {
-                 if (!drawing.hasDoodleOfClass(className))
-                 {
-                     drawing.addDoodle(className);
-                 }
-            },false);
+        	// FIXME: This incorrectly adds _all_ doodles at the moment
+        	/*
+          var element = document.getElementById(_id);
+          element.addEventListener('change', function (event) {
+               if (!drawing.hasDoodleOfClass(className))
+               {
+                   drawing.addDoodle(className);
+               }
+          },false);
+          */
 
-            // Add binding to doodle if it exists
-            if (doodle)
-            {
-                doodle.addBinding(parameter, _bindingArray[className][parameter]);
-            }
+          // Add binding to doodle if it exists
+          if (doodle)
+          {
+              doodle.addBinding(parameter, _bindingArray[className][parameter]);
+          }
         }
     }
 }
@@ -2219,23 +2220,21 @@ ED.Drawing.prototype.updateBindings = function(_doodle)
         // Iterate through this doodle's bindings array and alter value of HTML element
         for (var key in doodle.bindingArray)
         {
-            if (doodle.bindingArray[key] instanceof Array) {
-            	element = document.getElementById(doodle.bindingArray[key]['id']);
-            	_lkup = doodle.bindingArray[key]['attribute'];
-            	
-            	if (element.type == 'select-one') {
-            		// it's a dropdown
-            		for (var i = 0; i < element.length; i++) {
-            			if (element.options[i].getAttribute(_lkup) == doodle.getParameter(key)) {
-            				element.value = element.options[i].value;
-            				break;
-            			}
-            		}
-            	}
-            	else {
-            		element.setAttribute(_lkup, doodle.getParameter(key));
-            	}
-            }
+          	element = document.getElementById(doodle.bindingArray[key]['id']);
+          	_lkup = doodle.bindingArray[key]['attribute'];
+          	
+          	if (element.type == 'select-one') {
+          		// it's a dropdown
+          		for (var i = 0; i < element.length; i++) {
+          			if (element.options[i].getAttribute(_lkup) == doodle.getParameter(key)) {
+          				element.value = element.options[i].value;
+          				break;
+          			}
+          		}
+          	}
+          	else {
+          		element.setAttribute(_lkup, doodle.getParameter(key));
+          	}
         }
     }
     else
@@ -4140,13 +4139,13 @@ ED.Doodle.prototype.addBinding = function(_parameter, _fieldParameters)
             // Set parameter to value of element
             if (_lkup) {
 	            if (element.type == "select-one") {
-	            	this.setParameterFromString(_parameter, element.options[element.selectedIndex].getAttribute(_lkup));
-	            }
-	            else {
+	            	if(element.selectedIndex > -1) {
+		            	this.setParameterFromString(_parameter, element.options[element.selectedIndex].getAttribute(_lkup));
+	            	}
+	            } else {
 	            	this.setParameterFromString(_parameter, element.getAttribute(_lkup));
 	            }
-            } 
-            else {
+            } else {
             	this.setParameterFromString(_parameter, element.value)
             }
             
