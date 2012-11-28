@@ -138,6 +138,11 @@ class OEEyeDrawWidget extends CWidget
 	 */
     public $syncArray = array();
     
+    /*
+     * Array of javascript objects to be used as controllers on the drawing
+     */
+    public $controllerArray = array();
+    
 	/**
 	 * Optional inline styling for the canvas element
 	 * @var string
@@ -342,10 +347,15 @@ class OEEyeDrawWidget extends CWidget
             'bindingArray'=>$this->bindingArray,
             'deleteValueArray'=>$this->deleteValueArray,
             'syncArray'=>$this->syncArray,
+			'controllerArray'=>array(),
             'offsetX'=>$this->offsetX,
             'offsetY'=>$this->offsetY,
             'toImage'=>$this->toImage,
 		);
+		// need to escape the controller names so that they are not treated as string vars in javascript
+		foreach ($this->controllerArray as $controller) {
+			$properties['controllerArray'][] = "js:" . $controller;
+		}
 		
 		// Encode parameters and pass to a javascript function to set up canvas
 		$properties = CJavaScript::encode($properties);
@@ -362,6 +372,11 @@ class OEEyeDrawWidget extends CWidget
     {
         $cssFile = $this->cssPath.'/OEEyeDraw.css';
         Yii::app()->getClientScript()->registerCssFile($cssFile);				 
+    }
+    
+    public function getDrawingName()
+    {
+    	return $this->drawingName;
     }
 }
 

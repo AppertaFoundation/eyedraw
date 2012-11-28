@@ -2111,7 +2111,6 @@ ED.Drawing.prototype.addBindings = function(_bindingArray)
         for (parameter in _bindingArray[className])
         {
             var elementId = _bindingArray[className][parameter]['id'];
-            
             // Add an event listener to the element to create a doodle on change, if it does not exist
             // FIXME: This incorrectly adds _all_ doodles at the moment - May have fixed it
             var element = document.getElementById(elementId);
