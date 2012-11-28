@@ -1704,11 +1704,38 @@ ED.Drawing.prototype.deleteDoodle = function(_doodle)
                     // Remove bindings and reset values of bound elements
                     for (var parameter in _doodle.bindingArray)
                     {
-                        var element = document.getElementById(_doodle.bindingArray[parameter]['id']);
-                        if (element != null)
+                        var elementId = _doodle.bindingArray[parameter]['id'];
+                        var attribute = _doodle.bindingArray[parameter]['attribute'];
+                        
+                        var element = document.getElementById(elementId);
+                        var value = this.boundElementDeleteValueArray[elementId];
+
+                        if (element != null && typeof(value) != 'undefined')
                         {
-                            // Set new value of element
-                            element.value = this.boundElementDeleteValueArray[_doodle.bindingArray[parameter]['id']];
+                            if (attribute)
+                            {
+                                // Set new value of element depending on its type
+                                if (element.type == 'select-one')
+                                {
+                                    // It's a dropdown
+                                    for (var i = 0; i < element.length; i++)
+                                    {
+                                        if (element.options[i].getAttribute(attribute) == value)
+                                        {
+                                            element.value = element.options[i].value;
+                                            break;
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    element.setAttribute(attribute, value);
+                                }
+                            }
+                            else
+                            {
+                                element.value = value;
+                            }
                             
                             // Remove binding from doodle (also removes event listener from element)
                             _doodle.removeBinding(parameter);
@@ -1950,6 +1977,7 @@ ED.Drawing.prototype.addDoodle = function(_className, _parameterDefaults, _param
         var newDoodle = new ED[_className](this);
         
         // Create an instance of the parent if it does not already exist
+        /*
         if (newDoodle.parentClass.length > 0)
         {
             if (!this.hasDoodleOfClass(newDoodle.parentClass))
@@ -1957,6 +1985,7 @@ ED.Drawing.prototype.addDoodle = function(_className, _parameterDefaults, _param
                 this.addDoodle(newDoodle.parentClass);
             }
         }
+        */
     }
     else
     {
@@ -2011,14 +2040,15 @@ ED.Drawing.prototype.addDoodle = function(_className, _parameterDefaults, _param
         {
             for (var parameter in this.bindingArray[_className])
             {
-                // Value of element will be delete value (by definition), so use default value of doodle
+                // Value of element might be delete value (eg 'None'), so use default value of doodle instead
                 var value = newDoodle[parameter];
 
                 // Add binding to the doodle (NB this will set value of new doodle to the value of the element)
                 newDoodle.addBinding(parameter, this.bindingArray[_className][parameter]);
 
-                // Trigger binding by setting parameter to itself
+                // Trigger binding by setting parameter
                 newDoodle.setSimpleParameter(parameter, value);
+                newDoodle.updateDependentParameters(parameter);
                 this.updateBindings(newDoodle);
             }
         }
@@ -2067,37 +2097,48 @@ ED.Drawing.prototype.addBindings = function(_bindingArray)
 {
     // Store binding array as part of drawing object in order to restore bindings to doodles that are deleted and added again
     this.bindingArray = _bindingArray;
-    
+
     // Get reference to this drawing object (for inner function)
     var drawing = this;
-    
+
     // Iterate through classNames
     for (var className in _bindingArray)
     {
         // Look for the first doodle of this class to bind to
         var doodle = this.firstDoodleOfClass(className);
-        
+
         // Iterate through bindings for this className
         for (parameter in _bindingArray[className])
         {
-        	_id = _bindingArray[className][parameter]['id'];
-        	// Add an event listener to the element to create a doodle on change, if it does not exist
-        	// FIXME: This incorrectly adds _all_ doodles at the moment
-        	/*
-          var element = document.getElementById(_id);
-          element.addEventListener('change', function (event) {
-               if (!drawing.hasDoodleOfClass(className))
-               {
-                   drawing.addDoodle(className);
-               }
-          },false);
-          */
+            var elementId = _bindingArray[className][parameter]['id'];
+            
+            // Add an event listener to the element to create a doodle on change, if it does not exist
+            // FIXME: This incorrectly adds _all_ doodles at the moment - May have fixed it
+            var element = document.getElementById(elementId);
+            
+            element.addEventListener('change', function (event)
+            {
+                // Cannot use external variable className because of closure
+                for (var classNm in drawing.bindingArray)
+                {
+                    for (var param in drawing.bindingArray[classNm])
+                    {
+                        if (this.id == _bindingArray[classNm][param]['id'])
+                        {
+                            if (!drawing.hasDoodleOfClass(classNm))
+                            {
+                                drawing.addDoodle(classNm);
+                            }
+                        }
+                    }
+                }
+            },false);
 
-          // Add binding to doodle if it exists
-          if (doodle)
-          {
+            // Add binding to doodle if it exists
+            if (doodle)
+            {
               doodle.addBinding(parameter, _bindingArray[className][parameter]);
-          }
+            }
         }
     }
 }
@@ -2214,15 +2255,17 @@ ED.Drawing.prototype.updateBindings = function(_doodle)
         doodle = this.selectedDoodle;
     }
     
-    // No argment, so there must be a selected doodle to activate binding
+    // No argument, so there must be a selected doodle to activate binding, otherwise do nothing
     if (doodle != null)
     {
         // Iterate through this doodle's bindings array and alter value of HTML element
-        for (var key in doodle.bindingArray)
+        for (var parameter in doodle.bindingArray)
         {
-          	element = document.getElementById(doodle.bindingArray[key]['id']);
-          	_lkup = doodle.bindingArray[key]['attribute'];
+          	var element = document.getElementById(doodle.bindingArray[parameter]['id']);
+          	var attribute = doodle.bindingArray[parameter]['attribute'];
+            var value = doodle.getParameter(parameter);
           	
+            /*
           	if (element.type == 'select-one') {
           		// it's a dropdown
           		for (var i = 0; i < element.length; i++) {
@@ -2235,6 +2278,30 @@ ED.Drawing.prototype.updateBindings = function(_doodle)
           	else {
           		element.setAttribute(_lkup, doodle.getParameter(key));
           	}
+             */
+            if (attribute)
+            {
+                if (element.type == 'select-one')
+                {
+                    // It's a dropdown
+                    for (var i = 0; i < element.length; i++)
+                    {
+                        if (element.options[i].getAttribute(attribute) == value)
+                        {
+                            element.value = element.options[i].value;
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    element.setAttribute(attribute, value);
+                }
+            }
+            else
+            {
+                element.value = value;
+            }
         }
     }
     else
@@ -2247,7 +2314,7 @@ ED.Drawing.prototype.updateBindings = function(_doodle)
  * Test if doodle of a class exists in drawing
  *
  * @param {String} _className Classname of doodle
- * @returns {Bool} True is a doodle of the class exists, otherwise false 
+ * @returns {Bool} True is a doodle of the class exists, otherwise false
  */
 ED.Drawing.prototype.hasDoodleOfClass = function(_className)
 {
@@ -2726,16 +2793,16 @@ ED.Drawing.prototype.repaint = function()
         {
             buttonArray[i].disabled = false;
         }
-    }
-    
-	// Go through doodles looking for any that unique, and disable the corresponding add button
-    for (var i = 0; i < this.doodleArray.length; i++)
-    {
-        // Button ID is concatenation of class name and id suffix
-        var addButton = document.getElementById(this.doodleArray[i].className +  this.IDSuffix);
-        if (addButton)
+        
+        // Go through doodles looking for any that unique, and disable the corresponding add button
+        for (var i = 0; i < this.doodleArray.length; i++)
         {
-            addButton.disabled = this.doodleArray[i].isUnique;
+            // Button ID is concatenation of class name and id suffix
+            var addButton = document.getElementById(this.doodleArray[i].className +  this.IDSuffix);
+            if (addButton)
+            {
+                addButton.disabled = this.doodleArray[i].isUnique;
+            }
         }
     }
     
@@ -3674,11 +3741,6 @@ ED.Doodle.prototype.updateDependentParameters = function(_parameter)
     for (var parameter in valueArray)
     {
         this.setSimpleParameter(parameter, valueArray[parameter]);
-        // Assign new value
-        //this[parameter] = valueArray[parameter];
-        
-        // Notify change
-        //this.drawing.notify(parameter, valueArray[parameter]);
     }
 }
 
@@ -4121,10 +4183,10 @@ ED.Doodle.prototype.increment = function(_parameter, _value)
  */
 ED.Doodle.prototype.addBinding = function(_parameter, _fieldParameters)
 {
-		_id = _fieldParameters['id'];
-		_lkup = _fieldParameters['attribute'];
+    _id = _fieldParameters['id'];
+    _lkup = _fieldParameters['attribute'];
 
-		// Check that doodle has a parameter of this name
+    // Check that doodle has a parameter of this name
     if (typeof(this[_parameter]) != 'undefined')
     {
         // Get reference to HTML element
@@ -4136,7 +4198,7 @@ ED.Doodle.prototype.addBinding = function(_parameter, _fieldParameters)
             // Add binding to array
             this.bindingArray[_parameter] = { 'id': _id, 'attribute': _lkup };
             
-            // Set parameter to value of element
+            // Set parameter to the attribute (if passed), or the value of element
             if (_lkup) {
 	            if (element.type == "select-one") {
 	            	if(element.selectedIndex > -1) {
