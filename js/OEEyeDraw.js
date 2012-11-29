@@ -93,7 +93,7 @@ function eyeDrawInit(_properties)
                         // Draw doodles
                         this.drawing.drawAllDoodles();
                     }
-                    // Otherwise run commands in onLoadedCommand array
+                    // Otherwise run commands in onReadyCommand array
                     else
                     {
                         for ( var i = 0; i < _properties.onReadyCommandArray.length; i++)
@@ -145,6 +145,14 @@ function eyeDrawInit(_properties)
                     }
                     break;
                     
+                case 'doodleDeleted':
+                    // Save drawing to hidden input
+                    if (input != null && input.value.length > 0)
+                    {
+                        input.value = this.drawing.save();
+                    }
+                    break;
+                    
                 case 'mousedragged':
                     // Save drawing to hidden input
                     if (input != null && input.value.length > 0)
@@ -167,15 +175,6 @@ function eyeDrawInit(_properties)
                     
                     // Get master doodle
                     var masterDoodle = _messageArray['object'].doodle;
-
-                    // TEMP stop syncing if slave moves phako incision - put somewhere else
-                    //                    if (_messageArray.selectedDoodle != null)
-                    //                    {
-                    //                        if (_messageArray.selectedDoodle.className == 'PhakoIncision')
-                    //                        {
-                    //                            //stopSync(_messageArray.selectedDoodle);
-                    //                        }
-                    //                    }
 
                     // Iterate through sync array
                     for (var idSuffix in _properties.syncArray)
@@ -229,10 +228,6 @@ function eyeDrawInit(_properties)
                         // Refresh slave drawing
                         slaveDrawing.repaint();
                     }
-                     break;
-                
-                default:
-                    //console.log(_messageArray['eventName']);
                     break;
             }
         }

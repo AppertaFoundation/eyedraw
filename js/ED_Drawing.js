@@ -1710,6 +1710,7 @@ ED.Drawing.prototype.deleteDoodle = function(_doodle)
                         var element = document.getElementById(elementId);
                         var value = this.boundElementDeleteValueArray[elementId];
 
+                        // If available, set the value of the bound element to the appropriate value
                         if (element != null && typeof(value) != 'undefined')
                         {
                             if (attribute)
@@ -1736,12 +1737,12 @@ ED.Drawing.prototype.deleteDoodle = function(_doodle)
                             {
                                 element.value = value;
                             }
-                            
-                            // Remove binding from doodle (also removes event listener from element)
-                            _doodle.removeBinding(parameter);
-                        }
-                    }
+                         }
                         
+                        // Remove binding from doodle (also removes event listener from element)
+                        _doodle.removeBinding(parameter);
+                    }
+                    
                     // Remove it from array
                     this.doodleArray.splice(i,1);
                 }
@@ -1968,7 +1969,7 @@ ED.Drawing.prototype.isReady = function()
 ED.Drawing.prototype.addDoodle = function(_className, _parameterDefaults, _parameterBindings)
 {
     // Set flag to indicate whether a doodle of this className already exists
-    var exists = this.hasDoodleOfClass(_className);
+    var doodleExists = this.hasDoodleOfClass(_className);
     
     // Check that class exists, and create a new doodle
     if (ED.hasOwnProperty(_className))
@@ -2036,12 +2037,56 @@ ED.Drawing.prototype.addDoodle = function(_className, _parameterDefaults, _param
         this.doodleArray[this.doodleArray.length] = newDoodle;
         
         // Pre-existing binding
-        if (!exists)
+        if (!doodleExists)
         {
             for (var parameter in this.bindingArray[_className])
             {
-                // Value of element might be delete value (eg 'None'), so use default value of doodle instead
-                var value = newDoodle[parameter];
+                var elementId = this.bindingArray[_className][parameter]['id'];
+                var attribute = this.bindingArray[_className][parameter]['attribute'];
+                var element = document.getElementById(elementId);
+                
+                // Get the value of the element
+                var value;
+                if (attribute)
+                {
+                    if (element.type == "select-one")
+                    {
+                        if (element.selectedIndex > -1)
+                        {
+                            value = element.options[element.selectedIndex].getAttribute(attribute);
+                        }
+                    }
+                    else
+                    {
+                        value = element.getAttribute(attribute);
+                    }
+                }
+                else
+                {
+                    value = element.value;
+                }
+
+                // If the element value is equal to the delete value, use the default value of the doodle instead
+                if (value == this.boundElementDeleteValueArray[elementId])
+                {
+                    value = newDoodle[parameter];
+                }
+                
+                // Check validity of new value
+                var validityArray = newDoodle.validateParameter(parameter, value);
+                
+                // If new value is valid, set it, otherwise use default value of doodle
+                if (validityArray.valid)
+                {
+                    newDoodle.setSimpleParameter(parameter, validityArray.value);
+                    newDoodle.updateDependentParameters(parameter);
+                    //newDoodle.setParameterWithAnimation(parameter, validityArray.value);
+                }
+                else
+                {
+                    value = newDoodle[parameter];
+                    ED.errorHandler('ED.Drawing', 'addDoodle', 'Invalid value for parameter: ' + parameter);
+                }
 
                 // Add binding to the doodle (NB this will set value of new doodle to the value of the element)
                 newDoodle.addBinding(parameter, this.bindingArray[_className][parameter]);
@@ -2063,9 +2108,6 @@ ED.Drawing.prototype.addDoodle = function(_className, _parameterDefaults, _param
             }
         }
         
-        // Notify
-        this.notify("doodleAdded", newDoodle);
-        
         // Place doodle and refresh drawing
         if (newDoodle.addAtBack)
         {
@@ -2077,6 +2119,9 @@ ED.Drawing.prototype.addDoodle = function(_className, _parameterDefaults, _param
             // Refresh drawing
             this.repaint();
         }
+        
+        // Notify
+        this.notify("doodleAdded", newDoodle);
         
         // Return doodle
         return newDoodle;
@@ -2166,7 +2211,7 @@ ED.Drawing.prototype.addDeleteValues = function(_deleteValuesArray)
  */
 ED.Drawing.prototype.eventHandler = function(_type, _doodleId, _className, _elementId, _value)
 {
-    console.log("Event " + _type + ":" + _doodleId + ":" + _className + ":" + _elementId + ":" + _value);
+    //console.log("Event " + _type + ":" + _doodleId + ":" + _className + ":" + _elementId + ":" + _value);
 
     //var value;
     switch (_type)
@@ -2215,7 +2260,32 @@ ED.Drawing.prototype.eventHandler = function(_type, _doodleId, _className, _elem
                     // Apply new value to element if necessary
                     if (_value != validityArray.value)
                     {
-                        document.getElementById(_elementId).value = validityArray.value;
+                        var attribute = doodle.bindingArray[parameter]['attribute'];
+                        var element = document.getElementById(_elementId);
+                        
+                        if (attribute)
+                        {
+                            if (element.type == 'select-one')
+                            {
+                                // It's a dropdown
+                                for (var i = 0; i < element.length; i++)
+                                {
+                                    if (element.options[i].getAttribute(attribute) == validityArray.value)
+                                    {
+                                        element.value = element.options[i].value;
+                                        break;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                element.setAttribute(attribute, validityArray.value);
+                            }
+                        }
+                        else
+                        {
+                            element.value = validityArray.value;
+                        }
                     }
                     
                     
