@@ -139,9 +139,9 @@ class OEEyeDrawWidget extends CWidget
     public $syncArray = array();
     
     /*
-     * Array of javascript objects to be used as controllers on the drawing
+     * Array of javascript objects to be used as listeners on the drawing
      */
-    public $controllerArray = array();
+    public $listenerArray = array();
     
 	/**
 	 * Optional inline styling for the canvas element
@@ -347,14 +347,14 @@ class OEEyeDrawWidget extends CWidget
             'bindingArray'=>$this->bindingArray,
             'deleteValueArray'=>$this->deleteValueArray,
             'syncArray'=>$this->syncArray,
-			'controllerArray'=>array(),
+			'listenerArray'=>array(),
             'offsetX'=>$this->offsetX,
             'offsetY'=>$this->offsetY,
             'toImage'=>$this->toImage,
 		);
-		// need to escape the controller names so that they are not treated as string vars in javascript
-		foreach ($this->controllerArray as $controller) {
-			$properties['controllerArray'][] = "js:" . $controller;
+		// need to escape the listener names so that they are not treated as string vars in javascript
+		foreach ($this->listenerArray as $listener) {
+			$properties['listenerArray'][] = "js:" . $listener;
 		}
 		
 		// Encode parameters and pass to a javascript function to set up canvas

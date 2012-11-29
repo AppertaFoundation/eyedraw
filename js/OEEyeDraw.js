@@ -56,9 +56,9 @@ function eyeDrawInit(_properties)
     // Create a controller object for this drawing
     var controller = new eyeDrawController(window[_properties.drawingName]);
     
-    var controllerList = new Array();
-    for (var i = 0; i < _properties.controllerArray.length; i++) {
-    	controllerList[i] = new _properties.controllerArray[i](window[_properties.drawingName]);
+    var listenerList = new Array();
+    for (var i = 0; i < _properties.listenerArray.length; i++) {
+    	listenerList[i] = new _properties.listenerArray[i](window[_properties.drawingName]);
     }
     
     // Initialise drawing
