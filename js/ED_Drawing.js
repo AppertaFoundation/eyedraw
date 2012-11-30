@@ -4120,6 +4120,30 @@ ED.Doodle.prototype.setOriginWithDisplacements = function(_first, _next)
 }
 
 /**
+ * Set the value of a doodle's rotation to avoid overlapping other doodles
+ *
+ * @param {Int} _first Rotation in degrees of first doodle anticlockwise right eye, clockwise left eye
+ * @param {Int} _next Additional rotation of subsequent doodles
+ */
+ED.Doodle.prototype.setRotationWithDisplacements = function(_first, _next)
+{
+    var direction = this.drawing.eye == ED.eye.Right?-1:1;
+    var newRotation;
+    
+    var doodle = this.drawing.lastDoodleOfClass(this.className);
+    if (doodle)
+    {
+        newRotation = ((doodle.rotation * 180/Math.PI + direction * _next + 360) % 360) * Math.PI/180;
+    }
+    else
+    {
+        newRotation = ((direction * _first + 360) % 360) * Math.PI/180;
+    }
+    
+    this.rotation = this.parameterValidationArray['rotation']['range'].constrain(newRotation);
+}
+
+/**
  * Deselects doodle
  */
 ED.Doodle.prototype.deselect = function()

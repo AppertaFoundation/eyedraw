@@ -7,6 +7,10 @@
         <!-- Mandatory file containing key drawing classes -->
         <script language="JavaScript" src="js/ED_Drawing.js" type="text/javascript"></script>
         
+        <!-- Include language specific file with tooltips. Note use of charset attribute to define utf-8 -->
+        <!-- NB how to register a script with attribute charset="utf-8" using yii? -->
+        <script language="JavaScript" src="js/ED_Tooltips.js" type="text/javascript" charset="utf-8"></script>
+        
         <!-- Subclasses loaded according to need -->
         <script language="JavaScript" src="js/ED_AntSeg.js" type="text/javascript"></script>
 
@@ -46,16 +50,17 @@
                     {
                         // Ready notification
                         case 'ready':
-                            _drawing.addDoodle('AntSeg');
-                            //_drawing.addDoodle('AntSeg', {pupilSize:'Small'}, {pupilSize:{id:'pupilSizeSelect', attribute:'ed_val'}});
+                        _drawing.addDoodle('AntSeg');
+                        //_drawing.addDoodle('AntSeg', {pupilSize:'Small'}, {pupilSize:{id:'pupilSizeSelect', attribute:'ed_val'}});
                             //_drawing.addDoodle('NuclearCataract', {grade:'Brunescent'}, {grade:{id:'gradeSelect', attribute:'ed_val'}});
-                            _drawing.addBindings(
-                                                 {
-                                                 NuclearCataract:{grade:{id:'gradeSelect', attribute:'ed_val'}},
-                                                 AntSeg:{pupilSize:{id:'pupilSizeSelect', attribute:'ed_val'}}
-                                                 }
-                                                 );
-                            _drawing.addDeleteValues({gradeSelect:'None'});
+//                            _drawing.addBindings(
+//                                                 {
+//                                                 TrialLens:{axis:{id:'axisInput'}}
+//                                                 }
+//                                                 );
+//_drawing.addDeleteValues({gradeSelect:'None'});
+                        _drawing.addDoodle('CornealScar');
+
                         
                             _drawing.deselectDoodles();
                             break;
@@ -85,8 +90,11 @@
         
         <!-- Toolbar -->
         <button class="imgbutton" disabled="true" id="deleteSelectedDoodleRPS" title="Delete" onclick="drawingEdit.deleteSelectedDoodle(); return false;" ><img src="graphics/deleteSelectedDoodle.gif" /></button>
-        <button class="imgbutton" id="NuclearCataractRPS" onclick="drawingEdit.addDoodle('NuclearCataract'); return false;" ><img src="graphics/NuclearCataract.gif" /></button>
+        <button class="imgbutton" id="FuchsRPS" onclick="drawingEdit.addDoodle('CornealScar'); return false;" ><img src="graphics/CornealScar.gif" /></button>
         </br >
+        
+        <!-- Canvas tooltip -->
+        <span class="canvasTooltip" id="canvasEditTooltip"></span>
         
         <!-- Canvas element -->
         <canvas id="canvasEdit" class="ed_canvas_edit" width="300" height="300" tabindex="1"></canvas>
@@ -97,7 +105,7 @@
             <option value="3" ed_val="Small">Small</option>
         </select>
         
-        <input type="text" id="pupilSizeTextInput" value="Moderate" />
+        <input type="text" id="axisInput" value="0" />
         
         <input id="pxeCheckBox" value="1" type="checkbox">
             
@@ -107,6 +115,8 @@
             <option value="3" ed_val="Moderate">Moderate</option>
             <option value="4" ed_val="Brunescent">Brunescent</option>
         </select>
+            
+        <button onclick="alert(drawingEdit.report()); return false;" >Report</button>
         
         </br>
         <textarea rows="4" cols="180" id="saveInput"></textarea>
