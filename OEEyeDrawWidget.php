@@ -119,6 +119,12 @@ class OEEyeDrawWidget extends CWidget
 	 * @var array
 	 */
     public $onReadyCommandArray = array();
+
+    /**
+	 * Array of commands to apply to the drawing object once doodles have been loaded from a saved JSON string
+	 * @var array
+	 */
+    public $onDoodlesLoadedCommandArray = array();
     
 	/**
 	 * Array of bindings to apply to doodles, applied after onLoaded commands
@@ -344,6 +350,7 @@ class OEEyeDrawWidget extends CWidget
             'graphicsPath'=>$this->imgPath,
             'inputId'=>$this->inputId,
             'onReadyCommandArray'=>$this->onReadyCommandArray,
+            'onDoodlesLoadedCommandArray'=>$this->onDoodlesLoadedCommandArray,
             'bindingArray'=>$this->bindingArray,
             'deleteValueArray'=>$this->deleteValueArray,
             'syncArray'=>$this->syncArray,

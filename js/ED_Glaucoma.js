@@ -992,3 +992,1355 @@ ED.DiskHaemorrhage.prototype.description = function()
 	
 	return returnString;
 }
+
+/**
+ * Gonioscopy
+ *
+ * @class Gonioscopy
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Int} _originX
+ * @param {Int} _originY
+ * @param {Float} _radius
+ * @param {Int} _apexX
+ * @param {Int} _apexY
+ * @param {Float} _scaleX
+ * @param {Float} _scaleY
+ * @param {Float} _arc
+ * @param {Float} _rotation
+ * @param {Int} _order
+ */
+ED.Gonioscopy = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+{
+	// Set classname
+	this.className = "Gonioscopy";
+
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.Gonioscopy.prototype = new ED.Doodle;
+ED.Gonioscopy.prototype.constructor = ED.Gonioscopy;
+ED.Gonioscopy.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.Gonioscopy.prototype.setHandles = function()
+{
+    this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+}
+
+/**
+ * Set default properties
+ */
+ED.Gonioscopy.prototype.setPropertyDefaults = function()
+{
+    this.isDeletable = false;
+	this.isScaleable = false;
+	this.isMoveable = false;
+	this.isRotatable = false;
+    this.isUnique = true;
+    
+    // Update component of validation array for simple parameters
+    this.parameterValidationArray['apexX']['range'].setMinAndMax(-460, -420);
+    this.parameterValidationArray['apexY']['range'].setMinAndMax(-460, -400);
+}
+
+/**
+ * Sets default parameters
+ */
+ED.Gonioscopy.prototype.setParameterDefaults = function()
+{
+    this.apexX = -460;
+    this.apexY = -460;
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.Gonioscopy.prototype.draw = function(_point)
+{
+	// Get context
+	var ctx = this.drawing.context;
+	
+	// Call draw method in superclass
+	ED.Gonioscopy.superclass.draw.call(this, _point);
+    
+	// Calculate parameters for arcs
+	var arcStart = 0;
+	var arcEnd = 2 * Math.PI;
+    
+	// Boundary path
+	ctx.beginPath();
+    
+	// Do a 360 arc
+	ctx.arc(0, 0, rsl, arcStart, arcEnd, true);
+	
+	// Set line attributes
+	ctx.lineWidth = 15;
+	ctx.fillStyle = "rgba(255, 255, 255, 0)";
+	ctx.strokeStyle = "rgba(200, 200, 200, 1)";
+	
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+	
+	// Non boundary paths
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
+	{
+        // Trabecular meshwork
+        ctx.beginPath();
+        
+        // Arc across, move to inner and arc back
+        ctx.arc(0, 0, rtmo, arcStart, arcEnd, true);
+        ctx.moveTo(rtmi, 0);
+        ctx.arc(0, 0, rtmi, arcEnd, arcStart, false);
+        
+        // Set line attributes
+        ctx.lineWidth = 1;
+        
+        // Fill style
+        var ptrn;
+        
+        // Pattern
+        if (this.apexX < -440)
+        {
+            if (this.apexY < -440) ptrn = ctx.createPattern(this.drawing.imageArray['MeshworkPatternLight'],'repeat');
+            else if (this.apexY < -420) ptrn = ctx.createPattern(this.drawing.imageArray['MeshworkPatternMedium'],'repeat');
+            else ptrn = ctx.createPattern(this.drawing.imageArray['MeshworkPatternHeavy'],'repeat');
+            ctx.fillStyle = ptrn;
+        }
+        // Uniform
+        else
+        {
+            if (this.apexY < -440) ctx.fillStyle = "rgba(250, 200, 0, 1)";
+            else if (this.apexY < -420) ctx.fillStyle = "rgba(200, 150, 0, 1)";
+            else ctx.fillStyle = "rgba(150, 100, 0, 1)";
+        }
+        
+        // Stroke style
+        ctx.strokeStyle = "rgba(200, 200, 200, 1)";
+        
+        // Draw it
+        ctx.fill();
+        ctx.stroke();
+        
+        // Ciliary Body
+        ctx.beginPath();
+        
+        // Arc across, move to inner and arc back
+        ctx.arc(0, 0, rcbo, arcStart, arcEnd, true);
+        ctx.arc(0, 0, rcbi, arcEnd, arcStart, false);
+        
+        // Draw it
+        ctx.fillStyle = "rgba(200, 200, 200, 1)";
+        ctx.fill();
+        
+        // Draw radial lines
+        var firstAngle = 15;
+        var innerPoint = new ED.Point(0,0);
+        var outerPoint = new ED.Point(0,0);
+        var i = 0;
+        
+        // Loop through clock face
+        for (i = 0; i < 12; i++)
+        {
+            // Get angle
+            var angleInRadians = (firstAngle + i * 30) * Math.PI/180;
+            innerPoint.setWithPolars(rcbi, angleInRadians);
+            
+            // Set new line
+            ctx.beginPath();
+            ctx.moveTo(innerPoint.x, innerPoint.y);
+            
+            // Some lines are longer, wider and darker
+            if (i == 1 || i == 4 || i == 7 || i == 10)
+            {
+                outerPoint.setWithPolars(rsl + 80, angleInRadians);
+                ctx.lineWidth = 6;
+                ctx.strokeStyle = "rgba(20, 20, 20, 1)";
+            }
+            else
+            {
+                outerPoint.setWithPolars(rsl, angleInRadians);
+                ctx.lineWidth = 2;
+                ctx.strokeStyle = "rgba(137, 137, 137, 1)";
+            }
+            
+            // Draw line
+            ctx.lineTo(outerPoint.x, outerPoint.y);
+            ctx.closePath();
+            ctx.stroke();
+        }
+        
+        // Iris
+        ctx.beginPath();
+        
+        // Arc across, move to inner and arc back
+        ctx.arc(0, 0, riro, arcStart, arcEnd, true);
+        ctx.arc(0, 0, riri, arcEnd, arcStart, false);
+        
+        // Set attributes
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = "rgba(180, 180, 180, 1)";
+        ctx.fillStyle = "rgba(200, 200, 200, 1)";
+        
+        // Draw it
+        ctx.fill();
+        ctx.stroke();
+	}
+    
+    // Coordinates of handles (in canvas plane)
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
+    
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+    
+	// Return value indicating successful hit test
+	return this.isClicked;
+}
+
+/**
+ * Returns a string containing a text description of the doodle (overridden by subclasses)
+ *
+ * @returns {String} Description of doodle
+ */
+ED.Gonioscopy.prototype.description = function()
+{
+    var returnValue = "";
+    
+    if (this.apexX < -440)
+    {
+        if (this.apexY < -440) returnValue = "Light patchy pigment";
+        else if (this.apexY < -420) returnValue = "Medium patchy pigment";
+        else returnValue = "Heavy patchy pigment";
+    }
+    // Uniform
+    else
+    {
+        if (this.apexY < -440) returnValue = "Light homogenous pigment";
+        else if (this.apexY < -420) returnValue = "Medium homogenous pigment";
+        else returnValue = "Heavy homogenous pigment";
+    }
+
+    return returnValue;
+}
+
+/**
+ * AngleGradeNorth
+ *
+ * @class AngleGradeNorth
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Int} _originX
+ * @param {Int} _originY
+ * @param {Float} _radius
+ * @param {Int} _apexX
+ * @param {Int} _apexY
+ * @param {Float} _scaleX
+ * @param {Float} _scaleY
+ * @param {Float} _arc
+ * @param {Float} _rotation
+ * @param {Int} _order
+ */
+ED.AngleGradeNorth = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+{
+	// Set classname
+	this.className = "AngleGradeNorth";
+    
+    // Derived parameters
+    this.grade = "O";
+
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.AngleGradeNorth.prototype = new ED.Doodle;
+ED.AngleGradeNorth.prototype.constructor = ED.AngleGradeNorth;
+ED.AngleGradeNorth.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.AngleGradeNorth.prototype.setHandles = function()
+{
+    this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+}
+
+/**
+ * Sets default dragging attributes
+ */
+ED.AngleGradeNorth.prototype.setPropertyDefaults = function()
+{
+    this.isDeletable = false;
+	this.isScaleable = false;
+	this.isMoveable = false;
+	this.isRotatable = false;
+    
+    // Update component of validation array for simple parameters
+    this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.125, +1.5);
+    this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.125, +1.5);
+    this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
+    this.parameterValidationArray['apexY']['range'].setMinAndMax(-rsli, -riri);
+    
+    // Add complete validation arrays for derived parameters
+    this.parameterValidationArray['grade'] = {kind:'derived', type:'string', list:['O', 'I', 'II', 'III', 'IV'], animate:true};
+}
+
+/**
+ * Sets default parameters
+ */
+ED.AngleGradeNorth.prototype.setParameterDefaults = function()
+{
+    this.arc = 90 * Math.PI/180;
+    this.apexY = -riri;
+}
+
+/**
+ * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
+ * The returned parameters are animated if their 'animate' property is set to true
+ *
+ * @param {String} _parameter Name of parameter that has changed
+ * @value {Undefined} _value Value of parameter to calculate
+ * @returns {Array} Associative array of values of dependent parameters
+ */
+ED.AngleGradeNorth.prototype.dependentParameterValues = function(_parameter, _value)
+{
+    var returnArray = new Array();
+    
+    switch (_parameter)
+    {
+        case 'apexY':
+            // Return value uses SCHEIE classificaton
+            var returnValue = "O";
+            if (-_value > riro) returnValue = "I";
+            if (-_value > rcbo) returnValue = "II";
+            if (-_value > rtmo) returnValue = "III";
+            if (-_value >= rsli) returnValue = "IV";
+            returnArray['grade'] = returnValue;
+            break;
+            
+        case 'grade':
+            var returnValue = "";
+            switch (_value)
+            {
+                case 'IV':
+                    if (-this.apexY >= rsli) returnValue = this.apexY;
+                    else returnValue = -rsli;
+                    break;
+                case 'III':
+                    if (-this.apexY >= rtmo && -this.apexY < rsli) returnValue = this.apexY;
+                    else returnValue = -rtmo;
+                    break;
+                case 'II':
+                    if (-this.apexY >= rcbo && -this.apexY < rtmo) returnValue = this.apexY;
+                    else returnValue = -rcbo;
+                    break;
+                case 'I':
+                    if (-this.apexY >= riro && -this.apexY < rcbo) returnValue = this.apexY;
+                    else returnValue = -riro;
+                    break;
+                case 'O':
+                    returnValue = -riri;
+                    break;
+            }
+
+            returnArray['apexY'] = returnValue;
+            break;
+    }
+    
+    return returnArray;
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.AngleGradeNorth.prototype.draw = function(_point)
+{
+	// Get context
+	var ctx = this.drawing.context;
+	
+	// Call draw method in superclass
+	ED.AngleGradeNorth.superclass.draw.call(this, _point);
+	
+	// Calculate parameters for arcs
+	var theta = this.arc/2;
+	var arcStart = - Math.PI/2 + theta;
+	var arcEnd = - Math.PI/2 - theta;
+    
+	// Boundary path
+	ctx.beginPath();
+  
+    // Arc across, move to inner and arc back
+	ctx.arc(0, 0, -this.apexY, arcStart, arcEnd, true);
+	ctx.arc(0, 0, rpu, arcEnd, arcStart, false);
+    ctx.closePath();
+    
+    // Set fill attributes (same colour as Iris)
+    ctx.fillStyle = "rgba(100, 200, 250, 1.0)";
+	ctx.strokeStyle = "rgba(100, 100, 100, 1.0)";
+    ctx.lineWidth = 4;
+	
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+	
+	// Coordinates of handles (in canvas plane)
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
+	
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+	
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * AngleGradeEast
+ *
+ * @class AngleGradeEast
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Int} _originX
+ * @param {Int} _originY
+ * @param {Float} _radius
+ * @param {Int} _apexX
+ * @param {Int} _apexY
+ * @param {Float} _scaleX
+ * @param {Float} _scaleY
+ * @param {Float} _arc
+ * @param {Float} _rotation
+ * @param {Int} _order
+ */
+ED.AngleGradeEast = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+{
+	// Set classname
+	this.className = "AngleGradeEast";
+    
+    // Derived parameters
+    this.grade = "O";
+    
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.AngleGradeEast.prototype = new ED.Doodle;
+ED.AngleGradeEast.prototype.constructor = ED.AngleGradeEast;
+ED.AngleGradeEast.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.AngleGradeEast.prototype.setHandles = function()
+{
+    this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+}
+
+/**
+ * Sets default dragging attributes
+ */
+ED.AngleGradeEast.prototype.setPropertyDefaults = function()
+{
+    this.isDeletable = false;
+	this.isScaleable = false;
+	this.isMoveable = false;
+	this.isRotatable = false;
+    
+    // Update component of validation array for simple parameters
+    this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.125, +1.5);
+    this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.125, +1.5);
+    this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
+    this.parameterValidationArray['apexY']['range'].setMinAndMax(-rsli, -riri);
+    
+    // Add complete validation arrays for derived parameters
+    this.parameterValidationArray['grade'] = {kind:'derived', type:'string', list:['O', 'I', 'II', 'III', 'IV'], animate:true};
+}
+
+/**
+ * Sets default parameters
+ */
+ED.AngleGradeEast.prototype.setParameterDefaults = function()
+{
+    this.arc = 90 * Math.PI/180;
+    this.apexY = -riri;
+    this.rotation = Math.PI/2;
+}
+
+/**
+ * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
+ * The returned parameters are animated if their 'animate' property is set to true
+ *
+ * @param {String} _parameter Name of parameter that has changed
+ * @value {Undefined} _value Value of parameter to calculate
+ * @returns {Array} Associative array of values of dependent parameters
+ */
+ED.AngleGradeEast.prototype.dependentParameterValues = function(_parameter, _value)
+{
+    var returnArray = new Array();
+    
+    switch (_parameter)
+    {
+        case 'apexY':
+            // Return value uses SCHEIE classificaton
+            var returnValue = "O";
+            if (-_value > riro) returnValue = "I";
+            if (-_value > rcbo) returnValue = "II";
+            if (-_value > rtmo) returnValue = "III";
+            if (-_value >= rsli) returnValue = "IV";
+            returnArray['grade'] = returnValue;
+            break;
+            
+        case 'grade':
+            var returnValue = "";
+            switch (_value)
+        {
+            case 'IV':
+                if (-this.apexY >= rsli) returnValue = this.apexY;
+                else returnValue = -rsli;
+                break;
+            case 'III':
+                if (-this.apexY >= rtmo && -this.apexY < rsli) returnValue = this.apexY;
+                else returnValue = -rtmo;
+                break;
+            case 'II':
+                if (-this.apexY >= rcbo && -this.apexY < rtmo) returnValue = this.apexY;
+                else returnValue = -rcbo;
+                break;
+            case 'I':
+                if (-this.apexY >= riro && -this.apexY < rcbo) returnValue = this.apexY;
+                else returnValue = -riro;
+                break;
+            case 'O':
+                returnValue = -riri;
+                break;
+        }
+            
+            returnArray['apexY'] = returnValue;
+            break;
+    }
+    
+    return returnArray;
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.AngleGradeEast.prototype.draw = function(_point)
+{
+	// Get context
+	var ctx = this.drawing.context;
+	
+	// Call draw method in superclass
+	ED.AngleGradeEast.superclass.draw.call(this, _point);
+	
+	// Calculate parameters for arcs
+	var theta = this.arc/2;
+	var arcStart = - Math.PI/2 + theta;
+	var arcEnd = - Math.PI/2 - theta;
+    
+	// Boundary path
+	ctx.beginPath();
+    
+    // Arc across, move to inner and arc back
+	ctx.arc(0, 0, -this.apexY, arcStart, arcEnd, true);
+	ctx.arc(0, 0, rpu, arcEnd, arcStart, false);
+    ctx.closePath();
+    
+    // Set fill attributes (same colour as Iris)
+    ctx.fillStyle = "rgba(100, 200, 250, 1.0)";
+	ctx.strokeStyle = "rgba(100, 100, 100, 1.0)";
+    ctx.lineWidth = 4;
+	
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+	
+	// Coordinates of handles (in canvas plane)
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
+	
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+	
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * AngleGradeSouth
+ *
+ * @class AngleGradeSouth
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Int} _originX
+ * @param {Int} _originY
+ * @param {Float} _radius
+ * @param {Int} _apexX
+ * @param {Int} _apexY
+ * @param {Float} _scaleX
+ * @param {Float} _scaleY
+ * @param {Float} _arc
+ * @param {Float} _rotation
+ * @param {Int} _order
+ */
+ED.AngleGradeSouth = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+{
+	// Set classname
+	this.className = "AngleGradeSouth";
+    
+    // Derived parameters
+    this.grade = "O";
+    
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.AngleGradeSouth.prototype = new ED.Doodle;
+ED.AngleGradeSouth.prototype.constructor = ED.AngleGradeSouth;
+ED.AngleGradeSouth.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.AngleGradeSouth.prototype.setHandles = function()
+{
+    this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+}
+
+/**
+ * Sets default dragging attributes
+ */
+ED.AngleGradeSouth.prototype.setPropertyDefaults = function()
+{
+    this.isDeletable = false;
+	this.isScaleable = false;
+	this.isMoveable = false;
+	this.isRotatable = false;
+    
+    // Update component of validation array for simple parameters
+    this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.125, +1.5);
+    this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.125, +1.5);
+    this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
+    this.parameterValidationArray['apexY']['range'].setMinAndMax(-rsli, -riri);
+    
+    // Add complete validation arrays for derived parameters
+    this.parameterValidationArray['grade'] = {kind:'derived', type:'string', list:['O', 'I', 'II', 'III', 'IV'], animate:true};
+}
+
+/**
+ * Sets default parameters
+ */
+ED.AngleGradeSouth.prototype.setParameterDefaults = function()
+{
+    this.arc = 90 * Math.PI/180;
+    this.apexY = -riri;
+    this.rotation = Math.PI;
+}
+
+/**
+ * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
+ * The returned parameters are animated if their 'animate' property is set to true
+ *
+ * @param {String} _parameter Name of parameter that has changed
+ * @value {Undefined} _value Value of parameter to calculate
+ * @returns {Array} Associative array of values of dependent parameters
+ */
+ED.AngleGradeSouth.prototype.dependentParameterValues = function(_parameter, _value)
+{
+    var returnArray = new Array();
+    
+    switch (_parameter)
+    {
+        case 'apexY':
+            // Return value uses SCHEIE classificaton
+            var returnValue = "O";
+            if (-_value > riro) returnValue = "I";
+            if (-_value > rcbo) returnValue = "II";
+            if (-_value > rtmo) returnValue = "III";
+            if (-_value >= rsli) returnValue = "IV";
+            returnArray['grade'] = returnValue;
+            break;
+            
+        case 'grade':
+            var returnValue = "";
+            switch (_value)
+        {
+            case 'IV':
+                if (-this.apexY >= rsli) returnValue = this.apexY;
+                else returnValue = -rsli;
+                break;
+            case 'III':
+                if (-this.apexY >= rtmo && -this.apexY < rsli) returnValue = this.apexY;
+                else returnValue = -rtmo;
+                break;
+            case 'II':
+                if (-this.apexY >= rcbo && -this.apexY < rtmo) returnValue = this.apexY;
+                else returnValue = -rcbo;
+                break;
+            case 'I':
+                if (-this.apexY >= riro && -this.apexY < rcbo) returnValue = this.apexY;
+                else returnValue = -riro;
+                break;
+            case 'O':
+                returnValue = -riri;
+                break;
+        }
+            
+            returnArray['apexY'] = returnValue;
+            break;
+    }
+    
+    return returnArray;
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.AngleGradeSouth.prototype.draw = function(_point)
+{
+	// Get context
+	var ctx = this.drawing.context;
+	
+	// Call draw method in superclass
+	ED.AngleGradeSouth.superclass.draw.call(this, _point);
+	
+	// Calculate parameters for arcs
+	var theta = this.arc/2;
+	var arcStart = - Math.PI/2 + theta;
+	var arcEnd = - Math.PI/2 - theta;
+    
+	// Boundary path
+	ctx.beginPath();
+    
+    // Arc across, move to inner and arc back
+	ctx.arc(0, 0, -this.apexY, arcStart, arcEnd, true);
+	ctx.arc(0, 0, rpu, arcEnd, arcStart, false);
+    ctx.closePath();
+    
+    // Set fill attributes (same colour as Iris)
+    ctx.fillStyle = "rgba(100, 200, 250, 1.0)";
+	ctx.strokeStyle = "rgba(100, 100, 100, 1.0)";
+    ctx.lineWidth = 4;
+	
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+	
+	// Coordinates of handles (in canvas plane)
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
+	
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+	
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * AngleGradeWest
+ *
+ * @class AngleGradeWest
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Int} _originX
+ * @param {Int} _originY
+ * @param {Float} _radius
+ * @param {Int} _apexX
+ * @param {Int} _apexY
+ * @param {Float} _scaleX
+ * @param {Float} _scaleY
+ * @param {Float} _arc
+ * @param {Float} _rotation
+ * @param {Int} _order
+ */
+ED.AngleGradeWest = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+{
+	// Set classname
+	this.className = "AngleGradeWest";
+    
+    // Derived parameters
+    this.grade = "O";
+    
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.AngleGradeWest.prototype = new ED.Doodle;
+ED.AngleGradeWest.prototype.constructor = ED.AngleGradeWest;
+ED.AngleGradeWest.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.AngleGradeWest.prototype.setHandles = function()
+{
+    this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+}
+
+/**
+ * Sets default dragging attributes
+ */
+ED.AngleGradeWest.prototype.setPropertyDefaults = function()
+{
+    this.isDeletable = false;
+	this.isScaleable = false;
+	this.isMoveable = false;
+	this.isRotatable = false;
+    
+    // Update component of validation array for simple parameters
+    this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.125, +1.5);
+    this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.125, +1.5);
+    this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
+    this.parameterValidationArray['apexY']['range'].setMinAndMax(-rsli, -riri);
+    
+    // Add complete validation arrays for derived parameters
+    this.parameterValidationArray['grade'] = {kind:'derived', type:'string', list:['O', 'I', 'II', 'III', 'IV'], animate:true};
+}
+
+/**
+ * Sets default parameters
+ */
+ED.AngleGradeWest.prototype.setParameterDefaults = function()
+{
+    this.arc = 90 * Math.PI/180;
+    this.apexY = -riri;
+    this.rotation = 3 * Math.PI/2;
+}
+
+/**
+ * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
+ * The returned parameters are animated if their 'animate' property is set to true
+ *
+ * @param {String} _parameter Name of parameter that has changed
+ * @value {Undefined} _value Value of parameter to calculate
+ * @returns {Array} Associative array of values of dependent parameters
+ */
+ED.AngleGradeWest.prototype.dependentParameterValues = function(_parameter, _value)
+{
+    var returnArray = new Array();
+    
+    switch (_parameter)
+    {
+        case 'apexY':
+            // Return value uses SCHEIE classificaton
+            var returnValue = "O";
+            if (-_value > riro) returnValue = "I";
+            if (-_value > rcbo) returnValue = "II";
+            if (-_value > rtmo) returnValue = "III";
+            if (-_value >= rsli) returnValue = "IV";
+            returnArray['grade'] = returnValue;
+            break;
+            
+        case 'grade':
+            var returnValue = "";
+            switch (_value)
+        {
+            case 'IV':
+                if (-this.apexY >= rsli) returnValue = this.apexY;
+                else returnValue = -rsli;
+                break;
+            case 'III':
+                if (-this.apexY >= rtmo && -this.apexY < rsli) returnValue = this.apexY;
+                else returnValue = -rtmo;
+                break;
+            case 'II':
+                if (-this.apexY >= rcbo && -this.apexY < rtmo) returnValue = this.apexY;
+                else returnValue = -rcbo;
+                break;
+            case 'I':
+                if (-this.apexY >= riro && -this.apexY < rcbo) returnValue = this.apexY;
+                else returnValue = -riro;
+                break;
+            case 'O':
+                returnValue = -riri;
+                break;
+        }
+            
+            returnArray['apexY'] = returnValue;
+            break;
+    }
+    
+    return returnArray;
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.AngleGradeWest.prototype.draw = function(_point)
+{
+	// Get context
+	var ctx = this.drawing.context;
+	
+	// Call draw method in superclass
+	ED.AngleGradeWest.superclass.draw.call(this, _point);
+	
+	// Calculate parameters for arcs
+	var theta = this.arc/2;
+	var arcStart = - Math.PI/2 + theta;
+	var arcEnd = - Math.PI/2 - theta;
+    
+	// Boundary path
+	ctx.beginPath();
+    
+    // Arc across, move to inner and arc back
+	ctx.arc(0, 0, -this.apexY, arcStart, arcEnd, true);
+	ctx.arc(0, 0, rpu, arcEnd, arcStart, false);
+    ctx.closePath();
+    
+    // Set fill attributes (same colour as Iris)
+    ctx.fillStyle = "rgba(100, 200, 250, 1.0)";
+	ctx.strokeStyle = "rgba(100, 100, 100, 1.0)";
+    ctx.lineWidth = 4;
+	
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+	
+	// Coordinates of handles (in canvas plane)
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
+	
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+	
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * Angle New Vessels
+ *
+ * @class AngleNV
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Int} _originX
+ * @param {Int} _originY
+ * @param {Float} _radius
+ * @param {Int} _apexX
+ * @param {Int} _apexY
+ * @param {Float} _scaleX
+ * @param {Float} _scaleY
+ * @param {Float} _arc
+ * @param {Float} _rotation
+ * @param {Int} _order
+ */
+ED.AngleNV = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+{
+	// Set classname
+	this.className = "AngleNV";
+
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.AngleNV.prototype = new ED.Doodle;
+ED.AngleNV.prototype.constructor = ED.AngleNV;
+ED.AngleNV.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.AngleNV.prototype.setHandles = function()
+{
+	this.handleArray[0] = new ED.Handle(null, true, ED.Mode.Arc, false);
+	this.handleArray[3] = new ED.Handle(null, true, ED.Mode.Arc, false);
+}
+
+/**
+ * Sets default dragging attributes
+ */
+ED.AngleNV.prototype.setPropertyDefaults = function()
+{
+	this.isScaleable = false;
+	this.isMoveable = false;
+    
+    // Update component of validation array for simple parameters
+    this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.125, +1.5);
+    this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.125, +1.5);
+    this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
+    this.parameterValidationArray['apexY']['range'].setMinAndMax(+50, +250);
+}
+
+/**
+ * Sets default parameters
+ */
+ED.AngleNV.prototype.setParameterDefaults = function()
+{
+    this.arc = 30 * Math.PI/180;
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.AngleNV.prototype.draw = function(_point)
+{
+	// Get context
+	var ctx = this.drawing.context;
+	
+	// Call draw method in superclass
+	ED.AngleNV.superclass.draw.call(this, _point);
+    
+    // AngleNV is at equator
+    var ras = rtmo;
+	var rir = rtmi;
+    var r = rir + (ras - rir)/2;
+	
+	// Calculate parameters for arcs
+	var theta = this.arc/2;
+	var arcStart = - Math.PI/2 + theta;
+	var arcEnd = - Math.PI/2 - theta;
+    
+    // Coordinates of 'corners' of AngleNV
+	var topRightX = r * Math.sin(theta);
+	var topRightY = - r * Math.cos(theta);
+	var topLeftX = - r * Math.sin(theta);
+	var topLeftY = topRightY;
+    
+	// Boundary path
+	ctx.beginPath();
+    
+	// Path
+	ctx.arc(0, 0, rir, arcStart, arcEnd, true);
+	ctx.arc(0, 0, ras, arcEnd, arcStart, false);
+    
+	// Close path
+	ctx.closePath();
+    
+    // create pattern
+    var ptrn = ctx.createPattern(this.drawing.imageArray['NewVesselPattern'],'repeat');
+    ctx.fillStyle = ptrn;
+	ctx.strokeStyle = "rgba(255, 255, 255, 0)";
+	
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+	
+	// Coordinates of handles (in canvas plane)
+	this.handleArray[0].location = this.transform.transformPoint(new ED.Point(topLeftX, topLeftY));
+	this.handleArray[3].location = this.transform.transformPoint(new ED.Point(topRightX, topRightY));
+	
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+	
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * Returns a String which, if not empty, determines the root descriptions of multiple instances of the doodle
+ *
+ * @returns {String} Group description
+ */
+ED.AngleNV.prototype.groupDescription = function()
+{
+    // Calculate total extent in degrees
+    var degrees = this.drawing.totalDegreesExtent(this.className);
+    
+    // Return string
+    return "Angle new vessels over " + degrees.toString() + " degrees";
+}
+
+/**
+ * Anterior Synechiae
+ *
+ * @class AntSynech
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Int} _originX
+ * @param {Int} _originY
+ * @param {Float} _radius
+ * @param {Int} _apexX
+ * @param {Int} _apexY
+ * @param {Float} _scaleX
+ * @param {Float} _scaleY
+ * @param {Float} _arc
+ * @param {Float} _rotation
+ * @param {Int} _order
+ */
+ED.AntSynech = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+{
+	// Set classname
+	this.className = "AntSynech";
+
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.AntSynech.prototype = new ED.Doodle;
+ED.AntSynech.prototype.constructor = ED.AntSynech;
+ED.AntSynech.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.AntSynech.prototype.setHandles = function()
+{
+	this.handleArray[0] = new ED.Handle(null, true, ED.Mode.Arc, false);
+	this.handleArray[3] = new ED.Handle(null, true, ED.Mode.Arc, false);
+    this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+}
+
+/**
+ * Sets default dragging attributes
+ */
+ED.AntSynech.prototype.setPropertyDefaults = function()
+{
+	this.isScaleable = false;
+	this.isMoveable = false;
+    
+    // Update component of validation array for simple parameters
+    this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.125, +1.5);
+    this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.125, +1.5);
+    this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
+    this.parameterValidationArray['apexY']['range'].setMinAndMax(-rsli, -rcbo);
+    this.parameterValidationArray['arc']['range'].setMinAndMax(30 * Math.PI/180, Math.PI*2);
+}
+
+/**
+ * Sets default parameters
+ */
+ED.AntSynech.prototype.setParameterDefaults = function()
+{
+    this.arc = 30 * Math.PI/180;
+    this.apexY = -rtmi;
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.AntSynech.prototype.draw = function(_point)
+{
+	// Get context
+	var ctx = this.drawing.context;
+	
+	// Call draw method in superclass
+	ED.AntSynech.superclass.draw.call(this, _point);
+    
+    // AntSynech is at equator
+    var ras = -this.apexY;
+	var rir = riri;
+    
+    var r = rir + (ras - rir)/2;
+	
+	// Calculate parameters for arcs
+	var theta = this.arc/2;
+	var arcStart = - Math.PI/2 + theta;
+	var arcEnd = - Math.PI/2 - theta;
+    var outArcStart = - Math.PI/2 + theta - Math.PI/14;
+    var outArcEnd = - Math.PI/2 - theta + Math.PI/14;
+    
+    // Coordinates of 'corners' of AntSynech
+	var topRightX = rir * Math.sin(theta);
+	var topRightY = - rir * Math.cos(theta);
+	var topLeftX = - rir * Math.sin(theta);
+	var topLeftY = topRightY;
+    
+	// Boundary path
+	ctx.beginPath();
+    
+	// Path
+	ctx.arc(0, 0, rir, arcStart, arcEnd, true);
+	ctx.arc(0, 0, ras, outArcEnd, outArcStart, false);
+    
+	// Close path
+	ctx.closePath();
+    
+    ctx.fillStyle = "rgba(100, 200, 250, 1.0)";
+	ctx.strokeStyle = "rgba(255, 255, 255, 0)";
+	
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+	
+	// Coordinates of handles (in canvas plane)
+	this.handleArray[0].location = this.transform.transformPoint(new ED.Point(topLeftX, topLeftY));
+	this.handleArray[3].location = this.transform.transformPoint(new ED.Point(topRightX, topRightY));
+    this.handleArray[4].location = this.transform.transformPoint(new ED.Point(0, this.apexY));
+	
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+	
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * Returns a String which, if not empty, determines the root descriptions of multiple instances of the doodle
+ *
+ * @returns {String} Group description
+ */
+ED.AntSynech.prototype.groupDescription = function()
+{
+    // Calculate total extent in degrees
+    var degrees = this.drawing.totalDegreesExtent(this.className);
+    
+    // Return string
+    return "Anterior synechiae over " + degrees.toString() + " degrees";
+}
+
+/**
+ * Angle Recession
+ *
+ * @class AngleRecession
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Int} _originX
+ * @param {Int} _originY
+ * @param {Float} _radius
+ * @param {Int} _apexX
+ * @param {Int} _apexY
+ * @param {Float} _scaleX
+ * @param {Float} _scaleY
+ * @param {Float} _arc
+ * @param {Float} _rotation
+ * @param {Int} _order
+ */
+ED.AngleRecession = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+{
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	
+	// Set classname
+	this.className = "AngleRecession";
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.AngleRecession.prototype = new ED.Doodle;
+ED.AngleRecession.prototype.constructor = ED.AngleRecession;
+ED.AngleRecession.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.AngleRecession.prototype.setHandles = function()
+{
+	this.handleArray[0] = new ED.Handle(null, true, ED.Mode.Arc, false);
+	this.handleArray[3] = new ED.Handle(null, true, ED.Mode.Arc, false);
+}
+
+/**
+ * Sets default dragging attributes
+ */
+ED.AngleRecession.prototype.setPropertyDefaults = function()
+{
+	this.isScaleable = false;
+	this.isMoveable = false;
+    
+    // Update component of validation array for simple parameters
+    this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.125, +1.5);
+    this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.125, +1.5);
+    this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
+    this.parameterValidationArray['apexY']['range'].setMinAndMax(+50, +250);
+}
+
+/**
+ * Sets default parameters
+ */
+ED.AngleRecession.prototype.setParameterDefaults = function()
+{
+    this.arc = 30 * Math.PI/180;
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.AngleRecession.prototype.draw = function(_point)
+{
+	// Get context
+	var ctx = this.drawing.context;
+	
+	// Call draw method in superclass
+	ED.AngleRecession.superclass.draw.call(this, _point);
+    
+    // AngleRecession is at equator
+    var ras = riri - 30;
+	var rir = riri;
+    var r = rir + (ras - rir)/2;
+	
+	// Calculate parameters for arcs
+	var theta = this.arc/2;
+	var arcStart = - Math.PI/2 + theta;
+	var arcEnd = - Math.PI/2 - theta;
+    var outArcStart = - Math.PI/2 + theta - Math.PI/24;
+    var outArcEnd = - Math.PI/2 - theta + Math.PI/24;
+    
+    // Coordinates of 'corners' of AngleRecession
+	var topRightX = rir * Math.sin(theta);
+	var topRightY = - rir * Math.cos(theta);
+	var topLeftX = - rir * Math.sin(theta);
+	var topLeftY = topRightY;
+    
+	// Boundary path
+	ctx.beginPath();
+    
+	// Path
+	ctx.arc(0, 0, rir, arcStart, arcEnd, true);
+	ctx.arc(0, 0, ras, outArcEnd, outArcStart, false);
+    
+	// Close path
+	ctx.closePath();
+    
+    ctx.fillStyle = "rgba(255, 255, 200, 1.0)";
+	ctx.strokeStyle = "rgba(255, 255, 255, 0)";
+	
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+	
+	// Coordinates of handles (in canvas plane)
+	this.handleArray[0].location = this.transform.transformPoint(new ED.Point(topLeftX, topLeftY));
+	this.handleArray[3].location = this.transform.transformPoint(new ED.Point(topRightX, topRightY));
+	
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+	
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * Returns a String which, if not empty, determines the root descriptions of multiple instances of the doodle
+ *
+ * @returns {String} Group description
+ */
+ED.AngleRecession.prototype.groupDescription = function()
+{
+    // Calculate total extent in degrees
+    var degrees = this.drawing.totalDegreesExtent(this.className);
+    
+    // Return string
+    return "Angle recession over " + degrees.toString() + " degrees";
+}
+
+
+

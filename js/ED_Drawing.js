@@ -579,15 +579,19 @@ ED.Drawing.prototype.notify = function(_eventName, _object)
  */
 ED.Drawing.prototype.loadDoodles = function(_id)
 {
+    // Get element containing JSON string
     var sourceElement = document.getElementById(_id);
     
-    // If it contains something, load it (***TODO*** better error checking here)
-    if (sourceElement.value.length > 0)
+    // If it exists and contains something, load it
+    if (sourceElement && sourceElement.value.length > 0)
     {
         var doodleSet = window.JSON.parse(sourceElement.value);
         
-        this.load(doodleSet);				 
+        this.load(doodleSet);
     }
+    
+    // Notify
+    this.notify("doodlesLoaded");
 }
 
 /**
@@ -677,7 +681,11 @@ ED.Drawing.prototype.json = function()
     // Go through each member of doodle array, encoding it
 	for (var i = 0; i < this.doodleArray.length; i++)
 	{
-        s = s + this.doodleArray[i].json() + ",";
+        var doodle = this.doodleArray[i];
+        if (doodle.isSaveable)
+        {
+            s = s + doodle.json() + ",";
+        }
     }
     
     // Remove last comma
@@ -2156,8 +2164,8 @@ ED.Drawing.prototype.addBindings = function(_bindingArray)
         for (parameter in _bindingArray[className])
         {
             var elementId = _bindingArray[className][parameter]['id'];
-            // Add an event listener to the element to create a doodle on change, if it does not exist
-            // FIXME: This incorrectly adds _all_ doodles at the moment - May have fixed it
+            
+            // Add an event listener to the element to create a bound doodle on change, if it does not exist
             var element = document.getElementById(elementId);
             
             element.addEventListener('change', function (event)
@@ -3226,7 +3234,8 @@ ED.Report.prototype.isMacOff = function()
  * @property {Bool} isLocked True if doodle is locked (temporarily unselectable) 
  * @property {Bool} isSelectable True if doodle is non-selectable
  * @property {Bool} isShowHighlight True if doodle shows a highlight when selected
- * @property {Bool} isDeletable True if doodle can be deleted 
+ * @property {Bool} isDeletable True if doodle can be deleted
+ * @property {Bool} isSaveable Flag indicating whether doodle will be included in saved JSON string
  * @property {Bool} isOrientated True if doodle should always point to the centre (default = false)
  * @property {Bool} isScaleable True if doodle can be scaled. If false, doodle increases its arc angle
  * @property {Bool} isSqueezable True if scaleX and scaleY can be independently modifed (ie no fixed aspect ratio)
@@ -3244,7 +3253,7 @@ ED.Report.prototype.isMacOff = function()
  * @property {Array} pointsArray Array of points to snap to
  * @property {Array} anglesArray Array of angles to snap to
  * @property {Bool} willReport True if doodle responds to a report request (can be used to suppress reports when not needed)
- * @property {Bool} willSync Flag used to indicate whether doodle will synchronise with another doodle 
+ * @property {Bool} willSync Flag used to indicate whether doodle will synchronise with another doodle
  * @property {Float} radius Distance from centre of doodle space, calculated for doodles with isRotable true
  * @property {Range} rangeOfOriginX Range of allowable scales
  * @property {Range} rangeOfOriginY Range of allowable scales
@@ -3304,6 +3313,7 @@ ED.Doodle = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _sca
 		this.isSelectable = true;
         this.isShowHighlight = true;
 		this.isDeletable = true;
+        this.isSaveable = true;
 		this.isOrientated = false;
 		this.isScaleable = true;
 		this.isSqueezable = false;
@@ -3994,6 +4004,18 @@ ED.Doodle.prototype.setParameterWithAnimation = function(_parameter, _value)
             {
                 this.increment(parameter, valueArray[parameter]);
             }
+            // Increment may be too small to animate, but still needs setting
+            else
+            {
+                // Set  parameter to exact value
+                this.setSimpleParameter(parameter, valueArray[parameter]);
+                
+                // Update dependencies
+                this.updateDependentParameters(parameter);
+                
+                // Refresh drawing
+                this.drawing.repaint();
+            }
         }
 
     }
@@ -4284,6 +4306,7 @@ ED.Doodle.prototype.addBinding = function(_parameter, _fieldParameters)
     {
         // Get reference to HTML element
         var element = document.getElementById(_id);
+
         
         // Check element exists
         if (element != null)

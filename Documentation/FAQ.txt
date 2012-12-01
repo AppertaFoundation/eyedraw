@@ -13,6 +13,12 @@ A:  Any change in a parameter either by user interaction with the mouse, or duri
     
 EG: AntSegCrossSection
 
+Q:  A bound parameter is a list with a wide range of values of a simple parameter between valid values. How can the granularity of the simple parameter be preserved withour breaking the binding?
+
+A:  When calculating the value of the simple parameter, check that it is within the range of the bound element value, and if so preserver it
+
+EG: AngleGrade
+
 
 Notes:
 

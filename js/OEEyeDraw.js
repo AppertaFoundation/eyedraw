@@ -71,7 +71,7 @@ function eyeDrawInit(_properties)
         this.drawing = _drawing;
         
         // Register controller for notifications
-        _drawing.registerForNotifications(this, 'notificationHandler', []);
+        this.drawing.registerForNotifications(this, 'notificationHandler', ['ready', 'doodlesLoaded', 'doodleAdded', 'doodleDeleted', 'doodleSelected', 'mousedragged', 'parameterChanged']);
         
         // Method called for notification
         this.notificationHandler = function(_messageArray)
@@ -84,16 +84,17 @@ function eyeDrawInit(_properties)
             {
                 // Drawing object ready
                 case 'ready':
+                    
                     // If input exists and contains data, load it into the drawing
                     if (input != null && input.value.length > 0)
                     {
                         // Load drawing data from input element
                         this.drawing.loadDoodles(_properties.inputId);
                         
-                        // Draw doodles
-                        this.drawing.drawAllDoodles();
+                        // Refresh drawing
+                        this.drawing.repaint();
                     }
-                    // Otherwise run commands in onReadyCommand array
+                    // Otherwise run commands in onLoadedCommand array
                     else
                     {
                         for ( var i = 0; i < _properties.onReadyCommandArray.length; i++)
@@ -103,7 +104,7 @@ function eyeDrawInit(_properties)
                             var argumentArray = _properties.onReadyCommandArray[i][1];
                             
                             // Run method with arguments
-                            var dood = this.drawing[method].apply(this.drawing, argumentArray);
+                            this.drawing[method].apply(this.drawing, argumentArray);
                         }
                     }
                     
@@ -111,14 +112,12 @@ function eyeDrawInit(_properties)
                     //if (_properties.bindingArray.length > 0)
                     if (!ED.objectIsEmpty(_properties.bindingArray))
                     {
-                        console.log('adding bindings');
                         this.drawing.addBindings(_properties.bindingArray);
                     }
 
                     // Apply delete values
                     if (!ED.objectIsEmpty(_properties.deleteValueArray))
                     {
-                        console.log('adding delete values');
                         this.drawing.addDeleteValues(_properties.deleteValueArray);
                     }
                     
@@ -131,10 +130,22 @@ function eyeDrawInit(_properties)
                     // Optionally make canvas element focussed
                     if (_properties.focus)
                     {
-                        console.log('focus');
                         canvas.focus();
                     }
                     
+                    break;
+
+                case 'doodlesLoaded':
+                    // Run commands after doodles have successfully loaded
+                    for ( var i = 0; i < _properties.onDoodlesLoadedCommandArray.length; i++)
+                    {
+                        // Get method name
+                        var method = _properties.onDoodlesLoadedCommandArray[i][0];
+                        var argumentArray = _properties.onDoodlesLoadedCommandArray[i][1];
+                        
+                        // Run method with arguments
+                        this.drawing[method].apply(this.drawing, argumentArray);
+                    }
                     break;
                     
                 case 'doodleAdded':
@@ -153,21 +164,20 @@ function eyeDrawInit(_properties)
                     }
                     break;
                     
-                case 'mousedragged':
-                    // Save drawing to hidden input
-                    if (input != null && input.value.length > 0)
-                    {
-                        input.value = this.drawing.save();
-                    }
-                    break;
-                    
-                    
                 case 'doodleSelected':
                     // Ensure that selecting a doodle in one drawing de-deselects the others
                     for (var idSuffix in _properties.syncArray)
                     {
                         var drawing = window['ed_drawing_edit_' + idSuffix];
                         drawing.deselectDoodles();
+                    }
+                    break;
+                    
+                case 'mousedragged':
+                    // Save drawing to hidden input
+                    if (input != null && input.value.length > 0)
+                    {
+                        input.value = this.drawing.save();
                     }
                     break;
                     

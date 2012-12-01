@@ -13,7 +13,8 @@
         
         <!-- Subclasses loaded according to need -->
         <script language="JavaScript" src="js/ED_AntSeg.js" type="text/javascript"></script>
-
+        <script language="JavaScript" src="js/ED_Glaucoma.js" type="text/javascript"></script>
+        
         <!-- This script handles the drawings for the page -->
         <script type="text/javascript">
             
@@ -50,16 +51,18 @@
                     {
                         // Ready notification
                         case 'ready':
-                        _drawing.addDoodle('AntSeg');
+                        _drawing.addDoodle('Gonioscopy');
+                        //var doodleAngleGradeSup = _drawing.addDoodle('AngleGrade', {grade:'II'}, {grade:{id:'gradeInputSup'}});
+                        //var doodleAngleGradeTem = _drawing.addDoodle('AngleGrade', {grade:'III', rotation:90 * Math.PI/180}, {grade:{id:'gradeInputTem'}});
                         //_drawing.addDoodle('AntSeg', {pupilSize:'Small'}, {pupilSize:{id:'pupilSizeSelect', attribute:'ed_val'}});
                             //_drawing.addDoodle('NuclearCataract', {grade:'Brunescent'}, {grade:{id:'gradeSelect', attribute:'ed_val'}});
 //                            _drawing.addBindings(
 //                                                 {
-//                                                 TrialLens:{axis:{id:'axisInput'}}
+//                                                 AngleGrade:{grade:{id:'gradeInput'}}
 //                                                 }
 //                                                 );
-//_drawing.addDeleteValues({gradeSelect:'None'});
-                        _drawing.addDoodle('CornealScar');
+                        _drawing.addDoodle('AngleNV');
+                        _drawing.addDoodle('AngleNV');
 
                         
                             _drawing.deselectDoodles();
@@ -105,7 +108,8 @@
             <option value="3" ed_val="Small">Small</option>
         </select>
         
-        <input type="text" id="axisInput" value="0" />
+        <input type="text" id="gradeInputSup" value="O" />
+        <input type="text" id="gradeInputTem" value="III" />
         
         <input id="pxeCheckBox" value="1" type="checkbox">
             
