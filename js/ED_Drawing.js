@@ -586,12 +586,11 @@ ED.Drawing.prototype.loadDoodles = function(_id)
     if (sourceElement && sourceElement.value.length > 0)
     {
         var doodleSet = window.JSON.parse(sourceElement.value);
-        
         this.load(doodleSet);
+        
+        // Notify
+        this.notify("doodlesLoaded");
     }
-    
-    // Notify
-    this.notify("doodlesLoaded");
 }
 
 /**
@@ -1152,33 +1151,31 @@ ED.Drawing.prototype.mousemove = function(_point)
                     
 				case ED.Mode.Handles:
 					// Move handles to new position (Stored in a squiggle)
-                    var i = doodle.draggingHandleIndex;
+                    var index = doodle.draggingHandleIndex;
                     
+                    // Get new position into a point object
+                    var newPosition = new ED.Point(0,0);
+                    newPosition.x = doodle.squiggleArray[0].pointsArray[index].x + (mousePosSelectedDoodlePlane.x - lastMousePosSelectedDoodlePlane.x);
+                    newPosition.y = doodle.squiggleArray[0].pointsArray[index].y + (mousePosSelectedDoodlePlane.y - lastMousePosSelectedDoodlePlane.y);
                     
-                    // TEMP testing constraining radius
-                    var p = doodle.squiggleArray[0].pointsArray[i];
-                    if (p.length() < doodle.rangeArray['radius'].max)
+                    // Constraining coordiantes handle with optional range array (set in a subclass)
+                    if (typeof(doodle.handleCoordinateRangeArray) != 'undefined')
                     {
-                        doodle.squiggleArray[0].pointsArray[i].x += (mousePosSelectedDoodlePlane.x - lastMousePosSelectedDoodlePlane.x);
-                        doodle.squiggleArray[0].pointsArray[i].y += (mousePosSelectedDoodlePlane.y - lastMousePosSelectedDoodlePlane.y);
+                        newPosition.x = doodle.handleCoordinateRangeArray[index]['x'].constrain(newPosition.x);
+                        newPosition.y = doodle.handleCoordinateRangeArray[index]['y'].constrain(newPosition.y);
                     }
-                    else
+
+                    // Constraining radius and angle of handle with optional range array (set in a subclass)
+                    if (typeof(doodle.handleVectorRangeArray) != 'undefined')
                     {
-                        if (p.x * p.x > p.y * p.y)
-                        {
-                            var ax = Math.abs(p.x);
-                            p.x = (ax - 1) * p.x/ax;
-                        }
-                        else
-                        {
-                            var ay = Math.abs(p.y);
-                            p.y = (ay - 1) * p.y/ay;
-                        }
+                        var length = doodle.handleVectorRangeArray[index]['length'].constrain(newPosition.length());
+                        var angle = doodle.handleVectorRangeArray[index]['angle'].constrainToAngularRange(newPosition.direction(), false);
+                        newPosition.setWithPolars(length, angle);
                     }
-                    
-                    // Enforce bounds
-					doodle.squiggleArray[0].pointsArray[i].x = doodle.rangeOfHandlesXArray[i].constrain(doodle.squiggleArray[0].pointsArray[i].x);
-					doodle.squiggleArray[0].pointsArray[i].y = doodle.rangeOfHandlesYArray[i].constrain(doodle.squiggleArray[0].pointsArray[i].y);
+
+                    // Set new position for handle
+                    doodle.squiggleArray[0].pointsArray[index].x = newPosition.x;
+                    doodle.squiggleArray[0].pointsArray[index].y = newPosition.y;
 					break;
                     
                 case ED.Mode.Draw:
@@ -1195,8 +1192,7 @@ ED.Drawing.prototype.mousemove = function(_point)
 					break;		
 			}
             
-			// Refresh drawing and update any bindings - order is important since draw method may alter value of parameters (***TODO*** changing parameters within draw method is deprecated)
-            //this.repaint();
+			// Update any bindings
             this.updateBindings();
 		}
 		
@@ -3255,15 +3251,6 @@ ED.Report.prototype.isMacOff = function()
  * @property {Bool} willReport True if doodle responds to a report request (can be used to suppress reports when not needed)
  * @property {Bool} willSync Flag used to indicate whether doodle will synchronise with another doodle
  * @property {Float} radius Distance from centre of doodle space, calculated for doodles with isRotable true
- * @property {Range} rangeOfOriginX Range of allowable scales
- * @property {Range} rangeOfOriginY Range of allowable scales
- * @property {Range} rangeOfScale Range of allowable scales
- * @property {Range} rangeOfArc Range of allowable Arcs
- * @property {Range} rangeOfApexX Range of allowable values of apexX
- * @property {Range} rangeOfApexY Range of allowable values of apexY
- * @property {Array} rangeOfHandlesXArray Array of four ranges of allowable values of x coordinate of handle
- * @property {Array} rangeOfHandlesYArray Array of four ranges of allowable values of y coordinate of handle
- * @property {Range} rangeOfRadius Range of allowable values of radius
  * @property {Bool} isSelected True if doodle is currently selected
  * @property {Bool} isBeingDragged Flag indicating doodle is being dragged
  * @property {Int} draggingHandleIndex index of handle being dragged
@@ -4672,8 +4659,13 @@ ED.Doodle.prototype.json = function()
     s = s + '"squiggleArray": ['; 
     for (var j = 0; j < this.squiggleArray.length; j++)
     {
-        s = s + this.squiggleArray[j].json() + ', ';
+        s = s + this.squiggleArray[j].json();
+        if (this.squiggleArray.length - j > 1)
+        {
+            s = s + ', ';
+        }
     }
+    
     s = s + ']';
     s = s + '}';
     
@@ -4967,7 +4959,7 @@ ED.Range.prototype.constrainToAngularRange = function(_angle, _isDegrees)
             angle.setWithPolars(r, _angle * Math.PI/180);
         }
         
-        // Return appropriate value depending on relationshipt to range
+        // Return appropriate value depending on relationship to range
         if (min.clockwiseAngleTo(angle) <= min.clockwiseAngleTo(max))
         {
             return _angle;
@@ -5341,7 +5333,11 @@ ED.Squiggle.prototype.json = function()
     s = s + '"pointsArray": [';
     for (var i = 0; i < this.pointsArray.length; i++)
 	{
-        s = s + this.pointsArray[i].json() + ', ';
+        s = s + this.pointsArray[i].json();
+        if (this.pointsArray.length - i > 1)
+        {
+            s = s + ', ';
+        }
     }
     s = s + ']';
     s = s + '}';

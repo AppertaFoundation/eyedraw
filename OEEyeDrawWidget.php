@@ -457,6 +457,7 @@ class DoodleInfo
         "Papilloedema" => "Papilloedema",
         "Patch" => "Tube patch",
         "PCIOL" => "Posterior chamber IOL",
+        "PeripapillaryAtrophy" => "Peripapillary atrophy",
         "PhakoIncision" => "Phako incision",
         "PI" => "Peripheral iridectomy",
         "PointInLine" => "Point in line",

@@ -50,7 +50,7 @@ ED.AntSeg = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _sca
 	// Set classname
 	this.className = "AntSeg";
     
-    // Private parameters (NB. this private parameter is not saved, so MUST be bound to an input element via a derived parameter)
+    // Private parameters
     this.hasPXE;
     
     // Derived parameters
@@ -3657,6 +3657,8 @@ ED.CornealScar.prototype.setParameterDefaults = function()
     this.apexY = -50;
     this.scaleX = 0.7;
     this.scaleY = 0.5;
+    
+    this.setOriginWithDisplacements(0,25);
 }
 
 /**

@@ -43,7 +43,6 @@
                 // Method called for notification
                 this.notificationHandler = function(_messageArray)
                 {
-                    
                     // Element used to display saved content for debugging purposes
                     var saveInput = document.getElementById('saveInput');
                     
@@ -51,7 +50,8 @@
                     {
                         // Ready notification
                         case 'ready':
-                        _drawing.addDoodle('Gonioscopy');
+                        //_drawing.addDoodle('OpticDisk', {mode:'Expert'}, {mode:{id:'opticDiskModeSelect', attribute:'ed_val'}});
+                        _drawing.addDoodle('OpticDiskPit');
                         //var doodleAngleGradeSup = _drawing.addDoodle('AngleGrade', {grade:'II'}, {grade:{id:'gradeInputSup'}});
                         //var doodleAngleGradeTem = _drawing.addDoodle('AngleGrade', {grade:'III', rotation:90 * Math.PI/180}, {grade:{id:'gradeInputTem'}});
                         //_drawing.addDoodle('AntSeg', {pupilSize:'Small'}, {pupilSize:{id:'pupilSizeSelect', attribute:'ed_val'}});
@@ -61,9 +61,6 @@
 //                                                 AngleGrade:{grade:{id:'gradeInput'}}
 //                                                 }
 //                                                 );
-                        _drawing.addDoodle('AngleNV');
-                        _drawing.addDoodle('AngleNV');
-
                         
                             _drawing.deselectDoodles();
                             break;
@@ -93,7 +90,7 @@
         
         <!-- Toolbar -->
         <button class="imgbutton" disabled="true" id="deleteSelectedDoodleRPS" title="Delete" onclick="drawingEdit.deleteSelectedDoodle(); return false;" ><img src="graphics/deleteSelectedDoodle.gif" /></button>
-        <button class="imgbutton" id="FuchsRPS" onclick="drawingEdit.addDoodle('CornealScar'); return false;" ><img src="graphics/CornealScar.gif" /></button>
+        <button class="imgbutton" id="FuchsRPS" onclick="drawingEdit.addDoodle('DiskHaemorrhage'); return false;" ><img src="graphics/PeripapillaryAtrophy.gif" /></button>
         </br >
         
         <!-- Canvas tooltip -->
@@ -102,6 +99,7 @@
         <!-- Canvas element -->
         <canvas id="canvasEdit" class="ed_canvas_edit" width="300" height="300" tabindex="1"></canvas>
         
+        <!-- 
         <select name="Element_OphCiExamination_AnteriorSegment[right_pupil_id]" id="pupilSizeSelect">
             <option value="1" ed_val="Large">Large</option>
             <option value="2" ed_val="Medium">Medium</option>
@@ -112,14 +110,19 @@
         <input type="text" id="gradeInputTem" value="III" />
         
         <input id="pxeCheckBox" value="1" type="checkbox">
-            
+    
         <select id="gradeSelect">
             <option value="1" ed_val="None">None</option>
             <option value="2" ed_val="Mild" selected="selected">Mild</option>
             <option value="3" ed_val="Moderate">Moderate</option>
             <option value="4" ed_val="Brunescent">Brunescent</option>
         </select>
-            
+         -->
+        <select id="opticDiskModeSelect">
+            <option value="1" ed_val="Basic">Basic</option>
+            <option value="2" ed_val="Expert" selected="true">Expert</option>
+        </select>
+        
         <button onclick="alert(drawingEdit.report()); return false;" >Report</button>
         
         </br>
