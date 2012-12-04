@@ -50,17 +50,12 @@
                     {
                         // Ready notification
                         case 'ready':
-                        //_drawing.addDoodle('OpticDisk', {mode:'Expert'}, {mode:{id:'opticDiskModeSelect', attribute:'ed_val'}});
-                        _drawing.addDoodle('OpticDiskPit');
-                        //var doodleAngleGradeSup = _drawing.addDoodle('AngleGrade', {grade:'II'}, {grade:{id:'gradeInputSup'}});
-                        //var doodleAngleGradeTem = _drawing.addDoodle('AngleGrade', {grade:'III', rotation:90 * Math.PI/180}, {grade:{id:'gradeInputTem'}});
-                        //_drawing.addDoodle('AntSeg', {pupilSize:'Small'}, {pupilSize:{id:'pupilSizeSelect', attribute:'ed_val'}});
-                            //_drawing.addDoodle('NuclearCataract', {grade:'Brunescent'}, {grade:{id:'gradeSelect', attribute:'ed_val'}});
-//                            _drawing.addBindings(
-//                                                 {
-//                                                 AngleGrade:{grade:{id:'gradeInput'}}
-//                                                 }
-//                                                 );
+                        _drawing.addDoodle('AntSeg', {pupilSize:'Small'}, {pupilSize:{id:'pupilSizeSelect', attribute:'ed_val'}});
+                        _drawing.addBindings(
+                                             {
+                                             AntSeg:{pupilSize:{id:'pupilSizeSelect', attribute:'ed_val'}, pxe:{id:'pxeCheckBox'}}
+                                             }
+                                             );
                         
                             _drawing.deselectDoodles();
                             break;
@@ -99,15 +94,16 @@
         <!-- Canvas element -->
         <canvas id="canvasEdit" class="ed_canvas_edit" width="300" height="300" tabindex="1"></canvas>
         
-        <!-- 
-        <select name="Element_OphCiExamination_AnteriorSegment[right_pupil_id]" id="pupilSizeSelect">
+        <select id="pupilSizeSelect">
             <option value="1" ed_val="Large">Large</option>
             <option value="2" ed_val="Medium">Medium</option>
             <option value="3" ed_val="Small">Small</option>
         </select>
-        
+
+        <!--         
         <input type="text" id="gradeInputSup" value="O" />
         <input type="text" id="gradeInputTem" value="III" />
+         -->
         
         <input id="pxeCheckBox" value="1" type="checkbox">
     
@@ -117,12 +113,14 @@
             <option value="3" ed_val="Moderate">Moderate</option>
             <option value="4" ed_val="Brunescent">Brunescent</option>
         </select>
-         -->
+            
+        <!--  
         <select id="opticDiskModeSelect">
             <option value="1" ed_val="Basic">Basic</option>
             <option value="2" ed_val="Expert" selected="true">Expert</option>
         </select>
-        
+         -->
+            
         <button onclick="alert(drawingEdit.report()); return false;" >Report</button>
         
         </br>

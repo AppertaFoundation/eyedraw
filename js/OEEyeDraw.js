@@ -238,6 +238,11 @@ function eyeDrawInit(_properties)
                         // Refresh slave drawing
                         slaveDrawing.repaint();
                     }
+                    // Save drawing to hidden input
+                    if (input != null && input.value.length > 0)
+                    {
+                        input.value = this.drawing.save();
+                    }
                     break;
             }
         }

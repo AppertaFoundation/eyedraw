@@ -4294,7 +4294,6 @@ ED.Doodle.prototype.addBinding = function(_parameter, _fieldParameters)
         // Get reference to HTML element
         var element = document.getElementById(_id);
 
-        
         // Check element exists
         if (element != null)
         {
@@ -4319,6 +4318,7 @@ ED.Doodle.prototype.addBinding = function(_parameter, _fieldParameters)
             var id = this.id;
             var className = this.className;
             var listener;
+            //console.log(id, className, _lkup);
             element.addEventListener('change', listener = function (event) {
                                      if (this.type == 'checkbox')
                                      {
@@ -4328,6 +4328,7 @@ ED.Doodle.prototype.addBinding = function(_parameter, _fieldParameters)
                                     	 if (this.type == 'select-one')
                                     	 {
                                   			drawing.eventHandler('onchange', id, className, this.id, this.options[this.selectedIndex].getAttribute(_lkup));
+                                     //console.log('onchange', id, className, this.id, this.options[this.selectedIndex].getAttribute(_lkup));
                                          }
                                          else
                                          {
@@ -4339,6 +4340,7 @@ ED.Doodle.prototype.addBinding = function(_parameter, _fieldParameters)
                                      }
                                      
                                      },false);
+            //console.log(element)
             
             // Add listener to array
             var array = new Array();
