@@ -1392,9 +1392,9 @@ ED.AngleRecession.prototype.groupDescription = function()
 }
 
 /**
- * The optic cup (used in conjunection with the optic disk
+ * The optic cup (used in conjunection with the optic disc
  *
- * @class OpticDisk
+ * @class OpticDisc
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
  * @param {Int} _originX
@@ -1408,10 +1408,10 @@ ED.AngleRecession.prototype.groupDescription = function()
  * @param {Float} _rotation
  * @param {Int} _order
  */
-ED.OpticDisk = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+ED.OpticDisc = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
 {
 	// Set classname
-	this.className = "OpticDisk";
+	this.className = "OpticDisc";
     
     // Private parameters
     this.numberOfHandles = 8;
@@ -1429,14 +1429,14 @@ ED.OpticDisk = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _
 /**
  * Sets superclass and constructor
  */
-ED.OpticDisk.prototype = new ED.Doodle;
-ED.OpticDisk.prototype.constructor = ED.OpticDisk;
-ED.OpticDisk.superclass = ED.Doodle.prototype;
+ED.OpticDisc.prototype = new ED.Doodle;
+ED.OpticDisc.prototype.constructor = ED.OpticDisc;
+ED.OpticDisc.superclass = ED.Doodle.prototype;
 
 /**
  * Sets handle attributes
  */
-ED.OpticDisk.prototype.setHandles = function()
+ED.OpticDisc.prototype.setHandles = function()
 {
     // Array of handles for expert mode
     for (var i = 0; i < this.numberOfHandles; i++)
@@ -1451,7 +1451,7 @@ ED.OpticDisk.prototype.setHandles = function()
 /**
  * Sets default properties
  */
-ED.OpticDisk.prototype.setPropertyDefaults = function()
+ED.OpticDisc.prototype.setPropertyDefaults = function()
 {
 	this.isMoveable = false;
 	this.isRotatable = false;
@@ -1484,7 +1484,7 @@ ED.OpticDisk.prototype.setPropertyDefaults = function()
 /**
  * Sets default parameters
  */
-ED.OpticDisk.prototype.setParameterDefaults = function()
+ED.OpticDisc.prototype.setParameterDefaults = function()
 {
     this.apexY = -150;
 
@@ -1511,7 +1511,7 @@ ED.OpticDisk.prototype.setParameterDefaults = function()
  * @value {Undefined} _value Value of parameter to calculate
  * @returns {Array} Associative array of values of dependent parameters
  */
-ED.OpticDisk.prototype.dependentParameterValues = function(_parameter, _value)
+ED.OpticDisc.prototype.dependentParameterValues = function(_parameter, _value)
 {
     var returnArray = new Array();
     
@@ -1530,15 +1530,15 @@ ED.OpticDisk.prototype.dependentParameterValues = function(_parameter, _value)
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.OpticDisk.prototype.draw = function(_point)
+ED.OpticDisc.prototype.draw = function(_point)
 {
 	// Get context
 	var ctx = this.drawing.context;
 	
 	// Call draw method in superclass
-	ED.OpticDisk.superclass.draw.call(this, _point);
+	ED.OpticDisc.superclass.draw.call(this, _point);
     
-	// Radius of disk
+	// Radius of disc
 	var ro = 300;
     var ri = -this.apexY;
 	
@@ -1616,16 +1616,16 @@ ED.OpticDisk.prototype.draw = function(_point)
         
 	    // Set margin attributes
 	    var colour = new ED.Colour(0,0,0,1);
-	    colour.setWithHexString('FFA83C');  // Taken from disk margin of a fundus photo
+	    colour.setWithHexString('FFA83C');  // Taken from disc margin of a fundus photo
 	    ctx.fillStyle = colour.rgba();
         
-        // Draw disk margin
+        // Draw disc margin
         ctx.fill();
         
         // Disc vessels
         ctx.beginPath();
         
-        // Vessels start on nasal side of disk
+        // Vessels start on nasal side of disc
         var sign;
         if (this.drawing.eye == ED.eye.Right)
         {
@@ -1729,9 +1729,9 @@ ED.OpticDisk.prototype.draw = function(_point)
  *
  * @returns {String} Description of doodle
  */
-ED.OpticDisk.prototype.description = function()
+ED.OpticDisc.prototype.description = function()
 {
-	returnString = "Cup/disk ratio: ";
+	returnString = "Cup/disc ratio: ";
     
     var ratio = 0;
     
@@ -1759,7 +1759,7 @@ ED.OpticDisk.prototype.description = function()
 /**
  * Defines handles visibility
  */
-ED.OpticDisk.prototype.setHandleProperties = function()
+ED.OpticDisc.prototype.setHandleProperties = function()
 {
     // Basic mode
     if (this.mode == "Basic")
@@ -1924,7 +1924,7 @@ ED.PeripapillaryAtrophy.prototype.draw = function(_point)
     toY = this.squiggleArray[0].pointsArray[0].y;
     ctx.bezierCurveTo(-fromY * f, fromY, toX, -toX * f, toX, toY);
     
-    // Only fill to margin, to allow cup to sit behind giving disk margin
+    // Only fill to margin, to allow cup to sit behind giving disc margin
     ctx.moveTo(280, 00);
     ctx.arc(0, 0, 280, 0, Math.PI*2, true);
     
@@ -2155,9 +2155,9 @@ ED.NerveFibreDefect.prototype.description = function()
 }
 
 /**
- * Disk Haemorrhage
+ * Disc Haemorrhage
  *
- * @class DiskHaemorrhage
+ * @class DiscHaemorrhage
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
  * @param {Int} _originX
@@ -2171,10 +2171,10 @@ ED.NerveFibreDefect.prototype.description = function()
  * @param {Float} _rotation
  * @param {Int} _order
  */
-ED.DiskHaemorrhage = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+ED.DiscHaemorrhage = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
 {
 	// Set classname
-	this.className = "DiskHaemorrhage";
+	this.className = "DiscHaemorrhage";
 	
 	// Call super-class constructor
 	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
@@ -2183,14 +2183,14 @@ ED.DiskHaemorrhage = function(_drawing, _originX, _originY, _radius, _apexX, _ap
 /**
  * Sets superclass and constructor
  */
-ED.DiskHaemorrhage.prototype = new ED.Doodle;
-ED.DiskHaemorrhage.prototype.constructor = ED.DiskHaemorrhage;
-ED.DiskHaemorrhage.superclass = ED.Doodle.prototype;
+ED.DiscHaemorrhage.prototype = new ED.Doodle;
+ED.DiscHaemorrhage.prototype.constructor = ED.DiscHaemorrhage;
+ED.DiscHaemorrhage.superclass = ED.Doodle.prototype;
 
 /**
  * Sets default dragging attributes
  */
-ED.DiskHaemorrhage.prototype.setPropertyDefaults = function()
+ED.DiscHaemorrhage.prototype.setPropertyDefaults = function()
 {
 	this.isMoveable = false;
 
@@ -2202,7 +2202,7 @@ ED.DiskHaemorrhage.prototype.setPropertyDefaults = function()
 /**
  * Sets default parameters
  */
-ED.DiskHaemorrhage.prototype.setParameterDefaults = function()
+ED.DiscHaemorrhage.prototype.setParameterDefaults = function()
 {
     this.arc = 10 * Math.PI/180;
     this.apexY = -350;
@@ -2215,13 +2215,13 @@ ED.DiskHaemorrhage.prototype.setParameterDefaults = function()
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.DiskHaemorrhage.prototype.draw = function(_point)
+ED.DiscHaemorrhage.prototype.draw = function(_point)
 {
 	// Get context
 	var ctx = this.drawing.context;
 	
 	// Call draw method in superclass
-	ED.DiskHaemorrhage.superclass.draw.call(this, _point);
+	ED.DiscHaemorrhage.superclass.draw.call(this, _point);
     
 	// Radius of outer curve just inside ora on right and left fundus diagrams
 	var ro = -this.apexY;
@@ -2233,7 +2233,7 @@ ED.DiskHaemorrhage.prototype.draw = function(_point)
 	var arcStart = - Math.PI/2 + theta;
 	var arcEnd = - Math.PI/2 - theta;
     
-    // Coordinates of 'corners' of DiskHaemorrhage
+    // Coordinates of 'corners' of DiscHaemorrhage
 	var topRightX = r * Math.sin(theta);
 	var topRightY = - r * Math.cos(theta);
 	var topLeftX = - r * Math.sin(theta);
@@ -2271,9 +2271,9 @@ ED.DiskHaemorrhage.prototype.draw = function(_point)
  *
  * @returns {String} Group description
  */
-ED.DiskHaemorrhage.prototype.groupDescription = function()
+ED.DiscHaemorrhage.prototype.groupDescription = function()
 {
-	return  "Disk haemorrhage at ";
+	return  "Disc haemorrhage at ";
 }
 
 /**
@@ -2281,15 +2281,15 @@ ED.DiskHaemorrhage.prototype.groupDescription = function()
  *
  * @returns {String} Description of doodle
  */
-ED.DiskHaemorrhage.prototype.description = function()
+ED.DiscHaemorrhage.prototype.description = function()
 {
 	return this.clockHour() + " o'clock";
 }
 
 /**
- * OpticDiskPit Acquired Pit of Optic Nerve (APON)
+ * OpticDiscPit Acquired Pit of Optic Nerve (APON)
  *
- * @class OpticDiskPit
+ * @class OpticDiscPit
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
  * @param {Int} _originX
@@ -2303,10 +2303,10 @@ ED.DiskHaemorrhage.prototype.description = function()
  * @param {Float} _rotation
  * @param {Int} _order
  */
-ED.OpticDiskPit = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+ED.OpticDiscPit = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
 {
 	// Set classname
-	this.className = "OpticDiskPit";
+	this.className = "OpticDiscPit";
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
@@ -2315,14 +2315,14 @@ ED.OpticDiskPit = function(_drawing, _originX, _originY, _radius, _apexX, _apexY
 /**
  * Sets superclass and constructor
  */
-ED.OpticDiskPit.prototype = new ED.Doodle;
-ED.OpticDiskPit.prototype.constructor = ED.OpticDiskPit;
-ED.OpticDiskPit.superclass = ED.Doodle.prototype;
+ED.OpticDiscPit.prototype = new ED.Doodle;
+ED.OpticDiscPit.prototype.constructor = ED.OpticDiscPit;
+ED.OpticDiscPit.superclass = ED.Doodle.prototype;
 
 /**
  * Sets handle attributes
  */
-ED.OpticDiskPit.prototype.setHandles = function()
+ED.OpticDiscPit.prototype.setHandles = function()
 {
     this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, false);
 }
@@ -2330,7 +2330,7 @@ ED.OpticDiskPit.prototype.setHandles = function()
 /**
  * Sets default dragging attributes
  */
-ED.OpticDiskPit.prototype.setPropertyDefaults = function()
+ED.OpticDiscPit.prototype.setPropertyDefaults = function()
 {
 	this.isSqueezable = true;
     this.isUnique = true;
@@ -2345,7 +2345,7 @@ ED.OpticDiskPit.prototype.setPropertyDefaults = function()
 /**
  * Sets default parameters
  */
-ED.OpticDiskPit.prototype.setParameterDefaults = function()
+ED.OpticDiscPit.prototype.setParameterDefaults = function()
 {
     this.originY = 130;
     this.apexY = 0;
@@ -2367,13 +2367,13 @@ ED.OpticDiskPit.prototype.setParameterDefaults = function()
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.OpticDiskPit.prototype.draw = function(_point)
+ED.OpticDiscPit.prototype.draw = function(_point)
 {
 	// Get context
 	var ctx = this.drawing.context;
     
 	// Call draw method in superclass
-	ED.OpticDiskPit.superclass.draw.call(this, _point);
+	ED.OpticDiscPit.superclass.draw.call(this, _point);
     
 	// Boundary path
 	ctx.beginPath();
@@ -2414,7 +2414,7 @@ ED.OpticDiskPit.prototype.draw = function(_point)
  *
  * @returns {String} Description of doodle
  */
-ED.OpticDiskPit.prototype.description = function()
+ED.OpticDiscPit.prototype.description = function()
 {
     return "Acquired pit of optic nerve";
 }

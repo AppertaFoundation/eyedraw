@@ -4057,6 +4057,7 @@ ED.Doodle.prototype.setSimpleParameter = function(_parameter, _value)
 ED.Doodle.prototype.setParameterFromString = function(_parameter, _value)
 {
     // Check type of passed value variable
+	debugger;
     var type = typeof(_value);
     if (type != 'string')
     {

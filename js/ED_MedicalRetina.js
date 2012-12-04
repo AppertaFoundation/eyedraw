@@ -29,7 +29,7 @@
 if (ED == null || typeof(ED) != "object") { var ED = new Object();}
 
 /**
- * PostPole template with disk and arcades
+ * PostPole template with disc and arcades
  *
  * @class PostPole
  * @property {String} className Name of doodle subclass
@@ -144,14 +144,14 @@ ED.PostPole.prototype.draw = function(_point)
 	// Call draw method in superclass
 	ED.PostPole.superclass.draw.call(this, _point);
     
-    // Disk radius
+    // Disc radius
     var rd = 84;
     var x = this.drawing.eye == ED.eye.Right?300:-300;
     
 	// Boundary path
 	ctx.beginPath();
     
-	// Optic disk
+	// Optic disc
 	ctx.arc(x, 0, rd, 0, 2 * Math.PI, true);
     
 	// Set attributes
@@ -212,7 +212,7 @@ ED.PostPole.prototype.draw = function(_point)
         ctx.strokeStyle = "red";
 		ctx.stroke();
         
-        // One disk diameter
+        // One disc diameter
         ctx.beginPath();
         ctx.arc(0, 0, 2 * rd, 2 * Math.PI, 0, false);
         ctx.lineWidth = 1;
@@ -241,13 +241,13 @@ ED.PostPole.prototype.description = function()
 }
 
 /**
- * Tests whether passed doodle is within a number of disk diameters of fovea
+ * Tests whether passed doodle is within a number of disc diameters of fovea
  *
  * @param {Doodle} _doodle The doodle to test
- * @param {Int} _diameters The number of disk diameters to test
- * @returns {Bool} True if doodle is within the passed number of disk diameters of fovea
+ * @param {Int} _diameters The number of disc diameters to test
+ * @returns {Bool} True if doodle is within the passed number of disc diameters of fovea
  */
-ED.PostPole.prototype.isWithinDiskDiametersOfFovea = function(_doodle, _diameters)
+ED.PostPole.prototype.isWithinDiscDiametersOfFovea = function(_doodle, _diameters)
 {
 	return (_doodle.originX * _doodle.originX + _doodle.originY * _doodle.originY) < 4 * 84 * 84;
 }
@@ -909,7 +909,7 @@ ED.BlotHaemorrhage.prototype.description = function()
 }
 
 /**
- * DiabeticNV template with disk and arcades
+ * DiabeticNV template with disc and arcades
  *
  * @class DiabeticNV
  * @property {String} className Name of doodle subclass
@@ -1082,7 +1082,7 @@ ED.DiabeticNV.prototype.description = function()
     {
         if (this.originX > 180 && this.originX < 420 && this.originY > -120 && this.originY < 120)
         {
-            locationString = "at the disk";
+            locationString = "at the disc";
         }
         else
         {
@@ -1095,7 +1095,7 @@ ED.DiabeticNV.prototype.description = function()
     {
         if (this.originX < -180 && this.originX > -420 && this.originY > -120 && this.originY < 120)
         {
-            locationString = "at the disk";
+            locationString = "at the disc";
         }
         else
         {
@@ -1801,7 +1801,7 @@ ED.PRPPostPole.prototype.draw = function(_point)
                 // Avoid macula
                 if ((x * x + y * y) > r * r)
                 {
-                    // Avoid disk
+                    // Avoid disc
                     if (this.drawing.eye == ED.eye.Right)
                     {
                         if (!((i == 13 && (j == 6 || j == 7 || j == 8 || j == 9)) || (i == 14) && (j == 7 || j == 8)))
@@ -2292,7 +2292,7 @@ ED.Geographic.prototype.diagnosticHierarchy = function()
 }
 
 /**
- * VitreousOpacity template with disk and arcades
+ * VitreousOpacity template with disc and arcades
  *
  * @class VitreousOpacity
  * @property {String} className Name of doodle subclass
