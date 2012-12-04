@@ -50,9 +50,6 @@ ED.AntSeg = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _sca
 	// Set classname
 	this.className = "AntSeg";
     
-    // Private parameters
-    this.hasPXE;
-    
     // Derived parameters
     this.pupilSize = 'Large';
     this.pxe = false;
@@ -101,8 +98,8 @@ ED.AntSeg.prototype.setPropertyDefaults = function()
  */
 ED.AntSeg.prototype.setParameterDefaults = function()
 {
-    this.setParameterFromString('pupilSize', 'Large');
-    this.setParameterFromString('pxe', 'false');
+    //this.setParameterFromString('pupilSize', 'Large');
+    //this.setParameterFromString('pxe', 'false');
 }
 
 /**
@@ -125,28 +122,27 @@ ED.AntSeg.prototype.dependentParameterValues = function(_parameter, _value)
             else returnArray['pupilSize']  = 'Small';
             break;
             
-        case 'hasPXE':
-            returnArray['pxe'] = _value;
-            break;
-            
         case 'pupilSize':
             switch (_value)
             {
                 case 'Large':
-                    returnArray['apexY'] = -260;
+                    if (this.apexY < -200) returnValue = this.apexY;
+                    else returnArray['apexY'] = -260;
                     break;
                 case 'Medium':
-                    returnArray['apexY'] = -200;
+                    if (this.apexY >= -200 && this.apexY < -100) returnValue = this.apexY;
+                    else returnArray['apexY'] = -200;
                     break;
                 case 'Small':
-                    returnArray['apexY'] = -100;
+                    if (this.apexY >= -100) returnValue = this.apexY;
+                    else returnArray['apexY'] = -100;
                     break;
             }
             break;
             
-        case 'pxe':
-            returnArray['hasPXE'] = _value;
-            break;
+//        case 'pxe':
+//            returnArray['pxe'] = _value;
+//            break;
     }
     
     return returnArray;
@@ -198,7 +194,7 @@ ED.AntSeg.prototype.draw = function(_point)
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
 	{
         // Pseudo exfoliation
-        if (this.hasPXE)
+        if (this.pxe)
         {
             ctx.lineWidth = 8;
             ctx.strokeStyle = "darkgray";

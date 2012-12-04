@@ -2185,7 +2185,7 @@ ED.Drawing.prototype.addBindings = function(_bindingArray)
             // Add binding to doodle if it exists
             if (doodle)
             {
-              doodle.addBinding(parameter, _bindingArray[className][parameter]);
+                doodle.addBinding(parameter, _bindingArray[className][parameter]);
             }
         }
     }
@@ -2215,8 +2215,8 @@ ED.Drawing.prototype.addDeleteValues = function(_deleteValuesArray)
  */
 ED.Drawing.prototype.eventHandler = function(_type, _doodleId, _className, _elementId, _value)
 {
-    //console.log("Event " + _type + ":" + _doodleId + ":" + _className + ":" + _elementId + ":" + _value);
-
+    console.log("Event: " + _type + " doodleId: " + _doodleId + " doodleClass: " + _className + " elementId: " + _elementId + " value: " + _value);
+    
     //var value;
     switch (_type)
     {
@@ -2264,31 +2264,45 @@ ED.Drawing.prototype.eventHandler = function(_type, _doodleId, _className, _elem
                     // Apply new value to element if necessary
                     if (_value != validityArray.value)
                     {
-                        var attribute = doodle.bindingArray[parameter]['attribute'];
                         var element = document.getElementById(_elementId);
+                        var attribute = doodle.bindingArray[parameter]['attribute'];
                         
-                        if (attribute)
+                        // Set the parameter to the value of the element, and attach a listener
+                        switch (element.type)
                         {
-                            if (element.type == 'select-one')
-                            {
-                                // It's a dropdown
-                                for (var i = 0; i < element.length; i++)
+                            case 'checkbox':
+                                console.log('setting checkbox - needs testing with a suitable doodle');
+                                element.value = (validityArray.value == "true")?1:0;
+                                break;
+                                
+                            case 'select-one':
+                                if (attribute)
                                 {
-                                    if (element.options[i].getAttribute(attribute) == validityArray.value)
+                                    for (var i = 0; i < element.length; i++)
                                     {
-                                        element.value = element.options[i].value;
-                                        break;
+                                        if (element.options[i].getAttribute(attribute) == validityArray.value)
+                                        {
+                                            element.value = element.options[i].value;
+                                            break;
+                                        }
                                     }
                                 }
-                            }
-                            else
-                            {
-                                element.setAttribute(attribute, validityArray.value);
-                            }
-                        }
-                        else
-                        {
-                            element.value = validityArray.value;
+                                else
+                                {
+                                    element.value = validityArray.value;
+                                }
+                                break;
+                                
+                            default:
+                                if (attribute)
+                                {
+                                    element.setAttribute(attribute, validityArray.value);
+                                }
+                                else
+                                {
+                                    element.value = validityArray.value;
+                                }
+                                break;
                         }
                     }
                     
@@ -2328,7 +2342,7 @@ ED.Drawing.prototype.updateBindings = function(_doodle)
         doodle = this.selectedDoodle;
     }
     
-    // No argument, so there must be a selected doodle to activate binding, otherwise do nothing
+    // Update bindings for this doodle
     if (doodle != null)
     {
         // Iterate through this doodle's bindings array and alter value of HTML element
@@ -2338,43 +2352,42 @@ ED.Drawing.prototype.updateBindings = function(_doodle)
           	var attribute = doodle.bindingArray[parameter]['attribute'];
             var value = doodle.getParameter(parameter);
           	
-            /*
-          	if (element.type == 'select-one') {
-          		// it's a dropdown
-          		for (var i = 0; i < element.length; i++) {
-          			if (element.options[i].getAttribute(_lkup) == doodle.getParameter(key)) {
-          				element.value = element.options[i].value;
-          				break;
-          			}
-          		}
-          	}
-          	else {
-          		element.setAttribute(_lkup, doodle.getParameter(key));
-          	}
-             */
-            if (attribute)
+            // Modify value of element according to type
+            switch (element.type)
             {
-                if (element.type == 'select-one')
-                {
-                    // It's a dropdown
-                    for (var i = 0; i < element.length; i++)
+                case 'checkbox':
+                    element.value = (value == "true")?1:0;
+                    break;
+                    
+                case 'select-one':
+                    if (attribute)
                     {
-                        if (element.options[i].getAttribute(attribute) == value)
+                        for (var i = 0; i < element.length; i++)
                         {
-                            element.value = element.options[i].value;
-                            break;
+                            if (element.options[i].getAttribute(attribute) == value)
+                            {
+                                element.value = element.options[i].value;
+                                break;
+                            }
                         }
                     }
-                }
-                else
-                {
-                    element.setAttribute(attribute, value);
-                }
-            }
-            else
-            {
-                element.value = value;
-            }
+                    else
+                    {
+                        element.value = value;
+                    }
+                    break;
+                    
+                default:
+                    if (attribute)
+                    {
+                         element.setAttribute(attribute, value);
+                    }
+                    else
+                    {
+                        element.value = value;
+                    }
+                    break;
+            }  
         }
     }
     else
@@ -4285,62 +4298,74 @@ ED.Doodle.prototype.increment = function(_parameter, _value)
  */
 ED.Doodle.prototype.addBinding = function(_parameter, _fieldParameters)
 {
-    _id = _fieldParameters['id'];
-    _lkup = _fieldParameters['attribute'];
+    var elementId = _fieldParameters['id'];
+    var attribute = _fieldParameters['attribute'];
 
     // Check that doodle has a parameter of this name
     if (typeof(this[_parameter]) != 'undefined')
     {
         // Get reference to HTML element
-        var element = document.getElementById(_id);
+        var element = document.getElementById(elementId);
 
         // Check element exists
         if (element != null)
         {
             // Add binding to array
-            this.bindingArray[_parameter] = { 'id': _id, 'attribute': _lkup };
-            
-            // Set parameter to the attribute (if passed), or the value of element
-            if (_lkup) {
-	            if (element.type == "select-one") {
-	            	if(element.selectedIndex > -1) {
-		            	this.setParameterFromString(_parameter, element.options[element.selectedIndex].getAttribute(_lkup));
-	            	}
-	            } else {
-	            	this.setParameterFromString(_parameter, element.getAttribute(_lkup));
-	            }
-            } else {
-            	this.setParameterFromString(_parameter, element.value)
-            }
+            this.bindingArray[_parameter] = { 'id': elementId, 'attribute': attribute };
             
             // Attach onchange event of element with a function which calls the drawing event handler
             var drawing = this.drawing;
             var id = this.id;
             var className = this.className;
             var listener;
-            //console.log(id, className, _lkup);
-            element.addEventListener('change', listener = function (event) {
-                                     if (this.type == 'checkbox')
-                                     {
-                                        drawing.eventHandler('onchange', id, className, this.id, this.checked.toString());
-                                     }
-                                     else if (_lkup) {
-                                    	 if (this.type == 'select-one')
-                                    	 {
-                                  			drawing.eventHandler('onchange', id, className, this.id, this.options[this.selectedIndex].getAttribute(_lkup));
-                                     //console.log('onchange', id, className, this.id, this.options[this.selectedIndex].getAttribute(_lkup));
-                                         }
-                                         else
-                                         {
-                                            drawing.eventHandler('onchange', id, className, this.id, this.getAttribute(_lkup));
-                                         }
-                                     }
-                                     else {
-                                    	 drawing.eventHandler('onchange', id, className, this.id, this.value);
-                                     }
-                                     
-                                     },false);
-            //console.log(element)
+            
+            // Set the parameter to the value of the element, and attach a listener
+            switch (element.type)
+            {
+                case 'checkbox':
+                    this.setParameterFromString(_parameter, element.checked.toString());
+                    element.addEventListener('change', listener = function (event) {
+                                             drawing.eventHandler('onchange', id, className, this.id, this.checked.toString());
+                                             },false);
+                    break;
+                    
+                case 'select-one':
+                    if (attribute)
+                    {
+                        if (element.selectedIndex > -1)
+                        {
+                            this.setParameterFromString(_parameter, element.options[element.selectedIndex].getAttribute(attribute));
+                        }
+                        element.addEventListener('change', listener = function (event) {
+                                             drawing.eventHandler('onchange', id, className, this.id, this.options[this.selectedIndex].getAttribute(attribute));                  
+                                             },false);
+                    }
+                    else
+                    {
+                        this.setParameterFromString(_parameter, element.value);
+                        element.addEventListener('change', listener = function (event) {
+                                                 drawing.eventHandler('onchange', id, className, this.id, this.value);
+                                                 },false);
+                    }
+                    break;
+                    
+                default:
+                    if (attribute)
+                    {
+                        this.setParameterFromString(_parameter, element.getAttribute(attribute));
+                        element.addEventListener('change', listener = function (event) {
+                                                 drawing.eventHandler('onchange', id, className, this.id, this.getAttribute(_lkup));
+                                                 },false);
+                    }
+                    else
+                    {
+                        this.setParameterFromString(_parameter, element.value);
+                        element.addEventListener('change', listener = function (event) {
+                                                 drawing.eventHandler('onchange', id, className, this.id, this.value);
+                                                 },false);
+                    }
+                    break;
+            }
             
             // Add listener to array
             var array = new Array();
