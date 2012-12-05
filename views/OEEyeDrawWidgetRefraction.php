@@ -1,6 +1,6 @@
 <!-- Uncomment following line to re-enable doodle hover tooltips once layer bug is fixed (OE-1583) -->
 <!-- <span id="canvasTooltip"></span> -->
-<canvas id="<?php echo $canvasId?>" class="<?php if ($isEditable) { echo 'edit'; } else { echo 'display'; }?>" width="<?php echo $size?>" height="<?php echo $size?>" tabindex="1"<?php if ($canvasStyle) {?> style="<?php echo $canvasStyle?>"<?php }?>></canvas>
+<canvas id="<?php echo $canvasId?>" class="<?php if ($isEditable) { echo 'edit'; } else { echo 'display'; }?>" width="<?php echo $size?>" height="<?php echo $size?>" tabindex="1" data-drawing-name="<?php echo $drawingName ?>"<?php if ($canvasStyle) {?> style="<?php echo $canvasStyle?>"<?php }?>></canvas>
 <input type="hidden" id="<?php echo $inputId?>" name="<?php echo $inputName?>" value='<?php echo $this->model[$this->attribute]?>' />
 <?php if ($isEditable && $toolbar) {?>
 	<div style="float: left">
