@@ -110,6 +110,8 @@ class OEEyeDrawWidget extends CWidget
 
 	/**
 	 * Array of doodles to appear in doodle selection toolbar
+	 * or 
+	 * Array of array of doodles to appear in multiple rows in doodle selection toolbar
 	 * @var array
 	 */
     public $doodleToolBarArray = array();
@@ -288,24 +290,35 @@ class OEEyeDrawWidget extends CWidget
         $this->registerScripts();
         $this->registerCss();
 
-        // Iterate through any button array
-        foreach($this->doodleToolBarArray as $i => $doodleClassName)
-        {
-            // Get title attribute from language specific array
-            if (array_key_exists($doodleClassName, DoodleInfo::$titles))
-            {
-                $title = DoodleInfo::$titles[$doodleClassName];
-            }
-            else
-            {
-                $title = DoodleInfo::$titles['NONE'];
-            }
-            $this->doodleToolBarArray[$i] = array(
-                'title' => $title,
-                'classname' => $doodleClassName
-            );
+        if (sizeof($this->doodleToolBarArray) > 0) {
+        	// check if need to convert into one row array to have all buttons in one row
+        	if (!is_array($this->doodleToolBarArray[0])) {
+        		$this->doodleToolBarArray = array($this->doodleToolBarArray);
+        	}
         }
-
+        
+        // Iterate through any button array
+        $finalToolBar = array(); 
+        foreach ($this->doodleToolBarArray as $row => $rowButtons) {
+        	$finalToolBar[] = array();
+	        foreach($rowButtons as $i => $doodleClassName)
+	        {
+	            // Get title attribute from language specific array
+	            if (array_key_exists($doodleClassName, DoodleInfo::$titles))
+	            {
+	                $title = DoodleInfo::$titles[$doodleClassName];
+	            }
+	            else
+	            {
+	                $title = DoodleInfo::$titles['NONE'];
+	            }
+	            $finalToolBar[$row][$i] = array(
+	                'title' => $title,
+	                'classname' => $doodleClassName
+	            );
+	        }
+        }
+        $this->doodleToolBarArray = $finalToolBar;
         // Render the widget
         $this->render($this->template, get_object_vars($this));
 	}
