@@ -50,7 +50,7 @@ ED.Surgeon = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _sc
     // Set classname
 	this.className = "Surgeon";
     
-    // Derived parameters
+    // Derived parameters (NB must set a value here to define parameter as a property of the object, even though value set later)
     this.surgeonPosition;
     
 	// Call superclass constructor
@@ -100,6 +100,7 @@ ED.Surgeon.prototype.setPropertyDefaults = function()
 ED.Surgeon.prototype.setParameterDefaults = function()
 {
     this.rotation = 0;
+    this.setParameterFromString('surgeonPosition', 'Temporal');
 }
 
 /**

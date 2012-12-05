@@ -1058,6 +1058,10 @@ ED.Drawing.prototype.mousemove = function(_point)
 
                             doodle.setSimpleParameter('scaleX', newScaleX * signX);
                             doodle.setSimpleParameter('scaleY', newScaleY * signY);
+                            
+                            // Update dependencies
+                            this.updateDependentParameters('scaleX');
+                            this.updateDependentParameters('scaleY');
 						}
 						else
 						{
@@ -1192,8 +1196,8 @@ ED.Drawing.prototype.mousemove = function(_point)
 					break;		
 			}
             
-			// Update any bindings
-            this.updateBindings();
+			// Update any bindings NB temporarilly moved to updateDependentParameters method which SHOULD be called for all relevant changes in this method
+            //this.updateBindings();
 		}
 		
 		// Store mouse position
@@ -1716,30 +1720,56 @@ ED.Drawing.prototype.deleteDoodle = function(_doodle)
 
                         // If available, set the value of the bound element to the appropriate value
                         if (element != null && typeof(value) != 'undefined')
-                        {
-                            if (attribute)
+                        {                            
+                            // Set the element according to the value
+                            switch (element.type)
                             {
-                                // Set new value of element depending on its type
-                                if (element.type == 'select-one')
-                                {
-                                    // It's a dropdown
-                                    for (var i = 0; i < element.length; i++)
+                                case 'checkbox':
+                                    if (attribute)
                                     {
-                                        if (element.options[i].getAttribute(attribute) == value)
+                                        ED.errorHandler('ED.Drawing', 'deleteDoodle', 'Binding to a checkbox with a non-standard attribute not yet supported');
+                                    }
+                                    else
+                                    {
+                                        if (value == "true")
                                         {
-                                            element.value = element.options[i].value;
-                                            break;
+                                            element.setAttribute('checked', 'checked');
+                                        }
+                                        else
+                                        {
+                                            element.removeAttribute('checked');
                                         }
                                     }
-                                }
-                                else
-                                {
-                                    element.setAttribute(attribute, value);
-                                }
-                            }
-                            else
-                            {
-                                element.value = value;
+                                    break;
+                                    
+                                case 'select-one':
+                                    if (attribute)
+                                    {
+                                        for (var i = 0; i < element.length; i++)
+                                        {
+                                            if (element.options[i].getAttribute(attribute) == value)
+                                            {
+                                                element.value = element.options[i].value;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        element.value = value;
+                                    }
+                                    break;
+                                    
+                                default:
+                                    if (attribute)
+                                    {
+                                        element.setAttribute(attribute, value);
+                                    }
+                                    else
+                                    {
+                                        element.value = value;
+                                    }
+                                    break;
                             }
                          }
                         
@@ -2051,23 +2081,45 @@ ED.Drawing.prototype.addDoodle = function(_className, _parameterDefaults, _param
                 
                 // Get the value of the element
                 var value;
-                if (attribute)
+
+                // Set the value to the value of the element
+                switch (element.type)
                 {
-                    if (element.type == "select-one")
-                    {
-                        if (element.selectedIndex > -1)
+                    case 'checkbox':
+                        if (attribute)
                         {
-                            value = element.options[element.selectedIndex].getAttribute(attribute);
+                            ED.errorHandler('ED.Drawing', 'addDoodle', 'Binding to a checkbox with a non-standard attribute not yet supported');
                         }
-                    }
-                    else
-                    {
-                        value = element.getAttribute(attribute);
-                    }
-                }
-                else
-                {
-                    value = element.value;
+                        else
+                        {
+                            value = element.checked.toString();
+                        }
+                        break;
+                        
+                    case 'select-one':
+                        if (attribute)
+                        {
+                            if (element.selectedIndex > -1)
+                            {
+                                value = element.options[element.selectedIndex].getAttribute(attribute);
+                            }
+                        }
+                        else
+                        {
+                            value = element.value;
+                        }
+                        break;
+                        
+                    default:
+                        if (attribute)
+                        {
+                            value = element.getAttribute(attribute);
+                        }
+                        else
+                        {
+                            value = element.value;
+                        }
+                        break;
                 }
 
                 // If the element value is equal to the delete value, use the default value of the doodle instead
@@ -2159,33 +2211,40 @@ ED.Drawing.prototype.addBindings = function(_bindingArray)
         // Iterate through bindings for this className
         for (parameter in _bindingArray[className])
         {
+            // Get reference to element
             var elementId = _bindingArray[className][parameter]['id'];
-            
-            // Add an event listener to the element to create a bound doodle on change, if it does not exist
             var element = document.getElementById(elementId);
             
-            element.addEventListener('change', function (event)
+            if (element)
             {
-                // Cannot use external variable className because of closure
-                for (var classNm in drawing.bindingArray)
+                // Add an event listener to the element to create a bound doodle on change, if it does not exist
+                element.addEventListener('change', function (event)
                 {
-                    for (var param in drawing.bindingArray[classNm])
+                    // Cannot use external variable className because of closure
+                    for (var classNm in drawing.bindingArray)
                     {
-                        if (this.id == _bindingArray[classNm][param]['id'])
+                        for (var param in drawing.bindingArray[classNm])
                         {
-                            if (!drawing.hasDoodleOfClass(classNm))
+                            if (this.id == _bindingArray[classNm][param]['id'])
                             {
-                                drawing.addDoodle(classNm);
+                                if (!drawing.hasDoodleOfClass(classNm))
+                                {
+                                    drawing.addDoodle(classNm);
+                                }
                             }
                         }
                     }
-                }
-            },false);
+                },false);
 
-            // Add binding to doodle if it exists
-            if (doodle)
+                // Add binding to doodle if it exists
+                if (doodle)
+                {
+                    doodle.addBinding(parameter, _bindingArray[className][parameter]);
+                }
+            }
+            else
             {
-                doodle.addBinding(parameter, _bindingArray[className][parameter]);
+                ED.errorHandler('ED.Drawing', 'addBinding', 'Attempt to add binding for an element that does not exist for parameter: ' + parameter);
             }
         }
     }
@@ -2215,7 +2274,7 @@ ED.Drawing.prototype.addDeleteValues = function(_deleteValuesArray)
  */
 ED.Drawing.prototype.eventHandler = function(_type, _doodleId, _className, _elementId, _value)
 {
-    console.log("Event: " + _type + " doodleId: " + _doodleId + " doodleClass: " + _className + " elementId: " + _elementId + " value: " + _value);
+    //console.log("Event: " + _type + " doodleId: " + _doodleId + " doodleClass: " + _className + " elementId: " + _elementId + " value: " + _value);
     
     //var value;
     switch (_type)
@@ -2267,12 +2326,26 @@ ED.Drawing.prototype.eventHandler = function(_type, _doodleId, _className, _elem
                         var element = document.getElementById(_elementId);
                         var attribute = doodle.bindingArray[parameter]['attribute'];
                         
-                        // Set the parameter to the value of the element, and attach a listener
+                        // Set the element according to the value
                         switch (element.type)
                         {
                             case 'checkbox':
-                                console.log('setting checkbox - needs testing with a suitable doodle');
-                                element.value = (validityArray.value == "true")?1:0;
+                                if (attribute)
+                                {
+                                    ED.errorHandler('ED.Drawing', 'eventHandler', 'Binding to a checkbox with a non-standard attribute not yet supported');
+                                }
+                                else
+                                {
+                                    console.log('setting checkbox - needs testing with a suitable doodle');
+                                    if (value == "true")
+                                    {
+                                        element.setAttribute('checked', 'checked');
+                                    }
+                                    else
+                                    {
+                                        element.removeAttribute('checked');
+                                    }
+                                }
                                 break;
                                 
                             case 'select-one':
@@ -2351,12 +2424,26 @@ ED.Drawing.prototype.updateBindings = function(_doodle)
           	var element = document.getElementById(doodle.bindingArray[parameter]['id']);
           	var attribute = doodle.bindingArray[parameter]['attribute'];
             var value = doodle.getParameter(parameter);
-          	
+    
             // Modify value of element according to type
             switch (element.type)
             {
                 case 'checkbox':
-                    element.value = (value == "true")?1:0;
+                    if (attribute)
+                    {
+                        ED.errorHandler('ED.Drawing', 'updateBindings', 'Binding to a checkbox with a non-standard attribute not yet supported');
+                    }
+                    else
+                    {
+                        if (value == "true")
+                        {
+                            element.setAttribute('checked', 'checked');
+                        }
+                        else
+                        {
+                            element.removeAttribute('checked');
+                        }
+                    }
                     break;
                     
                 case 'select-one':
@@ -2392,7 +2479,8 @@ ED.Drawing.prototype.updateBindings = function(_doodle)
     }
     else
     {
-        ED.errorHandler('ED.Drawing', 'updateBindings', 'Attempt to update bindings on null doodle');
+        // Since moving updateBindings method, this is no longer an error
+        //ED.errorHandler('ED.Drawing', 'updateBindings', 'Attempt to update bindings on null doodle');
     }
 }
 
@@ -3821,6 +3909,9 @@ ED.Doodle.prototype.updateDependentParameters = function(_parameter)
     {
         this.setSimpleParameter(parameter, valueArray[parameter]);
     }
+    
+    // Update bindings
+    this.drawing.updateBindings();
 }
 
 /**
@@ -4057,7 +4148,6 @@ ED.Doodle.prototype.setSimpleParameter = function(_parameter, _value)
 ED.Doodle.prototype.setParameterFromString = function(_parameter, _value)
 {
     // Check type of passed value variable
-	debugger;
     var type = typeof(_value);
     if (type != 'string')
     {
@@ -4324,10 +4414,17 @@ ED.Doodle.prototype.addBinding = function(_parameter, _fieldParameters)
             switch (element.type)
             {
                 case 'checkbox':
-                    this.setParameterFromString(_parameter, element.checked.toString());
-                    element.addEventListener('change', listener = function (event) {
-                                             drawing.eventHandler('onchange', id, className, this.id, this.checked.toString());
-                                             },false);
+                    if (attribute)
+                    {
+                        ED.errorHandler('ED.Doodle', 'addBinding', 'Binding to a checkbox with a non-standard attribute not yet supported');
+                    }
+                    else
+                    {
+                        this.setParameterFromString(_parameter, element.checked.toString());
+                        element.addEventListener('change', listener = function (event) {
+                                                 drawing.eventHandler('onchange', id, className, this.id, this.checked.toString());
+                                                 },false);
+                    }
                     break;
                     
                 case 'select-one':

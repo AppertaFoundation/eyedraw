@@ -50,8 +50,8 @@ ED.PostPole = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _s
 	// Set classname
 	this.className = "PostPole";
     
-    // Derived parameters
-    this.cdRatio;
+    // Derived parameters (NB must set a value here to define parameter as a property of the object, even though value set later)
+    this.cdRatio = '0';
     
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
