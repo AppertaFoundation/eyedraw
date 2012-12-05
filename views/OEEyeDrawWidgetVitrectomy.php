@@ -23,6 +23,9 @@
 				<img src="<?php echo $imgPath?>unlock.gif" />
 			</button>
 		</div>
+		<?php 
+		foreach ($doodleToolBarArray as $row => $rowItems) {
+    	?>
 		<div class="ed_toolbar">
 			<?php foreach ($doodleToolBarArray as $i => $item) {?>
 				<?php if ($i>0 && $i%5 == 0) {?>
@@ -34,5 +37,6 @@
 				</button>
 			<?php }?>
 		</div>
+		<?php } ?>
 	</div>
 <?php }?>
