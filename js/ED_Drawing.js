@@ -1060,8 +1060,8 @@ ED.Drawing.prototype.mousemove = function(_point)
                             doodle.setSimpleParameter('scaleY', newScaleY * signY);
                             
                             // Update dependencies
-                            this.updateDependentParameters('scaleX');
-                            this.updateDependentParameters('scaleY');
+                            doodle.updateDependentParameters('scaleX');
+                            doodle.updateDependentParameters('scaleY');
 						}
 						else
 						{
@@ -4113,7 +4113,7 @@ ED.Doodle.prototype.setParameterWithAnimation = function(_parameter, _value)
     // Otherwise just set it directly
     else
     {
-        this.setParameterFromString(_parameter, _value);
+        this.setParameterFromString(_parameter, _value.toString());
     }
 }
 
