@@ -4221,7 +4221,17 @@ ED.Doodle.prototype.setOriginWithDisplacements = function(_first, _next)
     this.originX = this.drawing.eye == ED.eye.Right?-_first:_first;
     this.originY = -_first;
 
-    var doodle = this.drawing.lastDoodleOfClass(this.className);
+    // Get last doodle to be added
+    if (this.addAtBack)
+    {
+    	var doodle = this.drawing.firstDoodleOfClass(this.className);
+    }
+    else
+    {
+    	var doodle = this.drawing.lastDoodleOfClass(this.className);
+    }
+    
+    // If there is one, make position relative to it
     if (doodle)
     {
         var newOriginX = doodle.originX - _next;
@@ -4243,7 +4253,17 @@ ED.Doodle.prototype.setRotationWithDisplacements = function(_first, _next)
     var direction = this.drawing.eye == ED.eye.Right?-1:1;
     var newRotation;
     
-    var doodle = this.drawing.lastDoodleOfClass(this.className);
+    // Get last doodle to be added
+    if (this.addAtBack)
+    {
+    	var doodle = this.drawing.firstDoodleOfClass(this.className);
+    }
+    else
+    {
+    	var doodle = this.drawing.lastDoodleOfClass(this.className);
+    }
+    
+    // If there is one, make rotation relative to it
     if (doodle)
     {
         newRotation = ((doodle.rotation * 180/Math.PI + direction * _next + 360) % 360) * Math.PI/180;
@@ -4601,6 +4621,85 @@ ED.Doodle.prototype.degreesExtent = function()
 }
 
 /**
+ * Returns the location relative to the disc
+ *
+ * @returns {String} Text description of location
+ */
+ED.Doodle.prototype.locationRelativeToDisc = function()
+{
+    var locationString = "";
+    
+    // Right eye
+    if (this.drawing.eye == ED.eye.Right)
+    {
+        if (this.originX > 180 && this.originX < 420 && this.originY > -120 && this.originY < 120)
+        {
+            locationString = "at the disc";
+        }
+        else
+        {
+            locationString += this.originY <= 0?"supero":"infero";
+            locationString += this.originX <= 300?"temporally":"nasally";
+        }
+    }
+    // Left eye
+    else
+    {
+        if (this.originX < -180 && this.originX > -420 && this.originY > -120 && this.originY < 120)
+        {
+            locationString = "at the disc";
+        }
+        else
+        {
+            locationString += this.originY <= 0?"supero":"infero";
+            locationString += this.originX >= -300?"temporally":"nasally";
+        }
+    }
+    
+    return locationString;
+}
+
+/**
+ * Returns the location relative to the fovea
+ *
+ * @returns {String} Text description of location
+ */
+ED.Doodle.prototype.locationRelativeToFovea = function()
+{
+    var locationString = "";
+    
+    // Right eye
+    if (this.drawing.eye == ED.eye.Right)
+    {
+    	if (this.originX > -10 && this.originX < 10 && this.originY > -10 && this.originY < 10)
+        {
+            locationString = "at the fovea";
+        }
+        else
+        {
+			locationString += this.originY <= 0?"supero":"infero";
+			locationString += this.originX <= 0?"temporal":"nasal";
+			locationString += " to the fovea";
+		}
+    }
+    // Left eye
+    else
+    {
+    	if (this.originX > -10 && this.originX < 10 && this.originY > -10 && this.originY < 10)
+        {
+            locationString = "at the fovea";
+        }
+        else
+        {
+			locationString += this.originY <= 0?"supero":"infero";
+			locationString += this.originX >= 0?"temporally":"nasally";
+			locationString += " to the fovea";
+		}
+    }
+    return locationString;
+}
+
+/**
  * Adds a new squiggle to the doodle's squiggle array
  */
 ED.Doodle.prototype.addSquiggle = function()
@@ -4868,6 +4967,18 @@ ED.Doodle.prototype.drawLine = function(_ctx, _x1, _y1, _x2, _y2, _w, _colour)
 ED.Doodle.prototype.drawLaserSpot = function(_ctx, _x, _y)
 {
     this.drawCircle(_ctx, _x, _y, 15, "Yellow", 10, "rgba(255, 128, 0, 1)");
+}
+
+/**
+ * Returns the x coordinate of a point given its y and the radius
+ *
+ * @param {Float} _r Radius to point
+ * @param {Float} _y y coordinate of point
+ * @returns {Float} x coordinate of point
+ */
+ED.Doodle.prototype.xForY = function(_r, _y)
+{
+	return Math.sqrt(_r * _r - _y * _y);
 }
 
 /**
