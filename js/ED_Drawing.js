@@ -2896,8 +2896,6 @@ ED.Doodle.prototype.setParameterWithAnimation = function(_parameter, _value)
     {
         this.setParameter(_parameter, _value);
     }
-
-		if (typeof(this.drawing.saveToInputElement) != 'undefined') this.drawing.saveToInputElement();
 }
 
 /**
