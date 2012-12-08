@@ -213,6 +213,7 @@ ED.randomArray = [0.6570,0.2886,0.7388,0.1621,0.9896,0.0434,0.1695,0.9099,0.1948
  * @property {Int} scrollValue Current value of scrollFactor
  * @property {Int} lastDoodleId id of last doodle to be added
  * @property {Bool} isActive Flag indicating that the mouse is interacting with the drawing
+ * @property {Bool} isNew Flag indicating that the drawing is new (false after doodles loaded from an input string)
  * @param {Canvas} _canvas Canvas element 
  * @param {Eye} _eye Right or left eye
  * @param {String} _IDSuffix String suffix to identify HTML elements related to this drawing
@@ -265,6 +266,7 @@ ED.Drawing = function(_canvas, _eye, _IDSuffix, _isEditable, _options)
     this.scrollValue = 0;
     this.lastDoodleId = 0;
     this.isActive = false;
+    this.isNew = true;
     
     // Associative array of bound element no doodle values (ie value associated with deleted doodle)
     this.boundElementDeleteValueArray = new Array();
@@ -587,6 +589,9 @@ ED.Drawing.prototype.loadDoodles = function(_id)
     {
         var doodleSet = window.JSON.parse(sourceElement.value);
         this.load(doodleSet);
+        
+        // Set isNew flag
+        this.isNew = false;
         
         // Notify
         this.notify("doodlesLoaded");
@@ -1256,15 +1261,13 @@ ED.Drawing.prototype.mouseup = function(_point)
             this.selectedDoodle.completeSquiggle();
             this.drawAllDoodles();
 		}
-	}
-    
-	// Cycle through doodles from front to back doing hit test  ***TODO*** ask Mark what this code is for
-	for (var i = this.doodleArray.length - 1; i > -1; i--)
-	{
-		if (this.doodleArray[i].className == 'Surgeon') {
-			this.doodleArray[i].isSelected = false;
-			this.doodleArray[i].drawing.repaint();
-		}
+        
+        // Remove selection from some doodles
+        if (!this.selectedDoodle.willStaySelected)
+        {
+            this.selectedDoodle.isSelected = false;
+            this.selectedDoodle = null;
+        }
 	}
     
     // Redraw to get rid of select rectangle
@@ -1688,7 +1691,7 @@ ED.Drawing.prototype.deleteDoodle = function(_doodle)
 {
     // Class name and flag for successful deletion
     var deletedClassName = false;
-    
+
     var errorMessage = 'Attempt to delete a doodle that does not exist';
     
     // Check that doodle will delete
@@ -1708,7 +1711,7 @@ ED.Drawing.prototype.deleteDoodle = function(_doodle)
                     {
                         this.selectedDoodle = null;
                     }
-                    
+
                     // Remove bindings and reset values of bound elements
                     for (var parameter in _doodle.bindingArray)
                     {
@@ -1745,11 +1748,11 @@ ED.Drawing.prototype.deleteDoodle = function(_doodle)
                                 case 'select-one':
                                     if (attribute)
                                     {
-                                        for (var i = 0; i < element.length; i++)
+                                        for (var j = 0; j < element.length; j++)
                                         {
-                                            if (element.options[i].getAttribute(attribute) == value)
+                                            if (element.options[j].getAttribute(attribute) == value)
                                             {
-                                                element.value = element.options[i].value;
+                                                element.value = element.options[j].value;
                                                 break;
                                             }
                                         }
@@ -2069,7 +2072,7 @@ ED.Drawing.prototype.addDoodle = function(_className, _parameterDefaults, _param
         
         // Add to array
         this.doodleArray[this.doodleArray.length] = newDoodle;
-        
+
         // Pre-existing binding
         if (!doodleExists)
         {
@@ -2134,7 +2137,8 @@ ED.Drawing.prototype.addDoodle = function(_className, _parameterDefaults, _param
                 // If new value is valid, set it, otherwise use default value of doodle
                 if (validityArray.valid)
                 {
-                    newDoodle.setSimpleParameter(parameter, validityArray.value);
+                    newDoodle.setParameterFromString(parameter, validityArray.value);
+                    //newDoodle.setSimpleParameter(parameter, validityArray.value);
                     newDoodle.updateDependentParameters(parameter);
                     //newDoodle.setParameterWithAnimation(parameter, validityArray.value);
                 }
@@ -2148,7 +2152,8 @@ ED.Drawing.prototype.addDoodle = function(_className, _parameterDefaults, _param
                 newDoodle.addBinding(parameter, this.bindingArray[_className][parameter]);
 
                 // Trigger binding by setting parameter
-                newDoodle.setSimpleParameter(parameter, value);
+                //newDoodle.setSimpleParameter(parameter, value);
+                newDoodle.setParameterFromString(parameter, validityArray.value);
                 newDoodle.updateDependentParameters(parameter);
                 this.updateBindings(newDoodle);
             }
@@ -2209,7 +2214,7 @@ ED.Drawing.prototype.addBindings = function(_bindingArray)
         var doodle = this.firstDoodleOfClass(className);
 
         // Iterate through bindings for this className
-        for (parameter in _bindingArray[className])
+        for (var parameter in _bindingArray[className])
         {
             // Get reference to element
             var elementId = _bindingArray[className][parameter]['id'];
@@ -2244,7 +2249,7 @@ ED.Drawing.prototype.addBindings = function(_bindingArray)
             }
             else
             {
-                ED.errorHandler('ED.Drawing', 'addBinding', 'Attempt to add binding for an element that does not exist for parameter: ' + parameter);
+                ED.errorHandler('ED.Drawing', 'addBindings', 'Attempt to add binding for an element that does not exist for parameter: ' + parameter);
             }
         }
     }
@@ -3331,6 +3336,7 @@ ED.Report.prototype.isMacOff = function()
  * @property {Bool} isLocked True if doodle is locked (temporarily unselectable) 
  * @property {Bool} isSelectable True if doodle is non-selectable
  * @property {Bool} isShowHighlight True if doodle shows a highlight when selected
+ * @property {Bool} willStaySelected True if selection persists on mouseup
  * @property {Bool} isDeletable True if doodle can be deleted
  * @property {Bool} isSaveable Flag indicating whether doodle will be included in saved JSON string
  * @property {Bool} isOrientated True if doodle should always point to the centre (default = false)
@@ -3400,6 +3406,7 @@ ED.Doodle = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _sca
         this.isLocked = false;
 		this.isSelectable = true;
         this.isShowHighlight = true;
+        this.willStaySelected = true;
 		this.isDeletable = true;
         this.isSaveable = true;
 		this.isOrientated = false;
@@ -3433,7 +3440,7 @@ ED.Doodle = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _sca
             scaleX:{kind:'simple', type:'float', range:new ED.Range(+0.5,+4.0), precision:6, delta:0.1},
             scaleY:{kind:'simple', type:'float', range:new ED.Range(+0.5,+4.0), precision:6, delta:0.1},
             arc:{kind:'simple', type:'float', range:new ED.Range(Math.PI/12, Math.PI * 2), precision:6, delta:0.1},
-            rotation:{kind:'simple', type:'float', range:new ED.Range(0, 2 * Math.PI), precision:6, delta:0.1},
+            rotation:{kind:'simple', type:'float', range:new ED.Range(0, 2 * Math.PI), precision:6, delta:0.2},
         };
 
         // Grid properties
@@ -3461,6 +3468,7 @@ ED.Doodle = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _sca
         
         // Bindings to HTML element values. Associative array with parameter name as key
         this.bindingArray = new Array();
+        this.drawing.listenerArray[this.id] = new Array();
         
 		// Array of 5 handles
 		this.handleArray = new Array();
@@ -4075,7 +4083,15 @@ ED.Doodle.prototype.setParameterWithAnimation = function(_parameter, _value)
                 // This formula works out correct distance and direction on a radians 'clock face' (ie the shortest way round)
                 var sign = ((Math.PI - Math.abs(distance)) * distance) < 0?-1:1;
                 distance = distance * sign;
+                
+                // Make distance positive
                 if (distance < 0) distance += 2 * Math.PI;
+                
+                // Test for roughly half way
+                if (distance > 3.141)
+                {
+                    if (this.rotation < Math.PI) sign = -sign;
+                }
             }
             else
             {
@@ -4486,9 +4502,7 @@ ED.Doodle.prototype.addBinding = function(_parameter, _fieldParameters)
             }
             
             // Add listener to array
-            var array = new Array();
-            array[_parameter] = listener;
-            this.drawing.listenerArray[this.id] = array;
+            this.drawing.listenerArray[this.id][_parameter] = listener;
         }
         else
         {
@@ -4510,7 +4524,7 @@ ED.Doodle.prototype.removeBinding = function(_parameter)
 {
     // Get id of corresponding element
     var elementId;
-    for (parameter in this.bindingArray)
+    for (var parameter in this.bindingArray)
     {
         if (parameter == _parameter)
         {
@@ -4523,10 +4537,10 @@ ED.Doodle.prototype.removeBinding = function(_parameter)
     
     // Remove event listener
     var element = document.getElementById(elementId);
-    element.removeEventListener('change', this.drawing.listenerArray[this.id][parameter], false);
+    element.removeEventListener('change', this.drawing.listenerArray[this.id][_parameter], false);
     
     // Remove entry in listener array
-    delete this.drawing.listenerArray[this.id];
+    delete this.drawing.listenerArray[this.id][_parameter];
 }
 
 /**

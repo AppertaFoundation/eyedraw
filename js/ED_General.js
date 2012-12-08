@@ -51,7 +51,7 @@ ED.Surgeon = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _sc
 	this.className = "Surgeon";
     
     // Derived parameters (NB must set a value here to define parameter as a property of the object, even though value set later)
-    this.surgeonPosition;
+    this.surgeonPosition = 'Temporal';
     
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
@@ -65,14 +65,6 @@ ED.Surgeon.prototype.constructor = ED.Surgeon;
 ED.Surgeon.superclass = ED.Doodle.prototype;
 
 /**
- * Sets handle attributes
- */
-ED.Surgeon.prototype.setHandles = function()
-{
-	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
-}
-
-/**
  * Sets default dragging attributes
  */
 ED.Surgeon.prototype.setPropertyDefaults = function()
@@ -80,6 +72,9 @@ ED.Surgeon.prototype.setPropertyDefaults = function()
 	this.isScaleable = false;
 	this.isMoveable = false;
     this.snapToAngles = true;
+    this.willStaySelected = false;
+    this.isUnique = true;
+    this.isDeletable = true;
 
     // Update component of validation array for simple parameters
     this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
@@ -268,14 +263,99 @@ ED.Surgeon.prototype.draw = function(_point)
         ctx.fill();
         ctx.stroke();
 	}
+    
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ *  OperatingTable
+ *
+ * @class  OperatingTable
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Int} _originX
+ * @param {Int} _originY
+ * @param {Float} _radius
+ * @param {Int} _apexX
+ * @param {Int} _apexY
+ * @param {Float} _scaleX
+ * @param {Float} _scaleY
+ * @param {Float} _arc
+ * @param {Float} _rotation
+ * @param {Int} _order
+ */
+ED.OperatingTable = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+{
+	// Set classname
+	this.className = "OperatingTable";
+
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.OperatingTable.prototype = new ED.Doodle;
+ED.OperatingTable.prototype.constructor = ED.OperatingTable;
+ED.OperatingTable.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets default properties
+ */
+ED.OperatingTable.prototype.setPropertyDefaults = function()
+{
+	this.isSelectable = false;
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.OperatingTable.prototype.draw = function(_point)
+{
+	// Get context
+	var ctx = this.drawing.context;
 	
-	// Coordinates of handles (in canvas plane)
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
+	// Call draw method in superclass
+	ED.OperatingTable.superclass.draw.call(this, _point);
 	
+	// Boundary path
+	ctx.beginPath();
+    
+	// Head
+	ctx.arc(0,-0,60,0,Math.PI*2,true);
+    
+    // Set Attributes
+    ctx.lineWidth = 30;
+    ctx.strokeStyle = "rgba(120,120,120,1)";
+    ctx.fillStyle = "rgba(220,220,220,1)";
+	
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+	
+	// Non boundary paths here
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
+	{
+        ctx.beginPath();
+        
+        // Bed
+        ctx.rect(-100, 20, 200, 400);
+        
+        // Set Attributes
+        ctx.lineWidth = 8;
+        ctx.strokeStyle = "rgba(120,120,120,1)";
+        ctx.fillStyle = "rgba(220,220,220,1)";
+        
+        ctx.fill();
+        ctx.stroke();
+	}
+    
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
     
 	// Return value indicating successful hittest
 	return this.isClicked;
 }
-

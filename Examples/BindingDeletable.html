@@ -43,8 +43,9 @@
                         // Ready notification
                         case 'ready':
                             _drawing.addDoodle('AntSeg');
-                            _drawing.addBindings({CorticalCataract:{grade:'gradeSelect'}});
-                            _drawing.addDeleteValues({gradeSelect:'None'});
+                        //_drawing.addDoodle('PhakoIncision');
+                        _drawing.addBindings({CorticalCataract:{grade:{id:'gradeSelect'}}});
+                        _drawing.addDeleteValues({gradeSelect:'None'});
                             break;
                     }
                 }

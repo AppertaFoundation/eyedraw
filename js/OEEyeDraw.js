@@ -56,6 +56,7 @@ function eyeDrawInit(_properties)
     // Create a controller object for this drawing
     var controller = new eyeDrawController(window[_properties.drawingName]);
     
+    // Array of additional controllers
     var listenerList = new Array();
     for (var i = 0; i < _properties.listenerArray.length; i++) {
     	listenerList[i] = new _properties.listenerArray[i](window[_properties.drawingName]);
@@ -84,7 +85,6 @@ function eyeDrawInit(_properties)
             {
                 // Drawing object ready
                 case 'ready':
-                    
                     // If input exists and contains data, load it into the drawing
                     if (input != null && input.value.length > 0)
                     {
@@ -94,7 +94,7 @@ function eyeDrawInit(_properties)
                         // Refresh drawing
                         this.drawing.repaint();
                     }
-                    // Otherwise run commands in onLoadedCommand array
+                    // Otherwise run commands in onReadyCommand array
                     else
                     {
                         for ( var i = 0; i < _properties.onReadyCommandArray.length; i++)
@@ -132,7 +132,6 @@ function eyeDrawInit(_properties)
                     {
                         canvas.focus();
                     }
-                    
                     break;
 
                 case 'doodlesLoaded':
@@ -182,7 +181,6 @@ function eyeDrawInit(_properties)
                     break;
                     
                 case 'parameterChanged':
-                    
                     // Get master doodle
                     var masterDoodle = _messageArray['object'].doodle;
 
@@ -191,7 +189,7 @@ function eyeDrawInit(_properties)
                     {
                         // Get reference to slave drawing
                         var slaveDrawing = window['ed_drawing_edit_' + idSuffix];
-                        
+
                         // Iterate through each specified className
                         for (var className in _properties.syncArray[idSuffix])
                         {
@@ -238,6 +236,7 @@ function eyeDrawInit(_properties)
                         // Refresh slave drawing
                         slaveDrawing.repaint();
                     }
+                    
                     // Save drawing to hidden input
                     if (input != null && input.value.length > 0)
                     {
@@ -248,15 +247,3 @@ function eyeDrawInit(_properties)
         }
     }
 }
-
-
-/*
- * Stops syncing for passed doodle
- * ***TODO*** Need to take this out of widget and put in app code somewhere
- */
-function stopSync(_doodle)
-{
-    _doodle.willSync = false;
-}
-
-
