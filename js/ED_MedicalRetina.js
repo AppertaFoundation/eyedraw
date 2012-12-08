@@ -329,13 +329,13 @@ ED.Microaneurysm.prototype.draw = function(_point)
 }
 
 /**
- * Returns a string containing a text description of the doodle
+ * Returns a String which, if not empty, determines the root descriptions of multiple instances of the doodle
  *
- * @returns {String} Description of doodle
+ * @returns {String} Group description
  */
-ED.Microaneurysm.prototype.description = function()
+ED.Microaneurysm.prototype.groupDescription = function()
 {
-	return "";
+	return "Microaneurysms";
 }
 
 /**
@@ -415,13 +415,13 @@ ED.HardExudate.prototype.draw = function(_point)
 }
 
 /**
- * Returns a string containing a text description of the doodle
+ * Returns a String which, if not empty, determines the root descriptions of multiple instances of the doodle
  *
- * @returns {String} Description of doodle
+ * @returns {String} Group description
  */
-ED.HardExudate.prototype.description = function()
+ED.HardExudate.prototype.groupDescription = function()
 {
-	return "";
+	return "Hard exudates";
 }
 
 /**
@@ -547,13 +547,13 @@ ED.CottonWoolSpot.prototype.draw = function(_point)
 }
 
 /**
- * Returns a string containing a text description of the doodle
+ * Returns a String which, if not empty, determines the root descriptions of multiple instances of the doodle
  *
- * @returns {String} Description of doodle
+ * @returns {String} Group description
  */
-ED.CottonWoolSpot.prototype.description = function()
+ED.CottonWoolSpot.prototype.groupDescription = function()
 {
-    return "Cotton wool spot";
+    return "Cotton wool spots";
 }
 
 /**
@@ -675,13 +675,13 @@ ED.PreRetinalHaemorrhage.prototype.draw = function(_point)
 }
 
 /**
- * Returns a string containing a text description of the doodle
+ * Returns a String which, if not empty, determines the root descriptions of multiple instances of the doodle
  *
- * @returns {String} Description of doodle
+ * @returns {String} Group description
  */
-ED.PreRetinalHaemorrhage.prototype.description = function()
+ED.PreRetinalHaemorrhage.prototype.groupDescription = function()
 {
-    return "Pre-retinal haemorrage";
+    return "Pre-retinal haemorrages";
 }
 
 /**
@@ -899,13 +899,13 @@ ED.BlotHaemorrhage.prototype.draw = function(_point)
 }
 
 /**
- * Returns a string containing a text description of the doodle
+ * Returns a String which, if not empty, determines the root descriptions of multiple instances of the doodle
  *
- * @returns {String} Description of doodle
+ * @returns {String} Group description
  */
-ED.BlotHaemorrhage.prototype.description = function()
+ED.BlotHaemorrhage.prototype.groupDescription = function()
 {
-    return "";
+    return "Blot haemorrhages";
 }
 
 /**
@@ -1649,6 +1649,16 @@ ED.LaserSpot.prototype.draw = function(_point)
 }
 
 /**
+ * Returns a String which, if not empty, determines the root descriptions of multiple instances of the doodle
+ *
+ * @returns {String} Group description
+ */
+ED.LaserSpot.prototype.groupDescription = function()
+{
+    return "laser spots";
+}
+
+/**
  * PRP (Poterior pole)
  *
  * @class PRPPostPole
@@ -2070,6 +2080,16 @@ ED.FocalLaser.prototype.draw = function(_point)
 	
 	// Return value indicating successful hittest
 	return this.isClicked;
+}
+
+/**
+ * Returns a String which, if not empty, determines the root descriptions of multiple instances of the doodle
+ *
+ * @returns {String} Group description
+ */
+ED.FocalLaser.prototype.groupDescription = function()
+{
+    return "laser spots";
 }
 
 /**

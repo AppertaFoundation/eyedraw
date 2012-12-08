@@ -4472,7 +4472,7 @@ ED.Doodle.prototype.addBinding = function(_parameter, _fieldParameters)
                     {
                         this.setParameterFromString(_parameter, element.getAttribute(attribute));
                         element.addEventListener('change', listener = function (event) {
-                                                 drawing.eventHandler('onchange', id, className, this.id, this.getAttribute(_lkup));
+                                                 drawing.eventHandler('onchange', id, className, this.id, this.getAttribute(attribute));
                                                  },false);
                     }
                     else
@@ -4492,7 +4492,7 @@ ED.Doodle.prototype.addBinding = function(_parameter, _fieldParameters)
         }
         else
         {
-            ED.errorHandler('ED.Doodle', 'addBinding', 'Failed to add binding. DOM has no element with id: ' + _id);
+            ED.errorHandler('ED.Doodle', 'addBinding', 'Failed to add binding. DOM has no element with id: ' + elementId);
         }
     }
     else
