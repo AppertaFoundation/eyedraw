@@ -2889,15 +2889,14 @@ ED.Doodle.prototype.setParameterWithAnimation = function(_parameter, _value)
         if (frames > 0)
         {
             this.increment(_parameter, _value, delta, frames, frameRate);
-        }
+				}
     }
     // Otherwise just set it in the normal way
     else
     {
         this.setParameter(_parameter, _value);
+				if (typeof(this.drawing.saveToInputElement) != 'undefined') this.drawing.saveToInputElement();
     }
-
-		if (typeof(this.drawing.saveToInputElement) != 'undefined') this.drawing.saveToInputElement();
 }
 
 /**
@@ -2936,6 +2935,8 @@ ED.Doodle.prototype.increment = function(_parameter, _value, _delta, _frames, _f
         
         // Stop timer
         clearTimeout(this.animationTimer);
+
+				if (typeof(this.drawing.saveToInputElement) != 'undefined') this.drawing.saveToInputElement();
     }
     else
     {
