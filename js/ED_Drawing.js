@@ -1185,6 +1185,9 @@ ED.Drawing.prototype.mousemove = function(_point)
                     // Set new position for handle
                     doodle.squiggleArray[0].pointsArray[index].x = newPosition.x;
                     doodle.squiggleArray[0].pointsArray[index].y = newPosition.y;
+                    
+                    // Update dependencies (NB handles is not stricly a parameter, but this will call the appropriate doodle methods)
+                    doodle.updateDependentParameters('handles');
 					break;
                     
                 case ED.Mode.Draw:
@@ -2235,6 +2238,7 @@ ED.Drawing.prototype.addBindings = function(_bindingArray)
                                 if (!drawing.hasDoodleOfClass(classNm))
                                 {
                                     drawing.addDoodle(classNm);
+                                    drawing.deselectDoodles();
                                 }
                             }
                         }
@@ -3919,7 +3923,7 @@ ED.Doodle.prototype.updateDependentParameters = function(_parameter)
     }
     
     // Update bindings
-    this.drawing.updateBindings();
+    this.drawing.updateBindings(this);
 }
 
 /**
@@ -5333,6 +5337,22 @@ ED.Point.prototype.clockwiseAngleTo = function(_point)
 	{
 		return angle;
 	}
+}
+
+/**
+ * Clock hour of point on clock face centred on origin
+ *
+ * @returns {Int} The clock hour
+ */
+ED.Point.prototype.clockHour = function(_point)
+{
+    var twelvePoint = new ED.Point(0,-100);
+    var clockHour = ((twelvePoint.clockwiseAngleTo(this) * 6/Math.PI) + 12) % 12;
+
+    clockHour = clockHour.toFixed(0);
+    if (clockHour == 0) clockHour = 12;
+    
+    return clockHour;
 }
 
 /**

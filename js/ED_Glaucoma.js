@@ -1498,12 +1498,13 @@ ED.OpticDisc = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _
     
     // Derived parameters (NB must set a value here to define parameter as a property of the object, even though value set later)
     this.mode = "Expert";
+    this.cdRatio = '0';
     
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
     
     // Set visibility of handles
-    this.setHandleProperties();
+    //this.setHandleProperties();
 }
 
 /**
@@ -1540,11 +1541,12 @@ ED.OpticDisc.prototype.setPropertyDefaults = function()
     
     // Update component of validation array for simple parameters
     this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
-    this.parameterValidationArray['apexY']['range'].setMinAndMax(-290, -20);
+    this.parameterValidationArray['apexY']['range'].setMinAndMax(-320, -20);
     this.parameterValidationArray['radius']['range'].setMinAndMax(50, 290);
     
     // Add complete validation arrays for derived parameters
     this.parameterValidationArray['mode'] = {kind:'derived', type:'string', list:['Basic', 'Expert'], animate:false};
+    this.parameterValidationArray['cdRatio'] = {kind:'derived', type:'string', list:['0.1','0.2','0.3','0.4','0.5','0.6','0.7','0.8','0.9','1.0','No view'], animate:true};
     
     // Create ranges to constrain handles
     this.handleVectorRangeArray = new Array();
@@ -1568,6 +1570,7 @@ ED.OpticDisc.prototype.setParameterDefaults = function()
 {
     this.apexY = -150;
     this.setParameterFromString('mode', 'Basic');
+    this.setParameterFromString('cdRatio', '0.5');
 
     // Create a squiggle to store the handles points
     var squiggle = new ED.Squiggle(this, new ED.Colour(100, 100, 100, 1), 4, true);
@@ -1600,6 +1603,68 @@ ED.OpticDisc.prototype.dependentParameterValues = function(_parameter, _value)
     {
         case 'mode':
             this.setHandleProperties();
+            if (this.apexY < -300)
+            {
+                returnArray['cdRatio'] = "No view";
+            }
+            else
+            {
+                returnArray['cdRatio'] = (-this.apexY/300).toFixed(1);
+            }
+            break;
+            
+        case 'apexY':
+            if (_value < -300)
+            {
+                returnArray['cdRatio'] = "No view";
+            }
+            else
+            {
+                returnArray['cdRatio'] = (-_value/300).toFixed(1);
+            }
+            break;
+            
+        case 'cdRatio':
+            if (_value != "No view")
+            {
+                var newValue = parseFloat(_value) * 300;
+                returnArray['apexY'] = -newValue;
+                
+                // Alter position of top and bottom points accordingly, then average the others
+                if (this.mode == "Expert")
+                {
+                    var ti = 0;
+                    var bi = this.numberOfHandles/2;
+                    var meanOldValue = (this.squiggleArray[0].pointsArray[ti].length() + this.squiggleArray[0].pointsArray[bi].length())/2;
+                    this.squiggleArray[0].pointsArray[ti].setWithPolars(newValue, this.squiggleArray[0].pointsArray[ti].direction());
+                    this.squiggleArray[0].pointsArray[bi].setWithPolars(newValue, this.squiggleArray[0].pointsArray[bi].direction());
+                    
+                    // Adjust others proportionately
+                    for (var i = 0; i < this.numberOfHandles; i++)
+                    {
+                        if (i != ti && i != bi)
+                        {
+                            var newLength = this.squiggleArray[0].pointsArray[i].length() * newValue/meanOldValue;
+                            newLength = newLength>300?300:newLength;
+                            this.squiggleArray[0].pointsArray[i].setWithPolars(newLength, this.squiggleArray[0].pointsArray[i].direction());
+                        }
+                    }
+                }
+            }
+            else
+            {
+                returnArray['apexY'] = -320;
+            }
+            break;
+            
+        case 'handles':
+            // Sum distances of (vertical) control points from centre
+            var sum = 0;
+            sum += this.squiggleArray[0].pointsArray[0].length();
+            sum += this.squiggleArray[0].pointsArray[this.numberOfHandles/2].length();
+            returnArray['apexY'] = -Math.round(sum/2);
+            var ratio = Math.round(10 * sum/(300 * 2))/10;
+            returnArray['cdRatio'] = ratio.toFixed(1);
             break;
     }
     
@@ -1784,6 +1849,17 @@ ED.OpticDisc.prototype.draw = function(_point)
         
         // Draw line
         ctx.stroke();
+        
+        // Obscure whole disc if no view
+        if (this.cdRatio == "No view")
+        {
+            // disk to obscure disc
+            ctx.beginPath();
+            ctx.arc(0, 0, 400, 0, 2 * Math.PI, true);
+            ctx.closePath();
+            ctx.fillStyle = "gray";
+            ctx.fill();
+        }
     }
     
 	// Coordinates of expert handles (in canvas plane)
@@ -1812,28 +1888,96 @@ ED.OpticDisc.prototype.draw = function(_point)
  */
 ED.OpticDisc.prototype.description = function()
 {
-	returnString = "Cup/disc ratio: ";
+    var returnString = "";
     
-    var ratio = 0;
-    
-    if (this.mode == "Basic")
-    {
-        ratio = Math.round(10 * -this.apexY/300)/10;
-    }
-    else
-    {
-        // Sum distances of control points from centre
-        var sum = 0;
+    // Only report when in expert mode 
+    if (this.mode == "Expert")
+    {        
+        // Get mean
+        var mean = this.getMeanRadius();
+        
+        // Look for notches by detecting outliers
+        var notchArray = new Array();
+        var inNotch = false;
+        var notch;
+        
+        // Find a non-notch point to start with
+        var s = 0;
         for (var i = 0; i < this.numberOfHandles; i++)
         {
-            sum += this.squiggleArray[0].pointsArray[i].length();
+            if (this.squiggleArray[0].pointsArray[i].length() < mean * 1.1)
+            {
+                s = i;
+                break;
+            }
         }
+        
+        // Iterate through points starting at a non-notch point
+        for (var i = 0; i < this.numberOfHandles; i++)
+        {
+            var j = (i + s)%this.numberOfHandles;
 
-        ratio = Math.round(10 * sum/(300 * this.numberOfHandles))/10;
+            if (this.squiggleArray[0].pointsArray[j].length() > mean * 1.1)
+            {
+                if (!inNotch)
+                {
+                    notch = new Object();
+                    notch.startHour = this.squiggleArray[0].pointsArray[j].clockHour();
+                    notch.endHour = this.squiggleArray[0].pointsArray[j].clockHour();
+                    inNotch = true;
+                }
+                else
+                {
+                    notch.endHour = this.squiggleArray[0].pointsArray[j].clockHour();
+                }
+            }
+            else
+            {
+                if (inNotch)
+                {
+                    notchArray.push(notch);
+                    inNotch = false;
+                }
+            }
+            
+            // Deal with boundary condition
+            if (i == this.numberOfHandles -1)
+            {
+                if (inNotch)
+                {
+                    notch.endHour = this.squiggleArray[0].pointsArray[j].clockHour();
+                    notchArray.push(notch);
+                    inNotch = false;
+                }
+            }
+        }
+        
+        // Turn into a sensible report
+        if (notchArray.length > 0)
+        {
+            var many = (notchArray.length > 1);
+            
+            returnString = many?"Notches":"Notch";
+
+            for (var i = 0; i < notchArray.length; i++)
+            {
+                if (notchArray[i].startHour == notchArray[i].endHour)
+                {
+                    returnString += " at " + notchArray[i].startHour;
+                }
+                else
+                {
+                    returnString += " from " + notchArray[i].startHour + " to " + notchArray[i].endHour + " o'clock";
+                }
+                
+                if (many && i != notchArray.length - 1)
+                {
+                    returnString += ", and";
+                }
+            }
+        }
     }
-    
-    returnString += ratio.toString();
-	
+
 	return returnString;
 }
 
@@ -1850,17 +1994,111 @@ ED.OpticDisc.prototype.setHandleProperties = function()
         {
             this.handleArray[i].isVisible = false;
         }
-        this.handleArray[this.numberOfHandles].isVisible = true;        
+        this.handleArray[this.numberOfHandles].isVisible = true;
+        
+        // Set to mean of expert handles
+        this.apexY = -this.getMeanRadius();
     }
     // Expert mode
     else
     { 
-        // Make handles visible, except for apex handle
+        // Make handles visible, except for apex handle,
         for (var i = 0; i < this.numberOfHandles; i++)
         {
             this.handleArray[i].isVisible = true;
+            
         }
         this.handleArray[this.numberOfHandles].isVisible = false;
+        
+        // Set points to mean
+        this.setMeanRadius(-this.apexY);
+    }
+}
+
+/**
+ * Returns minimum radius
+ *
+ * @returns {Float} Minimum radius regardless of mode
+ */
+ED.OpticDisc.prototype.minimumRadius = function()
+{
+    var returnValue = 500;
+    
+    if (this.mode == "Basic")
+    {
+        returnValue = Math.abs(this.apexY);
+    }
+    else
+    {        
+        // Iterate through points
+        for (var i = 0; i < this.numberOfHandles; i++)
+        {
+            // Calculate minimum radius
+            var radius = this.squiggleArray[0].pointsArray[i].length();
+
+            if (radius < returnValue)
+            {
+                returnValue = radius;
+            }
+        }
+    }
+    
+    return returnValue;
+}
+
+/**
+ * Returns mean radius
+ *
+ * @returns {Float} Mean radius of handle points
+ */
+ED.OpticDisc.prototype.getMeanRadius = function()
+{
+    // Sum distances of (vertical) control points from centre
+    if (typeof(this.squiggleArray[0]) != 'undefined')
+    {
+//        var sum = 0;
+//        var ti = 0;
+//        var bi = this.numberOfHandles/2;
+//        sum += this.squiggleArray[0].pointsArray[ti].length();
+//        sum += this.squiggleArray[0].pointsArray[bi].length();
+//        return sum/2;
+        
+        var sum = 0;
+        for (var i = 0; i < this.numberOfHandles; i++)
+        {
+            sum += this.squiggleArray[0].pointsArray[i].length();
+        }
+        return sum/this.numberOfHandles;
+    }
+    else
+    {
+        return -this.apexY;
+    }
+}
+
+/**
+ * Sets radius of handle points
+ *
+ *@param {Float} _radius Value to set
+ */
+ED.OpticDisc.prototype.setMeanRadius = function(_radius)
+{
+    // Get current mean
+    var mean = this.getMeanRadius();
+    
+    // Go through scaling each point according to new mean
+    for (var i = 0; i < this.numberOfHandles; i++)
+    {
+        // Get current length and direction
+        var length = this.squiggleArray[0].pointsArray[i].length();
+        var direction = this.squiggleArray[0].pointsArray[i].direction();
+
+        // Calculate new length
+        var newLength = length * _radius/mean;
+        newLength = newLength > 300?300:newLength;
+        
+        // Set point
+        this.squiggleArray[0].pointsArray[i].setWithPolars(newLength, direction);
     }
 }
 
@@ -2498,6 +2736,333 @@ ED.OpticDiscPit.prototype.draw = function(_point)
 ED.OpticDiscPit.prototype.description = function()
 {
     return "Acquired pit of optic nerve";
+}
+
+/**
+ * Disc Haemorrhage
+ *
+ * @class DiscPallor
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Int} _originX
+ * @param {Int} _originY
+ * @param {Float} _radius
+ * @param {Int} _apexX
+ * @param {Int} _apexY
+ * @param {Float} _scaleX
+ * @param {Float} _scaleY
+ * @param {Float} _arc
+ * @param {Float} _rotation
+ * @param {Int} _order
+ */
+ED.DiscPallor = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+{
+	// Set classname
+	this.className = "DiscPallor";
+
+    // Derived parameters (NB must set a value here to define parameter as a property of the object, even though value set later)
+    this.grade = 'Sectorial';
+	
+	// Call super-class constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.DiscPallor.prototype = new ED.Doodle;
+ED.DiscPallor.prototype.constructor = ED.DiscPallor;
+ED.DiscPallor.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.DiscPallor.prototype.setHandles = function()
+{
+	this.handleArray[0] = new ED.Handle(null, true, ED.Mode.Arc, false);
+	this.handleArray[3] = new ED.Handle(null, true, ED.Mode.Arc, false);
+}
+
+/**
+ * Sets default dragging attributes
+ */
+ED.DiscPallor.prototype.setPropertyDefaults = function()
+{
+    this.isArcSymmetrical = true;
+	this.isMoveable = false;
+    
+    // Add complete validation arrays for derived parameters
+    this.parameterValidationArray['grade'] = {kind:'derived', type:'string', list:['Sectorial', 'Diffuse'], animate:true};
+    
+    // Speed up animation for arc
+    this.parameterValidationArray['arc']['delta'] = 0.2;
+}
+
+/**
+ * Sets default parameters
+ */
+ED.DiscPallor.prototype.setParameterDefaults = function()
+{
+    this.arc = 60 * Math.PI/180;
+    this.setRotationWithDisplacements(45,-120);
+    this.setParameterFromString('grade', 'Sectorial');
+}
+
+/**
+ * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
+ * The returned parameters are animated if their 'animate' property is set to true
+ *
+ * @param {String} _parameter Name of parameter that has changed
+ * @value {Undefined} _value Value of parameter to calculate
+ * @returns {Array} Associative array of values of dependent parameters
+ */
+ED.DiscPallor.prototype.dependentParameterValues = function(_parameter, _value)
+{
+    var returnArray = new Array();
+    
+    switch (_parameter)
+    {
+        case 'arc':
+            if (_value < 2 * Math.PI) returnArray['grade'] = 'Sectorial';
+            else returnArray['grade'] = 'Diffuse';
+            break;
+            
+        case 'grade':
+            switch (_value)
+            {
+                case 'Sectorial':
+                    if (this.arc < 2 * Math.PI) returnArray['arc'] = this.arc;
+                    else returnArray['arc'] = Math.PI/2;
+                    break;
+                case 'Diffuse':
+                    returnArray['arc'] = 2 * Math.PI;
+                    break;
+            }
+            break;
+    }
+    
+    return returnArray;
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.DiscPallor.prototype.draw = function(_point)
+{
+	// Get context
+	var ctx = this.drawing.context;
+	
+	// Call draw method in superclass
+	ED.DiscPallor.superclass.draw.call(this, _point);
+    
+	// Radius of disc
+	var ro = 300;
+    
+    // Get inner radius from OpticDisk doodle
+    var opticDisc = this.drawing.firstDoodleOfClass('OpticDisc');
+    if (opticDisc)
+    {
+        var ri = opticDisc.minimumRadius();
+    }
+    else
+    {
+        var ri = 150;
+    }
+    var r = ri + (ro - ri)/2;
+	
+	// Calculate parameters for arcs
+	var theta = this.arc/2;
+	var arcStart = - Math.PI/2 + theta;
+	var arcEnd = - Math.PI/2 - theta;
+    
+    // Coordinates of 'corners' of DiscPallor
+	var topRightX = r * Math.sin(theta);
+	var topRightY = - r * Math.cos(theta);
+	var topLeftX = - r * Math.sin(theta);
+	var topLeftY = topRightY;
+    
+	// Boundary path
+	ctx.beginPath();
+    
+	// Arc across to mirror image point on the other side
+	ctx.arc(0, 0, ro, arcStart, arcEnd, true);
+    
+	// Arc back to mirror image point on the other side
+	ctx.arc(0, 0, ri, arcEnd, arcStart, false);
+    
+	// Close path
+	ctx.closePath();
+	
+	// Set line attributes
+	ctx.lineWidth = 1;
+	ctx.fillStyle = "rgba(255,255,255,0.5)";
+	ctx.strokeStyle = "rgba(255,255,255,0)";
+	
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+
+    // Coordinates of handles (in canvas plane)
+	this.handleArray[0].location = this.transform.transformPoint(new ED.Point(topLeftX, topLeftY));
+	this.handleArray[3].location = this.transform.transformPoint(new ED.Point(topRightX, topRightY));
+	
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+    
+	// Return value indicating successful hit test
+	return this.isClicked;
+}
+
+/**
+ * Returns a String which, if not empty, determines the root descriptions of multiple instances of the doodle
+ *
+ * @returns {String} Group description
+ */
+ED.DiscPallor.prototype.groupDescription = function()
+{
+    if (this.grade == 'Diffuse')
+    {
+        return "Diffuse disc pallor";
+    }
+    else
+    {
+        return  "Disc pallor at ";
+    }
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.DiscPallor.prototype.description = function()
+{
+    if (this.grade == 'Diffuse')
+    {
+        return "";
+    }
+    else
+    {
+        return this.clockHour() + " o'clock";
+    }
+}
+
+/**
+ * Papilloedema
+ *
+ * @class Papilloedema
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Int} _originX
+ * @param {Int} _originY
+ * @param {Float} _radius
+ * @param {Int} _apexX
+ * @param {Int} _apexY
+ * @param {Float} _scaleX
+ * @param {Float} _scaleY
+ * @param {Float} _arc
+ * @param {Float} _rotation
+ * @param {Int} _order
+ */
+ED.Papilloedema = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+{
+	// Set classname
+	this.className = "Papilloedema";
+
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.Papilloedema.prototype = new ED.Doodle;
+ED.Papilloedema.prototype.constructor = ED.Papilloedema;
+ED.Papilloedema.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets default dragging attributes
+ */
+ED.Papilloedema.prototype.setPropertyDefaults = function()
+{
+	this.isMoveable = false;
+	this.isRotatable = false;
+    this.isUnique = true;
+    this.addAtBack = true;
+}
+
+/**
+ * Sets default parameters
+ */
+ED.Papilloedema.prototype.setParameterDefaults = function()
+{
+    this.radius = 375;
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.Papilloedema.prototype.draw = function(_point)
+{
+	// Get context
+	var ctx = this.drawing.context;
+	
+	// Call draw method in superclass
+	ED.Papilloedema.superclass.draw.call(this, _point);
+    
+    var ro = this.radius + 75;
+    var ri = this.radius - 75;
+	
+	// Calculate parameters for arcs
+	var theta = this.arc/2;
+	var arcStart = - Math.PI/2 + theta;
+	var arcEnd = - Math.PI/2 - theta;
+    
+	// Boundary path
+	ctx.beginPath();
+    
+	// Arc across to mirror image point on the other side
+	ctx.arc(0, 0, ro, 0, Math.PI * 2, true);
+    
+	// Arc back to mirror image point on the other side
+	ctx.arc(0, 0, ri, Math.PI * 2, 0, false);
+    
+	// Close path
+	ctx.closePath();
+	
+	// Set line attributes
+	ctx.lineWidth = 0;
+    
+    // Colors for gradient
+    yellowColour = "rgba(255, 255, 0, 0.75)";
+    var brownColour = "rgba(240, 140, 40, 0.75)";
+    
+    // Radial gradient
+    var gradient = ctx.createRadialGradient(0, 0, this.radius + 75, 0, 0, this.radius - 75);
+    gradient.addColorStop(0, yellowColour);
+    gradient.addColorStop(1, brownColour);
+    
+	ctx.fillStyle = gradient;
+	ctx.strokeStyle = "rgba(0,0,0,0)";
+	
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+	
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.Papilloedema.prototype.description = function()
+{
+	return "Papilloedema";
 }
 
 
