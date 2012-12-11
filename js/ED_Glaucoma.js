@@ -419,7 +419,7 @@ ED.AngleGradeNorth.prototype.dependentParameterValues = function(_parameter, _va
 	              break;
 	            case 'Yes':
 	              if (-this.apexY < rtmo) returnValue = this.apexY;
-	              else returnValue = -riro;
+	              else returnValue = -riri;
 	              break;
             }
             returnArray['apexY'] = returnValue;
@@ -613,7 +613,7 @@ ED.AngleGradeEast.prototype.dependentParameterValues = function(_parameter, _val
 	              break;
 	            case 'Yes':
 	              if (-this.apexY < rtmo) returnValue = this.apexY;
-	              else returnValue = -riro;
+	              else returnValue = -riri;
 	              break;
             }
             returnArray['apexY'] = returnValue;
@@ -807,7 +807,7 @@ ED.AngleGradeSouth.prototype.dependentParameterValues = function(_parameter, _va
 	              break;
 	            case 'Yes':
 	              if (-this.apexY < rtmo) returnValue = this.apexY;
-	              else returnValue = -riro;
+	              else returnValue = -riri;
 	              break;
             }
             returnArray['apexY'] = returnValue;
@@ -1001,7 +1001,7 @@ ED.AngleGradeWest.prototype.dependentParameterValues = function(_parameter, _val
 	              break;
 	            case 'Yes':
 	              if (-this.apexY < rtmo) returnValue = this.apexY;
-	              else returnValue = -riro;
+	              else returnValue = -riri;
 	              break;
             }
             returnArray['apexY'] = returnValue;
