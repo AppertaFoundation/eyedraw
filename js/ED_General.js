@@ -353,9 +353,6 @@ ED.OperatingTable.prototype.draw = function(_point)
         ctx.stroke();
 	}
     
-	// Draw handles if selected
-	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
-    
 	// Return value indicating successful hittest
 	return this.isClicked;
 }
