@@ -2925,6 +2925,9 @@ ED.PhakoIncision.prototype.setParameter = function(_parameter, _value)
         default:
             break
     }
+
+		if (typeof(this.drawing.saveToInputElement) != 'undefined') this.drawing.saveToInputElement();
+		this.drawing.repaint();
 }
 
 /**
