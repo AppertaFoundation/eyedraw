@@ -22,8 +22,8 @@
             function init()
             {
                 // Create two drawings linked to each canvas
-                drawingEdit1 = new ED.Drawing(document.getElementById('canvasEdit1'), ED.eye.Right, 'RPS', true, {graphicsPath:"../graphics/"});
-                drawingEdit2 = new ED.Drawing(document.getElementById('canvasEdit2'), ED.eye.Right, 'LPS', true, {graphicsPath:"../graphics/"});
+                drawingEdit1 = new ED.Drawing(document.getElementById('canvasEdit1'), ED.eye.Left, 'RPS', true, {graphicsPath:"../graphics/"});
+                drawingEdit2 = new ED.Drawing(document.getElementById('canvasEdit2'), ED.eye.Left, 'LPS', true, {graphicsPath:"../graphics/"});
                 
                 // Create a controller object for this drawing
                 var controller1 = new eyeDrawController(drawingEdit1);
