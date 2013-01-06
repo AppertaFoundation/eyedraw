@@ -255,6 +255,20 @@ ED.PostPole.prototype.isWithinDiscDiametersOfFovea = function(_doodle, _diameter
 }
 
 /**
+ * Tests whether passed doodle is within a the confines of the optic disc
+ *
+ * @param {Doodle} _doodle The doodle to test
+ * @returns {Bool} True if doodle is within the confines of the optic disc
+ */
+ED.PostPole.prototype.isWithinDisc = function(_doodle)
+{
+    // Disc location
+    var x = _doodle.originX - (this.drawing.eye == ED.eye.Right?300:-300);
+    
+	return ( x * x + _doodle.originY * _doodle.originY) <  this.discRadius * this.discRadius;
+}
+
+/**
  * Tests whether passed doodle is within a the vascular arcades
  *
  * @param {Doodle} _doodle The doodle to test
