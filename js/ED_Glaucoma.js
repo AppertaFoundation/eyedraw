@@ -3276,8 +3276,8 @@ ED.KrukenbergSpindle.prototype.setPropertyDefaults = function()
     this.isUnique = true;
     
     // Update component of validation array for simple parameters
-    this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.1, +0.5);
-    this.parameterValidationArray['scaleY']['range'].setMinAndMax(+1, +4);
+    this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.3, +0.6);
+    this.parameterValidationArray['scaleY']['range'].setMinAndMax(+1, +3);
 }
 
 /**

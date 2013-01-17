@@ -380,7 +380,7 @@ ED.Label = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scal
 	this.className = "Label";
 
     // Label text
-    this.labelText = "Label";
+    this.labelText = "Start typing..";
     
     // Label width and height
     this.labelWidth = 0;
@@ -397,6 +397,10 @@ ED.Label = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scal
     
     // Flag to indicate first edit
     this.isEdited = false;
+    
+    // Temporary store for values of originX and originY
+    this.lastOriginX = 0;
+    this.lastOriginY = 0;
     
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
@@ -432,8 +436,37 @@ ED.Label.prototype.setPropertyDefaults = function()
 ED.Label.prototype.setParameterDefaults = function()
 {
     this.setOriginWithDisplacements(0, -100);
-    this.apexX = 100;
+    this.lastOriginX = this.originX;
+    this.lastOriginY = this.originY;
+    this.apexX = +100;
     this.apexY = -150;
+}
+
+/**
+ * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
+ * The returned parameters are animated if the 'animate' property in the parameterValidationArray is set to true
+ *
+ * @param {String} _parameter Name of parameter that has changed
+ * @value {Undefined} _value Value of parameter to calculate
+ * @returns {Array} Associative array of values of dependent parameters
+ */
+ED.Label.prototype.dependentParameterValues = function(_parameter, _value)
+{
+    var returnArray = new Array();
+    
+    switch (_parameter)
+    {
+        case 'originX':
+            returnArray['apexX'] = this.apexX - (_value - this.lastOriginX);
+            this.lastOriginX = _value;
+            break;
+        case 'originY':
+            returnArray['apexY'] = this.apexY - (_value - this.lastOriginY);
+            this.lastOriginY = _value;
+            break;
+    }
+    
+    return returnArray;
 }
 
 /**
