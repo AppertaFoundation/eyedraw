@@ -1343,7 +1343,7 @@ ED.Drawing.prototype.keydown = function(e)
         // Delete or move doodle
         switch (e.keyCode) {
             case 8:			// Backspace
-                this.deleteSelectedDoodle();
+                if (this.selectedDoodle.className != "Label") this.deleteSelectedDoodle();
                 break;
             case 37:		// Left arrow
                 this.selectedDoodle.move(-ED.arrowDelta,0);
@@ -1384,10 +1384,25 @@ ED.Drawing.prototype.keydown = function(e)
             {
                 code = e.keyCode;
             }
+            // Backspace
+            else if (e.keyCode == 8)
+            {
+                if (this.selectedDoodle.className == "Label") code = e.keyCode;
+            }
+            // Carriage return
+            else if (e.keyCode == 13)
+            {
+                code = 13;
+            }
         }
         
+        // Carriage return stops editing
+        if (code == 13)
+        {
+            this.deselectDoodles();
+        }
         // Currently only doodles of Lable class accept alphanumeric input
-        if (code > 0 && this.selectedDoodle.className == "Lable")
+        else if (code > 0 && this.selectedDoodle.className == "Label")
         {
             this.selectedDoodle.addLetter(code);
         }

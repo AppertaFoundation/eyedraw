@@ -356,3 +356,215 @@ ED.OperatingTable.prototype.draw = function(_point)
 	// Return value indicating successful hittest
 	return this.isClicked;
 }
+
+/**
+ * Peripheral iridectomy
+ *
+ * @class Label
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Int} _originX
+ * @param {Int} _originY
+ * @param {Float} _radius
+ * @param {Int} _apexX
+ * @param {Int} _apexY
+ * @param {Float} _scaleX
+ * @param {Float} _scaleY
+ * @param {Float} _arc
+ * @param {Float} _rotation
+ * @param {Int} _order
+ */
+ED.Label = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+{
+	// Set classname
+	this.className = "Label";
+
+    // Label text
+    this.labelText = "Label";
+    
+    // Label width and height
+    this.labelWidth = 0;
+    this.labelHeight = 80;
+    
+    // Label font
+    this.labelFont = "60px sans-serif";
+    
+    // Horizontal padding between label and boundary path
+    this.padding = 10;
+    
+    // Maximum length
+    this.maximumLength = 20;
+    
+    // Flag to indicate first edit
+    this.isEdited = false;
+    
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.Label.prototype = new ED.Doodle;
+ED.Label.prototype.constructor = ED.Label;
+ED.Label.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.Label.prototype.setHandles = function()
+{
+	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+}
+
+/**
+ * Sets default properties
+ */
+ED.Label.prototype.setPropertyDefaults = function()
+{
+    this.parameterValidationArray['apexX']['range'].setMinAndMax(-1000, +1000);
+    this.parameterValidationArray['apexY']['range'].setMinAndMax(-1000, +1000);
+}
+
+/**
+ * Sets default parameters
+ */
+ED.Label.prototype.setParameterDefaults = function()
+{
+    this.setOriginWithDisplacements(0, -100);
+    this.apexX = 100;
+    this.apexY = -150;
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.Label.prototype.draw = function(_point)
+{
+	// Get context
+	var ctx = this.drawing.context;
+	
+	// Call draw method in superclass
+	ED.Label.superclass.draw.call(this, _point);
+    
+    // Set font
+    ctx.font = this.labelFont;
+    
+    // Calculate pixel width of text with padding
+    this.labelWidth = ctx.measureText(this.labelText).width + this.padding * 2;
+	
+	// Boundary path
+	ctx.beginPath();
+	
+	// label boundary
+	ctx.rect(-this.labelWidth/2, -this.labelHeight/2, this.labelWidth, this.labelHeight);
+    
+	// Close path
+	ctx.closePath();
+	
+	// Set line attributes
+	ctx.lineWidth = 2;
+    this.isFilled = false;
+    ctx.strokeStyle = "rgba(0, 0, 0, 0)";
+    if (this.isSelected) ctx.strokeStyle = "gray";
+    
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+	
+	// Non boundary paths here
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
+	{
+        // Draw text
+        ctx.fillText(this.labelText, -this.labelWidth/2 + this.padding, this.labelHeight/6);
+        
+        // Coordinate of start of arrow
+        var arrowStart = new ED.Point(0, 0);
+        
+        // Calculation of which quadrant arrowEnd is in
+        var q;
+        if (this.apexX == 0) q = 2;
+        else q = Math.abs(this.apexY/this.apexX);
+        
+        // Set start
+        if (this.apexY <= 0 && q >= 1)
+        {
+            arrowStart.x = 0;
+            arrowStart.y = -this.labelHeight/2;
+        }
+        if (this.apexX <= 0 && q < 1)
+        {
+            arrowStart.x = -this.labelWidth/2;
+            arrowStart.y = 0;
+        }
+        if (this.apexY > 0 && q >= 1)
+        {
+            arrowStart.x = 0;
+            arrowStart.y = this.labelHeight/2;
+        }
+        if (this.apexX > 0 && q < 1)
+        {
+            arrowStart.x = this.labelWidth/2;
+            arrowStart.y = 0;
+        }
+        
+        // Coorindates of end of arrow
+        var arrowEnd = new ED.Point(this.apexX, this.apexY);
+        
+        // Draw arrow
+        ctx.beginPath();
+        ctx.moveTo(arrowStart.x, arrowStart.y);
+        ctx.lineTo(arrowEnd.x, arrowEnd.y);
+        ctx.strokeStyle = "Gray";
+        ctx.lineWidth = 4;
+        ctx.stroke();
+    }
+    
+	// Coordinates of handles (in canvas plane)
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
+	
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+	
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * Adds a letter to the label text
+ *
+ * @param {Int} _keyCode Keycode of pressed key
+ */
+ED.Label.prototype.addLetter = function(_keyCode)
+{
+    // Need code here to convert to character
+    var character = String.fromCharCode(_keyCode);
+    
+    if (!this.isEdited)
+    {
+        this.labelText = "";
+        this.isEdited = true;
+    }
+    
+    // Use backspace to edit
+    if (_keyCode == 8)
+    {
+         if(this.labelText.length> 0) this.labelText = this.labelText.substring(0,this.labelText.length - 1);
+    }
+    else
+    {
+        if (this.labelText.length < this.maximumLength) this.labelText += character;
+    }
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.Label.prototype.description = function()
+{
+    return "Peripheral iridectomy at " + this.clockHour() + " o'clock";
+}
+

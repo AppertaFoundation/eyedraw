@@ -345,6 +345,7 @@ class OEEyeDrawWidget extends CWidget
         // For languages that require utf8, use the following line in the view file (***TODO*** should be possible using Yii function)
         // <script language="JavaScript" src="js/ED_Tooltips.js" type="text/javascript" charset="utf-8"></script>
 		$cs->registerScriptFile($this->jsPath.'/ED_Tooltips.js', CClientScript::POS_HEAD);
+        $cs->registerScriptFile($this->jsPath.'/ED_General.js', CClientScript::POS_HEAD);
         
         // Register the specified optional sub-specialty scripts
         for ($i = 0; $i < count($this->scriptArray); $i++)
@@ -458,7 +459,9 @@ class DoodleInfo
         "Iris" => "Iris",
         "IrisHook" => "Iris hook",
         "IRMA" => "Intraretinal microvascular abnormalities",
-        "Lable" => "Label",
+        "KeraticPrecipitates" => "Keratic precipitates",
+        "KrukenbergSpindle" => "Krukenberg spindle",
+        "Label" => "Label",
         "LaserCircle" => "Circle of laser photocoagulation",
         "LasikFlap" => "LASIK flap",
         "LaserSpot" => "Laser spot",
@@ -484,6 +487,7 @@ class DoodleInfo
         "PhakoIncision" => "Phako incision",
         "PI" => "Peripheral iridectomy",
         "PointInLine" => "Point in line",
+        "PosteriorEmbryotoxon" => "Posterior embryotoxon",
         "PostPole" => "Posterior pole",
         "PostSubcapCataract" => "Posterior subcapsular cataract",
         "PreRetinalHaemorrhage" => "Pre-retinal haemorrhage",
@@ -503,6 +507,7 @@ class DoodleInfo
         "Supramid" => "Supramid suture",
         "ToricPCIOL" => "Toric posterior chamber IOL",
         "TractionRetinalDetachment" => "Traction retinal detachment",
+        "TransilluminationDefect" =>"Transillumination defect",
         "UpDrift" => "Up drift",
         "UpShoot" => "Up shoot",
         "UTear" => "Traction ‘U’ tear",

@@ -189,8 +189,8 @@ ED.AntSeg.prototype.draw = function(_point)
 	
 	// Set line attributes
 	ctx.lineWidth = 4;
-	//ctx.fillStyle = "rgba(100, 200, 250, 0.5)";
-	ctx.fillStyle = "rgba(255, 160, 40, 0.9)";
+	ctx.fillStyle = "rgba(100, 200, 250, 0.5)";
+	//ctx.fillStyle = "rgba(255, 160, 40, 0.9)";
 	ctx.strokeStyle = "gray";
 	
 	// Draw boundary path (also hit testing)

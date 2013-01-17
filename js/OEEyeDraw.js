@@ -53,8 +53,8 @@ function eyeDrawInit(_properties)
     // Create a drawing linked to the canvas
 	window[_properties.drawingName] = new ED.Drawing(canvas, _properties.eye, _properties.idSuffix, _properties.isEditable, options);
     
-    // Create a controller object for this drawing
-    var controller = new eyeDrawController(window[_properties.drawingName]);
+    // Create a controller object for this drawing with a unique name
+    window['ed_controller_' + _properties.idSuffix] = new eyeDrawController(window[_properties.drawingName]);
     
     // Array of additional controllers
     var listenerList = new Array();

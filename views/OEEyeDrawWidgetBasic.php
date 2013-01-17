@@ -16,6 +16,9 @@
 			<button class="ed_img_button" id="unlock<?php echo $idSuffix?>" title="Unlock" onclick="<?php echo $drawingName?>.unlock(); return false;">
 				<img src="<?php echo $imgPath?>unlock.gif" />
 			</button>
+            <button class="ed_img_button" id="Label<?php echo $idSuffix?>" title="Label" onclick="<?php echo $drawingName?>.addDoodle('Label'); return false;">
+                <img src="<?php echo $imgPath?>Label.gif" />
+            </button>
 		</div>
 	<?php }?>
     <?php if ($isEditable && count($doodleToolBarArray) > 0) {

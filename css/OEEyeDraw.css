@@ -139,4 +139,5 @@ span.squiggle {
     font-family: Calibri, Tahoma, Geneva, sans-serif;
     font-size: 0.8em;
     background: #FFFFAA; border: 1px solid #AAAAAA; 
+    z-index:100;
 }
