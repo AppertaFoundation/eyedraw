@@ -3742,13 +3742,22 @@ ED.VisualField.prototype.draw = function(_point)
         var toIndex = (i < this.numberOfHandles - 1)?i + 1:0;
         tp = this.squiggleArray[0].pointsArray[toIndex];
 
-        // Control points
-        cp1 = fp.tangentialControlPoint(+phi);
-        cp2 = tp.tangentialControlPoint(-phi);
+        // Bezier or straight depending on distance from centre
+        if (fp.length() < 100 || tp.length() < 100)
+        {
+            ctx.lineTo(tp.x, tp.y);
+        }
+        else
+        {
+            // Control points
+            cp1 = fp.tangentialControlPoint(+phi);
+            cp2 = tp.tangentialControlPoint(-phi);
 
-        // Draw Bezier curve
-        ctx.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, tp.x, tp.y);
+            // Draw Bezier curve
+            ctx.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, tp.x, tp.y);
+        }
     }
+
     
     // Blind spot
     ctx.moveTo(this.blindSpotX - this.apexY, 0);
