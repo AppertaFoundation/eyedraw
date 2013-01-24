@@ -82,7 +82,7 @@
 </div>
 
 <script type="text/javascript">
-	$('#eyedrawwidget_<?php echo $idSuffix ?> .ed_toolbar a').hover(
+	$('#eyedrawwidget_<?php echo $idSuffix ?> .ed_toolbar a').hoverIntent(
 			function(e) {
 				$(this).next().addClass('active');
 			},
