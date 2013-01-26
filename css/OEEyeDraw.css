@@ -141,3 +141,12 @@ span.squiggle {
     background: #FFFFAA; border: 1px solid #AAAAAA; 
     z-index:100;
 }
+
+ul.ed_toolbar { clear: both; margin: 0; padding: 0; margin: 0 20px 0 0; }
+ul.ed_toolbar li { float: left; list-style: none; border: 1px solid #ccc; margin: 0 3px 3px 0; position: relative; }
+ul.ed_toolbar li a { display: block; height: 32px; width: 32px; position: relative; background: #eee; }
+ul.ed_toolbar li a:hover { border: none; background: #fff; }
+ul.ed_toolbar li span { display: none; position: absolute; top: 32px; left: -1px; background: #fff; border: 1px solid #ccc; padding: 4px 6px; z-index: 99; white-space:nowrap; }
+ul.ed_toolbar li img { float: left; }
+ul.ed_toolbar li span.active { display: block;}
+ul.ed_toolbar li ul { background: #fff; position: absolute; top: 32px; left: -1px; width: 148px; margin: 0; padding: 3px 0 0 3px; border: 1px solid #ccc; }
