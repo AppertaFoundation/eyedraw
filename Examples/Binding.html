@@ -9,6 +9,7 @@
         
         <!-- Subclasses loaded according to need -->
         <script language="JavaScript" src="../js/ED_AntSeg.js" type="text/javascript"></script>
+        <script language="JavaScript" src="../js/ED_Cardiology.js" type="text/javascript"></script>
         
         <!-- This script handles the drawings for the page -->
         <script type="text/javascript">
@@ -42,7 +43,8 @@
                     {
                         // Ready notification
                         case 'ready':
-                            _drawing.addDoodle('AntSeg', {pupilSize:'Small'}, {pupilSize:'pupilSizeInput'});
+                        //_drawing.addDoodle('AntSeg', {pupilSize:'Small'}, {pupilSize:'pupilSizeInput'});, {degree:'0'}, {degree:'stenosis'}
+                            _drawing.addDoodle('Stenosis', {degree:'0.1'}, {degree:'stenosis'});
                             break;
                     }
                 }
@@ -53,10 +55,10 @@
     <body onload="init();">
         
         <!-- Canvas element -->
-        <canvas id="canvasEdit" class="ed_canvas_edit" width="300" height="300" tabindex="1"></canvas>
+        <canvas id="canvasEdit" class="ed_canvas_edit" width="500" height="500" tabindex="1"></canvas>
         
         <!-- Input element -->
-        <input type="text" id="pupilSizeInput" value="Medium" />
+        <input type="text" id="stenosis" value="0" />
         
     </body>
 </html>
