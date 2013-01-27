@@ -443,13 +443,7 @@ ED.RightCoronaryArtery.prototype.draw = function(_point)
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
 	{
         ctx.beginPath();
-        
-        ctx.moveTo(-54, 292);
-        ctx.bezierCurveTo(-54, 292, -103, 238, -110, 234);
-        ctx.bezierCurveTo(-125, 237, -142, 247, -142, 247);        
-
-//        ctx.moveTo(-210, -104);
-//        ctx.bezierCurveTo(-253, -100, -259, -73, -254, -66);
+    
         ctx.moveTo(-254, -66);
         ctx.bezierCurveTo(-379, 8, -313, 171, -289, 204);
         ctx.bezierCurveTo(-245, 265, -184, 266, -151, 252);
@@ -459,6 +453,17 @@ ED.RightCoronaryArtery.prototype.draw = function(_point)
         ctx.bezierCurveTo(-364, -23, -327, 263, -173, 247);
         ctx.bezierCurveTo(-138, 243, -88, 191, -36, 242);
         ctx.bezierCurveTo(-15, 261, -9, 276, -9, 276);
+        
+        ctx.moveTo(-54, 292);
+        ctx.bezierCurveTo(-54, 292, -103, 238, -110, 234);
+        ctx.bezierCurveTo(-125, 237, -142, 247, -142, 247);
+        
+        ctx.moveTo(-82, 306);
+        ctx.lineTo(-142, 247);
+
+        ctx.moveTo(-42, 286);
+        ctx.lineTo(-96, 232);
+        ctx.bezierCurveTo(-84, 218, -36, 250, -24, 276);
         
         ctx.lineWidth = 4;
         ctx.fillStyle = "rgba(255, 255, 255, 0)";
@@ -545,10 +550,10 @@ ED.LeftCoronaryArtery.prototype.setPropertyDefaults = function()
  */
 ED.LeftCoronaryArtery.prototype.setParameterDefaults = function()
 {
-    //    this.originX = -500;
-    this.originY = 0;
-    this.scaleX = 1.5;
-    this.scaleY = 1.5;
+
+//    this.originY = 0;
+//    this.scaleX = 1.5;
+//    this.scaleY = 1.5;
     this.apexX = -153;
     this.apexY = -84;
 }
@@ -639,6 +644,25 @@ ED.LeftCoronaryArtery.prototype.draw = function(_point)
         ctx.moveTo(190, 133);
         ctx.bezierCurveTo(190, 133, 191, 87, 178, 68);
         ctx.bezierCurveTo(165, 49, 96, 11, 96, 11);
+        
+        // Repairs
+        ctx.moveTo(-4, 98);
+        ctx.bezierCurveTo(-10, 136,-10, 136,-22, 156);
+        
+        ctx.moveTo(58, -10);
+        ctx.bezierCurveTo(62, 18, 62, 18, 54, 42);
+        
+        ctx.moveTo(102, 10);
+        ctx.bezierCurveTo(106, 38, 106, 38, 102, 56);
+
+        ctx.moveTo(222, 90);
+        ctx.bezierCurveTo(242, 92, 242, 92, 258, 94);
+        
+        ctx.moveTo(258, 142);
+        ctx.bezierCurveTo(340, 264, 316, 250, 204, 244);
+        
+        ctx.moveTo(258, 142);
+        ctx.bezierCurveTo(264, 164, 264, 164, 260, 176);
         
         ctx.moveTo(54, -12);
         ctx.bezierCurveTo(54, -12, 77, -4, 84, 7);
