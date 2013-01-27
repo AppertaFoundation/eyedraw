@@ -338,7 +338,7 @@ ED.Aorta.prototype.draw = function(_point)
  */
 ED.Aorta.prototype.description = function()
 {
-    return "Aorta";
+    return "";
 }
 
 /**
@@ -484,7 +484,7 @@ ED.RightCoronaryArtery.prototype.draw = function(_point)
  */
 ED.RightCoronaryArtery.prototype.description = function()
 {
-    return "RightCoronaryArtery";
+    return "";
 }
 
 /**
@@ -574,7 +574,7 @@ ED.LeftCoronaryArtery.prototype.draw = function(_point)
 	ctx.beginPath();
     
 	// Do a 360 arc
-	ctx.arc(0, 0, 400, arcStart, arcEnd, true);
+	ctx.arc(-100, -50, 100, arcStart, arcEnd, true);
 	
 	// Set line attributes
 	ctx.lineWidth = 1;
@@ -647,8 +647,8 @@ ED.LeftCoronaryArtery.prototype.draw = function(_point)
         // End segment
         ctx.moveTo(-38, 158);
         ctx.bezierCurveTo(-38, 158, 17, 81, -58, -42);
-        ctx.bezierCurveTo(-152, -40, -146, -27, this.apexX - 20, this.apexY);
-
+        if (this.apexX > -200) ctx.bezierCurveTo(-152, -40, -146, -27, this.apexX - 20, this.apexY);
+        else ctx.bezierCurveTo(-152, -40, -146, -27, this.apexX - 8, this.apexY + 15);
         
         ctx.lineWidth = 4;
         ctx.fillStyle = "rgba(255, 255, 255, 0)";
@@ -674,7 +674,8 @@ ED.LeftCoronaryArtery.prototype.draw = function(_point)
  */
 ED.LeftCoronaryArtery.prototype.description = function()
 {
-    return "LeftCoronaryArtery";
+    if (this.apexX < -200) return "Anomalous insertion of left coronary artery";
+    else return "";
 }
 
 /**
@@ -1150,7 +1151,7 @@ ED.Effusion.prototype.draw = function(_point)
  */
 ED.Effusion.prototype.description = function()
 {
-    return "Pleural effusion "
+    return "pleural effusion in right lung";
 }
 
 
@@ -1214,8 +1215,23 @@ ED.Bypass.prototype.setPropertyDefaults = function()
  */
 ED.Bypass.prototype.setParameterDefaults = function()
 {
-    this.apexX = 40;
-    this.apexY = -60;
+    var num = this.drawing.numberOfDoodlesOfClass(this.className);
+    
+    if (num == 0)
+    {
+        this.apexX = 40;
+        this.apexY = -60;
+    }
+    else if (num == 1)
+    {
+        this.apexX = -11;
+        this.apexY = 133;
+    }
+    else
+    {
+        this.apexX = -445;
+        this.apexY = 205;
+    }
 }
 
 /**
@@ -1225,6 +1241,7 @@ ED.Bypass.prototype.setParameterDefaults = function()
  */
 ED.Bypass.prototype.draw = function(_point)
 {
+    //console.log(this.apexX, this.apexY);
 	// Get context
 	var ctx = this.drawing.context;
 	
@@ -1234,20 +1251,53 @@ ED.Bypass.prototype.draw = function(_point)
 	// Boundary path
 	ctx.beginPath();
 	
-	// Bypass graft
-    var x = -320;
-    var y = -200;
-    var d = 150;
-    var r = 20;
-    cpX = x + (this.apexX - x)/2;
-    cpY = y + (this.apexY - y)/2 - d;
+	// Start point and end point
+    var startPoint = new ED.Point(-320, -200);
+    var endPoint = new ED.Point(this.apexX, this.apexY);
     
-    ctx.moveTo(x, y);
+    var d = startPoint.distanceTo(endPoint);
+    var r = 20;
+    var phi = Math.PI/8;
+    
+    // Start point
+    ctx.moveTo(startPoint.x, startPoint.y);
+    
+    // Calculate angle to apex point
+    var angleToApex = Math.atan((endPoint.y - startPoint.y)/(endPoint.x - startPoint.x));
+    if (angleToApex < 0) angleToApex = Math.PI/2 + (Math.PI/2 + angleToApex);
+    
+    var firstPoint = new ED.Point(0,0);
+    firstPoint.setWithPolars(r, angleToApex);
+    
+    var firstControlPoint = new ED.Point(0,0);
+    firstControlPoint.setWithPolars(d/2, angleToApex + Math.PI/2 - phi);
+    
+    var secondPoint =  new ED.Point(firstPoint.x + endPoint.x, firstPoint.y + endPoint.y);
+
+    var fourthPoint  = new ED.Point(0,0);
+    fourthPoint.setWithPolars(r, angleToApex + Math.PI);
+
+    var thirdPoint = new ED.Point(fourthPoint.x + endPoint.x, fourthPoint.y + endPoint.y);
+    
+    
+    ctx.lineTo(startPoint.x + firstPoint.x, startPoint.y + firstPoint.y);
+    
+    //ctx.lineTo(startPoint.x + firstPoint.x + firstControlPoint.x, startPoint.y + firstPoint.y + firstControlPoint.y);
+    //ctx.lineTo(secondPoint.x, secondPoint.y);
+    ctx.bezierCurveTo(startPoint.x + firstPoint.x + firstControlPoint.x, startPoint.y + firstPoint.y + firstControlPoint.y, startPoint.x + firstPoint.x + firstControlPoint.x, startPoint.y + firstPoint.y + firstControlPoint.y, secondPoint.x, secondPoint.y);
+    
+    
+    
     //ctx.lineTo(x + (this.apexX - x)/2, y + (this.apexY - y)/2 - d);
     //ctx.lineTo(this.apexX, this.apexY);
-    ctx.bezierCurveTo(cpX, cpY, cpX, cpY, this.apexX, this.apexY - r);
-    ctx.lineTo(this.apexX, this.apexY + r);
-    ctx.bezierCurveTo(cpX, cpY + r, cpX, cpY + r, x, y + r);
+    //ctx.bezierCurveTo(cpX, cpY, cpX, cpY, this.apexX, this.apexY - r);
+    ctx.lineTo(endPoint.x, endPoint.y);
+    ctx.lineTo(thirdPoint.x, thirdPoint.y);
+    
+    //ctx.lineTo(startPoint.x + fourthPoint.x + firstControlPoint.x, startPoint.y + fourthPoint.y + firstControlPoint.y);
+    //ctx.lineTo(startPoint.x + fourthPoint.x, startPoint.y + fourthPoint.y);
+    ctx.bezierCurveTo(startPoint.x + fourthPoint.x + firstControlPoint.x, startPoint.y + fourthPoint.y + firstControlPoint.y, startPoint.x + fourthPoint.x + firstControlPoint.x, startPoint.y + fourthPoint.y + firstControlPoint.y, startPoint.x + fourthPoint.x, startPoint.y + fourthPoint.y);
+    
     ctx.closePath();
     
 	
@@ -1287,19 +1337,14 @@ ED.Bypass.prototype.draw = function(_point)
  */
 ED.Bypass.prototype.description = function()
 {
-    var returnString = "";
+    var artery = "";
     
     // Size description
-    if (this.scaleX < 1) returnString = "Small ";
-    if (this.scaleX > 1.5) returnString = "Large ";
-    
-    // U tear
-	returnString += "'U' tear at ";
+    if (this.apexX > 0) artery = "left coronary artery";
+    else if(this.apexX > -300) artery = "circumflex artery";
+    else artery = "right coronary artery";
 	
-    // Location (clockhours)
-	returnString += this.clockHour() + " o'clock";
-	
-	return returnString;
+	return "Bypass graft to " + artery;
 }
 
 /**
@@ -1446,7 +1491,10 @@ ED.Crepitations.prototype.draw = function(_point)
  */
 ED.Crepitations.prototype.description = function()
 {
-    return "Crepitations in left lower lobe";
+    var lung = this.originX > 0?" left lung":" right lung";
+    var lobe = this.originY > 0?" lower lobe of":" upper lobe of";
+    
+    return 'crepitations' + lobe + lung;
 }
 
 /**
@@ -1510,6 +1558,11 @@ ED.Wheeze.prototype.setPropertyDefaults = function()
  */
 ED.Wheeze.prototype.setParameterDefaults = function()
 {
+    this.scaleX = 0.6;
+    this.scaleY = 0.6;
+    
+    this.originX = 172;
+    this.originY = -62;
 }
 
 /**
@@ -1519,6 +1572,7 @@ ED.Wheeze.prototype.setParameterDefaults = function()
  */
 ED.Wheeze.prototype.draw = function(_point)
 {
+    //console.log(this.originX, this.originY);
 	// Get context
 	var ctx = this.drawing.context;
 	
@@ -1599,11 +1653,10 @@ ED.Wheeze.prototype.draw = function(_point)
  */
 ED.Wheeze.prototype.description = function()
 {
-    var returnString = "Signficant numbers of ";
-    if (this.apexY > -100) returnString = "Moderate numbers of ";
-    if (this.apexY > -50) returnString = "Several ";
-	
-	return returnString + "hard drusen";
+    var lung = this.originX > 0?" left lung":" right lung";
+    var lobe = this.originY > 0?" lower lobe of":" upper lobe of";
+    
+    return 'wheeze' + lobe + lung;
 }
 
 /**
@@ -1644,8 +1697,7 @@ ED.MetalStent.superclass = ED.Doodle.prototype;
  */
 ED.MetalStent.prototype.setHandles = function()
 {
-    	this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, true);
-    //	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+    this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, true);
 }
 
 /**
@@ -1679,7 +1731,7 @@ ED.MetalStent.prototype.setParameterDefaults = function()
  */
 ED.MetalStent.prototype.draw = function(_point)
 {
-    //console.log(this.originX, this.originY, this.rotation);
+    console.log(this.originX, this.originY, this.rotation);
 	// Get context
 	var ctx = this.drawing.context;
 	
@@ -1696,7 +1748,7 @@ ED.MetalStent.prototype.draw = function(_point)
 	ctx.rect(-50, -10, 100, 20);
     
 	// Set attributes
-	ctx.lineWidth = 2;
+	ctx.lineWidth = 16;
 	//ctx.strokeStyle = "rgba(255, 255, 255, 0)";
     ctx.strokeStyle = "blue";
     ctx.fillStyle = "rgba(255, 255, 255, 0)";
@@ -1708,14 +1760,6 @@ ED.MetalStent.prototype.draw = function(_point)
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
 	{
 	}
-    
-	// Coordinates of handles (in canvas plane)
-    //    var point = new ED.Point(0, 0);
-    //    point.setWithPolars(rc, Math.PI/4);
-    //	this.handleArray[2].location = this.transform.transformPoint(point);
-	
-	// Draw handles if selected
-	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
     
     // Coordinates of handles (in canvas plane)
     var point = new ED.Point(-50, -10);
@@ -1735,7 +1779,12 @@ ED.MetalStent.prototype.draw = function(_point)
  */
 ED.MetalStent.prototype.description = function()
 {
-    return "Metal stent";
+    var artery;
+    if (this.originX > 0) artery = "left coronary artery";
+    else if(this.originX > -300) artery = "circumflex artery";
+    else artery = "right coronary artery";
+    
+    return "Metal stent in " + artery;
 }
 
 /**
@@ -1762,7 +1811,7 @@ ED.Stenosis = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _s
     
     // Derived parameters (NB must set a value here to define parameter as a property of the object, even though value set later)
     this.degree = 0;
-    this.type = "Non-calcified";
+    this.type = "Calcified";
     
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
@@ -1797,7 +1846,7 @@ ED.Stenosis.prototype.setPropertyDefaults = function()
 //    this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.5, +1.5);
     
     // Add complete validation arrays for derived parameters
-    this.parameterValidationArray['degree'] = {kind:'derived', type:'float', range:new ED.Range(0, 1.0), precision:0, animate:true};
+    this.parameterValidationArray['degree'] = {kind:'derived', type:'int', range:new ED.Range(0, 100), precision:0, animate:true};
     this.parameterValidationArray['type'] = {kind:'derived', type:'string', list:['Calcified', 'Non-calcified'], animate:true};
 }
 
@@ -1808,6 +1857,7 @@ ED.Stenosis.prototype.setPropertyDefaults = function()
 ED.Stenosis.prototype.setParameterDefaults = function()
 {
     this.setParameterFromString('degree', '0');
+    this.setParameterFromString('type', 'Calcified');
     this.apexX = 0;
     this.apexY = 0;
 }
@@ -1853,7 +1903,6 @@ ED.Stenosis.prototype.dependentParameterValues = function(_parameter, _value)
  */
 ED.Stenosis.prototype.draw = function(_point)
 {
-    
 	// Get context
 	var ctx = this.drawing.context;
 	
@@ -1897,13 +1946,8 @@ ED.Stenosis.prototype.draw = function(_point)
 //        ctx.closePath();
 //        ctx.fill();
 	}
-	
-	// Draw handles if selected
-	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
     
     // Coordinates of handles (in canvas plane)
-//    var point = new ED.Point(-100, -50);
-//	this.handleArray[2].location = this.transform.transformPoint(point);
     point = new ED.Point(this.apexX, this.apexY);
 	this.handleArray[4].location = this.transform.transformPoint(point);
 	
