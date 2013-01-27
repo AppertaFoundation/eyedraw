@@ -316,7 +316,7 @@ ED.Aorta.prototype.draw = function(_point)
         
         ctx.lineWidth = 8;
         ctx.fillStyle = "rgba(255, 255, 255, 0)";
-        ctx.strokeStyle = "rgba(200, 200, 200, 1)";
+        ctx.strokeStyle = "rgba(100, 100, 100, 1)";
         ctx.stroke();
         
 	}
@@ -467,7 +467,7 @@ ED.RightCoronaryArtery.prototype.draw = function(_point)
         
         ctx.lineWidth = 4;
         ctx.fillStyle = "rgba(255, 255, 255, 0)";
-        ctx.strokeStyle = "rgba(200, 200, 200, 1)";
+        ctx.strokeStyle = "rgba(100, 100, 100, 1)";
         ctx.stroke();
         
 	}
@@ -551,9 +551,9 @@ ED.LeftCoronaryArtery.prototype.setPropertyDefaults = function()
 ED.LeftCoronaryArtery.prototype.setParameterDefaults = function()
 {
 
-//    this.originY = 0;
-//    this.scaleX = 1.5;
-//    this.scaleY = 1.5;
+    this.originY = 0;
+    this.scaleX = 1.5;
+    this.scaleY = 1.5;
     this.apexX = -153;
     this.apexY = -84;
 }
@@ -676,7 +676,7 @@ ED.LeftCoronaryArtery.prototype.draw = function(_point)
         
         ctx.lineWidth = 4;
         ctx.fillStyle = "rgba(255, 255, 255, 0)";
-        ctx.strokeStyle = "rgba(200, 200, 200, 1)";
+        ctx.strokeStyle = "rgba(100, 100, 100, 1)";
         ctx.stroke();
         
 	}
@@ -2248,26 +2248,32 @@ ED.Groin.prototype.draw = function(_point)
 	ctx.beginPath();
     
 	// Do a 360 arc
-    ctx.moveTo(-380, -390);
-    ctx.bezierCurveTo(-388, -373, -417, -231, -417, -204);
-    ctx.bezierCurveTo(-417, -177, -423, -76, -423, -56);
-    ctx.bezierCurveTo(-423, -37, -440, 138, -440, 170);
-    ctx.bezierCurveTo(-440, 202, -432, 315, -432, 325);
+    ctx.moveTo(12, 49);
+    ctx.bezierCurveTo(37, 49, 68, 24, 68, 24);
+    ctx.bezierCurveTo(73, 42, 136, 318, 136, 318);
     
-    ctx.lineTo(432, 325);
-    ctx.bezierCurveTo(432, 315, 440, 202, 440, 170);
-    ctx.bezierCurveTo(440, 138, 423, -37, 423, -56);
-    ctx.bezierCurveTo(423, -76, 417, -177, 417, -204);
-    ctx.bezierCurveTo(417, -231, 388, -373, 380, -390);
+    ctx.lineTo(460, 318);
+    ctx.bezierCurveTo(460, 318, 468, 191, 468, 159);
+    ctx.bezierCurveTo(468, 127, 451, -48, 451, -67);
+    ctx.bezierCurveTo(451, -87, 444, -188, 444, -215);
+    ctx.bezierCurveTo(444, -242, 407, -402, 407, -402);
     
+    ctx.lineTo(-380, -402);
+    ctx.bezierCurveTo(-380, -402, -417, -242, -417, -215);
+    ctx.bezierCurveTo(-417, -189, -423, -87, -423, -67);
+    ctx.bezierCurveTo(-423, -48, -440, 127, -440, 159);
+    ctx.bezierCurveTo(-440, 191, -432, 318, -432, 318);
     
-    //ctx.closePath();
-
+    ctx.lineTo(-112, 318);
+    ctx.lineTo(-40, 24);
+    ctx.bezierCurveTo(-27, 39, -10, 49, 15, 49);
+    
+    ctx.closePath();
 	
 	// Set line attributes
     ctx.lineWidth = 4;
-    ctx.fillStyle = "rgba(255, 255, 255, 1)";
-    ctx.strokeStyle = "rgba(200, 200, 200, 0)";
+    ctx.fillStyle = "rgba(255, 175, 175, 0.5)";
+    ctx.strokeStyle = "rgba(100, 100, 100, 1)";
 	
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
@@ -2277,44 +2283,20 @@ ED.Groin.prototype.draw = function(_point)
 	{
         ctx.beginPath();
 
+        ctx.moveTo(-228, -189);
         
-        ctx.moveTo(-380, -390);
-        ctx.bezierCurveTo(-388, -373, -417, -231, -417, -204);
-        ctx.bezierCurveTo(-417, -177, -423, -76, -423, -56);
-        ctx.bezierCurveTo(-423, -37, -440, 138, -440, 170);
-        ctx.bezierCurveTo(-440, 202, -432, 315, -432, 325);
+        ctx.lineTo(-158, -155);
+        ctx.bezierCurveTo(-158, -155, -109, -113, -88, -75);
+        ctx.bezierCurveTo(-74, -51, -65, -5, -40, 24);
         
-        ctx.moveTo(380, -390);
-        ctx.bezierCurveTo(388, -373, 417, -231, 417, -204);
-        ctx.bezierCurveTo(417, -177, 423, -76, 423, -56);
-        ctx.bezierCurveTo(423, -37, 440, 138, 440, 170);
-        ctx.bezierCurveTo(440, 202, 432, 315, 432, 325);
-        
-        ctx.moveTo(-112, 329);
-        ctx.bezierCurveTo(-112, 329, -45, 53, -40, 35);
-        
-        ctx.moveTo(-228, -182);
-        ctx.lineTo(-158, -148);
-        ctx.bezierCurveTo(-158, -148, -109, -107, -88, -69);
-        ctx.bezierCurveTo(-67, -31, -56, 56, 15, 56);
- 
-        ctx.moveTo(380, -390);
-        ctx.bezierCurveTo(388, -373, 417, -231, 417, -204);
-        ctx.bezierCurveTo(417, -177, 423, -76, 423, -56);
-        ctx.bezierCurveTo(423, -37, 440, 138, 440, 170);
-        ctx.bezierCurveTo(440, 202, 432, 315, 432, 325);
-        
-        ctx.moveTo(112, 329);
-        ctx.bezierCurveTo(112, 329, 45, 53, 40, 35);
-        
-        ctx.moveTo(228, -182);
-        ctx.lineTo(158, -148);
-        ctx.bezierCurveTo(158, -148, 109, -107, 88, -69);
-        ctx.bezierCurveTo(67, -31, 56, 56, -15, 56);
+        ctx.moveTo(255, -189);
+        ctx.lineTo(186, -155);
+        ctx.bezierCurveTo(186, -155, 136, -113, 115, -75);
+        ctx.bezierCurveTo(102, -51, 92, -5, 68, 23);
         
         ctx.lineWidth = 4;
         ctx.fillStyle = "rgba(255, 255, 255, 0)";
-        ctx.strokeStyle = "rgba(200, 200, 200, 1)";
+        ctx.strokeStyle = "rgba(100, 100, 100, 1)";
         ctx.stroke();
         
 	}
