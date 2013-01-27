@@ -120,3 +120,6 @@ ED.trans['LeftCoronaryArtery'] = 'Left coronary artery<br/><br/>Drag handle to m
 ED.trans['DrugStent'] = 'Drug eluting stent<br/><br/>Drag to move';
 ED.trans['MetalStent'] = 'Metal stent<br/><br/>Drag to move';
 ED.trans['Bypass'] = 'Coronary artery bypass<br/><br/>Drag handle to alter destination';
+ED.trans['Bruit'] = 'Bruit<br/><br/>Drag to move';
+ED.trans['Bruising'] = 'Bruising<br/><br/>Drag to move<br/>Drag handle to resize';
+ED.trans['Haematoma'] = 'Haematoma<br/><br/>Drag to move<br/>Drag handle to resize';

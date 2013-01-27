@@ -521,6 +521,9 @@ class DoodleInfo
         "LeftCoronaryArtery" => "Left coronary artery",
         "DrugStent" => "Drug eluting stent",
         "MetalStent" => "Metal stent",
-        "Bypass" => "Coronary artery bypass"
+        "Bypass" => "Coronary artery bypass",
+        "Bruit" => "Bruit",
+        "Bruising" => "Bruising",
+        "Haematoma" => "Haematoma",
         );
 }

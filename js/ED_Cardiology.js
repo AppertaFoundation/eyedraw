@@ -2142,3 +2142,532 @@ ED.Stenosis.prototype.description = function()
     
     return this.degree.toString() + "% " + this.type + " stenosis in the " + artery;
 }
+
+/**
+ * Groin
+ *
+ * @class Groin
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Int} _originX
+ * @param {Int} _originY
+ * @param {Float} _radius
+ * @param {Int} _apexX
+ * @param {Int} _apexY
+ * @param {Float} _scaleX
+ * @param {Float} _scaleY
+ * @param {Float} _arc
+ * @param {Float} _rotation
+ * @param {Int} _order
+ */
+ED.Groin = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+{
+	// Set classname
+	this.className = "Groin";
+    
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.Groin.prototype = new ED.Doodle;
+ED.Groin.prototype.constructor = ED.Groin;
+ED.Groin.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.Groin.prototype.setHandles = function()
+{
+    this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+}
+
+/**
+ * Set default properties
+ */
+ED.Groin.prototype.setPropertyDefaults = function()
+{
+    this.isSelectable= false;
+    
+    // Update component of validation array for simple parameters
+    this.parameterValidationArray['apexX']['range'].setMinAndMax(-460, -420);
+    this.parameterValidationArray['apexY']['range'].setMinAndMax(-460, -400);
+}
+
+/**
+ * Sets default parameters
+ */
+ED.Groin.prototype.setParameterDefaults = function()
+{
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.Groin.prototype.draw = function(_point)
+{
+	// Get context
+	var ctx = this.drawing.context;
+	
+	// Call draw method in superclass
+	ED.Groin.superclass.draw.call(this, _point);
+    
+	// Calculate parameters for arcs
+	var arcStart = 0;
+	var arcEnd = 2 * Math.PI;
+    
+	// Boundary path
+	ctx.beginPath();
+    
+	// Do a 360 arc
+	ctx.arc(0, 0, 400, arcStart, arcEnd, true);
+	
+	// Set line attributes
+	ctx.lineWidth = 1;
+	ctx.fillStyle = "rgba(255, 255, 255, 0)";
+	ctx.strokeStyle = "rgba(200, 200, 200, 0)";
+	
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+	
+	// Non boundary paths
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
+	{
+        ctx.beginPath();
+        
+        ctx.moveTo(-380, -390);
+        ctx.bezierCurveTo(-388, -373, -417, -231, -417, -204);
+        ctx.bezierCurveTo(-417, -177, -423, -76, -423, -56);
+        ctx.bezierCurveTo(-423, -37, -440, 138, -440, 170);
+        ctx.bezierCurveTo(-440, 202, -432, 315, -432, 325);
+        
+        ctx.moveTo(-112, 329);
+        ctx.bezierCurveTo(-112, 329, -45, 53, -40, 35);
+        
+        ctx.moveTo(-228, -182);
+        ctx.lineTo(-158, -148);
+        ctx.bezierCurveTo(-158, -148, -109, -107, -88, -69);
+        ctx.bezierCurveTo(-67, -31, -56, 56, 15, 56);
+ 
+        ctx.moveTo(380, -390);
+        ctx.bezierCurveTo(388, -373, 417, -231, 417, -204);
+        ctx.bezierCurveTo(417, -177, 423, -76, 423, -56);
+        ctx.bezierCurveTo(423, -37, 440, 138, 440, 170);
+        ctx.bezierCurveTo(440, 202, 432, 315, 432, 325);
+        
+        ctx.moveTo(112, 329);
+        ctx.bezierCurveTo(112, 329, 45, 53, 40, 35);
+        
+        ctx.moveTo(228, -182);
+        ctx.lineTo(158, -148);
+        ctx.bezierCurveTo(158, -148, 109, -107, 88, -69);
+        ctx.bezierCurveTo(67, -31, 56, 56, -15, 56);
+        
+        ctx.lineWidth = 4;
+        ctx.fillStyle = "rgba(255, 255, 255, 0)";
+        ctx.strokeStyle = "rgba(200, 200, 200, 1)";
+        ctx.stroke();
+        
+	}
+    
+    // Coordinates of handles (in canvas plane)
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
+    
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+    
+	// Return value indicating successful hit test
+	return this.isClicked;
+}
+
+/**
+ * Returns a string containing a text description of the doodle (overridden by subclasses)
+ *
+ * @returns {String} Description of doodle
+ */
+ED.Groin.prototype.description = function()
+{
+    return "Groin";
+}
+
+/**
+ * Blot Haemorrhage
+ *
+ * @class Haematoma
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Int} _originX
+ * @param {Int} _originY
+ * @param {Float} _radius
+ * @param {Int} _apexX
+ * @param {Int} _apexY
+ * @param {Float} _scaleX
+ * @param {Float} _scaleY
+ * @param {Float} _arc
+ * @param {Float} _rotation
+ * @param {Int} _order
+ */
+ED.Haematoma = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+{
+	// Set classname
+	this.className = "Haematoma";
+    
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.Haematoma.prototype = new ED.Doodle;
+ED.Haematoma.prototype.constructor = ED.Haematoma;
+ED.Haematoma.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.Haematoma.prototype.setHandles = function()
+{
+    this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, false);
+}
+
+/**
+ * Sets default parameters (Only called for new doodles)
+ * Use the setParameter function for derived parameters, as this will also update dependent variables
+ */
+ED.Haematoma.prototype.setParameterDefaults = function()
+{
+    this.originX = -150;
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.Haematoma.prototype.draw = function(_point)
+{
+	// Get context
+	var ctx = this.drawing.context;
+	
+	// Call draw method in superclass
+	ED.Haematoma.superclass.draw.call(this, _point);
+    
+    // Exudate radius
+    var r = 30;
+    
+	// Boundary path
+	ctx.beginPath();
+    
+	// Exudate
+	ctx.arc(0, 0, r, 0, 2 * Math.PI, true);
+    
+	// Set attributes
+	ctx.lineWidth = 1;
+	ctx.strokeStyle = "red";
+    ctx.fillStyle = "red";
+	
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+    
+    // Coordinates of handles (in canvas plane)
+    var point = new ED.Point(0, 0);
+    point.setWithPolars(r, Math.PI/4);
+	this.handleArray[2].location = this.transform.transformPoint(point);
+	
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+    
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * Returns a String which, if not empty, determines the root descriptions of multiple instances of the doodle
+ *
+ * @returns {String} Group description
+ */
+ED.Haematoma.prototype.groupDescription = function()
+{
+    return "Haematoma";
+}
+
+
+/**
+ * Blot Haemorrhage
+ *
+ * @class Bruising
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Int} _originX
+ * @param {Int} _originY
+ * @param {Float} _radius
+ * @param {Int} _apexX
+ * @param {Int} _apexY
+ * @param {Float} _scaleX
+ * @param {Float} _scaleY
+ * @param {Float} _arc
+ * @param {Float} _rotation
+ * @param {Int} _order
+ */
+ED.Bruising = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+{
+	// Set classname
+	this.className = "Bruising";
+    
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.Bruising.prototype = new ED.Doodle;
+ED.Bruising.prototype.constructor = ED.Bruising;
+ED.Bruising.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.Bruising.prototype.setHandles = function()
+{
+    this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, false);
+}
+
+/**
+ * Sets default parameters (Only called for new doodles)
+ * Use the setParameter function for derived parameters, as this will also update dependent variables
+ */
+ED.Bruising.prototype.setParameterDefaults = function()
+{
+    this.originX = -190;
+    this.originY = 100;
+    this.scaleY = 2;
+}
+
+/**
+ * Sets default dragging attributes
+ */
+ED.Bruising.prototype.setPropertyDefaults = function()
+{
+    this.isSqueezable = true;
+//    // Update component of validation array for simple parameters
+//    this.parameterValidationArray['apexX']['range'].setMinAndMax(-10, +10);
+//    this.parameterValidationArray['apexY']['range'].setMinAndMax(-100, +0);
+//    //    this.parameterValidationArray['arc']['range'].setMinAndMax(Math.PI/6, Math.PI*2);
+//    //    this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.5, +1.5);
+//    //    this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.5, +1.5);
+//    
+//    // Add complete validation arrays for derived parameters
+//    this.parameterValidationArray['degree'] = {kind:'derived', type:'int', range:new ED.Range(0, 100), precision:0, animate:true};
+//    this.parameterValidationArray['type'] = {kind:'derived', type:'string', list:['Calcified', 'Non-calcified'], animate:true};
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.Bruising.prototype.draw = function(_point)
+{
+	// Get context
+	var ctx = this.drawing.context;
+	
+	// Call draw method in superclass
+	ED.Bruising.superclass.draw.call(this, _point);
+    
+    // Exudate radius
+    var r = 100;
+    
+	// Boundary path
+	ctx.beginPath();
+    
+	// Exudate
+	ctx.arc(0, 0, r, 0, 2 * Math.PI, true);
+    
+	// Set attributes
+	ctx.lineWidth = 1;
+	ctx.strokeStyle = "rgba(127, 0, 127, 0.5)";
+    ctx.fillStyle = "rgba(127, 0, 127, 0.5)";
+	
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+    
+    // Coordinates of handles (in canvas plane)
+    var point = new ED.Point(0, 0);
+    point.setWithPolars(r, Math.PI/4);
+	this.handleArray[2].location = this.transform.transformPoint(point);
+	
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+    
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * Returns a String which, if not empty, determines the root descriptions of multiple instances of the doodle
+ *
+ * @returns {String} Group description
+ */
+ED.Bruising.prototype.description = function()
+{
+    return "Bruising";
+}
+
+/**
+ * Bruit
+ *
+ * @class Bruit
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Int} _originX
+ * @param {Int} _originY
+ * @param {Float} _radius
+ * @param {Int} _apexX
+ * @param {Int} _apexY
+ * @param {Float} _scaleX
+ * @param {Float} _scaleY
+ * @param {Float} _arc
+ * @param {Float} _rotation
+ * @param {Int} _order
+ */
+ED.Bruit = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+{
+	// Set classname
+	this.className = "Bruit";
+    
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.Bruit.prototype = new ED.Doodle;
+ED.Bruit.prototype.constructor = ED.Bruit;
+ED.Bruit.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.Bruit.prototype.setHandles = function()
+{
+    //	this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, false);
+    //	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+}
+
+/**
+ * Sets default dragging attributes
+ */
+ED.Bruit.prototype.setPropertyDefaults = function()
+{
+    // Update component of validation array for simple parameters
+    this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
+    this.parameterValidationArray['apexY']['range'].setMinAndMax(-160, +0);
+    this.parameterValidationArray['arc']['range'].setMinAndMax(Math.PI/6, Math.PI*2);
+    this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.5, +1.5);
+    this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.5, +1.5);
+}
+
+/**
+ * Sets default parameters (Only called for new doodles)
+ * Use the setParameter function for derived parameters, as this will also update dependent variables
+ */
+ED.Bruit.prototype.setParameterDefaults = function()
+{
+    this.scaleX = 0.6;
+    this.scaleY = 0.6;
+    
+    this.originX = -150;
+    this.originY = -62;
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.Bruit.prototype.draw = function(_point)
+{
+    //console.log(this.originX, this.originY);
+	// Get context
+	var ctx = this.drawing.context;
+	
+	// Call draw method in superclass
+	ED.Bruit.superclass.draw.call(this, _point);
+    
+    // Exudate radius
+    var r = 100;
+    
+	// Boundary path
+	ctx.beginPath();
+    
+	// Exudate
+	ctx.arc(0, -50, r, 0, 2 * Math.PI, true);
+    
+	// Set attributes
+	ctx.lineWidth = 2;
+	ctx.strokeStyle = "rgba(155, 255, 255, 0)";
+    ctx.fillStyle = "rgba(255, 255, 255, 0)";
+	
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+    
+    // Other paths and drawing here
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
+	{
+        ctx.fillStyle = "gray";
+        ctx.strokeStyle = "gray";
+        ctx.lineWidth = 8;
+        
+        // Red centre
+        ctx.beginPath();
+        ctx.arc(-50, 0, 20, 0, 2 * Math.PI, false);
+        ctx.fill();
+        
+        ctx.beginPath();
+        ctx.moveTo(-34, 0);
+        ctx.lineTo(-34, -100);
+        ctx.lineTo(0, -80);
+        
+        ctx.stroke();
+        
+	}
+    
+	// Coordinates of handles (in canvas plane)
+    //    var point = new ED.Point(0, 0);
+    //    point.setWithPolars(rc, Math.PI/4);
+    //	this.handleArray[2].location = this.transform.transformPoint(point);
+	
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+    
+    // Coordinates of handles (in canvas plane)
+    var point = new ED.Point(0, 0);
+    point.setWithPolars(r, Math.PI/4);
+	this.handleArray[2].location = this.transform.transformPoint(point);
+	
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+    
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.Bruit.prototype.description = function()
+{
+//    var lung = this.originX > 0?" left lung":" right lung";
+//    var lobe = this.originY > 0?" lower lobe of":" upper lobe of";
+    
+    return 'Bruit';
+}
