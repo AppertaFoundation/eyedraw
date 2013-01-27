@@ -2248,12 +2248,26 @@ ED.Groin.prototype.draw = function(_point)
 	ctx.beginPath();
     
 	// Do a 360 arc
-	ctx.arc(0, 0, 400, arcStart, arcEnd, true);
+    ctx.moveTo(-380, -390);
+    ctx.bezierCurveTo(-388, -373, -417, -231, -417, -204);
+    ctx.bezierCurveTo(-417, -177, -423, -76, -423, -56);
+    ctx.bezierCurveTo(-423, -37, -440, 138, -440, 170);
+    ctx.bezierCurveTo(-440, 202, -432, 315, -432, 325);
+    
+    ctx.lineTo(432, 325);
+    ctx.bezierCurveTo(432, 315, 440, 202, 440, 170);
+    ctx.bezierCurveTo(440, 138, 423, -37, 423, -56);
+    ctx.bezierCurveTo(423, -76, 417, -177, 417, -204);
+    ctx.bezierCurveTo(417, -231, 388, -373, 380, -390);
+    
+    
+    //ctx.closePath();
+
 	
 	// Set line attributes
-	ctx.lineWidth = 1;
-	ctx.fillStyle = "rgba(255, 255, 255, 0)";
-	ctx.strokeStyle = "rgba(200, 200, 200, 0)";
+    ctx.lineWidth = 4;
+    ctx.fillStyle = "rgba(255, 255, 255, 1)";
+    ctx.strokeStyle = "rgba(200, 200, 200, 0)";
 	
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
@@ -2262,12 +2276,19 @@ ED.Groin.prototype.draw = function(_point)
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
 	{
         ctx.beginPath();
+
         
         ctx.moveTo(-380, -390);
         ctx.bezierCurveTo(-388, -373, -417, -231, -417, -204);
         ctx.bezierCurveTo(-417, -177, -423, -76, -423, -56);
         ctx.bezierCurveTo(-423, -37, -440, 138, -440, 170);
         ctx.bezierCurveTo(-440, 202, -432, 315, -432, 325);
+        
+        ctx.moveTo(380, -390);
+        ctx.bezierCurveTo(388, -373, 417, -231, 417, -204);
+        ctx.bezierCurveTo(417, -177, 423, -76, 423, -56);
+        ctx.bezierCurveTo(423, -37, 440, 138, 440, 170);
+        ctx.bezierCurveTo(440, 202, 432, 315, 432, 325);
         
         ctx.moveTo(-112, 329);
         ctx.bezierCurveTo(-112, 329, -45, 53, -40, 35);
