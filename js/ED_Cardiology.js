@@ -315,7 +315,7 @@ ED.Aorta.prototype.draw = function(_point)
         
         //ctx.closePath();
         
-        ctx.lineWidth = 8;
+        ctx.lineWidth = 12;
         ctx.fillStyle = "rgba(255, 255, 255, 0)";
         ctx.strokeStyle = "rgba(100, 100, 100, 1)";
         ctx.stroke();
