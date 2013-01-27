@@ -229,6 +229,7 @@ ED.Aorta.prototype.setHandles = function()
 ED.Aorta.prototype.setPropertyDefaults = function()
 {
     this.isSelectable= false;
+    this.isDeletable = false;
     
     // Update component of validation array for simple parameters
     this.parameterValidationArray['apexX']['range'].setMinAndMax(-460, -420);
@@ -388,6 +389,7 @@ ED.RightCoronaryArtery.prototype.setHandles = function()
 ED.RightCoronaryArtery.prototype.setPropertyDefaults = function()
 {
     this.isSelectable= false;
+    this.isDeletable = false;
     
     // Update component of validation array for simple parameters
     this.parameterValidationArray['apexX']['range'].setMinAndMax(-460, -420);
@@ -539,6 +541,7 @@ ED.LeftCoronaryArtery.prototype.setHandles = function()
 ED.LeftCoronaryArtery.prototype.setPropertyDefaults = function()
 {
     //this.isSelectable= false;
+    this.isDeletable = false;
     
     // Update component of validation array for simple parameters
 //    this.parameterValidationArray['apexX']['range'].setMinAndMax(-460, -420);
@@ -972,6 +975,7 @@ ED.Lungs.prototype.setHandles = function()
 ED.Lungs.prototype.setPropertyDefaults = function()
 {
     this.isSelectable = false;
+    this.isDeletable = false;
     
     // Update component of validation array for simple parameters
     this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
@@ -2214,6 +2218,7 @@ ED.Groin.prototype.setHandles = function()
 ED.Groin.prototype.setPropertyDefaults = function()
 {
     this.isSelectable= false;
+    this.isDeletable = false;
     
     // Update component of validation array for simple parameters
     this.parameterValidationArray['apexX']['range'].setMinAndMax(-460, -420);
