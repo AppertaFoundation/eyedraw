@@ -2069,16 +2069,16 @@ ED.Stenosis.prototype.draw = function(_point)
 	// Boundary path
 	ctx.beginPath();
     
-	// Exudate
-	//ctx.rect(-100, -50, 200, 100);
+	// Stenosis
     ctx.arc(0, 0, 30, 0, 2 * Math.PI, false);
     
 	// Set attributes
 	ctx.lineWidth = 2;
 	//ctx.strokeStyle = "rgba(255, 255, 255, 0)";
     ctx.strokeStyle = "blue";
-    if (this.apexX > 0) ctx.fillStyle = "rgba(0, 0, 255," + (this.apexY/-100) + ")";
-    else ctx.fillStyle = "rgba(0, 255, 0," + (this.apexY/-100) + ")";
+//    if (this.apexX > 0) ctx.fillStyle = "rgba(0, 0, 255," + (this.apexY/-100) + ")";
+//    else ctx.fillStyle = "rgba(0, 255, 0," + (this.apexY/-100) + ")";
+    ctx.fillStyle = "rgba(155, 155, 0," + (this.apexY/-100) + ")";
 	
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
@@ -2086,6 +2086,22 @@ ED.Stenosis.prototype.draw = function(_point)
     // Other paths and drawing here
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
 	{
+        
+        if (this.type == "Calcified")
+        {
+            ctx.beginPath();
+            ctx.arc(-10, -10, 8, 0, 2 * Math.PI, false);
+            ctx.moveTo(+10, -10);
+            ctx.arc(+10, -10, 8, 0, 2 * Math.PI, false);
+            ctx.moveTo(+10, +10);
+            ctx.arc(+10, +10, 8, 0, 2 * Math.PI, false);
+            ctx.moveTo(-10, +10);
+            ctx.arc(-10, +10, 8, 0, 2 * Math.PI, false);
+            
+            ctx.fillStyle = "white";
+            ctx.fill();
+            
+        }
 //        ctx.fillStyle = "blue";
 //        
 //        ctx.beginPath();
