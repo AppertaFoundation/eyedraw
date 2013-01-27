@@ -1738,17 +1738,19 @@ ED.MetalStent.prototype.draw = function(_point)
 	// Call draw method in superclass
 	ED.MetalStent.superclass.draw.call(this, _point);
     
-    // Exudate radius
-    var r = 100;
+    // Stent radius
+    var r = 50;
+    var w = 10;
+    var d = 10
     
 	// Boundary path
 	ctx.beginPath();
     
 	// Exudate
-	ctx.rect(-50, -10, 100, 20);
+	ctx.rect(-r, -w, 2 * r, 2* w);
     
 	// Set attributes
-	ctx.lineWidth = 16;
+	ctx.lineWidth = 4;
 	//ctx.strokeStyle = "rgba(255, 255, 255, 0)";
     ctx.strokeStyle = "blue";
     ctx.fillStyle = "rgba(255, 255, 255, 0)";
@@ -1759,6 +1761,14 @@ ED.MetalStent.prototype.draw = function(_point)
     // Other paths and drawing here
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
 	{
+        ctx.beginPath();
+        
+        for (var i = 0; i < 10; i ++)
+        {
+            ctx.moveTo(-r + i * d, -w);
+            ctx.lineTo(-r + i * d, +w);
+        }
+        ctx.stroke();
 	}
     
     // Coordinates of handles (in canvas plane)
@@ -1778,6 +1788,146 @@ ED.MetalStent.prototype.draw = function(_point)
  * @returns {String} Description of doodle
  */
 ED.MetalStent.prototype.description = function()
+{
+    var artery;
+    if (this.originX > 0) artery = "left coronary artery";
+    else if(this.originX > -300) artery = "circumflex artery";
+    else artery = "right coronary artery";
+    
+    return "Metal stent in " + artery;
+}
+
+/**
+ * DrugStent
+ *
+ * @class DrugStent
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Int} _originX
+ * @param {Int} _originY
+ * @param {Float} _radius
+ * @param {Int} _apexX
+ * @param {Int} _apexY
+ * @param {Float} _scaleX
+ * @param {Float} _scaleY
+ * @param {Float} _arc
+ * @param {Float} _rotation
+ * @param {Int} _order
+ */
+ED.DrugStent = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+{
+	// Set classname
+	this.className = "DrugStent";
+    
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.DrugStent.prototype = new ED.Doodle;
+ED.DrugStent.prototype.constructor = ED.DrugStent;
+ED.DrugStent.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.DrugStent.prototype.setHandles = function()
+{
+    this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, true);
+}
+
+/**
+ * Sets default dragging attributes
+ */
+ED.DrugStent.prototype.setPropertyDefaults = function()
+{
+    // Update component of validation array for simple parameters
+    this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
+    this.parameterValidationArray['apexY']['range'].setMinAndMax(-160, +0);
+    this.parameterValidationArray['arc']['range'].setMinAndMax(Math.PI/6, Math.PI*2);
+    this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.5, +1.5);
+    this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.5, +1.5);
+}
+
+/**
+ * Sets default parameters (Only called for new doodles)
+ * Use the setParameter function for derived parameters, as this will also update dependent variables
+ */
+ED.DrugStent.prototype.setParameterDefaults = function()
+{
+    this.originX = -18;
+    this.originY = 86;
+    this.rotation = -4.985446531081719;
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.DrugStent.prototype.draw = function(_point)
+{
+    console.log(this.originX, this.originY, this.rotation);
+	// Get context
+	var ctx = this.drawing.context;
+	
+	// Call draw method in superclass
+	ED.DrugStent.superclass.draw.call(this, _point);
+    
+    // Stent radius
+    var r = 50;
+    var w = 10;
+    var d = 20;
+    
+	// Boundary path
+	ctx.beginPath();
+    
+	// Exudate
+	ctx.rect(-r, -w, 2 * r, 2* w);
+    
+	// Set attributes
+	ctx.lineWidth = 4;
+	//ctx.strokeStyle = "rgba(255, 255, 255, 0)";
+    ctx.strokeStyle = "blue";
+    ctx.fillStyle = "rgba(255, 255, 255, 0)";
+	
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+    
+    // Other paths and drawing here
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
+	{
+        ctx.beginPath();
+        
+        for (var i = 0; i < 5; i ++)
+        {
+            ctx.moveTo(-r + i * d, -w);
+            ctx.lineTo(-r + (i + 1) * d, +w);
+            ctx.moveTo(-r + (i + 1) * d, -w);
+            ctx.lineTo(-r + i * d, +w);
+        }
+        ctx.stroke();
+	}
+    
+    // Coordinates of handles (in canvas plane)
+    var point = new ED.Point(-50, -10);
+	this.handleArray[2].location = this.transform.transformPoint(point);
+	
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+    
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.DrugStent.prototype.description = function()
 {
     var artery;
     if (this.originX > 0) artery = "left coronary artery";
@@ -1860,6 +2010,9 @@ ED.Stenosis.prototype.setParameterDefaults = function()
     this.setParameterFromString('type', 'Calcified');
     this.apexX = 0;
     this.apexY = 0;
+    
+    this.originX = -373;
+    this.originY = 323;
 }
 
 /**
@@ -1903,6 +2056,7 @@ ED.Stenosis.prototype.dependentParameterValues = function(_parameter, _value)
  */
 ED.Stenosis.prototype.draw = function(_point)
 {
+    //console.log(this.originX, this.originY);
 	// Get context
 	var ctx = this.drawing.context;
 	
@@ -1965,5 +2119,10 @@ ED.Stenosis.prototype.draw = function(_point)
  */
 ED.Stenosis.prototype.description = function()
 {
-    return "Stenosis";
+    var artery;
+    if (this.originX > 0) artery = "left coronary artery";
+    else if(this.originX > -300) artery = "circumflex artery";
+    else artery = "right coronary artery";
+    
+    return this.degree.toString() + "% " + this.type + " stenosis in the " + artery;
 }
