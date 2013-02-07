@@ -518,5 +518,16 @@ class DoodleInfo
         "Vicryl" => "Vicryl suture",
         "VitreousOpacity" => "Vitreous opacity",
         "VPattern" => "V pattern",
+        "Crepitations" => "Crepitations",
+        "Stenosis" => "Stenosis",
+        "Wheeze" => "Wheeze",
+        "Effusion" => "Pleural effusion",
+        "LeftCoronaryArtery" => "Left coronary artery",
+        "DrugStent" => "Drug eluting stent",
+        "MetalStent" => "Metal stent",
+        "Bypass" => "Coronary artery bypass",
+        "Bruit" => "Bruit",
+        "Bruising" => "Bruising",
+        "Haematoma" => "Haematoma",
         );
 }
