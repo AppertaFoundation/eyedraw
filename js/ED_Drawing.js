@@ -5355,6 +5355,51 @@ ED.Point.prototype.clockwiseAngleTo = function(_point)
 }
 
 /**
+ * Creates a new point at an angle
+ *
+ * @param {Float} _r Distance from the origin
+ * @param {Float} _phi Angle form the radius to the control point
+ * @returns {Point} The control point
+ */
+ED.Point.prototype.pointAtRadiusAndClockwiseAngle = function(_r, _phi)
+{
+    // Calculate direction (clockwise from north)
+    var angle = this.direction();
+    
+    // Create point and set length and direction
+    var point = new ED.Point(0, 0);
+    point.setWithPolars(_r, angle + _phi);
+    
+    return point;
+}
+
+/**
+ * Creates a new point at an angle to and half way along a straight line between this point and another
+ *
+ * @param {Float} _phi Angle form the radius to the control point
+ * @param {Float} _point Point at other end of straight line
+ * @returns {Point} A point object
+ */
+ED.Point.prototype.pointAtAngleToLineToPointAtProportion = function(_phi, _point, _prop)
+{
+    // Midpoint in coordinates as if current point is origin
+    var bp = new ED.Point((_point.x - this.x) * _prop, (_point.y - this.y) * _prop);
+    
+    // Calculate radius
+    r = bp.length();
+    
+    // Create new point
+    var point = bp.pointAtRadiusAndClockwiseAngle(r, _phi);
+    
+    // Shift origin back
+    point.x += this.x;
+    point.y += this.y;
+    
+    return point;
+}
+
+
+/**
  * Clock hour of point on clock face centred on origin
  *
  * @returns {Int} The clock hour
