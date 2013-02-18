@@ -122,7 +122,7 @@ ED.findOffset = function(obj, curleft, curtop)
 
 ED.findPosition = function(obj, event) {
 	if(typeof jQuery != 'undefined') {
-		var offset = $(obj).offset();
+		var offset = jQuery(obj).offset();
 	} else {
 		var offset = ED.findOffset(obj, 0, 0);
 	}
