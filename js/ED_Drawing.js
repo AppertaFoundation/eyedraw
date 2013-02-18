@@ -116,8 +116,17 @@ ED.findOffset = function(obj, curleft, curtop)
             curleft += obj.offsetLeft;
             curtop += obj.offsetTop;
         } while (obj = obj.offsetParent);
-        return { x: curleft, y: curtop };
+        return { left: curleft, top: curtop };
     }
+}
+
+ED.findPosition = function(obj, event) {
+	if(jQuery) {
+		var offset = $(obj).offset();
+	} else {
+		var offset = ED.findOffset(obj, 0, 0);
+	}
+	return { x: event.pageX - offset.left,  y: event.pageY - offset.top };
 }
 
 /*
@@ -337,32 +346,32 @@ ED.Drawing = function(_canvas, _eye, _IDSuffix, _isEditable, _options)
         
         // Mouse listeners
         this.canvas.addEventListener('mousedown', function(e) {
-                                     var offset = ED.findOffset(this, offsetX, offsetY);
-                                     var point = new ED.Point(e.pageX-offset.x,e.pageY-offset.y);
+          var position = ED.findPosition(this, e);
+          var point = new ED.Point(position.x,position.y);
                                      drawing.mousedown(point);
                                      }, false);
         
         this.canvas.addEventListener('mouseup', function(e) { 
-                                     var offset = ED.findOffset(this, offsetX, offsetY);
-                                     var point = new ED.Point(e.pageX-offset.x,e.pageY-offset.y);
+          var position = ED.findPosition(this, e);
+          var point = new ED.Point(position.x,position.y);
                                      drawing.mouseup(point); 
                                      }, false);
         
-        this.canvas.addEventListener('mousemove', function(e) { 
-                                     var offset = ED.findOffset(this, offsetX, offsetY);
-                                     var point = new ED.Point(e.pageX-offset.x,e.pageY-offset.y);
+        this.canvas.addEventListener('mousemove', function(e) {
+          var position = ED.findPosition(this, e);
+          var point = new ED.Point(position.x,position.y);
                                      drawing.mousemove(point); 
                                      }, false);
 
         this.canvas.addEventListener('mouseover', function(e) {
-                                     var offset = ED.findOffset(this, offsetX, offsetY);
-                                     var point = new ED.Point(e.pageX-offset.x,e.pageY-offset.y);
+          var position = ED.findPosition(this, e);
+          var point = new ED.Point(position.x,position.y);
                                      drawing.mouseover(point);
                                      }, false);
         
         this.canvas.addEventListener('mouseout', function(e) { 
-                                     var offset = ED.findOffset(this, offsetX, offsetY);
-                                     var point = new ED.Point(e.pageX-offset.x,e.pageY-offset.y);
+          var position = ED.findPosition(this, e);
+          var point = new ED.Point(position.x,position.y);
                                      drawing.mouseout(point); 
                                      }, false);
         
