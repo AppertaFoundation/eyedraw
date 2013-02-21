@@ -1346,6 +1346,7 @@ ED.Drawing.prototype.mouseout = function(_point)
  */  
 ED.Drawing.prototype.keydown = function(e)
 {
+    //console.log(e.keyCode);
 	// Keyboard action works on selected doodle
 	if (this.selectedDoodle != null)
 	{
@@ -1392,6 +1393,36 @@ ED.Drawing.prototype.keydown = function(e)
             else if (e.keyCode == 32 || (e.keyCode > 47 && e.keyCode < 58))
             {
                 code = e.keyCode;
+            }
+            // Apostrophes
+            else if (e.keyCode == 222)
+            {
+                if (e.shiftKey)
+                {
+                    code = 34;
+                }
+                else
+                {
+                    code = 39;
+                }
+            }
+            // Colon and semicolon
+            else if (e.keyCode == 186)
+            {
+                if (e.shiftKey)
+                {
+                    code = 58;
+                }
+                else
+                {
+                    code = 59;
+                }
+            }
+            // Other punctuation
+            else if (e.keyCode == 188 || e.keyCode == 190)
+            {
+                if (e.keyCode == 188) code = 44;
+                if (e.keyCode == 190) code = 46;
             }
             // Backspace
             else if (e.keyCode == 8)
