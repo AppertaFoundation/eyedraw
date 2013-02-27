@@ -2176,3 +2176,912 @@ ED.MacularHole.prototype.diagnosticHierarchy = function()
 {
 	return 2;
 }
+
+/**
+ * BuckleOperation
+ *
+ * @class BuckleOperation
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Int} _originX
+ * @param {Int} _originY
+ * @param {Float} _radius
+ * @param {Int} _apexX
+ * @param {Int} _apexY
+ * @param {Float} _scaleX
+ * @param {Float} _scaleY
+ * @param {Float} _arc
+ * @param {Float} _rotation
+ * @param {Int} _order
+ */
+ED.BuckleOperation = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+{
+	// Set classname
+	this.className = "BuckleOperation";
+    
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.BuckleOperation.prototype = new ED.Doodle;
+ED.BuckleOperation.prototype.constructor = ED.BuckleOperation;
+ED.BuckleOperation.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets default dragging attributes
+ */
+ED.BuckleOperation.prototype.setPropertyDefaults = function()
+{
+	this.isSelectable = false;
+    this.isDeletable = false;
+    this.willReport = false;
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.BuckleOperation.prototype.draw = function(_point)
+{
+	// Get context
+	var ctx = this.drawing.context;
+	
+	// Call draw method in superclass
+	ED.BuckleOperation.superclass.draw.call(this, _point);
+    
+	// Boundary path
+	ctx.beginPath();
+	
+	// Cornea
+    ctx.arc(0,0,100,0,Math.PI*2,true);
+	
+	// Close path
+	ctx.closePath();
+	
+	// Set line attributes
+	ctx.lineWidth = 4;
+    this.isFilled = false;
+	ctx.strokeStyle = "#444";
+	
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+	
+	// Other stuff here
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
+	{
+        // Recti
+        this.drawRectus(ctx, 'Sup');
+        this.drawRectus(ctx, 'Nas');
+        this.drawRectus(ctx, 'Inf');
+        this.drawRectus(ctx, 'Tem');
+	}
+	
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * Draws a rectus muscle
+ *
+ * @param {Context} _ctx
+ * @param {Stirng} _quad Quadrant
+ */
+ED.BuckleOperation.prototype.drawRectus = function(_ctx, _quad)
+{
+    _ctx.beginPath();
+    
+    switch (_quad)
+    {
+        case 'Sup':
+            x1 = -60;
+            y1 = -480;
+            x2 = -60;
+            y2 = -200;
+            x3 = 60;
+            y3 = -200;
+            x4 = 60;
+            y4 = -480;
+            xd = 30;
+            yd = 0;
+            break;
+        case 'Nas':
+            x1 = 480;
+            y1 = -60;
+            x2 = 200;
+            y2 = -60;
+            x3 = 200;
+            y3 = 60;
+            x4 = 480;
+            y4 = 60;
+            xd = 0;
+            yd = 30;
+            break;
+        case 'Inf':
+            x1 = 60;
+            y1 = 480;
+            x2 = 60;
+            y2 = 200;
+            x3 = -60;
+            y3 = 200;
+            x4 = -60;
+            y4 = 480;
+            xd = -30;
+            yd = 0;
+            break;
+        case 'Tem':
+            x1 = -480;
+            y1 = 60;
+            x2 = -200;
+            y2 = 60;
+            x3 = -200;
+            y3 = -60;
+            x4 = -480;
+            y4 = -60;
+            xd = 0;
+            yd = -30;
+        default:
+            break;
+    }
+    
+    _ctx.moveTo(x1, y1);
+    _ctx.lineTo(x2, y2);
+    _ctx.lineTo(x3, y3);
+    _ctx.lineTo(x4, y4);
+    _ctx.moveTo(x1 + xd, y1 + yd);
+    _ctx.lineTo(x2 + xd, y2 + yd);
+    _ctx.moveTo(x1 + 2 * xd, y1 + 2 * yd);
+    _ctx.lineTo(x2 + 2 * xd, y2 + 2 * yd);
+    _ctx.moveTo(x1 + 3 * xd, y1 + 3 * yd);
+    _ctx.lineTo(x2 + 3 * xd, y2 + 3 * yd);
+    _ctx.fillStyle = "#CA6800";
+    _ctx.fill();
+    _ctx.lineWidth = 8;
+    _ctx.strokeStyle = "#804000";
+    _ctx.stroke();
+}
+
+/**
+ * CircumferentialBuckle buckle
+ *
+ * @class CircumferentialBuckle
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Int} _originX
+ * @param {Int} _originY
+ * @param {Float} _radius
+ * @param {Int} _apexX
+ * @param {Int} _apexY
+ * @param {Float} _scaleX
+ * @param {Float} _scaleY
+ * @param {Float} _arc
+ * @param {Float} _rotation
+ * @param {Int} _order
+ */
+ED.CircumferentialBuckle = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+{
+	// Set classname
+	this.className = "CircumferentialBuckle";
+
+	// Call super-class constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.CircumferentialBuckle.prototype = new ED.Doodle;
+ED.CircumferentialBuckle.prototype.constructor = ED.CircumferentialBuckle;
+ED.CircumferentialBuckle.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.CircumferentialBuckle.prototype.setHandles = function()
+{
+	this.handleArray[0] = new ED.Handle(null, true, ED.Mode.Arc, false);
+	this.handleArray[3] = new ED.Handle(null, true, ED.Mode.Arc, false);
+	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+}
+
+/**
+ * Sets default dragging attributes
+ */
+ED.CircumferentialBuckle.prototype.setPropertyDefaults = function()
+{
+	this.isMoveable = false;
+    this.addAtBack = true;
+    
+    // Update component of validation array for simple parameters
+    this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
+    this.parameterValidationArray['apexY']['range'].setMinAndMax(-410, -320);
+    this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.25, +4);
+    this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.25, +4);
+}
+
+/**
+ * Sets default parameters
+ */
+ED.CircumferentialBuckle.prototype.setParameterDefaults = function()
+{
+    this.arc = 140 * Math.PI/180;
+    this.apexY = -320;
+    this.rotation = -45 * Math.PI/180;
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.CircumferentialBuckle.prototype.draw = function(_point)
+{
+	// Get context
+	var ctx = this.drawing.context;
+	
+	// Call draw method in superclass
+	ED.CircumferentialBuckle.superclass.draw.call(this, _point);
+    
+	// Radii
+    var ro = 320;
+    if (-350 > this.apexY && this.apexY > -380) ro = 350;
+    else if (this.apexY < -380) ro = 410;
+    var ri = 220;
+    var r = ri + (ro - ri)/2;
+	
+	// Calculate parameters for arcs
+	var theta = this.arc/2;
+	var arcStart = - Math.PI/2 + theta;
+	var arcEnd = - Math.PI/2 - theta;
+    
+    // Coordinates of 'corners' of CircumferentialBuckle
+	var topRightX = ro * Math.sin(theta);
+	var topRightY = - ro * Math.cos(theta);
+	var topLeftX = - ro * Math.sin(theta);
+	var topLeftY = topRightY;
+    
+	// Boundary path
+	ctx.beginPath();
+    
+	// Arc across to mirror image point on the other side
+	ctx.arc(0, 0, ro, arcStart, arcEnd, true);
+    
+	// Arc back to mirror image point on the other side
+	ctx.arc(0, 0, ri, arcEnd, arcStart, false);
+    
+	// Close path
+	ctx.closePath();
+	
+	// Set line attributes
+	ctx.lineWidth = 4;
+    ctx.fillStyle = "rgba(200,200,200,0.75)";
+	ctx.strokeStyle = "gray";
+	
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+	
+	// Other paths and drawing here
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
+	{
+        // Gutter path
+        ctx.beginPath();
+        
+        var gut = 30;
+        
+        rgi = ri + (ro - ri - gut)/2;
+        rgo = ro - (ro - ri - gut)/2;
+        
+        // Arc across
+        ctx.arc(0, 0, rgo, arcStart, arcEnd, true);
+        
+        // Arc back
+        ctx.arc(0, 0, rgi, arcEnd, arcStart, false);
+        
+        ctx.closePath();
+        
+        ctx.fill();
+        ctx.stroke();
+	}
+    
+	// Coordinates of handles (in canvas plane)
+	this.handleArray[0].location = this.transform.transformPoint(new ED.Point(topLeftX, topLeftY));
+	this.handleArray[3].location = this.transform.transformPoint(new ED.Point(topRightX, topRightY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, -ro));
+	
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+    
+	// Return value indicating successful hit test
+	return this.isClicked;
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.CircumferentialBuckle.prototype.description = function()
+{
+    var returnString = "";
+    
+    // Size description
+    if (this.apexY <= -380) returnString = "280 circumferential buckle ";
+    else if (this.apexY <= -350) returnString = "279 circumferential buckle ";
+	else returnString = "277 circumferential buckle ";
+    
+    // Location (clockhours)
+    if (this.arc > Math.PI * 1.8) returnString += "encirclement";
+    else returnString += this.clockHourExtent() + " o'clock";
+	
+	return returnString;
+}
+
+
+/**
+ * BuckleSuture
+ *
+ * @class BuckleSuture
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Int} _originX
+ * @param {Int} _originY
+ * @param {Float} _radius
+ * @param {Int} _apexX
+ * @param {Int} _apexY
+ * @param {Float} _scaleX
+ * @param {Float} _scaleY
+ * @param {Float} _arc
+ * @param {Float} _rotation
+ * @param {Int} _order
+ */
+ED.BuckleSuture = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+{
+	// Set classname
+	this.className = "BuckleSuture";
+
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.BuckleSuture.prototype = new ED.Doodle;
+ED.BuckleSuture.prototype.constructor = ED.BuckleSuture;
+ED.BuckleSuture.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.BuckleSuture.prototype.setHandles = function()
+{
+    //this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, true);
+}
+
+/**
+ * Sets default dragging attributes
+ */
+ED.BuckleSuture.prototype.setPropertyDefaults = function()
+{
+	this.isScaleable = false;
+	this.isMoveable = false;
+    this.willReport = false;
+}
+
+/**
+ * Sets default parameters
+ */
+ED.BuckleSuture.prototype.setParameterDefaults = function()
+{
+    this.arc = 15 * Math.PI/180;
+    this.apexY = -320;
+    
+    // Make rotation 30 degrees to last one of same class
+    var doodle = this.drawing.lastDoodleOfClass(this.className);
+    if (doodle)
+    {
+        this.rotation = doodle.rotation + Math.PI/6;
+    }
+    else
+    {
+        this.rotation = -60 * Math.PI/180
+    }
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.BuckleSuture.prototype.draw = function(_point)
+{
+	// Get context
+	var ctx = this.drawing.context;
+	
+	// Call draw method in superclass
+	ED.BuckleSuture.superclass.draw.call(this, _point);
+
+    // If Buckle there, take account of  size
+    var ro = 340;
+    var doodle = this.drawing.lastDoodleOfClass("CircumferentialBuckle");
+    if (doodle) ro = -doodle.apexY + 20;
+    
+    var ri = 200;
+    
+	// Calculate parameters for arcs
+	var theta = this.arc/2;
+	var arcStart = - Math.PI/2 + theta;
+	var arcEnd = - Math.PI/2 - theta;
+    
+	// Boundary path
+	ctx.beginPath();
+    
+	// Arc across to mirror image point on the other side
+	ctx.arc(0, 0, ro, arcStart, arcEnd, true);
+    
+	// Arc back to mirror image point on the other side
+	ctx.arc(0, 0, ri, arcEnd, arcStart, false);
+    
+	// Close path
+	ctx.closePath();
+    
+	// Set line attributes
+	ctx.lineWidth = 4;
+    this.isFilled = false;
+	ctx.strokeStyle = "#666";
+	
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+	
+	// Other stuff here
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
+	{
+        // Calculate location of suture
+        r = ri + (ro - ri)/2;
+        var sutureX = r * Math.sin(theta);
+        var sutureY = - r * Math.cos(theta);
+        
+        ctx.beginPath();
+        ctx.arc(sutureX, sutureY,5,0,Math.PI*2,true);
+        ctx.moveTo(sutureX + 20, sutureY + 20);
+        ctx.lineTo(sutureX, sutureY);
+        ctx.lineTo(sutureX + 20, sutureY - 20);
+        
+        ctx.stroke();
+	}
+	
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+	
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * EncirclingBand buckle
+ *
+ * @class EncirclingBand
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Int} _originX
+ * @param {Int} _originY
+ * @param {Float} _radius
+ * @param {Int} _apexX
+ * @param {Int} _apexY
+ * @param {Float} _scaleX
+ * @param {Float} _scaleY
+ * @param {Float} _arc
+ * @param {Float} _rotation
+ * @param {Int} _order
+ */
+ED.EncirclingBand = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+{
+	// Set classname
+	this.className = "EncirclingBand";
+
+	// Call super-class constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.EncirclingBand.prototype = new ED.Doodle;
+ED.EncirclingBand.prototype.constructor = ED.EncirclingBand;
+ED.EncirclingBand.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets default dragging attributes
+ */
+ED.EncirclingBand.prototype.setPropertyDefaults = function()
+{
+	this.isMoveable = false;
+    this.addAtBack = true;
+    this.isUnique = true;
+}
+
+/**
+ * Sets default parameters
+ */
+ED.EncirclingBand.prototype.setParameterDefaults = function()
+{
+    this.rotation = -45 * Math.PI/180;
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.EncirclingBand.prototype.draw = function(_point)
+{
+	// Get context
+	var ctx = this.drawing.context;
+	
+	// Call draw method in superclass
+	ED.EncirclingBand.superclass.draw.call(this, _point);
+    
+	// Radii
+    var r = 270;
+    // If Buckle there, take account of  size
+    var doodle = this.drawing.lastDoodleOfClass("CircumferentialBuckle");
+    if (doodle)
+    {
+        var da = doodle.apexY;
+        if (-350 > da && da > -380) r = 286;
+        else if (da < -380) r = 315;
+    }
+    
+    var ro = r + 15;
+    var ri = r - 15;
+    
+	// Boundary path
+	ctx.beginPath();
+    
+	// Arc across to mirror image point on the other side
+	ctx.arc(0, 0, ro, 0, 2 * Math.PI, true);
+    
+	// Arc back to mirror image point on the other side
+	ctx.arc(0, 0, ri, 2 * Math.PI, 0, false);
+    
+	// Close path
+	ctx.closePath();
+	
+	// Set line attributes
+	ctx.lineWidth = 4;
+    ctx.fillStyle = "rgba(200,200,200,0.75)";
+	ctx.strokeStyle = "gray";
+	
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+	
+	// Other paths and drawing here
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
+	{
+        // Watzke
+        ctx.beginPath();
+        
+        var theta = Math.PI/16;
+        
+        // Arc across to mirror image point on the other side
+        ctx.arc(0, 0, ro + 10, theta, -theta, true);
+        
+        // Arc back to mirror image point on the other side
+        ctx.arc(0, 0, ri - 10, -theta, theta, false);
+        
+        // Close path
+        ctx.closePath();
+        ctx.lineWidth = 6;
+        ctx.stroke();
+	}
+    
+	// Return value indicating successful hit test
+	return this.isClicked;
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.EncirclingBand.prototype.description = function()
+{
+    var returnString = "Encircling band, with Watzke in ";
+    
+    // Get side
+    if(this.drawing.eye == ED.eye.Right)
+	{
+		var isRightSide = true;
+	}
+	else
+	{
+		var isRightSide = false;
+	}
+	
+	// Use trigonometry on rotation field to determine quadrant
+    var angle = this.rotation + Math.PI/2;
+	returnString = returnString + (Math.cos(angle) > 0?"supero":"infero");
+	returnString = returnString + (Math.sin(angle) > 0?(isRightSide?"nasal":"temporal"):(isRightSide?"temporal":"nasal"));
+	returnString = returnString + " quadrant";
+    
+	return returnString;
+}
+
+
+/**
+ * DrainageSite
+ *
+ * @class DrainageSite
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Int} _originX
+ * @param {Int} _originY
+ * @param {Float} _radius
+ * @param {Int} _apexX
+ * @param {Int} _apexY
+ * @param {Float} _scaleX
+ * @param {Float} _scaleY
+ * @param {Float} _arc
+ * @param {Float} _rotation
+ * @param {Int} _order
+ */
+ED.DrainageSite = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+{
+	// Set classname
+	this.className = "DrainageSite";
+
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.DrainageSite.prototype = new ED.Doodle;
+ED.DrainageSite.prototype.constructor = ED.DrainageSite;
+ED.DrainageSite.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets default dragging attributes
+ */
+ED.DrainageSite.prototype.setPropertyDefaults = function()
+{
+	this.isScaleable = false;
+	this.isMoveable = false;
+}
+
+/**
+ * Sets default parameters
+ */
+ED.DrainageSite.prototype.setParameterDefaults = function()
+{
+    // Make rotation 30 degrees to last one of same class
+    var doodle = this.drawing.lastDoodleOfClass(this.className);
+    if (doodle)
+    {
+        this.rotation = doodle.rotation + Math.PI/6;
+    }
+    else
+    {
+        this.rotation = -60 * Math.PI/180
+    }
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.DrainageSite.prototype.draw = function(_point)
+{
+	// Get context
+	var ctx = this.drawing.context;
+	
+	// Call draw method in superclass
+	ED.DrainageSite.superclass.draw.call(this, _point);
+    
+    // Radii
+    var ro = 440;
+    var ri = 360;
+    
+	// Calculate parameters for arcs
+	var theta = Math.PI/30;
+	var arcStart = - Math.PI/2 + theta;
+	var arcEnd = - Math.PI/2 - theta;
+    
+	// Boundary path
+	ctx.beginPath();
+    
+	// Arc across
+	ctx.arc(0, 0, ro, arcStart, arcEnd, true);
+    
+	// Line to point
+	ctx.lineTo(0, -ri);;
+    
+	// Close path
+	ctx.closePath();
+    
+	// Set line attributes
+	ctx.lineWidth = 4;
+	ctx.strokeStyle = "#777";
+	
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+	
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+	
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * Returns a String which, if not empty, determines the root descriptions of multiple instances of the doodle
+ *
+ * @returns {String} Group description
+ */
+ED.DrainageSite.prototype.groupDescription = function()
+{
+	return "Drainage site at ";
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.DrainageSite.prototype.description = function()
+{
+    // Location (clockhours)
+	return this.clockHour() + " o'clock";
+}
+
+/**
+ * RadialSponge
+ *
+ * @class RadialSponge
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Int} _originX
+ * @param {Int} _originY
+ * @param {Float} _radius
+ * @param {Int} _apexX
+ * @param {Int} _apexY
+ * @param {Float} _scaleX
+ * @param {Float} _scaleY
+ * @param {Float} _arc
+ * @param {Float} _rotation
+ * @param {Int} _order
+ */
+ED.RadialSponge = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+{
+	// Set classname
+	this.className = "RadialSponge";
+
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.RadialSponge.prototype = new ED.Doodle;
+ED.RadialSponge.prototype.constructor = ED.RadialSponge;
+ED.RadialSponge.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets default dragging attributes
+ */
+ED.RadialSponge.prototype.setPropertyDefaults = function()
+{
+	this.isScaleable = false;
+	this.isMoveable = false;
+    this.addAtBack = true;
+}
+
+/**
+ * Sets default parameters
+ */
+ED.RadialSponge.prototype.setParameterDefaults = function()
+{
+    // Make rotation 30 degrees to last one of same class
+    var doodle = this.drawing.lastDoodleOfClass(this.className);
+    if (doodle)
+    {
+        this.rotation = doodle.rotation + Math.PI/6;
+    }
+    else
+    {
+        this.rotation = -60 * Math.PI/180
+    }
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.RadialSponge.prototype.draw = function(_point)
+{
+	// Get context
+	var ctx = this.drawing.context;
+	
+	// Call draw method in superclass
+	ED.RadialSponge.superclass.draw.call(this, _point);
+    
+    // Radii
+    var y = -220;
+    var h = 200;
+    var w = 80;
+    
+	// Boundary path
+	ctx.beginPath();
+    
+    ctx.moveTo(-w/2, y);
+    ctx.lineTo(-w/2, y - h);
+	ctx.lineTo(w/2, y - h);
+	ctx.lineTo(w/2, y);
+    
+	// Close path
+	ctx.closePath();
+    
+	// Set line attributes
+	ctx.lineWidth = 4;
+	ctx.fillStyle = "lightgray";
+	ctx.strokeStyle = "gray";
+	
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+	
+	// Other stuff here
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
+	{
+        ctx.beginPath();
+        
+        // Knot
+        ctx.arc(0, y - h + 40,5,0,Math.PI*2,true);
+        ctx.lineTo(-20, y - h + 30);
+        ctx.moveTo(0, y - h + 40);
+        ctx.lineTo(20, y - h + 30);
+        
+        // Suture
+        ctx.moveTo(-w/2 - 20, y - 40);
+        ctx.lineTo(-w/2 - 20, y - h + 40);
+        ctx.lineTo(w/2 + 20, y - h + 40);
+        ctx.lineTo(w/2 + 20, y - 40);
+        ctx.closePath();
+        ctx.stroke();
+	}
+	
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+	
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+
+/**
+ * Returns a String which, if not empty, determines the root descriptions of multiple instances of the doodle
+ *
+ * @returns {String} Group description
+ */
+ED.RadialSponge.prototype.groupDescription = function()
+{
+	return "Radial sponge at ";
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.RadialSponge.prototype.description = function()
+{
+    // Location (clockhours)
+	return this.clockHour() + " o'clock";
+}
+
