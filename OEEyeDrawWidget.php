@@ -347,7 +347,7 @@ class OEEyeDrawWidget extends CWidget
 		$cs->registerScriptFile($this->jsPath.'/ED_Drawing.js', CClientScript::POS_HEAD);
         
         // For languages that require utf8, use the following line in the view file (***TODO*** should be possible using Yii function)
-        // <script language="JavaScript" src="js/ED_Tooltips.js" type="text/javascript" charset="utf-8"></script>
+        // <script src="js/ED_Tooltips.js" type="text/javascript" charset="utf-8"></script>
 		$cs->registerScriptFile($this->jsPath.'/ED_Tooltips.js', CClientScript::POS_HEAD);
         $cs->registerScriptFile($this->jsPath.'/ED_General.js', CClientScript::POS_HEAD);
         
