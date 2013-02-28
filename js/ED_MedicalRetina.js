@@ -1682,7 +1682,7 @@ ED.LaserSpot.prototype.draw = function(_point)
  */
 ED.LaserSpot.prototype.groupDescription = function()
 {
-    return "laser spots";
+    return "Laser spots";
 }
 
 /**
@@ -1849,6 +1849,16 @@ ED.SectorPRPPostPole.prototype.draw = function(_point)
     
 	// Return value indicating successful hit test
 	return this.isClicked;
+}
+
+/**
+ * Returns a String which, if not empty, determines the root descriptions of multiple instances of the doodle
+ *
+ * @returns {String} Group description
+ */
+ED.SectorPRPPostPole.prototype.description = function()
+{
+    return "Sector PRP";
 }
 
 /**
@@ -2137,6 +2147,16 @@ ED.MacularGrid.prototype.draw = function(_point)
 }
 
 /**
+ * Returns a String which, if not empty, determines the root descriptions of multiple instances of the doodle
+ *
+ * @returns {String} Group description
+ */
+ED.MacularGrid.prototype.description = function()
+{
+    return "Macular grid laser";
+}
+
+/**
  * Focal laser
  *
  * @class FocalLaser
@@ -2282,7 +2302,7 @@ ED.FocalLaser.prototype.draw = function(_point)
  */
 ED.FocalLaser.prototype.groupDescription = function()
 {
-    return "laser spots";
+    return "Focal laser";
 }
 
 /**
