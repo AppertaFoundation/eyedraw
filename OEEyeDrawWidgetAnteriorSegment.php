@@ -26,28 +26,27 @@
 
 require_once(dirname(__FILE__)."/OEEyeDrawWidget.php");
 
-class OEEyeDrawWidgetRefraction extends OEEyeDrawWidget {
-	public $doodleToolBarArray = array();
-	public $size = 160;
-	public $view_size = 100;
-	public $no_wrapper = true;
-	public $toolbar = false;
+class OEEyeDrawWidgetAnteriorSegment extends OEEyeDrawWidget {
+	public $doodleToolBarArray = array('NuclearCataract','CorticalCataract','PostSubcapCataract','PCIOL','ACIOL','Bleb','PI','Fuchs','RK','LasikFlap','CornealScar');
+	public $size = 300;
 
 	public $onLoadedCommandArray = array(
-		array('addDoodle', array('TrialFrame')),
-		array('addDoodle', array('TrialLens')),
+		array('addDoodle', array('AntSeg')),
 		array('deselectDoodles', array()),
 	);
 
-	public $identifier = 'Refraction';
-
-	public $refraction_types;
+	public $identifier = 'AnteriorSegment';
+	public $no_wrapper = true;
 
 	public function init() {
+		$side = ($this->side == 'R') ? 'right' : 'left'; 
+		$this->onLoadedParamsArray = array(
+			array('AntSeg', 'pxe', (bool) $this->model->{$side.'_pxe'}),
+		);
+
 		if ($this->mode == 'view') {
-			$this->size = $this->view_size;
 			$this->doodleToolBarArray = array();
-			$this->onLoadedCommandArray = array(array('addDoodle', array('AntSeg')),array('deselectDoodles', array()));
+			$this->onLoadedCommandArray = array();
 		}
 
 		parent::init();

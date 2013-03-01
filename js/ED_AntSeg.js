@@ -306,9 +306,11 @@ ED.AntSeg.prototype.setParameter = function(_parameter, _value)
  */
 ED.AntSeg.prototype.description = function()
 {
-    var returnString = this.getParameter('grade') + " pupil";
+    //var returnString = this.getParameter('grade') + " pupil";
     
-    if (this.hasPXE) returnString += " with pseudoexfoliation";
+    //if (this.hasPXE) returnString += " with pseudoexfoliation";
+    
+    var returnString = this.drawing.doodleArray.length == 1?"no abnormality":"";
 	
 	return returnString;
 }
@@ -541,13 +543,47 @@ ED.NuclearCataract.prototype.setParameter = function(_parameter, _value)
 }
 
 /**
+ * Sets parameters for this doodle
+ *
+ * @param {String} _parameter Name of parameter
+ * @param {String} _value New value of parameter
+ */
+ED.NuclearCataract.prototype.setParameterWithoutAnimation = function(_parameter, _value)
+{
+    switch (_parameter)
+    {
+        case 'grade':
+            switch (_value)
+            {
+                case 'Mild':
+                    this.apexY = -180;
+                    break;
+                case 'Moderate':
+                    this.apexY = -100;
+                    break;
+                case 'Brunescent':
+                    this.apexY = 0;
+                    break;
+                default:
+                    break;
+            }
+            break;
+        case 'apexY':
+            this.apexY = _value;
+            break;
+        default:
+            break
+    }
+}
+
+/**
  * Returns a string containing a text description of the doodle
  *
  * @returns {String} Description of doodle
  */
 ED.NuclearCataract.prototype.description = function()
 {
-	return this.getParameter('grade') + " nuclear cataract";
+	return this.getParameter('grade').toLowerCase() + " nuclear cataract";
 }
 
 /**
@@ -811,13 +847,47 @@ ED.CorticalCataract.prototype.setParameter = function(_parameter, _value)
 }
 
 /**
+ * Sets parameters for this doodle
+ *
+ * @param {String} _parameter Name of parameter
+ * @param {String} _value New value of parameter
+ */
+ED.CorticalCataract.prototype.setParameterWithoutAnimation = function(_parameter, _value)
+{
+    switch (_parameter)
+    {
+        case 'grade':
+            switch (_value)
+            {
+                case 'Mild':
+                    this.apexY = -180;
+                    break;
+                case 'Moderate':
+                    this.apexY = -100;
+                    break;
+                case 'White':
+                    this.apexY = -20;
+                    break;
+                default:
+                    break;
+            }
+            break;
+        case 'apexY':
+            this.apexY = _value;
+            break;
+        default:
+            break
+    }
+}
+
+/**
  * Returns a string containing a text description of the doodle
  *
  * @returns {String} Description of doodle
  */
 ED.CorticalCataract.prototype.description = function()
 {
-	return this.getParameter('grade') + " cortical cataract";
+	return this.getParameter('grade').toLowerCase() + " cortical cataract";
 }
 
 /**
@@ -964,7 +1034,7 @@ ED.PostSubcapCataract.prototype.draw = function(_point)
  */
 ED.PostSubcapCataract.prototype.description = function()
 {
-	return "Posterior subcapsular cataract";
+	return "posterior subcapsular cataract";
 }
 
 /**
@@ -1025,7 +1095,7 @@ ED.PCIOL.superclass = ED.Doodle.prototype;
  */
 ED.PCIOL.prototype.setHandles = function()
 {
-    this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, true);
+    this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Rotate, false);
 }
 
 /**
@@ -1036,7 +1106,7 @@ ED.PCIOL.prototype.setPropertyDefaults = function()
 	this.isSelectable = true;
     this.addAtBack = true;
 	this.isOrientated = false;
-	this.isScaleable = true;
+	this.isScaleable = false;
 	this.isSqueezable = false;
 	this.isMoveable = true;
 	this.isRotatable = true;
@@ -1131,7 +1201,7 @@ ED.PCIOL.prototype.draw = function(_point)
  */
 ED.PCIOL.prototype.description = function()
 {
-    var returnValue = "Posterior chamber IOL";
+    var returnValue = "posterior chamber IOL";
     
     // Displacement limit
     var limit = 40;
@@ -1204,7 +1274,7 @@ ED.ACIOL.superclass = ED.Doodle.prototype;
  */
 ED.ACIOL.prototype.setHandles = function()
 {
-    this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, true);
+    this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Rotate, false);
 }
 
 /**
@@ -1214,7 +1284,7 @@ ED.ACIOL.prototype.setPropertyDefaults = function()
 {
 	this.isSelectable = true;
 	this.isOrientated = false;
-	this.isScaleable = true;
+	this.isScaleable = false;
 	this.isSqueezable = false;
 	this.isMoveable = true;
 	this.isRotatable = true;
@@ -1328,7 +1398,7 @@ ED.ACIOL.prototype.draw = function(_point)
  */
 ED.ACIOL.prototype.description = function()
 {
-    var returnValue = "Anterior chamber IOL";
+    var returnValue = "anterior chamber IOL";
     
     // Displacement limit
     var limit = 40;
@@ -1401,7 +1471,7 @@ ED.ToricPCIOL.superclass = ED.Doodle.prototype;
  */
 ED.ToricPCIOL.prototype.setHandles = function()
 {
-    this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, true);
+    this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Rotate, false);
 }
 
 /**
@@ -1412,7 +1482,7 @@ ED.ToricPCIOL.prototype.setPropertyDefaults = function()
 	this.isSelectable = true;
     this.addAtBack = true;
 	this.isOrientated = false;
-	this.isScaleable = true;
+	this.isScaleable = false;
 	this.isSqueezable = false;
 	this.isMoveable = true;
 	this.isRotatable = true;
@@ -1694,7 +1764,7 @@ ED.Bleb.prototype.draw = function(_point)
  */
 ED.Bleb.prototype.description = function()
 {
-    var returnString = "Trabeculectomy bleb at ";
+    var returnString = "trabeculectomy bleb at ";
     
     returnString += this.clockHour() + " o'clock";
     
@@ -1824,7 +1894,7 @@ ED.PI.prototype.draw = function(_point)
  */
 ED.PI.prototype.description = function()
 {
-    var returnString = "Peripheral iridectomy at ";
+    var returnString = "peripheral iridectomy at ";
     
     returnString += this.clockHour() + " o'clock";
     
@@ -1988,7 +2058,7 @@ ED.RK.prototype.draw = function(_point)
  */
 ED.RK.prototype.description = function()
 {
-    var returnString = "Radial keratotomy";
+    var returnString = "radial keratotomy";
     
 	return returnString;
 }
@@ -2146,7 +2216,7 @@ ED.LasikFlap.prototype.description = function()
     if (s < c && as > ac) quadrant = isRightSide?"temporal":"nasal";
     if (s < c && as < ac) quadrant = "superior";
     
-	returnString = "Lasik flap with " + quadrant + " hinge";
+	returnString = "LASIK flap with " + quadrant + " hinge";
     
 	return returnString;
 }
@@ -2271,7 +2341,7 @@ ED.Fuchs.prototype.draw = function(_point)
  */
 ED.Fuchs.prototype.description = function()
 {
-    var returnString = "Fuch's Endothelial Dystrophy";
+    var returnString = "Fuch's endothelial dystrophy";
     
 	return returnString;
 }
@@ -2439,9 +2509,9 @@ ED.CornealScar.prototype.description = function()
     var averageScale = this.scaleX + this.scaleY;
     
     // Arbitrary cutoffs
-    if (averageScale < 2) returnString = "Small ";
-    else if (averageScale < 4) returnString = "Medium ";
-    else returnString = "Large ";
+    if (averageScale < 2) returnString = "small ";
+    else if (averageScale < 4) returnString = "medium ";
+    else returnString = "large ";
     
     returnString += "corneal scar";
     
@@ -2726,9 +2796,9 @@ ED.PhakoIncision.prototype.description = function()
     var returnString = "";
     
     // Incision site
-    if (this.radius > 428) returnString = 'Scleral ';
-    else if (this.radius > 344) returnString = 'Limbal ';
-    else returnString = 'Corneal ';
+    if (this.radius > 428) returnString = 'scleral ';
+    else if (this.radius > 344) returnString = 'limbal ';
+    else returnString = 'corneal ';
     
     // Incision type
     returnString += this.apexYDelta == 0?"pocket ":"section "
@@ -3012,7 +3082,7 @@ ED.SidePort.prototype.draw = function(_point)
  */
 ED.SidePort.prototype.description = function()
 {
-    var returnString = "Sideport at ";
+    var returnString = "sideport at ";
     
     returnString += this.clockHour() + " o'clock";
     
@@ -3177,7 +3247,7 @@ ED.LimbalRelaxingIncision.prototype.draw = function(_point)
  */
 ED.LimbalRelaxingIncision.prototype.description = function()
 {
-    var returnString = "Limbal relaxing incision " + (this.arc * 180/Math.PI).toFixed(0) + " degrees at ";
+    var returnString = "limbal relaxing incision " + (this.arc * 180/Math.PI).toFixed(0) + " degrees at ";
     returnString += this.clockHour() + " o'clock";
     
 	return returnString;
@@ -3541,7 +3611,7 @@ ED.MattressSuture.prototype.draw = function(_point)
  */
 ED.MattressSuture.prototype.description = function()
 {
-    var returnString = "Mattress suture at ";
+    var returnString = "mattress suture at ";
     
     returnString += this.clockHour() + " o'clock";
     
@@ -3692,7 +3762,7 @@ ED.CornealSuture.prototype.draw = function(_point)
  */
 ED.CornealSuture.prototype.description = function()
 {
-    var returnString = "Corneal suture at ";
+    var returnString = "corneal suture at ";
     
     returnString += this.clockHour() + " o'clock";
     

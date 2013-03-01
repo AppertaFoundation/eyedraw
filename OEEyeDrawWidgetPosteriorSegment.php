@@ -26,28 +26,22 @@
 
 require_once(dirname(__FILE__)."/OEEyeDrawWidget.php");
 
-class OEEyeDrawWidgetRefraction extends OEEyeDrawWidget {
-	public $doodleToolBarArray = array();
-	public $size = 160;
-	public $view_size = 100;
-	public $no_wrapper = true;
-	public $toolbar = false;
+class OEEyeDrawWidgetPosteriorSegment extends OEEyeDrawWidget {
+	public $doodleToolBarArray = array('Geographic','VitreousOpacity','DiabeticNV','CNV','Circinate','CystoidMacularOedema','EpiretinalMembrane','HardDrusen','PRPPostPole','MacularHole');
+	public $size = 300;
 
 	public $onLoadedCommandArray = array(
-		array('addDoodle', array('TrialFrame')),
-		array('addDoodle', array('TrialLens')),
+		array('addDoodle', array('PostPole')),
 		array('deselectDoodles', array()),
 	);
 
-	public $identifier = 'Refraction';
-
-	public $refraction_types;
+	public $identifier = 'PosteriorSegment';
+	public $no_wrapper = true;
 
 	public function init() {
 		if ($this->mode == 'view') {
-			$this->size = $this->view_size;
 			$this->doodleToolBarArray = array();
-			$this->onLoadedCommandArray = array(array('addDoodle', array('AntSeg')),array('deselectDoodles', array()));
+			$this->onLoadedCommandArray = array();
 		}
 
 		parent::init();
