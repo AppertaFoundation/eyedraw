@@ -1,0 +1,467 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXFileReference section */
+		A90A35DF1659A2C1001760C2 /* HTML5_Canvas_Cheat_Sheet.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = HTML5_Canvas_Cheat_Sheet.pdf; sourceTree = "<group>"; };
+		A90A35E01659A2C1001760C2 /* OpenEyes EyeDraw.pages */ = {isa = PBXFileReference; lastKnownFileType = file; path = "OpenEyes EyeDraw.pages"; sourceTree = "<group>"; };
+		A90A35E11659A2C1001760C2 /* SVG to Canvas.numbers */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SVG to Canvas.numbers"; sourceTree = "<group>"; };
+		A91371C816A81ACD0067D1D1 /* BlotHaemorrhage.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = BlotHaemorrhage.gif; sourceTree = "<group>"; };
+		A91371C916A81ACD0067D1D1 /* CottonWoolSpot.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = CottonWoolSpot.gif; sourceTree = "<group>"; };
+		A91371CA16A81ACD0067D1D1 /* DiscHaem.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = DiscHaem.gif; sourceTree = "<group>"; };
+		A91371CB16A81ACD0067D1D1 /* DiscHaemorrhage.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = DiscHaemorrhage.gif; sourceTree = "<group>"; };
+		A91371CC16A81ACD0067D1D1 /* DiscPallor.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = DiscPallor.gif; sourceTree = "<group>"; };
+		A91371CD16A81ACD0067D1D1 /* EpiretinalMembrane.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = EpiretinalMembrane.gif; sourceTree = "<group>"; };
+		A91371CE16A81ACD0067D1D1 /* FibrousProliferation.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = FibrousProliferation.gif; sourceTree = "<group>"; };
+		A91371CF16A81ACD0067D1D1 /* FocalLaser.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = FocalLaser.gif; sourceTree = "<group>"; };
+		A91371D016A81ACD0067D1D1 /* HardDrusen.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = HardDrusen.gif; sourceTree = "<group>"; };
+		A91371D116A81ACD0067D1D1 /* HardExudate.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = HardExudate.gif; sourceTree = "<group>"; };
+		A91371D216A81ACD0067D1D1 /* IRMA.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = IRMA.gif; sourceTree = "<group>"; };
+		A91371D316A81ACD0067D1D1 /* LaserDemarcation.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = LaserDemarcation.gif; sourceTree = "<group>"; };
+		A91371D416A81ACD0067D1D1 /* LaserSpot.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = LaserSpot.gif; sourceTree = "<group>"; };
+		A91371D516A81ACD0067D1D1 /* Lens.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = Lens.gif; sourceTree = "<group>"; };
+		A91371D616A81ACD0067D1D1 /* MacularGrid.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = MacularGrid.gif; sourceTree = "<group>"; };
+		A91371D716A81ACD0067D1D1 /* MacularThickening.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = MacularThickening.gif; sourceTree = "<group>"; };
+		A91371D816A81ACD0067D1D1 /* Microaneurysm.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = Microaneurysm.gif; sourceTree = "<group>"; };
+		A91371D916A81ACD0067D1D1 /* OpticDisc.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = OpticDisc.gif; sourceTree = "<group>"; };
+		A91371DA16A81ACD0067D1D1 /* OpticDiscPit.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = OpticDiscPit.gif; sourceTree = "<group>"; };
+		A91371DB16A81ACD0067D1D1 /* PeripapillaryAtrophy.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = PeripapillaryAtrophy.gif; sourceTree = "<group>"; };
+		A91371DC16A81ACD0067D1D1 /* PreRetinalHaemorrhage.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = PreRetinalHaemorrhage.gif; sourceTree = "<group>"; };
+		A91371DD16A81ACD0067D1D1 /* PRPPostPole.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = PRPPostPole.gif; sourceTree = "<group>"; };
+		A91371DE16A81ACD0067D1D1 /* SectorPRP.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = SectorPRP.gif; sourceTree = "<group>"; };
+		A91371DF16A81ACD0067D1D1 /* SectorPRPPostPole.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = SectorPRPPostPole.gif; sourceTree = "<group>"; };
+		A91371E016A81ACD0067D1D1 /* TractionRetinalDetachment.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = TractionRetinalDetachment.gif; sourceTree = "<group>"; };
+		A91371E116A854710067D1D1 /* KeraticPrecipitates.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = KeraticPrecipitates.gif; sourceTree = "<group>"; };
+		A91371E216A854710067D1D1 /* KrukenbergSpindle.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = KrukenbergSpindle.gif; sourceTree = "<group>"; };
+		A91371E316A854710067D1D1 /* Label.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = Label.gif; sourceTree = "<group>"; };
+		A91371E416A854710067D1D1 /* TransilluminationDefect.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = TransilluminationDefect.gif; sourceTree = "<group>"; };
+		A929825316B2E92300E0D109 /* ED_Cardiology.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = ED_Cardiology.js; sourceTree = "<group>"; };
+		A930700E164457C900404172 /* BasicUsage.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = BasicUsage.html; sourceTree = "<group>"; };
+		A93070101644602700404172 /* Binding.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = Binding.html; sourceTree = "<group>"; };
+		A93070111644617B00404172 /* BindingDeletable.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = BindingDeletable.html; sourceTree = "<group>"; };
+		A9307012164462B400404172 /* SynchronisationOneWay.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = SynchronisationOneWay.html; sourceTree = "<group>"; };
+		A93070131644691000404172 /* SynchronisationTwoWay.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = SynchronisationTwoWay.html; sourceTree = "<group>"; };
+		A930701416447D5900404172 /* Notifications.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = Notifications.html; sourceTree = "<group>"; };
+		A93F4D7E158BD107008545EE /* OEEyeDrawWidgetBasic.php */ = {isa = PBXFileReference; lastKnownFileType = text.script.php; lineEnding = 0; path = OEEyeDrawWidgetBasic.php; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.php; };
+		A93F4D82158BD107008545EE /* default.php */ = {isa = PBXFileReference; lastKnownFileType = text.script.php; lineEnding = 0; path = default.php; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.php; };
+		A93F4D84158BD7AD008545EE /* ED_Tooltips.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = ED_Tooltips.js; sourceTree = "<group>"; };
+		A96BB5D91662C44700A19749 /* AdvancedSynchronisation.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = AdvancedSynchronisation.html; sourceTree = "<group>"; };
+		A96BB5DA1662C45500A19749 /* TestBed.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = TestBed.html; path = ../TestBed.html; sourceTree = "<group>"; };
+		A96DE81F151B17FE001EBEAD /* OEEyeDraw.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = OEEyeDraw.css; sourceTree = "<group>"; };
+		A96DE821151B17FE001EBEAD /* Doodles.numbers */ = {isa = PBXFileReference; lastKnownFileType = file; path = Doodles.numbers; sourceTree = "<group>"; };
+		A96DE823151B17FE001EBEAD /* ACIOL.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = ACIOL.gif; sourceTree = "<group>"; };
+		A96DE824151B17FE001EBEAD /* APattern.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = APattern.gif; sourceTree = "<group>"; };
+		A96DE825151B17FE001EBEAD /* Abrasion.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = Abrasion.gif; sourceTree = "<group>"; };
+		A96DE826151B17FE001EBEAD /* Ahmed.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = Ahmed.gif; sourceTree = "<group>"; };
+		A96DE827151B17FE001EBEAD /* AngleNV.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = AngleNV.gif; sourceTree = "<group>"; };
+		A96DE828151B17FE001EBEAD /* AngleRecession.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = AngleRecession.gif; sourceTree = "<group>"; };
+		A96DE829151B17FE001EBEAD /* AntPVR.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = AntPVR.gif; sourceTree = "<group>"; };
+		A96DE82A151B17FE001EBEAD /* AntPVRPattern.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = AntPVRPattern.gif; sourceTree = "<group>"; };
+		A96DE82B151B17FE001EBEAD /* AntSeg.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = AntSeg.gif; sourceTree = "<group>"; };
+		A96DE82C151B17FE001EBEAD /* AntSynech.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = AntSynech.gif; sourceTree = "<group>"; };
+		A96DE82D151B17FE001EBEAD /* Arrow.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = Arrow.gif; sourceTree = "<group>"; };
+		A96DE82E151B17FE001EBEAD /* BSV.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = BSV.png; sourceTree = "<group>"; };
+		A96DE82F151B17FE001EBEAD /* Baerveldt.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = Baerveldt.gif; sourceTree = "<group>"; };
+		A96DE830151B17FE001EBEAD /* Bleb.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = Bleb.gif; sourceTree = "<group>"; };
+		A96DE831151B17FE001EBEAD /* Buckle.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = Buckle.gif; sourceTree = "<group>"; };
+		A96DE832151B17FE001EBEAD /* BuckleSuture.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = BuckleSuture.gif; sourceTree = "<group>"; };
+		A96DE833151B17FE001EBEAD /* BuckleWithMargin.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = BuckleWithMargin.gif; sourceTree = "<group>"; };
+		A96DE834151B17FE001EBEAD /* CNV.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = CNV.gif; sourceTree = "<group>"; };
+		A96DE835151B17FE001EBEAD /* Chalazion.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = Chalazion.gif; sourceTree = "<group>"; };
+		A96DE836151B17FE001EBEAD /* Circinate.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = Circinate.gif; sourceTree = "<group>"; };
+		A96DE837151B17FE001EBEAD /* CircumferentialBuckle.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = CircumferentialBuckle.gif; sourceTree = "<group>"; };
+		A96DE838151B17FE001EBEAD /* ColourWell.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = ColourWell.gif; sourceTree = "<group>"; };
+		A96DE839151B17FE001EBEAD /* Conjunctivitis.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = Conjunctivitis.gif; sourceTree = "<group>"; };
+		A96DE83A151B17FE001EBEAD /* CornealFB.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = CornealFB.gif; sourceTree = "<group>"; };
+		A96DE83B151B17FE001EBEAD /* CornealScar.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = CornealScar.gif; sourceTree = "<group>"; };
+		A96DE83C151B17FE001EBEAD /* CorticalCataract.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = CorticalCataract.gif; sourceTree = "<group>"; };
+		A96DE83D151B17FE001EBEAD /* CribriformPattern.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = CribriformPattern.gif; sourceTree = "<group>"; };
+		A96DE83E151B17FE001EBEAD /* Cryo.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = Cryo.gif; sourceTree = "<group>"; };
+		A96DE83F151B17FE001EBEAD /* CryoPattern.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = CryoPattern.gif; sourceTree = "<group>"; };
+		A96DE840151B17FE001EBEAD /* Dendrite.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = Dendrite.gif; sourceTree = "<group>"; };
+		A96DE841151B17FE001EBEAD /* DiabeticNV.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = DiabeticNV.gif; sourceTree = "<group>"; };
+		A96DE842151B17FE001EBEAD /* Dialysis.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = Dialysis.gif; sourceTree = "<group>"; };
+		A96DE845151B17FE001EBEAD /* DrainageSite.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = DrainageSite.gif; sourceTree = "<group>"; };
+		A96DE846151B17FE001EBEAD /* EncirclingBand.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = EncirclingBand.gif; sourceTree = "<group>"; };
+		A96DE847151B17FE001EBEAD /* EyeWithLids.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = EyeWithLids.gif; sourceTree = "<group>"; };
+		A96DE848151B17FE001EBEAD /* Freehand.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = Freehand.gif; sourceTree = "<group>"; };
+		A96DE849151B17FE001EBEAD /* Fuchs.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = Fuchs.gif; sourceTree = "<group>"; };
+		A96DE84A151B17FE001EBEAD /* FuchsPattern.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = FuchsPattern.gif; sourceTree = "<group>"; };
+		A96DE84B151B17FE001EBEAD /* GRT.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = GRT.gif; sourceTree = "<group>"; };
+		A96DE84C151B17FE001EBEAD /* Geographic.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = Geographic.gif; sourceTree = "<group>"; };
+		A96DE84D151B17FE001EBEAD /* Hyphaema.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = Hyphaema.gif; sourceTree = "<group>"; };
+		A96DE84E151B17FE001EBEAD /* InnerLeafBreak.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = InnerLeafBreak.gif; sourceTree = "<group>"; };
+		A96DE84F151B17FE001EBEAD /* IrisHook.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = IrisHook.gif; sourceTree = "<group>"; };
+		A96DE851151B17FE001EBEAD /* LaserCircle.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = LaserCircle.gif; sourceTree = "<group>"; };
+		A96DE852151B17FE001EBEAD /* LaserPattern.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = LaserPattern.gif; sourceTree = "<group>"; };
+		A96DE853151B17FE001EBEAD /* LasikFlap.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = LasikFlap.gif; sourceTree = "<group>"; };
+		A96DE854151B17FE001EBEAD /* Lattice.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = Lattice.gif; sourceTree = "<group>"; };
+		A96DE855151B17FE001EBEAD /* LatticePattern.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = LatticePattern.gif; sourceTree = "<group>"; };
+		A96DE856151B17FE001EBEAD /* Lump.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = Lump.gif; sourceTree = "<group>"; };
+		A96DE857151B17FE001EBEAD /* MacularHole.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = MacularHole.gif; sourceTree = "<group>"; };
+		A96DE858151B17FE001EBEAD /* MattressSuture.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = MattressSuture.gif; sourceTree = "<group>"; };
+		A96DE859151B17FE001EBEAD /* MeshworkPatternHeavy.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = MeshworkPatternHeavy.gif; sourceTree = "<group>"; };
+		A96DE85A151B17FE001EBEAD /* MeshworkPatternLight.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = MeshworkPatternLight.gif; sourceTree = "<group>"; };
+		A96DE85B151B17FE001EBEAD /* MeshworkPatternMedium.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = MeshworkPatternMedium.gif; sourceTree = "<group>"; };
+		A96DE85C151B17FE001EBEAD /* Molteno.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = Molteno.gif; sourceTree = "<group>"; };
+		A96DE85D151B17FE001EBEAD /* NerveDefect.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = NerveDefect.gif; sourceTree = "<group>"; };
+		A96DE85E151B17FE001EBEAD /* NerveFibreDefect.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = NerveFibreDefect.gif; sourceTree = "<group>"; };
+		A96DE85F151B17FE001EBEAD /* NewVesselPattern.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = NewVesselPattern.gif; sourceTree = "<group>"; };
+		A96DE860151B17FE001EBEAD /* NoPattern.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = NoPattern.gif; sourceTree = "<group>"; };
+		A96DE861151B17FE001EBEAD /* NuclearCataract.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = NuclearCataract.gif; sourceTree = "<group>"; };
+		A96DE862151B17FE001EBEAD /* OpticCup.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = OpticCup.gif; sourceTree = "<group>"; };
+		A96DE865151B17FE001EBEAD /* OuterLeafBreak.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = OuterLeafBreak.gif; sourceTree = "<group>"; };
+		A96DE866151B17FE001EBEAD /* PCIOL.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = PCIOL.gif; sourceTree = "<group>"; };
+		A96DE867151B17FE001EBEAD /* PI.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = PI.gif; sourceTree = "<group>"; };
+		A96DE868151B17FE001EBEAD /* PSCPattern.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = PSCPattern.gif; sourceTree = "<group>"; };
+		A96DE869151B17FE001EBEAD /* Papilloedema.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = Papilloedema.gif; sourceTree = "<group>"; };
+		A96DE86A151B17FE001EBEAD /* Patch.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = Patch.gif; sourceTree = "<group>"; };
+		A96DE86B151B17FE001EBEAD /* PatientImage.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = PatientImage.png; sourceTree = "<group>"; };
+		A96DE86C151B17FE001EBEAD /* PhakoIncision.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = PhakoIncision.gif; sourceTree = "<group>"; };
+		A96DE86D151B17FE001EBEAD /* PointInLine.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = PointInLine.gif; sourceTree = "<group>"; };
+		A96DE86E151B17FE001EBEAD /* PostSubcapCataract.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = PostSubcapCataract.gif; sourceTree = "<group>"; };
+		A96DE86F151B17FE001EBEAD /* RK.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = RK.gif; sourceTree = "<group>"; };
+		A96DE870151B17FE001EBEAD /* RRD.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = RRD.gif; sourceTree = "<group>"; };
+		A96DE871151B17FE001EBEAD /* RadialSponge.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = RadialSponge.gif; sourceTree = "<group>"; };
+		A96DE872151B17FE001EBEAD /* Retinoschisis.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = Retinoschisis.gif; sourceTree = "<group>"; };
+		A96DE873151B17FE001EBEAD /* RightFundus.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = RightFundus.gif; sourceTree = "<group>"; };
+		A96DE874151B17FE001EBEAD /* RightPostPole.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = RightPostPole.gif; sourceTree = "<group>"; };
+		A96DE875151B17FE001EBEAD /* Rotate.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = Rotate.gif; sourceTree = "<group>"; };
+		A96DE876151B17FE001EBEAD /* RoundHole.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = RoundHole.gif; sourceTree = "<group>"; };
+		A96DE877151B17FE001EBEAD /* Save.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = Save.gif; sourceTree = "<group>"; };
+		A96DE878151B17FE001EBEAD /* Scale.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = Scale.gif; sourceTree = "<group>"; };
+		A96DE879151B17FE001EBEAD /* Scar.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = Scar.gif; sourceTree = "<group>"; };
+		A96DE87A151B17FE001EBEAD /* Select.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = Select.gif; sourceTree = "<group>"; };
+		A96DE87B151B17FE001EBEAD /* Shading.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = Shading.gif; sourceTree = "<group>"; };
+		A96DE87C151B17FE001EBEAD /* SidePort.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = SidePort.gif; sourceTree = "<group>"; };
+		A96DE87D151B17FE001EBEAD /* StarFold.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = StarFold.gif; sourceTree = "<group>"; };
+		A96DE87E151B17FE001EBEAD /* Supramid.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = Supramid.gif; sourceTree = "<group>"; };
+		A96DE87F151B17FE001EBEAD /* UTear.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = UTear.gif; sourceTree = "<group>"; };
+		A96DE880151B17FE001EBEAD /* UpDriftFromLeft.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = UpDriftFromLeft.gif; sourceTree = "<group>"; };
+		A96DE881151B17FE001EBEAD /* UpDriftFromRight.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = UpDriftFromRight.gif; sourceTree = "<group>"; };
+		A96DE882151B17FE001EBEAD /* UpShootFromLeft.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = UpShootFromLeft.gif; sourceTree = "<group>"; };
+		A96DE883151B17FE001EBEAD /* UpShootFromRight.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = UpShootFromRight.gif; sourceTree = "<group>"; };
+		A96DE884151B17FE001EBEAD /* VPattern.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = VPattern.gif; sourceTree = "<group>"; };
+		A96DE885151B17FE001EBEAD /* Vicryl.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = Vicryl.gif; sourceTree = "<group>"; };
+		A96DE886151B17FE001EBEAD /* VitreousOpacity.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = VitreousOpacity.gif; sourceTree = "<group>"; };
+		A96DE887151B17FE001EBEAD /* deleteSelectedDoodle.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = deleteSelectedDoodle.gif; sourceTree = "<group>"; };
+		A96DE888151B17FE001EBEAD /* flipHor.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = flipHor.gif; sourceTree = "<group>"; };
+		A96DE889151B17FE001EBEAD /* flipVer.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = flipVer.gif; sourceTree = "<group>"; };
+		A96DE88A151B17FE001EBEAD /* lock.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = lock.gif; sourceTree = "<group>"; };
+		A96DE88B151B17FE001EBEAD /* moveToBack.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = moveToBack.gif; sourceTree = "<group>"; };
+		A96DE88C151B17FE001EBEAD /* moveToFront.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = moveToFront.gif; sourceTree = "<group>"; };
+		A96DE88D151B17FE001EBEAD /* unlock.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = unlock.gif; sourceTree = "<group>"; };
+		A96DE88F151B17FE001EBEAD /* ED_Adnexal.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = ED_Adnexal.js; sourceTree = "<group>"; };
+		A96DE890151B17FE001EBEAD /* ED_AntSeg.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = ED_AntSeg.js; sourceTree = "<group>"; };
+		A96DE891151B17FE001EBEAD /* ED_Cancer.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = ED_Cancer.js; sourceTree = "<group>"; };
+		A96DE892151B17FE001EBEAD /* ED_Drawing.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; lineEnding = 0; path = ED_Drawing.js; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.javascript; };
+		A96DE893151B17FE001EBEAD /* ED_General.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = ED_General.js; sourceTree = "<group>"; };
+		A96DE894151B17FE001EBEAD /* ED_Glaucoma.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = ED_Glaucoma.js; sourceTree = "<group>"; };
+		A96DE895151B17FE001EBEAD /* ED_MedicalRetina.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = ED_MedicalRetina.js; sourceTree = "<group>"; };
+		A96DE896151B17FE001EBEAD /* ED_Strabismus.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = ED_Strabismus.js; sourceTree = "<group>"; };
+		A96DE897151B17FE001EBEAD /* ED_VitreoRetinal.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = ED_VitreoRetinal.js; sourceTree = "<group>"; };
+		A96DE898151B17FE001EBEAD /* OEEyeDraw.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = OEEyeDraw.js; sourceTree = "<group>"; };
+		A96DE899151B17FE001EBEAD /* Licence */ = {isa = PBXFileReference; lastKnownFileType = text; name = Licence; path = ../Licence; sourceTree = "<group>"; };
+		A96DE89A151B17FE001EBEAD /* OEEyeDrawWidget.php */ = {isa = PBXFileReference; lastKnownFileType = text.script.php; name = OEEyeDrawWidget.php; path = ../OEEyeDrawWidget.php; sourceTree = "<group>"; };
+		A96DE89B151B17FE001EBEAD /* README */ = {isa = PBXFileReference; lastKnownFileType = text; name = README; path = ../README; sourceTree = "<group>"; };
+		A96DE89D151B17FE001EBEAD /* testDoodle.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = testDoodle.html; path = ../testDoodle.html; sourceTree = "<group>"; };
+		A97BC703166597A5008A6A13 /* testBinding.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = testBinding.html; path = ../testBinding.html; sourceTree = "<group>"; };
+		A97C0308162DF64500A2AB84 /* FAQ.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = FAQ.txt; sourceTree = "<group>"; };
+		A97C030A162E91A600A2AB84 /* CribriformPatternSmall.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = CribriformPatternSmall.gif; sourceTree = "<group>"; };
+		A97C030B162E91CB00A2AB84 /* CornealSuture.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = CornealSuture.gif; sourceTree = "<group>"; };
+		A97C030C162E91CB00A2AB84 /* LimbalRelaxingIncision.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = LimbalRelaxingIncision.gif; sourceTree = "<group>"; };
+		A98C0C88162945590071C110 /* CystoidMacularOedema.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = CystoidMacularOedema.gif; sourceTree = "<group>"; };
+		A9A937751580D3B3004AD047 /* CapsularTensionRing.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = CapsularTensionRing.gif; sourceTree = "<group>"; };
+		A9B8261816202C0300171B45 /* Calling of methods */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Calling of methods"; sourceTree = "<group>"; };
+		A9EFE65E158DE23E001C0D1F /* ToricPCIOL.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = ToricPCIOL.gif; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		A930700D164457C900404172 /* Examples */ = {
+			isa = PBXGroup;
+			children = (
+				A96BB5D91662C44700A19749 /* AdvancedSynchronisation.html */,
+				A930700E164457C900404172 /* BasicUsage.html */,
+				A93070101644602700404172 /* Binding.html */,
+				A93070111644617B00404172 /* BindingDeletable.html */,
+				A9307012164462B400404172 /* SynchronisationOneWay.html */,
+				A93070131644691000404172 /* SynchronisationTwoWay.html */,
+				A930701416447D5900404172 /* Notifications.html */,
+			);
+			name = Examples;
+			path = ../Examples;
+			sourceTree = "<group>";
+		};
+		A93F4D7D158BD107008545EE /* views */ = {
+			isa = PBXGroup;
+			children = (
+				A93F4D7E158BD107008545EE /* OEEyeDrawWidgetBasic.php */,
+				A93F4D82158BD107008545EE /* default.php */,
+			);
+			name = views;
+			path = ../views;
+			sourceTree = "<group>";
+		};
+		A96DE81E151B17FE001EBEAD /* css */ = {
+			isa = PBXGroup;
+			children = (
+				A96DE81F151B17FE001EBEAD /* OEEyeDraw.css */,
+			);
+			name = css;
+			path = ../css;
+			sourceTree = "<group>";
+		};
+		A96DE820151B17FE001EBEAD /* Documentation */ = {
+			isa = PBXGroup;
+			children = (
+				A90A35DF1659A2C1001760C2 /* HTML5_Canvas_Cheat_Sheet.pdf */,
+				A90A35E01659A2C1001760C2 /* OpenEyes EyeDraw.pages */,
+				A90A35E11659A2C1001760C2 /* SVG to Canvas.numbers */,
+				A9B8261816202C0300171B45 /* Calling of methods */,
+				A96DE821151B17FE001EBEAD /* Doodles.numbers */,
+				A97C0308162DF64500A2AB84 /* FAQ.txt */,
+			);
+			name = Documentation;
+			path = ../Documentation;
+			sourceTree = "<group>";
+		};
+		A96DE822151B17FE001EBEAD /* graphics */ = {
+			isa = PBXGroup;
+			children = (
+				A91371E116A854710067D1D1 /* KeraticPrecipitates.gif */,
+				A91371E216A854710067D1D1 /* KrukenbergSpindle.gif */,
+				A91371E316A854710067D1D1 /* Label.gif */,
+				A91371E416A854710067D1D1 /* TransilluminationDefect.gif */,
+				A91371C816A81ACD0067D1D1 /* BlotHaemorrhage.gif */,
+				A91371C916A81ACD0067D1D1 /* CottonWoolSpot.gif */,
+				A91371CA16A81ACD0067D1D1 /* DiscHaem.gif */,
+				A91371CB16A81ACD0067D1D1 /* DiscHaemorrhage.gif */,
+				A91371CC16A81ACD0067D1D1 /* DiscPallor.gif */,
+				A91371CD16A81ACD0067D1D1 /* EpiretinalMembrane.gif */,
+				A91371CE16A81ACD0067D1D1 /* FibrousProliferation.gif */,
+				A91371CF16A81ACD0067D1D1 /* FocalLaser.gif */,
+				A91371D016A81ACD0067D1D1 /* HardDrusen.gif */,
+				A91371D116A81ACD0067D1D1 /* HardExudate.gif */,
+				A91371D216A81ACD0067D1D1 /* IRMA.gif */,
+				A91371D316A81ACD0067D1D1 /* LaserDemarcation.gif */,
+				A91371D416A81ACD0067D1D1 /* LaserSpot.gif */,
+				A91371D516A81ACD0067D1D1 /* Lens.gif */,
+				A91371D616A81ACD0067D1D1 /* MacularGrid.gif */,
+				A91371D716A81ACD0067D1D1 /* MacularThickening.gif */,
+				A91371D816A81ACD0067D1D1 /* Microaneurysm.gif */,
+				A91371D916A81ACD0067D1D1 /* OpticDisc.gif */,
+				A91371DA16A81ACD0067D1D1 /* OpticDiscPit.gif */,
+				A91371DB16A81ACD0067D1D1 /* PeripapillaryAtrophy.gif */,
+				A91371DC16A81ACD0067D1D1 /* PreRetinalHaemorrhage.gif */,
+				A91371DD16A81ACD0067D1D1 /* PRPPostPole.gif */,
+				A91371DE16A81ACD0067D1D1 /* SectorPRP.gif */,
+				A91371DF16A81ACD0067D1D1 /* SectorPRPPostPole.gif */,
+				A91371E016A81ACD0067D1D1 /* TractionRetinalDetachment.gif */,
+				A97C030B162E91CB00A2AB84 /* CornealSuture.gif */,
+				A97C030C162E91CB00A2AB84 /* LimbalRelaxingIncision.gif */,
+				A97C030A162E91A600A2AB84 /* CribriformPatternSmall.gif */,
+				A98C0C88162945590071C110 /* CystoidMacularOedema.gif */,
+				A9EFE65E158DE23E001C0D1F /* ToricPCIOL.gif */,
+				A9A937751580D3B3004AD047 /* CapsularTensionRing.gif */,
+				A96DE823151B17FE001EBEAD /* ACIOL.gif */,
+				A96DE824151B17FE001EBEAD /* APattern.gif */,
+				A96DE825151B17FE001EBEAD /* Abrasion.gif */,
+				A96DE826151B17FE001EBEAD /* Ahmed.gif */,
+				A96DE827151B17FE001EBEAD /* AngleNV.gif */,
+				A96DE828151B17FE001EBEAD /* AngleRecession.gif */,
+				A96DE829151B17FE001EBEAD /* AntPVR.gif */,
+				A96DE82A151B17FE001EBEAD /* AntPVRPattern.gif */,
+				A96DE82B151B17FE001EBEAD /* AntSeg.gif */,
+				A96DE82C151B17FE001EBEAD /* AntSynech.gif */,
+				A96DE82D151B17FE001EBEAD /* Arrow.gif */,
+				A96DE82E151B17FE001EBEAD /* BSV.png */,
+				A96DE82F151B17FE001EBEAD /* Baerveldt.gif */,
+				A96DE830151B17FE001EBEAD /* Bleb.gif */,
+				A96DE831151B17FE001EBEAD /* Buckle.gif */,
+				A96DE832151B17FE001EBEAD /* BuckleSuture.gif */,
+				A96DE833151B17FE001EBEAD /* BuckleWithMargin.gif */,
+				A96DE834151B17FE001EBEAD /* CNV.gif */,
+				A96DE835151B17FE001EBEAD /* Chalazion.gif */,
+				A96DE836151B17FE001EBEAD /* Circinate.gif */,
+				A96DE837151B17FE001EBEAD /* CircumferentialBuckle.gif */,
+				A96DE838151B17FE001EBEAD /* ColourWell.gif */,
+				A96DE839151B17FE001EBEAD /* Conjunctivitis.gif */,
+				A96DE83A151B17FE001EBEAD /* CornealFB.gif */,
+				A96DE83B151B17FE001EBEAD /* CornealScar.gif */,
+				A96DE83C151B17FE001EBEAD /* CorticalCataract.gif */,
+				A96DE83D151B17FE001EBEAD /* CribriformPattern.gif */,
+				A96DE83E151B17FE001EBEAD /* Cryo.gif */,
+				A96DE83F151B17FE001EBEAD /* CryoPattern.gif */,
+				A96DE840151B17FE001EBEAD /* Dendrite.gif */,
+				A96DE841151B17FE001EBEAD /* DiabeticNV.gif */,
+				A96DE842151B17FE001EBEAD /* Dialysis.gif */,
+				A96DE845151B17FE001EBEAD /* DrainageSite.gif */,
+				A96DE846151B17FE001EBEAD /* EncirclingBand.gif */,
+				A96DE847151B17FE001EBEAD /* EyeWithLids.gif */,
+				A96DE848151B17FE001EBEAD /* Freehand.gif */,
+				A96DE849151B17FE001EBEAD /* Fuchs.gif */,
+				A96DE84A151B17FE001EBEAD /* FuchsPattern.gif */,
+				A96DE84B151B17FE001EBEAD /* GRT.gif */,
+				A96DE84C151B17FE001EBEAD /* Geographic.gif */,
+				A96DE84D151B17FE001EBEAD /* Hyphaema.gif */,
+				A96DE84E151B17FE001EBEAD /* InnerLeafBreak.gif */,
+				A96DE84F151B17FE001EBEAD /* IrisHook.gif */,
+				A96DE851151B17FE001EBEAD /* LaserCircle.gif */,
+				A96DE852151B17FE001EBEAD /* LaserPattern.gif */,
+				A96DE853151B17FE001EBEAD /* LasikFlap.gif */,
+				A96DE854151B17FE001EBEAD /* Lattice.gif */,
+				A96DE855151B17FE001EBEAD /* LatticePattern.gif */,
+				A96DE856151B17FE001EBEAD /* Lump.gif */,
+				A96DE857151B17FE001EBEAD /* MacularHole.gif */,
+				A96DE858151B17FE001EBEAD /* MattressSuture.gif */,
+				A96DE859151B17FE001EBEAD /* MeshworkPatternHeavy.gif */,
+				A96DE85A151B17FE001EBEAD /* MeshworkPatternLight.gif */,
+				A96DE85B151B17FE001EBEAD /* MeshworkPatternMedium.gif */,
+				A96DE85C151B17FE001EBEAD /* Molteno.gif */,
+				A96DE85D151B17FE001EBEAD /* NerveDefect.gif */,
+				A96DE85E151B17FE001EBEAD /* NerveFibreDefect.gif */,
+				A96DE85F151B17FE001EBEAD /* NewVesselPattern.gif */,
+				A96DE860151B17FE001EBEAD /* NoPattern.gif */,
+				A96DE861151B17FE001EBEAD /* NuclearCataract.gif */,
+				A96DE862151B17FE001EBEAD /* OpticCup.gif */,
+				A96DE865151B17FE001EBEAD /* OuterLeafBreak.gif */,
+				A96DE866151B17FE001EBEAD /* PCIOL.gif */,
+				A96DE867151B17FE001EBEAD /* PI.gif */,
+				A96DE868151B17FE001EBEAD /* PSCPattern.gif */,
+				A96DE869151B17FE001EBEAD /* Papilloedema.gif */,
+				A96DE86A151B17FE001EBEAD /* Patch.gif */,
+				A96DE86B151B17FE001EBEAD /* PatientImage.png */,
+				A96DE86C151B17FE001EBEAD /* PhakoIncision.gif */,
+				A96DE86D151B17FE001EBEAD /* PointInLine.gif */,
+				A96DE86E151B17FE001EBEAD /* PostSubcapCataract.gif */,
+				A96DE86F151B17FE001EBEAD /* RK.gif */,
+				A96DE870151B17FE001EBEAD /* RRD.gif */,
+				A96DE871151B17FE001EBEAD /* RadialSponge.gif */,
+				A96DE872151B17FE001EBEAD /* Retinoschisis.gif */,
+				A96DE873151B17FE001EBEAD /* RightFundus.gif */,
+				A96DE874151B17FE001EBEAD /* RightPostPole.gif */,
+				A96DE875151B17FE001EBEAD /* Rotate.gif */,
+				A96DE876151B17FE001EBEAD /* RoundHole.gif */,
+				A96DE877151B17FE001EBEAD /* Save.gif */,
+				A96DE878151B17FE001EBEAD /* Scale.gif */,
+				A96DE879151B17FE001EBEAD /* Scar.gif */,
+				A96DE87A151B17FE001EBEAD /* Select.gif */,
+				A96DE87B151B17FE001EBEAD /* Shading.gif */,
+				A96DE87C151B17FE001EBEAD /* SidePort.gif */,
+				A96DE87D151B17FE001EBEAD /* StarFold.gif */,
+				A96DE87E151B17FE001EBEAD /* Supramid.gif */,
+				A96DE87F151B17FE001EBEAD /* UTear.gif */,
+				A96DE880151B17FE001EBEAD /* UpDriftFromLeft.gif */,
+				A96DE881151B17FE001EBEAD /* UpDriftFromRight.gif */,
+				A96DE882151B17FE001EBEAD /* UpShootFromLeft.gif */,
+				A96DE883151B17FE001EBEAD /* UpShootFromRight.gif */,
+				A96DE884151B17FE001EBEAD /* VPattern.gif */,
+				A96DE885151B17FE001EBEAD /* Vicryl.gif */,
+				A96DE886151B17FE001EBEAD /* VitreousOpacity.gif */,
+				A96DE887151B17FE001EBEAD /* deleteSelectedDoodle.gif */,
+				A96DE888151B17FE001EBEAD /* flipHor.gif */,
+				A96DE889151B17FE001EBEAD /* flipVer.gif */,
+				A96DE88A151B17FE001EBEAD /* lock.gif */,
+				A96DE88B151B17FE001EBEAD /* moveToBack.gif */,
+				A96DE88C151B17FE001EBEAD /* moveToFront.gif */,
+				A96DE88D151B17FE001EBEAD /* unlock.gif */,
+			);
+			name = graphics;
+			path = ../graphics;
+			sourceTree = "<group>";
+		};
+		A96DE88E151B17FE001EBEAD /* js */ = {
+			isa = PBXGroup;
+			children = (
+				A96DE88F151B17FE001EBEAD /* ED_Adnexal.js */,
+				A96DE890151B17FE001EBEAD /* ED_AntSeg.js */,
+				A96DE891151B17FE001EBEAD /* ED_Cancer.js */,
+				A96DE892151B17FE001EBEAD /* ED_Drawing.js */,
+				A96DE893151B17FE001EBEAD /* ED_General.js */,
+				A96DE894151B17FE001EBEAD /* ED_Glaucoma.js */,
+				A96DE895151B17FE001EBEAD /* ED_MedicalRetina.js */,
+				A96DE896151B17FE001EBEAD /* ED_Strabismus.js */,
+				A96DE897151B17FE001EBEAD /* ED_VitreoRetinal.js */,
+				A96DE898151B17FE001EBEAD /* OEEyeDraw.js */,
+				A93F4D84158BD7AD008545EE /* ED_Tooltips.js */,
+				A929825316B2E92300E0D109 /* ED_Cardiology.js */,
+			);
+			name = js;
+			path = ../js;
+			sourceTree = "<group>";
+		};
+		A9C2A38A14ED2D290036ED86 = {
+			isa = PBXGroup;
+			children = (
+				A93F4D7D158BD107008545EE /* views */,
+				A96DE81E151B17FE001EBEAD /* css */,
+				A96DE820151B17FE001EBEAD /* Documentation */,
+				A96DE822151B17FE001EBEAD /* graphics */,
+				A96DE88E151B17FE001EBEAD /* js */,
+				A96DE899151B17FE001EBEAD /* Licence */,
+				A96DE89A151B17FE001EBEAD /* OEEyeDrawWidget.php */,
+				A96DE89B151B17FE001EBEAD /* README */,
+				A96BB5DA1662C45500A19749 /* TestBed.html */,
+				A96DE89D151B17FE001EBEAD /* testDoodle.html */,
+				A97BC703166597A5008A6A13 /* testBinding.html */,
+				A930700D164457C900404172 /* Examples */,
+			);
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXProject section */
+		A9C2A38C14ED2D290036ED86 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0420;
+				ORGANIZATIONNAME = "Moorfields Eye Hospital";
+			};
+			buildConfigurationList = A9C2A38F14ED2D290036ED86 /* Build configuration list for PBXProject "EyeDrawJS" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = A9C2A38A14ED2D290036ED86;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+			);
+		};
+/* End PBXProject section */
+
+/* Begin XCBuildConfiguration section */
+		A9C2A39114ED2D290036ED86 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = Debug;
+		};
+		A9C2A39214ED2D290036ED86 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		A9C2A38F14ED2D290036ED86 /* Build configuration list for PBXProject "EyeDrawJS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A9C2A39114ED2D290036ED86 /* Debug */,
+				A9C2A39214ED2D290036ED86 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = A9C2A38C14ED2D290036ED86 /* Project object */;
+}
