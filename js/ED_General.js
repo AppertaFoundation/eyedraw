@@ -542,7 +542,7 @@ ED.Label.prototype.draw = function(_point)
             arrowStart.y = 0;
         }
         
-        // Coorindates of end of arrow
+        // Coordinates of end of arrow
         var arrowEnd = new ED.Point(this.apexX, this.apexY);
         
         // Draw arrow

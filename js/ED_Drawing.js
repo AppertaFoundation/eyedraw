@@ -1176,7 +1176,7 @@ ED.Drawing.prototype.mousemove = function(_point)
                     newPosition.x = doodle.squiggleArray[0].pointsArray[index].x + (mousePosSelectedDoodlePlane.x - lastMousePosSelectedDoodlePlane.x);
                     newPosition.y = doodle.squiggleArray[0].pointsArray[index].y + (mousePosSelectedDoodlePlane.y - lastMousePosSelectedDoodlePlane.y);
                     
-                    // Constraining coordiantes handle with optional range array (set in a subclass)
+                    // Constraining coordinates handle with optional range array (set in a subclass)
                     if (typeof(doodle.handleCoordinateRangeArray) != 'undefined')
                     {
                         newPosition.x = doodle.handleCoordinateRangeArray[index]['x'].constrain(newPosition.x);
@@ -2839,7 +2839,7 @@ ED.Drawing.prototype.report = function()
             }
             else
             {
-                // Only add additional detail if supplied by descripton method
+                // Only add additional detail if supplied by description method
                 if (doodle.description().length > 0)
                 {
                     groupArray[doodle.className] += ", ";
@@ -3889,8 +3889,22 @@ ED.Doodle.prototype.drawBoundary = function(_point)
         
         // Reset so shadow only on boundary
         ctx.shadowBlur = 0;
+        
+        // Draw any additional highlight items
+		if (this.isSelected && this.isShowHighlight)
+		{
+            this.drawHighlightExtras();
+        }
 	}
 }
+
+/**
+ * Draws extra items if the doodle is highlighted
+ */
+ED.Doodle.prototype.drawHighlightExtras = function()
+{
+}
+
 
 /**
  * Returns a String which, if not empty, determines the root descriptions of multiple instances of the doodle
@@ -3911,6 +3925,16 @@ ED.Doodle.prototype.description = function()
 {
 	return "";
 }
+
+///**
+// * Returns a String which, if not empty, determines the suffix following a group description
+// *
+// * @returns {String} Group description end
+// */
+//ED.Doodle.prototype.groupDescriptionEnd = function()
+//{
+//	return "";
+//}
 
 /**
  * Returns a string containing a text description of the doodle. String taken from language specific ED_Tooltips.js

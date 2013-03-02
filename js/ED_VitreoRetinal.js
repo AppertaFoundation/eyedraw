@@ -2810,9 +2810,8 @@ ED.EncirclingBand.prototype.description = function()
 	return returnString;
 }
 
-
 /**
- * DrainageSite
+ * Drainage site
  *
  * @class DrainageSite
  * @property {String} className Name of doodle subclass
@@ -3085,3 +3084,959 @@ ED.RadialSponge.prototype.description = function()
 	return this.clockHour() + " o'clock";
 }
 
+/**
+ * Sclerostomy - bind an HTML element with 'overallGauge' parameter in order to achieve one way binding
+ *
+ * @class Sclerostomy
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Int} _originX
+ * @param {Int} _originY
+ * @param {Float} _radius
+ * @param {Int} _apexX
+ * @param {Int} _apexY
+ * @param {Float} _scaleX
+ * @param {Float} _scaleY
+ * @param {Float} _arc
+ * @param {Float} _rotation
+ * @param {Int} _order
+ */
+ED.Sclerostomy = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+{
+	// Set classname
+	this.className = "Sclerostomy";
+    
+    // Private parameters
+    this.parsPlana = -560;
+    
+    // Derived parameters (NB must set a value here to define parameter as a property of the object, even though value set later)
+    this.overallGauge = '20g';
+    this.gauge = '23g';
+    this.isSutured = false;
+    
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.Sclerostomy.prototype = new ED.Doodle;
+ED.Sclerostomy.prototype.constructor = ED.Sclerostomy;
+ED.Sclerostomy.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.Sclerostomy.prototype.setHandles = function()
+{
+    this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+}
+
+/**
+ * Sets default dragging attributes
+ */
+ED.Sclerostomy.prototype.setPropertyDefaults = function()
+{
+	this.isScaleable = false;
+	this.isMoveable = false;
+    
+    // Update component of validation array for simple parameters
+    this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
+    this.parameterValidationArray['apexY']['range'].setMinAndMax(-660, -460);
+    
+    // Add complete validation arrays for derived parameters
+    this.parameterValidationArray['overallGauge'] = {kind:'derived', type:'string', list:['20g', '23g', '25g', '27g'], animate:false};
+    this.parameterValidationArray['gauge'] = {kind:'derived', type:'string', list:['20g', '23g', '25g', '27g'], animate:false};
+    this.parameterValidationArray['isSutured'] = {kind:'derived', type:'bool'};
+}
+
+/**
+ * Sets default parameters
+ */
+ED.Sclerostomy.prototype.setParameterDefaults = function()
+{
+    this.apexY = -600;
+    this.gauge = "23g";
+    
+    this.setRotationWithDisplacements(60,-45);
+}
+
+/**
+ * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
+ * The returned parameters are animated if their 'animate' property is set to true
+ *
+ * @param {String} _parameter Name of parameter that has changed
+ * @value {Undefined} _value Value of parameter to calculate
+ * @returns {Array} Associative array of values of dependent parameters
+ */
+ED.Sclerostomy.prototype.dependentParameterValues = function(_parameter, _value)
+{
+    var returnArray = new Array();
+    
+    switch (_parameter)
+    {
+        case 'apexY':
+            if (_value < -610) returnArray['gauge'] = "20g";
+            else if (_value < -560) returnArray['gauge'] = "23g";
+            else if (_value < -510) returnArray['gauge'] = "25g";
+            else returnArray['gauge'] = "27g";
+            break;
+        
+        case 'overallGauge':
+            returnArray['gauge'] = _value;
+            break;
+            
+        case 'gauge':
+            if (_value == "20g") returnArray['apexY'] = -650;
+            else if (_value == "23g") returnArray['apexY'] = -600;
+            else if (_value == "25g") returnArray['apexY'] = -550;
+            else returnArray['apexY'] = -500;
+            break;
+    }
+    
+    return returnArray;
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.Sclerostomy.prototype.draw = function(_point)
+{
+	// Get context
+	var ctx = this.drawing.context;
+	
+	// Call draw method in superclass
+	ED.Sclerostomy.superclass.draw.call(this, _point);
+    
+	// Boundary path
+	ctx.beginPath();
+    
+	// Port
+	ctx.rect(-60, this.parsPlana - 120, 120, 160);
+    
+	// Set line attributes
+	ctx.lineWidth = 2;
+	ctx.strokeStyle = "rgba(0, 0, 0, 0)";
+    ctx.fillStyle = "rgba(0, 0, 0, 0)";
+	
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+    
+    // Other stuff here
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
+	{
+        // Draw different shape according to gauge
+        switch (this.gauge)
+        {
+            case "20g":
+                ctx.beginPath();
+                // Use arcTo to create an ellipsoid
+
+                ctx.moveTo(-50, this.parsPlana);
+                ctx.bezierCurveTo(-30, this.parsPlana - 30, 30, this.parsPlana - 30, 50, this.parsPlana);
+                ctx.bezierCurveTo(30, this.parsPlana + 30, -30, this.parsPlana + 30, -50, this.parsPlana);
+                ctx.closePath();
+                ctx.fillStyle = "red";
+                ctx.fill();
+                break;
+            
+            case "23g":
+                ctx.beginPath();
+                ctx.rect(-60, this.parsPlana - 120, 120, 60);
+                ctx.fillStyle = "rgba(0, 0, 255, 0.5)";
+                ctx.fill();
+                ctx.beginPath();
+                ctx.rect(-30, this.parsPlana - 60, 60, 60);
+                ctx.fillStyle = "rgba(120, 120, 120, 0.5)";
+                ctx.fill();
+                ctx.beginPath();
+                ctx.rect(-30, this.parsPlana, 60, 100);
+                ctx.fillStyle = "rgba(220, 220, 220, 0.5)";
+                ctx.fill();
+                break;
+                
+            case "25g":
+                ctx.beginPath();
+                ctx.rect(-50, this.parsPlana - 120, 100, 60);
+                ctx.fillStyle = "rgba(255, 128, 0, 0.5)";
+                ctx.fill();
+                ctx.beginPath();
+                ctx.rect(-20, this.parsPlana - 60, 40, 60);
+                ctx.fillStyle = "rgba(120, 120, 120, 0.5)";
+                ctx.fill();
+                ctx.beginPath();
+                ctx.rect(-20, this.parsPlana, 40, 100);
+                ctx.fillStyle = "rgba(220, 220, 220, 0.5)";
+                ctx.fill();
+                break;
+                
+            case "27g":
+                ctx.beginPath();
+                ctx.rect(-40, this.parsPlana - 120, 80, 60);
+                ctx.fillStyle = "rgba(0, 255, 0, 0.5)";
+                ctx.fill();
+                ctx.beginPath();
+                ctx.rect(-15, this.parsPlana - 60, 30, 60);
+                ctx.fillStyle = "rgba(120, 120, 120, 0.5)";
+                ctx.fill();
+                ctx.beginPath();
+                ctx.rect(-15, this.parsPlana, 30, 100);
+                ctx.fillStyle = "rgba(220, 220, 220, 0.5)";
+                ctx.fill();
+                break;
+        }
+        ctx.fill();
+        
+        // Draw suture
+        if (this.isSutured || this.gauge == "20g")
+        {
+            ctx.beginPath();
+            ctx.moveTo(-40, this.parsPlana + 40);
+            ctx.lineTo(-40, this.parsPlana - 40);
+            ctx.lineTo(+40, this.parsPlana + 40);
+            ctx.lineTo(+40, this.parsPlana - 40);
+            ctx.lineTo(-40, this.parsPlana + 40);
+            
+            ctx.lineWidth = 6;
+            ctx.strokeStyle = "rgba(0,0,120,0.7)";
+            ctx.closePath();
+            ctx.stroke();
+        }
+    }
+    
+	// Coordinates of handles (in canvas plane)
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
+	
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+    
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * Draws extra items if the doodle is highlighted
+ */
+ED.Sclerostomy.prototype.drawHighlightExtras = function()
+{
+    // Get context
+	var ctx = this.drawing.context;
+    
+    // Draw text description of gauge
+    ctx.lineWidth=1;
+    ctx.fillStyle="gray";
+    ctx.font="64px sans-serif";
+    ctx.fillText(this.gauge, 80, this.parsPlana + 20);
+}
+
+/**
+ * Returns a String which, if not empty, determines the root descriptions of multiple instances of the doodle
+ *
+ * @returns {String} Group description
+ */
+ED.Sclerostomy.prototype.groupDescription = function()
+{
+	return "Sclerostomies at ";
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.Sclerostomy.prototype.description = function()
+{
+    // Sutured?
+    var sutured = this.isSutured?" (sutured)":"";
+    
+    // Location (clockhours)
+	return this.clockHour() + " o'clock" + sutured;
+}
+
+/**
+ * Chandelier (single)
+ *
+ * @class ChandelierSingle
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Int} _originX
+ * @param {Int} _originY
+ * @param {Float} _radius
+ * @param {Int} _apexX
+ * @param {Int} _apexY
+ * @param {Float} _scaleX
+ * @param {Float} _scaleY
+ * @param {Float} _arc
+ * @param {Float} _rotation
+ * @param {Int} _order
+ */
+ED.ChandelierSingle = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+{
+	// Set classname
+	this.className = "ChandelierSingle";
+    
+    // Private parameters
+    this.parsPlana = -560;
+    
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.ChandelierSingle.prototype = new ED.Doodle;
+ED.ChandelierSingle.prototype.constructor = ED.ChandelierSingle;
+ED.ChandelierSingle.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets default dragging attributes
+ */
+ED.ChandelierSingle.prototype.setPropertyDefaults = function()
+{
+	this.isScaleable = false;
+	this.isMoveable = false;
+}
+
+/**
+ * Sets default parameters
+ */
+ED.ChandelierSingle.prototype.setParameterDefaults = function()
+{
+    this.setRotationWithDisplacements(180, 90);
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.ChandelierSingle.prototype.draw = function(_point)
+{
+	// Get context
+	var ctx = this.drawing.context;
+	
+	// Call draw method in superclass
+	ED.ChandelierSingle.superclass.draw.call(this, _point);
+    
+	// Boundary path
+	ctx.beginPath();
+    
+	// Port
+	ctx.rect(-60, this.parsPlana - 60, 120, 160);
+    
+	// Set line attributes
+	ctx.lineWidth = 2;
+	ctx.strokeStyle = "rgba(0, 0, 0, 0)";
+    
+    ctx.fillStyle = "rgba(0, 0, 0, 0)";
+	
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+    
+    // Other stuff here
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
+	{
+        // Trocar
+        ctx.beginPath();
+        ctx.moveTo(-20, this.parsPlana + 60);
+        ctx.lineTo(+20, this.parsPlana + 60);
+        ctx.lineTo(+20, this.parsPlana + 120);
+        ctx.lineTo(0, this.parsPlana + 140);
+        ctx.lineTo(-20, this.parsPlana + 120);
+        ctx.lineTo(-20, this.parsPlana + 60);
+        ctx.fillStyle = "rgba(120, 120, 120, 0.5)";
+        ctx.fill();
+        
+        // Body
+        ctx.beginPath();
+        ctx.rect(-60, this.parsPlana, 120, 60);
+        ctx.fillStyle = "rgba(120, 120, 120, 1)";
+        ctx.fill();
+        
+        // Fibre optic
+        ctx.beginPath();
+        ctx.moveTo(0, this.parsPlana);
+        ctx.bezierCurveTo(0, this.parsPlana - 50, 50, this.parsPlana - 100, 100, this.parsPlana - 100);
+        ctx.lineWidth = 40;
+        ctx.strokeStyle = "rgba(120, 120, 120, 0.5)";
+        ctx.stroke();
+    }
+
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * Returns a String which, if not empty, determines the root descriptions of multiple instances of the doodle
+ *
+ * @returns {String} Group description
+ */
+ED.ChandelierSingle.prototype.groupDescription = function()
+{
+	return "Chandelier at ";
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.ChandelierSingle.prototype.description = function()
+{
+    // Location (clockhours)
+	return this.clockHour() + " o'clock";
+}
+
+/**
+ * Chandelier (double)
+ *
+ * @class ChandelierDouble
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Int} _originX
+ * @param {Int} _originY
+ * @param {Float} _radius
+ * @param {Int} _apexX
+ * @param {Int} _apexY
+ * @param {Float} _scaleX
+ * @param {Float} _scaleY
+ * @param {Float} _arc
+ * @param {Float} _rotation
+ * @param {Int} _order
+ */
+ED.ChandelierDouble = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+{
+	// Set classname
+	this.className = "ChandelierDouble";
+    
+    // Private parameters
+    this.parsPlana = -560;
+    
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.ChandelierDouble.prototype = new ED.Doodle;
+ED.ChandelierDouble.prototype.constructor = ED.ChandelierDouble;
+ED.ChandelierDouble.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets default dragging attributes
+ */
+ED.ChandelierDouble.prototype.setPropertyDefaults = function()
+{
+	this.isScaleable = false;
+	this.isMoveable = false;
+}
+
+/**
+ * Sets default parameters
+ */
+ED.ChandelierDouble.prototype.setParameterDefaults = function()
+{
+    this.setRotationWithDisplacements(180, 90);
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.ChandelierDouble.prototype.draw = function(_point)
+{
+	// Get context
+	var ctx = this.drawing.context;
+	
+	// Call draw method in superclass
+	ED.ChandelierDouble.superclass.draw.call(this, _point);
+    
+	// Boundary path
+	ctx.beginPath();
+    
+	// Port
+	ctx.rect(-120, this.parsPlana - 60, 240, 160);
+    
+	// Set line attributes
+	ctx.lineWidth = 2;
+	ctx.strokeStyle = "rgba(0, 0, 0, 0)";
+    
+    ctx.fillStyle = "rgba(0, 0, 0, 0)";
+	
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+    
+    // Other stuff here
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
+	{
+        // Trocars
+        ctx.beginPath();
+        var d = -80;
+        ctx.moveTo(d - 20, this.parsPlana + 60);
+        ctx.lineTo(d + 20, this.parsPlana + 60);
+        ctx.lineTo(d + 20, this.parsPlana + 120);
+        ctx.lineTo(d, this.parsPlana + 140);
+        ctx.lineTo(d - 20, this.parsPlana + 120);
+        ctx.lineTo(d - 20, this.parsPlana + 60);
+        var d = 80;
+        ctx.moveTo(d - 20, this.parsPlana + 60);
+        ctx.lineTo(d + 20, this.parsPlana + 60);
+        ctx.lineTo(d + 20, this.parsPlana + 120);
+        ctx.lineTo(d, this.parsPlana + 140);
+        ctx.lineTo(d - 20, this.parsPlana + 120);
+        ctx.lineTo(d - 20, this.parsPlana + 60);
+        ctx.fillStyle = "rgba(120, 120, 120, 0.5)";
+        ctx.fill();
+        
+        // Body
+        ctx.beginPath();
+        ctx.rect(-120, this.parsPlana, 240, 60);
+        ctx.fillStyle = "rgba(120, 120, 120, 1)";
+        ctx.fill();
+        
+        // Fibre optic
+        ctx.beginPath();
+        ctx.moveTo(0, this.parsPlana);
+        ctx.bezierCurveTo(0, this.parsPlana - 50, 50, this.parsPlana - 100, 100, this.parsPlana - 100);
+        ctx.lineWidth = 40;
+        ctx.strokeStyle = "rgba(120, 120, 120, 0.5)";
+        ctx.stroke();
+    }
+    
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * Returns a String which, if not empty, determines the root descriptions of multiple instances of the doodle
+ *
+ * @returns {String} Group description
+ */
+ED.ChandelierDouble.prototype.groupDescription = function()
+{
+	return "Twin chandelier at ";
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.ChandelierDouble.prototype.description = function()
+{
+    // Location (clockhours)
+	return this.clockHour() + " o'clock";
+}
+
+/**
+ * Corneal erosion
+ *
+ * @class CornealErosion
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Int} _originX
+ * @param {Int} _originY
+ * @param {Float} _radius
+ * @param {Int} _apexX
+ * @param {Int} _apexY
+ * @param {Float} _scaleX
+ * @param {Float} _scaleY
+ * @param {Float} _arc
+ * @param {Float} _rotation
+ * @param {Int} _order
+ */
+ED.CornealErosion = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+{
+	// Set classname
+	this.className = "CornealErosion";
+    
+    // Doodle specific property
+    this.isInVisualAxis = false;
+    
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.CornealErosion.prototype = new ED.Doodle;
+ED.CornealErosion.prototype.constructor = ED.CornealErosion;
+ED.CornealErosion.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.CornealErosion.prototype.setHandles = function()
+{
+    this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, false);
+}
+
+/**
+ * Sets default dragging attributes
+ */
+ED.CornealErosion.prototype.setPropertyDefaults = function()
+{
+	this.isSqueezable = true;
+	this.isRotatable = false;
+    
+    // Update component of validation array for simple parameters
+    this.parameterValidationArray['originX']['range'].setMinAndMax(-150, +150);
+    this.parameterValidationArray['originY']['range'].setMinAndMax(-150, +150);
+    this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.25, +2);
+    this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.25, +2);
+}
+
+/**
+ * Sets default parameters
+ */
+ED.CornealErosion.prototype.setParameterDefaults = function()
+{
+    this.apexY = -50;
+    this.scaleX = 1.5;
+    this.scaleY = 1;
+    
+    this.setOriginWithDisplacements(0,25);
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.CornealErosion.prototype.draw = function(_point)
+{
+	// Get context
+	var ctx = this.drawing.context;
+	
+	// Call draw method in superclass
+	ED.CornealErosion.superclass.draw.call(this, _point);
+	
+	// Boundary path
+	ctx.beginPath();
+    
+	// CornealErosion
+    var r = 120;
+	ctx.arc(0, 0, r, 0, Math.PI * 2, false);
+    
+	// Close path
+	ctx.closePath();
+    
+    // Properties
+    ctx.lineWidth = 3;
+    ctx.fillStyle = "rgba(230, 230, 230, 0.25)";
+	ctx.strokeStyle = "rgba(100, 100, 100, 1)";
+	
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+	
+	// Coordinates of handles (in canvas plane)
+    var point = new ED.Point(0, 0);
+    point.setWithPolars(r, Math.PI/4);
+	this.handleArray[2].location = this.transform.transformPoint(point);
+	
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+	
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.CornealErosion.prototype.groupDescription = function()
+{
+	return "Removal of some corneal epithelium";
+}
+
+/**
+ * Cutter Peripheral iridectomy
+ *
+ * @class CutterPI
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Int} _originX
+ * @param {Int} _originY
+ * @param {Float} _radius
+ * @param {Int} _apexX
+ * @param {Int} _apexY
+ * @param {Float} _scaleX
+ * @param {Float} _scaleY
+ * @param {Float} _arc
+ * @param {Float} _rotation
+ * @param {Int} _order
+ */
+ED.CutterPI = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+{
+	// Set classname
+	this.className = "CutterPI";
+    
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.CutterPI.prototype = new ED.Doodle;
+ED.CutterPI.prototype.constructor = ED.CutterPI;
+ED.CutterPI.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets default properties
+ */
+ED.CutterPI.prototype.setPropertyDefaults = function()
+{
+	this.isScaleable = false;
+	this.isMoveable = false;
+}
+
+/**
+ * Sets default parameters
+ */
+ED.CutterPI.prototype.setParameterDefaults = function()
+{
+    this.setRotationWithDisplacements(160,40);
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.CutterPI.prototype.draw = function(_point)
+{
+	// Get context
+	var ctx = this.drawing.context;
+	
+	// Call draw method in superclass
+	ED.CutterPI.superclass.draw.call(this, _point);
+	
+	// Boundary path
+	ctx.beginPath();
+    
+    // Draw base
+    ctx.arc(0, -324, 40, 0, 2 * Math.PI, true);
+    
+    // Colour of fill
+    ctx.fillStyle = "rgba(255,255,255,1)";
+    
+	// Set line attributes
+	ctx.lineWidth = 4;
+    
+    // Colour of outer line is dark gray
+    ctx.strokeStyle = "rgba(120,120,120,0.75)";;
+	
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+	
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.CutterPI.prototype.groupDescription = function()
+{
+    return "Cutter iridectomy/s";
+}
+
+/**
+ * Scleral incision
+ *
+ * @class ScleralIncision
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Int} _originX
+ * @param {Int} _originY
+ * @param {Float} _radius
+ * @param {Int} _apexX
+ * @param {Int} _apexY
+ * @param {Float} _scaleX
+ * @param {Float} _scaleY
+ * @param {Float} _arc
+ * @param {Float} _rotation
+ * @param {Int} _order
+ */
+ED.ScleralIncision = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+{
+	// Set classname
+	this.className = "ScleralIncision";
+    
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.ScleralIncision.prototype = new ED.Doodle;
+ED.ScleralIncision.prototype.constructor = ED.ScleralIncision;
+ED.ScleralIncision.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.ScleralIncision.prototype.setHandles = function()
+{
+    this.handleArray[3] = new ED.Handle(null, true, ED.Mode.Arc, false);
+}
+
+/**
+ * Sets default properties
+ */
+ED.ScleralIncision.prototype.setPropertyDefaults = function()
+{
+	this.isScaleable = false;
+	this.isMoveable = false;
+	this.isRotatable = true;
+    this.isArcSymmetrical = true;
+    
+    // Update component of validation array for simple parameters
+    this.parameterValidationArray['arc']['range'].setMinAndMax(Math.PI/16, Math.PI/2);
+}
+
+/**
+ * Sets default parameters (only called for new doodles)
+ * Use the setParameter function for derived parameters, as this will also update dependent variables
+ */
+ED.ScleralIncision.prototype.setParameterDefaults = function()
+{
+    this.arc = Math.PI/8;
+    this.setRotationWithDisplacements(60,-120);
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.ScleralIncision.prototype.draw = function(_point)
+{
+	// Get context
+	var ctx = this.drawing.context;
+	
+	// Call draw method in superclass
+	ED.ScleralIncision.superclass.draw.call(this, _point);
+	
+    // Radii
+    var r =  560;
+    var d = 40;
+    var ro = r + d;
+    var ri = r - d;
+    
+    // Boundary path
+	ctx.beginPath();
+    
+    // Half angle of arc
+    var theta = this.arc/2;
+    
+    // Arc across
+    ctx.arc(0, 0, ro, - Math.PI/2 + theta, - Math.PI/2 - theta, true);
+    
+    // Arc back to mirror image point on the other side
+    ctx.arc(0, 0, ri, - Math.PI/2 - theta, - Math.PI/2 + theta, false);
+    
+	// Close path
+	ctx.closePath();
+    
+    // Colour of fill
+    ctx.fillStyle = "rgba(200,200,200,0)";
+    
+    // Set line attributes
+    ctx.lineWidth = 5;
+    
+    // Colour of outer line
+    ctx.strokeStyle = "rgba(120,120,120,0)";
+    
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+	
+	// Non boundary drawing here
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
+    {
+        // New path
+        ctx.beginPath();
+        
+        // Arc across
+        ctx.arc(0, 0, r, - Math.PI/2 + theta, - Math.PI/2 - theta, true);
+        
+        // Sutures
+        var sutureSeparationAngle = 0.2;
+        var p = new ED.Point(0, 0);
+        var phi = theta - sutureSeparationAngle/2;
+        
+        do
+        {
+            p.setWithPolars(r - d, phi);
+            ctx.moveTo(p.x, p.y);
+            p.setWithPolars(r + d, phi);
+            ctx.lineTo(p.x, p.y);
+            
+            phi = phi - sutureSeparationAngle;
+        } while(phi > -theta);
+        
+        // Set line attributes
+        ctx.lineWidth = 6;
+        
+        // Colour of outer line is dark gray
+        ctx.strokeStyle = "rgba(120,120,120,0.75)";
+        
+        // Draw incision
+        ctx.stroke();
+	}
+    
+    // Coordinates of handles (in canvas plane)
+    var point = new ED.Point(0, 0);
+    point.setWithPolars(r, theta);
+	this.handleArray[3].location = this.transform.transformPoint(point);
+    
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+	
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.ScleralIncision.prototype.groupDescription = function()
+{
+	return "Scleral incision at ";
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.ScleralIncision.prototype.description = function()
+{
+    // Location (clockhours)
+	return this.clockHour() + " o'clock";
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+//ED.ScleralIncision.prototype.groupDescriptionEnd = function()
+//{
+//	return " o'clock";
+//}
