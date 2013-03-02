@@ -33,7 +33,7 @@ if (ED == null || typeof(ED) != "object") { var ED = new Object();}
  *
  * In order to display UTF.8 characters, this file should be loaded with the 'charset="utf-8"' attribute.
  * This currently cannot be done with the Yii registerScriptFile method, so should be loaded using a tag in the view file;
- * <script language="JavaScript" src="js/ED_Tooltips.js" type="text/javascript" charset="utf-8"></script>
+ * <script src="js/ED_Tooltips.js" type="text/javascript" charset="utf-8"></script>
  */
 ED.trans = new Object();
 

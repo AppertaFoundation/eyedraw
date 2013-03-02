@@ -5,11 +5,11 @@
         <link rel="stylesheet" href="../css/OEEyeDraw.css" type="text/css" media="screen" />
         
         <!-- Mandatory file containing key drawing classes -->
-        <script language="JavaScript" src="../js/ED_Drawing.js" type="text/javascript"></script>
+        <script src="../js/ED_Drawing.js" type="text/javascript"></script>
         
         <!-- Subclasses loaded according to need -->
-        <script language="JavaScript" src="../js/ED_Tooltips.js" type="text/javascript" charset="utf-8"></script>
-        <script language="JavaScript" src="../js/ED_AntSeg.js" type="text/javascript"></script>
+        <script src="../js/ED_Tooltips.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../js/ED_AntSeg.js" type="text/javascript"></script>
                 
         <!--   This script handles the drawings for the page   -->
         <script type="text/javascript">
@@ -317,13 +317,13 @@
         
         <!-- Doodle controls toolbar -->
         <div class="ed_toolbar">
-            <button class="imgbutton" class="imgbutton" disabled="true" id="moveToFrontRPS" title="Move to front" onclick="drawingEdit1.moveToFront(); return false;" ><img src="../graphics/moveToFront.gif"/></button>
-            <button class="imgbutton" disabled="true" id="moveToBackRPS" title="Move to back" onclick="drawingEdit1.moveToBack(); return false;" ><img src="../graphics/moveToBack.gif" /></button>
-            <button class="imgbutton" disabled="true" id="flipVerRPS" title="Flip around vertical axis" onclick="drawingEdit1.flipVer(); return false;" ><img src="../graphics/flipVer.gif" /></button>
-            <button class="imgbutton" disabled="true" id="flipHorRPS" title="Flip around horizontal axis" onclick="drawingEdit1.flipHor(); return false;" ><img src="../graphics/flipHor.gif" /></button>
-            <button class="imgbutton" disabled="true" id="deleteSelectedDoodleRPS" title="Delete" onclick="drawingEdit1.deleteSelectedDoodle(); return false;" ><img src="../graphics/deleteSelectedDoodle.gif" /></button>
-            <button class="imgbutton" disabled="true" id="lockRPS" title="Lock" onclick="drawingEdit1.lock(); return false;" ><img src="../graphics/lock.gif" /></button>
-            <button class="imgbutton" disabled="true" id="unlockRPS" title="Unlock" onclick="drawingEdit1.unlock(); return false;" ><img src="../graphics/unlock.gif" /></button>
+            <button class="imgbutton" class="imgbutton" disabled="disabled" id="moveToFrontRPS" title="Move to front" onclick="drawingEdit1.moveToFront(); return false;" ><img src="../graphics/moveToFront.gif"/></button>
+            <button class="imgbutton" disabled="disabled" id="moveToBackRPS" title="Move to back" onclick="drawingEdit1.moveToBack(); return false;" ><img src="../graphics/moveToBack.gif" /></button>
+            <button class="imgbutton" disabled="disabled" id="flipVerRPS" title="Flip around vertical axis" onclick="drawingEdit1.flipVer(); return false;" ><img src="../graphics/flipVer.gif" /></button>
+            <button class="imgbutton" disabled="disabled" id="flipHorRPS" title="Flip around horizontal axis" onclick="drawingEdit1.flipHor(); return false;" ><img src="../graphics/flipHor.gif" /></button>
+            <button class="imgbutton" disabled="disabled" id="deleteSelectedDoodleRPS" title="Delete" onclick="drawingEdit1.deleteSelectedDoodle(); return false;" ><img src="../graphics/deleteSelectedDoodle.gif" /></button>
+            <button class="imgbutton" disabled="disabled" id="lockRPS" title="Lock" onclick="drawingEdit1.lock(); return false;" ><img src="../graphics/lock.gif" /></button>
+            <button class="imgbutton" disabled="disabled" id="unlockRPS" title="Unlock" onclick="drawingEdit1.unlock(); return false;" ><img src="../graphics/unlock.gif" /></button>
             <br />
         </div>
 
@@ -344,7 +344,7 @@
         <canvas id="canvasEdit1" class="ed_canvas_edit" width="200" height="200" tabindex="1"></canvas>
 
          <canvas id="canvasEdit2" class="ed_canvas_edit" width="120" height="200" tabindex="3"></canvas>
-        </br>
+        <br/>
         
         <select id="pupilSize">
             <option value="Large">Large</option>

@@ -5,10 +5,10 @@
         <link rel="stylesheet" href="../css/OEEyeDraw.css" type="text/css" media="screen" />
         
         <!-- Mandatory file containing key drawing classes -->
-        <script language="JavaScript" src="../js/ED_Drawing.js" type="text/javascript"></script>
+        <script src="../js/ED_Drawing.js" type="text/javascript"></script>
         
         <!-- Subclasses loaded according to need -->
-        <script language="JavaScript" src="../js/ED_AntSeg.js" type="text/javascript"></script>
+        <script src="../js/ED_AntSeg.js" type="text/javascript"></script>
         
         <!-- This script handles the drawings for the page -->
         <script type="text/javascript">
@@ -56,16 +56,16 @@
     <body onload="init();">
         
         <!-- doodle button to delete or add a doodle -->
-        <button class="imgbutton" disabled="true" id="deleteSelectedDoodleRPS" title="Delete" onclick="drawingEdit.deleteSelectedDoodle(); return false;" ><img src="../graphics/deleteSelectedDoodle.gif" /></button>
+        <button class="imgbutton" disabled="disabled" id="deleteSelectedDoodleRPS" title="Delete" onclick="drawingEdit.deleteSelectedDoodle(); return false;" ><img src="../graphics/deleteSelectedDoodle.gif" /></button>
         <button class="imgbutton" onclick="drawingEdit.addDoodle('CorticalCataract'); return false;" ><img src="../graphics/CorticalCataract.gif" /></button>
-        </br >
+        <br/>
         
         <!-- Canvas element -->
         <canvas id="canvasEdit" class="ed_canvas_edit" width="300" height="300" tabindex="1"></canvas>
         
         <!-- Input element -->
         <select id="gradeSelect">
-            <option value="None" selected="true">None</option>
+            <option value="None" selected="selected">None</option>
             <option value="Mild" >Mild</option>
             <option value="Moderate">Moderate</option>
             <option value="White">White</option>
