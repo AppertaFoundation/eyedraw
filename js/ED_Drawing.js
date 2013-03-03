@@ -2822,6 +2822,7 @@ ED.Drawing.prototype.report = function()
 {
 	var returnString = "";
     var groupArray = new Array();
+    var groupEndArray = new Array();
 	
 	// Go through every doodle
 	for (var i = 0; i < this.doodleArray.length; i++)
@@ -2844,6 +2845,15 @@ ED.Drawing.prototype.report = function()
                 {
                     groupArray[doodle.className] += ", ";
                     groupArray[doodle.className] += doodle.description();
+                }
+            }
+            
+            // Check if there is a corresponding end description
+            if (doodle.groupDescriptionEnd().length > 0)
+            {
+                if (typeof(groupEndArray[doodle.className]) == 'undefined')
+                {
+                    groupEndArray[doodle.className] = doodle.groupDescriptionEnd();
                 }
             }
         }
@@ -2877,8 +2887,15 @@ ED.Drawing.prototype.report = function()
         // Get description
         var description = groupArray[className];
         
+        // Get end description
+        var endDescription = "";
+        if (typeof(groupEndArray[className]) != 'undefined')
+        {
+            endDescription = groupEndArray[className];
+        }
+        
         // Replace last comma with a comma and 'and'
-        description = description.addAndAfterLastComma();
+        description = description.addAndAfterLastComma() + endDescription;
         
         // If its not an empty string, add to the return
         if (description.length > 0)
@@ -3926,15 +3943,15 @@ ED.Doodle.prototype.description = function()
 	return "";
 }
 
-///**
-// * Returns a String which, if not empty, determines the suffix following a group description
-// *
-// * @returns {String} Group description end
-// */
-//ED.Doodle.prototype.groupDescriptionEnd = function()
-//{
-//	return "";
-//}
+/**
+ * Returns a String which, if not empty, determines the suffix following a group description
+ *
+ * @returns {String} Group description end
+ */
+ED.Doodle.prototype.groupDescriptionEnd = function()
+{
+	return "";
+}
 
 /**
  * Returns a string containing a text description of the doodle. String taken from language specific ED_Tooltips.js

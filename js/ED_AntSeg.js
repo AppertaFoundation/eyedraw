@@ -1305,9 +1305,29 @@ ED.SidePort.prototype.draw = function(_point)
  *
  * @returns {String} Description of doodle
  */
+ED.SidePort.prototype.groupDescription = function()
+{
+	return "Sideport at ";
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
 ED.SidePort.prototype.description = function()
 {
-    return "Sideport at " + this.clockHour() + " o'clock";;
+    return this.clockHour();
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.SidePort.prototype.groupDescriptionEnd = function()
+{
+	return " o'clock";
 }
 
 /**
@@ -4214,9 +4234,19 @@ ED.IrisHook.prototype.description = function()
 {
     var returnString = "";
     
-    returnString += this.clockHour() + " o'clock";
+    returnString += this.clockHour();
     
 	return returnString;
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.IrisHook.prototype.groupDescriptionEnd = function()
+{
+	return " o'clock";
 }
 
 /**

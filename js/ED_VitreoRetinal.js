@@ -3353,7 +3353,17 @@ ED.Sclerostomy.prototype.description = function()
     var sutured = this.isSutured?" (sutured)":"";
     
     // Location (clockhours)
-	return this.clockHour() + " o'clock" + sutured;
+	return this.clockHour() + sutured;
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.Sclerostomy.prototype.groupDescriptionEnd = function()
+{
+	return " o'clock";
 }
 
 /**
@@ -4027,8 +4037,7 @@ ED.ScleralIncision.prototype.groupDescription = function()
  */
 ED.ScleralIncision.prototype.description = function()
 {
-    // Location (clockhours)
-	return this.clockHour() + " o'clock";
+	return this.clockHour();
 }
 
 /**
@@ -4036,7 +4045,7 @@ ED.ScleralIncision.prototype.description = function()
  *
  * @returns {String} Description of doodle
  */
-//ED.ScleralIncision.prototype.groupDescriptionEnd = function()
-//{
-//	return " o'clock";
-//}
+ED.ScleralIncision.prototype.groupDescriptionEnd = function()
+{
+	return " o'clock";
+}
