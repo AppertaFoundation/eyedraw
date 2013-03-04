@@ -95,6 +95,12 @@ class OEEyeDrawWidget extends CWidget
 	 * @var int
 	 */
     public $height = 300;
+    
+    /**
+	 * Global scale factor
+	 * @var int
+	 */
+    public $scale = 1;
 
 	/**
 	 * The model possessing an attribute to store JSON data
@@ -116,6 +122,13 @@ class OEEyeDrawWidget extends CWidget
 	 */
     public $doodleToolBarArray = array();
 
+    /**
+	 * Array of doodles with properties to display
+     *
+	 * @var array
+	 */
+    public $displayParameterArray = array();
+    
 	/**
 	 * Array of commands to apply to the drawing object once images have loaded
 	 * @var array
@@ -362,6 +375,7 @@ class OEEyeDrawWidget extends CWidget
             'drawingName'=>$this->drawingName,
             'canvasId'=>$this->canvasId,
             'eye'=>$this->eye,
+            'scale'=>$this->scale,
             'idSuffix'=>$this->idSuffix,
             'isEditable'=>$this->isEditable,
             'focus'=>$this->focus,

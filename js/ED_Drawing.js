@@ -1903,6 +1903,37 @@ ED.Drawing.prototype.deleteSelectedDoodle = function()
 }
 
 /**
+ * Sets a property on currently selected doodle NB currently only supports boolean properties
+ *
+ * @param {Object} _element An HTML element which called this function
+ * @param {String} _property The name of the property to switch
+ */
+ED.Drawing.prototype.setSelectedDoodle = function(_element, _property)
+{
+    // Get value of check box
+    var value = _element.checked?"true":"false";
+    
+    // Should only be called if a doodle is selected, but check anyway
+	if (this.selectedDoodle != null)
+	{
+        this.selectedDoodle.setParameterFromString(_property, value);
+    }
+    else
+    {
+        ED.errorHandler('ED.Drawing', 'setSelectedDoodle', 'Attempt to set a property on the selected doodle, when none selected');
+    }
+    
+//    if (_element.checked)
+//    {
+//        console.log('YES');
+//    }
+//    else
+//    {
+//        console.log('NO');        
+//    }
+}
+
+/**
  * Deletes doodle with selected id
  */
 ED.Drawing.prototype.deleteDoodleOfId = function(_id)
@@ -3002,7 +3033,17 @@ ED.Drawing.prototype.repaint = function()
 	
 	// Redraw all doodles
 	this.drawAllDoodles();
-	
+    
+    // Go through doodles unsetting and then setting property display
+    for (var i = 0; i < this.doodleArray.length; i++)
+    {
+        this.doodleArray[i].setDisplayOfParameterControls(false);
+    }
+	if (this.selectedDoodle != null)
+    {
+        this.selectedDoodle.setDisplayOfParameterControls(true);
+    }
+    
 	// Enable or disable buttons which work on selected doodle
 	if (this.selectedDoodle != null)
 	{
@@ -3922,6 +3963,42 @@ ED.Doodle.prototype.drawHighlightExtras = function()
 {
 }
 
+/**
+ * Shows doodle parameter controls. Doodle must set display:true in parameterValidationArray
+ *
+ * @param {Bool} _flag Flag determining whether display is shown or not shown
+ */
+ED.Doodle.prototype.setDisplayOfParameterControls = function(_flag)
+{
+    for (var parameter in this.parameterValidationArray)
+    {
+        var validation = this.parameterValidationArray[parameter];
+        if (validation.display)
+        {
+            // Construct id of element
+            var id = parameter + this.className + this.drawing.IDSuffix;
+            
+            // Look for corresponding element and toggle display
+            var element = document.getElementById(id);
+            if (element)
+            {
+                // Get parent label
+                var label = element.parentNode;
+                if (_flag)
+                {
+                    label.style.display = 'inline';
+                }
+                else
+                {
+                    label.style.display = 'none';
+                }
+                
+                // Ensure value of checkbox matches value of property
+                element.checked = this[parameter];
+            }
+        }
+    }
+}
 
 /**
  * Returns a String which, if not empty, determines the root descriptions of multiple instances of the doodle

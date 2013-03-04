@@ -85,6 +85,10 @@ function eyeDrawInit(_properties)
             {
                 // Drawing object ready
                 case 'ready':
+                    
+                    // Set scale of drawing
+                    this.drawing.globalScaleFactor = _properties.scale;
+                    
                     // If input exists and contains data, load it into the drawing
                     if (input != null && input.value.length > 0)
                     {

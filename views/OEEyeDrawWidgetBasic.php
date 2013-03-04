@@ -19,6 +19,16 @@
             <button class="ed_img_button" id="Label<?php echo $idSuffix?>" title="Label" onclick="<?php echo $drawingName?>.addDoodle('Label'); <?php echo $drawingName?>.canvas.focus(); return false;">
                 <img src="<?php echo $imgPath?>Label.gif" />
             </button>
+
+            <?php
+                foreach ($displayParameterArray as $doodleClass => $parameterArray)
+                {
+                    $parameter = $parameterArray['parameter'];
+                    $label = $parameterArray['label'];
+                ?>
+            <label class="displayParameterLabel" style="display:inline;" ><input class="displayParameterElement" type="checkbox" id="<?php echo $parameter.$doodleClass.$idSuffix;?>" onchange="<?php echo $drawingName;?>.setSelectedDoodle(this, '<?php echo $parameter;?>');return false;" ><?php echo $label;?></label>
+            <?php }?>
+
 		</div>
 	<?php }?>
     <?php if ($isEditable && count($doodleToolBarArray) > 0) {

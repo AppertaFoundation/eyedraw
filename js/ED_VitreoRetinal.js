@@ -3087,6 +3087,8 @@ ED.RadialSponge.prototype.description = function()
 /**
  * Sclerostomy - bind an HTML element with 'overallGauge' parameter in order to achieve one way binding
  *
+ * Also an example of using 'spare' properties to save otherwise unsaved parameters
+ *
  * @class Sclerostomy
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
@@ -3110,7 +3112,7 @@ ED.Sclerostomy = function(_drawing, _originX, _originY, _radius, _apexX, _apexY,
     this.parsPlana = -560;
     
     // Derived parameters (NB must set a value here to define parameter as a property of the object, even though value set later)
-    this.overallGauge = '20g';
+    this.overallGauge = '23g';
     this.gauge = '23g';
     this.isSutured = false;
     
@@ -3148,7 +3150,7 @@ ED.Sclerostomy.prototype.setPropertyDefaults = function()
     // Add complete validation arrays for derived parameters
     this.parameterValidationArray['overallGauge'] = {kind:'derived', type:'string', list:['20g', '23g', '25g', '27g'], animate:false};
     this.parameterValidationArray['gauge'] = {kind:'derived', type:'string', list:['20g', '23g', '25g', '27g'], animate:false};
-    this.parameterValidationArray['isSutured'] = {kind:'derived', type:'bool'};
+    this.parameterValidationArray['isSutured'] = {kind:'derived', type:'bool', display:true};
 }
 
 /**
@@ -3158,6 +3160,8 @@ ED.Sclerostomy.prototype.setParameterDefaults = function()
 {
     this.apexY = -600;
     this.gauge = "23g";
+    this.radius = 50;
+    this.isSutured = false;
     
     this.setRotationWithDisplacements(60,-45);
 }
@@ -3193,6 +3197,16 @@ ED.Sclerostomy.prototype.dependentParameterValues = function(_parameter, _value)
             else if (_value == "25g") returnArray['apexY'] = -550;
             else returnArray['apexY'] = -500;
             break;
+            
+        case 'radius':
+            if (_value < 100) returnArray['isSutured'] = false;
+            else returnArray['isSutured'] = true;
+            break;
+            
+        case 'isSutured':
+            if (_value) returnArray['radius'] = 150;
+            else returnArray['radius'] = 50;
+            break;
     }
     
     return returnArray;
@@ -3204,7 +3218,7 @@ ED.Sclerostomy.prototype.dependentParameterValues = function(_parameter, _value)
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
 ED.Sclerostomy.prototype.draw = function(_point)
-{
+{console.log(this.radius);
 	// Get context
 	var ctx = this.drawing.context;
 	

@@ -52,7 +52,7 @@ ED.AntSeg = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _sca
     
     // Derived parameters (NB must set a value here to define parameter as a property of the object, even though value set later)
     this.pupilSize = 'Large';
-    this.pxe = true;
+    this.pxe = false;
     
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
@@ -84,7 +84,7 @@ ED.AntSeg.prototype.setPropertyDefaults = function()
     this.isUnique = true;
     
     // Update component of validation array for simple parameters
-    this.parameterValidationArray['apexX']['range'].setMinAndMax(-50, +50);
+    this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
     this.parameterValidationArray['apexY']['range'].setMinAndMax(-280, -60);
     
     // Add complete validation arrays for derived parameters
@@ -140,15 +140,18 @@ ED.AntSeg.prototype.dependentParameterValues = function(_parameter, _value)
             }
             break;
 
+            /*
         case 'apexX':
             if (_value < -5) returnArray['pxe'] = false;
             else returnArray['pxe'] = true;
             break;
+
             
         case 'pxe':
             if (this.pxe) returnArray['apexX'] = +50;
             else returnArray['apexX'] = -50;
             break;
+             */
     }
     
     return returnArray;
