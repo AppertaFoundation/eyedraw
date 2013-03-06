@@ -289,7 +289,11 @@ class OEEyeDrawWidget extends CWidget
         
         // Flag indicating whether the drawing is editable or not (normally corresponded to edit and view mode)
         $this->isEditable = $this->mode == 'edit'?true:false;
-
+		
+        // jquery dependency
+        $cs = Yii::app()->clientScript;
+        $cs->registerCoreScript('jquery');
+        
         // Register the chosen scripts and CSS files
         $this->registerScripts();
         $this->registerCss();
