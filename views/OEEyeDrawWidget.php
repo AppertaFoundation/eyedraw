@@ -82,7 +82,13 @@
 </div>
 
 <script type="text/javascript">
-	$('#eyedrawwidget_<?php echo $idSuffix ?> .ed_toolbar a').hoverIntent(
+
+	// Use jQuery.hoverIntent if available
+	var hover_event = 'hover';
+	if($.fn.hoverIntent) {
+		hover_event = 'hoverIntent';
+	}
+	$('#eyedrawwidget_<?php echo $idSuffix ?> .ed_toolbar a')[hover_event](
 			function(e) {
 				$(this).next().addClass('active');
 			},
@@ -90,6 +96,7 @@
 				$(this).next().removeClass('active');
 			}
 	);
+	
 	$('#eyedrawwidget_<?php echo $idSuffix ?> .ed_toolbar li.action a').click(function(e) {
 		var fn = $(this).attr('data-function');
 		var arg = $(this).attr('data-arg');
