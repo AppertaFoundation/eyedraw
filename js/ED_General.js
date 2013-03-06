@@ -592,16 +592,6 @@ ED.Label.prototype.addLetter = function(_keyCode)
 }
 
 /**
- * Returns a string containing a text description of the doodle
- *
- * @returns {String} Description of doodle
- */
-ED.Label.prototype.description = function()
-{
-    return "Peripheral iridectomy at " + this.clockHour() + " o'clock";
-}
-
-/**
  *  OperatingTable
  *
  * @class  MouseTest
