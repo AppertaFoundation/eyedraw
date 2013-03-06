@@ -64,7 +64,7 @@ class OEEyeDrawWidget extends CWidget
     * View file for rendering the eyeDraw
     * @var string
     */
-    public $template = 'OEEyeDrawWidgetBasic';
+    public $template = 'OEEyeDrawWidget';
 
 	/**
 	 * Unique identifier for the drawing on the current page
