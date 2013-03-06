@@ -32,8 +32,8 @@
 		foreach ($doodleToolBarArray as $row => $rowItems) { ?>
 	<ul class="ed_toolbar clearfix" id="<?php echo $canvasId.'doodleToolbar' . $row ?>">
 		<?php
-			$main_items = array_slice($rowItems, 0, 4);
-			$extra_items = array_slice($rowItems, 4);
+			$main_items = array_slice($rowItems, 0, 7);
+			$extra_items = array_slice($rowItems, 7);
 			foreach ($main_items as $item) {
 		?>
 		<li class="ed_img_button action" id="<?php echo $item['classname'].$idSuffix ?>">
@@ -51,7 +51,7 @@
 				<img src="<?php echo $imgPath ?>more.gif" />
 			</a>
 			<span>More...</span>
-			<ul class="clearfix">
+			<ul class="clearfix" style="display: none;">
 				<?php foreach($extra_items as $item) { ?>
 				<li class="ed_img_button action"  id="<?php echo $item['classname'].$idSuffix ?>">
 					<a href="" data-function="addDoodle" data-arg="<?php echo $item['classname'] ?>">
@@ -99,9 +99,16 @@
 		$('#eyedrawwidget_<?php echo $idSuffix ?> .ed_toolbar ul').hide();
 		e.preventDefault();
 	});
-	$('#eyedrawwidget_<?php echo $idSuffix ?> .ed_toolbar ul').hide();
+
+	// Show/hide drawer when clicked on/away
+	$(document).click(function() {
+	  $(".EyeDrawWidget .drawer ul").hide(); //click came from somewhere else
+	});
 	$('#eyedrawwidget_<?php echo $idSuffix ?> .ed_toolbar li.drawer > a').click(function(e) {
-		$(this).parent().find('ul').toggle();
+		$(".EyeDrawWidget .drawer ul").hide();
+		$(this).parent().find('ul').show();
+		e.stopPropagation();
 		e.preventDefault();
 	});
+	
 </script>
