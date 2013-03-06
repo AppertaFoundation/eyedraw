@@ -5059,16 +5059,16 @@ ED.Doodle.prototype.nearestAngleTo = function(_angle)
 ED.Doodle.prototype.json = function()
 {
 	var s = '{';
-    s = s + '"subclass": ' + '"' + this.className + '", '
-    s = s + '"originX": ' + this.originX.toFixed(0) + ', '
-    s = s + '"originY": ' + this.originY.toFixed(0) + ', '
-    s = s + '"radius": ' + this.radius.toFixed(0) + ', '
-    s = s + '"apexX": ' + this.apexX.toFixed(0) + ', '
-    s = s + '"apexY": ' + this.apexY.toFixed(0) + ', '
-    s = s + '"scaleX": ' + this.scaleX.toFixed(2) + ', '
-    s = s + '"scaleY": ' + this.scaleY.toFixed(2) + ', '
-    s = s + '"arc": ' + (this.arc * 180/Math.PI).toFixed(0)  + ', '
-    s = s + '"rotation": ' + (this.rotation * 180/Math.PI).toFixed(0) + ', '
+    s = s + '"subclass": ' + '"' + this.className + '", ';
+    s = s + '"originX": ' + this.originX.toFixed(0) + ', ';
+    s = s + '"originY": ' + this.originY.toFixed(0) + ', ';
+    s = s + '"radius": ' + this.radius.toFixed(0) + ', ';
+    s = s + '"apexX": ' + this.apexX.toFixed(0) + ', ';
+    s = s + '"apexY": ' + this.apexY.toFixed(0) + ', ';
+    s = s + '"scaleX": ' + this.scaleX.toFixed(2) + ', ';
+    s = s + '"scaleY": ' + this.scaleY.toFixed(2) + ', ';
+    s = s + '"arc": ' + (this.arc * 180/Math.PI).toFixed(0)  + ', ';
+    s = s + '"rotation": ' + (this.rotation * 180/Math.PI).toFixed(0) + ', ';
     s = s + '"order": ' + this.order.toFixed(0) + ', '
     
     s = s + '"squiggleArray": ['; 

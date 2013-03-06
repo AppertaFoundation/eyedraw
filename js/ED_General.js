@@ -398,7 +398,7 @@ ED.Label = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scal
     // Flag to indicate first edit
     this.isEdited = false;
     
-    // Temporary store for values of originX and originY
+    // Temporary store for values of originX and originY (to prevent apex moving with body of label)
     this.lastOriginX = 0;
     this.lastOriginY = 0;
     
@@ -457,11 +457,11 @@ ED.Label.prototype.dependentParameterValues = function(_parameter, _value)
     switch (_parameter)
     {
         case 'originX':
-            returnArray['apexX'] = this.apexX - (_value - this.lastOriginX);
+            returnArray['apexX'] = this.apexX - (_value - this.lastOriginX)/this.drawing.globalScaleFactor;
             this.lastOriginX = _value;
             break;
         case 'originY':
-            returnArray['apexY'] = this.apexY - (_value - this.lastOriginY);
+            returnArray['apexY'] = this.apexY - (_value - this.lastOriginY)/this.drawing.globalScaleFactor;
             this.lastOriginY = _value;
             break;
     }
@@ -544,14 +544,22 @@ ED.Label.prototype.draw = function(_point)
         
         // Coordinates of end of arrow
         var arrowEnd = new ED.Point(this.apexX, this.apexY);
-        
+            
         // Draw arrow
+        ctx.strokeStyle = "Gray";
+        ctx.fillStyle = "Gray";
+        ctx.lineWidth = 4;
+        
         ctx.beginPath();
         ctx.moveTo(arrowStart.x, arrowStart.y);
         ctx.lineTo(arrowEnd.x, arrowEnd.y);
-        ctx.strokeStyle = "Gray";
-        ctx.lineWidth = 4;
         ctx.stroke();
+        
+        ctx.beginPath();
+        ctx.arc(arrowEnd.x, arrowEnd.y, 16, 0, Math.PI*2, true);
+        ctx.closePath();
+        ctx.moveTo(arrowEnd.x, arrowEnd.y);
+        ctx.fill();
     }
     
 	// Coordinates of handles (in canvas plane)

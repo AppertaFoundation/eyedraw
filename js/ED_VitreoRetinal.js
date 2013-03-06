@@ -3218,7 +3218,7 @@ ED.Sclerostomy.prototype.dependentParameterValues = function(_parameter, _value)
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
 ED.Sclerostomy.prototype.draw = function(_point)
-{console.log(this.radius);
+{
 	// Get context
 	var ctx = this.drawing.context;
 	

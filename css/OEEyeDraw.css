@@ -148,7 +148,9 @@ span.squiggle {
     font-weight: normal !important;
 }
 
-.displayParameterCheckbox {
+.displayParameterElement {
+    margin-bottom: 0px !important;
+    margin-right: 5px !important;
 }
 
 ul.ed_toolbar { clear: both; margin: 0; padding: 0; margin: 0 20px 0 0; }

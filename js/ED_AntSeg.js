@@ -89,7 +89,7 @@ ED.AntSeg.prototype.setPropertyDefaults = function()
     
     // Add complete validation arrays for derived parameters
     this.parameterValidationArray['pupilSize'] = {kind:'derived', type:'string', list:['Large', 'Medium', 'Small'], animate:true};
-    this.parameterValidationArray['pxe'] = {kind:'derived', type:'bool'};
+    this.parameterValidationArray['pxe'] = {kind:'derived', type:'bool', display:true};
 }
 
 /**
