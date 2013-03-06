@@ -3448,6 +3448,7 @@ ED.Report.prototype.isMacOff = function()
  * @property {Int} gridSpacing Separation of grid elements
  * @property {Int} gridDisplacementX Displacement of grid matrix from origin along x axis
  * @property {Int} gridDisplacementY Displacement of grid matrix from origin along y axis
+ * @property {Float} version Version of doodle
  * @param {Drawing} _drawing
  * @param {Int} _originX
  * @param {Int} _originY
@@ -3558,6 +3559,9 @@ ED.Doodle = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _sca
         // Extremities
         this.leftExtremity = new ED.Point(-100,-100);
         this.rightExtremity = new ED.Point(0,-100);
+        
+        // Version
+        this.version = +1.0;
         
 		// Set dragging default settings
 		this.setPropertyDefaults();
@@ -4982,17 +4986,18 @@ ED.Doodle.prototype.nearestAngleTo = function(_angle)
 ED.Doodle.prototype.json = function()
 {
 	var s = '{';
-    s = s + '"subclass": ' + '"' + this.className + '", '
-    s = s + '"originX": ' + this.originX.toFixed(0) + ', '
-    s = s + '"originY": ' + this.originY.toFixed(0) + ', '
-    s = s + '"radius": ' + this.radius.toFixed(0) + ', '
-    s = s + '"apexX": ' + this.apexX.toFixed(0) + ', '
-    s = s + '"apexY": ' + this.apexY.toFixed(0) + ', '
-    s = s + '"scaleX": ' + this.scaleX.toFixed(2) + ', '
-    s = s + '"scaleY": ' + this.scaleY.toFixed(2) + ', '
-    s = s + '"arc": ' + (this.arc * 180/Math.PI).toFixed(0)  + ', '
-    s = s + '"rotation": ' + (this.rotation * 180/Math.PI).toFixed(0) + ', '
-    s = s + '"order": ' + this.order.toFixed(0) + ', '
+    s = s + '"version": ' + this.version.toFixed(1) + ', ';
+    s = s + '"subclass": ' + '"' + this.className + '", ';
+    s = s + '"originX": ' + this.originX.toFixed(0) + ', ';
+    s = s + '"originY": ' + this.originY.toFixed(0) + ', ';
+    s = s + '"radius": ' + this.radius.toFixed(0) + ', ';
+    s = s + '"apexX": ' + this.apexX.toFixed(0) + ', ';
+    s = s + '"apexY": ' + this.apexY.toFixed(0) + ', ';
+    s = s + '"scaleX": ' + this.scaleX.toFixed(2) + ', ';
+    s = s + '"scaleY": ' + this.scaleY.toFixed(2) + ', ';
+    s = s + '"arc": ' + (this.arc * 180/Math.PI).toFixed(0)  + ', ';
+    s = s + '"rotation": ' + (this.rotation * 180/Math.PI).toFixed(0) + ', ';
+    s = s + '"order": ' + this.order.toFixed(0) + ', ';
     
     s = s + '"squiggleArray": ['; 
     for (var j = 0; j < this.squiggleArray.length; j++)

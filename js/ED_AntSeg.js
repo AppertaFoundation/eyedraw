@@ -78,6 +78,7 @@ ED.AntSeg.prototype.setHandles = function()
  */
 ED.AntSeg.prototype.setPropertyDefaults = function()
 {
+    this.version = 1.1;
     this.isDeletable = false;
 	this.isMoveable = false;
 	this.isRotatable = false;
