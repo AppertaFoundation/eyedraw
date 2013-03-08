@@ -349,6 +349,137 @@ ED.EpiretinalMembrane.prototype.diagnosticHierarchy = function()
 }
 
 /**
+ * Cryotherapy
+ *
+ * @class Cryo
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Int} _originX
+ * @param {Int} _originY
+ * @param {Int} _apexX
+ * @param {Int} _apexY
+ * @param {Float} _scaleX
+ * @param {Float} _scaleY
+ * @param {Float} _arc
+ * @param {Float} _rotation
+ * @param {Int} _order
+ */
+ED.Cryo = function(_drawing, _originX, _originY, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+{
+	// Set classname
+	this.className = "Cryo";
+    
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.Cryo.prototype = new ED.Doodle;
+ED.Cryo.prototype.constructor = ED.Cryo;
+ED.Cryo.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.Cryo.prototype.setHandles = function()
+{
+	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+}
+
+/**
+ * Sets default properties
+ */
+ED.Cryo.prototype.setPropertyDefaults = function()
+{
+    // Update component of validation array for simple parameters
+    this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
+    this.parameterValidationArray['apexY']['range'].setMinAndMax(-80, -40);
+}
+
+/**
+ * Sets default parameters
+ */
+ED.Cryo.prototype.setParameterDefaults = function()
+{
+    this.apexY = -40;
+    
+    // Put control handle at 45 degrees
+    this.rotation = Math.PI/4;
+    
+    // Displacement from fovea, and from last doodle
+    var d = 280;
+    
+    this.originX = d;
+    this.originY = -d;
+    
+    var doodle = this.drawing.lastDoodleOfClass(this.className);
+    if (doodle)
+    {
+        var point = new ED.Point(doodle.originX, doodle.originY);
+        var direction = point.direction() + Math.PI/8;
+        var distance = point.length();
+        var np = new ED.Point(0,0);
+        np.setWithPolars(distance, direction);
+        
+        this.originX = np.x;
+        this.originY = np.y;
+    }
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.Cryo.prototype.draw = function(_point)
+{
+	// Get context
+	var ctx = this.drawing.context;
+	
+	// Call draw method in superclass
+	ED.Cryo.superclass.draw.call(this, _point);
+	
+	// Boundary path
+	ctx.beginPath();
+	
+	// Circular scar
+    var r = Math.sqrt(this.apexX * this.apexX + this.apexY * this.apexY);
+    
+    // Circular scar
+	ctx.arc(0, 0, r, 0, 2 * Math.PI, true);
+	
+	// Set line attributes
+	ctx.lineWidth = 8;
+    var ptrn = ctx.createPattern(this.drawing.imageArray['CryoPattern'],'repeat');
+    ctx.fillStyle = ptrn;
+	ctx.strokeStyle = "rgba(80, 40, 0, 1)";
+	
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+	
+	// Coordinates of handles (in canvas plane)
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
+	
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+	
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.Cryo.prototype.groupDescription = function()
+{
+	return "Cryotherapy";
+}
+
+/**
  * Sector PRP
  *
  * @class SectorPRP
@@ -809,6 +940,16 @@ ED.LaserDemarcation.prototype.setParameterDefaults = function()
             this.rotation = 0.8 * Math.PI;
         }
     }
+    
+    // If there is a retinectomy present, adjust to it
+    doodle = this.drawing.lastDoodleOfClass('PeripheralRetinectomy');
+    if (doodle)
+    {
+        this.rotation = doodle.rotation;
+        this.arc = doodle.arc + Math.PI/16;
+        this.apexY = doodle.apexY + 50;
+    }
+
 }
 
 /**
@@ -844,7 +985,7 @@ ED.LaserDemarcation.prototype.draw = function(_point)
 	ctx.beginPath();
     
 	// Arc across to mirror image point on the other side
-	ctx.arc(0, 0, ro, arcStart, arcEnd, true);
+	ctx.arc(0, 0, r, arcStart, arcEnd, true);
     
 	// Arc back to mirror image point on the other side
 	ctx.arc(0, 0, ri, arcEnd, arcStart, false);
@@ -854,7 +995,7 @@ ED.LaserDemarcation.prototype.draw = function(_point)
 	
 	// Set line attributes
 	ctx.lineWidth = 4;
-	ctx.fillStyle = "rgba(255,255,255,0)";
+	ctx.fillStyle = "rgba(255,255,0,0)";
 	ctx.strokeStyle = "rgba(255,255,255,0)";
 	
 	// Draw boundary path (also hit testing)
@@ -1459,11 +1600,6 @@ ED.UTear.prototype.draw = function(_point)
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 	
-	// Non boundary drawing
-	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
-	{
-	}
-	
 	// Coordinates of handles (in canvas plane)
 	this.handleArray[3].location = this.transform.transformPoint(new ED.Point(40, -40));
 	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
@@ -1485,23 +1621,30 @@ ED.UTear.prototype.draw = function(_point)
  *
  * @returns {String} Description of doodle
  */
-ED.UTear.prototype.description = function()
+ED.UTear.prototype.groupDescription = function()
 {
-    var returnString = "";
-    
-    // Size description
-    if (this.scaleX < 1) returnString = "Small ";
-    if (this.scaleX > 1.5) returnString = "Large ";
-    
-    // U tear
-	returnString += "'U' tear at ";
-	
-    // Location (clockhours)
-	returnString += this.clockHour() + " o'clock";
-	
-	return returnString;
+	return "'U' tear at ";
 }
 
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.UTear.prototype.description = function()
+{
+	return this.clockHour();
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.UTear.prototype.groupDescriptionEnd = function()
+{
+	return " o'clock";
+}
 
 /**
  * Round hole
@@ -1527,7 +1670,6 @@ ED.RoundHole = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _
 	
     // Call superclass constructor
 	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
-
 }
 
 /**
@@ -4063,3 +4205,590 @@ ED.ScleralIncision.prototype.groupDescriptionEnd = function()
 {
 	return " o'clock";
 }
+
+/**
+ * Peripheral retinectomy
+ *
+ * @class PeripheralRetinectomy
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Int} _originX
+ * @param {Int} _originY
+ * @param {Float} _radius
+ * @param {Int} _apexX
+ * @param {Int} _apexY
+ * @param {Float} _scaleX
+ * @param {Float} _scaleY
+ * @param {Float} _arc
+ * @param {Float} _rotation
+ * @param {Int} _order
+ */
+ED.PeripheralRetinectomy = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+{
+	// Set classname
+	this.className = "PeripheralRetinectomy";
+    
+    // Private parameter
+    this.extent = "blank";
+    
+	// Call super-class constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.PeripheralRetinectomy.prototype = new ED.Doodle;
+ED.PeripheralRetinectomy.prototype.constructor = ED.PeripheralRetinectomy;
+ED.PeripheralRetinectomy.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.PeripheralRetinectomy.prototype.setHandles = function()
+{
+	this.handleArray[0] = new ED.Handle(null, true, ED.Mode.Arc, false);
+	this.handleArray[3] = new ED.Handle(null, true, ED.Mode.Arc, false);
+	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+}
+
+/**
+ * Sets default properties
+ */
+ED.PeripheralRetinectomy.prototype.setPropertyDefaults = function()
+{
+	this.isMoveable = false;
+    
+    // Update component of validation array for simple parameters
+    this.parameterValidationArray['arc']['range'].setMinAndMax(Math.PI/4, 2 * Math.PI);
+    this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
+    this.parameterValidationArray['apexY']['range'].setMinAndMax(-450, -350);
+}
+
+/**
+ * Sets default parameters (Only called for new doodles)
+ * Use the setParameter function for derived parameters, as this will also update dependent variables
+ */
+ED.PeripheralRetinectomy.prototype.setParameterDefaults = function()
+{
+    this.arc = 240 * Math.PI/180;
+    this.apexY = -380;
+    
+    var doodle = this.drawing.lastDoodleOfClass(this.className);
+    if (doodle)
+    {
+        this.rotation = doodle.rotation + Math.PI/4;
+    }
+    else
+    {
+        this.rotation = Math.PI;
+    }
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.PeripheralRetinectomy.prototype.draw = function(_point)
+{
+	// Get context
+	var ctx = this.drawing.context;
+	
+	// Call draw method in superclass
+	ED.PeripheralRetinectomy.superclass.draw.call(this, _point);
+    
+	// Radius of outer curve just inside ora on right and left fundus diagrams
+	var ro = 952/2;
+    var ri = -this.apexY;
+    var r = ri + (ro - ri)/2;
+	
+	// Calculate parameters for arcs
+	var theta = this.arc/2;
+	var arcStart = - Math.PI/2 + theta;
+	var arcEnd = - Math.PI/2 - theta;
+    
+    // Coordinates of 'corners' of PeripheralRetinectomy
+	var topRightX = r * Math.sin(theta);
+	var topRightY = - r * Math.cos(theta);
+	var topLeftX = - r * Math.sin(theta);
+	var topLeftY = topRightY;
+    
+	// Boundary path
+	ctx.beginPath();
+    
+	// Arc across to mirror image point on the other side
+	ctx.arc(0, 0, ro, arcStart, arcEnd, true);
+    
+	// Arc back to mirror image point on the other side
+	ctx.arc(0, 0, ri, arcEnd, arcStart, false);
+    
+	// Close path
+	ctx.closePath();
+	
+	// Set line attributes
+	ctx.lineWidth = 4;
+	ctx.fillStyle = "rgba(255,255,0,0)";
+	ctx.strokeStyle = "rgba(255,0,255,0)";
+	
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+	
+	// Other paths and drawing here
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
+	{
+        // Path for retinectomy
+        ctx.beginPath();
+        
+        // Unless 360, curve out from the ora
+        if (this.arc < 1.95 * Math.PI)
+        {
+            // Angle to determine curve
+            var phi1 = theta - Math.PI/24;
+            var phi2 = theta - 2 * Math.PI/24;
+            
+            // Right points
+            var rsp = new ED.Point(ro * Math.sin(theta), -ro * Math.cos(theta));
+            var rcp1 = new ED.Point(r * Math.sin(theta), -r * Math.cos(theta));
+            var rcp2 = new ED.Point(ri * Math.sin(phi1), -ri * Math.cos(phi1));
+            var rep = new ED.Point(ri * Math.sin(phi2), -ri * Math.cos(phi2));
+            
+            // Inner arc
+            arcStart = - Math.PI/2 + phi2;
+            arcEnd = - Math.PI/2 - phi2;
+            
+            // Left points
+            var lsp = new ED.Point(-ri * Math.sin(phi2), -ri * Math.cos(phi2));
+            var lcp1 = new ED.Point(-ri * Math.sin(phi1), -ri * Math.cos(phi1));
+            var lcp2 = new ED.Point(-r * Math.sin(theta), -r * Math.cos(theta));
+            var lep = new ED.Point(-ro * Math.sin(theta), -ro * Math.cos(theta));
+            
+            // Path
+            ctx.moveTo(rsp.x, rsp.y);
+            ctx.bezierCurveTo(rcp1.x, rcp1.y, rcp2.x, rcp2.y, rep.x, rep.y);
+            ctx.arc(0, 0, ri, arcStart, arcEnd, true);
+            ctx.bezierCurveTo(lcp1.x, lcp1.y, lcp2.x, lcp2.y, lep.x, lep.y)
+            
+            // Angle to nearest 10 degrees.
+            var degrees = Math.floor(this.arc * 18/Math.PI) * 10;
+            
+            this.extent = "Retinectomy of " + degrees + " degrees centred at " + this.clockHour() + " o'clock";
+        }
+        else
+        {
+            // Just a circl to represent a 360 degree retinectomy
+            ctx.arc(0, 0, ri, 0, 2 * Math.PI, true);
+            
+            // Description text
+            this.extent = "360 degree retinectomy";
+        }
+        
+        // Draw retinectomy
+        ctx.lineWidth = 16;
+        ctx.strokeStyle = "red";
+        ctx.stroke();
+	}
+    
+	// Coordinates of handles (in canvas plane)
+	this.handleArray[0].location = this.transform.transformPoint(new ED.Point(topLeftX, topLeftY));
+	this.handleArray[3].location = this.transform.transformPoint(new ED.Point(topRightX, topRightY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
+	
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+    
+	// Return value indicating successful hit test
+	return this.isClicked;
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.PeripheralRetinectomy.prototype.description = function()
+{
+	return this.extent;
+}
+
+/**
+ * Posterior retinectomy
+ *
+ * @class PosteriorRetinectomy
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Int} _originX
+ * @param {Int} _originY
+ * @param {Int} _apexX
+ * @param {Int} _apexY
+ * @param {Float} _scaleX
+ * @param {Float} _scaleY
+ * @param {Float} _arc
+ * @param {Float} _rotation
+ * @param {Int} _order
+ */
+ED.PosteriorRetinectomy = function(_drawing, _originX, _originY, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+{
+	// Set classname
+	this.className = "PosteriorRetinectomy";
+    
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.PosteriorRetinectomy.prototype = new ED.Doodle;
+ED.PosteriorRetinectomy.prototype.constructor = ED.PosteriorRetinectomy;
+ED.PosteriorRetinectomy.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.PosteriorRetinectomy.prototype.setHandles = function()
+{
+	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+}
+
+/**
+ * Sets default properties
+ */
+ED.PosteriorRetinectomy.prototype.setPropertyDefaults = function()
+{
+	//this.isRotatable = false;
+    
+    // Update component of validation array for simple parameters
+    this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
+    this.parameterValidationArray['apexY']['range'].setMinAndMax(-200, -50);
+}
+
+/**
+ * Sets default parameters
+ */
+ED.PosteriorRetinectomy.prototype.setParameterDefaults = function()
+{
+    this.apexX = 0;
+    this.apexY = -100;
+    
+    // Displacement from fovea, and from last doodle
+    var d = 100;
+    
+    this.originX = d;
+    this.originY = -d;
+    
+    var doodle = this.drawing.lastDoodleOfClass(this.className);
+    if (doodle)
+    {
+        var point = new ED.Point(doodle.originX, doodle.originY);
+        var direction = point.direction() + Math.PI/8;
+        var distance = point.length();
+        var np = new ED.Point(0,0);
+        np.setWithPolars(distance, direction);
+        
+        this.originX = np.x;
+        this.originY = np.y;
+    }
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.PosteriorRetinectomy.prototype.draw = function(_point)
+{
+	// Get context
+	var ctx = this.drawing.context;
+	
+	// Call draw method in superclass
+	ED.PosteriorRetinectomy.superclass.draw.call(this, _point);
+	
+	// Boundary path
+	ctx.beginPath();
+	
+	// Circular retinectomy
+    var r = Math.sqrt(this.apexX * this.apexX + this.apexY * this.apexY);
+    var w = 16;
+    
+    // Two arcs
+	ctx.arc(0, 0, r + w, 0, Math.PI*2, true);
+    ctx.arc(0, 0, r - w, Math.PI*2, 0, false);
+    
+	// Close path
+	ctx.closePath();
+	
+	// Set line attributes
+	ctx.lineWidth = 1;
+    ctx.fillStyle = "rgba(255,255,0,0)";
+	ctx.strokeStyle = "rgba(255,255,0,0)";
+	
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+    
+    // Other paths and drawing here
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
+	{
+        ctx.beginPath();
+        ctx.arc(0, 0, r, 0, Math.PI*2, true);
+        ctx.lineWidth = 16;
+        ctx.strokeStyle = "red";
+        ctx.stroke();
+    }
+	
+	// Coordinates of handles (in canvas plane)
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
+	
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+	
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.PosteriorRetinectomy.prototype.groupDescription = function()
+{
+	return "Posterior retinectomy";
+}
+
+/**
+ * Drainage retinotomy
+ *
+ * @class DrainageRetinotomy
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Int} _originX
+ * @param {Int} _originY
+ * @param {Float} _radius
+ * @param {Int} _apexX
+ * @param {Int} _apexY
+ * @param {Float} _scaleX
+ * @param {Float} _scaleY
+ * @param {Float} _arc
+ * @param {Float} _rotation
+ * @param {Int} _order
+ */
+ED.DrainageRetinotomy = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+{
+	// Set classname
+	this.className = "DrainageRetinotomy";
+	
+    // Call superclass constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.DrainageRetinotomy.prototype = new ED.Doodle;
+ED.DrainageRetinotomy.prototype.constructor = ED.DrainageRetinotomy;
+ED.DrainageRetinotomy.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets default parameters (Only called for new doodles)
+ * Use the setParameter function for derived parameters, as this will also update dependent variables
+ */
+ED.DrainageRetinotomy.prototype.setParameterDefaults = function()
+{
+    this.setOriginWithDisplacements(140, 100);
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.DrainageRetinotomy.prototype.draw = function(_point)
+{
+	// Get context
+	var ctx = this.drawing.context;
+	
+	// Call draw method in superclass
+	ED.DrainageRetinotomy.superclass.draw.call(this, _point);
+	
+	// Boundary path
+	ctx.beginPath();
+	
+	// Circle
+	ctx.arc(0,0,30,0,Math.PI*2,true);
+    
+	// Close path
+	ctx.closePath();
+	
+	// Set line attributes
+	ctx.lineWidth = 16;
+	ctx.fillStyle = "rgba(255,0,0,0.5)";
+	ctx.strokeStyle = "red";
+	
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+	
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.DrainageRetinotomy.prototype.description = function()
+{
+    return "Drainage retinotomy";
+}
+
+/**
+ * Entry Site Break
+ *
+ * @class EntrySiteBreak
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Int} _originX
+ * @param {Int} _originY
+ * @param {Float} _radius
+ * @param {Int} _apexX
+ * @param {Int} _apexY
+ * @param {Float} _scaleX
+ * @param {Float} _scaleY
+ * @param {Float} _arc
+ * @param {Float} _rotation
+ * @param {Int} _order
+ */
+ED.EntrySiteBreak = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+{
+	// Set classname
+	this.className = "EntrySiteBreak";
+    
+	// Call super-class constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.EntrySiteBreak.prototype = new ED.Doodle;
+ED.EntrySiteBreak.prototype.constructor = ED.EntrySiteBreak;
+ED.EntrySiteBreak.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.EntrySiteBreak.prototype.setHandles = function()
+{
+	this.handleArray[0] = new ED.Handle(null, true, ED.Mode.Arc, false);
+	this.handleArray[3] = new ED.Handle(null, true, ED.Mode.Arc, false);
+}
+
+/**
+ * Sets default properties
+ */
+ED.EntrySiteBreak.prototype.setPropertyDefaults = function()
+{
+	this.isMoveable = false;
+    this.isArcSymmetrical = true;
+    
+    // Update component of validation array for simple parameters
+    this.parameterValidationArray['arc']['range'].setMinAndMax(Math.PI/16, 3 * Math.PI/16);
+}
+
+/**
+ * Sets default parameters (Only called for new doodles)
+ * Use the setParameter function for derived parameters, as this will also update dependent variables
+ */
+ED.EntrySiteBreak.prototype.setParameterDefaults = function()
+{
+    this.arc = Math.PI/8;
+    this.setRotationWithDisplacements(60, -120);
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.EntrySiteBreak.prototype.draw = function(_point)
+{
+	// Get context
+	var ctx = this.drawing.context;
+	
+	// Call draw method in superclass
+	ED.EntrySiteBreak.superclass.draw.call(this, _point);
+    
+	// Radius of outer curve just inside ora on right and left fundus diagrams
+	var ro = 460;
+    var ri = 400;
+	
+	// Calculate parameters for arcs
+	var theta = this.arc/2;
+	var arcStart = - Math.PI/2 + theta;
+	var arcEnd = - Math.PI/2 - theta;
+    
+    // Coordinates of 'corners' of EntrySiteBreak
+	var topRightX = ro * Math.sin(theta);
+	var topRightY = - ro * Math.cos(theta);
+	var topLeftX = - ro * Math.sin(theta);
+	var topLeftY = topRightY;
+    
+	// Boundary path
+	ctx.beginPath();
+    
+	// Arc across to mirror image point on the other side
+	ctx.arc(0, 0, ro, arcStart, arcEnd, true);
+    
+	// Curve gracefull to start again
+	ctx.bezierCurveTo(0, -ri, 0, -ri, topRightX, topRightY);
+	
+	// Set line attributes
+	ctx.lineWidth = 4;
+	ctx.fillStyle = "red";
+	ctx.strokeStyle = "blue";
+	
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+    
+	// Coordinates of handles (in canvas plane)
+	this.handleArray[0].location = this.transform.transformPoint(new ED.Point(topLeftX, topLeftY));
+	this.handleArray[3].location = this.transform.transformPoint(new ED.Point(topRightX, topRightY));
+	
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+    
+	// Return value indicating successful hit test
+	return this.isClicked;
+}
+
+///**
+// * Returns a string containing a text description of the doodle
+// *
+// * @returns {String} Description of doodle
+// */
+//ED.EntrySiteBreak.prototype.groupDescription = function()
+//{
+//	return "Entry site break at ";
+//}
+//
+///**
+// * Returns a string containing a text description of the doodle
+// *
+// * @returns {String} Description of doodle
+// */
+//ED.EntrySiteBreak.prototype.description = function()
+//{
+//	return this.clockHour();
+//}
+//
+///**
+// * Returns a string containing a text description of the doodle
+// *
+// * @returns {String} Description of doodle
+// */
+//ED.EntrySiteBreak.prototype.groupDescriptionEnd = function()
+//{
+//	return " o'clock";
+//}
+
