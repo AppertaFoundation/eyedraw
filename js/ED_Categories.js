@@ -33,5 +33,9 @@ if (ED == null || typeof(ED) != "object") { var ED = new Object();}
  */
 ED.Categories = new Object();
 
+/**
+ * Complications
+ */
 ED.Categories['EntrySiteBreak'] = {complication:'Entry site break'};
-
+ED.Categories['RetinalTouch'] = {complication:'Retinal touch'};
+ED.Categories['IatrogenicBreak'] = {complication:'Iatrogenic break'};

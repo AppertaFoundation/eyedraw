@@ -4746,6 +4746,31 @@ ED.Doodle.prototype.clockHour = function()
 }
 
 /**
+ * Returns the quadrant of a doodle based on origin coordinates
+ *
+ * @returns {String} Description of quadrant
+ */
+ED.Doodle.prototype.quadrant = function()
+{
+    var returnString = "";
+    
+    // Use trigonometry on rotation field to determine quadrant
+    returnString += this.originY < 0?"supero":"infero";
+    if (this.drawing.eye == ED.eye.Right)
+    {
+        returnString += this.originX < 0?"temporal":"nasal";        
+    }
+    else
+    {
+        returnString += this.originX < 0?"nasal":"temporal";
+    }
+    
+    returnString += " quadrant";
+
+    return returnString;
+}
+
+/**
  * Returns the rotation converted to degrees
  *
  * @returns {Int} Degrees from 0 to 360
