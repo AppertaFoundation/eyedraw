@@ -39,3 +39,4 @@ ED.Categories = new Object();
 ED.Categories['EntrySiteBreak'] = {complication:'Entry site break'};
 ED.Categories['RetinalTouch'] = {complication:'Retinal touch'};
 ED.Categories['IatrogenicBreak'] = {complication:'Iatrogenic break'};
+ED.Categories['SubretinalPFCL'] = {complication:'Subretinal PFCL'};

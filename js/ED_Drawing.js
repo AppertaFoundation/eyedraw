@@ -2845,6 +2845,18 @@ ED.Drawing.prototype.totalDegreesExtent = function(_class)
 }
 
 /**
+ * Suppresses reporting for all doodles currently in drawing.
+ */
+ED.Drawing.prototype.suppressReports = function()
+{
+    // Iterate through all doodles
+    for (var i = 0; i < this.doodleArray.length; i++)
+    {
+        this.doodleArray[i].willReport = false;
+    }
+}
+
+/**
  * Returns a string containing a description of the drawing
  *
  * @returns {String} Description of the drawing
@@ -2860,37 +2872,38 @@ ED.Drawing.prototype.report = function()
 	{
         var doodle = this.doodleArray[i];
         
-        // Check for a group description
-        if (doodle.groupDescription().length > 0)
+        // Reporting can be switched off with willReport flag
+        if (doodle.willReport)
         {
-            // Create an array entry for it or add to existing
-            if (typeof(groupArray[doodle.className]) == 'undefined')
+            // Check for a group description
+            if (doodle.groupDescription().length > 0)
             {
-                groupArray[doodle.className] = doodle.groupDescription();
-                groupArray[doodle.className] += doodle.description();
-            }
-            else
-            {
-                // Only add additional detail if supplied by description method
-                if (doodle.description().length > 0)
+                // Create an array entry for it or add to existing
+                if (typeof(groupArray[doodle.className]) == 'undefined')
                 {
-                    groupArray[doodle.className] += ", ";
+                    groupArray[doodle.className] = doodle.groupDescription();
                     groupArray[doodle.className] += doodle.description();
                 }
-            }
-            
-            // Check if there is a corresponding end description
-            if (doodle.groupDescriptionEnd().length > 0)
-            {
-                if (typeof(groupEndArray[doodle.className]) == 'undefined')
+                else
                 {
-                    groupEndArray[doodle.className] = doodle.groupDescriptionEnd();
+                    // Only add additional detail if supplied by description method
+                    if (doodle.description().length > 0)
+                    {
+                        groupArray[doodle.className] += ", ";
+                        groupArray[doodle.className] += doodle.description();
+                    }
+                }
+                
+                // Check if there is a corresponding end description
+                if (doodle.groupDescriptionEnd().length > 0)
+                {
+                    if (typeof(groupEndArray[doodle.className]) == 'undefined')
+                    {
+                        groupEndArray[doodle.className] = doodle.groupDescriptionEnd();
+                    }
                 }
             }
-        }
-        else
-        {
-        	if (doodle.willReport)
+            else
             {
                 // Get description
                 var description = doodle.description();
