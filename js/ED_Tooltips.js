@@ -78,6 +78,7 @@ ED.trans['EntrySiteBreak'] = 'Entry site break<br/><br/>Drag to position<br/>Dra
 ED.trans['EpiretinalMembrane'] = 'Epiretinal membrane<br/><br/>Drag inner handle to change shape and size<br/>Drag outer handle to rotate';
 ED.trans['FibrousProliferation'] = 'Fibrous Proliferation<br/><br/>Drag to position<br/>Drag inner handle to change shape and size<br/>Drag outer handle to rotate';
 ED.trans['FocalLaser'] = 'Focal laser burns<br/><br/>Drag the handle for a bigger area with more burns';
+ED.trans['Freehand'] = 'Freehand drawing<br/><br/>Double-click to start drawing<br/>Drag inner handle to change size<br/>Drag outer handle to rotate<br/><br/>Adjust colours and settings in tool bar';
 ED.trans['Fundus'] = '';
 ED.trans['Fuchs'] = 'Fuch\'s Endothelial Dystrophy<br/><br/>Drag handle to change shape';
 ED.trans['Geographic'] = 'Geographic Atrophy<br/><br/>Drag middle handle to alter size of remaining central island of RPE<br/>Drag outside handle to scale';

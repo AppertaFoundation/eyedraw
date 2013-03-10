@@ -19,6 +19,31 @@
             <button class="ed_img_button" id="Label<?php echo $idSuffix?>" title="Label" onclick="<?php echo $drawingName?>.addDoodle('Label'); <?php echo $drawingName?>.canvas.focus(); return false;">
                 <img src="<?php echo $imgPath?>Label.gif" />
             </button>
+            <button class="ed_img_button" id="Freehand<?php echo $idSuffix?>" title="Freehand drawing" onclick="<?php echo $drawingName?>.addDoodle('Freehand'); <?php echo $drawingName?>.canvas.focus(); return false;">
+            <img src="<?php echo $imgPath?>Freehand.gif" />
+            </button>
+
+            <span class= "squiggle" id="squiggleSpan<?php echo $idSuffix?>" style="display:none;">
+                <img class="colourWell" border="0" src="<?php echo $imgPath?>ColourWell.gif" usemap="#colormap<?php echo $idSuffix?>" alt='colormap' />
+                <map id="colormap<?php echo $idSuffix?>" name="colormap<?php echo $idSuffix?>">
+                    <area style="cursor:pointer" shape="rect" coords="0,0,16,16" onclick="<?php echo $drawingName?>.setSquiggleColour('000000');" />
+                    <area style="cursor:pointer" shape="rect" coords="16,0,32,16" onclick="<?php echo $drawingName?>.setSquiggleColour('FF0000');" />
+                    <area style="cursor:pointer" shape="rect" coords="32,0,48,16" onclick="<?php echo $drawingName?>.setSquiggleColour('FF7F00');" />
+                    <area style="cursor:pointer" shape="rect" coords="0,16,16,32" onclick="<?php echo $drawingName?>.setSquiggleColour('0000FF');" />
+                    <area style="cursor:pointer" shape="rect" coords="16,16,32,32" onclick="<?php echo $drawingName?>.setSquiggleColour('00FF00');" />
+                    <area style="cursor:pointer" shape="rect" coords="32,16,48,32" onclick="<?php echo $drawingName?>.setSquiggleColour('FFFF00');" />
+                </map>
+                <img class="drawingControl" border="0" src="<?php echo $imgPath?>DrawingControl.gif" usemap="#drawingControl<?php echo $idSuffix?>" alt='drawingcontrol' />
+                <map id="drawingControl<?php echo $idSuffix?>" name="drawingControl<?php echo $idSuffix?>">
+                    <area style="cursor:pointer" shape="rect" coords="0,0,16,16" onclick="<?php echo $drawingName?>.setSquiggleWidth(ED.squiggleWidth.Thin);" />
+                    <area style="cursor:pointer" shape="rect" coords="16,0,32,16" onclick="<?php echo $drawingName?>.setSquiggleWidth(ED.squiggleWidth.Medium);" />
+                    <area style="cursor:pointer" shape="rect" coords="32,0,48,16" onclick="<?php echo $drawingName?>.setSquiggleWidth(ED.squiggleWidth.Thick);" />
+                    <area style="cursor:pointer" shape="rect" coords="0,16,24,32" onclick="<?php echo $drawingName?>.setSquiggleStyle(ED.squiggleStyle.Outline);" />
+                    <area style="cursor:pointer" shape="rect" coords="24,16,48,32" onclick="<?php echo $drawingName?>.setSquiggleStyle(ED.squiggleStyle.Solid);" />
+                </map>
+                <canvas id="squiggleSettings<?php echo $idSuffix?>" width="24" height="32"></canvas>
+
+            </span>
 
             <?php
                 foreach ($displayParameterArray as $doodleClass => $parameterArray)

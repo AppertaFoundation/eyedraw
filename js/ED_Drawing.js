@@ -46,8 +46,17 @@ ED.arrowDelta = 4;
 ED.squiggleWidth = 
 {
     Thin:4,
-    Medium:12,
-    Thick:20
+    Medium:8,
+    Thick:12
+}
+
+/**
+ * SquiggleStyle
+ */
+ED.squiggleStyle =
+{
+    Outline: 0,
+    Solid: 1
 }
 
 /**
@@ -223,11 +232,14 @@ ED.randomArray = [0.6570,0.2886,0.7388,0.1621,0.9896,0.0434,0.1695,0.9099,0.1948
  * @property {Int} lastDoodleId id of last doodle to be added
  * @property {Bool} isActive Flag indicating that the mouse is interacting with the drawing
  * @property {Bool} isNew Flag indicating that the drawing is new (false after doodles loaded from an input string)
- * @param {Canvas} _canvas Canvas element 
+ * @property {String} squiggleColour Colour of line for freehand drawing
+ * @property {Int} squiggleWidth Width of line for freehand drawing
+ * @property {Int} squiggleStyle Style of freehand drawing (solid or outline)
+ * @param {Canvas} _canvas Canvas element
  * @param {Eye} _eye Right or left eye
  * @param {String} _IDSuffix String suffix to identify HTML elements related to this drawing
  * @param {Bool} _isEditable Flag indicating whether canvas is editable or not
- * @param {Array} _options Associative array of optional parameters 
+ * @param {Array} _options Associative array of optional parameters
  */
 //ED.Drawing = function(_canvas, _eye, _IDSuffix, _isEditable, _offsetX, _offsetY, _toImage)
 ED.Drawing = function(_canvas, _eye, _IDSuffix, _isEditable, _options)
@@ -276,6 +288,14 @@ ED.Drawing = function(_canvas, _eye, _IDSuffix, _isEditable, _options)
     this.lastDoodleId = 0;
     this.isActive = false;
     this.isNew = true;
+    
+    // Freehand drawing properties
+    this.squiggleColour = '00FF00';
+    this.squiggleWidth = ED.squiggleWidth.Medium;
+    this.squiggleStyle = ED.squiggleStyle.Outline;
+    
+    // Put settings into display canvas
+    this.refreshSquiggleSettings();
     
     // Associative array of bound element no doodle values (ie value associated with deleted doodle)
     this.boundElementDeleteValueArray = new Array();
@@ -645,9 +665,8 @@ ED.Drawing.prototype.load = function(_doodleSet)
         {
             for (var j = 0; j < _doodleSet[i].squiggleArray.length; j++)
             {
-                // Get paramters and create squiggle
-                var c = _doodleSet[i].squiggleArray[j].colour;
-                var colour = new ED.Colour(c.red, c.green, c.blue, c.alpha);
+                // Get parameters and create squiggle
+                var colour = _doodleSet[i].squiggleArray[j].colour;
                 var thickness = _doodleSet[i].squiggleArray[j].thickness;
                 var filled = _doodleSet[i].squiggleArray[j].filled;
                 var squiggle = new ED.Squiggle(this.doodleArray[i], colour, thickness, filled);
@@ -3195,6 +3214,81 @@ ED.Drawing.prototype.nextDoodleId = function()
 }
 
 /**
+ * Changes the drawing colour of freehand drawing
+ *
+ * @returns {String} _hexColour A string describing the colour to use for freehand drawing
+ */
+ED.Drawing.prototype.setSquiggleColour = function(_hexColour)
+{
+    this.squiggleColour = _hexColour;
+    
+    this.refreshSquiggleSettings()
+}
+
+/**
+ * Changes the line width for freehand drawing
+ *
+ * @returns {Int} _hexColour A number describing the width
+ */
+ED.Drawing.prototype.setSquiggleWidth = function(_width)
+{
+    this.squiggleWidth = _width;
+    
+    this.refreshSquiggleSettings()
+}
+
+/**
+ * Changes the line width for freehand drawing
+ *
+ * @returns {int} _style A string describing the style to use for freehand drawing
+ */
+ED.Drawing.prototype.setSquiggleStyle = function(_style)
+{
+    this.squiggleStyle = _style;
+    
+    this.refreshSquiggleSettings()
+}
+
+/**
+ * Refreshes the display of settings for freehand drawing
+ *
+ * @returns {String} _hexColour A string describing the colour to use for freehand drawing
+ */
+ED.Drawing.prototype.refreshSquiggleSettings = function()
+{
+    // Get reference to canvas
+    var displayCanvas = document.getElementById("squiggleSettings" + this.IDSuffix);
+    
+    // Get context
+    var ctx = displayCanvas.getContext('2d');
+    
+    // Reset canvas
+    displayCanvas.width = displayCanvas.width;
+    ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    
+    // Set colours
+    ctx.strokeStyle = "#" + this.squiggleColour;
+    ctx.fillStyle = "#" + this.squiggleColour;
+
+    // Line width
+    ctx.beginPath();
+    ctx.moveTo(3, 8);
+    ctx.lineTo(20, 8);
+    ctx.lineWidth = this.squiggleWidth/2;
+    ctx.stroke();
+    
+    // Outline or solid
+    ctx.beginPath();
+    ctx.rect(5, 19, 13, 8);
+    ctx.lineWidth = 3;
+    ctx.stroke();
+    if (this.squiggleStyle == ED.squiggleStyle.Solid)
+    {
+        ctx.fill();
+    }
+}
+
+/**
  * An object of the Report class is used to extract data for the Royal College of Ophthalmologists retinal detachment dataset.
  * The object analyses an EyeDraw drawing, and sets the value of HTML elements on the page accordingly.
  *
@@ -4934,36 +5028,16 @@ ED.Doodle.prototype.locationRelativeToFovea = function()
 ED.Doodle.prototype.addSquiggle = function()
 {
     // Get preview colour (returned as rgba(r,g,b))
-    var colourString = this.drawing.colourPreview.style.backgroundColor;
+    //var colourString = this.drawing.squiggleColour;
     
     // Use regular expression to extract rgb values from returned value
-    var colourArray = colourString.match(/\d+/g);
+    //var colourArray = colourString.match(/\d+/g);
     
-    // Get solid or clear
-    var filled = this.drawing.fillRadio.checked;
-    
-    // Line thickness
-    var thickness = this.drawing.thickness.value;
-    var lineThickness;
-    switch (thickness)
-    {
-        case "Thin":
-            lineThickness = ED.squiggleWidth.Thin;
-            break;
-        case "Medium":
-            lineThickness = ED.squiggleWidth.Medium;
-            break;
-        case "Thick":
-            lineThickness = ED.squiggleWidth.Thick;
-            break;
-        default:
-            lineThickness = ED.squiggleWidth.Thin;
-            break;						
-    }
+    // True if solid
+    var filled = this.drawing.squiggleStyle == ED.squiggleStyle.Solid;
     
     // Create new squiggle of selected colour
-    var colour = new ED.Colour(colourArray[0], colourArray[1], colourArray[2], 1);
-    var squiggle = new ED.Squiggle(this, colour, lineThickness, filled);
+    var squiggle = new ED.Squiggle(this, this.drawing.squiggleColour, this.drawing.squiggleWidth, filled);
     
     // Add it to squiggle array
     this.squiggleArray.push(squiggle);
@@ -5813,7 +5887,7 @@ ED.AffineTransform.prototype.createInverse = function()
  *
  * @class Squiggle
  * @property {Doodle} doodle The doodle to which this squiggle belongs
- * @property {Colour} colour Colour of the squiggle
+ * @property {String} colour Colour of the squiggle
  * @property {Int} thickness Thickness of the squiggle in pixels
  * @property {Bool} filled True if squiggle is solid (filled)
  * @property {Array} pointsArray Array of points making up the squiggle
@@ -5852,7 +5926,7 @@ ED.Squiggle.prototype.addPoint = function(_point)
 ED.Squiggle.prototype.json = function()
 {
 	var s = '{';
-    s = s + '"colour": ' + this.colour.json() + ', ';
+    s = s + '"colour": "' + this.colour + '", ';
     s = s + '"thickness": ' + this.thickness + ', ';
     s = s + '"filled": "' + this.filled + '", ';
     

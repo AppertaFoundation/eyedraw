@@ -610,7 +610,136 @@ ED.Label.prototype.description = function()
 }
 
 /**
- *  OperatingTable
+ * Freehand drawing
+ *
+ * @class Freehand
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Int} _originX
+ * @param {Int} _originY
+ * @param {Float} _radius
+ * @param {Int} _apexX
+ * @param {Int} _apexY
+ * @param {Float} _scaleX
+ * @param {Float} _scaleY
+ * @param {Float} _arc
+ * @param {Float} _rotation
+ * @param {Int} _order
+ */
+ED.Freehand = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+{
+	// Set classname
+	this.className = "Freehand";
+
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.Freehand.prototype = new ED.Doodle;
+ED.Freehand.prototype.constructor = ED.Freehand;
+ED.Freehand.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.Freehand.prototype.setHandles = function()
+{
+	this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, true);
+}
+
+/**
+ * Sets default dragging attributes
+ */
+ED.Freehand.prototype.setPropertyDefaults = function()
+{
+    this.isDrawable = true;
+}
+
+/**
+ * Sets default parameters (Only called for new doodles)
+ * Use the setParameter function for derived parameters, as this will also update dependent variables
+ */
+ED.Freehand.prototype.setParameterDefaults = function()
+{
+    this.setOriginWithDisplacements(0, 100);
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.Freehand.prototype.draw = function(_point)
+{
+	// Get context
+	var ctx = this.drawing.context;
+	
+	// Call draw method in superclass
+	ED.Freehand.superclass.draw.call(this, _point);
+	
+	// Boundary path
+	ctx.beginPath();
+	
+	// Freehand
+	ctx.rect(-150, -150, 300, 300);
+	
+	// Close path
+	ctx.closePath();
+	
+	// Set line attributes
+	ctx.lineWidth = 2;
+    this.isFilled = false;
+    ctx.strokeStyle = "rgba(0, 0, 0, 0)";
+    if (this.isSelected) ctx.strokeStyle = "gray";
+    if (this.isForDrawing) ctx.strokeStyle = "blue";
+    
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+	
+	// Non boundary paths here
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
+	{
+        // Iterate through squiggles, drawing them
+        for (var i = 0; i < this.squiggleArray.length; i++)
+        {
+            var squiggle = this.squiggleArray[i];
+            
+            ctx.beginPath();
+            
+            // Squiggle attributes
+            ctx.lineWidth = squiggle.thickness;
+            ctx.strokeStyle = squiggle.colour;
+            ctx.fillStyle = squiggle.colour;
+            
+            // Iterate through squiggle points
+            for (var j = 0; j < squiggle.pointsArray.length; j++)
+            {
+                ctx.lineTo(squiggle.pointsArray[j].x, squiggle.pointsArray[j].y);
+            }
+            
+            // Draw squiggle
+            ctx.stroke();
+            
+            // Optionally fill if squiggle is complete (stops filling while drawing)
+            if (squiggle.filled && squiggle.complete) ctx.fill();
+        }
+	}
+	
+	// Coordinates of handles (in canvas plane)
+	this.handleArray[2].location = this.transform.transformPoint(new ED.Point(150, -150));
+	
+	// Draw handles if selected but not if for drawing
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+	
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ *  Mouse test - used for testing detection of mouse pointer
  *
  * @class  MouseTest
  * @property {String} className Name of doodle subclass
