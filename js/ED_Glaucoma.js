@@ -303,7 +303,7 @@ ED.AngleGradeNorth = function(_drawing, _originX, _originY, _radius, _apexX, _ap
 	this.className = "AngleGradeNorth";
     
     // Derived parameters (NB must set a value here to define parameter as a property of the object, even though value set later)
-    this.grade = "O";
+    this.grade = "4";
     this.seen = "Yes";
 
 	// Call superclass constructor
@@ -342,7 +342,7 @@ ED.AngleGradeNorth.prototype.setPropertyDefaults = function()
     this.parameterValidationArray['apexY']['range'].setMinAndMax(-rsli, -riri);
     
     // Add complete validation arrays for derived parameters
-    this.parameterValidationArray['grade'] = {kind:'derived', type:'string', list:['O', 'I', 'II', 'III', 'IV'], animate:true};
+    this.parameterValidationArray['grade'] = {kind:'derived', type:'string', list:['4', '3', '2', '1', '0'], animate:true};
     this.parameterValidationArray['seen'] = {kind:'derived', type:'string', list:['Yes', 'No'], animate:true};
 }
 
@@ -353,7 +353,7 @@ ED.AngleGradeNorth.prototype.setParameterDefaults = function()
 {
     this.arc = 90 * Math.PI/180;
     this.apexY = -riri;
-    this.setParameterFromString('grade', 'O');
+    this.setParameterFromString('grade', '4');
     this.setParameterFromString('seen', 'Yes');
 }
 
@@ -373,11 +373,11 @@ ED.AngleGradeNorth.prototype.dependentParameterValues = function(_parameter, _va
     {
         case 'apexY':
             // Return value uses SCHEIE classificaton
-            var returnValue = "O";
-            if (-_value > riro) returnValue = "I";
-            if (-_value > rcbo) returnValue = "II";
-            if (-_value > rtmo) returnValue = "III";
-            if (-_value >= rsli) returnValue = "IV";
+            var returnValue = "4";
+            if (-_value > riro) returnValue = "3";
+            if (-_value > rcbo) returnValue = "2";
+            if (-_value > rtmo) returnValue = "1";
+            if (-_value >= rsli) returnValue = "0";
             returnArray['grade'] = returnValue;
             returnArray['seen'] = (-_value >= rtmo) ? 'No' : 'Yes';
             break;
@@ -386,23 +386,23 @@ ED.AngleGradeNorth.prototype.dependentParameterValues = function(_parameter, _va
             var returnValue = "";
             switch (_value)
             {
-                case 'IV':
+                case '0':
                     if (-this.apexY >= rsli) returnValue = this.apexY;
                     else returnValue = -rsli;
                     break;
-                case 'III':
+                case '1':
                     if (-this.apexY >= rtmo && -this.apexY < rsli) returnValue = this.apexY;
                     else returnValue = -rtmo;
                     break;
-                case 'II':
+                case '2':
                     if (-this.apexY >= rcbo && -this.apexY < rtmo) returnValue = this.apexY;
                     else returnValue = -rcbo;
                     break;
-                case 'I':
+                case '3':
                     if (-this.apexY >= riro && -this.apexY < rcbo) returnValue = this.apexY;
                     else returnValue = -riro;
                     break;
-                case 'O':
+                case '4':
                     returnValue = -riri;
                     break;
             }
@@ -496,7 +496,7 @@ ED.AngleGradeEast = function(_drawing, _originX, _originY, _radius, _apexX, _ape
 	this.className = "AngleGradeEast";
     
     // Derived parameters (NB must set a value here to define parameter as a property of the object, even though value set later)
-    this.grade = "O";
+    this.grade = "4";
     this.seen = "Yes";
     
 	// Call superclass constructor
@@ -535,7 +535,7 @@ ED.AngleGradeEast.prototype.setPropertyDefaults = function()
     this.parameterValidationArray['apexY']['range'].setMinAndMax(-rsli, -riri);
     
     // Add complete validation arrays for derived parameters
-    this.parameterValidationArray['grade'] = {kind:'derived', type:'string', list:['O', 'I', 'II', 'III', 'IV'], animate:true};
+    this.parameterValidationArray['grade'] = {kind:'derived', type:'string', list:['4', '3', '2', '1', '0'], animate:true};
     this.parameterValidationArray['seen'] = {kind:'derived', type:'string', list:['Yes', 'No'], animate:true};
 }
 
@@ -547,7 +547,7 @@ ED.AngleGradeEast.prototype.setParameterDefaults = function()
     this.arc = 90 * Math.PI/180;
     this.apexY = -riri;
     this.rotation = Math.PI/2;
-    this.setParameterFromString('grade', 'O');
+    this.setParameterFromString('grade', '4');
     this.setParameterFromString('seen', 'Yes');
 }
 
@@ -567,11 +567,11 @@ ED.AngleGradeEast.prototype.dependentParameterValues = function(_parameter, _val
     {
         case 'apexY':
             // Return value uses SCHEIE classificaton
-            var returnValue = "O";
-            if (-_value > riro) returnValue = "I";
-            if (-_value > rcbo) returnValue = "II";
-            if (-_value > rtmo) returnValue = "III";
-            if (-_value >= rsli) returnValue = "IV";
+            var returnValue = "4";
+            if (-_value > riro) returnValue = "3";
+            if (-_value > rcbo) returnValue = "2";
+            if (-_value > rtmo) returnValue = "1";
+            if (-_value >= rsli) returnValue = "0";
             returnArray['grade'] = returnValue;
             returnArray['seen'] = (-_value >= rtmo) ? 'No' : 'Yes';
             break;
@@ -580,23 +580,23 @@ ED.AngleGradeEast.prototype.dependentParameterValues = function(_parameter, _val
             var returnValue = "";
             switch (_value)
             {
-                case 'IV':
+                case '0':
                     if (-this.apexY >= rsli) returnValue = this.apexY;
                     else returnValue = -rsli;
                     break;
-                case 'III':
+                case '1':
                     if (-this.apexY >= rtmo && -this.apexY < rsli) returnValue = this.apexY;
                     else returnValue = -rtmo;
                     break;
-                case 'II':
+                case '2':
                     if (-this.apexY >= rcbo && -this.apexY < rtmo) returnValue = this.apexY;
                     else returnValue = -rcbo;
                     break;
-                case 'I':
+                case '3':
                     if (-this.apexY >= riro && -this.apexY < rcbo) returnValue = this.apexY;
                     else returnValue = -riro;
                     break;
-                case 'O':
+                case '4':
                     returnValue = -riri;
                     break;
             }
@@ -690,7 +690,7 @@ ED.AngleGradeSouth = function(_drawing, _originX, _originY, _radius, _apexX, _ap
 	this.className = "AngleGradeSouth";
     
     // Derived parameters (NB must set a value here to define parameter as a property of the object, even though value set later)
-    this.grade = "O";
+    this.grade = "4";
     this.seen = "Yes";
     
 	// Call superclass constructor
@@ -729,7 +729,7 @@ ED.AngleGradeSouth.prototype.setPropertyDefaults = function()
     this.parameterValidationArray['apexY']['range'].setMinAndMax(-rsli, -riri);
     
     // Add complete validation arrays for derived parameters
-    this.parameterValidationArray['grade'] = {kind:'derived', type:'string', list:['O', 'I', 'II', 'III', 'IV'], animate:true};
+    this.parameterValidationArray['grade'] = {kind:'derived', type:'string', list:['4', '3', '2', '1', '0'], animate:true};
     this.parameterValidationArray['seen'] = {kind:'derived', type:'string', list:['Yes', 'No'], animate:true};
 }
 
@@ -741,7 +741,7 @@ ED.AngleGradeSouth.prototype.setParameterDefaults = function()
     this.arc = 90 * Math.PI/180;
     this.apexY = -riri;
     this.rotation = Math.PI;
-    this.setParameterFromString('grade', 'O');
+    this.setParameterFromString('grade', '4');
     this.setParameterFromString('seen', 'Yes');
 }
 
@@ -761,11 +761,11 @@ ED.AngleGradeSouth.prototype.dependentParameterValues = function(_parameter, _va
     {
         case 'apexY':
             // Return value uses SCHEIE classificaton
-            var returnValue = "O";
-            if (-_value > riro) returnValue = "I";
-            if (-_value > rcbo) returnValue = "II";
-            if (-_value > rtmo) returnValue = "III";
-            if (-_value >= rsli) returnValue = "IV";
+            var returnValue = "4";
+            if (-_value > riro) returnValue = "3";
+            if (-_value > rcbo) returnValue = "2";
+            if (-_value > rtmo) returnValue = "1";
+            if (-_value >= rsli) returnValue = "0";
             returnArray['grade'] = returnValue;
             returnArray['seen'] = (-_value >= rtmo) ? 'No' : 'Yes';
             break;
@@ -774,23 +774,23 @@ ED.AngleGradeSouth.prototype.dependentParameterValues = function(_parameter, _va
             var returnValue = "";
             switch (_value)
             {
-                case 'IV':
+                case '0':
                     if (-this.apexY >= rsli) returnValue = this.apexY;
                     else returnValue = -rsli;
                     break;
-                case 'III':
+                case '1':
                     if (-this.apexY >= rtmo && -this.apexY < rsli) returnValue = this.apexY;
                     else returnValue = -rtmo;
                     break;
-                case 'II':
+                case '2':
                     if (-this.apexY >= rcbo && -this.apexY < rtmo) returnValue = this.apexY;
                     else returnValue = -rcbo;
                     break;
-                case 'I':
+                case '3':
                     if (-this.apexY >= riro && -this.apexY < rcbo) returnValue = this.apexY;
                     else returnValue = -riro;
                     break;
-                case 'O':
+                case '4':
                     returnValue = -riri;
                     break;
             }
@@ -884,7 +884,7 @@ ED.AngleGradeWest = function(_drawing, _originX, _originY, _radius, _apexX, _ape
 	this.className = "AngleGradeWest";
     
     // Derived parameters (NB must set a value here to define parameter as a property of the object, even though value set later)
-    this.grade = "O";
+    this.grade = "4";
     this.seen = "Yes";
     
 	// Call superclass constructor
@@ -923,7 +923,7 @@ ED.AngleGradeWest.prototype.setPropertyDefaults = function()
     this.parameterValidationArray['apexY']['range'].setMinAndMax(-rsli, -riri);
     
     // Add complete validation arrays for derived parameters
-    this.parameterValidationArray['grade'] = {kind:'derived', type:'string', list:['O', 'I', 'II', 'III', 'IV'], animate:true};
+    this.parameterValidationArray['grade'] = {kind:'derived', type:'string', list:['4', '3', '2', '1', '0'], animate:true};
     this.parameterValidationArray['seen'] = {kind:'derived', type:'string', list:['Yes', 'No'], animate:true};
 }
 
@@ -935,7 +935,7 @@ ED.AngleGradeWest.prototype.setParameterDefaults = function()
     this.arc = 90 * Math.PI/180;
     this.apexY = -riri;
     this.rotation = 3 * Math.PI/2;
-    this.setParameterFromString('grade', 'O');
+    this.setParameterFromString('grade', '4');
     this.setParameterFromString('seen', 'Yes');
 }
 
@@ -955,11 +955,11 @@ ED.AngleGradeWest.prototype.dependentParameterValues = function(_parameter, _val
     {
         case 'apexY':
             // Return value uses SCHEIE classificaton
-            var returnValue = "O";
-            if (-_value > riro) returnValue = "I";
-            if (-_value > rcbo) returnValue = "II";
-            if (-_value > rtmo) returnValue = "III";
-            if (-_value >= rsli) returnValue = "IV";
+            var returnValue = "4";
+            if (-_value > riro) returnValue = "3";
+            if (-_value > rcbo) returnValue = "2";
+            if (-_value > rtmo) returnValue = "1";
+            if (-_value >= rsli) returnValue = "0";
             returnArray['grade'] = returnValue;
             returnArray['seen'] = (-_value >= rtmo) ? 'No' : 'Yes';
             break;
@@ -968,23 +968,23 @@ ED.AngleGradeWest.prototype.dependentParameterValues = function(_parameter, _val
             var returnValue = "";
             switch (_value)
             {
-                case 'IV':
+                case '0':
                     if (-this.apexY >= rsli) returnValue = this.apexY;
                     else returnValue = -rsli;
                     break;
-                case 'III':
+                case '1':
                     if (-this.apexY >= rtmo && -this.apexY < rsli) returnValue = this.apexY;
                     else returnValue = -rtmo;
                     break;
-                case 'II':
+                case '2':
                     if (-this.apexY >= rcbo && -this.apexY < rtmo) returnValue = this.apexY;
                     else returnValue = -rcbo;
                     break;
-                case 'I':
+                case '3':
                     if (-this.apexY >= riro && -this.apexY < rcbo) returnValue = this.apexY;
                     else returnValue = -riro;
                     break;
-                case 'O':
+                case '4':
                     returnValue = -riri;
                     break;
             }
