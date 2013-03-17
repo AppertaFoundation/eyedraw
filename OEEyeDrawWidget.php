@@ -542,6 +542,7 @@ class DoodleInfo
         "StarFold" => "Star fold",
         "SubretinalPFCL" => "Subretinal PFCL",
         "Supramid" => "Supramid suture",
+        "Trabectome" => "Trabectome",
         "ToricPCIOL" => "Toric posterior chamber IOL",
         "TractionRetinalDetachment" => "Traction retinal detachment",
         "TransilluminationDefect" =>"Transillumination defect",

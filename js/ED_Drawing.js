@@ -3259,32 +3259,35 @@ ED.Drawing.prototype.refreshSquiggleSettings = function()
     // Get reference to canvas
     var displayCanvas = document.getElementById("squiggleSettings" + this.IDSuffix);
     
-    // Get context
-    var ctx = displayCanvas.getContext('2d');
-    
-    // Reset canvas
-    displayCanvas.width = displayCanvas.width;
-    ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    
-    // Set colours
-    ctx.strokeStyle = "#" + this.squiggleColour;
-    ctx.fillStyle = "#" + this.squiggleColour;
-
-    // Line width
-    ctx.beginPath();
-    ctx.moveTo(3, 8);
-    ctx.lineTo(20, 8);
-    ctx.lineWidth = this.squiggleWidth/2;
-    ctx.stroke();
-    
-    // Outline or solid
-    ctx.beginPath();
-    ctx.rect(5, 19, 13, 8);
-    ctx.lineWidth = 3;
-    ctx.stroke();
-    if (this.squiggleStyle == ED.squiggleStyle.Solid)
+    if (displayCanvas)
     {
-        ctx.fill();
+        // Get context
+        var ctx = displayCanvas.getContext('2d');
+        
+        // Reset canvas
+        displayCanvas.width = displayCanvas.width;
+        ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        
+        // Set colours
+        ctx.strokeStyle = "#" + this.squiggleColour;
+        ctx.fillStyle = "#" + this.squiggleColour;
+
+        // Line width
+        ctx.beginPath();
+        ctx.moveTo(3, 8);
+        ctx.lineTo(20, 8);
+        ctx.lineWidth = this.squiggleWidth/2;
+        ctx.stroke();
+        
+        // Outline or solid
+        ctx.beginPath();
+        ctx.rect(5, 19, 13, 8);
+        ctx.lineWidth = 3;
+        ctx.stroke();
+        if (this.squiggleStyle == ED.squiggleStyle.Solid)
+        {
+            ctx.fill();
+        }
     }
 }
 
