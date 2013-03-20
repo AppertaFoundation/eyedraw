@@ -4621,7 +4621,7 @@ ED.CornealSuture.prototype.draw = function(_point)
     ctx.fillStyle = "rgba(255,255,255,0.0)";
     
 	// Set line attributes
-	ctx.lineWidth = 4;
+	ctx.lineWidth = 6;
     
     // Colour of outer line is dark gray
     ctx.strokeStyle = "rgba(120,120,120,0)";
