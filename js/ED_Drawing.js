@@ -188,11 +188,31 @@ ED.Mod = function Mod(_x, _y)
 }
 
 /**
+ * Converts an angle (positive or negative) into a positive angle (ie a bearing)
+ *
+ * @param {Float} _angle Angle in radians
+ * @returns {Float} Positive angle between 0 and 2 * Pi
+ */
+ED.positiveAngle = function(_angle)
+{
+    var circle = 2 * Math.PI;
+    
+    // First make it positive
+    while (_angle < 0)
+    {
+        _angle += circle;
+    }
+    
+    // Return remainder
+    return _angle % circle;
+}
+
+/**
  * Error handler
  *
  * @param {String} _class Class
- * @param {String} _method Method 
- * @param {String} _message Error message 
+ * @param {String} _method Method
+ * @param {String} _message Error message
  */
 ED.errorHandler = function(_class, _method, _message)
 {
@@ -235,6 +255,7 @@ ED.randomArray = [0.6570,0.2886,0.7388,0.1621,0.9896,0.0434,0.1695,0.9099,0.1948
  * @property {String} squiggleColour Colour of line for freehand drawing
  * @property {Int} squiggleWidth Width of line for freehand drawing
  * @property {Int} squiggleStyle Style of freehand drawing (solid or outline)
+ * @property {Float} scaleOn Options for setting scale to either width or height
  * @param {Canvas} _canvas Canvas element
  * @param {Eye} _eye Right or left eye
  * @param {String} _IDSuffix String suffix to identify HTML elements related to this drawing
@@ -250,7 +271,8 @@ ED.Drawing = function(_canvas, _eye, _IDSuffix, _isEditable, _options)
     var toImage = false;
     this.controllerFunctionName = 'eyeDrawController';
     this.graphicsPath = 'graphics/';
-    
+    this.scaleOn = 'height';
+
     // If optional parameters exist, use them instead
     if (typeof(_options) != 'undefined')
     {
@@ -259,6 +281,7 @@ ED.Drawing = function(_canvas, _eye, _IDSuffix, _isEditable, _options)
         if (_options['toImage']) toImage = _options['toImage'];
         if (_options['controllerFunctionName']) this.controllerFunctionName = _options['controllerFunctionName'];
         if (_options['graphicsPath']) this.graphicsPath = _options['graphicsPath'];
+        if (_options['scaleOn']) this.scaleOn = _options['scaleOn'];
     }
 
 	// Initialise properties
@@ -310,7 +333,14 @@ ED.Drawing = function(_canvas, _eye, _IDSuffix, _isEditable, _options)
     this.canvasTooltip = document.getElementById(this.canvas.id + 'Tooltip');
     
     // Make sure doodle plane fits within canvas (Height priority)
-    this.scale = this.canvas.height/1001;
+    if (this.scaleOn == 'height')
+    {
+        this.scale = this.canvas.height/1001;
+    }
+    else
+    {
+        this.scale = this.canvas.width/1001;
+    }
     
     // Calculate dimensions of doodle plane
     this.doodlePlaneWidth = this.canvas.width/this.scale;
@@ -1165,7 +1195,12 @@ ED.Drawing.prototype.mousemove = function(_point)
 						
 						// Work out difference, and change doodle's angle of rotation by this amount
 						var deltaAngle = newAngle - oldAngle;
-                        doodle.setSimpleParameter('rotation', doodle.rotation + deltaAngle);
+                        //deltaAngle = ED.positiveAngle(deltaAngle);
+                        var newRotation = doodle.rotation + deltaAngle;
+                        newRotation = ED.positiveAngle(newRotation);
+                        
+                        // Restrict to allowable range
+                        doodle.setSimpleParameter('rotation', doodle.parameterValidationArray['rotation']['range'].constrainToAngularRange(newRotation, false));
                         
                         // Update dependencies
                         doodle.updateDependentParameters('rotation');
