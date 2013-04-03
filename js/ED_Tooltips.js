@@ -55,7 +55,7 @@ ED.trans['BuckleSuture'] = 'Buckle suture<br/><br/>Drag to position';
 ED.trans['CapsularTensionRing'] = 'Capsular Tension Ring<br/><br/>This cannot be selected directly since it is behind the iris<br/>Select the iris first<br/>Then move the scroll wheel until the ring is selected<br/>Click the \'Move to front\' button<br/>Err.. of course if you are seeing this tooltip you have already done it';
 ED.trans['ChandelierSingle'] = 'Chandelier illumination<br/><br/>Drag to rotate around centre<br/>';
 ED.trans['ChandelierDouble'] = 'Double chandelier illumination<br/><br/>Drag to rotate around centre<br/>';
-
+ED.trans['CiliaryInjection'] = 'Ciliary injection<br/><br/>Drag to rotate around centre<br/>Drag handles to change extent';
 ED.trans['Circinate'] = 'Circinate (Ring of exudates)<br/><br/>Drag to position<br/>Drag handle to change size';
 ED.trans['CircumferentialBuckle'] = 'Circumferential buckle<br/><br/>Drag to position<br/>Drag outer handles to change extent<br/>Drag middle handle to change width';
 ED.trans['CornealAbrasion'] = 'Corneal abrasion<br/><br/>Drag to position<br/>Drag handle to change size';
@@ -82,6 +82,8 @@ ED.trans['Geographic'] = 'Geographic Atrophy<br/><br/>Drag middle handle to alte
 ED.trans['Gonioscopy'] = 'Goniogram<br/><br/>Drag top left handle up and down to alter pigment density<br/>Drag top left handle left and right to alter pigment homogeneity';
 ED.trans['HardDrusen'] = 'Hard drusen<br/><br/>Drag middle handle up and down to alter density of drusen<br/>Drag outside handle to scale';
 ED.trans['HardExudate'] = 'Hard exudate<br/><br/>Drag to position';
+ED.trans['Hyphaema'] = 'Hyphaema<br/><br/>Drag handle vertically to change size<br/>Drag handle horizontally to change density';
+ED.trans['Hypopyon'] = 'Hypopyon<br/><br/>Drag handle vertically to change size';
 ED.trans['IrisHook'] = 'Iris hook<br/><br/>Drag to move around the clock<br/><br/>The hook will match the size of the pupil as it changes<br/>Subsequent hooks are added to the next quadrant';
 ED.trans['IRMA'] = 'Intraretinal microvascular abnormalities<br/><br/>Drag to move<br/>Drag inner handle to change size<br/>Drag outer handle to rotate';
 ED.trans['KeraticPrecipitates'] = 'Keratic precipitates<br/><br/>Drag middle handle up and down to alter density<br/>Drag middle handle left and right to alter size<br/>Drag outside handle to scale';

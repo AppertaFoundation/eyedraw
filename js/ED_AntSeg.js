@@ -84,8 +84,8 @@ ED.AntSeg.prototype.setPropertyDefaults = function()
 	this.isRotatable = false;
     this.isUnique = true;
     
-    // Update component of validation array for simple parameters
-    this.parameterValidationArray['apexX']['range'].setMinAndMax(-50, +50);
+    // Update component of validation array for simple parameters (enable 2D control by adding -50,+50 apexX range
+    this.parameterValidationArray['apexX']['range'].setMinAndMax(0, 0);
     this.parameterValidationArray['apexY']['range'].setMinAndMax(-280, -60);
     
     // Add complete validation arrays for derived parameters
@@ -141,15 +141,15 @@ ED.AntSeg.prototype.dependentParameterValues = function(_parameter, _value)
             }
             break;
 
-        case 'apexX':
-            if (_value < -5) returnArray['pxe'] = false;
-            else returnArray['pxe'] = true;
-            break;
-            
-        case 'pxe':
-            if (this.pxe) returnArray['apexX'] = +50;
-            else returnArray['apexX'] = -50;
-            break;
+//         case 'apexX':
+//             if (_value < -5) returnArray['pxe'] = false;
+//             else returnArray['pxe'] = true;
+//             break;
+//             
+//         case 'pxe':
+//             if (this.pxe) returnArray['apexX'] = +50;
+//             else returnArray['apexX'] = -50;
+//             break;
     }
     
     return returnArray;
@@ -5558,7 +5558,7 @@ ED.SectorIridectomy.prototype.draw = function(_point)
 	var arcStart = - Math.PI/2 + theta;
 	var arcEnd = - Math.PI/2 - theta;
     
-    // Coordinates of 'corners' of NerveFibreDefect
+    // Coordinates of 'corners' of doodle
 	var topRightX = r * Math.sin(theta);
 	var topRightY = - r * Math.cos(theta);
 	var topLeftX = - r * Math.sin(theta);
@@ -5613,4 +5613,436 @@ ED.SectorIridectomy.prototype.description = function()
     returnString += this.clockHour() + " o'clock";
     
 	return returnString;
+}
+
+/**
+ * CiliaryInjection
+ *
+ * @class CiliaryInjection
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Int} _originX
+ * @param {Int} _originY
+ * @param {Float} _radius
+ * @param {Int} _apexX
+ * @param {Int} _apexY
+ * @param {Float} _scaleX
+ * @param {Float} _scaleY
+ * @param {Float} _arc
+ * @param {Float} _rotation
+ * @param {Int} _order
+ */
+ED.CiliaryInjection = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+{
+	// Set classname
+	this.className = "CiliaryInjection";
+    
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.CiliaryInjection.prototype = new ED.Doodle;
+ED.CiliaryInjection.prototype.constructor = ED.CiliaryInjection;
+ED.CiliaryInjection.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.CiliaryInjection.prototype.setHandles = function()
+{
+	this.handleArray[0] = new ED.Handle(null, true, ED.Mode.Arc, false);
+	this.handleArray[3] = new ED.Handle(null, true, ED.Mode.Arc, false);
+}
+
+/**
+ * Sets default dragging attributes
+ */
+ED.CiliaryInjection.prototype.setPropertyDefaults = function()
+{
+	this.isScaleable = false;
+	this.isMoveable = false;
+	this.isRotatable = true;
+    this.isArcSymmetrical = true;
+    
+    // Update component of validation array for simple parameters
+    this.parameterValidationArray['arc']['range'].setMinAndMax(20 * Math.PI/180, 2 * Math.PI);
+    this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
+    this.parameterValidationArray['apexY']['range'].setMinAndMax(-334, -300);
+    this.parameterValidationArray['radius']['range'].setMinAndMax(250, 450);
+}
+
+/**
+ * Sets default parameters
+ */
+ED.CiliaryInjection.prototype.setParameterDefaults = function()
+{
+    // Default arc
+    this.arc = 90 * Math.PI/180;
+    
+    // Make a second one 90 degress to last one of same class
+	this.setRotationWithDisplacements(90,-120);
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.CiliaryInjection.prototype.draw = function(_point)
+{
+	// Get context
+	var ctx = this.drawing.context;
+	
+	// Call draw method in superclass
+	ED.CiliaryInjection.superclass.draw.call(this, _point);
+	
+    // Radii
+    var ro =  480;
+    var ri = 400;
+    var r = ri + (ro - ri)/2;
+    
+    // Calculate parameters for arcs
+	var theta = this.arc/2;
+	var arcStart = - Math.PI/2 + theta;
+	var arcEnd = - Math.PI/2 - theta;
+    
+    // Coordinates of 'corners' of doodle
+	var topRightX = r * Math.sin(theta);
+	var topRightY = - r * Math.cos(theta);
+	var topLeftX = - r * Math.sin(theta);
+	var topLeftY = topRightY;
+    
+    // Boundary path
+	ctx.beginPath();
+    
+    // Arc across
+    ctx.arc(0, 0, ro, - Math.PI/2 + theta, - Math.PI/2 - theta, true);
+    
+    // Arc back to mirror image point on the other side
+    ctx.arc(0, 0, ri, - Math.PI/2 - theta, - Math.PI/2 + theta, false);
+    
+	// Close path
+	ctx.closePath();
+    
+    // Colour of fill
+    ctx.fillStyle = "rgba(218,230,241,0)";
+    
+    // Set line attributes
+    ctx.lineWidth = 4;
+    
+    // Colour of outer line
+    ctx.strokeStyle = "rgba(218,230,241,0)";
+    
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+	
+	// Non-boundary paths
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
+	{
+		// Total number of vessels in a 360 arc
+		var t = 60;
+		
+		// Number in the current arc and angular separation
+		var phi = 2 * Math.PI/t;
+		var n = Math.floor(this.arc/phi);
+		
+		// Start and end points of vessel
+		var sp = new ED.Point(0, 0);
+		var ep = new ED.Point(0, 0);
+
+		ctx.beginPath();
+		
+		// Radial lines		
+		for (var i = 0; i < n; i++)
+		{
+			var theta = Math.PI/2 + arcEnd + i * phi;
+			sp.setWithPolars(ro, theta);
+			ep.setWithPolars(ri, theta);
+			
+			ctx.moveTo(sp.x, sp.y);
+			ctx.lineTo(ep.x, ep.y);
+		}
+		
+		ctx.strokeStyle = "red";
+		ctx.lineWidth = 16;
+		ctx.stroke();
+	}
+    
+    // Coordinates of handles (in canvas plane)
+	this.handleArray[0].location = this.transform.transformPoint(new ED.Point(topLeftX, topLeftY));
+	this.handleArray[3].location = this.transform.transformPoint(new ED.Point(topRightX, topRightY));
+    
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+	
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.CiliaryInjection.prototype.groupDescription = function()
+{
+    return "Ciliary injection ";
+}
+
+/**
+ * Hyphaema
+ *
+ * @class Hyphaema
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Int} _originX
+ * @param {Int} _originY
+ * @param {Float} _radius
+ * @param {Int} _apexX
+ * @param {Int} _apexY
+ * @param {Float} _scaleX
+ * @param {Float} _scaleY
+ * @param {Float} _arc
+ * @param {Float} _rotation
+ * @param {Int} _order
+ */
+ED.Hyphaema = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+{
+	// Set classname
+	this.className = "Hyphaema";
+	
+	// Private parameters
+	this.ro = 380;
+	this.minimum = 304;
+    
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.Hyphaema.prototype = new ED.Doodle;
+ED.Hyphaema.prototype.constructor = ED.Hyphaema;
+ED.Hyphaema.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.Hyphaema.prototype.setHandles = function()
+{
+	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+}
+
+/**
+ * Sets default dragging attributes
+ */
+ED.Hyphaema.prototype.setPropertyDefaults = function()
+{
+	this.isMoveable = false;
+	this.isRotatable = false;
+	this.isUnique = true;
+    
+    // Update component of validation array for simple parameters
+    this.parameterValidationArray['arc']['range'].setMinAndMax(20 * Math.PI/180, 2 * Math.PI);
+    this.parameterValidationArray['apexX']['range'].setMinAndMax(-50, +50);
+    this.parameterValidationArray['apexY']['range'].setMinAndMax(-380, this.minimum);
+    this.parameterValidationArray['radius']['range'].setMinAndMax(250, 450);
+}
+
+/**
+ * Sets default parameters
+ */
+ED.Hyphaema.prototype.setParameterDefaults = function()
+{
+	this.apexY = 152;
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.Hyphaema.prototype.draw = function(_point)
+{
+	// Get context
+	var ctx = this.drawing.context;
+	
+	// Call draw method in superclass
+	ED.Hyphaema.superclass.draw.call(this, _point);
+    
+    // Calculate angle of apex above or below horizontal
+    var phi = Math.asin(this.apexY/this.ro);
+    
+    // Boundary path
+	ctx.beginPath();
+    
+    // Arc from point on circumference level with apex point to other side
+    ctx.arc(0, 0, this.ro, phi, Math.PI - phi, false);
+    
+	// Close path
+	ctx.closePath();
+    
+    // Colour of fill, density depends on setting of apexX
+    var density = (0.1 + (this.apexX + 50)/111).toFixed(2);
+    ctx.fillStyle = "rgba(255,0,0," + density + ")";
+    
+    // Set line attributes
+    ctx.lineWidth = 1;
+    
+    // Colour of outer line
+    ctx.strokeStyle = ctx.fillStyle;
+    
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+	
+    // Coordinates of handles (in canvas plane)
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
+    
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+	
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.Hyphaema.prototype.description = function()
+{
+	var percent = 10 * Math.round(10 * (this.ro - this.apexY)/(2 * this.ro));
+    return percent + "% hyphaema";
+}
+
+/**
+ * Hypopyon
+ *
+ * @class Hypopyon
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Int} _originX
+ * @param {Int} _originY
+ * @param {Float} _radius
+ * @param {Int} _apexX
+ * @param {Int} _apexY
+ * @param {Float} _scaleX
+ * @param {Float} _scaleY
+ * @param {Float} _arc
+ * @param {Float} _rotation
+ * @param {Int} _order
+ */
+ED.Hypopyon = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+{
+	// Set classname
+	this.className = "Hypopyon";
+	
+	// Private parameters
+	this.ro = 380;
+	this.minimum = 304;
+    
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.Hypopyon.prototype = new ED.Doodle;
+ED.Hypopyon.prototype.constructor = ED.Hypopyon;
+ED.Hypopyon.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.Hypopyon.prototype.setHandles = function()
+{
+	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+}
+
+/**
+ * Sets default dragging attributes
+ */
+ED.Hypopyon.prototype.setPropertyDefaults = function()
+{
+	this.isMoveable = false;
+	this.isRotatable = false;
+	this.isUnique = true;
+    
+    // Update component of validation array for simple parameters
+    this.parameterValidationArray['arc']['range'].setMinAndMax(20 * Math.PI/180, 2 * Math.PI);
+    this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
+    this.parameterValidationArray['apexY']['range'].setMinAndMax(-380, this.minimum);
+    this.parameterValidationArray['radius']['range'].setMinAndMax(250, 450);
+}
+
+/**
+ * Sets default parameters
+ */
+ED.Hypopyon.prototype.setParameterDefaults = function()
+{
+	this.apexY = 260;
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.Hypopyon.prototype.draw = function(_point)
+{
+	// Get context
+	var ctx = this.drawing.context;
+	
+	// Call draw method in superclass
+	ED.Hypopyon.superclass.draw.call(this, _point);
+    
+    // Calculate angle of apex above or below horizontal
+    var phi = Math.asin(this.apexY/this.ro);
+    
+    // Boundary path
+	ctx.beginPath();
+    
+    // Arc from point on circumference level with apex point to other side
+    ctx.arc(0, 0, this.ro, phi, Math.PI - phi, false);
+    
+	// Close path
+	ctx.closePath();
+    
+    // Colour of fill
+    ctx.fillStyle = "rgba(221,209,171,1)";
+    
+    // Set line attributes
+    ctx.lineWidth = 1;
+    
+    // Colour of outer line
+    ctx.strokeStyle = ctx.fillStyle;
+    
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+	
+    // Coordinates of handles (in canvas plane)
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
+    
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+	
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.Hypopyon.prototype.description = function()
+{
+	var height = Math.round(10 * (this.ro - this.apexY)/(2 * this.ro));
+    return height + "mm hypopyon";
 }
