@@ -367,16 +367,17 @@ ED.AngleGradeNorth.prototype.setParameterDefaults = function()
  */
 ED.AngleGradeNorth.prototype.dependentParameterValues = function(_parameter, _value)
 {
+    console.log(_parameter, _value);
     var returnArray = new Array();
     
     switch (_parameter)
     {
         case 'apexY':
-            // Return value uses SCHEIE classificaton
+            // Return value uses Schaffer classificaton (although visibility is based on Scheie)
             var returnValue = "4";
-            if (-_value > riro) returnValue = "3";
-            if (-_value > rcbo) returnValue = "2";
-            if (-_value > rtmo) returnValue = "1";
+            if (-_value >= riro) returnValue = "3";
+            if (-_value >= rcbo) returnValue = "2";
+            if (-_value >= rtmo) returnValue = "1";
             if (-_value >= rsli) returnValue = "0";
             returnArray['grade'] = returnValue;
             returnArray['seen'] = (-_value >= rtmo) ? 'No' : 'Yes';
@@ -403,7 +404,8 @@ ED.AngleGradeNorth.prototype.dependentParameterValues = function(_parameter, _va
                     else returnValue = -riro;
                     break;
                 case '4':
-                    returnValue = -riri;
+                    if (-this.apexY >= riri && -this.apexY < riro) returnValue = this.apexY;
+                    else returnValue= -riri;
                     break;
             }
             returnArray['apexY'] = returnValue;
@@ -414,7 +416,7 @@ ED.AngleGradeNorth.prototype.dependentParameterValues = function(_parameter, _va
             switch (_value)
             {
 	            case 'No':
-	              if (-this.apexY > rtmo) returnValue = this.apexY;
+	              if (-this.apexY >= rtmo) returnValue = this.apexY;
 	              else returnValue = -rtmo;
 	              break;
 	            case 'Yes':

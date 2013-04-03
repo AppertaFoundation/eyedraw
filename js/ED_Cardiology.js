@@ -1052,6 +1052,16 @@ ED.Lungs.prototype.draw = function(_point)
 }
 
 /**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.Lungs.prototype.description = function()
+{
+    return this.drawing.doodleArray.length == 1?"No abnormality":"";
+}
+
+/**
  * Effusion
  *
  * @class Effusion
