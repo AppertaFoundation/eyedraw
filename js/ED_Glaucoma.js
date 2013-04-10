@@ -1501,7 +1501,7 @@ ED.OpticDisc = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _
     this.numberOfHandles = 8;
     
     // Derived parameters (NB must set a value here to define parameter as a property of the object, even though value set later)
-    this.mode = "Expert";
+    this.mode = "Basic";
     this.cdRatio = '0';
     
 	// Call superclass constructor
@@ -1572,7 +1572,7 @@ ED.OpticDisc.prototype.setPropertyDefaults = function()
  */
 ED.OpticDisc.prototype.setParameterDefaults = function()
 {
-    this.apexY = -150;
+    this.apexY = -150;    
     this.setParameterFromString('mode', 'Basic');
     this.setParameterFromString('cdRatio', '0.5');
 
@@ -1616,7 +1616,7 @@ ED.OpticDisc.prototype.dependentParameterValues = function(_parameter, _value)
                 returnArray['cdRatio'] = (-this.apexY/300).toFixed(1);
             }
             break;
-            
+                        
         case 'apexY':
             if (_value < -300)
             {
@@ -1894,7 +1894,7 @@ ED.OpticDisc.prototype.description = function()
 {
     var returnString = "";
     
-    // Only report when in expert mode 
+    // Expert mode 
     if (this.mode == "Expert")
     {        
         // Get mean
@@ -1980,6 +1980,15 @@ ED.OpticDisc.prototype.description = function()
                 }
             }
         }
+        else
+		{
+			returnString = this.drawing.doodleArray.length == 1?"No abnormality":"";
+		}
+    }
+    // Basic mode
+    else
+    {
+		returnString = this.drawing.doodleArray.length == 1?"No abnormality":"";
     }
 
 	return returnString;

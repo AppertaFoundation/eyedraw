@@ -618,7 +618,7 @@ ED.Drawing.prototype.load = function(_doodleSet)
 	for (var i = 0; i < _doodleSet.length; i++)
 	{
 		if (ED[_doodleSet[i].subclass] === undefined) {
-			ED.errorHandler('ED.Drawing', 'warn', 'Unrecognised doodle: ' + _doodleSet[i].subclass);
+			ED.errorHandler('ED.Drawing', 'load', 'Unrecognised doodle: ' + _doodleSet[i].subclass);
 			break;
 		}
 		
@@ -799,7 +799,7 @@ ED.Drawing.prototype.mousedown = function(_point)
 			// Successful hit test?
 			if (this.doodleArray[i].draw(_point))
 			{
-				if (this.doodleArray[i].isSelectable)
+				if (this.doodleArray[i].isSelectable && !this.doodleArray[i].isLocked)
 				{
                     // If double clicked, go into drawing mode
                     if (this.doubleClick && this.doodleArray[i].isSelected && this.doodleArray[i].isDrawable)
@@ -1951,7 +1951,7 @@ ED.Drawing.prototype.unlock = function()
 	// Go through doodles unlocking all
 	for (var i = 0; i < this.doodleArray.length; i++)
 	{
-		this.doodleArray[i].isSelectable = true;
+		this.doodleArray[i].isLocked = false;
 	}
 	
 	// Refresh canvas
@@ -3031,9 +3031,10 @@ ED.Drawing.prototype.repaint = function()
         this.unlockButton.disabled = true;
         for (var i = 0; i < this.doodleArray.length; i++)
         {
-            if (!this.doodleArray[i].isSelectable)
+            if (this.doodleArray[i].isLocked)
             {
                 this.unlockButton.disabled = false;
+                break;
             }
         }
     }
