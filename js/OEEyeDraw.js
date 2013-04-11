@@ -40,7 +40,8 @@ function EyeDrawChecker()
 	
 	// quickly establish all the canvases that are eyedraw
 	$('canvas').each(function() {
-		if ($(this).hasClass('ed_canvas_display')) {
+		// either a display or edit canvas
+		if ($(this).hasClass('ed_canvas_display') || $(this).hasClass('ed_canvas_edit')) {
 			self._eyedraws.push($(this).attr('id'));
 		}
 	});
