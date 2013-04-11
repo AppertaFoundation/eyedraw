@@ -670,7 +670,7 @@ ED.Drawing.prototype.load = function(_doodleSet)
             for (var j = 0; j < _doodleSet[i].params.length; j++) {
             	var param_name = _doodleSet[i].params[j].name;
             	var param_value = _doodleSet[i].params[j].value;
-            	//this.doodleArray[i].setParameterFromString(param_name, param_value);
+            	this.doodleArray[i].setParameterFromString(param_name, param_value);
             }
         }
 	}
