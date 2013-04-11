@@ -665,6 +665,14 @@ ED.Drawing.prototype.load = function(_doodleSet)
                 this.doodleArray[i].squiggleArray.push(squiggle);
             }
         }
+        
+        if(typeof(_doodleSet[i].params) != 'undefined') {
+            for (var j = 0; j < _doodleSet[i].params.length; j++) {
+            	var param_name = _doodleSet[i].params[j].name;
+            	var param_value = _doodleSet[i].params[j].value;
+            	//this.doodleArray[i].setParameterFromString(param_name, param_value);
+            }
+        }
 	}
 	
 	// Sort array by order (puts back doodle first)
@@ -5009,8 +5017,20 @@ ED.Doodle.prototype.json = function()
             s = s + ', ';
         }
     }
+    s = s + '], ';
     
+    s = s + '"params": [';
+    if(typeof(this.savedParams) != 'undefined') {
+      for (var j = 0; j < this.savedParams.length; j++) {
+      	var param = this.savedParams[j];
+      	s = s + '{ "name": "' + param + '", "value": "' + this[param] + '" }';
+          if (this.savedParams.length - j > 1) {
+              s = s + ', ';
+          }
+      }
+    }
     s = s + ']';
+    
     s = s + '}';
     
     return s;
