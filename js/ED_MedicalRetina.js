@@ -1104,6 +1104,16 @@ ED.DiabeticNV.prototype.description = function()
 }
 
 /**
+ * Returns the SnoMed code of the doodle
+ *
+ * @returns {Int} SnoMed code of entity representated by doodle
+ */
+ED.DiabeticNV.prototype.snomedCode = function()
+{
+	return 59276001;
+}
+
+/**
  * Circinate
  *
  * @class Circinate
@@ -2519,6 +2529,7 @@ ED.VitreousOpacity.prototype.setHandles = function()
 ED.VitreousOpacity.prototype.setPropertyDefaults = function()
 {
 	this.isRotatable = false;
+	this.isSqueezable = true;
     
     // Update component of validation array for simple parameters
     this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
@@ -2598,7 +2609,17 @@ ED.VitreousOpacity.prototype.draw = function(_point)
  */
 ED.VitreousOpacity.prototype.description = function()
 {
-	return "Vitreous opacity";
+	return "Vitreous haemorrhage";
+}
+
+/**
+ * Returns the SnoMed code of the doodle
+ *
+ * @returns {Int} SnoMed code of entity representated by doodle
+ */
+ED.VitreousOpacity.prototype.snomedCode = function()
+{
+	return 31341008;
 }
 
 /**

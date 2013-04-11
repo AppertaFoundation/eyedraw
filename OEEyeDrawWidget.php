@@ -469,6 +469,7 @@ class DoodleInfo
         "InnerLeafBreak" => "Inner leaf break",
         "Iris" => "Iris",
         "IrisHook" => "Iris hook",
+        "IrisNaevus" => "Iris naevus",
         "IRMA" => "Intraretinal microvascular abnormalities",
         "KeraticPrecipitates" => "Keratic precipitates",
         "KrukenbergSpindle" => "Krukenberg spindle",
