@@ -170,6 +170,7 @@ ul.ed_toolbar li ul {
 	padding: 3px 0 0 3px;
 	border: 1px solid #ccc;
 	box-shadow: 1px 3px 8px 1px rgba(0, 0, 0, 0.3);
+	z-index: 99;
 }
 ul.ed_toolbar li.drawer ul { display: none; }
 ul.ed_toolbar li.active > span.active { display: none;}
