@@ -122,7 +122,7 @@
 		if(typeof(<?php echo $drawingName?>[fn]) == "function") {
 			<?php echo $drawingName?>[fn](arg);
 		}
-		$('#eyedrawwidget_<?php echo $idSuffix ?> .ed_toolbar ul').hide();
+		$(".EyeDrawWidget .drawer").removeClass('active');
 		e.preventDefault();
 	});
 
