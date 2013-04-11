@@ -70,7 +70,7 @@
 				<img src="<?php echo $imgPath ?>more.gif" />
 			</a>
 			<span>More...</span>
-			<ul class="clearfix" style="display: none;">
+			<ul class="clearfix">
 				<?php foreach($extra_items as $item) { ?>
 				<li class="ed_img_button action"  id="<?php echo $item['classname'].$idSuffix ?>">
 					<a href="" data-function="addDoodle" data-arg="<?php echo $item['classname'] ?>">
@@ -128,11 +128,11 @@
 
 	// Show/hide drawer when clicked on/away
 	$(document).click(function() {
-	  $(".EyeDrawWidget .drawer ul").hide(); //click came from somewhere else
+	  $(".EyeDrawWidget .drawer").removeClass('active'); //click came from somewhere else
 	});
 	$('#eyedrawwidget_<?php echo $idSuffix ?> .ed_toolbar li.drawer > a').click(function(e) {
-		$(".EyeDrawWidget .drawer ul").hide();
-		$(this).parent().find('ul').show();
+		$(".EyeDrawWidget .drawer").removeClass('active');
+		$(this).parent().addClass('active');
 		e.stopPropagation();
 		e.preventDefault();
 	});
