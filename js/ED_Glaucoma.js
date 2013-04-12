@@ -1503,6 +1503,8 @@ ED.OpticDisc = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _
     // Derived parameters (NB must set a value here to define parameter as a property of the object, even though value set later)
     this.mode = "Basic";
     this.cdRatio = '0';
+
+    this.savedParams = ['mode'];
     
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
