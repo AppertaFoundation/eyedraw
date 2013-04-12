@@ -1606,15 +1606,18 @@ ED.OpticDisc.prototype.dependentParameterValues = function(_parameter, _value)
     switch (_parameter)
     {
         case 'mode':
-            this.setHandleProperties();
-            if (this.apexY < -300)
-            {
-                returnArray['cdRatio'] = "No view";
-            }
-            else
-            {
-                returnArray['cdRatio'] = (-this.apexY/300).toFixed(1);
-            }
+//			This is commented out since it was causing recursive setting of cdRation and altering position of points in expert mode
+//			Not sure what the code did in the first place anyway!
+//             this.setHandleProperties();
+//             if (this.apexY < -300)
+//             {
+//                 returnArray['cdRatio'] = "No view";
+//             }
+//             else
+//             {
+//                 returnArray['cdRatio'] = (-this.apexY/300).toFixed(1);
+//             }
+//             console.log("mode: Setting cdRatio to " + returnArray['cdRatio']);
             break;
                         
         case 'apexY':
