@@ -160,4 +160,19 @@ ul.ed_toolbar li span {
 }
 ul.ed_toolbar li img { float: left; }
 ul.ed_toolbar li span.active { display: block;}
-ul.ed_toolbar li ul { background: #fff; position: absolute; top: 32px; left: -1px; width: 148px; margin: 0; padding: 3px 0 0 3px; border: 1px solid #ccc; }
+ul.ed_toolbar li ul { 
+	background: #fff;
+	position: absolute;
+	top: 36px;
+	left: 3px;
+	width: 148px;
+	margin: 0;
+	padding: 3px 0 0 3px;
+	border: 1px solid #ccc;
+	box-shadow: 1px 3px 8px 1px rgba(0, 0, 0, 0.3);
+	z-index: 99;
+}
+ul.ed_toolbar li.drawer ul { display: none; }
+ul.ed_toolbar li.active > span.active { display: none;}
+ul.ed_toolbar li.drawer.active ul { display: block; }
+ul.ed_toolbar li.drawer.active > a { background: #dae6f1; }
