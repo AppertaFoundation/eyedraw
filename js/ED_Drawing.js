@@ -668,7 +668,7 @@ ED.Drawing.prototype.load = function(_doodleSet)
 	for (var i = 0; i < _doodleSet.length; i++)
 	{
 		if (ED[_doodleSet[i].subclass] === undefined) {
-			ED.errorHandler('ED.Drawing', 'warn', 'Unrecognised doodle: ' + _doodleSet[i].subclass);
+			ED.errorHandler('ED.Drawing', 'load', 'Unrecognised doodle: ' + _doodleSet[i].subclass);
 			break;
 		}
 		
@@ -712,6 +712,14 @@ ED.Drawing.prototype.load = function(_doodleSet)
                 
                 // Add squiggle to doodle's squiggle array
                 this.doodleArray[i].squiggleArray.push(squiggle);
+            }
+        }
+        
+        if(typeof(_doodleSet[i].params) != 'undefined') {
+            for (var j = 0; j < _doodleSet[i].params.length; j++) {
+            	var param_name = _doodleSet[i].params[j].name;
+            	var param_value = _doodleSet[i].params[j].value;
+            	this.doodleArray[i].setParameterFromString(param_name, param_value);
             }
         }
 	}
@@ -848,7 +856,7 @@ ED.Drawing.prototype.mousedown = function(_point)
 			// Successful hit test?
 			if (this.doodleArray[i].draw(_point))
 			{
-				if (this.doodleArray[i].isSelectable)
+				if (this.doodleArray[i].isSelectable && !this.doodleArray[i].isLocked)
 				{
                     // If double clicked, go into drawing mode
                     if (this.doubleClick && this.doodleArray[i].isSelected && this.doodleArray[i].isDrawable)
@@ -2036,7 +2044,7 @@ ED.Drawing.prototype.unlock = function()
 	// Go through doodles unlocking all
 	for (var i = 0; i < this.doodleArray.length; i++)
 	{
-		this.doodleArray[i].isSelectable = true;
+		this.doodleArray[i].isLocked = false;
 	}
 	
 	// Refresh canvas
@@ -3139,9 +3147,10 @@ ED.Drawing.prototype.repaint = function()
         this.unlockButton.disabled = true;
         for (var i = 0; i < this.doodleArray.length; i++)
         {
-            if (!this.doodleArray[i].isSelectable)
+            if (this.doodleArray[i].isLocked)
             {
                 this.unlockButton.disabled = false;
+                break;
             }
         }
     }
@@ -3634,6 +3643,7 @@ ED.Report.prototype.isMacOff = function()
  * @property {Int} gridSpacing Separation of grid elements
  * @property {Int} gridDisplacementX Displacement of grid matrix from origin along x axis
  * @property {Int} gridDisplacementY Displacement of grid matrix from origin along y axis
+ * @property {Float} version Version of doodle
  * @param {Drawing} _drawing
  * @param {Int} _originX
  * @param {Int} _originY
@@ -3744,6 +3754,9 @@ ED.Doodle = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _sca
         // Extremities
         this.leftExtremity = new ED.Point(-100,-100);
         this.rightExtremity = new ED.Point(0,-100);
+        
+        // Version
+        this.version = +1.0;
         
 		// Set dragging default settings
 		this.setPropertyDefaults();
@@ -5209,6 +5222,7 @@ ED.Doodle.prototype.nearestAngleTo = function(_angle)
 ED.Doodle.prototype.json = function()
 {
 	var s = '{';
+    s = s + '"version": ' + this.version.toFixed(1) + ', ';
     s = s + '"subclass": ' + '"' + this.className + '", ';
     s = s + '"originX": ' + this.originX.toFixed(0) + ', ';
     s = s + '"originY": ' + this.originY.toFixed(0) + ', ';
@@ -5219,7 +5233,7 @@ ED.Doodle.prototype.json = function()
     s = s + '"scaleY": ' + this.scaleY.toFixed(2) + ', ';
     s = s + '"arc": ' + (this.arc * 180/Math.PI).toFixed(0)  + ', ';
     s = s + '"rotation": ' + (this.rotation * 180/Math.PI).toFixed(0) + ', ';
-    s = s + '"order": ' + this.order.toFixed(0) + ', '
+    s = s + '"order": ' + this.order.toFixed(0) + ', ';
     
     s = s + '"squiggleArray": ['; 
     for (var j = 0; j < this.squiggleArray.length; j++)
@@ -5230,8 +5244,20 @@ ED.Doodle.prototype.json = function()
             s = s + ', ';
         }
     }
+    s = s + '], ';
     
+    s = s + '"params": [';
+    if(typeof(this.savedParams) != 'undefined') {
+      for (var j = 0; j < this.savedParams.length; j++) {
+      	var param = this.savedParams[j];
+      	s = s + '{ "name": "' + param + '", "value": "' + this[param] + '" }';
+          if (this.savedParams.length - j > 1) {
+              s = s + ', ';
+          }
+      }
+    }
     s = s + ']';
+    
     s = s + '}';
     
     return s;
