@@ -6107,5 +6107,3 @@ ED.TrabySuture.prototype.drawHighlightExtras = function()
     ctx.fillText(this.type, 80, 0 + 20);
 }
 
-=======
->>>>>>> 7d2450df2945a909c0fbc38e2eecf7f90b4eb921
