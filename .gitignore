@@ -15,6 +15,7 @@ temp*
 
 # Folders containing temporary data
 EyeDrawJS/EyeDrawJS.xcodeproj
+EyeDrawJS/EyeDrawJS.bbprojectd
 
 # Ignore folder containing automatic documentation
 jsdoc-toolkit/out/

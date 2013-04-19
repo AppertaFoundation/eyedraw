@@ -5589,6 +5589,18 @@ ED.Point.prototype.setWithPolars = function(_r, _p)
 }
 
 /**
+ * Sets x and y of the point
+ *
+ * @param {Float} _x value of x
+ * @param {Float} _y value of y
+ */ 
+ED.Point.prototype.setCoordinates = function(_x, _y)
+{
+    this.x = _x;
+    this.y = _y;
+}
+
+/**
  * Calculates the distance between this point and another
  *
  * @param {Point} _point
