@@ -54,6 +54,8 @@ ED.AntSeg = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _sca
     this.pupilSize = 'Large';
     this.pxe = true;
     
+    this.savedParams = ['pxe'];
+    
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
 }
