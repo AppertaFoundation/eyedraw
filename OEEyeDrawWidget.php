@@ -1,27 +1,20 @@
 <?php
 /**
- * Contains a Yii widget for EyeDraw
- * @package EyeDraw
- * @author Bill Aylward <bill.aylward@openeyes.org>
- * @version 1.0
- * @link http://www.openeyes.org.uk/
- * @copyright Copyright (c) 2012 OpenEyes Foundation
- * @license http://www.yiiframework.com/license/
- * 
+ * OpenEyes
+ *
+ * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
+ * (C) OpenEyes Foundation, 2011-2013
  * This file is part of OpenEyes.
- * 
- * OpenEyes is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * OpenEyes is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with OpenEyes.  If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package OpenEyes
+ * @link http://www.openeyes.org.uk
+ * @author OpenEyes <info@openeyes.org.uk>
+ * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
+ * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
  */
 
 /**
@@ -64,7 +57,7 @@ class OEEyeDrawWidget extends CWidget
     * View file for rendering the eyeDraw
     * @var string
     */
-    public $template = 'OEEyeDrawWidgetBasic';
+    public $template = 'OEEyeDrawWidget';
 
 	/**
 	 * Unique identifier for the drawing on the current page
@@ -302,7 +295,11 @@ class OEEyeDrawWidget extends CWidget
         
         // Flag indicating whether the drawing is editable or not (normally corresponded to edit and view mode)
         $this->isEditable = $this->mode == 'edit'?true:false;
-
+		
+        // jquery dependency
+        $cs = Yii::app()->clientScript;
+        $cs->registerCoreScript('jquery');
+        
         // Register the chosen scripts and CSS files
         $this->registerScripts();
         $this->registerCss();
@@ -440,6 +437,7 @@ class DoodleInfo
         "AntSeg" => "Anterior segment",
         "AntSynech" => "Anterior synechiae",
         "APattern" => "A pattern",
+        "ArcuateScotoma" => "Arcuate scotoma",
         "Arrow" => "Arrow",
         "Baerveldt" => "Baerveld tube",
         "BiopsySite" => "Biopsy site",
@@ -451,12 +449,15 @@ class DoodleInfo
         "CapsularTensionRing" => "Capsular Tension Ring",
         "ChandelierDouble" => "Double chandelier",
         "ChandelierSingle" => "Chandelier",
+        "CiliaryInjection" => "Cilary injection",
         "Circinate" => "Circinate retinopathy",
         "CircumferentialBuckle" => "Circumferential buckle",
         "CNV" => "Choroidal new vessels",
         "CornealAbrasion" => "Corneal abrasion",
         "CornealErosion" => "Removal of corneal epithelium",
+        "CornealOedema" => "Corneal oedema",
         "CornealScar" => "Corneal scar",
+        "CornealStriae" => "Corneal striae",
         "CornealSuture" => "Corneal suture",
         "CorticalCataract" => "Cortical cataract",
         "CottonWoolSpot" => "Cotton wool spot",
@@ -482,11 +483,14 @@ class DoodleInfo
         "GRT" => "Giant retinal tear",
         "HardDrusen" => "Hard drusen",
         "HardExudate" => "Hard exudate",
+        "Hyphaema" => "Hyphaema",
+        "Hypopyon" => "Hypopyon",
         "IatrogenicBreak" => "IatrogenicBreak",
         "ILMPeel" => "ILM peel",
         "InnerLeafBreak" => "Inner leaf break",
         "Iris" => "Iris",
         "IrisHook" => "Iris hook",
+        "IrisNaevus" => "Iris naevus",
         "IRMA" => "Intraretinal microvascular abnormalities",
         "KeraticPrecipitates" => "Keratic precipitates",
         "KrukenbergSpindle" => "Krukenberg spindle",
@@ -536,6 +540,7 @@ class DoodleInfo
         "SectorPRPPostPole" => "Sector PRP (posterior pole)",
         "ScleralIncision" => "Scleral Incision",
         "Sclerostomy" => "Sclerostomy",
+        "SectorIridectomy" => "Sector iridectomy",
         "Shading" => "Shading",
         "SidePort" => "Side port",
         "Slider" => "Slider",
