@@ -381,6 +381,7 @@ ED.Label = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scal
 
     // Label text
     this.labelText = "Start typing..";
+    this.savedParams = ['labelText'];
     
     // Label width and height
     this.labelWidth = 0;
@@ -428,6 +429,9 @@ ED.Label.prototype.setPropertyDefaults = function()
 {
     this.parameterValidationArray['apexX']['range'].setMinAndMax(-1000, +1000);
     this.parameterValidationArray['apexY']['range'].setMinAndMax(-1000, +1000);
+    
+    // Add complete validation arrays for derived parameters
+    this.parameterValidationArray['labelText'] = {kind:'derived', type:'string', animate:false};
 }
 
 /**
@@ -435,6 +439,7 @@ ED.Label.prototype.setPropertyDefaults = function()
  */
 ED.Label.prototype.setParameterDefaults = function()
 {
+    this.setParameterFromString('labelText', 'Start typing..');
     this.setOriginWithDisplacements(0, -100);
     this.lastOriginX = this.originX;
     this.lastOriginY = this.originY;
@@ -588,6 +593,17 @@ ED.Label.prototype.addLetter = function(_keyCode)
     else
     {
         if (this.labelText.length < this.maximumLength) this.labelText += character;
+    }
+    
+    // Save changes by triggering parameterChanged method in controller
+    if (this.isEdited)
+    {
+        // Create notification message
+    	var object = new Object;
+    	object.doodle = this;
+    
+    	// Trigger notification
+    	this.drawing.notify('parameterChanged', object);
     }
 }
 

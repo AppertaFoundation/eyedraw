@@ -1305,9 +1305,11 @@ ED.AntSynech.prototype.draw = function(_point)
     
 	// Close path
 	ctx.closePath();
-    
+
+    // Set fill attributes (same colour as Iris)
     ctx.fillStyle = "rgba(100, 200, 250, 1.0)";
-	ctx.strokeStyle = "rgba(255, 255, 255, 0)";
+	ctx.strokeStyle = "rgba(100, 100, 100, 1.0)";
+    ctx.lineWidth = 4;
 	
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
@@ -1576,7 +1578,7 @@ ED.OpticDisc.prototype.setParameterDefaults = function()
 {
     this.apexY = -150;    
     this.setParameterFromString('mode', 'Basic');
-    this.setParameterFromString('cdRatio', '0.5');
+    this.setParameterFromString('cdRatio', '0.3');
 
     // Create a squiggle to store the handles points
     var squiggle = new ED.Squiggle(this, new ED.Colour(100, 100, 100, 1), 4, true);
@@ -1608,9 +1610,9 @@ ED.OpticDisc.prototype.dependentParameterValues = function(_parameter, _value)
     switch (_parameter)
     {
         case 'mode':
+        	this.setHandleProperties();
 //			This is commented out since it was causing recursive setting of cdRation and altering position of points in expert mode
 //			Not sure what the code did in the first place anyway!
-//             this.setHandleProperties();
 //             if (this.apexY < -300)
 //             {
 //                 returnArray['cdRatio'] = "No view";
