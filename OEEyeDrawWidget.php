@@ -255,21 +255,6 @@ class OEEyeDrawWidget extends CWidget
         $this->jsPath = Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('application.modules.eyedraw.dist'), false, -1, YII_DEBUG);
         $this->imgPath = Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('application.modules.eyedraw.img'), false, -1, YII_DEBUG).'/';
         
-        // If script array is empty, just load all the ED_.js files (with exception of two mandatory files)
-        if (empty($this->scriptArray))
-        {
-            foreach (new DirectoryIterator(Yii::app()->getAssetManager()->basePath."/".basename($this->jsPath)) as $file)
-            {
-                if ($file->isFile() === TRUE && $file->getFilename() !== 'ED_Drawing.js' && $file->getBasename() !== 'OEEyeDraw.js')
-                {
-                    if (pathinfo($file->getFilename(), PATHINFO_EXTENSION) == "js")
-                    {
-                        array_push ($this->scriptArray, $file->getFilename());
-                    }
-                }
-            }
-        }
-
         // Create a unique and descriptive variable name for the drawing object and the corresponding canvas element
         $this->drawingName = 'ed_drawing_'.$this->mode.'_'.$this->idSuffix;
         $this->canvasId = 'ed_canvas_'.$this->mode.'_'.$this->idSuffix;
@@ -352,11 +337,13 @@ class OEEyeDrawWidget extends CWidget
         // Get client script object
 		$cs = Yii::app()->getClientScript();
  
-        // Register the EyeDraw mandatory scripts
-		$cs->registerScriptFile($this->jsPath.'/oe-eyedraw.js', CClientScript::POS_HEAD);
+		$minified = (YII_DEBUG) ? '' : '.min';
+
+		// Register the EyeDraw mandatory scripts
+		$cs->registerScriptFile($this->jsPath.'/oe-eyedraw'.$minified.'.js', CClientScript::POS_HEAD);
     // For languages that require utf8, use the following line in the view file (***TODO*** should be possible using Yii function)
     // <script src="dist/eyedraw.js" type="text/javascript" charset="utf-8"></script>
-		$cs->registerScriptFile($this->jsPath.'/eyedraw.js', CClientScript::POS_HEAD);
+		$cs->registerScriptFile($this->jsPath.'/eyedraw'.$minified.'.js', CClientScript::POS_HEAD);
         
 		// Create array of parameters to pass to the javascript function which runs on page load
 		$properties = array(
