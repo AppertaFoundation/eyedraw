@@ -5,8 +5,8 @@ module.exports = function(grunt) {
 		concat : {
 			basic_and_extras : {
 				files: {
-					'dist/eyedraw.js': [ 'src/drawing.js', 'src/tooltips.js', 'src/*/*.js' ],
-					'dist/oe_eyedraw.js': [ 'src/oe_eyedraw.js' ]
+					'dist/eyedraw.js': [ 'src/ED/Drawing.js', 'src/ED/Misc/**/*.js', 'src/ED/Doodles/**/*.js' ],
+					'dist/oe-eyedraw.js': [ 'src/OEEyeDraw.js' ]
 				}
 			}
 		},
@@ -17,7 +17,7 @@ module.exports = function(grunt) {
 			dist : {
 				files : {
 					'dist/eyedraw.min.js' : [ 'dist/eyedraw.js' ],
-					'dist/oe_eyedraw.min.js' : [ 'dist/oe_eyedraw.js' ]
+					'dist/oe-eyedraw.min.js' : [ 'dist/oe-eyedraw.js' ]
 				}
 			}
 		},
@@ -38,7 +38,8 @@ module.exports = function(grunt) {
 		},
 		watch : {
 			files : [ '<%= jshint.files %>' ],
-			tasks : [ 'jshint', 'qunit' ]
+			//tasks : [ 'jshint', 'qunit' ]
+			tasks : [ 'concat' ]
 		}
 	});
 

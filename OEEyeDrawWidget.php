@@ -252,8 +252,8 @@ class OEEyeDrawWidget extends CWidget
     {
         // Set values of paths
         $this->cssPath = Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('application.modules.eyedraw.css'), false, -1, YII_DEBUG);
-        $this->jsPath = Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('application.modules.eyedraw.js'), false, -1, YII_DEBUG);
-        $this->imgPath = Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('application.modules.eyedraw.graphics'), false, -1, YII_DEBUG).'/';
+        $this->jsPath = Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('application.modules.eyedraw.dist'), false, -1, YII_DEBUG);
+        $this->imgPath = Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('application.modules.eyedraw.img'), false, -1, YII_DEBUG).'/';
         
         // If script array is empty, just load all the ED_.js files (with exception of two mandatory files)
         if (empty($this->scriptArray))
@@ -353,20 +353,11 @@ class OEEyeDrawWidget extends CWidget
 		$cs = Yii::app()->getClientScript();
  
         // Register the EyeDraw mandatory scripts
-		$cs->registerScriptFile($this->jsPath.'/OEEyeDraw.js', CClientScript::POS_HEAD);
-		$cs->registerScriptFile($this->jsPath.'/ED_Drawing.js', CClientScript::POS_HEAD);
+		$cs->registerScriptFile($this->jsPath.'/oe-eyedraw.js', CClientScript::POS_HEAD);
+    // For languages that require utf8, use the following line in the view file (***TODO*** should be possible using Yii function)
+    // <script src="dist/eyedraw.js" type="text/javascript" charset="utf-8"></script>
+		$cs->registerScriptFile($this->jsPath.'/eyedraw.js', CClientScript::POS_HEAD);
         
-        // For languages that require utf8, use the following line in the view file (***TODO*** should be possible using Yii function)
-        // <script src="js/ED_Tooltips.js" type="text/javascript" charset="utf-8"></script>
-		$cs->registerScriptFile($this->jsPath.'/ED_Tooltips.js', CClientScript::POS_HEAD);
-        $cs->registerScriptFile($this->jsPath.'/ED_General.js', CClientScript::POS_HEAD);
-        
-        // Register the specified optional sub-specialty scripts
-        for ($i = 0; $i < count($this->scriptArray); $i++)
-        {
-            $cs->registerScriptFile($this->jsPath.'/'.$this->scriptArray[$i], CClientScript::POS_HEAD);
-        }
-
 		// Create array of parameters to pass to the javascript function which runs on page load
 		$properties = array(
             'drawingName'=>$this->drawingName,
@@ -403,7 +394,7 @@ class OEEyeDrawWidget extends CWidget
 	 */	
     protected function registerCss()
     {
-        $cssFile = $this->cssPath.'/OEEyeDraw.css';
+        $cssFile = $this->cssPath.'/oe-eyedraw.css';
         Yii::app()->getClientScript()->registerCssFile($cssFile);				 
     }
     

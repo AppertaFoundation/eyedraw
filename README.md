@@ -12,7 +12,7 @@ ED_Vitreoretinal.js	Doodles for Vitreoretinal drawings
 
 EyeDrawJS (dir)		Contains an XCode project file for those who use it
 
-graphics (dir)		Contains all graphics and icon files for EyeDraw
+img (dir)		Contains all graphics and icon files for EyeDraw
 
 jsdoc-toolkit (dir)	For generating documentation
 
