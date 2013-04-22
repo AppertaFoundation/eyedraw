@@ -5572,7 +5572,6 @@ ED.ScleralPatch.prototype.description = function()
 {
     return "Scleral patch";
 }
-<<<<<<< HEAD
 
 /**
  * Supramid suture
