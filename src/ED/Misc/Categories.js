@@ -27,7 +27,7 @@
  * @namespace Namespace for all EyeDraw classes
  */
 if (ED == null || typeof(ED) != "object") {
-    var ED = new Object();
+	var ED = new Object();
 }
 
 /**
@@ -39,14 +39,14 @@ ED.Categories = new Object();
  * Complications
  */
 ED.Categories['EntrySiteBreak'] = {
-    complication: 'Entry site break'
+	complication: 'Entry site break'
 };
 ED.Categories['RetinalTouch'] = {
-    complication: 'Retinal touch'
+	complication: 'Retinal touch'
 };
 ED.Categories['IatrogenicBreak'] = {
-    complication: 'Iatrogenic break'
+	complication: 'Iatrogenic break'
 };
 ED.Categories['SubretinalPFCL'] = {
-    complication: 'Subretinal PFCL'
+	complication: 'Subretinal PFCL'
 };

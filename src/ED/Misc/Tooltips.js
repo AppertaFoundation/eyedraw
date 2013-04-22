@@ -27,7 +27,7 @@
  * @namespace Namespace for all EyeDraw classes
  */
 if (ED == null || typeof(ED) != "object") {
-    var ED = new Object();
+	var ED = new Object();
 }
 
 /**

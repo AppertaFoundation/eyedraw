@@ -27,7 +27,7 @@
  * @namespace Namespace for all EyeDraw classes
  */
 if (ED == null || typeof(ED) != "object") {
-    var ED = new Object();
+	var ED = new Object();
 }
 
 /**
@@ -48,14 +48,14 @@ if (ED == null || typeof(ED) != "object") {
  * @param {Int} _order
  */
 ED.Surgeon = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
-    // Set classname
-    this.className = "Surgeon";
+	// Set classname
+	this.className = "Surgeon";
 
-    // Derived parameters (NB must set a value here to define parameter as a property of the object, even though value set later)
-    this.surgeonPosition = 'Temporal';
+	// Derived parameters (NB must set a value here to define parameter as a property of the object, even though value set later)
+	this.surgeonPosition = 'Temporal';
 
-    // Call superclass constructor
-    ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
 }
 
 /**
@@ -69,28 +69,28 @@ ED.Surgeon.superclass = ED.Doodle.prototype;
  * Sets default dragging attributes
  */
 ED.Surgeon.prototype.setPropertyDefaults = function() {
-    this.isScaleable = false;
-    this.isMoveable = false;
-    this.snapToAngles = true;
-    this.willStaySelected = false;
-    this.isUnique = true;
-    this.isDeletable = true;
+	this.isScaleable = false;
+	this.isMoveable = false;
+	this.snapToAngles = true;
+	this.willStaySelected = false;
+	this.isUnique = true;
+	this.isDeletable = true;
 
-    // Update component of validation array for simple parameters
-    this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
-    this.parameterValidationArray['apexY']['range'].setMinAndMax(+100, +500);
+	// Update component of validation array for simple parameters
+	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
+	this.parameterValidationArray['apexY']['range'].setMinAndMax(+100, +500);
 
-    // Add complete validation arrays for derived parameters
-    this.parameterValidationArray['surgeonPosition'] = {
-        kind: 'derived',
-        type: 'string',
-        list: ['Superior', 'Supero-temporal', 'Temporal', 'Infero-temporal', 'Inferior', 'Infero-nasal', 'Nasal', 'Supero-nasal'],
-        animate: true
-    };
+	// Add complete validation arrays for derived parameters
+	this.parameterValidationArray['surgeonPosition'] = {
+		kind: 'derived',
+		type: 'string',
+		list: ['Superior', 'Supero-temporal', 'Temporal', 'Infero-temporal', 'Inferior', 'Infero-nasal', 'Nasal', 'Supero-nasal'],
+		animate: true
+	};
 
-    // Array of angles to snap to
-    var phi = Math.PI / 4;
-    this.anglesArray = [0, phi, phi * 2, phi * 3, phi * 4, phi * 5, phi * 6, phi * 7];
+	// Array of angles to snap to
+	var phi = Math.PI / 4;
+	this.anglesArray = [0, phi, phi * 2, phi * 3, phi * 4, phi * 5, phi * 6, phi * 7];
 }
 
 /**
@@ -98,8 +98,8 @@ ED.Surgeon.prototype.setPropertyDefaults = function() {
  * Use the setParameter function for derived parameters, as this will also update dependent variables
  */
 ED.Surgeon.prototype.setParameterDefaults = function() {
-    this.rotation = 0;
-    this.setParameterFromString('surgeonPosition', 'Temporal');
+	this.rotation = 0;
+	this.setParameterFromString('surgeonPosition', 'Temporal');
 }
 
 /**
@@ -111,68 +111,68 @@ ED.Surgeon.prototype.setParameterDefaults = function() {
  * @returns {Array} Associative array of values of dependent parameters
  */
 ED.Surgeon.prototype.dependentParameterValues = function(_parameter, _value) {
-    var returnArray = new Array();
+	var returnArray = new Array();
 
-    var isRE = (this.drawing.eye == ED.eye.Right);
-    var dial = 2 * Math.PI;
+	var isRE = (this.drawing.eye == ED.eye.Right);
+	var dial = 2 * Math.PI;
 
-    switch (_parameter) {
-        // Surgeon position
-        case 'rotation':
-            if (isRE) {
-                if (_value < dial / 16) returnArray['surgeonPosition'] = 'Superior';
-                else if (_value < 3 * dial / 16) returnArray['surgeonPosition'] = 'Supero-nasal';
-                else if (_value < 5 * dial / 16) returnArray['surgeonPosition'] = 'Nasal';
-                else if (_value < 7 * dial / 16) returnArray['surgeonPosition'] = 'Infero-nasal';
-                else if (_value < 9 * dial / 16) returnArray['surgeonPosition'] = 'Inferior';
-                else if (_value < 11 * dial / 16) returnArray['surgeonPosition'] = 'Infero-temporal';
-                else if (_value < 13 * dial / 16) returnArray['surgeonPosition'] = 'Temporal';
-                else if (_value < 15 * dial / 16) returnArray['surgeonPosition'] = 'Supero-temporal';
-                else returnArray['surgeonPosition'] = 'Superior';
-            } else {
-                if (_value < dial / 16) returnArray['surgeonPosition'] = 'Superior';
-                else if (_value < 3 * dial / 16) returnArray['surgeonPosition'] = 'Supero-temporal';
-                else if (_value < 5 * dial / 16) returnArray['surgeonPosition'] = 'Temporal';
-                else if (_value < 7 * dial / 16) returnArray['surgeonPosition'] = 'Infero-temporal';
-                else if (_value < 9 * dial / 16) returnArray['surgeonPosition'] = 'Inferior';
-                else if (_value < 11 * dial / 16) returnArray['surgeonPosition'] = 'Infero-nasal';
-                else if (_value < 13 * dial / 16) returnArray['surgeonPosition'] = 'Nasal';
-                else if (_value < 15 * dial / 16) returnArray['surgeonPosition'] = 'Supero-nasal';
-                else returnArray['surgeonPosition'] = 'Superior';
-            }
-            break;
+	switch (_parameter) {
+		// Surgeon position
+		case 'rotation':
+			if (isRE) {
+				if (_value < dial / 16) returnArray['surgeonPosition'] = 'Superior';
+				else if (_value < 3 * dial / 16) returnArray['surgeonPosition'] = 'Supero-nasal';
+				else if (_value < 5 * dial / 16) returnArray['surgeonPosition'] = 'Nasal';
+				else if (_value < 7 * dial / 16) returnArray['surgeonPosition'] = 'Infero-nasal';
+				else if (_value < 9 * dial / 16) returnArray['surgeonPosition'] = 'Inferior';
+				else if (_value < 11 * dial / 16) returnArray['surgeonPosition'] = 'Infero-temporal';
+				else if (_value < 13 * dial / 16) returnArray['surgeonPosition'] = 'Temporal';
+				else if (_value < 15 * dial / 16) returnArray['surgeonPosition'] = 'Supero-temporal';
+				else returnArray['surgeonPosition'] = 'Superior';
+			} else {
+				if (_value < dial / 16) returnArray['surgeonPosition'] = 'Superior';
+				else if (_value < 3 * dial / 16) returnArray['surgeonPosition'] = 'Supero-temporal';
+				else if (_value < 5 * dial / 16) returnArray['surgeonPosition'] = 'Temporal';
+				else if (_value < 7 * dial / 16) returnArray['surgeonPosition'] = 'Infero-temporal';
+				else if (_value < 9 * dial / 16) returnArray['surgeonPosition'] = 'Inferior';
+				else if (_value < 11 * dial / 16) returnArray['surgeonPosition'] = 'Infero-nasal';
+				else if (_value < 13 * dial / 16) returnArray['surgeonPosition'] = 'Nasal';
+				else if (_value < 15 * dial / 16) returnArray['surgeonPosition'] = 'Supero-nasal';
+				else returnArray['surgeonPosition'] = 'Superior';
+			}
+			break;
 
-        case 'surgeonPosition':
-            switch (_value) {
-                case 'Superior':
-                    returnArray['rotation'] = 0;
-                    break;
-                case 'Supero-temporal':
-                    returnArray['rotation'] = isRE ? 7 * Math.PI / 4 : 1 * Math.PI / 4;
-                    break;
-                case 'Temporal':
-                    returnArray['rotation'] = isRE ? 6 * Math.PI / 4 : 2 * Math.PI / 4;
-                    break;
-                case 'Infero-temporal':
-                    returnArray['rotation'] = isRE ? 5 * Math.PI / 4 : 3 * Math.PI / 4;
-                    break;
-                case 'Inferior':
-                    returnArray['rotation'] = Math.PI;
-                    break;
-                case 'Infero-nasal':
-                    returnArray['rotation'] = isRE ? 3 * Math.PI / 4 : 5 * Math.PI / 4;
-                    break;
-                case 'Nasal':
-                    returnArray['rotation'] = isRE ? 2 * Math.PI / 4 : 6 * Math.PI / 4;
-                    break;
-                case 'Supero-nasal':
-                    returnArray['rotation'] = isRE ? 1 * Math.PI / 4 : 7 * Math.PI / 4;
-                    break;
-            }
-            break;
-    }
+		case 'surgeonPosition':
+			switch (_value) {
+				case 'Superior':
+					returnArray['rotation'] = 0;
+					break;
+				case 'Supero-temporal':
+					returnArray['rotation'] = isRE ? 7 * Math.PI / 4 : 1 * Math.PI / 4;
+					break;
+				case 'Temporal':
+					returnArray['rotation'] = isRE ? 6 * Math.PI / 4 : 2 * Math.PI / 4;
+					break;
+				case 'Infero-temporal':
+					returnArray['rotation'] = isRE ? 5 * Math.PI / 4 : 3 * Math.PI / 4;
+					break;
+				case 'Inferior':
+					returnArray['rotation'] = Math.PI;
+					break;
+				case 'Infero-nasal':
+					returnArray['rotation'] = isRE ? 3 * Math.PI / 4 : 5 * Math.PI / 4;
+					break;
+				case 'Nasal':
+					returnArray['rotation'] = isRE ? 2 * Math.PI / 4 : 6 * Math.PI / 4;
+					break;
+				case 'Supero-nasal':
+					returnArray['rotation'] = isRE ? 1 * Math.PI / 4 : 7 * Math.PI / 4;
+					break;
+			}
+			break;
+	}
 
-    return returnArray;
+	return returnArray;
 }
 
 /**
@@ -181,87 +181,87 @@ ED.Surgeon.prototype.dependentParameterValues = function(_parameter, _value) {
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
 ED.Surgeon.prototype.draw = function(_point) {
-    // Get context
-    var ctx = this.drawing.context;
+	// Get context
+	var ctx = this.drawing.context;
 
-    // Call draw method in superclass
-    ED.Surgeon.superclass.draw.call(this, _point);
+	// Call draw method in superclass
+	ED.Surgeon.superclass.draw.call(this, _point);
 
-    // Boundary path
-    ctx.beginPath();
+	// Boundary path
+	ctx.beginPath();
 
-    // Scaling factor
-    var s = 0.2;
+	// Scaling factor
+	var s = 0.2;
 
-    // Shift up y-axis
-    var y = -300;
+	// Shift up y-axis
+	var y = -300;
 
-    // Surgeon
-    ctx.moveTo(0 * s, y - 200 * s);
-    ctx.bezierCurveTo(-100 * s, y - 250 * s, -145 * s, y - 190 * s, -200 * s, y - 180 * s);
-    ctx.bezierCurveTo(-310 * s, y - 160 * s, -498 * s, y - 75 * s, -500 * s, y + 0 * s);
-    ctx.bezierCurveTo(-500 * s, y + 50 * s, -500 * s, y + 460 * s, -470 * s, y + 700 * s);
-    ctx.bezierCurveTo(-470 * s, y + 710 * s, -500 * s, y + 770 * s, -500 * s, y + 810 * s);
-    ctx.bezierCurveTo(-500 * s, y + 840 * s, -440 * s, y + 850 * s, -420 * s, y + 840 * s);
-    ctx.bezierCurveTo(-390 * s, y + 830 * s, -380 * s, y + 710 * s, -380 * s, y + 700 * s);
-    ctx.bezierCurveTo(-370 * s, y + 700 * s, -360 * s, y + 780 * s, -350 * s, y + 780 * s);
-    ctx.bezierCurveTo(-330 * s, y + 780 * s, -340 * s, y + 730 * s, -340 * s, y + 700 * s);
-    ctx.bezierCurveTo(-340 * s, y + 690 * s, -350 * s, y + 680 * s, -350 * s, y + 670 * s);
-    ctx.bezierCurveTo(-350 * s, y + 590 * s, -385 * s, y + 185 * s, -300 * s, y + 100 * s);
+	// Surgeon
+	ctx.moveTo(0 * s, y - 200 * s);
+	ctx.bezierCurveTo(-100 * s, y - 250 * s, -145 * s, y - 190 * s, -200 * s, y - 180 * s);
+	ctx.bezierCurveTo(-310 * s, y - 160 * s, -498 * s, y - 75 * s, -500 * s, y + 0 * s);
+	ctx.bezierCurveTo(-500 * s, y + 50 * s, -500 * s, y + 460 * s, -470 * s, y + 700 * s);
+	ctx.bezierCurveTo(-470 * s, y + 710 * s, -500 * s, y + 770 * s, -500 * s, y + 810 * s);
+	ctx.bezierCurveTo(-500 * s, y + 840 * s, -440 * s, y + 850 * s, -420 * s, y + 840 * s);
+	ctx.bezierCurveTo(-390 * s, y + 830 * s, -380 * s, y + 710 * s, -380 * s, y + 700 * s);
+	ctx.bezierCurveTo(-370 * s, y + 700 * s, -360 * s, y + 780 * s, -350 * s, y + 780 * s);
+	ctx.bezierCurveTo(-330 * s, y + 780 * s, -340 * s, y + 730 * s, -340 * s, y + 700 * s);
+	ctx.bezierCurveTo(-340 * s, y + 690 * s, -350 * s, y + 680 * s, -350 * s, y + 670 * s);
+	ctx.bezierCurveTo(-350 * s, y + 590 * s, -385 * s, y + 185 * s, -300 * s, y + 100 * s);
 
-    ctx.bezierCurveTo(-150 * s, y + 140 * s, -250 * s, y + 200 * s, 0 * s, y + 300 * s);
+	ctx.bezierCurveTo(-150 * s, y + 140 * s, -250 * s, y + 200 * s, 0 * s, y + 300 * s);
 
-    ctx.bezierCurveTo(250 * s, y + 200 * s, 150 * s, y + 140 * s, 300 * s, y + 100 * s);
-    ctx.bezierCurveTo(380 * s, y + 180 * s, 350 * s, y + 590 * s, 350 * s, y + 670 * s);
-    ctx.bezierCurveTo(350 * s, y + 680 * s, 340 * s, y + 690 * s, 340 * s, y + 700 * s);
-    ctx.bezierCurveTo(340 * s, y + 730 * s, 330 * s, y + 780 * s, 350 * s, y + 780 * s);
-    ctx.bezierCurveTo(360 * s, y + 780 * s, 370 * s, y + 700 * s, 380 * s, y + 700 * s);
-    ctx.bezierCurveTo(380 * s, y + 710 * s, 390 * s, y + 830 * s, 420 * s, y + 840 * s);
-    ctx.bezierCurveTo(430 * s, y + 845 * s, 505 * s, y + 840 * s, 505 * s, y + 810 * s);
-    ctx.bezierCurveTo(505 * s, y + 760 * s, 470 * s, y + 710 * s, 470 * s, y + 700 * s);
-    ctx.bezierCurveTo(500 * s, y + 460 * s, 499 * s, y + 45 * s, 500 * s, y + 0 * s);
-    ctx.bezierCurveTo(498 * s, y - 78 * s, 308 * s, y - 164 * s, 200 * s, y - 182 * s);
-    ctx.bezierCurveTo(145 * s, y - 190 * s, 100 * s, y - 250 * s, 0 * s, y - 200 * s);
+	ctx.bezierCurveTo(250 * s, y + 200 * s, 150 * s, y + 140 * s, 300 * s, y + 100 * s);
+	ctx.bezierCurveTo(380 * s, y + 180 * s, 350 * s, y + 590 * s, 350 * s, y + 670 * s);
+	ctx.bezierCurveTo(350 * s, y + 680 * s, 340 * s, y + 690 * s, 340 * s, y + 700 * s);
+	ctx.bezierCurveTo(340 * s, y + 730 * s, 330 * s, y + 780 * s, 350 * s, y + 780 * s);
+	ctx.bezierCurveTo(360 * s, y + 780 * s, 370 * s, y + 700 * s, 380 * s, y + 700 * s);
+	ctx.bezierCurveTo(380 * s, y + 710 * s, 390 * s, y + 830 * s, 420 * s, y + 840 * s);
+	ctx.bezierCurveTo(430 * s, y + 845 * s, 505 * s, y + 840 * s, 505 * s, y + 810 * s);
+	ctx.bezierCurveTo(505 * s, y + 760 * s, 470 * s, y + 710 * s, 470 * s, y + 700 * s);
+	ctx.bezierCurveTo(500 * s, y + 460 * s, 499 * s, y + 45 * s, 500 * s, y + 0 * s);
+	ctx.bezierCurveTo(498 * s, y - 78 * s, 308 * s, y - 164 * s, 200 * s, y - 182 * s);
+	ctx.bezierCurveTo(145 * s, y - 190 * s, 100 * s, y - 250 * s, 0 * s, y - 200 * s);
 
-    // Set Attributes
-    ctx.lineWidth = 4;
-    ctx.strokeStyle = "rgba(120,120,120,1)";
+	// Set Attributes
+	ctx.lineWidth = 4;
+	ctx.strokeStyle = "rgba(120,120,120,1)";
 
-    // Set light blue for surgeon's gown
-    var colour = new ED.Colour(0, 0, 0, 1);
-    colour.setWithHexString('3AFEFA');
-    ctx.fillStyle = colour.rgba();
+	// Set light blue for surgeon's gown
+	var colour = new ED.Colour(0, 0, 0, 1);
+	colour.setWithHexString('3AFEFA');
+	ctx.fillStyle = colour.rgba();
 
-    // Draw boundary path (also hit testing)
-    this.drawBoundary(_point);
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
 
-    // Non boundary paths here
-    if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
-        // Head
-        ctx.beginPath();
+	// Non boundary paths here
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+		// Head
+		ctx.beginPath();
 
-        ctx.moveTo(0 * s, y - 250 * s);
-        ctx.bezierCurveTo(-100 * s, y - 250 * s, -180 * s, y - 200 * s, -200 * s, y - 170 * s);
-        ctx.bezierCurveTo(-209 * s, y - 157 * s, -220 * s, y - 100 * s, -230 * s, y - 50 * s);
-        ctx.bezierCurveTo(-260 * s, y - 70 * s, -260 * s, y - 20 * s, -260 * s, y + 0 * s);
-        ctx.bezierCurveTo(-260 * s, y + 20 * s, -260 * s, y + 80 * s, -230 * s, y + 60 * s);
-        ctx.bezierCurveTo(-230 * s, y + 90 * s, -220 * s, y + 141 * s, -210 * s, y + 160 * s);
-        ctx.bezierCurveTo(-190 * s, y + 200 * s, -100 * s, y + 280 * s, -40 * s, y + 300 * s);
-        ctx.bezierCurveTo(-34 * s, y + 303 * s, -20 * s, y + 350 * s, 0 * s, y + 350 * s);
-        ctx.bezierCurveTo(20 * s, y + 350 * s, 34 * s, y + 300 * s, 40 * s, y + 300 * s);
-        ctx.bezierCurveTo(100 * s, y + 280 * s, 190 * s, y + 200 * s, 210 * s, y + 160 * s);
-        ctx.bezierCurveTo(218 * s, y + 143 * s, 230 * s, y + 90 * s, 230 * s, y + 60 * s);
-        ctx.bezierCurveTo(260 * s, y + 80 * s, 260 * s, y + 20 * s, 260 * s, y + 0 * s);
-        ctx.bezierCurveTo(260 * s, y - 20 * s, 260 * s, y - 70 * s, 230 * s, y - 50 * s);
-        ctx.bezierCurveTo(220 * s, y - 100 * s, 208 * s, y - 158 * s, 200 * s, y - 170 * s);
-        ctx.bezierCurveTo(180 * s, y - 200 * s, 100 * s, y - 250 * s, 0 * s, y - 250 * s);
+		ctx.moveTo(0 * s, y - 250 * s);
+		ctx.bezierCurveTo(-100 * s, y - 250 * s, -180 * s, y - 200 * s, -200 * s, y - 170 * s);
+		ctx.bezierCurveTo(-209 * s, y - 157 * s, -220 * s, y - 100 * s, -230 * s, y - 50 * s);
+		ctx.bezierCurveTo(-260 * s, y - 70 * s, -260 * s, y - 20 * s, -260 * s, y + 0 * s);
+		ctx.bezierCurveTo(-260 * s, y + 20 * s, -260 * s, y + 80 * s, -230 * s, y + 60 * s);
+		ctx.bezierCurveTo(-230 * s, y + 90 * s, -220 * s, y + 141 * s, -210 * s, y + 160 * s);
+		ctx.bezierCurveTo(-190 * s, y + 200 * s, -100 * s, y + 280 * s, -40 * s, y + 300 * s);
+		ctx.bezierCurveTo(-34 * s, y + 303 * s, -20 * s, y + 350 * s, 0 * s, y + 350 * s);
+		ctx.bezierCurveTo(20 * s, y + 350 * s, 34 * s, y + 300 * s, 40 * s, y + 300 * s);
+		ctx.bezierCurveTo(100 * s, y + 280 * s, 190 * s, y + 200 * s, 210 * s, y + 160 * s);
+		ctx.bezierCurveTo(218 * s, y + 143 * s, 230 * s, y + 90 * s, 230 * s, y + 60 * s);
+		ctx.bezierCurveTo(260 * s, y + 80 * s, 260 * s, y + 20 * s, 260 * s, y + 0 * s);
+		ctx.bezierCurveTo(260 * s, y - 20 * s, 260 * s, y - 70 * s, 230 * s, y - 50 * s);
+		ctx.bezierCurveTo(220 * s, y - 100 * s, 208 * s, y - 158 * s, 200 * s, y - 170 * s);
+		ctx.bezierCurveTo(180 * s, y - 200 * s, 100 * s, y - 250 * s, 0 * s, y - 250 * s);
 
-        ctx.fill();
-        ctx.stroke();
-    }
+		ctx.fill();
+		ctx.stroke();
+	}
 
-    // Return value indicating successful hittest
-    return this.isClicked;
+	// Return value indicating successful hittest
+	return this.isClicked;
 }
 
 /**
@@ -282,11 +282,11 @@ ED.Surgeon.prototype.draw = function(_point) {
  * @param {Int} _order
  */
 ED.OperatingTable = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
-    // Set classname
-    this.className = "OperatingTable";
+	// Set classname
+	this.className = "OperatingTable";
 
-    // Call superclass constructor
-    ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
 }
 
 /**
@@ -300,7 +300,7 @@ ED.OperatingTable.superclass = ED.Doodle.prototype;
  * Sets default properties
  */
 ED.OperatingTable.prototype.setPropertyDefaults = function() {
-    this.isSelectable = false;
+	this.isSelectable = false;
 }
 
 /**
@@ -309,44 +309,44 @@ ED.OperatingTable.prototype.setPropertyDefaults = function() {
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
 ED.OperatingTable.prototype.draw = function(_point) {
-    // Get context
-    var ctx = this.drawing.context;
+	// Get context
+	var ctx = this.drawing.context;
 
-    // Call draw method in superclass
-    ED.OperatingTable.superclass.draw.call(this, _point);
+	// Call draw method in superclass
+	ED.OperatingTable.superclass.draw.call(this, _point);
 
-    // Boundary path
-    ctx.beginPath();
+	// Boundary path
+	ctx.beginPath();
 
-    // Head
-    ctx.arc(0, -0, 60, 0, Math.PI * 2, true);
+	// Head
+	ctx.arc(0, -0, 60, 0, Math.PI * 2, true);
 
-    // Set Attributes
-    ctx.lineWidth = 30;
-    ctx.strokeStyle = "rgba(120,120,120,1)";
-    ctx.fillStyle = "rgba(220,220,220,1)";
+	// Set Attributes
+	ctx.lineWidth = 30;
+	ctx.strokeStyle = "rgba(120,120,120,1)";
+	ctx.fillStyle = "rgba(220,220,220,1)";
 
-    // Draw boundary path (also hit testing)
-    this.drawBoundary(_point);
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
 
-    // Non boundary paths here
-    if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
-        ctx.beginPath();
+	// Non boundary paths here
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+		ctx.beginPath();
 
-        // Bed
-        ctx.rect(-100, 20, 200, 400);
+		// Bed
+		ctx.rect(-100, 20, 200, 400);
 
-        // Set Attributes
-        ctx.lineWidth = 8;
-        ctx.strokeStyle = "rgba(120,120,120,1)";
-        ctx.fillStyle = "rgba(220,220,220,1)";
+		// Set Attributes
+		ctx.lineWidth = 8;
+		ctx.strokeStyle = "rgba(120,120,120,1)";
+		ctx.fillStyle = "rgba(220,220,220,1)";
 
-        ctx.fill();
-        ctx.stroke();
-    }
+		ctx.fill();
+		ctx.stroke();
+	}
 
-    // Return value indicating successful hittest
-    return this.isClicked;
+	// Return value indicating successful hittest
+	return this.isClicked;
 }
 
 /**
@@ -367,35 +367,35 @@ ED.OperatingTable.prototype.draw = function(_point) {
  * @param {Int} _order
  */
 ED.Label = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
-    // Set classname
-    this.className = "Label";
+	// Set classname
+	this.className = "Label";
 
-    // Label text
-    this.labelText = "Start typing..";
-    this.savedParams = ['labelText'];
+	// Label text
+	this.labelText = "Start typing..";
+	this.savedParams = ['labelText'];
 
-    // Label width and height
-    this.labelWidth = 0;
-    this.labelHeight = 80;
+	// Label width and height
+	this.labelWidth = 0;
+	this.labelHeight = 80;
 
-    // Label font
-    this.labelFont = "60px sans-serif";
+	// Label font
+	this.labelFont = "60px sans-serif";
 
-    // Horizontal padding between label and boundary path
-    this.padding = 10;
+	// Horizontal padding between label and boundary path
+	this.padding = 10;
 
-    // Maximum length
-    this.maximumLength = 20;
+	// Maximum length
+	this.maximumLength = 20;
 
-    // Flag to indicate first edit
-    this.isEdited = false;
+	// Flag to indicate first edit
+	this.isEdited = false;
 
-    // Temporary store for values of originX and originY (to prevent apex moving with body of label)
-    this.lastOriginX = 0;
-    this.lastOriginY = 0;
+	// Temporary store for values of originX and originY (to prevent apex moving with body of label)
+	this.lastOriginX = 0;
+	this.lastOriginY = 0;
 
-    // Call superclass constructor
-    ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
 }
 
 /**
@@ -409,34 +409,34 @@ ED.Label.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.Label.prototype.setHandles = function() {
-    this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
 }
 
 /**
  * Sets default properties
  */
 ED.Label.prototype.setPropertyDefaults = function() {
-    this.parameterValidationArray['apexX']['range'].setMinAndMax(-1000, +1000);
-    this.parameterValidationArray['apexY']['range'].setMinAndMax(-1000, +1000);
+	this.parameterValidationArray['apexX']['range'].setMinAndMax(-1000, +1000);
+	this.parameterValidationArray['apexY']['range'].setMinAndMax(-1000, +1000);
 
-    // Add complete validation arrays for derived parameters
-    this.parameterValidationArray['labelText'] = {
-        kind: 'derived',
-        type: 'string',
-        animate: false
-    };
+	// Add complete validation arrays for derived parameters
+	this.parameterValidationArray['labelText'] = {
+		kind: 'derived',
+		type: 'string',
+		animate: false
+	};
 }
 
 /**
  * Sets default parameters
  */
 ED.Label.prototype.setParameterDefaults = function() {
-    this.setParameterFromString('labelText', 'Start typing..');
-    this.setOriginWithDisplacements(0, -100);
-    this.lastOriginX = this.originX;
-    this.lastOriginY = this.originY;
-    this.apexX = +100;
-    this.apexY = -150;
+	this.setParameterFromString('labelText', 'Start typing..');
+	this.setOriginWithDisplacements(0, -100);
+	this.lastOriginX = this.originX;
+	this.lastOriginY = this.originY;
+	this.apexX = +100;
+	this.apexY = -150;
 }
 
 /**
@@ -448,20 +448,20 @@ ED.Label.prototype.setParameterDefaults = function() {
  * @returns {Array} Associative array of values of dependent parameters
  */
 ED.Label.prototype.dependentParameterValues = function(_parameter, _value) {
-    var returnArray = new Array();
+	var returnArray = new Array();
 
-    switch (_parameter) {
-        case 'originX':
-            returnArray['apexX'] = this.apexX - (_value - this.lastOriginX) / this.drawing.globalScaleFactor;
-            this.lastOriginX = _value;
-            break;
-        case 'originY':
-            returnArray['apexY'] = this.apexY - (_value - this.lastOriginY) / this.drawing.globalScaleFactor;
-            this.lastOriginY = _value;
-            break;
-    }
+	switch (_parameter) {
+		case 'originX':
+			returnArray['apexX'] = this.apexX - (_value - this.lastOriginX) / this.drawing.globalScaleFactor;
+			this.lastOriginX = _value;
+			break;
+		case 'originY':
+			returnArray['apexY'] = this.apexY - (_value - this.lastOriginY) / this.drawing.globalScaleFactor;
+			this.lastOriginY = _value;
+			break;
+	}
 
-    return returnArray;
+	return returnArray;
 }
 
 /**
@@ -470,95 +470,95 @@ ED.Label.prototype.dependentParameterValues = function(_parameter, _value) {
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
 ED.Label.prototype.draw = function(_point) {
-    // Get context
-    var ctx = this.drawing.context;
+	// Get context
+	var ctx = this.drawing.context;
 
-    // Call draw method in superclass
-    ED.Label.superclass.draw.call(this, _point);
+	// Call draw method in superclass
+	ED.Label.superclass.draw.call(this, _point);
 
-    // Set font
-    ctx.font = this.labelFont;
+	// Set font
+	ctx.font = this.labelFont;
 
-    // Calculate pixel width of text with padding
-    this.labelWidth = ctx.measureText(this.labelText).width + this.padding * 2;
+	// Calculate pixel width of text with padding
+	this.labelWidth = ctx.measureText(this.labelText).width + this.padding * 2;
 
-    // Boundary path
-    ctx.beginPath();
+	// Boundary path
+	ctx.beginPath();
 
-    // label boundary
-    ctx.rect(-this.labelWidth / 2, -this.labelHeight / 2, this.labelWidth, this.labelHeight);
+	// label boundary
+	ctx.rect(-this.labelWidth / 2, -this.labelHeight / 2, this.labelWidth, this.labelHeight);
 
-    // Close path
-    ctx.closePath();
+	// Close path
+	ctx.closePath();
 
-    // Set line attributes
-    ctx.lineWidth = 2;
-    this.isFilled = false;
-    ctx.strokeStyle = "rgba(0, 0, 0, 0)";
-    if (this.isSelected) ctx.strokeStyle = "gray";
+	// Set line attributes
+	ctx.lineWidth = 2;
+	this.isFilled = false;
+	ctx.strokeStyle = "rgba(0, 0, 0, 0)";
+	if (this.isSelected) ctx.strokeStyle = "gray";
 
-    // Draw boundary path (also hit testing)
-    this.drawBoundary(_point);
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
 
-    // Non boundary paths here
-    if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
-        // Draw text
-        ctx.fillText(this.labelText, -this.labelWidth / 2 + this.padding, this.labelHeight / 6);
+	// Non boundary paths here
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+		// Draw text
+		ctx.fillText(this.labelText, -this.labelWidth / 2 + this.padding, this.labelHeight / 6);
 
-        // Coordinate of start of arrow
-        var arrowStart = new ED.Point(0, 0);
+		// Coordinate of start of arrow
+		var arrowStart = new ED.Point(0, 0);
 
-        // Calculation of which quadrant arrowEnd is in
-        var q;
-        if (this.apexX == 0) q = 2;
-        else q = Math.abs(this.apexY / this.apexX);
+		// Calculation of which quadrant arrowEnd is in
+		var q;
+		if (this.apexX == 0) q = 2;
+		else q = Math.abs(this.apexY / this.apexX);
 
-        // Set start
-        if (this.apexY <= 0 && q >= 1) {
-            arrowStart.x = 0;
-            arrowStart.y = -this.labelHeight / 2;
-        }
-        if (this.apexX <= 0 && q < 1) {
-            arrowStart.x = -this.labelWidth / 2;
-            arrowStart.y = 0;
-        }
-        if (this.apexY > 0 && q >= 1) {
-            arrowStart.x = 0;
-            arrowStart.y = this.labelHeight / 2;
-        }
-        if (this.apexX > 0 && q < 1) {
-            arrowStart.x = this.labelWidth / 2;
-            arrowStart.y = 0;
-        }
+		// Set start
+		if (this.apexY <= 0 && q >= 1) {
+			arrowStart.x = 0;
+			arrowStart.y = -this.labelHeight / 2;
+		}
+		if (this.apexX <= 0 && q < 1) {
+			arrowStart.x = -this.labelWidth / 2;
+			arrowStart.y = 0;
+		}
+		if (this.apexY > 0 && q >= 1) {
+			arrowStart.x = 0;
+			arrowStart.y = this.labelHeight / 2;
+		}
+		if (this.apexX > 0 && q < 1) {
+			arrowStart.x = this.labelWidth / 2;
+			arrowStart.y = 0;
+		}
 
-        // Coordinates of end of arrow
-        var arrowEnd = new ED.Point(this.apexX, this.apexY);
+		// Coordinates of end of arrow
+		var arrowEnd = new ED.Point(this.apexX, this.apexY);
 
-        // Draw arrow
-        ctx.strokeStyle = "Gray";
-        ctx.fillStyle = "Gray";
-        ctx.lineWidth = 4;
+		// Draw arrow
+		ctx.strokeStyle = "Gray";
+		ctx.fillStyle = "Gray";
+		ctx.lineWidth = 4;
 
-        ctx.beginPath();
-        ctx.moveTo(arrowStart.x, arrowStart.y);
-        ctx.lineTo(arrowEnd.x, arrowEnd.y);
-        ctx.stroke();
+		ctx.beginPath();
+		ctx.moveTo(arrowStart.x, arrowStart.y);
+		ctx.lineTo(arrowEnd.x, arrowEnd.y);
+		ctx.stroke();
 
-        ctx.beginPath();
-        ctx.arc(arrowEnd.x, arrowEnd.y, 16, 0, Math.PI * 2, true);
-        ctx.closePath();
-        ctx.moveTo(arrowEnd.x, arrowEnd.y);
-        ctx.fill();
-    }
+		ctx.beginPath();
+		ctx.arc(arrowEnd.x, arrowEnd.y, 16, 0, Math.PI * 2, true);
+		ctx.closePath();
+		ctx.moveTo(arrowEnd.x, arrowEnd.y);
+		ctx.fill();
+	}
 
-    // Coordinates of handles (in canvas plane)
-    this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
+	// Coordinates of handles (in canvas plane)
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
-    // Draw handles if selected
-    if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
 
-    // Return value indicating successful hittest
-    return this.isClicked;
+	// Return value indicating successful hittest
+	return this.isClicked;
 }
 
 /**
@@ -567,30 +567,30 @@ ED.Label.prototype.draw = function(_point) {
  * @param {Int} _keyCode Keycode of pressed key
  */
 ED.Label.prototype.addLetter = function(_keyCode) {
-    // Need code here to convert to character
-    var character = String.fromCharCode(_keyCode);
+	// Need code here to convert to character
+	var character = String.fromCharCode(_keyCode);
 
-    if (!this.isEdited) {
-        this.labelText = "";
-        this.isEdited = true;
-    }
+	if (!this.isEdited) {
+		this.labelText = "";
+		this.isEdited = true;
+	}
 
-    // Use backspace to edit
-    if (_keyCode == 8) {
-        if (this.labelText.length > 0) this.labelText = this.labelText.substring(0, this.labelText.length - 1);
-    } else {
-        if (this.labelText.length < this.maximumLength) this.labelText += character;
-    }
+	// Use backspace to edit
+	if (_keyCode == 8) {
+		if (this.labelText.length > 0) this.labelText = this.labelText.substring(0, this.labelText.length - 1);
+	} else {
+		if (this.labelText.length < this.maximumLength) this.labelText += character;
+	}
 
-    // Save changes by triggering parameterChanged method in controller
-    if (this.isEdited) {
-        // Create notification message
-        var object = new Object;
-        object.doodle = this;
+	// Save changes by triggering parameterChanged method in controller
+	if (this.isEdited) {
+		// Create notification message
+		var object = new Object;
+		object.doodle = this;
 
-        // Trigger notification
-        this.drawing.notify('parameterChanged', object);
-    }
+		// Trigger notification
+		this.drawing.notify('parameterChanged', object);
+	}
 }
 
 /**
@@ -599,7 +599,7 @@ ED.Label.prototype.addLetter = function(_keyCode) {
  * @returns {String} Description of doodle
  */
 ED.Label.prototype.description = function() {
-    return "Peripheral iridectomy at " + this.clockHour() + " o'clock";
+	return "Peripheral iridectomy at " + this.clockHour() + " o'clock";
 }
 
 /**
@@ -620,11 +620,11 @@ ED.Label.prototype.description = function() {
  * @param {Int} _order
  */
 ED.Freehand = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
-    // Set classname
-    this.className = "Freehand";
+	// Set classname
+	this.className = "Freehand";
 
-    // Call superclass constructor
-    ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
 }
 
 /**
@@ -638,14 +638,14 @@ ED.Freehand.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.Freehand.prototype.setHandles = function() {
-    this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, true);
+	this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, true);
 }
 
 /**
  * Sets default dragging attributes
  */
 ED.Freehand.prototype.setPropertyDefaults = function() {
-    this.isDrawable = true;
+	this.isDrawable = true;
 }
 
 /**
@@ -653,7 +653,7 @@ ED.Freehand.prototype.setPropertyDefaults = function() {
  * Use the setParameter function for derived parameters, as this will also update dependent variables
  */
 ED.Freehand.prototype.setParameterDefaults = function() {
-    this.setOriginWithDisplacements(0, 100);
+	this.setOriginWithDisplacements(0, 100);
 }
 
 /**
@@ -662,65 +662,65 @@ ED.Freehand.prototype.setParameterDefaults = function() {
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
 ED.Freehand.prototype.draw = function(_point) {
-    // Get context
-    var ctx = this.drawing.context;
+	// Get context
+	var ctx = this.drawing.context;
 
-    // Call draw method in superclass
-    ED.Freehand.superclass.draw.call(this, _point);
+	// Call draw method in superclass
+	ED.Freehand.superclass.draw.call(this, _point);
 
-    // Boundary path
-    ctx.beginPath();
+	// Boundary path
+	ctx.beginPath();
 
-    // Freehand
-    ctx.rect(-150, -150, 300, 300);
+	// Freehand
+	ctx.rect(-150, -150, 300, 300);
 
-    // Close path
-    ctx.closePath();
+	// Close path
+	ctx.closePath();
 
-    // Set line attributes
-    ctx.lineWidth = 2;
-    this.isFilled = false;
-    ctx.strokeStyle = "rgba(0, 0, 0, 0)";
-    if (this.isSelected) ctx.strokeStyle = "gray";
-    if (this.isForDrawing) ctx.strokeStyle = "blue";
+	// Set line attributes
+	ctx.lineWidth = 2;
+	this.isFilled = false;
+	ctx.strokeStyle = "rgba(0, 0, 0, 0)";
+	if (this.isSelected) ctx.strokeStyle = "gray";
+	if (this.isForDrawing) ctx.strokeStyle = "blue";
 
-    // Draw boundary path (also hit testing)
-    this.drawBoundary(_point);
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
 
-    // Non boundary paths here
-    if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
-        // Iterate through squiggles, drawing them
-        for (var i = 0; i < this.squiggleArray.length; i++) {
-            var squiggle = this.squiggleArray[i];
+	// Non boundary paths here
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+		// Iterate through squiggles, drawing them
+		for (var i = 0; i < this.squiggleArray.length; i++) {
+			var squiggle = this.squiggleArray[i];
 
-            ctx.beginPath();
+			ctx.beginPath();
 
-            // Squiggle attributes
-            ctx.lineWidth = squiggle.thickness;
-            ctx.strokeStyle = squiggle.colour;
-            ctx.fillStyle = squiggle.colour;
+			// Squiggle attributes
+			ctx.lineWidth = squiggle.thickness;
+			ctx.strokeStyle = squiggle.colour;
+			ctx.fillStyle = squiggle.colour;
 
-            // Iterate through squiggle points
-            for (var j = 0; j < squiggle.pointsArray.length; j++) {
-                ctx.lineTo(squiggle.pointsArray[j].x, squiggle.pointsArray[j].y);
-            }
+			// Iterate through squiggle points
+			for (var j = 0; j < squiggle.pointsArray.length; j++) {
+				ctx.lineTo(squiggle.pointsArray[j].x, squiggle.pointsArray[j].y);
+			}
 
-            // Draw squiggle
-            ctx.stroke();
+			// Draw squiggle
+			ctx.stroke();
 
-            // Optionally fill if squiggle is complete (stops filling while drawing)
-            if (squiggle.filled && squiggle.complete) ctx.fill();
-        }
-    }
+			// Optionally fill if squiggle is complete (stops filling while drawing)
+			if (squiggle.filled && squiggle.complete) ctx.fill();
+		}
+	}
 
-    // Coordinates of handles (in canvas plane)
-    this.handleArray[2].location = this.transform.transformPoint(new ED.Point(150, -150));
+	// Coordinates of handles (in canvas plane)
+	this.handleArray[2].location = this.transform.transformPoint(new ED.Point(150, -150));
 
-    // Draw handles if selected but not if for drawing
-    if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+	// Draw handles if selected but not if for drawing
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
 
-    // Return value indicating successful hittest
-    return this.isClicked;
+	// Return value indicating successful hittest
+	return this.isClicked;
 }
 
 /**
@@ -741,11 +741,11 @@ ED.Freehand.prototype.draw = function(_point) {
  * @param {Int} _order
  */
 ED.MouseTest = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
-    // Set classname
-    this.className = "MouseTest";
+	// Set classname
+	this.className = "MouseTest";
 
-    // Call superclass constructor
-    ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
 }
 
 /**
@@ -759,7 +759,7 @@ ED.MouseTest.superclass = ED.Doodle.prototype;
  * Sets default properties
  */
 ED.MouseTest.prototype.setPropertyDefaults = function() {
-    this.isMoveable = false;
+	this.isMoveable = false;
 }
 
 /**
@@ -768,37 +768,37 @@ ED.MouseTest.prototype.setPropertyDefaults = function() {
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
 ED.MouseTest.prototype.draw = function(_point) {
-    //if (_point) console.log(_point.x, _point.y);
+	//if (_point) console.log(_point.x, _point.y);
 
-    // Get context
-    var ctx = this.drawing.context;
+	// Get context
+	var ctx = this.drawing.context;
 
-    // Call draw method in superclass
-    ED.MouseTest.superclass.draw.call(this, _point);
+	// Call draw method in superclass
+	ED.MouseTest.superclass.draw.call(this, _point);
 
-    // Boundary path
-    ctx.beginPath();
+	// Boundary path
+	ctx.beginPath();
 
-    // Square
-    var width = 200;
-    ctx.rect(-width / 2, -width / 2, width, width);
+	// Square
+	var width = 200;
+	ctx.rect(-width / 2, -width / 2, width, width);
 
-    // Close path
-    ctx.closePath();
+	// Close path
+	ctx.closePath();
 
-    // Set line attributes
-    ctx.lineWidth = 1;
-    ctx.fillStyle = "white"
-    ctx.strokeStyle = "blue";
+	// Set line attributes
+	ctx.lineWidth = 1;
+	ctx.fillStyle = "white"
+	ctx.strokeStyle = "blue";
 
-    // Draw boundary path (also hit testing)
-    this.drawBoundary(_point);
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
 
-    if (this.isClicked) console.log(_point.x, _point.y);
+	if (this.isClicked) console.log(_point.x, _point.y);
 
-    // Non boundary paths here
-    if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {}
+	// Non boundary paths here
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {}
 
-    // Return value indicating successful hittest
-    return this.isClicked;
+	// Return value indicating successful hittest
+	return this.isClicked;
 }
