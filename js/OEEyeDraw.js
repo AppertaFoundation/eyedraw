@@ -247,6 +247,16 @@ function eyeDrawInit(_properties)
                     {
                         input.value = this.drawing.save();
                     }
+                    
+                    // Label doodle needs immediate keyboard input, so give canvas focus
+                    var doodle = _messageArray['object'];
+					if (typeof(doodle) != 'undefined')
+					{
+						if (doodle.className == 'Label')
+						{
+							canvas.focus();
+						}
+					}
                     break;
                     
                 case 'doodleDeleted':

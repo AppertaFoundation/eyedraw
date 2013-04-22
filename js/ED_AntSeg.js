@@ -2182,6 +2182,7 @@ ED.PostSubcapCataract.prototype.setPropertyDefaults = function()
     this.isUnique = true;
     this.parentClass = "Lens";
     this.inFrontOfClassArray = ["Lens"];
+    this.addAtBack = true;
     
     // Update component of validation array for simple parameters
     this.parameterValidationArray['apexX']['range'].setMinAndMax(+35, +100);

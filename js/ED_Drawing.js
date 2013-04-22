@@ -715,6 +715,7 @@ ED.Drawing.prototype.load = function(_doodleSet)
             }
         }
         
+        // Saved parameters
         if(typeof(_doodleSet[i].params) != 'undefined') {
             for (var j = 0; j < _doodleSet[i].params.length; j++) {
             	var param_name = _doodleSet[i].params[j].name;
