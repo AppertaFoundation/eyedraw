@@ -26,7 +26,9 @@
  * Defines the EyeDraw namespace
  * @namespace Namespace for all EyeDraw classes
  */
-if (ED == null || typeof(ED) != "object") { var ED = new Object();}
+if (ED == null || typeof(ED) != "object") {
+	var ED = new Object();
+}
 
 /**
  * Language specific categories which can be used to take actions following addition of a doodle
@@ -36,7 +38,15 @@ ED.Categories = new Object();
 /**
  * Complications
  */
-ED.Categories['EntrySiteBreak'] = {complication:'Entry site break'};
-ED.Categories['RetinalTouch'] = {complication:'Retinal touch'};
-ED.Categories['IatrogenicBreak'] = {complication:'Iatrogenic break'};
-ED.Categories['SubretinalPFCL'] = {complication:'Subretinal PFCL'};
+ED.Categories['EntrySiteBreak'] = {
+	complication: 'Entry site break'
+};
+ED.Categories['RetinalTouch'] = {
+	complication: 'Retinal touch'
+};
+ED.Categories['IatrogenicBreak'] = {
+	complication: 'Iatrogenic break'
+};
+ED.Categories['SubretinalPFCL'] = {
+	complication: 'Subretinal PFCL'
+};

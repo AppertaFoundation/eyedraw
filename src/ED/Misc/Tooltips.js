@@ -26,7 +26,9 @@
  * Defines the EyeDraw namespace
  * @namespace Namespace for all EyeDraw classes
  */
-if (ED == null || typeof(ED) != "object") { var ED = new Object();}
+if (ED == null || typeof(ED) != "object") {
+	var ED = new Object();
+}
 
 /**
  * Language specific tooltips which appear over doodles on hover
