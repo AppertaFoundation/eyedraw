@@ -33,8 +33,7 @@
  * @param {Float} _rotation
  * @param {Int} _order
  */
-ED.Vicryl = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
-{	
+ED.Vicryl = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
 	// Set classname
 	this.className = "Vicryl";
 
@@ -52,8 +51,7 @@ ED.Vicryl.superclass = ED.Doodle.prototype;
 /**
  * Sets default dragging attributes
  */
-ED.Vicryl.prototype.setPropertyDefaults = function()
-{
+ED.Vicryl.prototype.setPropertyDefaults = function() {
 	this.isOrientated = true;
 	this.isRotatable = false;
 }
@@ -61,22 +59,18 @@ ED.Vicryl.prototype.setPropertyDefaults = function()
 /**
  * Sets default parameters
  */
-ED.Vicryl.prototype.setParameterDefaults = function()
-{
-    this.originY = -240;
-    this.apexY = 400;
-    
-    // Tubes are usually STQ
-    if(this.drawing.eye == ED.eye.Right)
-    {
-        this.originX = -240;        
-        this.rotation = -Math.PI/4;
-    }
-    else
-    {
-        this.originX = 240;
-        this.rotation = Math.PI/4;
-    }
+ED.Vicryl.prototype.setParameterDefaults = function() {
+	this.originY = -240;
+	this.apexY = 400;
+
+	// Tubes are usually STQ
+	if (this.drawing.eye == ED.eye.Right) {
+		this.originX = -240;
+		this.rotation = -Math.PI / 4;
+	} else {
+		this.originX = 240;
+		this.rotation = Math.PI / 4;
+	}
 }
 
 /**
@@ -84,47 +78,45 @@ ED.Vicryl.prototype.setParameterDefaults = function()
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.Vicryl.prototype.draw = function(_point)
-{
+ED.Vicryl.prototype.draw = function(_point) {
 	// Get context
 	var ctx = this.drawing.context;
 
 	// Call draw method in superclass
 	ED.Vicryl.superclass.draw.call(this, _point);
-    
+
 	// Boundary path
 	ctx.beginPath();
-    
-    // Use arcTo to create an ellipsoid
-    ctx.moveTo(-20, 0);
-    ctx.arcTo(0, -20, 20, 0, 30); 
-    ctx.arcTo(0, 20, -20, 0, 30);
-    
+
+	// Use arcTo to create an ellipsoid
+	ctx.moveTo(-20, 0);
+	ctx.arcTo(0, -20, 20, 0, 30);
+	ctx.arcTo(0, 20, -20, 0, 30);
+
 	// Set line attributes
 	ctx.lineWidth = 4;
 	ctx.fillStyle = "rgba(0, 0, 0, 0)";
 	ctx.strokeStyle = "purple";
-	
+
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
-	
+
 	// Other stuff here
-	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
-	{
-        // Ends of suture
-        ctx.beginPath();
-        ctx.moveTo(35, -10);
-        ctx.lineTo(20, 0);
-        ctx.lineTo(35, 10); 
-        ctx.stroke();
-        
-        // Knot
-        this.drawSpot(ctx, 20, 0, 4, "purple");
- 	}
-	
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+		// Ends of suture
+		ctx.beginPath();
+		ctx.moveTo(35, -10);
+		ctx.lineTo(20, 0);
+		ctx.lineTo(35, 10);
+		ctx.stroke();
+
+		// Knot
+		this.drawSpot(ctx, 20, 0, 4, "purple");
+	}
+
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
- 	
+
 	// Return value indicating successful hittest
 	return this.isClicked;
 }
@@ -134,7 +126,6 @@ ED.Vicryl.prototype.draw = function(_point)
  *
  * @returns {String} Description of doodle
  */
-ED.Vicryl.prototype.description = function()
-{
+ED.Vicryl.prototype.description = function() {
 	return "Vicryl suture";
 }

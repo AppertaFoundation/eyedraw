@@ -33,8 +33,7 @@
  * @param {Float} _rotation
  * @param {Int} _order
  */
-ED.ScleralPatch = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
-{
+ED.ScleralPatch = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
 	// Set classname
 	this.className = "Patch";
 
@@ -52,44 +51,41 @@ ED.ScleralPatch.superclass = ED.Doodle.prototype;
 /**
  * Sets handle attributes
  */
-ED.ScleralPatch.prototype.setHandles = function()
-{
-    this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+ED.ScleralPatch.prototype.setHandles = function() {
+	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
 }
 
 /**
  * Sets default dragging attributes
  */
-ED.ScleralPatch.prototype.setPropertyDefaults = function()
-{
+ED.ScleralPatch.prototype.setPropertyDefaults = function() {
 	this.isOrientated = true;
-    
-    // Update component of validation array for simple parameters
-    this.parameterValidationArray['apexX']['range'].setMinAndMax(-20, +200);
-    this.parameterValidationArray['apexY']['range'].setMinAndMax(-200, -20);
+
+	// Update component of validation array for simple parameters
+	this.parameterValidationArray['apexX']['range'].setMinAndMax(-20, +200);
+	this.parameterValidationArray['apexY']['range'].setMinAndMax(-200, -20);
 }
 
 /**
  * Sets default parameters
  */
-ED.ScleralPatch.prototype.setParameterDefaults = function()
-{
-    this.apexX = 50;
-    this.apexY = -70;
-    this.originY = -260;
-    
-    
-    // Patchs are usually temporal
-//    if(this.drawing.eye == ED.eye.Right)
-//    {
-//        this.originX = -260;
-//        this.rotation = -Math.PI/4;
-//    }
-//    else
-//    {
-//        this.originX = 260;
-//        this.rotation = Math.PI/4;
-//    }
+ED.ScleralPatch.prototype.setParameterDefaults = function() {
+	this.apexX = 50;
+	this.apexY = -70;
+	this.originY = -260;
+
+
+	// Patchs are usually temporal
+	//    if(this.drawing.eye == ED.eye.Right)
+	//    {
+	//        this.originX = -260;
+	//        this.rotation = -Math.PI/4;
+	//    }
+	//    else
+	//    {
+	//        this.originX = 260;
+	//        this.rotation = Math.PI/4;
+	//    }
 }
 
 /**
@@ -97,55 +93,53 @@ ED.ScleralPatch.prototype.setParameterDefaults = function()
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.ScleralPatch.prototype.draw = function(_point)
-{
+ED.ScleralPatch.prototype.draw = function(_point) {
 	// Get context
 	var ctx = this.drawing.context;
-	
+
 	// Call draw method in superclass
 	ED.ScleralPatch.superclass.draw.call(this, _point);
-    
-    // Boundary path
+
+	// Boundary path
 	ctx.beginPath();
-    
-    ctx.rect(-this.apexX, this.apexY, Math.abs(2 * this.apexX), Math.abs(2 * this.apexY));
-    
+
+	ctx.rect(-this.apexX, this.apexY, Math.abs(2 * this.apexX), Math.abs(2 * this.apexY));
+
 	// Close path
 	ctx.closePath();
-    
-    // Colour of fill
-    ctx.fillStyle = "rgba(200,200,50,0.5)";
-    ctx.strokeStyle = "rgba(120,120,120,0)";
-    
+
+	// Colour of fill
+	ctx.fillStyle = "rgba(200,200,50,0.5)";
+	ctx.strokeStyle = "rgba(120,120,120,0)";
+
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
-	
+
 	// Other stuff here
-	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
-    {
-//        // Suture knots
-//        this.drawSpot(ctx, -50, -50, 5, "blue");
-//        this.drawSpot(ctx, -50, 50, 5, "blue");
-//        this.drawSpot(ctx, 50, -50, 5, "blue");
-//        this.drawSpot(ctx, 50, 50, 5, "blue");
-//        
-//        // Suture thread ends
-//        this.drawLine(ctx, -60, -60, -50, -50, 2, "blue");
-//        this.drawLine(ctx, -50, -50, -60, -40, 2, "blue");
-//        this.drawLine(ctx, -60, 60, -50, 50, 2, "blue");
-//        this.drawLine(ctx, -50, 50, -60, 40, 2, "blue");
-//        this.drawLine(ctx, 60, -60, 50, -50, 2, "blue");
-//        this.drawLine(ctx, 50, -50, 60, -40, 2, "blue");
-//        this.drawLine(ctx, 60, 60, 50, 50, 2, "blue");
-//        this.drawLine(ctx, 50, 50, 60, 40, 2, "blue");
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+		//        // Suture knots
+		//        this.drawSpot(ctx, -50, -50, 5, "blue");
+		//        this.drawSpot(ctx, -50, 50, 5, "blue");
+		//        this.drawSpot(ctx, 50, -50, 5, "blue");
+		//        this.drawSpot(ctx, 50, 50, 5, "blue");
+		//        
+		//        // Suture thread ends
+		//        this.drawLine(ctx, -60, -60, -50, -50, 2, "blue");
+		//        this.drawLine(ctx, -50, -50, -60, -40, 2, "blue");
+		//        this.drawLine(ctx, -60, 60, -50, 50, 2, "blue");
+		//        this.drawLine(ctx, -50, 50, -60, 40, 2, "blue");
+		//        this.drawLine(ctx, 60, -60, 50, -50, 2, "blue");
+		//        this.drawLine(ctx, 50, -50, 60, -40, 2, "blue");
+		//        this.drawLine(ctx, 60, 60, 50, 50, 2, "blue");
+		//        this.drawLine(ctx, 50, 50, 60, 40, 2, "blue");
 	}
-    
-    // Coordinates of handles (in canvas plane)
-    this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
-    
+
+	// Coordinates of handles (in canvas plane)
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
+
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
-	
+
 	// Return value indicating successful hittest
 	return this.isClicked;
 }
@@ -155,7 +149,6 @@ ED.ScleralPatch.prototype.draw = function(_point)
  *
  * @returns {String} Description of doodle
  */
-ED.ScleralPatch.prototype.description = function()
-{
-    return "Scleral patch";
+ED.ScleralPatch.prototype.description = function() {
+	return "Scleral patch";
 }

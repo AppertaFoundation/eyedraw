@@ -33,11 +33,10 @@
  * @param {Float} _rotation
  * @param {Int} _order
  */
-ED.Microaneurysm = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
-{
+ED.Microaneurysm = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
 	// Set classname
 	this.className = "Microaneurysm";
-    
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
 }
@@ -53,9 +52,8 @@ ED.Microaneurysm.superclass = ED.Doodle.prototype;
  * Sets default parameters (Only called for new doodles)
  * Use the setParameter function for derived parameters, as this will also update dependent variables
  */
-ED.Microaneurysm.prototype.setParameterDefaults = function()
-{
-    this.setOriginWithDisplacements(50, 30);
+ED.Microaneurysm.prototype.setParameterDefaults = function() {
+	this.setOriginWithDisplacements(50, 30);
 }
 
 /**
@@ -63,31 +61,30 @@ ED.Microaneurysm.prototype.setParameterDefaults = function()
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.Microaneurysm.prototype.draw = function(_point)
-{
+ED.Microaneurysm.prototype.draw = function(_point) {
 	// Get context
 	var ctx = this.drawing.context;
-	
+
 	// Call draw method in superclass
 	ED.Microaneurysm.superclass.draw.call(this, _point);
-    
-    // Microaneurysm radius
-    var r = 14;
-    
+
+	// Microaneurysm radius
+	var r = 14;
+
 	// Boundary path
 	ctx.beginPath();
-    
+
 	// Microaneurysm
 	ctx.arc(0, 0, r, 0, 2 * Math.PI, true);
-    
+
 	// Set attributes
 	ctx.lineWidth = 1;
 	ctx.strokeStyle = "red";
-    ctx.fillStyle = "red";
-	
+	ctx.fillStyle = "red";
+
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
-    
+
 	// Return value indicating successful hittest
 	return this.isClicked;
 }
@@ -97,7 +94,6 @@ ED.Microaneurysm.prototype.draw = function(_point)
  *
  * @returns {String} Group description
  */
-ED.Microaneurysm.prototype.groupDescription = function()
-{
+ED.Microaneurysm.prototype.groupDescription = function() {
 	return "Microaneurysms";
 }

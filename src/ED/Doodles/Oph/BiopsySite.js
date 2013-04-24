@@ -33,11 +33,10 @@
  * @param {Float} _rotation
  * @param {Int} _order
  */
-ED.BiopsySite = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
-{
+ED.BiopsySite = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
 	// Set classname
 	this.className = "BiopsySite";
-    
+
 	// Call super-class constructor
 	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
 }
@@ -52,30 +51,27 @@ ED.BiopsySite.superclass = ED.Doodle.prototype;
 /**
  * Sets handle attributes
  */
-ED.BiopsySite.prototype.setHandles = function()
-{
+ED.BiopsySite.prototype.setHandles = function() {
 	this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, false);
 }
 
 /**
  * Sets default properties
  */
-ED.BiopsySite.prototype.setPropertyDefaults = function()
-{
-    // Update component of validation array for simple parameters
-    this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.5, +3);
-    this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.5, +3);
+ED.BiopsySite.prototype.setPropertyDefaults = function() {
+	// Update component of validation array for simple parameters
+	this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.5, +3);
+	this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.5, +3);
 }
 
 /**
  * Sets default parameters (Only called for new doodles)
  * Use the setParameter function for derived parameters, as this will also update dependent variables
  */
-ED.BiopsySite.prototype.setParameterDefaults = function()
-{
-    this.scaleX = 0.75;
-    this.scaleY = 0.75;
-    this.setOriginWithDisplacements(300, -80);
+ED.BiopsySite.prototype.setParameterDefaults = function() {
+	this.scaleX = 0.75;
+	this.scaleY = 0.75;
+	this.setOriginWithDisplacements(300, -80);
 }
 
 /**
@@ -83,46 +79,43 @@ ED.BiopsySite.prototype.setParameterDefaults = function()
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.BiopsySite.prototype.draw = function(_point)
-{
+ED.BiopsySite.prototype.draw = function(_point) {
 	// Get context
 	var ctx = this.drawing.context;
-	
+
 	// Call draw method in superclass
 	ED.BiopsySite.superclass.draw.call(this, _point);
-    
-    // Radius of laser spot
-    var r = 30;
-    
+
+	// Radius of laser spot
+	var r = 30;
+
 	// Boundary path
 	ctx.beginPath();
-    
+
 	// Circle
-    ctx.arc(0, 0, r, 0, Math.PI * 2, true);
-    
+	ctx.arc(0, 0, r, 0, Math.PI * 2, true);
+
 	// Close path
 	ctx.closePath();
-	
+
 	// Set line attributes
-	ctx.lineWidth = r * 2/3;
+	ctx.lineWidth = r * 2 / 3;
 	ctx.fillStyle = "yellow";
 	ctx.strokeStyle = "red";
-	
+
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
-	
+
 	// Other paths and drawing here
-	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
-	{
-	}
-    
-    var point = new ED.Point(0, 0);
-    point.setWithPolars(r, Math.PI/4);
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {}
+
+	var point = new ED.Point(0, 0);
+	point.setWithPolars(r, Math.PI / 4);
 	this.handleArray[2].location = this.transform.transformPoint(point);
-	
+
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
-    
+
 	// Return value indicating successful hit test
 	return this.isClicked;
 }
@@ -132,7 +125,6 @@ ED.BiopsySite.prototype.draw = function(_point)
  *
  * @returns {String} Group description
  */
-ED.BiopsySite.prototype.description = function()
-{
-    return "Biopsy site in the " + this.quadrant();
+ED.BiopsySite.prototype.description = function() {
+	return "Biopsy site in the " + this.quadrant();
 }

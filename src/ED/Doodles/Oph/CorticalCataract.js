@@ -33,14 +33,13 @@
  * @param {Float} _rotation
  * @param {Int} _order
  */
-ED.CorticalCataract = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
-{
+ED.CorticalCataract = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
 	// Set classname
 	this.className = "CorticalCataract";
-    
-    // Derived parameters (NB must set a value here to define parameter as a property of the object, even though value set later)
-    this.grade = 'Mild';
-    
+
+	// Derived parameters (NB must set a value here to define parameter as a property of the object, even though value set later)
+	this.grade = 'Mild';
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
 }
@@ -55,39 +54,41 @@ ED.CorticalCataract.superclass = ED.Doodle.prototype;
 /**
  * Sets handle attributes
  */
-ED.CorticalCataract.prototype.setHandles = function()
-{
+ED.CorticalCataract.prototype.setHandles = function() {
 	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
 }
 
 /**
  * Sets default properties
  */
-ED.CorticalCataract.prototype.setPropertyDefaults = function()
-{
+ED.CorticalCataract.prototype.setPropertyDefaults = function() {
 	this.isScaleable = false;
 	this.isRotatable = false;
-    this.isUnique = true;
-    this.parentClass = "Lens";
-    this.inFrontOfClassArray = ["Lens", "PostSubcapCataract", "NuclearCataract"];
+	this.isUnique = true;
+	this.parentClass = "Lens";
+	this.inFrontOfClassArray = ["Lens", "PostSubcapCataract", "NuclearCataract"];
 
-    // Update validation array for simple parameters
-    this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
-    this.parameterValidationArray['apexY']['range'].setMinAndMax(-180, -20);
-    this.parameterValidationArray['originX']['range'].setMinAndMax(-500, +500);
-    this.parameterValidationArray['originY']['range'].setMinAndMax(-500, +500);
-    
-    // Add complete validation arrays for derived parameters
-    this.parameterValidationArray['grade'] = {kind:'derived', type:'string', list:['Mild', 'Moderate', 'White'], animate:true};
+	// Update validation array for simple parameters
+	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
+	this.parameterValidationArray['apexY']['range'].setMinAndMax(-180, -20);
+	this.parameterValidationArray['originX']['range'].setMinAndMax(-500, +500);
+	this.parameterValidationArray['originY']['range'].setMinAndMax(-500, +500);
+
+	// Add complete validation arrays for derived parameters
+	this.parameterValidationArray['grade'] = {
+		kind: 'derived',
+		type: 'string',
+		list: ['Mild', 'Moderate', 'White'],
+		animate: true
+	};
 }
 
 /**
  * Sets default parameters (Only called for new doodles)
  * Use the setParameter function for derived parameters, as this will also update dependent variables
  */
-ED.CorticalCataract.prototype.setParameterDefaults = function()
-{
-    this.setParameterFromString('grade', 'Mild');
+ED.CorticalCataract.prototype.setParameterDefaults = function() {
+	this.setParameterFromString('grade', 'Mild');
 }
 
 /**
@@ -98,35 +99,32 @@ ED.CorticalCataract.prototype.setParameterDefaults = function()
  * @value {Undefined} _value Value of parameter to calculate
  * @returns {Array} Associative array of values of dependent parameters
  */
-ED.CorticalCataract.prototype.dependentParameterValues = function(_parameter, _value)
-{
-    var returnArray = new Array();
-    
-    switch (_parameter)
-    {
-        case 'apexY':
-            if (_value < -120) returnArray['grade'] = 'Mild';
-            else if (_value < -60) returnArray['grade'] = 'Moderate';
-            else returnArray['grade'] = 'White';
-            break;
-            
-        case 'grade':
-            switch (_value)
-            {
-                case 'Mild':
-                    returnArray['apexY'] = -180;
-                    break;
-                case 'Moderate':
-                    returnArray['apexY'] = -100;
-                    break;
-                case 'White':
-                    returnArray['apexY'] = -20;
-                    break;
-            }
-            break;
-    }
-    
-    return returnArray;
+ED.CorticalCataract.prototype.dependentParameterValues = function(_parameter, _value) {
+	var returnArray = new Array();
+
+	switch (_parameter) {
+		case 'apexY':
+			if (_value < -120) returnArray['grade'] = 'Mild';
+			else if (_value < -60) returnArray['grade'] = 'Moderate';
+			else returnArray['grade'] = 'White';
+			break;
+
+		case 'grade':
+			switch (_value) {
+				case 'Mild':
+					returnArray['apexY'] = -180;
+					break;
+				case 'Moderate':
+					returnArray['apexY'] = -100;
+					break;
+				case 'White':
+					returnArray['apexY'] = -20;
+					break;
+			}
+			break;
+	}
+
+	return returnArray;
 }
 
 /**
@@ -134,71 +132,67 @@ ED.CorticalCataract.prototype.dependentParameterValues = function(_parameter, _v
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.CorticalCataract.prototype.draw = function(_point)
-{
+ED.CorticalCataract.prototype.draw = function(_point) {
 	// Get context
 	var ctx = this.drawing.context;
-	
+
 	// Call draw method in superclass
 	ED.CorticalCataract.superclass.draw.call(this, _point);
-	
+
 	// Boundary path
 	ctx.beginPath();
-    
-    // Parameters
-    var n = 16;									// Number of cortical spokes
-    var ro = 240;								// Outer radius of cataract
-    var rs = 230;                               // Outer radius of spoke
-    var theta = 2 * Math.PI/n;                  // Angle of outer arc of cortical shard
-    var phi = theta/2;                          // Half theta
-    var ri = -this.apexY;                       // Radius of inner clear area
-    
-    // Draw cortical spokes
-    var sp = new ED.Point(0,0);
-    sp.setWithPolars(rs, - phi);
-    ctx.moveTo(sp.x, sp.y);
 
-    for (var i = 0; i < n; i++)
-    {
-        var startAngle = i * theta - phi;
-        var endAngle = startAngle + theta;
+	// Parameters
+	var n = 16; // Number of cortical spokes
+	var ro = 240; // Outer radius of cataract
+	var rs = 230; // Outer radius of spoke
+	var theta = 2 * Math.PI / n; // Angle of outer arc of cortical shard
+	var phi = theta / 2; // Half theta
+	var ri = -this.apexY; // Radius of inner clear area
 
-        var op = new ED.Point(0,0);
-        op.setWithPolars(rs, startAngle);
-        ctx.lineTo(op.x, op.y);
-        
-        //ctx.arc(0, 0, ro, startAngle, endAngle, false);
-        var ip = new ED.Point(0, 0);
-        ip.setWithPolars(ri, i * theta);
-        ctx.lineTo(ip.x, ip.y);
-    }
-    
-    ctx.lineTo(sp.x, sp.y);
+	// Draw cortical spokes
+	var sp = new ED.Point(0, 0);
+	sp.setWithPolars(rs, -phi);
+	ctx.moveTo(sp.x, sp.y);
 
-    // Surrounding ring
-    ctx.moveTo(ro, 0);
-    ctx.arc(0, 0, ro, 0, 2 * Math.PI, true);
-	
+	for (var i = 0; i < n; i++) {
+		var startAngle = i * theta - phi;
+		var endAngle = startAngle + theta;
+
+		var op = new ED.Point(0, 0);
+		op.setWithPolars(rs, startAngle);
+		ctx.lineTo(op.x, op.y);
+
+		//ctx.arc(0, 0, ro, startAngle, endAngle, false);
+		var ip = new ED.Point(0, 0);
+		ip.setWithPolars(ri, i * theta);
+		ctx.lineTo(ip.x, ip.y);
+	}
+
+	ctx.lineTo(sp.x, sp.y);
+
+	// Surrounding ring
+	ctx.moveTo(ro, 0);
+	ctx.arc(0, 0, ro, 0, 2 * Math.PI, true);
+
 	// Set boundary path attributes
 	ctx.lineWidth = 4;
-    ctx.lineJoin = 'bevel';
-    ctx.fillStyle = "rgba(200,200,200,0.75)";
+	ctx.lineJoin = 'bevel';
+	ctx.fillStyle = "rgba(200,200,200,0.75)";
 	ctx.strokeStyle = "rgba(200,200,200,0)";
-	
+
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
-	
+
 	// Non boundary drawing here
-	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
-	{
-	}
-	
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {}
+
 	// Coordinates of handles (in canvas plane)
 	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
-	
+
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
-	
+
 	// Return value indicating successful hittest
 	return this.isClicked;
 }
@@ -208,8 +202,7 @@ ED.CorticalCataract.prototype.draw = function(_point)
  *
  * @returns {String} Description of doodle
  */
-ED.CorticalCataract.prototype.description = function()
-{
+ED.CorticalCataract.prototype.description = function() {
 	return this.getParameter('grade') + " cortical cataract";
 }
 
@@ -218,8 +211,7 @@ ED.CorticalCataract.prototype.description = function()
  *
  * @returns {Int} SnoMed code of entity representated by doodle
  */
-ED.CorticalCataract.prototype.snomedCode = function()
-{
+ED.CorticalCataract.prototype.snomedCode = function() {
 	return 193576003;
 }
 
@@ -228,7 +220,6 @@ ED.CorticalCataract.prototype.snomedCode = function()
  *
  * @returns {Int} Position in diagnostic hierarchy
  */
-ED.CorticalCataract.prototype.diagnosticHierarchy = function()
-{
+ED.CorticalCataract.prototype.diagnosticHierarchy = function() {
 	return 3;
 }

@@ -33,11 +33,10 @@
  * @param {Float} _rotation
  * @param {Int} _order
  */
-ED.PI = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
-{
+ED.PI = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
 	// Set classname
 	this.className = "PI";
-    
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
 }
@@ -52,8 +51,7 @@ ED.PI.superclass = ED.Doodle.prototype;
 /**
  * Sets default properties
  */
-ED.PI.prototype.setPropertyDefaults = function()
-{
+ED.PI.prototype.setPropertyDefaults = function() {
 	this.isScaleable = false;
 	this.isMoveable = false;
 }
@@ -61,9 +59,8 @@ ED.PI.prototype.setPropertyDefaults = function()
 /**
  * Sets default parameters
  */
-ED.PI.prototype.setParameterDefaults = function()
-{
-    this.setRotationWithDisplacements(30,30);
+ED.PI.prototype.setParameterDefaults = function() {
+	this.setRotationWithDisplacements(30, 30);
 }
 
 /**
@@ -71,38 +68,37 @@ ED.PI.prototype.setParameterDefaults = function()
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.PI.prototype.draw = function(_point)
-{
+ED.PI.prototype.draw = function(_point) {
 	// Get context
 	var ctx = this.drawing.context;
-	
+
 	// Call draw method in superclass
 	ED.PI.superclass.draw.call(this, _point);
-    
-    // Outer radiuss
-    var r = 360;
-	
+
+	// Outer radiuss
+	var r = 360;
+
 	// Boundary path
 	ctx.beginPath();
-    
-    // Draw base
-    var phi = Math.PI/24;
-    ctx.arc(0, 0, r, - phi - Math.PI/2, phi - Math.PI/2, false);
-    ctx.lineTo(0, -r * 0.8);
-    ctx.closePath();
-    
-    // Colour of fill
-    ctx.fillStyle = "rgba(218,230,241,1)";
-    
+
+	// Draw base
+	var phi = Math.PI / 24;
+	ctx.arc(0, 0, r, -phi - Math.PI / 2, phi - Math.PI / 2, false);
+	ctx.lineTo(0, -r * 0.8);
+	ctx.closePath();
+
+	// Colour of fill
+	ctx.fillStyle = "rgba(218,230,241,1)";
+
 	// Set line attributes
 	ctx.lineWidth = 4;
-    
-    // Colour of outer line is dark gray
-    ctx.strokeStyle = "rgba(120,120,120,0.75)";;
-	
+
+	// Colour of outer line is dark gray
+	ctx.strokeStyle = "rgba(120,120,120,0.75)";;
+
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
-	
+
 	// Return value indicating successful hittest
 	return this.isClicked;
 }
@@ -112,7 +108,6 @@ ED.PI.prototype.draw = function(_point)
  *
  * @returns {String} Description of doodle
  */
-ED.PI.prototype.description = function()
-{
-    return "Peripheral iridectomy at " + this.clockHour() + " o'clock";
+ED.PI.prototype.description = function() {
+	return "Peripheral iridectomy at " + this.clockHour() + " o'clock";
 }

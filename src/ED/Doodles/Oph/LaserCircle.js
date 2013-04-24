@@ -33,11 +33,10 @@
  * @param {Float} _rotation
  * @param {Int} _order
  */
-ED.LaserCircle = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
-{
+ED.LaserCircle = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
 	// Set classname
 	this.className = "LaserCircle";
-    
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
 }
@@ -52,47 +51,41 @@ ED.LaserCircle.superclass = ED.Doodle.prototype;
 /**
  * Sets handle attributes
  */
-ED.LaserCircle.prototype.setHandles = function()
-{
-    this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, true);
+ED.LaserCircle.prototype.setHandles = function() {
+	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, true);
 }
 
 /**
  * Set default properties
  */
-ED.LaserCircle.prototype.setPropertyDefaults = function()
-{
-    //this.isOrientated = true;
-    
-    // Update component of validation array for simple parameters
-    this.parameterValidationArray['arc']['range'].setMinAndMax(Math.PI/6, Math.PI * 2);
-    this.parameterValidationArray['apexX']['range'].setMinAndMax(50, +400);
-    this.parameterValidationArray['apexY']['range'].setMinAndMax(-400, -50);
+ED.LaserCircle.prototype.setPropertyDefaults = function() {
+	//this.isOrientated = true;
+
+	// Update component of validation array for simple parameters
+	this.parameterValidationArray['arc']['range'].setMinAndMax(Math.PI / 6, Math.PI * 2);
+	this.parameterValidationArray['apexX']['range'].setMinAndMax(50, +400);
+	this.parameterValidationArray['apexY']['range'].setMinAndMax(-400, -50);
 }
 
 /**
  * Sets default parameters (Only called for new doodles)
  * Use the setParameter function for derived parameters, as this will also update dependent variables
  */
-ED.LaserCircle.prototype.setParameterDefaults = function()
-{
-    this.apexX = 84;
-    this.apexY = -84;
-    
-    var doodle = this.drawing.lastDoodleOfClass(this.className);
-    if (doodle)
-    {
-        var p = new ED.Point(doodle.originX, doodle.originY);
-        
-        var np = new ED.Point(0,0);
-        np.setWithPolars(p.length(), p.direction() + Math.PI/6);
-        
-        this.move(np.x, np.y);
-    }
-    else
-    {
-        this.move((this.drawing.eye == ED.eye.Right?-1:1) * 200, -300);
-    }
+ED.LaserCircle.prototype.setParameterDefaults = function() {
+	this.apexX = 84;
+	this.apexY = -84;
+
+	var doodle = this.drawing.lastDoodleOfClass(this.className);
+	if (doodle) {
+		var p = new ED.Point(doodle.originX, doodle.originY);
+
+		var np = new ED.Point(0, 0);
+		np.setWithPolars(p.length(), p.direction() + Math.PI / 6);
+
+		this.move(np.x, np.y);
+	} else {
+		this.move((this.drawing.eye == ED.eye.Right ? -1 : 1) * 200, -300);
+	}
 }
 
 /**
@@ -100,115 +93,98 @@ ED.LaserCircle.prototype.setParameterDefaults = function()
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.LaserCircle.prototype.draw = function(_point)
-{
+ED.LaserCircle.prototype.draw = function(_point) {
 	// Get context
 	var ctx = this.drawing.context;
-	
+
 	// Call draw method in superclass
 	ED.LaserCircle.superclass.draw.call(this, _point);
-	
+
 	// Boundary path
 	ctx.beginPath();
-    ctx.moveTo(this.apexX, this.apexY);
-    ctx.lineTo(this.apexX, -this.apexY);
-    ctx.lineTo(-this.apexX, -this.apexY);
-    ctx.lineTo(-this.apexX, this.apexY);
-    ctx.lineTo(this.apexX, this.apexY);
+	ctx.moveTo(this.apexX, this.apexY);
+	ctx.lineTo(this.apexX, -this.apexY);
+	ctx.lineTo(-this.apexX, -this.apexY);
+	ctx.lineTo(-this.apexX, this.apexY);
+	ctx.lineTo(this.apexX, this.apexY);
 	ctx.closePath();
-    
-    // Set line attributes
+
+	// Set line attributes
 	ctx.lineWidth = 0;
 	ctx.fillStyle = "rgba(0, 0, 0, 0)";
 	ctx.strokeStyle = "rgba(0, 0, 0, 0)";
-	
+
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
-	
+
 	// Non boundary drawing
-	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
-	{
-        // Spot separation
-        var ss = 25;
-        
-        // Point for spot
-        var p = new ED.Point(0,0);
-        
-        // Difference indicating aspect ratio
-        var d = this.apexX + this.apexY;
-        
-        // Radius and displacement of semicircle
-        if (d < 0)
-        {
-            var r = this.apexX;
-        }
-        else
-        {
-            var r = -this.apexY;
-        }
-        
-        // Number of spots in a semicircle
-        var n = (Math.round(Math.PI/(ss/r)));
-        
-        // Draw upper (or left) half
-        for (var i = 0; i < n + 1; i++)
-        {
-            if (d < 0)
-            {
-                var a = -Math.PI/2 + i * Math.PI/n;
-                p.setWithPolars(r, a);
-                this.drawLaserSpot(ctx, p.x, p.y + d);
-            }
-            else
-            {
-                var a = -Math.PI + i * Math.PI/n;
-                p.setWithPolars(r, a);
-                this.drawLaserSpot(ctx, p.x - d, p.y);
-            }
-        }
-        
-        // Draw lower (or right) half
-        for (var i = 1; i < n; i++)
-        {
-            if (d < 0)
-            {
-                var a = Math.PI/2 + i * Math.PI/n;
-                p.setWithPolars(r, a);
-                this.drawLaserSpot(ctx, p.x, p.y - d);
-            }
-            else
-            {
-                var a = 0 + i * Math.PI/n;
-                p.setWithPolars(r, a);
-                this.drawLaserSpot(ctx, p.x + d, p.y);
-            }
-        }
-        
-        // Draw connecting straight lines of laser
-        n = Math.abs(Math.round(d/ss));
-        for (var i = 0; i < 2 * n + 1; i++)
-        {
-            if (d < 0)
-            {
-                var y = this.apexY + r + i * Math.abs(d/n);
-                this.drawLaserSpot(ctx, -r, y);
-                this.drawLaserSpot(ctx, r, y);
-            }
-            else
-            {
-                var x = -this.apexX + r + i * Math.abs(d/n);
-                this.drawLaserSpot(ctx, x, -r);
-                this.drawLaserSpot(ctx, x, r);
-            }
-        }
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+		// Spot separation
+		var ss = 25;
+
+		// Point for spot
+		var p = new ED.Point(0, 0);
+
+		// Difference indicating aspect ratio
+		var d = this.apexX + this.apexY;
+
+		// Radius and displacement of semicircle
+		if (d < 0) {
+			var r = this.apexX;
+		} else {
+			var r = -this.apexY;
+		}
+
+		// Number of spots in a semicircle
+		var n = (Math.round(Math.PI / (ss / r)));
+
+		// Draw upper (or left) half
+		for (var i = 0; i < n + 1; i++) {
+			if (d < 0) {
+				var a = -Math.PI / 2 + i * Math.PI / n;
+				p.setWithPolars(r, a);
+				this.drawLaserSpot(ctx, p.x, p.y + d);
+			} else {
+				var a = -Math.PI + i * Math.PI / n;
+				p.setWithPolars(r, a);
+				this.drawLaserSpot(ctx, p.x - d, p.y);
+			}
+		}
+
+		// Draw lower (or right) half
+		for (var i = 1; i < n; i++) {
+			if (d < 0) {
+				var a = Math.PI / 2 + i * Math.PI / n;
+				p.setWithPolars(r, a);
+				this.drawLaserSpot(ctx, p.x, p.y - d);
+			} else {
+				var a = 0 + i * Math.PI / n;
+				p.setWithPolars(r, a);
+				this.drawLaserSpot(ctx, p.x + d, p.y);
+			}
+		}
+
+		// Draw connecting straight lines of laser
+		n = Math.abs(Math.round(d / ss));
+		for (var i = 0; i < 2 * n + 1; i++) {
+			if (d < 0) {
+				var y = this.apexY + r + i * Math.abs(d / n);
+				this.drawLaserSpot(ctx, -r, y);
+				this.drawLaserSpot(ctx, r, y);
+			} else {
+				var x = -this.apexX + r + i * Math.abs(d / n);
+				this.drawLaserSpot(ctx, x, -r);
+				this.drawLaserSpot(ctx, x, r);
+			}
+		}
 	}
-	
+
 	// Coordinates of handles (in canvas plane)
 	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
-	
+
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
-	
+
 	// Return value indicating successful hittest
 	return this.isClicked;
 }
@@ -218,7 +194,6 @@ ED.LaserCircle.prototype.draw = function(_point)
  *
  * @returns {String} Description of doodle
  */
-ED.LaserCircle.prototype.groupDescription = function()
-{
+ED.LaserCircle.prototype.groupDescription = function() {
 	return "laser retinopexy";
 }

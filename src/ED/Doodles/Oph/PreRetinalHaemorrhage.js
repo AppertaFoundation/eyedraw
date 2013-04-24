@@ -33,11 +33,10 @@
  * @param {Float} _rotation
  * @param {Int} _order
  */
-ED.PreRetinalHaemorrhage = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
-{
+ED.PreRetinalHaemorrhage = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
 	// Set classname
 	this.className = "PreRetinalHaemorrhage";
-    
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
 }
@@ -52,32 +51,29 @@ ED.PreRetinalHaemorrhage.superclass = ED.Doodle.prototype;
 /**
  * Sets handle attributes
  */
-ED.PreRetinalHaemorrhage.prototype.setHandles = function()
-{
-    this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, false);
-    this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+ED.PreRetinalHaemorrhage.prototype.setHandles = function() {
+	this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, false);
+	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
 }
 
 /**
  * Set default properties
  */
-ED.PreRetinalHaemorrhage.prototype.setPropertyDefaults = function()
-{
-    this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
-    this.parameterValidationArray['apexY']['range'].setMinAndMax(50, 200);
-    this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.5, +2.0);
-    this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.5, +2.0);
+ED.PreRetinalHaemorrhage.prototype.setPropertyDefaults = function() {
+	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
+	this.parameterValidationArray['apexY']['range'].setMinAndMax(50, 200);
+	this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.5, +2.0);
+	this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.5, +2.0);
 }
 
 /**
  * Sets default parameters (Only called for new doodles)
  * Use the setParameter function for derived parameters, as this will also update dependent variables
  */
-ED.PreRetinalHaemorrhage.prototype.setParameterDefaults = function()
-{
-    this.apexY = 200;
+ED.PreRetinalHaemorrhage.prototype.setParameterDefaults = function() {
+	this.apexY = 200;
 
-    this.setOriginWithDisplacements(-150, 150);
+	this.setOriginWithDisplacements(-150, 150);
 }
 
 /**
@@ -85,51 +81,49 @@ ED.PreRetinalHaemorrhage.prototype.setParameterDefaults = function()
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.PreRetinalHaemorrhage.prototype.draw = function(_point)
-{
+ED.PreRetinalHaemorrhage.prototype.draw = function(_point) {
 	// Get context
 	var ctx = this.drawing.context;
-	
+
 	// Call draw method in superclass
 	ED.PreRetinalHaemorrhage.superclass.draw.call(this, _point);
-    
-    // Dimensions of haemorrhage
-    var r = 100;
-    var f = 0.6;
-    
+
+	// Dimensions of haemorrhage
+	var r = 100;
+	var f = 0.6;
+
 	// Boundary path
 	ctx.beginPath();
-    
+
 	// Haemorrhage
-    ctx.moveTo(r,0);
-    ctx.lineTo(-r,0);
-    ctx.bezierCurveTo(-r * f, 0, -r * f, this.apexY, 0, this.apexY);
-    ctx.bezierCurveTo(r * f, this.apexY, r * f, 0, r, 0);
-    
-    // Close path
-    ctx.closePath();
+	ctx.moveTo(r, 0);
+	ctx.lineTo(-r, 0);
+	ctx.bezierCurveTo(-r * f, 0, -r * f, this.apexY, 0, this.apexY);
+	ctx.bezierCurveTo(r * f, this.apexY, r * f, 0, r, 0);
+
+	// Close path
+	ctx.closePath();
 
 	// Set attributes
 	ctx.lineWidth = 1;
 	ctx.strokeStyle = "red";
-    ctx.fillStyle = "red";
-	
+	ctx.fillStyle = "red";
+
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 
-    // Non boundary drawing here
-	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
-	{
+	// Non boundary drawing here
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
 
 	}
-    
-    // Coordinates of handles (in canvas plane)
-    this.handleArray[2].location = this.transform.transformPoint(new ED.Point(100, 0));
-    this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
-	
+
+	// Coordinates of handles (in canvas plane)
+	this.handleArray[2].location = this.transform.transformPoint(new ED.Point(100, 0));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
+
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
-    
+
 	// Return value indicating successful hittest
 	return this.isClicked;
 }
@@ -139,7 +133,6 @@ ED.PreRetinalHaemorrhage.prototype.draw = function(_point)
  *
  * @returns {String} Group description
  */
-ED.PreRetinalHaemorrhage.prototype.groupDescription = function()
-{
-    return "Pre-retinal haemorrages";
+ED.PreRetinalHaemorrhage.prototype.groupDescription = function() {
+	return "Pre-retinal haemorrages";
 }

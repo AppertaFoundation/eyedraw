@@ -33,11 +33,10 @@
  * @param {Float} _rotation
  * @param {Int} _order
  */
-ED.CystoidMacularOedema = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
-{
+ED.CystoidMacularOedema = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
 	// Set classname
 	this.className = "CystoidMacularOedema";
-    
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
 }
@@ -52,90 +51,83 @@ ED.CystoidMacularOedema.superclass = ED.Doodle.prototype;
 /**
  * Sets handle attributes
  */
-ED.CystoidMacularOedema.prototype.setHandles = function()
-{
+ED.CystoidMacularOedema.prototype.setHandles = function() {
 	this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, false);
 }
 
 /**
  * Sets default dragging attributes
  */
-ED.CystoidMacularOedema.prototype.setPropertyDefaults = function()
-{
+ED.CystoidMacularOedema.prototype.setPropertyDefaults = function() {
 	this.isMoveable = false;
 	this.isRotatable = false;
-    this.isUnique = true;
-    
-    // Update validation array for simple parameters
-    this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.5, +1.5);
-    this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.5, +1.5);
+	this.isUnique = true;
+
+	// Update validation array for simple parameters
+	this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.5, +1.5);
+	this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.5, +1.5);
 }
 
 /**
  * Sets default parameters (Only called for new doodles)
  * Use the setParameter function for derived parameters, as this will also update dependent variables
  */
-ED.CystoidMacularOedema.prototype.setParameterDefaults = function()
-{
-}
+ED.CystoidMacularOedema.prototype.setParameterDefaults = function() {}
 
 /**
  * Draws doodle or performs a hit test if a Point parameter is passed
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.CystoidMacularOedema.prototype.draw = function(_point)
-{
+ED.CystoidMacularOedema.prototype.draw = function(_point) {
 	// Get context
 	var ctx = this.drawing.context;
-	
+
 	// Call draw method in superclass
 	ED.CystoidMacularOedema.superclass.draw.call(this, _point);
-	
+
 	// Boundary path
 	ctx.beginPath();
-	
+
 	// Invisible boundary
-	ctx.arc(0,0,120,0,Math.PI*2,true);
-    
+	ctx.arc(0, 0, 120, 0, Math.PI * 2, true);
+
 	// Close path
 	ctx.closePath();
-	
+
 	// Set line attributes
 	ctx.lineWidth = 0;
 	ctx.fillStyle = "rgba(0, 0, 0, 0)";
 	ctx.strokeStyle = "rgba(0, 0, 0, 0)";
-	
+
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
-	
+
 	// Non boundary drawing here
-	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
-	{
-        // Colours
-        var fill = "rgba(255, 255, 138, 0.5)";
-        var stroke = "rgba(255, 82, 0, 0.7)";
-        
-        // Peripheral cysts
-        var point = new ED.Point(0,0);
-        var n = 8;
-        for (var i = 0; i < n; i++)
-        {
-            var angle = i * 2 * Math.PI/n;
-            point.setWithPolars(80,angle);
-            this.drawCircle(ctx, point.x, point.y, 40, fill, 2, stroke);
-        }
-        
-        // Large central cyst
-        this.drawCircle(ctx, 0, 0, 60, fill, 2, stroke);
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+		// Colours
+		var fill = "rgba(255, 255, 138, 0.5)";
+		var stroke = "rgba(255, 82, 0, 0.7)";
+
+		// Peripheral cysts
+		var point = new ED.Point(0, 0);
+		var n = 8;
+		for (var i = 0; i < n; i++) {
+			var angle = i * 2 * Math.PI / n;
+			point.setWithPolars(80, angle);
+			this.drawCircle(ctx, point.x, point.y, 40, fill, 2, stroke);
+		}
+
+		// Large central cyst
+		this.drawCircle(ctx, 0, 0, 60, fill, 2, stroke);
 	}
-	
+
 	// Coordinates of handles (in canvas plane)
 	this.handleArray[2].location = this.transform.transformPoint(new ED.Point(84, -84));
-	
+
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
-	
+
 	// Return value indicating successful hittest
 	return this.isClicked;
 }
@@ -145,9 +137,8 @@ ED.CystoidMacularOedema.prototype.draw = function(_point)
  *
  * @returns {String} Description of doodle
  */
-ED.CystoidMacularOedema.prototype.description = function()
-{
-    return "Cystoid macular oedema";
+ED.CystoidMacularOedema.prototype.description = function() {
+	return "Cystoid macular oedema";
 }
 
 
@@ -156,8 +147,7 @@ ED.CystoidMacularOedema.prototype.description = function()
  *
  * @returns {Int} SnoMed code of entity representated by doodle
  */
-ED.CystoidMacularOedema.prototype.snomedCode = function()
-{
+ED.CystoidMacularOedema.prototype.snomedCode = function() {
 	return 193387007;
 }
 
@@ -166,7 +156,6 @@ ED.CystoidMacularOedema.prototype.snomedCode = function()
  *
  * @returns {Int} Position in diagnostic hierarchy
  */
-ED.CystoidMacularOedema.prototype.diagnosticHierarchy = function()
-{
+ED.CystoidMacularOedema.prototype.diagnosticHierarchy = function() {
 	return 2;
 }

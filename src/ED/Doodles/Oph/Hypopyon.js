@@ -33,15 +33,14 @@
  * @param {Float} _rotation
  * @param {Int} _order
  */
-ED.Hypopyon = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
-{
+ED.Hypopyon = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
 	// Set classname
 	this.className = "Hypopyon";
-	
+
 	// Private parameters
 	this.ro = 380;
 	this.minimum = 304;
-    
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
 }
@@ -56,32 +55,29 @@ ED.Hypopyon.superclass = ED.Doodle.prototype;
 /**
  * Sets handle attributes
  */
-ED.Hypopyon.prototype.setHandles = function()
-{
+ED.Hypopyon.prototype.setHandles = function() {
 	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
 }
 
 /**
  * Sets default dragging attributes
  */
-ED.Hypopyon.prototype.setPropertyDefaults = function()
-{
+ED.Hypopyon.prototype.setPropertyDefaults = function() {
 	this.isMoveable = false;
 	this.isRotatable = false;
 	this.isUnique = true;
-    
-    // Update component of validation array for simple parameters
-    this.parameterValidationArray['arc']['range'].setMinAndMax(20 * Math.PI/180, 2 * Math.PI);
-    this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
-    this.parameterValidationArray['apexY']['range'].setMinAndMax(-380, this.minimum);
-    this.parameterValidationArray['radius']['range'].setMinAndMax(250, 450);
+
+	// Update component of validation array for simple parameters
+	this.parameterValidationArray['arc']['range'].setMinAndMax(20 * Math.PI / 180, 2 * Math.PI);
+	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
+	this.parameterValidationArray['apexY']['range'].setMinAndMax(-380, this.minimum);
+	this.parameterValidationArray['radius']['range'].setMinAndMax(250, 450);
 }
 
 /**
  * Sets default parameters
  */
-ED.Hypopyon.prototype.setParameterDefaults = function()
-{
+ED.Hypopyon.prototype.setParameterDefaults = function() {
 	this.apexY = 260;
 }
 
@@ -90,44 +86,43 @@ ED.Hypopyon.prototype.setParameterDefaults = function()
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.Hypopyon.prototype.draw = function(_point)
-{
+ED.Hypopyon.prototype.draw = function(_point) {
 	// Get context
 	var ctx = this.drawing.context;
-	
+
 	// Call draw method in superclass
 	ED.Hypopyon.superclass.draw.call(this, _point);
-    
-    // Calculate angle of apex above or below horizontal
-    var phi = Math.asin(this.apexY/this.ro);
-    
-    // Boundary path
+
+	// Calculate angle of apex above or below horizontal
+	var phi = Math.asin(this.apexY / this.ro);
+
+	// Boundary path
 	ctx.beginPath();
-    
-    // Arc from point on circumference level with apex point to other side
-    ctx.arc(0, 0, this.ro, phi, Math.PI - phi, false);
-    
+
+	// Arc from point on circumference level with apex point to other side
+	ctx.arc(0, 0, this.ro, phi, Math.PI - phi, false);
+
 	// Close path
 	ctx.closePath();
-    
-    // Colour of fill
-    ctx.fillStyle = "rgba(221,209,171,1)";
-    
-    // Set line attributes
-    ctx.lineWidth = 1;
-    
-    // Colour of outer line
-    ctx.strokeStyle = ctx.fillStyle;
-    
+
+	// Colour of fill
+	ctx.fillStyle = "rgba(221,209,171,1)";
+
+	// Set line attributes
+	ctx.lineWidth = 1;
+
+	// Colour of outer line
+	ctx.strokeStyle = ctx.fillStyle;
+
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
-	
-    // Coordinates of handles (in canvas plane)
+
+	// Coordinates of handles (in canvas plane)
 	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
-    
+
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
-	
+
 	// Return value indicating successful hittest
 	return this.isClicked;
 }
@@ -137,8 +132,7 @@ ED.Hypopyon.prototype.draw = function(_point)
  *
  * @returns {String} Description of doodle
  */
-ED.Hypopyon.prototype.description = function()
-{
-	var height = Math.round(10 * (this.ro - this.apexY)/(2 * this.ro));
-    return height + "mm hypopyon";
+ED.Hypopyon.prototype.description = function() {
+	var height = Math.round(10 * (this.ro - this.apexY) / (2 * this.ro));
+	return height + "mm hypopyon";
 }

@@ -33,8 +33,7 @@
  * @param {Float} _rotation
  * @param {Int} _order
  */
-ED.PostSubcapCataract = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
-{
+ED.PostSubcapCataract = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
 	// Set classname
 	this.className = "PostSubcapCataract";
 
@@ -52,37 +51,34 @@ ED.PostSubcapCataract.superclass = ED.Doodle.prototype;
 /**
  * Sets handle attributes
  */
-ED.PostSubcapCataract.prototype.setHandles = function()
-{
-    this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+ED.PostSubcapCataract.prototype.setHandles = function() {
+	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
 }
 
 /**
  * Sets default properties
  */
-ED.PostSubcapCataract.prototype.setPropertyDefaults = function()
-{
-    this.isMoveable = false;
+ED.PostSubcapCataract.prototype.setPropertyDefaults = function() {
+	this.isMoveable = false;
 	this.isRotatable = false;
-    this.isUnique = true;
-    this.parentClass = "Lens";
-    this.inFrontOfClassArray = ["Lens"];
-    this.addAtBack = true;
-    
-    // Update component of validation array for simple parameters
-    this.parameterValidationArray['apexX']['range'].setMinAndMax(+35, +100);
-    this.parameterValidationArray['apexY']['range'].setMinAndMax(-100, -35);
+	this.isUnique = true;
+	this.parentClass = "Lens";
+	this.inFrontOfClassArray = ["Lens"];
+	this.addAtBack = true;
+
+	// Update component of validation array for simple parameters
+	this.parameterValidationArray['apexX']['range'].setMinAndMax(+35, +100);
+	this.parameterValidationArray['apexY']['range'].setMinAndMax(-100, -35);
 }
 
 /**
  * Sets default parameters (Only called for new doodles)
  * Use the setParameter function for derived parameters, as this will also update dependent variables
  */
-ED.PostSubcapCataract.prototype.setParameterDefaults = function()
-{
-    this.apexX = 35;
-    this.apexY = 35;
-    this.radius = 50;
+ED.PostSubcapCataract.prototype.setParameterDefaults = function() {
+	this.apexX = 35;
+	this.apexY = 35;
+	this.radius = 50;
 }
 
 /**
@@ -93,22 +89,20 @@ ED.PostSubcapCataract.prototype.setParameterDefaults = function()
  * @value {Undefined} _value Value of parameter to calculate
  * @returns {Array} Associative array of values of dependent parameters
  */
-ED.PostSubcapCataract.prototype.dependentParameterValues = function(_parameter, _value)
-{
-    var returnArray = new Array();
-    
-    switch (_parameter)
-    {
-        case 'apexX':
-            returnArray['radius'] = Math.sqrt(this.apexX * this.apexX + this.apexY * this.apexY);
-            break;
-            
-        case 'apexY':
-            returnArray['radius'] = Math.sqrt(this.apexX * this.apexX + this.apexY * this.apexY);
-            break;
-    }
-    
-    return returnArray;
+ED.PostSubcapCataract.prototype.dependentParameterValues = function(_parameter, _value) {
+	var returnArray = new Array();
+
+	switch (_parameter) {
+		case 'apexX':
+			returnArray['radius'] = Math.sqrt(this.apexX * this.apexX + this.apexY * this.apexY);
+			break;
+
+		case 'apexY':
+			returnArray['radius'] = Math.sqrt(this.apexX * this.apexX + this.apexY * this.apexY);
+			break;
+	}
+
+	return returnArray;
 }
 
 /**
@@ -116,48 +110,45 @@ ED.PostSubcapCataract.prototype.dependentParameterValues = function(_parameter, 
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.PostSubcapCataract.prototype.draw = function(_point)
-{
+ED.PostSubcapCataract.prototype.draw = function(_point) {
 	// Get context
 	var ctx = this.drawing.context;
-	
+
 	// Call draw method in superclass
 	ED.PostSubcapCataract.superclass.draw.call(this, _point);
-	
+
 	// Boundary path
 	ctx.beginPath();
-    
+
 	// PostSubcapCataract
 	ctx.arc(0, 0, this.radius, 0, Math.PI * 2, false);
-    
+
 	// Close path
 	ctx.closePath();
-	
+
 	// Set line attributes
 	ctx.lineWidth = 4;
-    
-    // create pattern
-    var ptrn = ctx.createPattern(this.drawing.imageArray['PSCPattern'],'repeat');
-    ctx.fillStyle = ptrn;
-    
+
+	// create pattern
+	var ptrn = ctx.createPattern(this.drawing.imageArray['PSCPattern'], 'repeat');
+	ctx.fillStyle = ptrn;
+
 	ctx.strokeStyle = "lightgray";
-	
+
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
-	
+
 	// Other stuff here
-	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
-	{
-	}
-	
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {}
+
 	// Coordinates of handles (in canvas plane)
-    var point = new ED.Point(0, 0)
-    point.setWithPolars(this.radius, Math.PI/4);
+	var point = new ED.Point(0, 0)
+	point.setWithPolars(this.radius, Math.PI / 4);
 	this.handleArray[4].location = this.transform.transformPoint(point);
-	
+
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
-	
+
 	// Return value indicating successful hittest
 	return this.isClicked;
 }
@@ -167,8 +158,7 @@ ED.PostSubcapCataract.prototype.draw = function(_point)
  *
  * @returns {String} Description of doodle
  */
-ED.PostSubcapCataract.prototype.description = function()
-{
+ED.PostSubcapCataract.prototype.description = function() {
 	return "Posterior subcapsular cataract";
 }
 
@@ -177,8 +167,7 @@ ED.PostSubcapCataract.prototype.description = function()
  *
  * @returns {Int} SnoMed code of entity representated by doodle
  */
-ED.PostSubcapCataract.prototype.snomedCode = function()
-{
+ED.PostSubcapCataract.prototype.snomedCode = function() {
 	return 315353005;
 }
 
@@ -187,7 +176,6 @@ ED.PostSubcapCataract.prototype.snomedCode = function()
  *
  * @returns {Int} Position in diagnostic hierarchy
  */
-ED.PostSubcapCataract.prototype.diagnosticHierarchy = function()
-{
+ED.PostSubcapCataract.prototype.diagnosticHierarchy = function() {
 	return 3;
 }

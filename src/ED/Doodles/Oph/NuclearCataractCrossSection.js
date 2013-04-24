@@ -33,14 +33,13 @@
  * @param {Float} _rotation
  * @param {Int} _order
  */
-ED.NuclearCataractCrossSection = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
-{
+ED.NuclearCataractCrossSection = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
 	// Set classname
 	this.className = "NuclearCataractCrossSection";
-    
-    // Derived parameters (NB must set a value here to define parameter as a property of the object, even though value set later)
-    this.grade = 'Mild';
-    
+
+	// Derived parameters (NB must set a value here to define parameter as a property of the object, even though value set later)
+	this.grade = 'Mild';
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
 }
@@ -55,38 +54,40 @@ ED.NuclearCataractCrossSection.superclass = ED.Doodle.prototype;
 /**
  * Sets handle attributes
  */
-ED.NuclearCataractCrossSection.prototype.setHandles = function()
-{
+ED.NuclearCataractCrossSection.prototype.setHandles = function() {
 	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
 }
 
 /**
  * Sets default dragging attributes
  */
-ED.NuclearCataractCrossSection.prototype.setPropertyDefaults = function()
-{
+ED.NuclearCataractCrossSection.prototype.setPropertyDefaults = function() {
 	this.isScaleable = false;
 	this.isRotatable = false;
-    this.isUnique = true;
-    this.parentClass = "LensCrossSection";
-    this.inFrontOfClassArray = ["LensCrossSection", "NuclearCataractCrossSection"];
-    
-    // Update validation array for simple parameters
-    this.parameterValidationArray['apexX']['range'].setMinAndMax(+100, +100);
-    this.parameterValidationArray['apexY']['range'].setMinAndMax(-180, -20);
-    
-    // Add complete validation arrays for derived parameters
-    this.parameterValidationArray['grade'] = {kind:'derived', type:'string', list:['Mild', 'Moderate', 'Brunescent'], animate:true};
+	this.isUnique = true;
+	this.parentClass = "LensCrossSection";
+	this.inFrontOfClassArray = ["LensCrossSection", "NuclearCataractCrossSection"];
+
+	// Update validation array for simple parameters
+	this.parameterValidationArray['apexX']['range'].setMinAndMax(+100, +100);
+	this.parameterValidationArray['apexY']['range'].setMinAndMax(-180, -20);
+
+	// Add complete validation arrays for derived parameters
+	this.parameterValidationArray['grade'] = {
+		kind: 'derived',
+		type: 'string',
+		list: ['Mild', 'Moderate', 'Brunescent'],
+		animate: true
+	};
 }
 
 /**
  * Sets default parameters
  */
-ED.NuclearCataractCrossSection.prototype.setParameterDefaults = function()
-{
-    this.apexX = 100;
-    this.originX = 44;
-    this.setParameterFromString('grade', 'Mild');
+ED.NuclearCataractCrossSection.prototype.setParameterDefaults = function() {
+	this.apexX = 100;
+	this.originX = 44;
+	this.setParameterFromString('grade', 'Mild');
 }
 
 /**
@@ -97,35 +98,32 @@ ED.NuclearCataractCrossSection.prototype.setParameterDefaults = function()
  * @value {Undefined} _value Value of parameter to calculate
  * @returns {Array} Associative array of values of dependent parameters
  */
-ED.NuclearCataractCrossSection.prototype.dependentParameterValues = function(_parameter, _value)
-{
-    var returnArray = new Array();
-    
-    switch (_parameter)
-    {
-        case 'apexY':
-            if (_value < -80) returnArray['grade'] = 'Mild';
-            else if (_value < -40) returnArray['grade'] = 'Moderate';
-            else returnArray['grade'] = 'Brunescent';
-            break;
-            
-        case 'grade':
-            switch (_value)
-            {
-                case 'Mild':
-                    returnArray['apexY'] = -120;
-                    break;
-                case 'Moderate':
-                    returnArray['apexY'] = -80;
-                    break;
-                case 'Brunescent':
-                    returnArray['apexY'] = +0;
-                    break;
-            }
-            break;
-    }
-    
-    return returnArray;
+ED.NuclearCataractCrossSection.prototype.dependentParameterValues = function(_parameter, _value) {
+	var returnArray = new Array();
+
+	switch (_parameter) {
+		case 'apexY':
+			if (_value < -80) returnArray['grade'] = 'Mild';
+			else if (_value < -40) returnArray['grade'] = 'Moderate';
+			else returnArray['grade'] = 'Brunescent';
+			break;
+
+		case 'grade':
+			switch (_value) {
+				case 'Mild':
+					returnArray['apexY'] = -120;
+					break;
+				case 'Moderate':
+					returnArray['apexY'] = -80;
+					break;
+				case 'Brunescent':
+					returnArray['apexY'] = +0;
+					break;
+			}
+			break;
+	}
+
+	return returnArray;
 }
 
 /**
@@ -133,74 +131,71 @@ ED.NuclearCataractCrossSection.prototype.dependentParameterValues = function(_pa
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.NuclearCataractCrossSection.prototype.draw = function(_point)
-{
+ED.NuclearCataractCrossSection.prototype.draw = function(_point) {
 	// Get context
 	var ctx = this.drawing.context;
-	
+
 	// Call draw method in superclass
 	ED.NuclearCataractCrossSection.superclass.draw.call(this, _point);
-    
-    // Height of cross section (half value of ro in AntSeg doodle)
-    var h = 240;
-    
-    // Arbitrary radius of curvature corresponding to nucleus in Lens subclass
-    var r = 300;
-    
-    // Displacement of lens from centre
-    var ld = 100;
-    
-    // Angle of arc
-    var theta = Math.asin(h/r);
-    
-    // X coordinate of centre of circle
-    var x = r * Math.cos(theta);
-    
-    // Measurements of nucleus
-    var rn = r - 60;
-    
-    // Calculate nucleus angles
-    var phi = Math.acos(x/rn);
-    
-    // Lens
-    ctx.beginPath();
-    
-    // Draw lens with two sections of circumference of circle
-    ctx.arc(ld - x, 0, rn, phi, -phi, true);
-    ctx.arc(ld + x, 0, rn, Math.PI + phi, Math.PI - phi, true);
-    
-    // Draw it
-    ctx.stroke();
-    
+
+	// Height of cross section (half value of ro in AntSeg doodle)
+	var h = 240;
+
+	// Arbitrary radius of curvature corresponding to nucleus in Lens subclass
+	var r = 300;
+
+	// Displacement of lens from centre
+	var ld = 100;
+
+	// Angle of arc
+	var theta = Math.asin(h / r);
+
+	// X coordinate of centre of circle
+	var x = r * Math.cos(theta);
+
+	// Measurements of nucleus
+	var rn = r - 60;
+
+	// Calculate nucleus angles
+	var phi = Math.acos(x / rn);
+
+	// Lens
+	ctx.beginPath();
+
+	// Draw lens with two sections of circumference of circle
+	ctx.arc(ld - x, 0, rn, phi, -phi, true);
+	ctx.arc(ld + x, 0, rn, Math.PI + phi, Math.PI - phi, true);
+
+	// Draw it
+	ctx.stroke();
+
 	// Set line attributes
 	ctx.lineWidth = 0;
-    
-    // Colors for gradient
-    yellowColour = "rgba(255, 255, 0, 0.75)";
-    var brownColour = "rgba(" + Math.round(120 - this.apexY) + ", " + Math.round(60 - this.apexY) + ", 0, 0.75)";
-    
-    // Radial gradient
-    var gradient = ctx.createRadialGradient(ld, 0, 210, ld, 0, 50);
-    gradient.addColorStop(0, yellowColour);
-    gradient.addColorStop(1, brownColour);
-    
+
+	// Colors for gradient
+	yellowColour = "rgba(255, 255, 0, 0.75)";
+	var brownColour = "rgba(" + Math.round(120 - this.apexY) + ", " + Math.round(60 - this.apexY) + ", 0, 0.75)";
+
+	// Radial gradient
+	var gradient = ctx.createRadialGradient(ld, 0, 210, ld, 0, 50);
+	gradient.addColorStop(0, yellowColour);
+	gradient.addColorStop(1, brownColour);
+
 	ctx.fillStyle = gradient;
 	ctx.strokeStyle = "rgba(0,0,0,1)";
-	
+
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
-    
+
 	// Non boundary drawing
-	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
-    {
-	}
-	
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {}
+
 	// Coordinates of handles (in canvas plane)
 	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
-    
+
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
-	
+
 	// Return value indicating successful hittest
 	return this.isClicked;
 }

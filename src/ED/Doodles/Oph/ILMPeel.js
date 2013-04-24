@@ -32,11 +32,10 @@
  * @param {Float} _rotation
  * @param {Int} _order
  */
-ED.ILMPeel = function(_drawing, _originX, _originY, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
-{
+ED.ILMPeel = function(_drawing, _originX, _originY, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
 	// Set classname
 	this.className = "ILMPeel";
-    
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _originX, _originY, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
 }
@@ -51,32 +50,29 @@ ED.ILMPeel.superclass = ED.Doodle.prototype;
 /**
  * Sets handle attributes
  */
-ED.ILMPeel.prototype.setHandles = function()
-{
+ED.ILMPeel.prototype.setHandles = function() {
 	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
 }
 
 /**
  * Sets default properties
  */
-ED.ILMPeel.prototype.setPropertyDefaults = function()
-{
-    this.isUnique = true;
-    
-    // Update component of validation array for simple parameters
-    this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
-    this.parameterValidationArray['apexY']['range'].setMinAndMax(-80, -40);
+ED.ILMPeel.prototype.setPropertyDefaults = function() {
+	this.isUnique = true;
+
+	// Update component of validation array for simple parameters
+	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
+	this.parameterValidationArray['apexY']['range'].setMinAndMax(-80, -40);
 }
 
 /**
  * Sets default parameters
  */
-ED.ILMPeel.prototype.setParameterDefaults = function()
-{
-    this.apexY = -60;
-    this.rotation = Math.PI/4;
-    
-    this.originX = this.drawing.eye == ED.eye.Right?-100:100;
+ED.ILMPeel.prototype.setParameterDefaults = function() {
+	this.apexY = -60;
+	this.rotation = Math.PI / 4;
+
+	this.originX = this.drawing.eye == ED.eye.Right ? -100 : 100;
 }
 
 /**
@@ -84,37 +80,36 @@ ED.ILMPeel.prototype.setParameterDefaults = function()
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.ILMPeel.prototype.draw = function(_point)
-{
+ED.ILMPeel.prototype.draw = function(_point) {
 	// Get context
 	var ctx = this.drawing.context;
-	
+
 	// Call draw method in superclass
 	ED.ILMPeel.superclass.draw.call(this, _point);
-	
+
 	// Boundary path
 	ctx.beginPath();
-	
+
 	// Circular scar
-    var r = Math.sqrt(this.apexX * this.apexX + this.apexY * this.apexY);
-    
-    // Circular scar
+	var r = Math.sqrt(this.apexX * this.apexX + this.apexY * this.apexY);
+
+	// Circular scar
 	ctx.arc(0, 0, r, 0, 2 * Math.PI, true);
-	
+
 	// Set line attributes
 	ctx.lineWidth = 2;
-    ctx.fillStyle = "rgba(220, 220, 220, 0.5)";
+	ctx.fillStyle = "rgba(220, 220, 220, 0.5)";
 	ctx.strokeStyle = "gray";
-	
+
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
-	
+
 	// Coordinates of handles (in canvas plane)
 	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
-	
+
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
-	
+
 	// Return value indicating successful hittest
 	return this.isClicked;
 }
@@ -124,7 +119,6 @@ ED.ILMPeel.prototype.draw = function(_point)
  *
  * @returns {String} Description of doodle
  */
-ED.ILMPeel.prototype.groupDescription = function()
-{
+ED.ILMPeel.prototype.groupDescription = function() {
 	return "ILM peel";
 }

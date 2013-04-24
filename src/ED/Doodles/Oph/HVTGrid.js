@@ -33,11 +33,10 @@
  * @param {Float} _rotation
  * @param {Int} _order
  */
-ED.HVTGrid = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
-{
+ED.HVTGrid = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
 	// Set classname
 	this.className = "HVTGrid";
-    
+
 	// Call super-class constructor
 	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
 }
@@ -52,11 +51,10 @@ ED.HVTGrid.superclass = ED.Doodle.prototype;
 /**
  * Sets default dragging attributes
  */
-ED.HVTGrid.prototype.setPropertyDefaults = function()
-{
-    this.isDeletable = false;
-    this.isShowHighlight = false;
-    this.isSelectable = false;
+ED.HVTGrid.prototype.setPropertyDefaults = function() {
+	this.isDeletable = false;
+	this.isShowHighlight = false;
+	this.isSelectable = false;
 }
 
 /**
@@ -64,31 +62,30 @@ ED.HVTGrid.prototype.setPropertyDefaults = function()
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.HVTGrid.prototype.draw = function(_point)
-{
+ED.HVTGrid.prototype.draw = function(_point) {
 	// Get context
 	var ctx = this.drawing.context;
-	
+
 	// Call draw method in superclass
 	ED.HVTGrid.superclass.draw.call(this, _point);
-    
+
 	// Boundary path
 	ctx.beginPath();
-    
+
 	// Radius of HVT doodle
-    var ro = 125;
-    var d = ro * 2;
+	var ro = 125;
+	var d = ro * 2;
 	ctx.moveTo(-2 * d, 0);
-    ctx.lineTo(+2 * d, 0);
+	ctx.lineTo(+2 * d, 0);
 	ctx.moveTo(-d, -d);
-    ctx.lineTo(-d, +d);
+	ctx.lineTo(-d, +d);
 	ctx.moveTo(+d, -d);
-    ctx.lineTo(+d, +d);
-    
+	ctx.lineTo(+d, +d);
+
 	// Set line attributes
 	ctx.lineWidth = 4;
 	ctx.strokeStyle = "gray";
-	
+
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 

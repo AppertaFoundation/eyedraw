@@ -33,8 +33,7 @@
  * @param {Float} _rotation
  * @param {Int} _order
  */
-ED.BuckleSuture = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
-{
+ED.BuckleSuture = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
 	// Set classname
 	this.className = "BuckleSuture";
 
@@ -52,39 +51,33 @@ ED.BuckleSuture.superclass = ED.Doodle.prototype;
 /**
  * Sets handle attributes
  */
-ED.BuckleSuture.prototype.setHandles = function()
-{
-    //this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, true);
+ED.BuckleSuture.prototype.setHandles = function() {
+	//this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, true);
 }
 
 /**
  * Sets default dragging attributes
  */
-ED.BuckleSuture.prototype.setPropertyDefaults = function()
-{
+ED.BuckleSuture.prototype.setPropertyDefaults = function() {
 	this.isScaleable = false;
 	this.isMoveable = false;
-    this.willReport = false;
+	this.willReport = false;
 }
 
 /**
  * Sets default parameters
  */
-ED.BuckleSuture.prototype.setParameterDefaults = function()
-{
-    this.arc = 15 * Math.PI/180;
-    this.apexY = -320;
-    
-    // Make rotation 30 degrees to last one of same class
-    var doodle = this.drawing.lastDoodleOfClass(this.className);
-    if (doodle)
-    {
-        this.rotation = doodle.rotation + Math.PI/6;
-    }
-    else
-    {
-        this.rotation = -60 * Math.PI/180
-    }
+ED.BuckleSuture.prototype.setParameterDefaults = function() {
+	this.arc = 15 * Math.PI / 180;
+	this.apexY = -320;
+
+	// Make rotation 30 degrees to last one of same class
+	var doodle = this.drawing.lastDoodleOfClass(this.className);
+	if (doodle) {
+		this.rotation = doodle.rotation + Math.PI / 6;
+	} else {
+		this.rotation = -60 * Math.PI / 180
+	}
 }
 
 /**
@@ -92,66 +85,64 @@ ED.BuckleSuture.prototype.setParameterDefaults = function()
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.BuckleSuture.prototype.draw = function(_point)
-{
+ED.BuckleSuture.prototype.draw = function(_point) {
 	// Get context
 	var ctx = this.drawing.context;
-	
+
 	// Call draw method in superclass
 	ED.BuckleSuture.superclass.draw.call(this, _point);
 
-    // If Buckle there, take account of  size
-    var ro = 340;
-    var doodle = this.drawing.lastDoodleOfClass("CircumferentialBuckle");
-    if (doodle) ro = -doodle.apexY + 20;
-    
-    var ri = 200;
-    
+	// If Buckle there, take account of  size
+	var ro = 340;
+	var doodle = this.drawing.lastDoodleOfClass("CircumferentialBuckle");
+	if (doodle) ro = -doodle.apexY + 20;
+
+	var ri = 200;
+
 	// Calculate parameters for arcs
-	var theta = this.arc/2;
-	var arcStart = - Math.PI/2 + theta;
-	var arcEnd = - Math.PI/2 - theta;
-    
+	var theta = this.arc / 2;
+	var arcStart = -Math.PI / 2 + theta;
+	var arcEnd = -Math.PI / 2 - theta;
+
 	// Boundary path
 	ctx.beginPath();
-    
+
 	// Arc across to mirror image point on the other side
 	ctx.arc(0, 0, ro, arcStart, arcEnd, true);
-    
+
 	// Arc back to mirror image point on the other side
 	ctx.arc(0, 0, ri, arcEnd, arcStart, false);
-    
+
 	// Close path
 	ctx.closePath();
-    
+
 	// Set line attributes
 	ctx.lineWidth = 4;
-    this.isFilled = false;
+	this.isFilled = false;
 	ctx.strokeStyle = "#666";
-	
+
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
-	
+
 	// Other stuff here
-	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
-	{
-        // Calculate location of suture
-        r = ri + (ro - ri)/2;
-        var sutureX = r * Math.sin(theta);
-        var sutureY = - r * Math.cos(theta);
-        
-        ctx.beginPath();
-        ctx.arc(sutureX, sutureY,5,0,Math.PI*2,true);
-        ctx.moveTo(sutureX + 20, sutureY + 20);
-        ctx.lineTo(sutureX, sutureY);
-        ctx.lineTo(sutureX + 20, sutureY - 20);
-        
-        ctx.stroke();
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+		// Calculate location of suture
+		r = ri + (ro - ri) / 2;
+		var sutureX = r * Math.sin(theta);
+		var sutureY = -r * Math.cos(theta);
+
+		ctx.beginPath();
+		ctx.arc(sutureX, sutureY, 5, 0, Math.PI * 2, true);
+		ctx.moveTo(sutureX + 20, sutureY + 20);
+		ctx.lineTo(sutureX, sutureY);
+		ctx.lineTo(sutureX + 20, sutureY - 20);
+
+		ctx.stroke();
 	}
-	
+
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
-	
+
 	// Return value indicating successful hittest
 	return this.isClicked;
 }

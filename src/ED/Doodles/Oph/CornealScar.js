@@ -33,13 +33,12 @@
  * @param {Float} _rotation
  * @param {Int} _order
  */
-ED.CornealScar = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
-{
+ED.CornealScar = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
 	// Set classname
 	this.className = "CornealScar";
-    
-    // Doodle specific property
-    this.isInVisualAxis = false;
+
+	// Doodle specific property
+	this.isInVisualAxis = false;
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
@@ -55,35 +54,32 @@ ED.CornealScar.superclass = ED.Doodle.prototype;
 /**
  * Sets handle attributes
  */
-ED.CornealScar.prototype.setHandles = function()
-{
-    this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, false);
+ED.CornealScar.prototype.setHandles = function() {
+	this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, false);
 	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
 }
 
 /**
  * Sets default dragging attributes
  */
-ED.CornealScar.prototype.setPropertyDefaults = function()
-{
+ED.CornealScar.prototype.setPropertyDefaults = function() {
 	this.isSqueezable = true;
 	this.isRotatable = false;
-    
-    // Update component of validation array for simple parameters
-    this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
-    this.parameterValidationArray['apexY']['range'].setMinAndMax(-100, -10);
+
+	// Update component of validation array for simple parameters
+	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
+	this.parameterValidationArray['apexY']['range'].setMinAndMax(-100, -10);
 }
 
 /**
  * Sets default parameters
  */
-ED.CornealScar.prototype.setParameterDefaults = function()
-{
-    this.apexY = -50;
-    this.scaleX = 0.7;
-    this.scaleY = 0.5;
-    
-    this.setOriginWithDisplacements(0,25);
+ED.CornealScar.prototype.setParameterDefaults = function() {
+	this.apexY = -50;
+	this.scaleX = 0.7;
+	this.scaleY = 0.5;
+
+	this.setOriginWithDisplacements(0, 25);
 }
 
 /**
@@ -91,54 +87,52 @@ ED.CornealScar.prototype.setParameterDefaults = function()
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.CornealScar.prototype.draw = function(_point)
-{
+ED.CornealScar.prototype.draw = function(_point) {
 	// Get context
 	var ctx = this.drawing.context;
-	
+
 	// Call draw method in superclass
 	ED.CornealScar.superclass.draw.call(this, _point);
-	
+
 	// Boundary path
 	ctx.beginPath();
-    
+
 	// CornealScar
-    var r = 100;
+	var r = 100;
 	ctx.arc(0, 0, r, 0, Math.PI * 2, false);
-    
+
 	// Close path
 	ctx.closePath();
-    
-    // Create fill
-    var alpha = -this.apexY/100;
-    ctx.fillStyle = "rgba(100,100,100," + alpha.toFixed(2) + ")";
-    
-    // Transparent stroke
+
+	// Create fill
+	var alpha = -this.apexY / 100;
+	ctx.fillStyle = "rgba(100,100,100," + alpha.toFixed(2) + ")";
+
+	// Transparent stroke
 	ctx.strokeStyle = "rgba(100,100,100,0.9)";
-	
+
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
-	
+
 	// Non-boundary paths
-	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
-	{
-        // Work out whether visual axis is involved
-        var centre = new ED.Point(0,0);
-        var visualAxis = this.drawing.transform.transformPoint(centre);
-        var ctx = this.drawing.context;
-        if (ctx.isPointInPath(visualAxis.x,visualAxis.y)) this.isInVisualAxis = true;
-        else this.isInVisualAxis = false;
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+		// Work out whether visual axis is involved
+		var centre = new ED.Point(0, 0);
+		var visualAxis = this.drawing.transform.transformPoint(centre);
+		var ctx = this.drawing.context;
+		if (ctx.isPointInPath(visualAxis.x, visualAxis.y)) this.isInVisualAxis = true;
+		else this.isInVisualAxis = false;
 	}
-	
+
 	// Coordinates of handles (in canvas plane)
-    var point = new ED.Point(0, 0);
-    point.setWithPolars(r, Math.PI/4);
+	var point = new ED.Point(0, 0);
+	point.setWithPolars(r, Math.PI / 4);
 	this.handleArray[2].location = this.transform.transformPoint(point);
-    this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
-	
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
+
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
-	
+
 	// Return value indicating successful hittest
 	return this.isClicked;
 }
@@ -148,22 +142,21 @@ ED.CornealScar.prototype.draw = function(_point)
  *
  * @returns {String} Description of doodle
  */
-ED.CornealScar.prototype.description = function()
-{
-    var returnString = "";
-    
-    // Calculate size
-    var averageScale = this.scaleX + this.scaleY;
-    
-    // Arbitrary cutoffs
-    if (averageScale < 2) returnString = "Small ";
-    else if (averageScale < 4) returnString = "Medium ";
-    else returnString = "Large ";
-    
-    returnString += "corneal scar";
-    
-    if (this.isInVisualAxis) returnString += " involving visual axis";
-    
+ED.CornealScar.prototype.description = function() {
+	var returnString = "";
+
+	// Calculate size
+	var averageScale = this.scaleX + this.scaleY;
+
+	// Arbitrary cutoffs
+	if (averageScale < 2) returnString = "Small ";
+	else if (averageScale < 4) returnString = "Medium ";
+	else returnString = "Large ";
+
+	returnString += "corneal scar";
+
+	if (this.isInVisualAxis) returnString += " involving visual axis";
+
 	return returnString;
 }
 
@@ -172,8 +165,7 @@ ED.CornealScar.prototype.description = function()
  *
  * @returns {Int} SnoMed code of entity representated by doodle
  */
-ED.CornealScar.prototype.snomedCode = function()
-{
+ED.CornealScar.prototype.snomedCode = function() {
 	return 95726001;
 }
 
@@ -182,7 +174,6 @@ ED.CornealScar.prototype.snomedCode = function()
  *
  * @returns {Int} Position in diagnostic hierarchy
  */
-ED.CornealScar.prototype.diagnosticHierarchy = function()
-{
+ED.CornealScar.prototype.diagnosticHierarchy = function() {
 	return 2;
 }

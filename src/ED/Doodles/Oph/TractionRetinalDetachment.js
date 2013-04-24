@@ -33,8 +33,7 @@
  * @param {Float} _rotation
  * @param {Int} _order
  */
-ED.TractionRetinalDetachment = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
-{
+ED.TractionRetinalDetachment = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
 	// Set classname
 	this.className = "TractionRetinalDetachment";
 
@@ -52,30 +51,27 @@ ED.TractionRetinalDetachment.superclass = ED.Doodle.prototype;
 /**
  * Sets handle attributes
  */
-ED.TractionRetinalDetachment.prototype.setHandles = function()
-{
-    this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, true);
+ED.TractionRetinalDetachment.prototype.setHandles = function() {
+	this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, true);
 }
 
 /**
  * Set default properties
  */
-ED.TractionRetinalDetachment.prototype.setPropertyDefaults = function()
-{
+ED.TractionRetinalDetachment.prototype.setPropertyDefaults = function() {
 	this.isSqueezable = true;
 	this.addAtBack = true;
-	
-    // Update component of validation array for simple parameters
-    this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.5, +1.5);
-    this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.5, +1.5);
+
+	// Update component of validation array for simple parameters
+	this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.5, +1.5);
+	this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.5, +1.5);
 }
 
 /**
  * Sets default parameters
  */
-ED.TractionRetinalDetachment.prototype.setParameterDefaults = function()
-{
-    this.setOriginWithDisplacements(200, -100);
+ED.TractionRetinalDetachment.prototype.setParameterDefaults = function() {
+	this.setOriginWithDisplacements(200, -100);
 }
 
 /**
@@ -83,43 +79,42 @@ ED.TractionRetinalDetachment.prototype.setParameterDefaults = function()
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.TractionRetinalDetachment.prototype.draw = function(_point)
-{
+ED.TractionRetinalDetachment.prototype.draw = function(_point) {
 	// Get context
 	var ctx = this.drawing.context;
-    
+
 	// Call draw method in superclass
 	ED.TractionRetinalDetachment.superclass.draw.call(this, _point);
-    
+
 	// Boundary path
 	ctx.beginPath();
-    
-    // Move to centre
-    var r = 60;
-    var s = 150;
-    ctx.moveTo(-s, -s);
-    
-    // Create curves for the TractionRetinalDetachment
-    ctx.bezierCurveTo(-r, -r, r, -r, s, -s);
-    ctx.bezierCurveTo(r, -r, r, r, s, s);
-    ctx.bezierCurveTo(r, r, -r, r, -s, s);
-    ctx.bezierCurveTo(-r, r, -r, -r, -s, -s);
-    ctx.closePath();
-	
+
+	// Move to centre
+	var r = 60;
+	var s = 150;
+	ctx.moveTo(-s, -s);
+
+	// Create curves for the TractionRetinalDetachment
+	ctx.bezierCurveTo(-r, -r, r, -r, s, -s);
+	ctx.bezierCurveTo(r, -r, r, r, s, s);
+	ctx.bezierCurveTo(r, r, -r, r, -s, s);
+	ctx.bezierCurveTo(-r, r, -r, -r, -s, -s);
+	ctx.closePath();
+
 	// Set attributes
 	ctx.lineWidth = 1;
-	ctx.strokeStyle =  "blue";
-    ctx.fillStyle = "blue";
-	
+	ctx.strokeStyle = "blue";
+	ctx.fillStyle = "blue";
+
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
-    
-    // Coordinates of handles (in canvas plane)
+
+	// Coordinates of handles (in canvas plane)
 	this.handleArray[2].location = this.transform.transformPoint(new ED.Point(s, -s));
-	
+
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
-    
+
 	// Return value indicating successful hittest
 	return this.isClicked;
 }
@@ -129,8 +124,7 @@ ED.TractionRetinalDetachment.prototype.draw = function(_point)
  *
  * @returns {String} Group description
  */
-ED.TractionRetinalDetachment.prototype.groupDescription = function()
-{
+ED.TractionRetinalDetachment.prototype.groupDescription = function() {
 	return "Traction retinal detachment ";
 }
 
@@ -139,7 +133,6 @@ ED.TractionRetinalDetachment.prototype.groupDescription = function()
  *
  * @returns {String} Description of doodle
  */
-ED.TractionRetinalDetachment.prototype.description = function()
-{
-    return this.locationRelativeToDisc();
+ED.TractionRetinalDetachment.prototype.description = function() {
+	return this.locationRelativeToDisc();
 }

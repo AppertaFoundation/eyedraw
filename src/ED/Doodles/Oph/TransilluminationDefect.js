@@ -33,11 +33,10 @@
  * @param {Float} _rotation
  * @param {Int} _order
  */
-ED.TransilluminationDefect = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
-{
+ED.TransilluminationDefect = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
 	// Set classname
 	this.className = "TransilluminationDefect";
-    
+
 	// Call super-class constructor
 	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
 }
@@ -52,8 +51,7 @@ ED.TransilluminationDefect.superclass = ED.Doodle.prototype;
 /**
  * Sets handle attributes
  */
-ED.TransilluminationDefect.prototype.setHandles = function()
-{
+ED.TransilluminationDefect.prototype.setHandles = function() {
 	this.handleArray[0] = new ED.Handle(null, true, ED.Mode.Arc, false);
 	this.handleArray[3] = new ED.Handle(null, true, ED.Mode.Arc, false);
 }
@@ -61,33 +59,28 @@ ED.TransilluminationDefect.prototype.setHandles = function()
 /**
  * Set default properties
  */
-ED.TransilluminationDefect.prototype.setPropertyDefaults = function()
-{
+ED.TransilluminationDefect.prototype.setPropertyDefaults = function() {
 	this.isMoveable = false;
-    
-    // Update component of validation array for simple parameters
-    this.parameterValidationArray['arc']['range'].setMinAndMax(Math.PI/8, Math.PI * 2);
-    this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
-    this.parameterValidationArray['apexY']['range'].setMinAndMax(-400, -100);
+
+	// Update component of validation array for simple parameters
+	this.parameterValidationArray['arc']['range'].setMinAndMax(Math.PI / 8, Math.PI * 2);
+	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
+	this.parameterValidationArray['apexY']['range'].setMinAndMax(-400, -100);
 }
 
 /**
  * Sets default parameters (Only called for new doodles)
  * Use the setParameter function for derived parameters, as this will also update dependent variables
  */
-ED.TransilluminationDefect.prototype.setParameterDefaults = function()
-{
-    this.arc = 360 * Math.PI/180;
-    
-    var doodle = this.drawing.lastDoodleOfClass(this.className);
-    if (doodle)
-    {
-        this.rotation = doodle.rotation + (this.drawing.eye == ED.eye.Right?-1:1) * (doodle.arc/2 + this.arc/2 + Math.PI/12);
-    }
-    else
-    {
-        this.rotation = (this.drawing.eye == ED.eye.Right?-1:1) * this.arc/2;
-    }
+ED.TransilluminationDefect.prototype.setParameterDefaults = function() {
+	this.arc = 360 * Math.PI / 180;
+
+	var doodle = this.drawing.lastDoodleOfClass(this.className);
+	if (doodle) {
+		this.rotation = doodle.rotation + (this.drawing.eye == ED.eye.Right ? -1 : 1) * (doodle.arc / 2 + this.arc / 2 + Math.PI / 12);
+	} else {
+		this.rotation = (this.drawing.eye == ED.eye.Right ? -1 : 1) * this.arc / 2;
+	}
 }
 
 /**
@@ -95,73 +88,70 @@ ED.TransilluminationDefect.prototype.setParameterDefaults = function()
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.TransilluminationDefect.prototype.draw = function(_point)
-{
+ED.TransilluminationDefect.prototype.draw = function(_point) {
 	// Get context
 	var ctx = this.drawing.context;
-	
+
 	// Call draw method in superclass
 	ED.TransilluminationDefect.superclass.draw.call(this, _point);
-    
+
 	// Radius of outer curve just inside ora on right and left fundus diagrams
 	var ro = 380;
-    var ri = 280;
-    var r = ri + (ro - ri)/2;
-	
+	var ri = 280;
+	var r = ri + (ro - ri) / 2;
+
 	// Calculate parameters for arcs
-	var theta = this.arc/2;
-	var arcStart = - Math.PI/2 + theta;
-	var arcEnd = - Math.PI/2 - theta;
-    
-    // Coordinates of 'corners' of TransilluminationDefect
+	var theta = this.arc / 2;
+	var arcStart = -Math.PI / 2 + theta;
+	var arcEnd = -Math.PI / 2 - theta;
+
+	// Coordinates of 'corners' of TransilluminationDefect
 	var topRightX = r * Math.sin(theta);
-	var topRightY = - r * Math.cos(theta);
-	var topLeftX = - r * Math.sin(theta);
+	var topRightY = -r * Math.cos(theta);
+	var topLeftX = -r * Math.sin(theta);
 	var topLeftY = topRightY;
-    
+
 	// Boundary path
 	ctx.beginPath();
-    
+
 	// Arc across to mirror image point on the other side
 	ctx.arc(0, 0, ro, arcStart, arcEnd, true);
-    
+
 	// Arc back to mirror image point on the other side
 	ctx.arc(0, 0, ri, arcEnd, arcStart, false);
-    
+
 	// Close path
 	ctx.closePath();
-	
+
 	// Set line attributes
 	ctx.lineWidth = 4;
 	ctx.fillStyle = "rgba(255,255,255,0)";
 	ctx.strokeStyle = "rgba(255,255,255,0)";
-	
+
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
-	
+
 	// Non boundary drawing
-	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
-	{
-        // Spot data
-        var sr = 30;
-        var inc = Math.PI/8;
-        
-        // Iterate through radius and angle to draw spots
-        for (var a = -Math.PI/2 - arcStart + inc/2; a < this.arc - Math.PI/2 - arcStart; a += inc )
-        {
-            var p = new ED.Point(0,0);
-            p.setWithPolars(r, a);
-            this.drawCircle(ctx, p.x, p.y, sr, "rgba(255,255,255,1)", 4, "rgba(255,255,255,1)");
-        }
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+		// Spot data
+		var sr = 30;
+		var inc = Math.PI / 8;
+
+		// Iterate through radius and angle to draw spots
+		for (var a = -Math.PI / 2 - arcStart + inc / 2; a < this.arc - Math.PI / 2 - arcStart; a += inc) {
+			var p = new ED.Point(0, 0);
+			p.setWithPolars(r, a);
+			this.drawCircle(ctx, p.x, p.y, sr, "rgba(255,255,255,1)", 4, "rgba(255,255,255,1)");
+		}
 	}
-    
+
 	// Coordinates of handles (in canvas plane)
 	this.handleArray[0].location = this.transform.transformPoint(new ED.Point(topLeftX, topLeftY));
 	this.handleArray[3].location = this.transform.transformPoint(new ED.Point(topRightX, topRightY));
-	
+
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
-    
+
 	// Return value indicating successful hit test
 	return this.isClicked;
 }
@@ -171,7 +161,6 @@ ED.TransilluminationDefect.prototype.draw = function(_point)
  *
  * @returns {String} Description of doodle
  */
-ED.TransilluminationDefect.prototype.description = function()
-{
+ED.TransilluminationDefect.prototype.description = function() {
 	return "Transillumination defects of iris";
 }

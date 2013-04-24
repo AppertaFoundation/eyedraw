@@ -33,11 +33,10 @@
  * @param {Float} _rotation
  * @param {Int} _order
  */
-ED.VitreousOpacity = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
-{
+ED.VitreousOpacity = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
 	// Set classname
 	this.className = "VitreousOpacity";
-    
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
 }
@@ -52,35 +51,32 @@ ED.VitreousOpacity.superclass = ED.Doodle.prototype;
 /**
  * Sets handle attributes
  */
-ED.VitreousOpacity.prototype.setHandles = function()
-{
-    this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, false);
+ED.VitreousOpacity.prototype.setHandles = function() {
+	this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, false);
 	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
 }
 
 /**
  * Set default properties
  */
-ED.VitreousOpacity.prototype.setPropertyDefaults = function()
-{
+ED.VitreousOpacity.prototype.setPropertyDefaults = function() {
 	this.isRotatable = false;
 	this.isSqueezable = true;
-    
-    // Update component of validation array for simple parameters
-    this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
-    this.parameterValidationArray['apexY']['range'].setMinAndMax(-100, +0);
-    this.parameterValidationArray['arc']['range'].setMinAndMax(Math.PI/6, Math.PI*2);    
-    this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.5, +4);
-    this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.5, +4);
+
+	// Update component of validation array for simple parameters
+	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
+	this.parameterValidationArray['apexY']['range'].setMinAndMax(-100, +0);
+	this.parameterValidationArray['arc']['range'].setMinAndMax(Math.PI / 6, Math.PI * 2);
+	this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.5, +4);
+	this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.5, +4);
 }
 
 /**
  * Sets default parameters
  */
-ED.VitreousOpacity.prototype.setParameterDefaults = function()
-{
-    this.apexY = -100;
-    this.setOriginWithDisplacements(0, -100);
+ED.VitreousOpacity.prototype.setParameterDefaults = function() {
+	this.apexY = -100;
+	this.setOriginWithDisplacements(0, -100);
 }
 
 /**
@@ -88,51 +84,48 @@ ED.VitreousOpacity.prototype.setParameterDefaults = function()
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.VitreousOpacity.prototype.draw = function(_point)
-{
+ED.VitreousOpacity.prototype.draw = function(_point) {
 	// Get context
 	var ctx = this.drawing.context;
-    
+
 	// Call draw method in superclass
 	ED.VitreousOpacity.superclass.draw.call(this, _point);
-    
+
 	// Boundary path
 	ctx.beginPath();
-    
+
 	// Boundary path
 	ctx.beginPath();
-    
-    // Radius of opacity
-    var ro = 200;
-    
+
+	// Radius of opacity
+	var ro = 200;
+
 	// Do a 360 arc
 	ctx.arc(0, 0, ro, 0, 2 * Math.PI, true);
-    
-    // Opacity from apexY
-    var opacity = 0.3  + 0.6 * (ro + 2 * this.apexY)/ro;
-    ctx.fillStyle = "rgba(255, 0, 0," + opacity + ")";
-	
+
+	// Opacity from apexY
+	var opacity = 0.3 + 0.6 * (ro + 2 * this.apexY) / ro;
+	ctx.fillStyle = "rgba(255, 0, 0," + opacity + ")";
+
 	// Set attributes
 	ctx.lineWidth = 0;
-	ctx.strokeStyle =  "rgba(255, 0, 0, 0)";
-	
+	ctx.strokeStyle = "rgba(255, 0, 0, 0)";
+
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
-	
+
 	// Other stuff here
-	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
-	{
-	}
-    
-    // Coordinates of handles (in canvas plane)
-    point = new ED.Point(0, 0);
-    point.setWithPolars(ro, Math.PI/4);
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {}
+
+	// Coordinates of handles (in canvas plane)
+	point = new ED.Point(0, 0);
+	point.setWithPolars(ro, Math.PI / 4);
 	this.handleArray[2].location = this.transform.transformPoint(point);
-    this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
-	
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
+
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
-    
+
 	// Return value indicating successful hittest
 	return this.isClicked;
 }
@@ -142,8 +135,7 @@ ED.VitreousOpacity.prototype.draw = function(_point)
  *
  * @returns {String} Description of doodle
  */
-ED.VitreousOpacity.prototype.description = function()
-{
+ED.VitreousOpacity.prototype.description = function() {
 	return "Vitreous haemorrhage";
 }
 
@@ -152,7 +144,6 @@ ED.VitreousOpacity.prototype.description = function()
  *
  * @returns {Int} SnoMed code of entity representated by doodle
  */
-ED.VitreousOpacity.prototype.snomedCode = function()
-{
+ED.VitreousOpacity.prototype.snomedCode = function() {
 	return 31341008;
 }

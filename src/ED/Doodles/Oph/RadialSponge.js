@@ -33,8 +33,7 @@
  * @param {Float} _rotation
  * @param {Int} _order
  */
-ED.RadialSponge = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
-{
+ED.RadialSponge = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
 	// Set classname
 	this.className = "RadialSponge";
 
@@ -52,28 +51,23 @@ ED.RadialSponge.superclass = ED.Doodle.prototype;
 /**
  * Sets default dragging attributes
  */
-ED.RadialSponge.prototype.setPropertyDefaults = function()
-{
+ED.RadialSponge.prototype.setPropertyDefaults = function() {
 	this.isScaleable = false;
 	this.isMoveable = false;
-    this.addAtBack = true;
+	this.addAtBack = true;
 }
 
 /**
  * Sets default parameters
  */
-ED.RadialSponge.prototype.setParameterDefaults = function()
-{
-    // Make rotation 30 degrees to last one of same class
-    var doodle = this.drawing.lastDoodleOfClass(this.className);
-    if (doodle)
-    {
-        this.rotation = doodle.rotation + Math.PI/6;
-    }
-    else
-    {
-        this.rotation = -60 * Math.PI/180
-    }
+ED.RadialSponge.prototype.setParameterDefaults = function() {
+	// Make rotation 30 degrees to last one of same class
+	var doodle = this.drawing.lastDoodleOfClass(this.className);
+	if (doodle) {
+		this.rotation = doodle.rotation + Math.PI / 6;
+	} else {
+		this.rotation = -60 * Math.PI / 180
+	}
 }
 
 /**
@@ -81,61 +75,59 @@ ED.RadialSponge.prototype.setParameterDefaults = function()
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.RadialSponge.prototype.draw = function(_point)
-{
+ED.RadialSponge.prototype.draw = function(_point) {
 	// Get context
 	var ctx = this.drawing.context;
-	
+
 	// Call draw method in superclass
 	ED.RadialSponge.superclass.draw.call(this, _point);
-    
-    // Radii
-    var y = -220;
-    var h = 200;
-    var w = 80;
-    
+
+	// Radii
+	var y = -220;
+	var h = 200;
+	var w = 80;
+
 	// Boundary path
 	ctx.beginPath();
-    
-    ctx.moveTo(-w/2, y);
-    ctx.lineTo(-w/2, y - h);
-	ctx.lineTo(w/2, y - h);
-	ctx.lineTo(w/2, y);
-    
+
+	ctx.moveTo(-w / 2, y);
+	ctx.lineTo(-w / 2, y - h);
+	ctx.lineTo(w / 2, y - h);
+	ctx.lineTo(w / 2, y);
+
 	// Close path
 	ctx.closePath();
-    
+
 	// Set line attributes
 	ctx.lineWidth = 4;
 	ctx.fillStyle = "lightgray";
 	ctx.strokeStyle = "gray";
-	
+
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
-	
+
 	// Other stuff here
-	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
-	{
-        ctx.beginPath();
-        
-        // Knot
-        ctx.arc(0, y - h + 40,5,0,Math.PI*2,true);
-        ctx.lineTo(-20, y - h + 30);
-        ctx.moveTo(0, y - h + 40);
-        ctx.lineTo(20, y - h + 30);
-        
-        // Suture
-        ctx.moveTo(-w/2 - 20, y - 40);
-        ctx.lineTo(-w/2 - 20, y - h + 40);
-        ctx.lineTo(w/2 + 20, y - h + 40);
-        ctx.lineTo(w/2 + 20, y - 40);
-        ctx.closePath();
-        ctx.stroke();
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+		ctx.beginPath();
+
+		// Knot
+		ctx.arc(0, y - h + 40, 5, 0, Math.PI * 2, true);
+		ctx.lineTo(-20, y - h + 30);
+		ctx.moveTo(0, y - h + 40);
+		ctx.lineTo(20, y - h + 30);
+
+		// Suture
+		ctx.moveTo(-w / 2 - 20, y - 40);
+		ctx.lineTo(-w / 2 - 20, y - h + 40);
+		ctx.lineTo(w / 2 + 20, y - h + 40);
+		ctx.lineTo(w / 2 + 20, y - 40);
+		ctx.closePath();
+		ctx.stroke();
 	}
-	
+
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
-	
+
 	// Return value indicating successful hittest
 	return this.isClicked;
 }
@@ -146,8 +138,7 @@ ED.RadialSponge.prototype.draw = function(_point)
  *
  * @returns {String} Group description
  */
-ED.RadialSponge.prototype.groupDescription = function()
-{
+ED.RadialSponge.prototype.groupDescription = function() {
 	return "Radial sponge at ";
 }
 
@@ -156,8 +147,7 @@ ED.RadialSponge.prototype.groupDescription = function()
  *
  * @returns {String} Description of doodle
  */
-ED.RadialSponge.prototype.description = function()
-{
-    // Location (clockhours)
+ED.RadialSponge.prototype.description = function() {
+	// Location (clockhours)
 	return this.clockHour() + " o'clock";
 }
