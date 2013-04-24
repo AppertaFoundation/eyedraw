@@ -4330,6 +4330,16 @@ ED.Doodle.prototype.setParameterFromString = function(_parameter, _value)
                 this.updateDependentParameters(parameter);
             }
         }
+        
+		// Create notification message var messageArray = {eventName:_eventName, selectedDoodle:this.selectedDoodle, object:_object};
+		var object = new Object;
+		object.doodle = this;
+		object.parameter = _parameter;
+		object.value = _value;
+		object.oldValue = this[_parameter];
+	
+		// Trigger notification
+		this.drawing.notify('parameterChanged', object);
     }
     else
     {
@@ -4582,7 +4592,11 @@ ED.Doodle.prototype.addBinding = function(_parameter, _fieldParameters)
                     {
                         if (element.selectedIndex > -1)
                         {
-                            this.setParameterFromString(_parameter, element.options[element.selectedIndex].getAttribute(attribute));
+                        	// For parameters linked to a saved value, set value to that of bound element NB if this works, all the cases in this switch need updating
+                        	if (this.savedParams.indexOf(_parameter) < 0)
+                        	{
+                            	this.setParameterFromString(_parameter, element.options[element.selectedIndex].getAttribute(attribute));
+                            }
                         }
                         element.addEventListener('change', listener = function (event) {
                                              drawing.eventHandler('onchange', id, className, this.id, this.options[this.selectedIndex].getAttribute(attribute));                  
