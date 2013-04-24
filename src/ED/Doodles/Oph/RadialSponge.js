@@ -16,3 +16,148 @@
  * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
  */
 
+/**
+ * RadialSponge
+ *
+ * @class RadialSponge
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Int} _originX
+ * @param {Int} _originY
+ * @param {Float} _radius
+ * @param {Int} _apexX
+ * @param {Int} _apexY
+ * @param {Float} _scaleX
+ * @param {Float} _scaleY
+ * @param {Float} _arc
+ * @param {Float} _rotation
+ * @param {Int} _order
+ */
+ED.RadialSponge = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+{
+	// Set classname
+	this.className = "RadialSponge";
+
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.RadialSponge.prototype = new ED.Doodle;
+ED.RadialSponge.prototype.constructor = ED.RadialSponge;
+ED.RadialSponge.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets default dragging attributes
+ */
+ED.RadialSponge.prototype.setPropertyDefaults = function()
+{
+	this.isScaleable = false;
+	this.isMoveable = false;
+    this.addAtBack = true;
+}
+
+/**
+ * Sets default parameters
+ */
+ED.RadialSponge.prototype.setParameterDefaults = function()
+{
+    // Make rotation 30 degrees to last one of same class
+    var doodle = this.drawing.lastDoodleOfClass(this.className);
+    if (doodle)
+    {
+        this.rotation = doodle.rotation + Math.PI/6;
+    }
+    else
+    {
+        this.rotation = -60 * Math.PI/180
+    }
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.RadialSponge.prototype.draw = function(_point)
+{
+	// Get context
+	var ctx = this.drawing.context;
+	
+	// Call draw method in superclass
+	ED.RadialSponge.superclass.draw.call(this, _point);
+    
+    // Radii
+    var y = -220;
+    var h = 200;
+    var w = 80;
+    
+	// Boundary path
+	ctx.beginPath();
+    
+    ctx.moveTo(-w/2, y);
+    ctx.lineTo(-w/2, y - h);
+	ctx.lineTo(w/2, y - h);
+	ctx.lineTo(w/2, y);
+    
+	// Close path
+	ctx.closePath();
+    
+	// Set line attributes
+	ctx.lineWidth = 4;
+	ctx.fillStyle = "lightgray";
+	ctx.strokeStyle = "gray";
+	
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+	
+	// Other stuff here
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
+	{
+        ctx.beginPath();
+        
+        // Knot
+        ctx.arc(0, y - h + 40,5,0,Math.PI*2,true);
+        ctx.lineTo(-20, y - h + 30);
+        ctx.moveTo(0, y - h + 40);
+        ctx.lineTo(20, y - h + 30);
+        
+        // Suture
+        ctx.moveTo(-w/2 - 20, y - 40);
+        ctx.lineTo(-w/2 - 20, y - h + 40);
+        ctx.lineTo(w/2 + 20, y - h + 40);
+        ctx.lineTo(w/2 + 20, y - 40);
+        ctx.closePath();
+        ctx.stroke();
+	}
+	
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+	
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+
+/**
+ * Returns a String which, if not empty, determines the root descriptions of multiple instances of the doodle
+ *
+ * @returns {String} Group description
+ */
+ED.RadialSponge.prototype.groupDescription = function()
+{
+	return "Radial sponge at ";
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.RadialSponge.prototype.description = function()
+{
+    // Location (clockhours)
+	return this.clockHour() + " o'clock";
+}

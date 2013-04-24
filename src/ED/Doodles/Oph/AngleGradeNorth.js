@@ -16,3 +16,207 @@
  * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
  */
 
+/**
+ * AngleGradeNorth
+ *
+ * @class AngleGradeNorth
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Int} _originX
+ * @param {Int} _originY
+ * @param {Float} _radius
+ * @param {Int} _apexX
+ * @param {Int} _apexY
+ * @param {Float} _scaleX
+ * @param {Float} _scaleY
+ * @param {Float} _arc
+ * @param {Float} _rotation
+ * @param {Int} _order
+ */
+ED.AngleGradeNorth = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+{
+	// Set classname
+	this.className = "AngleGradeNorth";
+    
+	// Private parameters
+	this.rsl = 480;
+	this.rsli = 470;
+	this.rtmo = 404;
+	this.rtmi = 304;
+	this.rcbo = 270;
+	this.rcbi = 190;
+	this.riro = 190;
+	this.riri = 176;
+	this.rpu = 100;
+	
+    // Derived parameters (NB must set a value here to define parameter as a property of the object, even though value set later)
+    this.grade = "4";
+    this.seen = "Yes";
+
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.AngleGradeNorth.prototype = new ED.Doodle;
+ED.AngleGradeNorth.prototype.constructor = ED.AngleGradeNorth;
+ED.AngleGradeNorth.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.AngleGradeNorth.prototype.setHandles = function()
+{
+    this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+}
+
+/**
+ * Sets default dragging attributes
+ */
+ED.AngleGradeNorth.prototype.setPropertyDefaults = function()
+{
+    this.isDeletable = false;
+	this.isScaleable = false;
+	this.isMoveable = false;
+	this.isRotatable = false;
+    
+    // Update component of validation array for simple parameters
+    this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.125, +1.5);
+    this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.125, +1.5);
+    this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
+    this.parameterValidationArray['apexY']['range'].setMinAndMax(-this.rsli, -this.riri);
+    
+    // Add complete validation arrays for derived parameters
+    this.parameterValidationArray['grade'] = {kind:'derived', type:'string', list:['4', '3', '2', '1', '0'], animate:true};
+    this.parameterValidationArray['seen'] = {kind:'derived', type:'string', list:['Yes', 'No'], animate:true};
+}
+
+/**
+ * Sets default parameters
+ */
+ED.AngleGradeNorth.prototype.setParameterDefaults = function()
+{
+    this.arc = 90 * Math.PI/180;
+    this.apexY = -this.riri;
+    this.setParameterFromString('grade', '4');
+    this.setParameterFromString('seen', 'Yes');
+}
+
+/**
+ * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
+ * The returned parameters are animated if their 'animate' property is set to true
+ *
+ * @param {String} _parameter Name of parameter that has changed
+ * @value {Undefined} _value Value of parameter to calculate
+ * @returns {Array} Associative array of values of dependent parameters
+ */
+ED.AngleGradeNorth.prototype.dependentParameterValues = function(_parameter, _value)
+{
+    var returnArray = new Array();
+    
+    switch (_parameter)
+    {
+        case 'apexY':
+            // Return value uses Schaffer classificaton (although visibility is based on Scheie)
+            var returnValue = "4";
+            if (-_value >= this.riro) returnValue = "3";
+            if (-_value >= this.rcbo) returnValue = "2";
+            if (-_value >= this.rtmo) returnValue = "1";
+            if (-_value >= this.rsli) returnValue = "0";
+            returnArray['grade'] = returnValue;
+            returnArray['seen'] = (-_value >= this.rtmo) ? 'No' : 'Yes';
+            break;
+            
+        case 'grade':
+            var returnValue = "";
+            switch (_value)
+            {
+                case '0':
+                    if (-this.apexY >= this.rsli) returnValue = this.apexY;
+                    else returnValue = -this.rsli;
+                    break;
+                case '1':
+                    if (-this.apexY >= this.rtmo && -this.apexY < this.rsli) returnValue = this.apexY;
+                    else returnValue = -this.rtmo;
+                    break;
+                case '2':
+                    if (-this.apexY >= this.rcbo && -this.apexY < this.rtmo) returnValue = this.apexY;
+                    else returnValue = -360; //-this.rcbo;
+                    break;
+                case '3':
+                    if (-this.apexY >= this.riro && -this.apexY < this.rcbo) returnValue = this.apexY;
+                    else returnValue = -230; //-this.riro;
+                    break;
+                case '4':
+                    if (-this.apexY >= this.riri && -this.apexY < this.riro) returnValue = this.apexY;
+                    else returnValue= -this.riri;
+                    break;
+            }
+            returnArray['apexY'] = returnValue;
+            break;
+            
+        case 'seen':
+            var returnValue = "";
+            switch (_value)
+            {
+	            case 'No':
+	              if (-this.apexY >= this.rtmo) returnValue = this.apexY;
+	              else returnValue = -this.rtmo;
+	              break;
+	            case 'Yes':
+	              if (-this.apexY < this.rtmo) returnValue = this.apexY;
+	              else returnValue = -this.riri;
+	              break;
+            }
+            returnArray['apexY'] = returnValue;
+            break;
+    }
+    
+    return returnArray;
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.AngleGradeNorth.prototype.draw = function(_point)
+{
+	// Get context
+	var ctx = this.drawing.context;
+	
+	// Call draw method in superclass
+	ED.AngleGradeNorth.superclass.draw.call(this, _point);
+	
+	// Calculate parameters for arcs
+	var theta = this.arc/2;
+	var arcStart = - Math.PI/2 + theta;
+	var arcEnd = - Math.PI/2 - theta;
+    
+	// Boundary path
+	ctx.beginPath();
+  
+    // Arc across, move to inner and arc back
+	ctx.arc(0, 0, -this.apexY, arcStart, arcEnd, true);
+	ctx.arc(0, 0, this.rpu, arcEnd, arcStart, false);
+    ctx.closePath();
+    
+    // Set fill attributes (same colour as Iris)
+    ctx.fillStyle = "rgba(100, 200, 250, 1.0)";
+	ctx.strokeStyle = "rgba(100, 100, 100, 1.0)";
+    ctx.lineWidth = 4;
+	
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+	
+	// Coordinates of handles (in canvas plane)
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
+	
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+	
+	// Return value indicating successful hittest
+	return this.isClicked;
+}

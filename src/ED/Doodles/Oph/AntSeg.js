@@ -130,19 +130,6 @@ ED.AntSeg.prototype.dependentParameterValues = function(_parameter, _value)
                     break;
             }
             break;
-
-            /*
-        case 'apexX':
-            if (_value < -5) returnArray['pxe'] = false;
-            else returnArray['pxe'] = true;
-            break;
-
-            
-        case 'pxe':
-            if (this.pxe) returnArray['apexX'] = +50;
-            else returnArray['apexX'] = -50;
-            break;
-             */
     }
     
     return returnArray;
@@ -184,7 +171,6 @@ ED.AntSeg.prototype.draw = function(_point)
 	// Set line attributes
 	ctx.lineWidth = 4;
 	ctx.fillStyle = "rgba(100, 200, 250, 0.5)";
-	//ctx.fillStyle = "rgba(255, 160, 40, 0.9)";
 	ctx.strokeStyle = "gray";
 	
 	// Draw boundary path (also hit testing)

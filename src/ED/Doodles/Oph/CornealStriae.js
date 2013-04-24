@@ -16,3 +16,139 @@
  * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
  */
 
+/**
+ * Corneal Striae
+ *
+ * @class CornealStriae
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Int} _originX
+ * @param {Int} _originY
+ * @param {Float} _radius
+ * @param {Int} _apexX
+ * @param {Int} _apexY
+ * @param {Float} _scaleX
+ * @param {Float} _scaleY
+ * @param {Float} _arc
+ * @param {Float} _rotation
+ * @param {Int} _order
+ */
+ED.CornealStriae = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+{
+	// Set classname
+	this.className = "CornealStriae";
+
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.CornealStriae.prototype = new ED.Doodle;
+ED.CornealStriae.prototype.constructor = ED.CornealStriae;
+ED.CornealStriae.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+// ED.CornealStriae.prototype.setHandles = function()
+// {
+//     this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+// }
+
+/**
+ * Sets default dragging attributes
+ */
+ED.CornealStriae.prototype.setPropertyDefaults = function()
+{
+	this.isMoveable = false;
+	this.isRotatable = false;
+	
+    // Update component of validation array for simple parameters
+    this.parameterValidationArray['apexX']['range'].setMinAndMax(-50, +50);
+    this.parameterValidationArray['apexY']['range'].setMinAndMax(-380, -100);
+}
+
+/**
+ * Sets default parameters
+ */
+ED.CornealStriae.prototype.setParameterDefaults = function()
+{
+	this.apexY = -350;
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.CornealStriae.prototype.draw = function(_point)
+{
+	// Get context
+	var ctx = this.drawing.context;
+	
+	// Call draw method in superclass
+	ED.CornealStriae.superclass.draw.call(this, _point);
+	
+	// Boundary path
+	ctx.beginPath();
+    
+	// CornealStriae
+    var r = -this.apexY;
+	ctx.arc(0, 0, r, 0, Math.PI * 2, false);
+    
+	// Close path
+	ctx.closePath();
+    
+    // Create fill
+    ctx.fillStyle = "rgba(100,100,100,0)";
+	ctx.strokeStyle = "rgba(100,100,100,0)";
+	
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+	
+	// Non-boundary paths
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
+	{
+		var st = -300;
+		var d = 50;
+		var w = 30;
+		var s = 80;
+		var x =  - 2 * s;
+		
+		ctx.beginPath();
+
+		for (var i = 0; i < 5; i ++)
+		{
+			ctx.moveTo(x + s * i, st);
+			ctx.bezierCurveTo(x + s * i - w, st + 1 * d, x + s * i - w, st + 2 * d, x + s * i, st + 3 * d);
+			ctx.bezierCurveTo(x + s * i + w, st + 4 * d, x + s * i + w, st + 5 * d, x + s * i, st + 6 * d);
+			ctx.bezierCurveTo(x + s * i - w, st + 7 * d, x + s * i - w, st+ 8 * d, x + s * i, st + 9 * d);
+			ctx.bezierCurveTo(x + s * i + w, st + 10 * d, x + s * i + w, st + 11 * d, x + s * i, st + 12 * d);		
+		}
+		
+		ctx.lineWidth = 20;
+		ctx.strokeStyle = "rgba(100,100,100,0.6)";
+		ctx.stroke();
+	}
+	
+	// Coordinates of handles (in canvas plane)
+//     this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
+	
+	// Draw handles if selected
+// 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+	
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.CornealStriae.prototype.description = function()
+{
+	return "Striate keratopathy";
+}

@@ -16,3 +16,125 @@
  * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
  */
 
+/**
+ * Vicryl suture
+ *
+ * @class Vicryl
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Int} _originX
+ * @param {Int} _originY
+ * @param {Float} _radius
+ * @param {Int} _apexX
+ * @param {Int} _apexY
+ * @param {Float} _scaleX
+ * @param {Float} _scaleY
+ * @param {Float} _arc
+ * @param {Float} _rotation
+ * @param {Int} _order
+ */
+ED.Vicryl = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+{	
+	// Set classname
+	this.className = "Vicryl";
+
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.Vicryl.prototype = new ED.Doodle;
+ED.Vicryl.prototype.constructor = ED.Vicryl;
+ED.Vicryl.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets default dragging attributes
+ */
+ED.Vicryl.prototype.setPropertyDefaults = function()
+{
+	this.isOrientated = true;
+	this.isRotatable = false;
+}
+
+/**
+ * Sets default parameters
+ */
+ED.Vicryl.prototype.setParameterDefaults = function()
+{
+    this.originY = -240;
+    this.apexY = 400;
+    
+    // Tubes are usually STQ
+    if(this.drawing.eye == ED.eye.Right)
+    {
+        this.originX = -240;        
+        this.rotation = -Math.PI/4;
+    }
+    else
+    {
+        this.originX = 240;
+        this.rotation = Math.PI/4;
+    }
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.Vicryl.prototype.draw = function(_point)
+{
+	// Get context
+	var ctx = this.drawing.context;
+
+	// Call draw method in superclass
+	ED.Vicryl.superclass.draw.call(this, _point);
+    
+	// Boundary path
+	ctx.beginPath();
+    
+    // Use arcTo to create an ellipsoid
+    ctx.moveTo(-20, 0);
+    ctx.arcTo(0, -20, 20, 0, 30); 
+    ctx.arcTo(0, 20, -20, 0, 30);
+    
+	// Set line attributes
+	ctx.lineWidth = 4;
+	ctx.fillStyle = "rgba(0, 0, 0, 0)";
+	ctx.strokeStyle = "purple";
+	
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+	
+	// Other stuff here
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
+	{
+        // Ends of suture
+        ctx.beginPath();
+        ctx.moveTo(35, -10);
+        ctx.lineTo(20, 0);
+        ctx.lineTo(35, 10); 
+        ctx.stroke();
+        
+        // Knot
+        this.drawSpot(ctx, 20, 0, 4, "purple");
+ 	}
+	
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+ 	
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.Vicryl.prototype.description = function()
+{
+	return "Vicryl suture";
+}

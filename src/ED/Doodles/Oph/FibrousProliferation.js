@@ -16,3 +16,124 @@
  * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
  */
 
+/**
+ * Fibrous Proliferation
+ *
+ * @class FibrousProliferation
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Int} _originX
+ * @param {Int} _originY
+ * @param {Float} _radius
+ * @param {Int} _apexX
+ * @param {Int} _apexY
+ * @param {Float} _scaleX
+ * @param {Float} _scaleY
+ * @param {Float} _arc
+ * @param {Float} _rotation
+ * @param {Int} _order
+ */
+ED.FibrousProliferation = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+{
+	// Set classname
+	this.className = "FibrousProliferation";
+    
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.FibrousProliferation.prototype = new ED.Doodle;
+ED.FibrousProliferation.prototype.constructor = ED.FibrousProliferation;
+ED.FibrousProliferation.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.FibrousProliferation.prototype.setHandles = function()
+{
+    this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, true);
+}
+
+/**
+ * Set default properties
+ */
+ED.FibrousProliferation.prototype.setPropertyDefaults = function()
+{
+    this.isSqueezable = true;
+
+    this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.5, +2);
+    this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.5, +2);
+}
+
+/**
+ * Sets default parameters (Only called for new doodles)
+ * Use the setParameter function for derived parameters, as this will also update dependent variables
+ */
+ED.FibrousProliferation.prototype.setParameterDefaults = function()
+{
+    this.setOriginWithDisplacements(-200, 150);
+    this.rotation = -Math.PI/4;
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.FibrousProliferation.prototype.draw = function(_point)
+{
+	// Get context
+	var ctx = this.drawing.context;
+	
+	// Call draw method in superclass
+	ED.FibrousProliferation.superclass.draw.call(this, _point);
+    
+    // Dimensions
+    var w = 180;
+    var h = 70;
+    var wc = w * 0.6;
+    var hc = h * 0.2;
+    
+	// Boundary path
+	ctx.beginPath();
+    
+    // Patch with scalloped edges
+    ctx.moveTo(-w, -h);
+    ctx.bezierCurveTo(-wc, -hc, wc, -hc, w, -h);
+    ctx.bezierCurveTo(wc, -hc, wc, hc, w, h);
+    ctx.bezierCurveTo(wc, hc, -wc, hc, -w, h);
+    ctx.bezierCurveTo(-wc, hc, -wc, -hc, -w, -h);
+    
+    // Close path
+    ctx.closePath();
+    
+	// Set attributes
+	ctx.lineWidth = 1;
+	ctx.strokeStyle = "rgba(120,120,120,0.5)";
+    ctx.fillStyle = "rgba(120,120,120,0.5)";
+	
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+    
+    // Coordinates of handles (in canvas plane)
+    this.handleArray[2].location = this.transform.transformPoint(new ED.Point(w, -h));
+	
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+    
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.FibrousProliferation.prototype.description = function()
+{
+    return "Fibrous proliferation";
+}

@@ -16,3 +16,117 @@
  * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
  */
 
+/**
+ * Iatrogenic break
+ *
+ * @class IatrogenicBreak
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Int} _originX
+ * @param {Int} _originY
+ * @param {Float} _radius
+ * @param {Int} _apexX
+ * @param {Int} _apexY
+ * @param {Float} _scaleX
+ * @param {Float} _scaleY
+ * @param {Float} _arc
+ * @param {Float} _rotation
+ * @param {Int} _order
+ */
+ED.IatrogenicBreak = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+{
+	// Set classname
+	this.className = "IatrogenicBreak";
+	
+    // Call superclass constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.IatrogenicBreak.prototype = new ED.Doodle;
+ED.IatrogenicBreak.prototype.constructor = ED.IatrogenicBreak;
+ED.IatrogenicBreak.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.IatrogenicBreak.prototype.setHandles = function()
+{
+	this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, true);
+}
+
+/**
+ * Sets default properties
+ */
+ED.IatrogenicBreak.prototype.setPropertyDefaults = function()
+{
+    // Update component of validation array for simple parameters
+    this.parameterValidationArray['scaleX']['range'].setMinAndMax(0.8, 2);
+    this.parameterValidationArray['scaleY']['range'].setMinAndMax(0.8, 2);
+}
+
+/**
+ * Sets default parameters (Only called for new doodles)
+ * Use the setParameter function for derived parameters, as this will also update dependent variables
+ */
+ED.IatrogenicBreak.prototype.setParameterDefaults = function()
+{
+    this.setOriginWithDisplacements(240, -50);
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.IatrogenicBreak.prototype.draw = function(_point)
+{
+	// Get context
+	var ctx = this.drawing.context;
+	
+	// Call draw method in superclass
+	ED.IatrogenicBreak.superclass.draw.call(this, _point);
+	
+	// Boundary path
+	ctx.beginPath();
+	
+	// Oval break
+    var d = 40;
+    var p = 0.8;
+    var sp = new ED.Point(-d,d);
+    var ep = new ED.Point(d,-d);
+    
+    // Oval shape
+    ctx.moveTo(sp.x, sp.y);
+    ctx.bezierCurveTo(sp.x, sp.y - p * d, ep.x - p * d, ep.y, ep.x, ep.y);
+    ctx.bezierCurveTo(ep.x, ep.y + p * d, sp.x + p * d, sp.y, sp.x, sp.y);
+	
+	// Set line attributes
+	ctx.lineWidth = 4;
+	ctx.fillStyle = "red";
+	ctx.strokeStyle = "blue";
+	
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+	
+	// Coordinates of handles (in canvas plane)
+	this.handleArray[2].location = this.transform.transformPoint(ep);
+	
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+	
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.IatrogenicBreak.prototype.description = function()
+{
+    return "Iatrogenic break in " + this.quadrant();
+}

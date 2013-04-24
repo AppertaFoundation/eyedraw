@@ -16,3 +16,138 @@
  * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
  */
 
+/**
+ * Subretinal heavy liquid
+ *
+ * @class SubretinalPFCL
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Int} _originX
+ * @param {Int} _originY
+ * @param {Int} _apexX
+ * @param {Int} _apexY
+ * @param {Float} _scaleX
+ * @param {Float} _scaleY
+ * @param {Float} _arc
+ * @param {Float} _rotation
+ * @param {Int} _order
+ */
+ED.SubretinalPFCL = function(_drawing, _originX, _originY, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+{
+	// Set classname
+	this.className = "SubretinalPFCL";
+    
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.SubretinalPFCL.prototype = new ED.Doodle;
+ED.SubretinalPFCL.prototype.constructor = ED.SubretinalPFCL;
+ED.SubretinalPFCL.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.SubretinalPFCL.prototype.setHandles = function()
+{
+	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+}
+
+/**
+ * Sets default properties
+ */
+ED.SubretinalPFCL.prototype.setPropertyDefaults = function()
+{
+    this.addAtBack = true;
+    
+    // Update component of validation array for simple parameters
+    this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
+    this.parameterValidationArray['apexY']['range'].setMinAndMax(-80, -20);
+}
+
+/**
+ * Sets default parameters
+ */
+ED.SubretinalPFCL.prototype.setParameterDefaults = function()
+{
+    this.apexY = -40;
+    
+    // Put control handle at 45 degrees
+    this.rotation = Math.PI/4;
+    
+    // Displacement from fovea, and from last doodle
+    var doodle = this.drawing.lastDoodleOfClass(this.className);
+    if (doodle)
+    {
+        var p = new ED.Point(doodle.originX, doodle.originY);
+        
+        var np = new ED.Point(0,0);
+        np.setWithPolars(p.length(), p.direction() + Math.PI/6);
+        
+        this.move(np.x, np.y);
+    }
+    else
+    {
+        this.move((this.drawing.eye == ED.eye.Right?-1:1) * 200, 0);
+    }
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.SubretinalPFCL.prototype.draw = function(_point)
+{
+	// Get context
+	var ctx = this.drawing.context;
+	
+	// Call draw method in superclass
+	ED.SubretinalPFCL.superclass.draw.call(this, _point);
+	
+	// Boundary path
+	ctx.beginPath();
+	
+	// Radius 
+    var r = Math.sqrt(this.apexX * this.apexX + this.apexY * this.apexY);
+    
+    // Circular bleb
+	ctx.arc(0, 0, r, 0, 2 * Math.PI, true);
+	
+	// Set line attributes
+	ctx.lineWidth = 1;
+    
+    var d = r/1.1412135
+    var lingrad = ctx.createLinearGradient(-d,-d,d,d);
+    lingrad.addColorStop(0, 'rgba(255,255,255,1)');
+    lingrad.addColorStop(0.7, 'rgba(200,200,200,1)');
+    lingrad.addColorStop(1, 'rgba(140,140,140,1)');
+    
+    ctx.fillStyle = lingrad
+	ctx.strokeStyle = "gray";
+	
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+	
+	// Coordinates of handles (in canvas plane)
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
+	
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+	
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.SubretinalPFCL.prototype.groupDescription = function()
+{
+	return "Subretinal PFCL";
+}

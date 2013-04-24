@@ -16,3 +16,140 @@
  * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
  */
 
+/**
+ * ArcuateScotoma
+ *
+ * @class ArcuateScotoma
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Int} _originX
+ * @param {Int} _originY
+ * @param {Float} _radius
+ * @param {Int} _apexX
+ * @param {Int} _apexY
+ * @param {Float} _scaleX
+ * @param {Float} _scaleY
+ * @param {Float} _arc
+ * @param {Float} _rotation
+ * @param {Int} _order
+ */
+ED.ArcuateScotoma = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+{
+	// Set classname
+	this.className = "ArcuateScotoma";
+    
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.ArcuateScotoma.prototype = new ED.Doodle;
+ED.ArcuateScotoma.prototype.constructor = ED.ArcuateScotoma;
+ED.ArcuateScotoma.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.ArcuateScotoma.prototype.setHandles = function()
+{
+	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+}
+
+/**
+ * Sets default dragging attributes
+ */
+ED.ArcuateScotoma.prototype.setPropertyDefaults = function()
+{
+	this.isScaleable = false;
+	this.isMoveable = false;
+    this.isRotatable = false;
+    this.isArcSymmetrical = true;
+    
+    // Update component of validation array for simple parameters
+    this.parameterValidationArray['apexX']['range'].setMinAndMax(140, +300);
+    this.parameterValidationArray['apexY']['range'].setMinAndMax(-0, +0);
+}
+
+/**
+ * Sets default parameters
+ */
+ED.ArcuateScotoma.prototype.setParameterDefaults = function()
+{
+    // Default arc
+    this.arc = 60 * Math.PI/180;
+    this.apexX = 200;
+    
+    // Eye
+    if (this.drawing.eye == ED.eye.Left) this.scaleX = this.scaleX * -1;
+    
+    // Make a second one opposite to the first
+    var doodle = this.drawing.lastDoodleOfClass(this.className);
+    if (doodle)
+    {
+        this.scaleY = doodle.scaleY * -1;
+    }
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.ArcuateScotoma.prototype.draw = function(_point)
+{
+	// Get context
+	var ctx = this.drawing.context;
+
+	// Call draw method in superclass
+	ED.ArcuateScotoma.superclass.draw.call(this, _point);
+
+    // Dimensions
+    var bs = -100;
+    var be = 100;
+    var ts = -140;
+    
+    var r = (be - bs)/2;
+    var x = bs + r;
+    
+    // Boundary path
+	ctx.beginPath();
+    
+    // Arcuate scotoma base
+    ctx.arc(x, 0, r, - Math.PI, 0, false);
+    ctx.lineTo(this.apexX, 0);
+    
+    // Arcuate scotoma top
+    r = (this.apexX - ts)/2;
+    x = ts + r;
+    ctx.arc(x, 0, r, 0, - Math.PI, true);
+	ctx.closePath();
+    
+    // Set attributes
+	ctx.lineWidth = 6;
+    ctx.fillStyle = "gray";
+	ctx.strokeStyle = "black";
+    
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+    
+    // Coordinates of handles (in canvas plane)
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
+    
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.ArcuateScotoma.prototype.description = function()
+{
+    return this.scaleY > 0?"Superior":"Inferior" +  " arcuate scotoma";
+}

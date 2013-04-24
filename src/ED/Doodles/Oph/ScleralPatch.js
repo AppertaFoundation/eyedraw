@@ -17,9 +17,9 @@
  */
 
 /**
- * OpticDiscPit Acquired Pit of Optic Nerve (APON)
+ * Scleral Patch
  *
- * @class OpticDiscPit
+ * @class ScleralPatch
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
  * @param {Int} _originX
@@ -33,10 +33,10 @@
  * @param {Float} _rotation
  * @param {Int} _order
  */
-ED.OpticDiscPit = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+ED.ScleralPatch = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
 {
 	// Set classname
-	this.className = "OpticDiscPit";
+	this.className = "Patch";
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
@@ -45,51 +45,51 @@ ED.OpticDiscPit = function(_drawing, _originX, _originY, _radius, _apexX, _apexY
 /**
  * Sets superclass and constructor
  */
-ED.OpticDiscPit.prototype = new ED.Doodle;
-ED.OpticDiscPit.prototype.constructor = ED.OpticDiscPit;
-ED.OpticDiscPit.superclass = ED.Doodle.prototype;
+ED.ScleralPatch.prototype = new ED.Doodle;
+ED.ScleralPatch.prototype.constructor = ED.ScleralPatch;
+ED.ScleralPatch.superclass = ED.Doodle.prototype;
 
 /**
  * Sets handle attributes
  */
-ED.OpticDiscPit.prototype.setHandles = function()
+ED.ScleralPatch.prototype.setHandles = function()
 {
-    this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, false);
+    this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
 }
 
 /**
  * Sets default dragging attributes
  */
-ED.OpticDiscPit.prototype.setPropertyDefaults = function()
+ED.ScleralPatch.prototype.setPropertyDefaults = function()
 {
-	this.isSqueezable = true;
-    this.isUnique = true;
+	this.isOrientated = true;
     
     // Update component of validation array for simple parameters
-    this.parameterValidationArray['originX']['range'].setMinAndMax(-150, +150);
-    this.parameterValidationArray['originY']['range'].setMinAndMax(-150, +150);
-    this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.5, +3);
-    this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.5, +3);
+    this.parameterValidationArray['apexX']['range'].setMinAndMax(-20, +200);
+    this.parameterValidationArray['apexY']['range'].setMinAndMax(-200, -20);
 }
 
 /**
  * Sets default parameters
  */
-ED.OpticDiscPit.prototype.setParameterDefaults = function()
+ED.ScleralPatch.prototype.setParameterDefaults = function()
 {
-    this.originY = 130;
-    this.apexY = 0;
-    this.scaleX = 1.5;
+    this.apexX = 50;
+    this.apexY = -70;
+    this.originY = -260;
     
-    // Pits are usually STQ
-    if(this.drawing.eye == ED.eye.Right)
-    {
-        this.originX = -50;
-    }
-    else
-    {
-        this.originX = 50;
-    }
+    
+    // Patchs are usually temporal
+//    if(this.drawing.eye == ED.eye.Right)
+//    {
+//        this.originX = -260;
+//        this.rotation = -Math.PI/4;
+//    }
+//    else
+//    {
+//        this.originX = 260;
+//        this.rotation = Math.PI/4;
+//    }
 }
 
 /**
@@ -97,44 +97,55 @@ ED.OpticDiscPit.prototype.setParameterDefaults = function()
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.OpticDiscPit.prototype.draw = function(_point)
+ED.ScleralPatch.prototype.draw = function(_point)
 {
 	// Get context
 	var ctx = this.drawing.context;
-    
-	// Call draw method in superclass
-	ED.OpticDiscPit.superclass.draw.call(this, _point);
-    
-	// Boundary path
-	ctx.beginPath();
 	
-	// Round hole
-    var r = 80;
-	ctx.arc(0, 0, r, 0, Math.PI*2, true);
+	// Call draw method in superclass
+	ED.ScleralPatch.superclass.draw.call(this, _point);
+    
+    // Boundary path
+	ctx.beginPath();
+    
+    ctx.rect(-this.apexX, this.apexY, Math.abs(2 * this.apexX), Math.abs(2 * this.apexY));
     
 	// Close path
 	ctx.closePath();
     
-    // Radial gradient
-    var lightGray = "rgba(200, 200, 200, 0.75)";
-    var darkGray = "rgba(100, 100, 100, 0.75)";
-    var gradient = ctx.createRadialGradient(0, 0, r, 0, 0, 10);
-    gradient.addColorStop(0, darkGray);
-    gradient.addColorStop(1, lightGray);
+    // Colour of fill
+    ctx.fillStyle = "rgba(200,200,50,0.5)";
+    ctx.strokeStyle = "rgba(120,120,120,0)";
     
-	ctx.fillStyle = gradient;
-	ctx.lineWidth = 2;
-	ctx.strokeStyle = "gray";
-	
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
+	
+	// Other stuff here
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
+    {
+//        // Suture knots
+//        this.drawSpot(ctx, -50, -50, 5, "blue");
+//        this.drawSpot(ctx, -50, 50, 5, "blue");
+//        this.drawSpot(ctx, 50, -50, 5, "blue");
+//        this.drawSpot(ctx, 50, 50, 5, "blue");
+//        
+//        // Suture thread ends
+//        this.drawLine(ctx, -60, -60, -50, -50, 2, "blue");
+//        this.drawLine(ctx, -50, -50, -60, -40, 2, "blue");
+//        this.drawLine(ctx, -60, 60, -50, 50, 2, "blue");
+//        this.drawLine(ctx, -50, 50, -60, 40, 2, "blue");
+//        this.drawLine(ctx, 60, -60, 50, -50, 2, "blue");
+//        this.drawLine(ctx, 50, -50, 60, -40, 2, "blue");
+//        this.drawLine(ctx, 60, 60, 50, 50, 2, "blue");
+//        this.drawLine(ctx, 50, 50, 60, 40, 2, "blue");
+	}
     
     // Coordinates of handles (in canvas plane)
-	this.handleArray[2].location = this.transform.transformPoint(new ED.Point(55, -55));
+    this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
     
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
- 	
+	
 	// Return value indicating successful hittest
 	return this.isClicked;
 }
@@ -144,7 +155,7 @@ ED.OpticDiscPit.prototype.draw = function(_point)
  *
  * @returns {String} Description of doodle
  */
-ED.OpticDiscPit.prototype.description = function()
+ED.ScleralPatch.prototype.description = function()
 {
-    return "Acquired pit of optic nerve";
+    return "Scleral patch";
 }

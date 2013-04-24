@@ -16,3 +16,126 @@
  * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
  */
 
+/**
+ * Fundus template with disc and arcades, extends to ora. Natively right eye, flipFundus for left eye
+ *
+ * @class Fundus
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Int} _originX
+ * @param {Int} _originY
+ * @param {Float} _radius
+ * @param {Int} _apexX
+ * @param {Int} _apexY
+ * @param {Float} _scaleX
+ * @param {Float} _scaleY
+ * @param {Float} _arc
+ * @param {Float} _rotation
+ * @param {Int} _order
+ */
+ED.Fundus = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+{
+	// Set classname
+	this.className = "Fundus";
+    
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.Fundus.prototype = new ED.Doodle;
+ED.Fundus.prototype.constructor = ED.Fundus;
+ED.Fundus.superclass = ED.Doodle.prototype;
+
+/**
+ * Set default properties
+ */
+ED.Fundus.prototype.setPropertyDefaults = function()
+{
+	this.isSelectable = false;
+    this.isDeletable = false;
+    this.isFilled = false;
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.Fundus.prototype.draw = function(_point)
+{
+	// Get context
+	var ctx = this.drawing.context;
+	
+	// Call draw method in superclass
+	ED.Fundus.superclass.draw.call(this, _point);
+    
+	// Boundary path
+	ctx.beginPath();
+	
+	// Ora
+	ctx.arc(0,0,480,0,Math.PI*2,true);
+	
+	// Close path
+	ctx.closePath();
+	
+	// Set line attributes
+	ctx.lineWidth = 2;
+	ctx.strokeStyle = "red";
+	
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+	
+	// Non boundary paths
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
+	{
+		// These values different for right and left side
+		if(this.drawing.eye != ED.eye.Right)
+		{
+			var startX = 200;
+			var midX = 100;
+			var ctrlX = -50;
+			var endX = -100;
+			var foveaX = 100;
+		}
+		else
+		{
+			var startX = -200;
+			var midX = -100;
+			var ctrlX = 50;
+			var endX = 100;
+			var foveaX = -100;
+		}
+		
+		// Superior arcades
+		ctx.moveTo(startX, -50);
+		ctx.bezierCurveTo(midX, -166, 0, -62, 0, -12);
+		ctx.bezierCurveTo(0, -40, ctrlX, -100, endX, -50);
+		
+		// Inferior arcades
+		ctx.moveTo(startX, 50);
+		ctx.bezierCurveTo(midX, 166, 0, 62, 0, 12);
+		ctx.bezierCurveTo(0, 40, ctrlX, 100, endX, 50);
+		
+		// Small cross marking fovea
+		var crossLength = 10;
+		ctx.moveTo(foveaX, -crossLength);
+		ctx.lineTo(foveaX, crossLength);
+		ctx.moveTo(foveaX - crossLength, 0);
+		ctx.lineTo(foveaX + crossLength, 0);
+		
+		// Optic disc and cup
+		ctx.moveTo(25, 0);
+		ctx.arc(0,0,25,0,Math.PI*2,true);
+		ctx.moveTo(12, 0);
+		ctx.arc(0,0,12,0,Math.PI*2,true);
+		
+		// Draw it
+		ctx.stroke();
+	}
+	
+	// Return value indicating successful hittest
+	return this.isClicked;
+}

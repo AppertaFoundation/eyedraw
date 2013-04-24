@@ -16,3 +16,122 @@
  * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
  */
 
+/**
+ * Entry Site Break
+ *
+ * @class EntrySiteBreak
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Int} _originX
+ * @param {Int} _originY
+ * @param {Float} _radius
+ * @param {Int} _apexX
+ * @param {Int} _apexY
+ * @param {Float} _scaleX
+ * @param {Float} _scaleY
+ * @param {Float} _arc
+ * @param {Float} _rotation
+ * @param {Int} _order
+ */
+ED.EntrySiteBreak = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+{
+	// Set classname
+	this.className = "EntrySiteBreak";
+    
+	// Call super-class constructor
+	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.EntrySiteBreak.prototype = new ED.Doodle;
+ED.EntrySiteBreak.prototype.constructor = ED.EntrySiteBreak;
+ED.EntrySiteBreak.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.EntrySiteBreak.prototype.setHandles = function()
+{
+	this.handleArray[0] = new ED.Handle(null, true, ED.Mode.Arc, false);
+	this.handleArray[3] = new ED.Handle(null, true, ED.Mode.Arc, false);
+}
+
+/**
+ * Sets default properties
+ */
+ED.EntrySiteBreak.prototype.setPropertyDefaults = function()
+{
+	this.isMoveable = false;
+    this.isArcSymmetrical = true;
+    
+    // Update component of validation array for simple parameters
+    this.parameterValidationArray['arc']['range'].setMinAndMax(Math.PI/16, 3 * Math.PI/16);
+}
+
+/**
+ * Sets default parameters (Only called for new doodles)
+ * Use the setParameter function for derived parameters, as this will also update dependent variables
+ */
+ED.EntrySiteBreak.prototype.setParameterDefaults = function()
+{
+    this.arc = Math.PI/8;
+    this.setRotationWithDisplacements(60, -120);
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.EntrySiteBreak.prototype.draw = function(_point)
+{
+	// Get context
+	var ctx = this.drawing.context;
+	
+	// Call draw method in superclass
+	ED.EntrySiteBreak.superclass.draw.call(this, _point);
+    
+	// Radius of outer curve just inside ora on right and left fundus diagrams
+	var ro = 460;
+    var ri = 400;
+	
+	// Calculate parameters for arcs
+	var theta = this.arc/2;
+	var arcStart = - Math.PI/2 + theta;
+	var arcEnd = - Math.PI/2 - theta;
+    
+    // Coordinates of 'corners' of EntrySiteBreak
+	var topRightX = ro * Math.sin(theta);
+	var topRightY = - ro * Math.cos(theta);
+	var topLeftX = - ro * Math.sin(theta);
+	var topLeftY = topRightY;
+    
+	// Boundary path
+	ctx.beginPath();
+    
+	// Arc across to mirror image point on the other side
+	ctx.arc(0, 0, ro, arcStart, arcEnd, true);
+    
+	// Curve gracefull to start again
+	ctx.bezierCurveTo(0, -ri, 0, -ri, topRightX, topRightY);
+	
+	// Set line attributes
+	ctx.lineWidth = 4;
+	ctx.fillStyle = "red";
+	ctx.strokeStyle = "blue";
+	
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+    
+	// Coordinates of handles (in canvas plane)
+	this.handleArray[0].location = this.transform.transformPoint(new ED.Point(topLeftX, topLeftY));
+	this.handleArray[3].location = this.transform.transformPoint(new ED.Point(topRightX, topRightY));
+	
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+    
+	// Return value indicating successful hit test
+	return this.isClicked;
+}
