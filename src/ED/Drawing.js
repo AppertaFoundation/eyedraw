@@ -1086,19 +1086,28 @@ ED.Drawing.prototype.mousemove = function(_point) {
 						rotationCorrection = -1;
 					}
 
-					// Check for permitted range and stop dragging if exceeded
-					if (doodle.parameterValidationArray['arc']['range'].isBelow(doodle.arc + deltaAngle)) {
-						deltaAngle = doodle.parameterValidationArray['arc']['range'].min - doodle.arc;
-						doodle.setSimpleParameter('arc', doodle.parameterValidationArray['arc']['range'].min);
-						this.mode = ED.Mode.None;
-					} else if (doodle.parameterValidationArray['arc']['range'].isAbove(doodle.arc + deltaAngle)) {
-
-						deltaAngle = doodle.parameterValidationArray['arc']['range'].max - doodle.arc;
-						//doodle.arc = doodle.parameterValidationArray['arc']['range'].max;
-						doodle.setSimpleParameter('arc', doodle.parameterValidationArray['arc']['range'].max);
-						this.mode = ED.Mode.None;
+					// Handle snapping                     
+					if (doodle.snapToArc) {
+						// Correct for negative handle
+						if (rotationCorrection < 0) {
+							newAngle = 2 * Math.PI - ED.positiveAngle(newAngle);
+						}
+						doodle.setSimpleParameter('arc', doodle.nearestArcTo(doodle.arc/2 + newAngle));
 					} else {
-						doodle.setSimpleParameter('arc', doodle.arc + deltaAngle);
+						// Check for permitted range and stop dragging if exceeded
+						if (doodle.parameterValidationArray['arc']['range'].isBelow(doodle.arc + deltaAngle)) {
+							deltaAngle = doodle.parameterValidationArray['arc']['range'].min - doodle.arc;
+							doodle.setSimpleParameter('arc', doodle.parameterValidationArray['arc']['range'].min);
+							this.mode = ED.Mode.None;
+						} else if (doodle.parameterValidationArray['arc']['range'].isAbove(doodle.arc + deltaAngle)) {
+
+							deltaAngle = doodle.parameterValidationArray['arc']['range'].max - doodle.arc;
+							//doodle.arc = doodle.parameterValidationArray['arc']['range'].max;
+							doodle.setSimpleParameter('arc', doodle.parameterValidationArray['arc']['range'].max);
+							this.mode = ED.Mode.None;
+						} else {
+							doodle.setSimpleParameter('arc', doodle.arc + deltaAngle);
+						}
 					}
 
 					// Update dependencies
@@ -1112,7 +1121,6 @@ ED.Drawing.prototype.mousemove = function(_point) {
 						// Update dependencies
 						doodle.updateDependentParameters('rotation');
 					}
-
 					break;
 
 				case ED.Mode.Rotate:
@@ -2194,7 +2202,6 @@ ED.Drawing.prototype.addDeleteValues = function(_deleteValuesArray) {
 ED.Drawing.prototype.eventHandler = function(_type, _doodleId, _className, _elementId, _value) {
 	//console.log("Event: " + _type + " doodleId: " + _doodleId + " doodleClass: " + _className + " elementId: " + _elementId + " value: " + _value);
 
-	//var value;
 	switch (_type) {
 		// Onchange event
 		case 'onchange':
@@ -3277,6 +3284,7 @@ ED.Doodle = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _sca
 		this.snapToQuadrant = false;
 		this.snapToPoints = false;
 		this.snapToAngles = false;
+		this.snapToArc = false;
 		this.willReport = true;
 		this.willSync = true;
 
@@ -3368,6 +3376,7 @@ ED.Doodle = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _sca
 		// Array of points to snap to
 		this.pointsArray = new Array();
 		this.anglesArray = new Array();
+		this.arcArray = new Array();
 		this.quadrantPoint = new ED.Point(200, 200);
 
 		// Bindings to HTML element values. Associative array with parameter name as key
@@ -4658,6 +4667,39 @@ ED.Doodle.prototype.nearestAngleTo = function(_angle) {
 	else {
 		ED.errorHandler('ED.Doodle', 'nearestAngleTo', 'Attempt to calculate nearest angle with an empty angles array');
 		return _angle;
+	}
+}
+
+/**
+ * Finds the nearest arc in the doodle arcArray
+ *
+ * @param {Float} _arc The angle to test
+ * @returns {Float} The nearest angle
+ */
+ED.Doodle.prototype.nearestArcTo = function(_arc) {
+	// Check that arcArray has content
+	if (this.arcArray.length > 0) {
+		var min = 2 * Math.PI; // Greater than one complete rotation
+		var index = 0;
+
+		// Iterate through angles array to find nearest point
+		for (var i = 0; i < this.arcArray.length; i++) {
+			var p = this.arcArray[i];
+
+			var d = Math.abs(p - _arc);
+
+			if (d < min) {
+				min = d;
+				index = i;
+			}
+		}
+
+		return this.arcArray[index];
+	}
+	// Otherwise generate error and return passed arc
+	else {
+		ED.errorHandler('ED.Doodle', 'nearestArcTo', 'Attempt to calculate nearest arc with an empty arc array');
+		return _arc;
 	}
 }
 

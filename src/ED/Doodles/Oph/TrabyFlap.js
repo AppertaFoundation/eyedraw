@@ -17,9 +17,9 @@
  */
 
 /**
- * PartialThicknessScleralFlap
+ * TrabyFlap
  *
- * @class PartialThicknessScleralFlap
+ * @class TrabyFlap
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
  * @param {Int} _originX
@@ -33,10 +33,10 @@
  * @param {Float} _rotation
  * @param {Int} _order
  */
-ED.PartialThicknessScleralFlap = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+ED.TrabyFlap = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
 {
 	// Set classname
-	this.className = "PartialThicknessScleralFlap";
+	this.className = "TrabyFlap";
 
     // Derived parameters (NB must set a value here to define parameter as a property of the object, even though value set later)
     this.size = '4x3';
@@ -53,43 +53,46 @@ ED.PartialThicknessScleralFlap = function(_drawing, _originX, _originY, _radius,
 /**
  * Sets superclass and constructor
  */
-ED.PartialThicknessScleralFlap.prototype = new ED.Doodle;
-ED.PartialThicknessScleralFlap.prototype.constructor = ED.PartialThicknessScleralFlap;
-ED.PartialThicknessScleralFlap.superclass = ED.Doodle.prototype;
+ED.TrabyFlap.prototype = new ED.Doodle;
+ED.TrabyFlap.prototype.constructor = ED.TrabyFlap;
+ED.TrabyFlap.superclass = ED.Doodle.prototype;
 
 
 /**
  * Sets handle attributes
  */
-ED.PartialThicknessScleralFlap.prototype.setHandles = function()
+ED.TrabyFlap.prototype.setHandles = function()
 {
 	this.handleArray[0] = new ED.Handle(null, true, ED.Mode.Arc, false);
 	this.handleArray[3] = new ED.Handle(null, true, ED.Mode.Arc, false);
-	//this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+	//.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
 }
 
 /**
  * Sets default properties
  */
-ED.PartialThicknessScleralFlap.prototype.setPropertyDefaults = function()
+ED.TrabyFlap.prototype.setPropertyDefaults = function()
 {
 	this.isScaleable = false;
 	this.isMoveable = false;
     this.isArcSymmetrical = true;
+    this.snapToArc = true;
     
     // Update component of validation array for simple parameters
     this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
     this.parameterValidationArray['apexY']['range'].setMinAndMax(-580, -510);
-    this.parameterValidationArray['arc']['range'].setMinAndMax(0.9, 1.13);
     
     // Add complete validation arrays for derived parameters
-    this.parameterValidationArray['size'] = {kind:'derived', type:'string', list:['4x3', '5x2'], animate:true};
+    this.parameterValidationArray['size'] = {kind:'derived', type:'string', list:['4x3', '5x2'], animate:false};
+    
+    // Array of arcs to snap to
+    this.arcArray = [0.9, 1.13];
 }
 
 /**
  * Sets default parameters
  */
-ED.PartialThicknessScleralFlap.prototype.setParameterDefaults = function()
+ED.TrabyFlap.prototype.setParameterDefaults = function()
 {
     this.setParameterFromString('size', '4x3');
 }
@@ -102,26 +105,22 @@ ED.PartialThicknessScleralFlap.prototype.setParameterDefaults = function()
  * @value {Undefined} _value Value of parameter to calculate
  * @returns {Array} Associative array of values of dependent parameters
  */
-ED.PartialThicknessScleralFlap.prototype.dependentParameterValues = function(_parameter, _value)
+ED.TrabyFlap.prototype.dependentParameterValues = function(_parameter, _value)
 {
-
     var returnArray = new Array();
 
     switch (_parameter)
     {
         case 'arc':
-			// Example of using this method to implement a 'snap to arc'
 			if (_value < 1.0)
 			{
 				returnArray['size'] = '4x3';
-// 				returnArray['apexY'] = -580;
-// 				returnArray['arc'] = 0.9;
+				returnArray['apexY'] = -580;
 			}
 			else
 			{
 				returnArray['size'] = '5x2';
-// 				returnArray['apexY'] = -510;
-// 				returnArray['arc'] = 1.13;
+				returnArray['apexY'] = -510;
 			}
             break;
 
@@ -131,10 +130,12 @@ ED.PartialThicknessScleralFlap.prototype.dependentParameterValues = function(_pa
                 case '4x3':
                     returnArray['arc'] = 0.9;
                     returnArray['apexY'] = -580;
+                    this.right.setCoordinates(this.r * Math.sin(this.arc/2), - this.r * Math.cos(this.arc/2));
                     break;
                 case '5x2':
                     returnArray['arc'] = 1.13;
                     returnArray['apexY'] = -510;
+                    this.right.setCoordinates(this.r * Math.sin(this.arc/2), - this.r * Math.cos(this.arc/2));
                     break;
             }
             break;
@@ -148,13 +149,13 @@ ED.PartialThicknessScleralFlap.prototype.dependentParameterValues = function(_pa
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.PartialThicknessScleralFlap.prototype.draw = function(_point)
+ED.TrabyFlap.prototype.draw = function(_point)
 {
 	// Get context
 	var ctx = this.drawing.context;
 	
 	// Call draw method in superclass
-	ED.PartialThicknessScleralFlap.superclass.draw.call(this, _point);
+	ED.TrabyFlap.superclass.draw.call(this, _point);
     
     // Radius of limbus
     //var r = this.r;
@@ -242,7 +243,7 @@ ED.PartialThicknessScleralFlap.prototype.draw = function(_point)
  *
  * @returns {String} Description of doodle
  */
-ED.PartialThicknessScleralFlap.prototype.description = function()
+ED.TrabyFlap.prototype.description = function()
 {
     return (this.apexY < -280?"Fornix based ":"Limbus based ") + "flap";
 }
