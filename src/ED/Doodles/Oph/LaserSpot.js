@@ -33,11 +33,10 @@
  * @param {Float} _rotation
  * @param {Int} _order
  */
-ED.LaserSpot = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
-{
+ED.LaserSpot = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
 	// Set classname
 	this.className = "LaserSpot";
-    
+
 	// Call super-class constructor
 	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
 }
@@ -52,30 +51,27 @@ ED.LaserSpot.superclass = ED.Doodle.prototype;
 /**
  * Sets handle attributes
  */
-ED.LaserSpot.prototype.setHandles = function()
-{
+ED.LaserSpot.prototype.setHandles = function() {
 	this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, false);
 }
 
 /**
  * Sets default properties
  */
-ED.LaserSpot.prototype.setPropertyDefaults = function()
-{
-    // Update component of validation array for simple parameters
-    this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.5, +3);
-    this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.5, +3);
+ED.LaserSpot.prototype.setPropertyDefaults = function() {
+	// Update component of validation array for simple parameters
+	this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.5, +3);
+	this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.5, +3);
 }
 
 /**
  * Sets default parameters (Only called for new doodles)
  * Use the setParameter function for derived parameters, as this will also update dependent variables
  */
-ED.LaserSpot.prototype.setParameterDefaults = function()
-{
-    this.scaleX = 0.75;
-    this.scaleY = 0.75;
-    this.setOriginWithDisplacements(100, 80);
+ED.LaserSpot.prototype.setParameterDefaults = function() {
+	this.scaleX = 0.75;
+	this.scaleY = 0.75;
+	this.setOriginWithDisplacements(100, 80);
 }
 
 /**
@@ -83,41 +79,40 @@ ED.LaserSpot.prototype.setParameterDefaults = function()
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.LaserSpot.prototype.draw = function(_point)
-{
+ED.LaserSpot.prototype.draw = function(_point) {
 	// Get context
 	var ctx = this.drawing.context;
-	
+
 	// Call draw method in superclass
 	ED.LaserSpot.superclass.draw.call(this, _point);
-    
-    // Radius of laser spot
-    var r = 30;
-    
+
+	// Radius of laser spot
+	var r = 30;
+
 	// Boundary path
 	ctx.beginPath();
-    
+
 	// Circle
-    ctx.arc(0, 0, r, 0, Math.PI * 2, true);
-    
+	ctx.arc(0, 0, r, 0, Math.PI * 2, true);
+
 	// Close path
 	ctx.closePath();
-	
+
 	// Set line attributes
-	ctx.lineWidth = r * 2/3;
+	ctx.lineWidth = r * 2 / 3;
 	ctx.fillStyle = "yellow";
 	ctx.strokeStyle = "rgba(255, 128, 0, 1)";
-	
+
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
-    
-    var point = new ED.Point(0, 0);
-    point.setWithPolars(r, Math.PI/4);
+
+	var point = new ED.Point(0, 0);
+	point.setWithPolars(r, Math.PI / 4);
 	this.handleArray[2].location = this.transform.transformPoint(point);
-	
+
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
-    
+
 	// Return value indicating successful hit test
 	return this.isClicked;
 }
@@ -127,7 +122,6 @@ ED.LaserSpot.prototype.draw = function(_point)
  *
  * @returns {String} Group description
  */
-ED.LaserSpot.prototype.groupDescription = function()
-{
-    return "Laser spots";
+ED.LaserSpot.prototype.groupDescription = function() {
+	return "Laser spots";
 }

@@ -33,11 +33,10 @@
  * @param {Float} _rotation
  * @param {Int} _order
  */
-ED.TrialFrame = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
-{
+ED.TrialFrame = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
 	// Set classname
 	this.className = "TrialFrame";
-    
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
 }
@@ -52,11 +51,10 @@ ED.TrialFrame.superclass = ED.Doodle.prototype;
 /**
  * Sets default dragging attributes
  */
-ED.TrialFrame.prototype.setPropertyDefaults = function()
-{
+ED.TrialFrame.prototype.setPropertyDefaults = function() {
 	this.isSelectable = false;
-    this.isDeletable = false;
-    this.isUnique = true;
+	this.isDeletable = false;
+	this.isUnique = true;
 }
 
 /**
@@ -64,105 +62,102 @@ ED.TrialFrame.prototype.setPropertyDefaults = function()
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.TrialFrame.prototype.draw = function(_point)
-{
+ED.TrialFrame.prototype.draw = function(_point) {
 	// Get context
 	var ctx = this.drawing.context;
-	
+
 	// Call draw method in superclass
 	ED.TrialFrame.superclass.draw.call(this, _point);
-	
+
 	// Boundary path
 	ctx.beginPath();
-    
-    // Settings
-    var ro = 420;
-    var rt = 340;
-    var ri = 300;
-    var d = 20;
-    var height = 50;
-    
-    // Angles, phi gives a little extra at both ends of the frame
-    var phi = -Math.PI/20;
+
+	// Settings
+	var ro = 420;
+	var rt = 340;
+	var ri = 300;
+	var d = 20;
+	var height = 50;
+
+	// Angles, phi gives a little extra at both ends of the frame
+	var phi = -Math.PI / 20;
 	var arcStart = 0 + phi;
 	var arcEnd = Math.PI - phi;
-    
+
 	// Boundary path
 	ctx.beginPath();
-    
+
 	// Arc across
 	ctx.arc(0, 0, ro, arcStart, arcEnd, false);
-    
+
 	// Arc back
 	ctx.arc(0, 0, ri, arcEnd, arcStart, true);
-    
-    ctx.closePath();
-    
-    // Colour of fill is white but with transparency
-    ctx.fillStyle = "rgba(230,230,230,1)";
-    
+
+	ctx.closePath();
+
+	// Colour of fill is white but with transparency
+	ctx.fillStyle = "rgba(230,230,230,1)";
+
 	// Set line attributes
 	ctx.lineWidth = 4;
-    
-    // Colour of outer line is dark gray
-    ctx.strokeStyle = "darkgray";
-	
+
+	// Colour of outer line is dark gray
+	ctx.strokeStyle = "darkgray";
+
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
-	
+
 	// Other stuff here
-	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
-	{
-        // Set font and colour
-        ctx.font = height + "px sans-serif";
-        ctx.fillStyle = "blue";
-        
-        ctx.beginPath();
-        
-        var theta = 0;
-        
-        // Points for each line
-        var pi = new ED.Point(0,0);
-        var pj = new ED.Point(0,0);
-        var pt = new ED.Point(0,0);
-        var po = new ED.Point(0,0);
-        var pp = new ED.Point(0,0);
-        
-        for (var i = 0; i < 19; i++)
-        {
-            var text = i.toFixed(0);
-            theta = (-90 - i * 10) * Math.PI/180;
-            
-            pi.setWithPolars(ri, theta);
-            pj.setWithPolars(ri + d, theta);
-            pt.setWithPolars(rt, theta);
-            pp.setWithPolars(ro - d, theta);
-            po.setWithPolars(ro, theta);
-            
-            ctx.moveTo(pi.x, pi.y);
-            ctx.lineTo(pj.x, pj.y);
-            ctx.moveTo(pp.x, pp.y);
-            ctx.lineTo(po.x, po.y);
-            
-            ctx.save();
-            ctx.translate(pt.x, pt.y);
-            ctx.rotate(Math.PI + theta);
-            ctx.textAlign = "center";
-            ctx.fillText(text, 0, 80/2);
-            ctx.restore();
-        }
-        
-        ctx.moveTo(-20, 0);
-        ctx.lineTo(20, 0);
-        ctx.moveTo(0, -20);
-        ctx.lineTo(0, 20);
-        
-        ctx.stroke();
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+		// Set font and colour
+		ctx.font = height + "px sans-serif";
+		ctx.fillStyle = "blue";
+
+		ctx.beginPath();
+
+		var theta = 0;
+
+		// Points for each line
+		var pi = new ED.Point(0, 0);
+		var pj = new ED.Point(0, 0);
+		var pt = new ED.Point(0, 0);
+		var po = new ED.Point(0, 0);
+		var pp = new ED.Point(0, 0);
+
+		for (var i = 0; i < 19; i++) {
+			var text = i.toFixed(0);
+			theta = (-90 - i * 10) * Math.PI / 180;
+
+			pi.setWithPolars(ri, theta);
+			pj.setWithPolars(ri + d, theta);
+			pt.setWithPolars(rt, theta);
+			pp.setWithPolars(ro - d, theta);
+			po.setWithPolars(ro, theta);
+
+			ctx.moveTo(pi.x, pi.y);
+			ctx.lineTo(pj.x, pj.y);
+			ctx.moveTo(pp.x, pp.y);
+			ctx.lineTo(po.x, po.y);
+
+			ctx.save();
+			ctx.translate(pt.x, pt.y);
+			ctx.rotate(Math.PI + theta);
+			ctx.textAlign = "center";
+			ctx.fillText(text, 0, 80 / 2);
+			ctx.restore();
+		}
+
+		ctx.moveTo(-20, 0);
+		ctx.lineTo(20, 0);
+		ctx.moveTo(0, -20);
+		ctx.lineTo(0, 20);
+
+		ctx.stroke();
 	}
-	
+
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
-	
+
 	// Return value indicating successful hittest
 	return this.isClicked;
 }

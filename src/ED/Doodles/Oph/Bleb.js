@@ -33,8 +33,7 @@
  * @param {Float} _rotation
  * @param {Int} _order
  */
-ED.Bleb = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
-{
+ED.Bleb = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
 	// Set classname
 	this.className = "Bleb";
 
@@ -52,8 +51,7 @@ ED.Bleb.superclass = ED.Doodle.prototype;
 /**
  * Sets default dragging attributes
  */
-ED.Bleb.prototype.setPropertyDefaults = function()
-{
+ED.Bleb.prototype.setPropertyDefaults = function() {
 	this.isScaleable = false;
 	this.isMoveable = false;
 }
@@ -61,9 +59,8 @@ ED.Bleb.prototype.setPropertyDefaults = function()
 /**
  * Sets default parameters
  */
-ED.Bleb.prototype.setParameterDefaults = function()
-{
-    this.setRotationWithDisplacements(30,30);
+ED.Bleb.prototype.setParameterDefaults = function() {
+	this.setRotationWithDisplacements(30, 30);
 }
 
 /**
@@ -71,50 +68,48 @@ ED.Bleb.prototype.setParameterDefaults = function()
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.Bleb.prototype.draw = function(_point)
-{
+ED.Bleb.prototype.draw = function(_point) {
 	// Get context
 	var ctx = this.drawing.context;
-	
+
 	// Call draw method in superclass
 	ED.Bleb.superclass.draw.call(this, _point);
-    
-    // Base radius
-    var r = 384;
-	
+
+	// Base radius
+	var r = 384;
+
 	// Boundary path
 	ctx.beginPath();
-    
-    // Draw limbal base
-    var phi = Math.PI/12;
-    ctx.arc(0, 0, r, -phi - Math.PI/2, phi - Math.PI/2, false);
-    ctx.lineTo(r/4, -r * 1.25);
-    ctx.lineTo(-r/4, -r * 1.25);
-    ctx.closePath();
-    
-    // Colour of fill
-    ctx.fillStyle = "rgba(240,240,240,0.9)";
-    
+
+	// Draw limbal base
+	var phi = Math.PI / 12;
+	ctx.arc(0, 0, r, -phi - Math.PI / 2, phi - Math.PI / 2, false);
+	ctx.lineTo(r / 4, -r * 1.25);
+	ctx.lineTo(-r / 4, -r * 1.25);
+	ctx.closePath();
+
+	// Colour of fill
+	ctx.fillStyle = "rgba(240,240,240,0.9)";
+
 	// Set line attributes
 	ctx.lineWidth = 4;
-    
-    // Colour of outer line is dark gray
-    ctx.strokeStyle = "rgba(120,120,120,0.75)";;
-	
+
+	// Colour of outer line is dark gray
+	ctx.strokeStyle = "rgba(120,120,120,0.75)";;
+
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
-	
+
 	// Non-boundary paths
-	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
-	{
-        ctx.beginPath();
-        ctx.moveTo(-40, -r);
-        ctx.lineTo(-40, -r * 1.15);
-        ctx.lineTo(40, -r * 1.15);
-        ctx.lineTo(40, -r);
-        ctx.stroke();
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+		ctx.beginPath();
+		ctx.moveTo(-40, -r);
+		ctx.lineTo(-40, -r * 1.15);
+		ctx.lineTo(40, -r * 1.15);
+		ctx.lineTo(40, -r);
+		ctx.stroke();
 	}
-	
+
 	// Return value indicating successful hittest
 	return this.isClicked;
 }
@@ -124,7 +119,6 @@ ED.Bleb.prototype.draw = function(_point)
  *
  * @returns {String} Description of doodle
  */
-ED.Bleb.prototype.description = function()
-{
-    return "Trabeculectomy bleb at " + this.clockHour() + " o'clock";;
+ED.Bleb.prototype.description = function() {
+	return "Trabeculectomy bleb at " + this.clockHour() + " o'clock";;
 }

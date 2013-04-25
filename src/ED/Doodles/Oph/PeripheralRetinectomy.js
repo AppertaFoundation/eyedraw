@@ -33,14 +33,13 @@
  * @param {Float} _rotation
  * @param {Int} _order
  */
-ED.PeripheralRetinectomy = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
-{
+ED.PeripheralRetinectomy = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
 	// Set classname
 	this.className = "PeripheralRetinectomy";
-    
-    // Private parameter
-    this.extent = "";
-    
+
+	// Private parameter
+	this.extent = "";
+
 	// Call super-class constructor
 	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
 }
@@ -55,8 +54,7 @@ ED.PeripheralRetinectomy.superclass = ED.Doodle.prototype;
 /**
  * Sets handle attributes
  */
-ED.PeripheralRetinectomy.prototype.setHandles = function()
-{
+ED.PeripheralRetinectomy.prototype.setHandles = function() {
 	this.handleArray[0] = new ED.Handle(null, true, ED.Mode.Arc, false);
 	this.handleArray[3] = new ED.Handle(null, true, ED.Mode.Arc, false);
 	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
@@ -65,35 +63,30 @@ ED.PeripheralRetinectomy.prototype.setHandles = function()
 /**
  * Sets default properties
  */
-ED.PeripheralRetinectomy.prototype.setPropertyDefaults = function()
-{
+ED.PeripheralRetinectomy.prototype.setPropertyDefaults = function() {
 	this.isMoveable = false;
-    
-    // Update component of validation array for simple parameters
-    this.parameterValidationArray['arc']['range'].setMinAndMax(Math.PI/4, 2 * Math.PI);
-    this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
-    this.parameterValidationArray['apexY']['range'].setMinAndMax(-450, -350);
+
+	// Update component of validation array for simple parameters
+	this.parameterValidationArray['arc']['range'].setMinAndMax(Math.PI / 4, 2 * Math.PI);
+	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
+	this.parameterValidationArray['apexY']['range'].setMinAndMax(-450, -350);
 }
 
 /**
  * Sets default parameters (Only called for new doodles)
  * Use the setParameter function for derived parameters, as this will also update dependent variables
  */
-ED.PeripheralRetinectomy.prototype.setParameterDefaults = function()
-{
-    this.arc = 240 * Math.PI/180;
-    this.apexY = -380;
-    
-    // If more than one, rotate it a bit to distinguish it
-    var doodle = this.drawing.lastDoodleOfClass(this.className);
-    if (doodle)
-    {
-        this.rotation = doodle.rotation + Math.PI/4;
-    }
-    else
-    {
-        this.rotation = Math.PI;
-    }
+ED.PeripheralRetinectomy.prototype.setParameterDefaults = function() {
+	this.arc = 240 * Math.PI / 180;
+	this.apexY = -380;
+
+	// If more than one, rotate it a bit to distinguish it
+	var doodle = this.drawing.lastDoodleOfClass(this.className);
+	if (doodle) {
+		this.rotation = doodle.rotation + Math.PI / 4;
+	} else {
+		this.rotation = Math.PI;
+	}
 }
 
 /**
@@ -101,110 +94,105 @@ ED.PeripheralRetinectomy.prototype.setParameterDefaults = function()
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.PeripheralRetinectomy.prototype.draw = function(_point)
-{
+ED.PeripheralRetinectomy.prototype.draw = function(_point) {
 	// Get context
 	var ctx = this.drawing.context;
-	
+
 	// Call draw method in superclass
 	ED.PeripheralRetinectomy.superclass.draw.call(this, _point);
-    
+
 	// Radius of outer curve just inside ora on right and left fundus diagrams
-	var ro = 952/2;
-    var ri = -this.apexY;
-    var r = ri + (ro - ri)/2;
-	
+	var ro = 952 / 2;
+	var ri = -this.apexY;
+	var r = ri + (ro - ri) / 2;
+
 	// Calculate parameters for arcs
-	var theta = this.arc/2;
-	var arcStart = - Math.PI/2 + theta;
-	var arcEnd = - Math.PI/2 - theta;
-    
-    // Coordinates of 'corners' of PeripheralRetinectomy
+	var theta = this.arc / 2;
+	var arcStart = -Math.PI / 2 + theta;
+	var arcEnd = -Math.PI / 2 - theta;
+
+	// Coordinates of 'corners' of PeripheralRetinectomy
 	var topRightX = r * Math.sin(theta);
-	var topRightY = - r * Math.cos(theta);
-	var topLeftX = - r * Math.sin(theta);
+	var topRightY = -r * Math.cos(theta);
+	var topLeftX = -r * Math.sin(theta);
 	var topLeftY = topRightY;
-    
+
 	// Boundary path
 	ctx.beginPath();
-    
+
 	// Arc across to mirror image point on the other side
 	ctx.arc(0, 0, ro, arcStart, arcEnd, true);
-    
+
 	// Arc back to mirror image point on the other side
 	ctx.arc(0, 0, ri, arcEnd, arcStart, false);
-	
+
 	// Set line attributes
 	ctx.lineWidth = 4;
 	ctx.fillStyle = "rgba(255,255,0,0)";
 	ctx.strokeStyle = "rgba(255,0,255,0)";
-	
+
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
-	
+
 	// Other paths and drawing here
-	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
-	{
-        // Path for retinectomy
-        ctx.beginPath();
-        
-        // Unless 360, curve out from the ora
-        if (this.arc < 1.95 * Math.PI)
-        {
-            // Angle to determine curve
-            var phi1 = theta - Math.PI/24;
-            var phi2 = theta - 2 * Math.PI/24;
-            
-            // Right points
-            var rsp = new ED.Point(ro * Math.sin(theta), -ro * Math.cos(theta));
-            var rcp1 = new ED.Point(r * Math.sin(theta), -r * Math.cos(theta));
-            var rcp2 = new ED.Point(ri * Math.sin(phi1), -ri * Math.cos(phi1));
-            var rep = new ED.Point(ri * Math.sin(phi2), -ri * Math.cos(phi2));
-            
-            // Inner arc
-            arcStart = - Math.PI/2 + phi2;
-            arcEnd = - Math.PI/2 - phi2;
-            
-            // Left points
-            var lsp = new ED.Point(-ri * Math.sin(phi2), -ri * Math.cos(phi2));
-            var lcp1 = new ED.Point(-ri * Math.sin(phi1), -ri * Math.cos(phi1));
-            var lcp2 = new ED.Point(-r * Math.sin(theta), -r * Math.cos(theta));
-            var lep = new ED.Point(-ro * Math.sin(theta), -ro * Math.cos(theta));
-            
-            // Path
-            ctx.moveTo(rsp.x, rsp.y);
-            ctx.bezierCurveTo(rcp1.x, rcp1.y, rcp2.x, rcp2.y, rep.x, rep.y);
-            ctx.arc(0, 0, ri, arcStart, arcEnd, true);
-            ctx.bezierCurveTo(lcp1.x, lcp1.y, lcp2.x, lcp2.y, lep.x, lep.y)
-            
-            // Angle to nearest 10 degrees.
-            var degrees = Math.floor(this.arc * 18/Math.PI) * 10;
-            
-            this.extent = "Retinectomy of " + degrees + " degrees centred at " + this.clockHour() + " o'clock";
-        }
-        else
-        {
-            // Just a circl to represent a 360 degree retinectomy
-            ctx.arc(0, 0, ri, 0, 2 * Math.PI, true);
-            
-            // Description text
-            this.extent = "360 degree retinectomy";
-        }
-        
-        // Draw retinectomy
-        ctx.lineWidth = 16;
-        ctx.strokeStyle = "red";
-        ctx.stroke();
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+		// Path for retinectomy
+		ctx.beginPath();
+
+		// Unless 360, curve out from the ora
+		if (this.arc < 1.95 * Math.PI) {
+			// Angle to determine curve
+			var phi1 = theta - Math.PI / 24;
+			var phi2 = theta - 2 * Math.PI / 24;
+
+			// Right points
+			var rsp = new ED.Point(ro * Math.sin(theta), -ro * Math.cos(theta));
+			var rcp1 = new ED.Point(r * Math.sin(theta), -r * Math.cos(theta));
+			var rcp2 = new ED.Point(ri * Math.sin(phi1), -ri * Math.cos(phi1));
+			var rep = new ED.Point(ri * Math.sin(phi2), -ri * Math.cos(phi2));
+
+			// Inner arc
+			arcStart = -Math.PI / 2 + phi2;
+			arcEnd = -Math.PI / 2 - phi2;
+
+			// Left points
+			var lsp = new ED.Point(-ri * Math.sin(phi2), -ri * Math.cos(phi2));
+			var lcp1 = new ED.Point(-ri * Math.sin(phi1), -ri * Math.cos(phi1));
+			var lcp2 = new ED.Point(-r * Math.sin(theta), -r * Math.cos(theta));
+			var lep = new ED.Point(-ro * Math.sin(theta), -ro * Math.cos(theta));
+
+			// Path
+			ctx.moveTo(rsp.x, rsp.y);
+			ctx.bezierCurveTo(rcp1.x, rcp1.y, rcp2.x, rcp2.y, rep.x, rep.y);
+			ctx.arc(0, 0, ri, arcStart, arcEnd, true);
+			ctx.bezierCurveTo(lcp1.x, lcp1.y, lcp2.x, lcp2.y, lep.x, lep.y)
+
+			// Angle to nearest 10 degrees.
+			var degrees = Math.floor(this.arc * 18 / Math.PI) * 10;
+
+			this.extent = "Retinectomy of " + degrees + " degrees centred at " + this.clockHour() + " o'clock";
+		} else {
+			// Just a circl to represent a 360 degree retinectomy
+			ctx.arc(0, 0, ri, 0, 2 * Math.PI, true);
+
+			// Description text
+			this.extent = "360 degree retinectomy";
+		}
+
+		// Draw retinectomy
+		ctx.lineWidth = 16;
+		ctx.strokeStyle = "red";
+		ctx.stroke();
 	}
-    
+
 	// Coordinates of handles (in canvas plane)
 	this.handleArray[0].location = this.transform.transformPoint(new ED.Point(topLeftX, topLeftY));
 	this.handleArray[3].location = this.transform.transformPoint(new ED.Point(topRightX, topRightY));
 	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
-	
+
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
-    
+
 	// Return value indicating successful hit test
 	return this.isClicked;
 }
@@ -214,7 +202,6 @@ ED.PeripheralRetinectomy.prototype.draw = function(_point)
  *
  * @returns {String} Description of doodle
  */
-ED.PeripheralRetinectomy.prototype.description = function()
-{
+ED.PeripheralRetinectomy.prototype.description = function() {
 	return this.extent;
 }

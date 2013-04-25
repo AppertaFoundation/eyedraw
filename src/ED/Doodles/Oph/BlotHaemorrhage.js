@@ -33,11 +33,10 @@
  * @param {Float} _rotation
  * @param {Int} _order
  */
-ED.BlotHaemorrhage = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
-{
+ED.BlotHaemorrhage = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
 	// Set classname
 	this.className = "BlotHaemorrhage";
-    
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
 }
@@ -52,18 +51,16 @@ ED.BlotHaemorrhage.superclass = ED.Doodle.prototype;
 /**
  * Sets handle attributes
  */
-ED.BlotHaemorrhage.prototype.setHandles = function()
-{
-    this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, false);
+ED.BlotHaemorrhage.prototype.setHandles = function() {
+	this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, false);
 }
 
 /**
  * Sets default parameters (Only called for new doodles)
  * Use the setParameter function for derived parameters, as this will also update dependent variables
  */
-ED.BlotHaemorrhage.prototype.setParameterDefaults = function()
-{
-    this.setOriginWithDisplacements(-60, -60);
+ED.BlotHaemorrhage.prototype.setParameterDefaults = function() {
+	this.setOriginWithDisplacements(-60, -60);
 }
 
 /**
@@ -71,39 +68,38 @@ ED.BlotHaemorrhage.prototype.setParameterDefaults = function()
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.BlotHaemorrhage.prototype.draw = function(_point)
-{
+ED.BlotHaemorrhage.prototype.draw = function(_point) {
 	// Get context
 	var ctx = this.drawing.context;
-	
+
 	// Call draw method in superclass
 	ED.BlotHaemorrhage.superclass.draw.call(this, _point);
-    
-    // Exudate radius
-    var r = 30;
-    
+
+	// Exudate radius
+	var r = 30;
+
 	// Boundary path
 	ctx.beginPath();
-    
+
 	// Exudate
 	ctx.arc(0, 0, r, 0, 2 * Math.PI, true);
-    
+
 	// Set attributes
 	ctx.lineWidth = 1;
 	ctx.strokeStyle = "red";
-    ctx.fillStyle = "red";
-	
+	ctx.fillStyle = "red";
+
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
-    
-    // Coordinates of handles (in canvas plane)
-    var point = new ED.Point(0, 0);
-    point.setWithPolars(r, Math.PI/4);
+
+	// Coordinates of handles (in canvas plane)
+	var point = new ED.Point(0, 0);
+	point.setWithPolars(r, Math.PI / 4);
 	this.handleArray[2].location = this.transform.transformPoint(point);
-	
+
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
-    
+
 	// Return value indicating successful hittest
 	return this.isClicked;
 }
@@ -113,7 +109,6 @@ ED.BlotHaemorrhage.prototype.draw = function(_point)
  *
  * @returns {String} Group description
  */
-ED.BlotHaemorrhage.prototype.groupDescription = function()
-{
-    return "Blot haemorrhages";
+ED.BlotHaemorrhage.prototype.groupDescription = function() {
+	return "Blot haemorrhages";
 }

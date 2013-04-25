@@ -33,11 +33,10 @@
  * @param {Float} _rotation
  * @param {Int} _order
  */
-ED.AngleRecession = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
-{
+ED.AngleRecession = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
-	
+
 	// Set classname
 	this.className = "AngleRecession";
 }
@@ -52,8 +51,7 @@ ED.AngleRecession.superclass = ED.Doodle.prototype;
 /**
  * Sets handle attributes
  */
-ED.AngleRecession.prototype.setHandles = function()
-{
+ED.AngleRecession.prototype.setHandles = function() {
 	this.handleArray[0] = new ED.Handle(null, true, ED.Mode.Arc, false);
 	this.handleArray[3] = new ED.Handle(null, true, ED.Mode.Arc, false);
 }
@@ -61,24 +59,22 @@ ED.AngleRecession.prototype.setHandles = function()
 /**
  * Sets default dragging attributes
  */
-ED.AngleRecession.prototype.setPropertyDefaults = function()
-{
+ED.AngleRecession.prototype.setPropertyDefaults = function() {
 	this.isScaleable = false;
 	this.isMoveable = false;
-    
-    // Update component of validation array for simple parameters
-    this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.125, +1.5);
-    this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.125, +1.5);
-    this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
-    this.parameterValidationArray['apexY']['range'].setMinAndMax(+50, +250);
+
+	// Update component of validation array for simple parameters
+	this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.125, +1.5);
+	this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.125, +1.5);
+	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
+	this.parameterValidationArray['apexY']['range'].setMinAndMax(+50, +250);
 }
 
 /**
  * Sets default parameters
  */
-ED.AngleRecession.prototype.setParameterDefaults = function()
-{
-    this.arc = 30 * Math.PI/180;
+ED.AngleRecession.prototype.setParameterDefaults = function() {
+	this.arc = 30 * Math.PI / 180;
 }
 
 /**
@@ -86,55 +82,54 @@ ED.AngleRecession.prototype.setParameterDefaults = function()
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.AngleRecession.prototype.draw = function(_point)
-{
+ED.AngleRecession.prototype.draw = function(_point) {
 	// Get context
 	var ctx = this.drawing.context;
-	
+
 	// Call draw method in superclass
 	ED.AngleRecession.superclass.draw.call(this, _point);
-    
-    // AngleRecession is at equator
-    var ras = this.riri - 30;
+
+	// AngleRecession is at equator
+	var ras = this.riri - 30;
 	this.rir = this.riri;
-    var r = this.rir + (ras - this.rir)/2;
-	
+	var r = this.rir + (ras - this.rir) / 2;
+
 	// Calculate parameters for arcs
-	var theta = this.arc/2;
-	var arcStart = - Math.PI/2 + theta;
-	var arcEnd = - Math.PI/2 - theta;
-    var outArcStart = - Math.PI/2 + theta - Math.PI/24;
-    var outArcEnd = - Math.PI/2 - theta + Math.PI/24;
-    
-    // Coordinates of 'corners' of AngleRecession
+	var theta = this.arc / 2;
+	var arcStart = -Math.PI / 2 + theta;
+	var arcEnd = -Math.PI / 2 - theta;
+	var outArcStart = -Math.PI / 2 + theta - Math.PI / 24;
+	var outArcEnd = -Math.PI / 2 - theta + Math.PI / 24;
+
+	// Coordinates of 'corners' of AngleRecession
 	var topRightX = this.rir * Math.sin(theta);
-	var topRightY = - this.rir * Math.cos(theta);
-	var topLeftX = - this.rir * Math.sin(theta);
+	var topRightY = -this.rir * Math.cos(theta);
+	var topLeftX = -this.rir * Math.sin(theta);
 	var topLeftY = topRightY;
-    
+
 	// Boundary path
 	ctx.beginPath();
-    
+
 	// Path
 	ctx.arc(0, 0, this.rir, arcStart, arcEnd, true);
 	ctx.arc(0, 0, ras, outArcEnd, outArcStart, false);
-    
+
 	// Close path
 	ctx.closePath();
-    
-    ctx.fillStyle = "rgba(255, 255, 200, 1.0)";
+
+	ctx.fillStyle = "rgba(255, 255, 200, 1.0)";
 	ctx.strokeStyle = "rgba(255, 255, 255, 0)";
-	
+
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
-	
+
 	// Coordinates of handles (in canvas plane)
 	this.handleArray[0].location = this.transform.transformPoint(new ED.Point(topLeftX, topLeftY));
 	this.handleArray[3].location = this.transform.transformPoint(new ED.Point(topRightX, topRightY));
-	
+
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
-	
+
 	// Return value indicating successful hittest
 	return this.isClicked;
 }
@@ -144,11 +139,10 @@ ED.AngleRecession.prototype.draw = function(_point)
  *
  * @returns {String} Group description
  */
-ED.AngleRecession.prototype.groupDescription = function()
-{
-    // Calculate total extent in degrees
-    var degrees = this.drawing.totalDegreesExtent(this.className);
-    
-    // Return string
-    return "Angle recession over " + degrees.toString() + " degrees";
+ED.AngleRecession.prototype.groupDescription = function() {
+	// Calculate total extent in degrees
+	var degrees = this.drawing.totalDegreesExtent(this.className);
+
+	// Return string
+	return "Angle recession over " + degrees.toString() + " degrees";
 }

@@ -33,11 +33,10 @@
  * @param {Float} _rotation
  * @param {Int} _order
  */
-ED.ScleralIncision = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
-{
+ED.ScleralIncision = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
 	// Set classname
 	this.className = "ScleralIncision";
-    
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
 }
@@ -52,33 +51,30 @@ ED.ScleralIncision.superclass = ED.Doodle.prototype;
 /**
  * Sets handle attributes
  */
-ED.ScleralIncision.prototype.setHandles = function()
-{
-    this.handleArray[3] = new ED.Handle(null, true, ED.Mode.Arc, false);
+ED.ScleralIncision.prototype.setHandles = function() {
+	this.handleArray[3] = new ED.Handle(null, true, ED.Mode.Arc, false);
 }
 
 /**
  * Sets default properties
  */
-ED.ScleralIncision.prototype.setPropertyDefaults = function()
-{
+ED.ScleralIncision.prototype.setPropertyDefaults = function() {
 	this.isScaleable = false;
 	this.isMoveable = false;
 	this.isRotatable = true;
-    this.isArcSymmetrical = true;
-    
-    // Update component of validation array for simple parameters
-    this.parameterValidationArray['arc']['range'].setMinAndMax(Math.PI/16, Math.PI/2);
+	this.isArcSymmetrical = true;
+
+	// Update component of validation array for simple parameters
+	this.parameterValidationArray['arc']['range'].setMinAndMax(Math.PI / 16, Math.PI / 2);
 }
 
 /**
  * Sets default parameters (only called for new doodles)
  * Use the setParameter function for derived parameters, as this will also update dependent variables
  */
-ED.ScleralIncision.prototype.setParameterDefaults = function()
-{
-    this.arc = Math.PI/8;
-    this.setRotationWithDisplacements(60,-120);
+ED.ScleralIncision.prototype.setParameterDefaults = function() {
+	this.arc = Math.PI / 8;
+	this.setRotationWithDisplacements(60, -120);
 }
 
 /**
@@ -86,89 +82,86 @@ ED.ScleralIncision.prototype.setParameterDefaults = function()
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.ScleralIncision.prototype.draw = function(_point)
-{
+ED.ScleralIncision.prototype.draw = function(_point) {
 	// Get context
 	var ctx = this.drawing.context;
-	
+
 	// Call draw method in superclass
 	ED.ScleralIncision.superclass.draw.call(this, _point);
-	
-    // Radii
-    var r =  560;
-    var d = 40;
-    var ro = r + d;
-    var ri = r - d;
-    
-    // Boundary path
+
+	// Radii
+	var r = 560;
+	var d = 40;
+	var ro = r + d;
+	var ri = r - d;
+
+	// Boundary path
 	ctx.beginPath();
-    
-    // Half angle of arc
-    var theta = this.arc/2;
-    
-    // Arc across
-    ctx.arc(0, 0, ro, - Math.PI/2 + theta, - Math.PI/2 - theta, true);
-    
-    // Arc back to mirror image point on the other side
-    ctx.arc(0, 0, ri, - Math.PI/2 - theta, - Math.PI/2 + theta, false);
-    
+
+	// Half angle of arc
+	var theta = this.arc / 2;
+
+	// Arc across
+	ctx.arc(0, 0, ro, -Math.PI / 2 + theta, -Math.PI / 2 - theta, true);
+
+	// Arc back to mirror image point on the other side
+	ctx.arc(0, 0, ri, -Math.PI / 2 - theta, -Math.PI / 2 + theta, false);
+
 	// Close path
 	ctx.closePath();
-    
-    // Colour of fill
-    ctx.fillStyle = "rgba(200,200,200,0)";
-    
-    // Set line attributes
-    ctx.lineWidth = 5;
-    
-    // Colour of outer line
-    ctx.strokeStyle = "rgba(120,120,120,0)";
-    
+
+	// Colour of fill
+	ctx.fillStyle = "rgba(200,200,200,0)";
+
+	// Set line attributes
+	ctx.lineWidth = 5;
+
+	// Colour of outer line
+	ctx.strokeStyle = "rgba(120,120,120,0)";
+
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
-	
+
 	// Non boundary drawing here
-	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
-    {
-        // New path
-        ctx.beginPath();
-        
-        // Arc across
-        ctx.arc(0, 0, r, - Math.PI/2 + theta, - Math.PI/2 - theta, true);
-        
-        // Sutures
-        var sutureSeparationAngle = 0.2;
-        var p = new ED.Point(0, 0);
-        var phi = theta - sutureSeparationAngle/2;
-        
-        do
-        {
-            p.setWithPolars(r - d, phi);
-            ctx.moveTo(p.x, p.y);
-            p.setWithPolars(r + d, phi);
-            ctx.lineTo(p.x, p.y);
-            
-            phi = phi - sutureSeparationAngle;
-        } while(phi > -theta);
-        
-        // Set line attributes
-        ctx.lineWidth = 6;
-        
-        // Colour of outer line is dark gray
-        ctx.strokeStyle = "rgba(120,120,120,0.75)";
-        
-        // Draw incision
-        ctx.stroke();
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+		// New path
+		ctx.beginPath();
+
+		// Arc across
+		ctx.arc(0, 0, r, -Math.PI / 2 + theta, -Math.PI / 2 - theta, true);
+
+		// Sutures
+		var sutureSeparationAngle = 0.2;
+		var p = new ED.Point(0, 0);
+		var phi = theta - sutureSeparationAngle / 2;
+
+		do {
+			p.setWithPolars(r - d, phi);
+			ctx.moveTo(p.x, p.y);
+			p.setWithPolars(r + d, phi);
+			ctx.lineTo(p.x, p.y);
+
+			phi = phi - sutureSeparationAngle;
+		} while (phi > -theta);
+
+		// Set line attributes
+		ctx.lineWidth = 6;
+
+		// Colour of outer line is dark gray
+		ctx.strokeStyle = "rgba(120,120,120,0.75)";
+
+		// Draw incision
+		ctx.stroke();
 	}
-    
-    // Coordinates of handles (in canvas plane)
-    var point = new ED.Point(0, 0);
-    point.setWithPolars(r, theta);
+
+	// Coordinates of handles (in canvas plane)
+	var point = new ED.Point(0, 0);
+	point.setWithPolars(r, theta);
 	this.handleArray[3].location = this.transform.transformPoint(point);
-    
+
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
-	
+
 	// Return value indicating successful hittest
 	return this.isClicked;
 }
@@ -178,8 +171,7 @@ ED.ScleralIncision.prototype.draw = function(_point)
  *
  * @returns {String} Description of doodle
  */
-ED.ScleralIncision.prototype.groupDescription = function()
-{
+ED.ScleralIncision.prototype.groupDescription = function() {
 	return "Scleral incision at ";
 }
 
@@ -188,8 +180,7 @@ ED.ScleralIncision.prototype.groupDescription = function()
  *
  * @returns {String} Description of doodle
  */
-ED.ScleralIncision.prototype.description = function()
-{
+ED.ScleralIncision.prototype.description = function() {
 	return this.clockHour();
 }
 
@@ -198,7 +189,6 @@ ED.ScleralIncision.prototype.description = function()
  *
  * @returns {String} Description of doodle
  */
-ED.ScleralIncision.prototype.groupDescriptionEnd = function()
-{
+ED.ScleralIncision.prototype.groupDescriptionEnd = function() {
 	return " o'clock";
 }

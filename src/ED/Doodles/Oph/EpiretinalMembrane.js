@@ -33,11 +33,10 @@
  * @param {Float} _rotation
  * @param {Int} _order
  */
-ED.EpiretinalMembrane = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
-{
+ED.EpiretinalMembrane = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
-	
+
 	// Set classname
 	this.className = "EpiretinalMembrane";
 }
@@ -52,16 +51,14 @@ ED.EpiretinalMembrane.superclass = ED.Doodle.prototype;
 /**
  * Sets handle attributes
  */
-ED.EpiretinalMembrane.prototype.setHandles = function()
-{
+ED.EpiretinalMembrane.prototype.setHandles = function() {
 	this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, true);
 }
 
 /**
  * Sets default dragging attributes
  */
-ED.EpiretinalMembrane.prototype.setPropertyDefaults = function()
-{
+ED.EpiretinalMembrane.prototype.setPropertyDefaults = function() {
 	this.isSelectable = true;
 	this.isOrientated = false;
 	this.isScaleable = true;
@@ -69,7 +66,7 @@ ED.EpiretinalMembrane.prototype.setPropertyDefaults = function()
 	this.isMoveable = true;
 	this.isRotatable = true;
 	this.rangeOfScale = new ED.Range(+0.5, +1.5);
-	this.rangeOfArc = new ED.Range(Math.PI/6, Math.PI*2);
+	this.rangeOfArc = new ED.Range(Math.PI / 6, Math.PI * 2);
 	this.rangeOfApexX = new ED.Range(-0, +0);
 	this.rangeOfApexY = new ED.Range(-40, +30);
 }
@@ -78,17 +75,13 @@ ED.EpiretinalMembrane.prototype.setPropertyDefaults = function()
  * Sets default parameters (Only called for new doodles)
  * Use the setParameter function for derived parameters, as this will also update dependent variables
  */
-ED.EpiretinalMembrane.prototype.setParameterDefaults = function()
-{
-    this.originY = 0;
-    if (this.drawing.hasDoodleOfClass('PostPole'))
-    {
-        this.originX = 0;
-    }
-    else
-    {
-        this.originX = this.drawing.eye == ED.eye.Right?-100:100;
-    }
+ED.EpiretinalMembrane.prototype.setParameterDefaults = function() {
+	this.originY = 0;
+	if (this.drawing.hasDoodleOfClass('PostPole')) {
+		this.originX = 0;
+	} else {
+		this.originX = this.drawing.eye == ED.eye.Right ? -100 : 100;
+	}
 }
 
 /**
@@ -96,74 +89,72 @@ ED.EpiretinalMembrane.prototype.setParameterDefaults = function()
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.EpiretinalMembrane.prototype.draw = function(_point)
-{
+ED.EpiretinalMembrane.prototype.draw = function(_point) {
 	// Get context
 	var ctx = this.drawing.context;
-	
+
 	// Call draw method in superclass
 	ED.EpiretinalMembrane.superclass.draw.call(this, _point);
-	
+
 	// Boundary path
 	ctx.beginPath();
-	
+
 	// Invisible boundary
-    var r = 120;
-	ctx.arc(0,0,r,0,Math.PI*2,true);
-    
+	var r = 120;
+	ctx.arc(0, 0, r, 0, Math.PI * 2, true);
+
 	// Close path
 	ctx.closePath();
-	
+
 	// Set line attributes
 	ctx.lineWidth = 0;
 	ctx.fillStyle = "rgba(0, 0, 0, 0)";
 	ctx.strokeStyle = "rgba(0, 0, 0, 0)";
-	
+
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
-	
-	// Other stuff here
-	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
-	{
-        // Greenish semi-transparent
-        ctx.strokeStyle= "rgba(0, 255, 0, 0.7)";
 
-        // Central line
-        ctx.beginPath();
-        ctx.moveTo(-r, 0);
-        ctx.lineTo(r,0);
-        
-        // Curved lines above and below
-        var x = r * 0.9;
-        var y = -r/2;
-        var f = 0.3;
-        ctx.moveTo(-x, y);
-        ctx.bezierCurveTo(-x * f, y * f, x * f, y * f, x, y);
-        y = r/2;
-        ctx.moveTo(-x, y);
-        ctx.bezierCurveTo(-x * f, y * f, x * f, y * f, x, y);
-        x = r * 0.6;
-        y = -r * 0.8;
-        f = 0.5;
-        ctx.moveTo(-x, y);
-        ctx.bezierCurveTo(-x * f, y * f, x * f, y * f, x, y);
-        y = r * 0.8;
-        ctx.moveTo(-x, y);
-        ctx.bezierCurveTo(-x * f, y * f, x * f, y * f, x, y);
-        
-        // Round ended line
-        ctx.lineWidth = 18;
-        ctx.lineCap = "round";
-        
-        ctx.stroke();
+	// Other stuff here
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+		// Greenish semi-transparent
+		ctx.strokeStyle = "rgba(0, 255, 0, 0.7)";
+
+		// Central line
+		ctx.beginPath();
+		ctx.moveTo(-r, 0);
+		ctx.lineTo(r, 0);
+
+		// Curved lines above and below
+		var x = r * 0.9;
+		var y = -r / 2;
+		var f = 0.3;
+		ctx.moveTo(-x, y);
+		ctx.bezierCurveTo(-x * f, y * f, x * f, y * f, x, y);
+		y = r / 2;
+		ctx.moveTo(-x, y);
+		ctx.bezierCurveTo(-x * f, y * f, x * f, y * f, x, y);
+		x = r * 0.6;
+		y = -r * 0.8;
+		f = 0.5;
+		ctx.moveTo(-x, y);
+		ctx.bezierCurveTo(-x * f, y * f, x * f, y * f, x, y);
+		y = r * 0.8;
+		ctx.moveTo(-x, y);
+		ctx.bezierCurveTo(-x * f, y * f, x * f, y * f, x, y);
+
+		// Round ended line
+		ctx.lineWidth = 18;
+		ctx.lineCap = "round";
+
+		ctx.stroke();
 	}
-	
+
 	// Coordinates of handles (in canvas plane)
 	this.handleArray[2].location = this.transform.transformPoint(new ED.Point(r * 0.7, -r * 0.7));
-	
+
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
-	
+
 	// Return value indicating successful hittest
 	return this.isClicked;
 }
@@ -173,10 +164,9 @@ ED.EpiretinalMembrane.prototype.draw = function(_point)
  *
  * @returns {String} Description of doodle
  */
-ED.EpiretinalMembrane.prototype.description = function()
-{
-    var returnString = "Epiretinal membrane";
-	
+ED.EpiretinalMembrane.prototype.description = function() {
+	var returnString = "Epiretinal membrane";
+
 	return returnString;
 }
 
@@ -186,8 +176,7 @@ ED.EpiretinalMembrane.prototype.description = function()
  *
  * @returns {Int} SnoMed code of entity representated by doodle
  */
-ED.EpiretinalMembrane.prototype.snomedCode = function()
-{
+ED.EpiretinalMembrane.prototype.snomedCode = function() {
 	return 367649002;
 }
 
@@ -196,7 +185,6 @@ ED.EpiretinalMembrane.prototype.snomedCode = function()
  *
  * @returns {Int} Position in diagnostic hierarchy
  */
-ED.EpiretinalMembrane.prototype.diagnosticHierarchy = function()
-{
+ED.EpiretinalMembrane.prototype.diagnosticHierarchy = function() {
 	return 2;
 }

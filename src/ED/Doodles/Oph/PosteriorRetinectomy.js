@@ -32,11 +32,10 @@
  * @param {Float} _rotation
  * @param {Int} _order
  */
-ED.PosteriorRetinectomy = function(_drawing, _originX, _originY, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
-{
+ED.PosteriorRetinectomy = function(_drawing, _originX, _originY, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
 	// Set classname
 	this.className = "PosteriorRetinectomy";
-    
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _originX, _originY, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
 }
@@ -51,47 +50,43 @@ ED.PosteriorRetinectomy.superclass = ED.Doodle.prototype;
 /**
  * Sets handle attributes
  */
-ED.PosteriorRetinectomy.prototype.setHandles = function()
-{
+ED.PosteriorRetinectomy.prototype.setHandles = function() {
 	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
 }
 
 /**
  * Sets default properties
  */
-ED.PosteriorRetinectomy.prototype.setPropertyDefaults = function()
-{
-    // Update component of validation array for simple parameters
-    this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
-    this.parameterValidationArray['apexY']['range'].setMinAndMax(-200, -50);
+ED.PosteriorRetinectomy.prototype.setPropertyDefaults = function() {
+	// Update component of validation array for simple parameters
+	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
+	this.parameterValidationArray['apexY']['range'].setMinAndMax(-200, -50);
 }
 
 /**
  * Sets default parameters
  */
-ED.PosteriorRetinectomy.prototype.setParameterDefaults = function()
-{
-    this.apexX = 0;
-    this.apexY = -100;
-    
-    // Displacement from fovea, and from last doodle
-    var d = 100;
-    
-    this.originX = d;
-    this.originY = -d;
-    
-    var doodle = this.drawing.lastDoodleOfClass(this.className);
-    if (doodle)
-    {
-        var point = new ED.Point(doodle.originX, doodle.originY);
-        var direction = point.direction() + Math.PI/8;
-        var distance = point.length();
-        var np = new ED.Point(0,0);
-        np.setWithPolars(distance, direction);
-        
-        this.originX = np.x;
-        this.originY = np.y;
-    }
+ED.PosteriorRetinectomy.prototype.setParameterDefaults = function() {
+	this.apexX = 0;
+	this.apexY = -100;
+
+	// Displacement from fovea, and from last doodle
+	var d = 100;
+
+	this.originX = d;
+	this.originY = -d;
+
+	var doodle = this.drawing.lastDoodleOfClass(this.className);
+	if (doodle) {
+		var point = new ED.Point(doodle.originX, doodle.originY);
+		var direction = point.direction() + Math.PI / 8;
+		var distance = point.length();
+		var np = new ED.Point(0, 0);
+		np.setWithPolars(distance, direction);
+
+		this.originX = np.x;
+		this.originY = np.y;
+	}
 }
 
 /**
@@ -99,52 +94,50 @@ ED.PosteriorRetinectomy.prototype.setParameterDefaults = function()
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.PosteriorRetinectomy.prototype.draw = function(_point)
-{
+ED.PosteriorRetinectomy.prototype.draw = function(_point) {
 	// Get context
 	var ctx = this.drawing.context;
-	
+
 	// Call draw method in superclass
 	ED.PosteriorRetinectomy.superclass.draw.call(this, _point);
-	
+
 	// Boundary path
 	ctx.beginPath();
-	
+
 	// Circular retinectomy
-    var r = Math.sqrt(this.apexX * this.apexX + this.apexY * this.apexY);
-    var w = 16;
-    
-    // Two arcs
-	ctx.arc(0, 0, r + w, 0, Math.PI*2, true);
-    ctx.arc(0, 0, r - w, Math.PI*2, 0, false);
-    
+	var r = Math.sqrt(this.apexX * this.apexX + this.apexY * this.apexY);
+	var w = 16;
+
+	// Two arcs
+	ctx.arc(0, 0, r + w, 0, Math.PI * 2, true);
+	ctx.arc(0, 0, r - w, Math.PI * 2, 0, false);
+
 	// Close path
 	ctx.closePath();
-	
+
 	// Set line attributes
 	ctx.lineWidth = 1;
-    ctx.fillStyle = "rgba(255,255,0,0)";
+	ctx.fillStyle = "rgba(255,255,0,0)";
 	ctx.strokeStyle = "rgba(255,255,0,0)";
-	
+
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
-    
-    // Other paths and drawing here
-	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
-	{
-        ctx.beginPath();
-        ctx.arc(0, 0, r, 0, Math.PI*2, true);
-        ctx.lineWidth = 16;
-        ctx.strokeStyle = "red";
-        ctx.stroke();
-    }
-	
+
+	// Other paths and drawing here
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+		ctx.beginPath();
+		ctx.arc(0, 0, r, 0, Math.PI * 2, true);
+		ctx.lineWidth = 16;
+		ctx.strokeStyle = "red";
+		ctx.stroke();
+	}
+
 	// Coordinates of handles (in canvas plane)
 	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
-	
+
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
-	
+
 	// Return value indicating successful hittest
 	return this.isClicked;
 }
@@ -154,7 +147,6 @@ ED.PosteriorRetinectomy.prototype.draw = function(_point)
  *
  * @returns {String} Description of doodle
  */
-ED.PosteriorRetinectomy.prototype.groupDescription = function()
-{
+ED.PosteriorRetinectomy.prototype.groupDescription = function() {
 	return "Posterior retinectomy";
 }

@@ -34,19 +34,18 @@
  * @param {Int} _order
  * @constructor
  */
-ED.Rectus = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
-{
+ED.Rectus = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
 	// Set classname
 	this.className = "Rectus";
-    
-    // Private parameters
-    this.insertionY = -200;
-    this.hangback = false;
-    this.canTranspose = true;
-    
-    // Derived parameters (NB must set a value here to define parameter as a property of the object, even though value set later)
-    this.recession = 0;
-    this.transposition = 'None';
+
+	// Private parameters
+	this.insertionY = -200;
+	this.hangback = false;
+	this.canTranspose = true;
+
+	// Derived parameters (NB must set a value here to define parameter as a property of the object, even though value set later)
+	this.recession = 0;
+	this.transposition = 'None';
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
@@ -62,35 +61,47 @@ ED.Rectus.superclass = ED.Doodle.prototype;
 /**
  * Sets handle attributes
  */
-ED.Rectus.prototype.setHandles = function()
-{
+ED.Rectus.prototype.setHandles = function() {
 	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
 }
 
 /**
  * Sets default properties
  */
-ED.Rectus.prototype.setPropertyDefaults = function()
-{
+ED.Rectus.prototype.setPropertyDefaults = function() {
 	this.isScaleable = false;
 	this.isMoveable = false;
 	this.isRotatable = false;
 
-    // Add complete validation arrays for derived parameters
-    this.parameterValidationArray['recession'] = {kind:'derived', type:'float', range:new ED.Range(-12.5, 6.5), precision:1, animate:true};
-    this.parameterValidationArray['transposition'] = {kind:'derived', type:'string', list:['Up', 'None', 'Down'], animate:true};
-    this.parameterValidationArray['canTranspose'] = {kind:'derived', type:'bool', animate:false};
+	// Add complete validation arrays for derived parameters
+	this.parameterValidationArray['recession'] = {
+		kind: 'derived',
+		type: 'float',
+		range: new ED.Range(-12.5, 6.5),
+		precision: 1,
+		animate: true
+	};
+	this.parameterValidationArray['transposition'] = {
+		kind: 'derived',
+		type: 'string',
+		list: ['Up', 'None', 'Down'],
+		animate: true
+	};
+	this.parameterValidationArray['canTranspose'] = {
+		kind: 'derived',
+		type: 'bool',
+		animate: false
+	};
 }
 
 /**
  * Sets default parameters
  */
-ED.Rectus.prototype.setParameterDefaults = function()
-{
-    this.setParameterFromString('recession', '0');
-    this.setParameterFromString('transposition', 'None');
-    this.apexY = this.insertionY;
-    this.canTranspose = true;
+ED.Rectus.prototype.setParameterDefaults = function() {
+	this.setParameterFromString('recession', '0');
+	this.setParameterFromString('transposition', 'None');
+	this.apexY = this.insertionY;
+	this.canTranspose = true;
 }
 
 /**
@@ -101,85 +112,67 @@ ED.Rectus.prototype.setParameterDefaults = function()
  * @value {Undefined} _value Value of parameter to calculate
  * @returns {Array} Associative array of values of dependent parameters
  */
-ED.Rectus.prototype.dependentParameterValues = function(_parameter, _value)
-{
-    var returnArray = new Array();
-    
-    switch (_parameter)
-    {
-        case 'apexY':
-            returnArray['recession'] = Math.round(2 * (_value - this.insertionY)/16)/2;
-            break;
+ED.Rectus.prototype.dependentParameterValues = function(_parameter, _value) {
+	var returnArray = new Array();
 
-        case 'recession':
-            returnArray['apexY'] = _value * 16 + this.insertionY;
-            break;
-            
-        case 'apexX':
-            if (this.rotation > 0 && this.rotation < Math.PI)
-            {
-                if (_value < 0) returnArray['transposition'] = "Up";
-                else if (_value > 0) returnArray['transposition'] = "Down";
-                else returnArray['transposition'] = "None";
-            }
-            else
-            {
-                if (_value < 0) returnArray['transposition'] = "Down";
-                else if (_value > 0) returnArray['transposition'] = "Up";
-                else returnArray['transposition'] = "None";
-            }
-            break;
-            
-        case 'transposition':
-            switch (_value)
-            {
-                case "Up":
-                    if (this.rotation > 0 && this.rotation < Math.PI)
-                    {
-                        returnArray['apexX'] = -50;
-                    }
-                    else
-                    {
-                        returnArray['apexX'] = +50;
-                    }
-                    break;
-                case "Down":
-                    if (this.rotation > 0 && this.rotation < Math.PI)
-                    {
-                        returnArray['apexX'] = +50;
-                    }
-                    else
-                    {
-                        returnArray['apexX'] = -50;
-                    }
-                    break;
-                case "None":
-                    returnArray['apexX'] = +0;
-                    break;
-            }
-            break;
-    }
-    
-    // Constrain to a cross shaped path
-    var cw = 15;
-    if (this.apexY > this.insertionY - cw && this.apexY < this.insertionY + cw && this.canTranspose)
-    {
-        this.parameterValidationArray['apexX']['range'].setMinAndMax(-100, +100);
-    }
-    else
-    {
-        this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
-    }
-    if (this.apexX > - cw && this.apexX < cw)
-    {
-        this.parameterValidationArray['apexY']['range'].setMinAndMax(-400, -100);
-    }
-    else
-    {
-        this.parameterValidationArray['apexY']['range'].setMinAndMax(-200, -200);
-    }
-    
-    return returnArray;
+	switch (_parameter) {
+		case 'apexY':
+			returnArray['recession'] = Math.round(2 * (_value - this.insertionY) / 16) / 2;
+			break;
+
+		case 'recession':
+			returnArray['apexY'] = _value * 16 + this.insertionY;
+			break;
+
+		case 'apexX':
+			if (this.rotation > 0 && this.rotation < Math.PI) {
+				if (_value < 0) returnArray['transposition'] = "Up";
+				else if (_value > 0) returnArray['transposition'] = "Down";
+				else returnArray['transposition'] = "None";
+			} else {
+				if (_value < 0) returnArray['transposition'] = "Down";
+				else if (_value > 0) returnArray['transposition'] = "Up";
+				else returnArray['transposition'] = "None";
+			}
+			break;
+
+		case 'transposition':
+			switch (_value) {
+				case "Up":
+					if (this.rotation > 0 && this.rotation < Math.PI) {
+						returnArray['apexX'] = -50;
+					} else {
+						returnArray['apexX'] = +50;
+					}
+					break;
+				case "Down":
+					if (this.rotation > 0 && this.rotation < Math.PI) {
+						returnArray['apexX'] = +50;
+					} else {
+						returnArray['apexX'] = -50;
+					}
+					break;
+				case "None":
+					returnArray['apexX'] = +0;
+					break;
+			}
+			break;
+	}
+
+	// Constrain to a cross shaped path
+	var cw = 15;
+	if (this.apexY > this.insertionY - cw && this.apexY < this.insertionY + cw && this.canTranspose) {
+		this.parameterValidationArray['apexX']['range'].setMinAndMax(-100, +100);
+	} else {
+		this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
+	}
+	if (this.apexX > -cw && this.apexX < cw) {
+		this.parameterValidationArray['apexY']['range'].setMinAndMax(-400, -100);
+	} else {
+		this.parameterValidationArray['apexY']['range'].setMinAndMax(-200, -200);
+	}
+
+	return returnArray;
 }
 
 /**
@@ -187,120 +180,111 @@ ED.Rectus.prototype.dependentParameterValues = function(_parameter, _value)
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.Rectus.prototype.draw = function(_point)
-{
+ED.Rectus.prototype.draw = function(_point) {
 	// Get context
 	var ctx = this.drawing.context;
-	
+
 	// Call draw method in superclass
 	ED.Rectus.superclass.draw.call(this, _point);
-	
+
 	// Boundary path
 	ctx.beginPath();
-    
-    var muscleHalfWidth = 60;
-    var startY = -450;
-	
+
+	var muscleHalfWidth = 60;
+	var startY = -450;
+
 	// Rectus
 	ctx.moveTo(-muscleHalfWidth, startY);
-    ctx.lineTo(muscleHalfWidth, startY);
-    ctx.lineTo(this.apexX + muscleHalfWidth, this.apexY);
-    ctx.lineTo(this.apexX - muscleHalfWidth, this.apexY);   
-	
+	ctx.lineTo(muscleHalfWidth, startY);
+	ctx.lineTo(this.apexX + muscleHalfWidth, this.apexY);
+	ctx.lineTo(this.apexX - muscleHalfWidth, this.apexY);
+
 	// Close path
 	ctx.closePath();
-	
+
 	// Set line attributes
 	ctx.lineWidth = 2;
 	ctx.fillStyle = "rgba(255, 140 , 80, 1)";
-    ctx.strokeStyle = "rgba(255, 184, 93, 1)";
-	
+	ctx.strokeStyle = "rgba(255, 184, 93, 1)";
+
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
-	
+
 	// non boundary paths
-	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
-	{
-        // Indicate a recection by continuing muscle beyond insertion with different fill
-        if (this.insertionY < this.apexY)
-        {
-            // x coordinate of left side of muscle at insertion
-            var xi = -muscleHalfWidth + this.apexX * (this.insertionY - startY)/(this.apexY - startY);
-            
-            // Part of muscle anterior to insertion
-            ctx.beginPath();
-            ctx.moveTo(xi, this.insertionY);
-            ctx.lineTo(xi + 2 * muscleHalfWidth, this.insertionY);
-            ctx.lineTo(this.apexX + muscleHalfWidth, this.apexY);
-            ctx.lineTo(this.apexX - muscleHalfWidth, this.apexY);
-            ctx.closePath();
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+		// Indicate a recection by continuing muscle beyond insertion with different fill
+		if (this.insertionY < this.apexY) {
+			// x coordinate of left side of muscle at insertion
+			var xi = -muscleHalfWidth + this.apexX * (this.insertionY - startY) / (this.apexY - startY);
 
-            ctx.fillStyle = "rgba(255, 220, 140, 1)";
-            ctx.fill();
-        }
-        
-        // Suture
-        if (!(this.apexX == 0 && this.apexY == this.insertionY)) //&& this.recession() == "0.0"))
-        {
-            var margin = 15;
-            var sutureLength = 15;
-            var indent = 10;
-            var bite = 20;
-            
-            // Y coordinate of muscle bite
-            var ym;
-            if (this.insertionY > this.apexY)
-            {
-                ym = this.apexY;
-            }
-            else
-            {
-                ym = this.insertionY;
-            }
-            
-            // Y coordinate of knot
-            var yk;
-            if (!this.hangback && this.insertionY > this.apexY)
-            {
-                yk = this.apexY + margin;
-            }
-            else
-            {
-                yk = this.insertionY + margin;
-            }
-            
-            // X coordinate
-            var x = this.apexX;
+			// Part of muscle anterior to insertion
+			ctx.beginPath();
+			ctx.moveTo(xi, this.insertionY);
+			ctx.lineTo(xi + 2 * muscleHalfWidth, this.insertionY);
+			ctx.lineTo(this.apexX + muscleHalfWidth, this.apexY);
+			ctx.lineTo(this.apexX - muscleHalfWidth, this.apexY);
+			ctx.closePath();
 
-            ctx.beginPath();
-            ctx.moveTo(x, yk);
-            ctx.lineTo(x - sutureLength, yk + sutureLength);
-            ctx.moveTo(x + sutureLength, yk + sutureLength);
-            ctx.lineTo(x, yk);
-            ctx.arc(x, yk, 4, 0, Math.PI*2, true);            
-            ctx.moveTo(x, yk);
-            ctx.lineTo(x - muscleHalfWidth + indent, yk);
-            ctx.lineTo(x - muscleHalfWidth + indent, ym);
-            ctx.moveTo(x - muscleHalfWidth + indent, ym - margin);
-            ctx.lineTo(x - muscleHalfWidth + indent + bite, ym - margin);
-            ctx.moveTo(x + muscleHalfWidth - indent - bite, ym - margin);
-            ctx.lineTo(x + muscleHalfWidth - indent, ym - margin);
-            ctx.moveTo(x + muscleHalfWidth - indent, ym);  
-            ctx.lineTo(x + muscleHalfWidth - indent, yk);             
-            ctx.lineTo(x, yk);      
-            
-            ctx.lineWidth = 4;
-            ctx.strokeStyle = "black";
-            ctx.stroke();
-        }
+			ctx.fillStyle = "rgba(255, 220, 140, 1)";
+			ctx.fill();
+		}
+
+		// Suture
+		if (!(this.apexX == 0 && this.apexY == this.insertionY)) //&& this.recession() == "0.0"))
+		{
+			var margin = 15;
+			var sutureLength = 15;
+			var indent = 10;
+			var bite = 20;
+
+			// Y coordinate of muscle bite
+			var ym;
+			if (this.insertionY > this.apexY) {
+				ym = this.apexY;
+			} else {
+				ym = this.insertionY;
+			}
+
+			// Y coordinate of knot
+			var yk;
+			if (!this.hangback && this.insertionY > this.apexY) {
+				yk = this.apexY + margin;
+			} else {
+				yk = this.insertionY + margin;
+			}
+
+			// X coordinate
+			var x = this.apexX;
+
+			ctx.beginPath();
+			ctx.moveTo(x, yk);
+			ctx.lineTo(x - sutureLength, yk + sutureLength);
+			ctx.moveTo(x + sutureLength, yk + sutureLength);
+			ctx.lineTo(x, yk);
+			ctx.arc(x, yk, 4, 0, Math.PI * 2, true);
+			ctx.moveTo(x, yk);
+			ctx.lineTo(x - muscleHalfWidth + indent, yk);
+			ctx.lineTo(x - muscleHalfWidth + indent, ym);
+			ctx.moveTo(x - muscleHalfWidth + indent, ym - margin);
+			ctx.lineTo(x - muscleHalfWidth + indent + bite, ym - margin);
+			ctx.moveTo(x + muscleHalfWidth - indent - bite, ym - margin);
+			ctx.lineTo(x + muscleHalfWidth - indent, ym - margin);
+			ctx.moveTo(x + muscleHalfWidth - indent, ym);
+			ctx.lineTo(x + muscleHalfWidth - indent, yk);
+			ctx.lineTo(x, yk);
+
+			ctx.lineWidth = 4;
+			ctx.strokeStyle = "black";
+			ctx.stroke();
+		}
 	}
-	
+
 	// Coordinates of handles (in canvas plane)
 	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
-	
+
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
-	
+
 	// Return value indicating successful hittest
 	return this.isClicked;
 }

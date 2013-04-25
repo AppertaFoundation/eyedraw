@@ -33,8 +33,7 @@
  * @param {Float} _rotation
  * @param {Int} _order
  */
-ED.MacularHole = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
-{
+ED.MacularHole = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
 	// Set classname
 	this.className = "MacularHole";
 
@@ -52,39 +51,35 @@ ED.MacularHole.superclass = ED.Doodle.prototype;
 /**
  * Sets handle attributes
  */
-ED.MacularHole.prototype.setHandles = function()
-{
+ED.MacularHole.prototype.setHandles = function() {
 	this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, false);
 }
 
 /**
  * Sets default properties
  */
-ED.MacularHole.prototype.setPropertyDefaults = function()
-{
+ED.MacularHole.prototype.setPropertyDefaults = function() {
 	this.isMoveable = false;
 	this.isRotatable = false;
-    this.isUnique = true;
+	this.isUnique = true;
 
-    // Update component of validation array for simple parameters
-    this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
-    this.parameterValidationArray['apexY']['range'].setMinAndMax(-40, +30);
-    this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.5, +1.5);
-    this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.5, +1.5);
+	// Update component of validation array for simple parameters
+	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
+	this.parameterValidationArray['apexY']['range'].setMinAndMax(-40, +30);
+	this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.5, +1.5);
+	this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.5, +1.5);
 }
 
 /**
  * Sets default parameters
  */
-ED.MacularHole.prototype.setParameterDefaults = function()
-{
-    // CMO is displaced for Fundus, central for others
-    if (this.drawing.hasDoodleOfClass('Fundus'))
-    {
-        this.originX = this.drawing.eye == ED.eye.Right?-100:100;
-        this.scaleX = 0.5;
-        this.scaleY = 0.5;
-    }
+ED.MacularHole.prototype.setParameterDefaults = function() {
+	// CMO is displaced for Fundus, central for others
+	if (this.drawing.hasDoodleOfClass('Fundus')) {
+		this.originX = this.drawing.eye == ED.eye.Right ? -100 : 100;
+		this.scaleX = 0.5;
+		this.scaleY = 0.5;
+	}
 }
 
 /**
@@ -92,52 +87,50 @@ ED.MacularHole.prototype.setParameterDefaults = function()
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.MacularHole.prototype.draw = function(_point)
-{
+ED.MacularHole.prototype.draw = function(_point) {
 	// Get context
 	var ctx = this.drawing.context;
-	
+
 	// Call draw method in superclass
 	ED.MacularHole.superclass.draw.call(this, _point);
-    
-    // Radius
-    var r = 40;
-	
+
+	// Radius
+	var r = 40;
+
 	// Boundary path
 	ctx.beginPath();
-	
+
 	// Large yellow circle - hole and subretinal fluid
-	ctx.arc(0,0,r,0,Math.PI*2,true);
-    
+	ctx.arc(0, 0, r, 0, Math.PI * 2, true);
+
 	// Close path
 	ctx.closePath();
-	
+
 	// Set line attributes
 	ctx.lineWidth = 0;
 	ctx.fillStyle = "yellow";
 	ctx.strokeStyle = "red";
-	
+
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
-	
+
 	// Other stuff here
-	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
-	{
-        ctx.beginPath();
-        ctx.arc(0,0,2*r/3,0,Math.PI*2,true);
-        ctx.closePath();
-        ctx.fillStyle = "red";
-        ctx.fill();
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+		ctx.beginPath();
+		ctx.arc(0, 0, 2 * r / 3, 0, Math.PI * 2, true);
+		ctx.closePath();
+		ctx.fillStyle = "red";
+		ctx.fill();
 	}
-	
+
 	// Coordinates of handles (in canvas plane)
-    point = new ED.Point(0, 0);
-    point.setWithPolars(r, Math.PI/4);
+	point = new ED.Point(0, 0);
+	point.setWithPolars(r, Math.PI / 4);
 	this.handleArray[2].location = this.transform.transformPoint(point);
-	
+
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
-	
+
 	// Return value indicating successful hittest
 	return this.isClicked;
 }
@@ -147,9 +140,8 @@ ED.MacularHole.prototype.draw = function(_point)
  *
  * @returns {String} Description of doodle
  */
-ED.MacularHole.prototype.description = function()
-{
-    return "Macular hole";
+ED.MacularHole.prototype.description = function() {
+	return "Macular hole";
 }
 
 
@@ -158,8 +150,7 @@ ED.MacularHole.prototype.description = function()
  *
  * @returns {Int} SnoMed code of entity representated by doodle
  */
-ED.MacularHole.prototype.snomedCode = function()
-{
+ED.MacularHole.prototype.snomedCode = function() {
 	return 232006002;
 }
 
@@ -168,7 +159,6 @@ ED.MacularHole.prototype.snomedCode = function()
  *
  * @returns {Int} Position in diagnostic hierarchy
  */
-ED.MacularHole.prototype.diagnosticHierarchy = function()
-{
+ED.MacularHole.prototype.diagnosticHierarchy = function() {
 	return 2;
 }

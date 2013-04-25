@@ -33,8 +33,7 @@
  * @param {Float} _rotation
  * @param {Int} _order
  */
-ED.OpticDiscPit = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
-{
+ED.OpticDiscPit = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
 	// Set classname
 	this.className = "OpticDiscPit";
 
@@ -52,44 +51,38 @@ ED.OpticDiscPit.superclass = ED.Doodle.prototype;
 /**
  * Sets handle attributes
  */
-ED.OpticDiscPit.prototype.setHandles = function()
-{
-    this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, false);
+ED.OpticDiscPit.prototype.setHandles = function() {
+	this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, false);
 }
 
 /**
  * Sets default dragging attributes
  */
-ED.OpticDiscPit.prototype.setPropertyDefaults = function()
-{
+ED.OpticDiscPit.prototype.setPropertyDefaults = function() {
 	this.isSqueezable = true;
-    this.isUnique = true;
-    
-    // Update component of validation array for simple parameters
-    this.parameterValidationArray['originX']['range'].setMinAndMax(-150, +150);
-    this.parameterValidationArray['originY']['range'].setMinAndMax(-150, +150);
-    this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.5, +3);
-    this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.5, +3);
+	this.isUnique = true;
+
+	// Update component of validation array for simple parameters
+	this.parameterValidationArray['originX']['range'].setMinAndMax(-150, +150);
+	this.parameterValidationArray['originY']['range'].setMinAndMax(-150, +150);
+	this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.5, +3);
+	this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.5, +3);
 }
 
 /**
  * Sets default parameters
  */
-ED.OpticDiscPit.prototype.setParameterDefaults = function()
-{
-    this.originY = 130;
-    this.apexY = 0;
-    this.scaleX = 1.5;
-    
-    // Pits are usually STQ
-    if(this.drawing.eye == ED.eye.Right)
-    {
-        this.originX = -50;
-    }
-    else
-    {
-        this.originX = 50;
-    }
+ED.OpticDiscPit.prototype.setParameterDefaults = function() {
+	this.originY = 130;
+	this.apexY = 0;
+	this.scaleX = 1.5;
+
+	// Pits are usually STQ
+	if (this.drawing.eye == ED.eye.Right) {
+		this.originX = -50;
+	} else {
+		this.originX = 50;
+	}
 }
 
 /**
@@ -97,44 +90,43 @@ ED.OpticDiscPit.prototype.setParameterDefaults = function()
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.OpticDiscPit.prototype.draw = function(_point)
-{
+ED.OpticDiscPit.prototype.draw = function(_point) {
 	// Get context
 	var ctx = this.drawing.context;
-    
+
 	// Call draw method in superclass
 	ED.OpticDiscPit.superclass.draw.call(this, _point);
-    
+
 	// Boundary path
 	ctx.beginPath();
-	
+
 	// Round hole
-    var r = 80;
-	ctx.arc(0, 0, r, 0, Math.PI*2, true);
-    
+	var r = 80;
+	ctx.arc(0, 0, r, 0, Math.PI * 2, true);
+
 	// Close path
 	ctx.closePath();
-    
-    // Radial gradient
-    var lightGray = "rgba(200, 200, 200, 0.75)";
-    var darkGray = "rgba(100, 100, 100, 0.75)";
-    var gradient = ctx.createRadialGradient(0, 0, r, 0, 0, 10);
-    gradient.addColorStop(0, darkGray);
-    gradient.addColorStop(1, lightGray);
-    
+
+	// Radial gradient
+	var lightGray = "rgba(200, 200, 200, 0.75)";
+	var darkGray = "rgba(100, 100, 100, 0.75)";
+	var gradient = ctx.createRadialGradient(0, 0, r, 0, 0, 10);
+	gradient.addColorStop(0, darkGray);
+	gradient.addColorStop(1, lightGray);
+
 	ctx.fillStyle = gradient;
 	ctx.lineWidth = 2;
 	ctx.strokeStyle = "gray";
-	
+
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
-    
-    // Coordinates of handles (in canvas plane)
+
+	// Coordinates of handles (in canvas plane)
 	this.handleArray[2].location = this.transform.transformPoint(new ED.Point(55, -55));
-    
+
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
- 	
+
 	// Return value indicating successful hittest
 	return this.isClicked;
 }
@@ -144,7 +136,6 @@ ED.OpticDiscPit.prototype.draw = function(_point)
  *
  * @returns {String} Description of doodle
  */
-ED.OpticDiscPit.prototype.description = function()
-{
-    return "Acquired pit of optic nerve";
+ED.OpticDiscPit.prototype.description = function() {
+	return "Acquired pit of optic nerve";
 }

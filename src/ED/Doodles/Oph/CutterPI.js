@@ -33,11 +33,10 @@
  * @param {Float} _rotation
  * @param {Int} _order
  */
-ED.CutterPI = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
-{
+ED.CutterPI = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
 	// Set classname
 	this.className = "CutterPI";
-    
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
 }
@@ -52,8 +51,7 @@ ED.CutterPI.superclass = ED.Doodle.prototype;
 /**
  * Sets default properties
  */
-ED.CutterPI.prototype.setPropertyDefaults = function()
-{
+ED.CutterPI.prototype.setPropertyDefaults = function() {
 	this.isScaleable = false;
 	this.isMoveable = false;
 }
@@ -61,9 +59,8 @@ ED.CutterPI.prototype.setPropertyDefaults = function()
 /**
  * Sets default parameters
  */
-ED.CutterPI.prototype.setParameterDefaults = function()
-{
-    this.setRotationWithDisplacements(160,40);
+ED.CutterPI.prototype.setParameterDefaults = function() {
+	this.setRotationWithDisplacements(160, 40);
 }
 
 /**
@@ -71,32 +68,31 @@ ED.CutterPI.prototype.setParameterDefaults = function()
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.CutterPI.prototype.draw = function(_point)
-{
+ED.CutterPI.prototype.draw = function(_point) {
 	// Get context
 	var ctx = this.drawing.context;
-	
+
 	// Call draw method in superclass
 	ED.CutterPI.superclass.draw.call(this, _point);
-	
+
 	// Boundary path
 	ctx.beginPath();
-    
-    // Draw base
-    ctx.arc(0, -324, 40, 0, 2 * Math.PI, true);
-    
-    // Colour of fill
-    ctx.fillStyle = "rgba(255,255,255,1)";
-    
+
+	// Draw base
+	ctx.arc(0, -324, 40, 0, 2 * Math.PI, true);
+
+	// Colour of fill
+	ctx.fillStyle = "rgba(255,255,255,1)";
+
 	// Set line attributes
 	ctx.lineWidth = 4;
-    
-    // Colour of outer line is dark gray
-    ctx.strokeStyle = "rgba(120,120,120,0.75)";;
-	
+
+	// Colour of outer line is dark gray
+	ctx.strokeStyle = "rgba(120,120,120,0.75)";;
+
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
-	
+
 	// Return value indicating successful hittest
 	return this.isClicked;
 }
@@ -106,7 +102,6 @@ ED.CutterPI.prototype.draw = function(_point)
  *
  * @returns {String} Description of doodle
  */
-ED.CutterPI.prototype.groupDescription = function()
-{
-    return "Cutter iridectomy/s";
+ED.CutterPI.prototype.groupDescription = function() {
+	return "Cutter iridectomy/s";
 }

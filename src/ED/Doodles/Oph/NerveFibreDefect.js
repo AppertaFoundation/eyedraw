@@ -33,11 +33,10 @@
  * @param {Float} _rotation
  * @param {Int} _order
  */
-ED.NerveFibreDefect = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
-{
+ED.NerveFibreDefect = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
 	// Set classname
 	this.className = "NerveFibreDefect";
-	
+
 	// Call super-class constructor
 	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
 }
@@ -52,8 +51,7 @@ ED.NerveFibreDefect.superclass = ED.Doodle.prototype;
 /**
  * Sets handle attributes
  */
-ED.NerveFibreDefect.prototype.setHandles = function()
-{
+ED.NerveFibreDefect.prototype.setHandles = function() {
 	this.handleArray[0] = new ED.Handle(null, true, ED.Mode.Arc, false);
 	this.handleArray[3] = new ED.Handle(null, true, ED.Mode.Arc, false);
 	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
@@ -62,24 +60,22 @@ ED.NerveFibreDefect.prototype.setHandles = function()
 /**
  * Sets default dragging attributes
  */
-ED.NerveFibreDefect.prototype.setPropertyDefaults = function()
-{
+ED.NerveFibreDefect.prototype.setPropertyDefaults = function() {
 	this.isMoveable = false;
-    
-    // Update component of validation array for simple parameters
-    this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
-    this.parameterValidationArray['apexY']['range'].setMinAndMax(-560, -400);
+
+	// Update component of validation array for simple parameters
+	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
+	this.parameterValidationArray['apexY']['range'].setMinAndMax(-560, -400);
 }
 
 /**
  * Sets default parameters
  */
-ED.NerveFibreDefect.prototype.setParameterDefaults = function()
-{
-    this.arc = 20 * Math.PI/180;
-    this.apexY = -460;
-    
-    this.setRotationWithDisplacements(150,-120);
+ED.NerveFibreDefect.prototype.setParameterDefaults = function() {
+	this.arc = 20 * Math.PI / 180;
+	this.apexY = -460;
+
+	this.setRotationWithDisplacements(150, -120);
 }
 
 /**
@@ -87,58 +83,57 @@ ED.NerveFibreDefect.prototype.setParameterDefaults = function()
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.NerveFibreDefect.prototype.draw = function(_point)
-{
+ED.NerveFibreDefect.prototype.draw = function(_point) {
 	// Get context
 	var ctx = this.drawing.context;
-	
+
 	// Call draw method in superclass
 	ED.NerveFibreDefect.superclass.draw.call(this, _point);
-    
+
 	// Radius of outer curve
 	var ro = -this.apexY;
-    var ri = 360;
-    var r = ri + (ro - ri)/2;
-	
+	var ri = 360;
+	var r = ri + (ro - ri) / 2;
+
 	// Calculate parameters for arcs
-	var theta = this.arc/2;
-	var arcStart = - Math.PI/2 + theta;
-	var arcEnd = - Math.PI/2 - theta;
-    
-    // Coordinates of 'corners' of NerveFibreDefect
+	var theta = this.arc / 2;
+	var arcStart = -Math.PI / 2 + theta;
+	var arcEnd = -Math.PI / 2 - theta;
+
+	// Coordinates of 'corners' of NerveFibreDefect
 	var topRightX = r * Math.sin(theta);
-	var topRightY = - r * Math.cos(theta);
-	var topLeftX = - r * Math.sin(theta);
+	var topRightY = -r * Math.cos(theta);
+	var topLeftX = -r * Math.sin(theta);
 	var topLeftY = topRightY;
-    
+
 	// Boundary path
 	ctx.beginPath();
-    
+
 	// Arc across to mirror image point on the other side
 	ctx.arc(0, 0, ro, arcStart, arcEnd, true);
-    
+
 	// Arc back to mirror image point on the other side
 	ctx.arc(0, 0, ri, arcEnd, arcStart, false);
-    
+
 	// Close path
 	ctx.closePath();
-	
+
 	// Set line attributes
 	ctx.lineWidth = 4;
 	ctx.fillStyle = "rgba(200, 200, 200, 0.75)";
 	ctx.strokeStyle = "gray";
-	
+
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
-    
+
 	// Coordinates of handles (in canvas plane)
 	this.handleArray[0].location = this.transform.transformPoint(new ED.Point(topLeftX, topLeftY));
 	this.handleArray[3].location = this.transform.transformPoint(new ED.Point(topRightX, topRightY));
 	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
-	
+
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
-    
+
 	// Return value indicating successful hit test
 	return this.isClicked;
 }
@@ -148,9 +143,8 @@ ED.NerveFibreDefect.prototype.draw = function(_point)
  *
  * @returns {String} Group description
  */
-ED.NerveFibreDefect.prototype.groupDescription = function()
-{
-	return  "Nerve fibre layer defect at ";
+ED.NerveFibreDefect.prototype.groupDescription = function() {
+	return "Nerve fibre layer defect at ";
 }
 
 /**
@@ -158,7 +152,6 @@ ED.NerveFibreDefect.prototype.groupDescription = function()
  *
  * @returns {String} Description of doodle
  */
-ED.NerveFibreDefect.prototype.description = function()
-{
-    return this.clockHour() + " o'clock";
+ED.NerveFibreDefect.prototype.description = function() {
+	return this.clockHour() + " o'clock";
 }

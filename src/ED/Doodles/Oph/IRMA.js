@@ -33,8 +33,7 @@
  * @param {Float} _rotation
  * @param {Int} _order
  */
-ED.IRMA = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
-{
+ED.IRMA = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
 	// Set classname
 	this.className = "IRMA";
 
@@ -52,27 +51,24 @@ ED.IRMA.superclass = ED.Doodle.prototype;
 /**
  * Sets handle attributes
  */
-ED.IRMA.prototype.setHandles = function()
-{
-    this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, true);
+ED.IRMA.prototype.setHandles = function() {
+	this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, true);
 }
 
 /**
  * Set default properties
  */
-ED.IRMA.prototype.setPropertyDefaults = function()
-{
-    // Update component of validation array for simple parameters
-    this.parameterValidationArray['scaleX']['range'].setMinAndMax(+1, +1.5);
-    this.parameterValidationArray['scaleY']['range'].setMinAndMax(+1, +1.5);
+ED.IRMA.prototype.setPropertyDefaults = function() {
+	// Update component of validation array for simple parameters
+	this.parameterValidationArray['scaleX']['range'].setMinAndMax(+1, +1.5);
+	this.parameterValidationArray['scaleY']['range'].setMinAndMax(+1, +1.5);
 }
 
 /**
  * Sets default parameters
  */
-ED.IRMA.prototype.setParameterDefaults = function()
-{
-    this.setOriginWithDisplacements(100, 100);
+ED.IRMA.prototype.setParameterDefaults = function() {
+	this.setOriginWithDisplacements(100, 100);
 }
 
 /**
@@ -80,42 +76,41 @@ ED.IRMA.prototype.setParameterDefaults = function()
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.IRMA.prototype.draw = function(_point)
-{
+ED.IRMA.prototype.draw = function(_point) {
 	// Get context
 	var ctx = this.drawing.context;
-    
+
 	// Call draw method in superclass
 	ED.IRMA.superclass.draw.call(this, _point);
-    
+
 	// Boundary path
 	ctx.beginPath();
-    
-    // Move to centre
-    ctx.moveTo(0, 30);
-    
-    // Create curves for the IRMA
-    ctx.bezierCurveTo(-30, 30, -70, 0, -50, -20);
-    ctx.bezierCurveTo(-30, -40, -20, -10, 0, -10);
-    ctx.bezierCurveTo(20, -10, 30, -40, 50, -20);
-    ctx.bezierCurveTo(70, 0, 30, 30, 0, 30);
-    
-    // Transparent fill
-    ctx.fillStyle = "rgba(100, 100, 100, 0)";
-	
+
+	// Move to centre
+	ctx.moveTo(0, 30);
+
+	// Create curves for the IRMA
+	ctx.bezierCurveTo(-30, 30, -70, 0, -50, -20);
+	ctx.bezierCurveTo(-30, -40, -20, -10, 0, -10);
+	ctx.bezierCurveTo(20, -10, 30, -40, 50, -20);
+	ctx.bezierCurveTo(70, 0, 30, 30, 0, 30);
+
+	// Transparent fill
+	ctx.fillStyle = "rgba(100, 100, 100, 0)";
+
 	// Set attributes
 	ctx.lineWidth = 3;
-	ctx.strokeStyle =  "red";
-	
+	ctx.strokeStyle = "red";
+
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
-    
-    // Coordinates of handles (in canvas plane)
+
+	// Coordinates of handles (in canvas plane)
 	this.handleArray[2].location = this.transform.transformPoint(new ED.Point(50, -40));
-	
+
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
-    
+
 	// Return value indicating successful hittest
 	return this.isClicked;
 }
@@ -125,8 +120,7 @@ ED.IRMA.prototype.draw = function(_point)
  *
  * @returns {String} Group description
  */
-ED.IRMA.prototype.groupDescription = function()
-{
+ED.IRMA.prototype.groupDescription = function() {
 	return "Intraretinal microvascular abnormalities ";
 }
 
@@ -135,7 +129,6 @@ ED.IRMA.prototype.groupDescription = function()
  *
  * @returns {String} Description of doodle
  */
-ED.IRMA.prototype.description = function()
-{
-    return this.locationRelativeToFovea();
+ED.IRMA.prototype.description = function() {
+	return this.locationRelativeToFovea();
 }

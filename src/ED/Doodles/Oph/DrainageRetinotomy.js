@@ -33,12 +33,11 @@
  * @param {Float} _rotation
  * @param {Int} _order
  */
-ED.DrainageRetinotomy = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
-{
+ED.DrainageRetinotomy = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
 	// Set classname
 	this.className = "DrainageRetinotomy";
-	
-    // Call superclass constructor
+
+	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
 }
 
@@ -53,9 +52,8 @@ ED.DrainageRetinotomy.superclass = ED.Doodle.prototype;
  * Sets default parameters (Only called for new doodles)
  * Use the setParameter function for derived parameters, as this will also update dependent variables
  */
-ED.DrainageRetinotomy.prototype.setParameterDefaults = function()
-{
-    this.setOriginWithDisplacements(140, 100);
+ED.DrainageRetinotomy.prototype.setParameterDefaults = function() {
+	this.setOriginWithDisplacements(140, 100);
 }
 
 /**
@@ -63,31 +61,30 @@ ED.DrainageRetinotomy.prototype.setParameterDefaults = function()
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.DrainageRetinotomy.prototype.draw = function(_point)
-{
+ED.DrainageRetinotomy.prototype.draw = function(_point) {
 	// Get context
 	var ctx = this.drawing.context;
-	
+
 	// Call draw method in superclass
 	ED.DrainageRetinotomy.superclass.draw.call(this, _point);
-	
+
 	// Boundary path
 	ctx.beginPath();
-	
+
 	// Circle
-	ctx.arc(0,0,30,0,Math.PI*2,true);
-    
+	ctx.arc(0, 0, 30, 0, Math.PI * 2, true);
+
 	// Close path
 	ctx.closePath();
-	
+
 	// Set line attributes
 	ctx.lineWidth = 16;
 	ctx.fillStyle = "rgba(255,0,0,0.5)";
 	ctx.strokeStyle = "red";
-	
+
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
-	
+
 	// Return value indicating successful hittest
 	return this.isClicked;
 }
@@ -97,7 +94,6 @@ ED.DrainageRetinotomy.prototype.draw = function(_point)
  *
  * @returns {String} Description of doodle
  */
-ED.DrainageRetinotomy.prototype.description = function()
-{
-    return "Drainage retinotomy in " + this.quadrant();
+ED.DrainageRetinotomy.prototype.description = function() {
+	return "Drainage retinotomy in " + this.quadrant();
 }

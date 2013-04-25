@@ -33,14 +33,13 @@
  * @param {Float} _rotation
  * @param {Int} _order
  */
-ED.ChandelierSingle = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
-{
+ED.ChandelierSingle = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
 	// Set classname
 	this.className = "ChandelierSingle";
-    
-    // Private parameters
-    this.parsPlana = -560;
-    
+
+	// Private parameters
+	this.parsPlana = -560;
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
 }
@@ -55,8 +54,7 @@ ED.ChandelierSingle.superclass = ED.Doodle.prototype;
 /**
  * Sets default dragging attributes
  */
-ED.ChandelierSingle.prototype.setPropertyDefaults = function()
-{
+ED.ChandelierSingle.prototype.setPropertyDefaults = function() {
 	this.isScaleable = false;
 	this.isMoveable = false;
 }
@@ -64,9 +62,8 @@ ED.ChandelierSingle.prototype.setPropertyDefaults = function()
 /**
  * Sets default parameters
  */
-ED.ChandelierSingle.prototype.setParameterDefaults = function()
-{
-    this.setRotationWithDisplacements(180, 90);
+ED.ChandelierSingle.prototype.setParameterDefaults = function() {
+	this.setRotationWithDisplacements(180, 90);
 }
 
 /**
@@ -74,57 +71,55 @@ ED.ChandelierSingle.prototype.setParameterDefaults = function()
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.ChandelierSingle.prototype.draw = function(_point)
-{
+ED.ChandelierSingle.prototype.draw = function(_point) {
 	// Get context
 	var ctx = this.drawing.context;
-	
+
 	// Call draw method in superclass
 	ED.ChandelierSingle.superclass.draw.call(this, _point);
-    
+
 	// Boundary path
 	ctx.beginPath();
-    
+
 	// Port
 	ctx.rect(-60, this.parsPlana - 60, 120, 160);
-    
+
 	// Set line attributes
 	ctx.lineWidth = 2;
 	ctx.strokeStyle = "rgba(0, 0, 0, 0)";
-    
-    ctx.fillStyle = "rgba(0, 0, 0, 0)";
-	
+
+	ctx.fillStyle = "rgba(0, 0, 0, 0)";
+
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
-    
-    // Other stuff here
-	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
-	{
-        // Trocar
-        ctx.beginPath();
-        ctx.moveTo(-20, this.parsPlana + 60);
-        ctx.lineTo(+20, this.parsPlana + 60);
-        ctx.lineTo(+20, this.parsPlana + 120);
-        ctx.lineTo(0, this.parsPlana + 140);
-        ctx.lineTo(-20, this.parsPlana + 120);
-        ctx.lineTo(-20, this.parsPlana + 60);
-        ctx.fillStyle = "rgba(120, 120, 120, 0.5)";
-        ctx.fill();
-        
-        // Body
-        ctx.beginPath();
-        ctx.rect(-60, this.parsPlana, 120, 60);
-        ctx.fillStyle = "rgba(120, 120, 120, 1)";
-        ctx.fill();
-        
-        // Fibre optic
-        ctx.beginPath();
-        ctx.moveTo(0, this.parsPlana);
-        ctx.bezierCurveTo(0, this.parsPlana - 50, 50, this.parsPlana - 100, 100, this.parsPlana - 100);
-        ctx.lineWidth = 40;
-        ctx.strokeStyle = "rgba(120, 120, 120, 0.5)";
-        ctx.stroke();
-    }
+
+	// Other stuff here
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+		// Trocar
+		ctx.beginPath();
+		ctx.moveTo(-20, this.parsPlana + 60);
+		ctx.lineTo(+20, this.parsPlana + 60);
+		ctx.lineTo(+20, this.parsPlana + 120);
+		ctx.lineTo(0, this.parsPlana + 140);
+		ctx.lineTo(-20, this.parsPlana + 120);
+		ctx.lineTo(-20, this.parsPlana + 60);
+		ctx.fillStyle = "rgba(120, 120, 120, 0.5)";
+		ctx.fill();
+
+		// Body
+		ctx.beginPath();
+		ctx.rect(-60, this.parsPlana, 120, 60);
+		ctx.fillStyle = "rgba(120, 120, 120, 1)";
+		ctx.fill();
+
+		// Fibre optic
+		ctx.beginPath();
+		ctx.moveTo(0, this.parsPlana);
+		ctx.bezierCurveTo(0, this.parsPlana - 50, 50, this.parsPlana - 100, 100, this.parsPlana - 100);
+		ctx.lineWidth = 40;
+		ctx.strokeStyle = "rgba(120, 120, 120, 0.5)";
+		ctx.stroke();
+	}
 
 	// Return value indicating successful hittest
 	return this.isClicked;
@@ -135,8 +130,7 @@ ED.ChandelierSingle.prototype.draw = function(_point)
  *
  * @returns {String} Group description
  */
-ED.ChandelierSingle.prototype.groupDescription = function()
-{
+ED.ChandelierSingle.prototype.groupDescription = function() {
 	return "Chandelier at ";
 }
 
@@ -145,8 +139,7 @@ ED.ChandelierSingle.prototype.groupDescription = function()
  *
  * @returns {String} Description of doodle
  */
-ED.ChandelierSingle.prototype.description = function()
-{
-    // Location (clockhours)
+ED.ChandelierSingle.prototype.description = function() {
+	// Location (clockhours)
 	return this.clockHour() + " o'clock";
 }

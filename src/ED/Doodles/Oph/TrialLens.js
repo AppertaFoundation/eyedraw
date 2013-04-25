@@ -33,14 +33,13 @@
  * @param {Float} _rotation
  * @param {Int} _order
  */
-ED.TrialLens = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
-{
+ED.TrialLens = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
 	// Set classname
 	this.className = "TrialLens";
-    
-    // Derived parameters (NB must set a value here to define parameter as a property of the object, even though value set later)
-    this.axis = '0';
-    
+
+	// Derived parameters (NB must set a value here to define parameter as a property of the object, even though value set later)
+	this.axis = '0';
+
 	// Call super-class constructor
 	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
 }
@@ -55,25 +54,29 @@ ED.TrialLens.superclass = ED.Doodle.prototype;
 /**
  * Sets default dragging attributes
  */
-ED.TrialLens.prototype.setPropertyDefaults = function()
-{
-    this.isDeletable = false;
-    this.isShowHighlight = false;
+ED.TrialLens.prototype.setPropertyDefaults = function() {
+	this.isDeletable = false;
+	this.isShowHighlight = false;
 	this.isMoveable = false;
-    this.addAtBack = true;
-    this.isUnique = true;
-    
-    // Add complete validation arrays for derived parameters
-    this.parameterValidationArray['axis'] = {kind:'derived', type:'mod', range:new ED.Range(0, 180), clock:'bottom', animate:true};
+	this.addAtBack = true;
+	this.isUnique = true;
+
+	// Add complete validation arrays for derived parameters
+	this.parameterValidationArray['axis'] = {
+		kind: 'derived',
+		type: 'mod',
+		range: new ED.Range(0, 180),
+		clock: 'bottom',
+		animate: true
+	};
 }
 
 /**
  * Sets default parameters (Only called for new doodles)
  * Use the setParameter function for derived parameters, as this will also update dependent variables
  */
-ED.TrialLens.prototype.setParameterDefaults = function()
-{
-    this.setParameterFromString('axis', '0');
+ED.TrialLens.prototype.setParameterDefaults = function() {
+	this.setParameterFromString('axis', '0');
 }
 
 /**
@@ -84,22 +87,20 @@ ED.TrialLens.prototype.setParameterDefaults = function()
  * @value {Undefined} _value Value of parameter to calculate
  * @returns {Array} Associative array of values of dependent parameters
  */
-ED.TrialLens.prototype.dependentParameterValues = function(_parameter, _value)
-{
-    var returnArray = new Array();
-    
-    switch (_parameter)
-    {
-        case 'rotation':
-            returnArray['axis'] = (360 - 180 * _value/Math.PI) % 180;
-            break;
-            
-        case 'axis':
-            returnArray['rotation'] = (180 - _value) * Math.PI/180;
-            break;
-    }
-    
-    return returnArray;
+ED.TrialLens.prototype.dependentParameterValues = function(_parameter, _value) {
+	var returnArray = new Array();
+
+	switch (_parameter) {
+		case 'rotation':
+			returnArray['axis'] = (360 - 180 * _value / Math.PI) % 180;
+			break;
+
+		case 'axis':
+			returnArray['rotation'] = (180 - _value) * Math.PI / 180;
+			break;
+	}
+
+	return returnArray;
 }
 
 /**
@@ -107,53 +108,51 @@ ED.TrialLens.prototype.dependentParameterValues = function(_parameter, _value)
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.TrialLens.prototype.draw = function(_point)
-{
+ED.TrialLens.prototype.draw = function(_point) {
 	// Get context
 	var ctx = this.drawing.context;
-	
+
 	// Call draw method in superclass
 	ED.TrialLens.superclass.draw.call(this, _point);
-    
+
 	// Radius of outer curve just inside ora on right and left fundus diagrams
 	var ro = 360;
-    var ri = 180;
-    
+	var ri = 180;
+
 	// Boundary path
 	ctx.beginPath();
-    
+
 	// Arc across to mirror image point on the other side
 	ctx.arc(0, 0, ro, 0, 2 * Math.PI, true);
-    
-    // Move to start of next arc
-    ctx.moveTo(ri, 0);
-    
+
+	// Move to start of next arc
+	ctx.moveTo(ri, 0);
+
 	// Arc back to mirror image point on the other side
 	ctx.arc(0, 0, ri, 2 * Math.PI, 0, false);
-	
+
 	// Set line attributes
 	ctx.lineWidth = 4;
 	ctx.fillStyle = "rgba(255,100,100,1)";
 	ctx.strokeStyle = "gray";
-	
+
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
-	
+
 	// Other paths and drawing here
-	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
-	{
-        var d = 20;
-        ctx.beginPath();
-        ctx.moveTo(ro - d,0);
-        ctx.lineTo(ri + d,0);
-        ctx.moveTo(-ro + d,0);
-        ctx.lineTo(-ri - d,0);
-        
-        ctx.lineWidth = 16;
-        ctx.strokeStyle = "black";
-        ctx.stroke();
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+		var d = 20;
+		ctx.beginPath();
+		ctx.moveTo(ro - d, 0);
+		ctx.lineTo(ri + d, 0);
+		ctx.moveTo(-ro + d, 0);
+		ctx.lineTo(-ri - d, 0);
+
+		ctx.lineWidth = 16;
+		ctx.strokeStyle = "black";
+		ctx.stroke();
 	}
-    
+
 	// Return value indicating successful hit test
 	return this.isClicked;
 }

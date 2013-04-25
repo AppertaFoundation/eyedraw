@@ -33,8 +33,7 @@
  * @param {Float} _rotation
  * @param {Int} _order
  */
-ED.DrainageSite = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
-{
+ED.DrainageSite = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
 	// Set classname
 	this.className = "DrainageSite";
 
@@ -52,8 +51,7 @@ ED.DrainageSite.superclass = ED.Doodle.prototype;
 /**
  * Sets default dragging attributes
  */
-ED.DrainageSite.prototype.setPropertyDefaults = function()
-{
+ED.DrainageSite.prototype.setPropertyDefaults = function() {
 	this.isScaleable = false;
 	this.isMoveable = false;
 }
@@ -61,18 +59,14 @@ ED.DrainageSite.prototype.setPropertyDefaults = function()
 /**
  * Sets default parameters
  */
-ED.DrainageSite.prototype.setParameterDefaults = function()
-{
-    // Make rotation 30 degrees to last one of same class
-    var doodle = this.drawing.lastDoodleOfClass(this.className);
-    if (doodle)
-    {
-        this.rotation = doodle.rotation + Math.PI/6;
-    }
-    else
-    {
-        this.rotation = -60 * Math.PI/180
-    }
+ED.DrainageSite.prototype.setParameterDefaults = function() {
+	// Make rotation 30 degrees to last one of same class
+	var doodle = this.drawing.lastDoodleOfClass(this.className);
+	if (doodle) {
+		this.rotation = doodle.rotation + Math.PI / 6;
+	} else {
+		this.rotation = -60 * Math.PI / 180
+	}
 }
 
 /**
@@ -80,45 +74,44 @@ ED.DrainageSite.prototype.setParameterDefaults = function()
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.DrainageSite.prototype.draw = function(_point)
-{
+ED.DrainageSite.prototype.draw = function(_point) {
 	// Get context
 	var ctx = this.drawing.context;
-	
+
 	// Call draw method in superclass
 	ED.DrainageSite.superclass.draw.call(this, _point);
-    
-    // Radii
-    var ro = 440;
-    var ri = 360;
-    
+
+	// Radii
+	var ro = 440;
+	var ri = 360;
+
 	// Calculate parameters for arcs
-	var theta = Math.PI/30;
-	var arcStart = - Math.PI/2 + theta;
-	var arcEnd = - Math.PI/2 - theta;
-    
+	var theta = Math.PI / 30;
+	var arcStart = -Math.PI / 2 + theta;
+	var arcEnd = -Math.PI / 2 - theta;
+
 	// Boundary path
 	ctx.beginPath();
-    
+
 	// Arc across
 	ctx.arc(0, 0, ro, arcStart, arcEnd, true);
-    
+
 	// Line to point
 	ctx.lineTo(0, -ri);;
-    
+
 	// Close path
 	ctx.closePath();
-    
+
 	// Set line attributes
 	ctx.lineWidth = 4;
 	ctx.strokeStyle = "#777";
-	
+
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
-	
+
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
-	
+
 	// Return value indicating successful hittest
 	return this.isClicked;
 }
@@ -128,8 +121,7 @@ ED.DrainageSite.prototype.draw = function(_point)
  *
  * @returns {String} Group description
  */
-ED.DrainageSite.prototype.groupDescription = function()
-{
+ED.DrainageSite.prototype.groupDescription = function() {
 	return "Drainage site at ";
 }
 
@@ -138,8 +130,7 @@ ED.DrainageSite.prototype.groupDescription = function()
  *
  * @returns {String} Description of doodle
  */
-ED.DrainageSite.prototype.description = function()
-{
-    // Location (clockhours)
+ED.DrainageSite.prototype.description = function() {
+	// Location (clockhours)
 	return this.clockHour() + " o'clock";
 }

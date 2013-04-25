@@ -47,10 +47,7 @@ ED.TrabyFlap = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _
 	this.r = 380;
 	this.right = new ED.Point(0,0);
 	this.left = new ED.Point(0,0);
-	
-	// Additional parameters to save in JSON
-    //this.savedParams = ['height'];
-    
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
 }
@@ -179,12 +176,9 @@ ED.TrabyFlap.prototype.draw = function(_point)
 {
 	// Get context
 	var ctx = this.drawing.context;
-	
+
 	// Call draw method in superclass
 	ED.TrabyFlap.superclass.draw.call(this, _point);
-    
-    // Radius of limbus
-    //var r = this.r;
 	
 	// Calculate parameters for arcs
 	var theta = this.arc/2;
@@ -196,15 +190,15 @@ ED.TrabyFlap.prototype.draw = function(_point)
     
     // Apex point
     var apex = new ED.Point(0, this.height);
-    
+
 	this.right.x = this.r * Math.sin(theta);
-	this.right.y = - this.r * Math.cos(theta);
-	this.left.x = - this.r * Math.sin(theta);
-	this.left.y = - this.r * Math.cos(theta);
-	
+	this.right.y = -this.r * Math.cos(theta);
+	this.left.x = -this.r * Math.sin(theta);
+	this.left.y = -this.r * Math.cos(theta);
+
 	// Boundary path
 	ctx.beginPath();
-    
+
 	// Arc across to mirror image point on the other side
 	ctx.arc(0, 0, this.r, arcStart, arcEnd, true);
     
@@ -218,10 +212,10 @@ ED.TrabyFlap.prototype.draw = function(_point)
 
 	// Set line attributes
 	ctx.lineWidth = 4;
-    
-    // Colour of outer line is dark gray
-    ctx.strokeStyle = "rgba(120,120,120,0.75)";;
-	
+
+	// Colour of outer line is dark gray
+	ctx.strokeStyle = "rgba(120,120,120,0.75)";;
+
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
     
@@ -250,7 +244,7 @@ ED.TrabyFlap.prototype.draw = function(_point)
         ctx.fillStyle = "gray";
         ctx.fill();
 	}
-    
+
 	// Coordinates of handles (in canvas plane)
 	this.handleArray[0].location = this.transform.transformPoint(this.left);
 	this.handleArray[3].location = this.transform.transformPoint(this.right);
@@ -258,7 +252,7 @@ ED.TrabyFlap.prototype.draw = function(_point)
 	
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
-    
+
 	// Return value indicating successful hittest
 	return this.isClicked;
 }
@@ -267,7 +261,6 @@ ED.TrabyFlap.prototype.draw = function(_point)
  * Returns a string containing a text description of the doodle
  *
  * @returns {String} Description of doodle
- */
 ED.TrabyFlap.prototype.description = function()
 {
      return "Trabeculectomy flap at " + this.clockHour() + " o'clock with " + this.sclerostomy.firstLetterToLowerCase() + " sclerostomy";
