@@ -81,7 +81,7 @@ ED.ConjunctivalFlap.prototype.setPropertyDefaults = function()
 ED.ConjunctivalFlap.prototype.setParameterDefaults = function()
 {
     this.arc = 120 * Math.PI/180;
-    this.apexY = -620;
+    this.apexY = -660;
 }
 
 /**

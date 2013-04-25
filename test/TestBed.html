@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>EyeDraw</title>
+        
+        <!-- EyeDraw CSS style sheet -->
+        <link rel="stylesheet" href="../css/oe-eyedraw.css" type="text/css" media="screen" />
+        
+        <!-- Mandatory file containing key drawing classes -->
+        <script src="../dist/eyedraw.js" type="text/javascript"></script>
+        
+        <!--   This script handles the drawings for the page   -->
+        <script type="text/javascript">
+            
+            // This set can be written by PHP and contains doodle data for this drawing from a database
+//            var doodleSet = [{"subclass": "PhakoIncision", "originX": 0, "originY": 0, "radius": 250, "apexX": 0, "apexY": -250, "scaleX": 1.00, "scaleY": 1.00, "arc": 90, "rotation": 319, "order": 0, "squiggleArray": []}];
+            
+            
+            // Unique variable assigned to the drawing
+            var drawingEdit;
+            var drawingDisplay;
+            var doodle;
+            var controller;
+            
+            // Runs on page load
+            function init()
+            {
+                // Get reference to the drawingEdit canvas
+                var canvasEdit = document.getElementById('canvasEdit');
+                
+                // Create a drawingEdit , {scaleOn:'width'}
+                drawingEdit = new ED.Drawing(canvasEdit, ED.eye.Right, 'RPS', true, {graphicsPath:'../img/'});
+                
+                // Instantiate a controller object
+                controller = new eyeDrawController(drawingEdit);
+                
+                // Initialise drawing
+                drawingEdit.init();
+                
+                // Set focus to canvasEdit element
+                canvasEdit.focus();
+                
+//                for (var propertyName in ED)
+//                {
+//                    var doodle = ED[propertyName];
+//                    
+//                    if (doodle.superclass == ED.Doodle.prototype)
+//                    {
+//                        var dood = new ED[propertyName];
+//                        console.log(dood.className);
+//                    }
+//                }
+            }
+
+            // Controller class
+            function eyeDrawController(_drawing)
+            {
+                this.drawing = _drawing;
+                this.gsf = 0.72;
+                
+                // Specify call back function
+                this.callBack = callBack;
+                
+                // Register for notifications with drawing object
+                this.drawing.registerForNotifications(this, 'callBack', []);
+                
+                // Arrays to handle sutures
+                var suturePointsArray = new Array();
+                var sutureArray = new Array();
+                
+				// 'Prototype position' of trabeculectomy Sutures (relative position, angle and type)
+				var sutureSet = [
+					{xd: -1, yd: 0, a: 7 * Math.PI/4, t:'Releasable', ex: -25},
+					{xd: 0, yd: 0, a: 0, t:'Releasable', ex: 0},
+ 					{xd: +1, yd: 0, a: 1 * Math.PI/4, t:'Releasable', ex: +25},
+ 					{xd: -1, yd: 0.5, a: Math.PI/2, t:'Fixed', ex: 0},
+ 					{xd: +1, yd: 0.5, a: 3 * Math.PI/2, t:'Fixed', ex: 0},
+				];
+                
+                // Method called for notification
+                function callBack(_messageArray)
+                {
+                    switch (_messageArray['eventName'])
+                    {
+                        // Eye draw image files all loaded
+                        case 'ready':
+                        
+							//Scale down for glaucoma drawings
+							this.drawing.globalScaleFactor = this.gsf;
+
+							this.drawing.addDoodle('AntSeg');
+							this.drawing.addDoodle('ConjunctivalFlap');
+							this.drawing.addDoodle('PI', {rotation:0});
+						
+							// Add trabeculectomy flap
+							var trab = this.drawing.addDoodle('TrabyFlap', {size:'5x2'}, {size:{id:'sizeSelect', attribute:'value'}, sclerostomy:{id:'sclerostomySelect', attribute:'value'}});
+
+							// Iterate through sutures creating an array of objects representing 'ideal' sutures, and another array of the sutures themselves
+							for (var i in sutureSet)
+							{
+								// Create point from ideal with added attributes
+								var p = new ED.Point(sutureSet[i].xd * trab.right.x * this.gsf, (trab.height + sutureSet[i].yd * (trab.right.y - trab.height)) * this.gsf);
+								p.angle = sutureSet[i].a;
+								p.type = sutureSet[i].t;
+								p.ex = sutureSet[i].ex;
+							
+								// Add it to an array
+								suturePointsArray[suturePointsArray.length] = p;
+							
+								// Create a suture and add that to an array
+								var suture = this.drawing.addDoodle('TrabySuture', {originX:p.x, originY:p.y, rotation:p.angle, type:p.type});
+								suture.firstOriginX = p.ex;
+								sutureArray[sutureArray.length] = suture;
+							}                        
+
+							this.drawing.deselectDoodles();
+                            break;
+                            
+                        case 'parameterChanged':
+                            var doodle = _messageArray['object'].doodle;
+                            
+                            // TrabyFlap has changed size or rotated
+                            if (doodle.className == 'TrabyFlap')
+                            {
+                            	var trab = doodle;
+                            	if (_messageArray['object']['parameter'] == 'size')
+                            	{
+                            		for (var i = 0; i < sutureArray.length; i++)
+									{
+										sutureArray[i].originX = sutureSet[i].xd * trab.right.x * 0.72;
+										sutureArray[i].originY = (trab.height + sutureSet[i].yd * (trab.right.y - trab.height)) * 0.72;
+										
+										// Reset reference points (in doodle coordinates but before rotation applied)
+										suturePointsArray[i].x = sutureArray[i].originX;
+										suturePointsArray[i].y = sutureArray[i].originY;
+									}
+									
+									// Trigger notification to apply rotation to sutures
+									var object = {doodle:trab, parameter:'rotation', value:trab.rotation, oldValue:trab.rotation};
+									this.drawing.notify('parameterChanged', object);
+                            	}
+                            	
+                            	if (_messageArray['object']['parameter'] == 'rotation')
+                            	{
+                            		// Rotate sutures with flap
+									for (var i = 0; i < sutureArray.length; i++)
+									{
+										// Get original position
+										var p = suturePointsArray[i];
+									
+										// Calculate radius to this point
+										var r = Math.sqrt(p.x * p.x + p.y * p.y);
+									
+										// Calculate new position
+										var np = p.pointAtRadiusAndClockwiseAngle(r, trab.rotation);
+									
+										// Apply it to suture
+										var sut = sutureArray[i];
+										if (sut != null)
+										{
+											sut.originX = np.x;
+											sut.originY = np.y;
+									
+											// Apply rotation
+											sut.rotation = ED.Mod(p.angle + trab.rotation, 2 * Math.PI);
+										}
+									}
+									
+									// Also rotate a conjunctival flap if present
+									var conjFlap = this.drawing.lastDoodleOfClass('ConjunctivalFlap');
+									if (conjFlap) {
+										conjFlap.rotation = trab.rotation;
+									}
+                            	}
+                            }
+                        
+                        	// Suture has moved (a refinement would be to feed back movement to suture plan so that movement of flap carries sutures with it)
+                        	if (doodle.className == 'TrabySuture')
+                        	{
+                        		if (_messageArray['object']['parameter'] == 'originX' || _messageArray['object']['parameter'] == 'originY')
+                        		{
+                        			//console.log('TrabySuture moved ', doodle.originX, doodle.originY);
+                        		}
+                        		
+                        		if (_messageArray['object']['parameter'] == 'rotation')
+                        		{
+                        			//console.log('TrabySuture rotated ', doodle.rotation);
+                        		}
+                        	}
+                            break;
+                        
+                        case 'doodleAdded':
+							var dood = _messageArray['object'];
+							if (typeof(dood) != 'undefined')
+							{
+								if (dood.className == 'TrabySuture')
+								{
+									// Add it to first available slot in suture Array
+									for (var i = 0; i < sutureArray.length; i++)
+                            		{
+                            			if (sutureArray[i] == null)
+                            			{
+                            				sutureArray[i] = dood;
+                            				
+											var trab = this.drawing.lastDoodleOfClass("TrabyFlap");
+											if (trab)
+											{
+												// Get original position
+												var p = suturePointsArray[i];
+								
+												// Calculate radius to this point
+												var r = Math.sqrt(p.x * p.x + p.y * p.y);
+								
+												// Calculate new position
+												var np = p.pointAtRadiusAndClockwiseAngle(r, trab.rotation);
+								
+												// Apply it to suture
+												sutureArray[i].originX = np.x;
+												sutureArray[i].originY = np.y;
+								
+												// Apply rotation
+												sutureArray[i].rotation = ED.Mod(p.angle + trab.rotation, 2 * Math.PI);
+												
+												// Apply type
+												sutureArray[i].setParameterFromString('type', p.type);
+												
+												// Apply firstOrginX
+												sutureArray[i].firstOriginX = p.ex;
+												
+												this.drawing.repaint();
+											}
+											                      				
+                            				break;
+                            			}
+                            		}									
+								}
+							}
+							break;
+                        
+                        case 'doodleDeleted':
+							var className = _messageArray['object'];
+							if (typeof(className) != 'undefined')
+							{
+								if (className == 'TrabySuture') 
+								{
+									console.log('Traby suture deleted');
+									
+									// Go through array identifying which one has been removed
+									for (var i = 0; i < sutureArray.length; i++)
+                            		{
+                            			var id = sutureArray[i].id;
+                            			if (!this.drawing.doodleOfId(id))
+                            			{
+                            				sutureArray[i] = null;
+                            			}
+                            		}
+								}
+							}
+							break;
+                    }
+                }
+            }
+            
+            </script>
+    </head>
+    
+    <body onload="init();">
+    
+        <!-- Doodle controls toolbar -->
+        <div class="ed_toolbar">
+            <button class="imgbutton" class="imgbutton" disabled="true" id="moveToFrontRPS" title="Move to front" onclick="drawingEdit.moveToFront(); return false;" ><img src="../img/moveToFront.gif"/></button>
+            <button class="imgbutton" disabled="true" id="moveToBackRPS" title="Move to back" onclick="drawingEdit.moveToBack(); return false;" ><img src="../img/moveToBack.gif" /></button>
+            <button class="imgbutton" disabled="true" id="flipVerRPS" title="Flip around vertical axis" onclick="drawingEdit.flipVer(); return false;" ><img src="../img/flipVer.gif" /></button>
+            <button class="imgbutton" disabled="true" id="flipHorRPS" title="Flip around horizontal axis" onclick="drawingEdit.flipHor(); return false;" ><img src="../img/flipHor.gif" /></button>
+            <button class="imgbutton" disabled="true" id="deleteSelectedDoodleRPS" title="Delete" onclick="drawingEdit.deleteSelectedDoodle(); return false;" ><img src="../img/deleteSelectedDoodle.gif" /></button>
+            <button class="imgbutton" disabled="true" id="lockRPS" title="Lock" onclick="drawingEdit.lock(); return false;" ><img src="../img/lock.gif" /></button>
+            <button class="imgbutton" disabled="true" id="unlockRPS" title="Unlock" onclick="drawingEdit.unlock(); return false;" ><img src="../img/unlock.gif" /></button>
+            
+            <label style="display:none;" ><input class="checkbox" type="checkbox" id="isSuturedSclerostomyRPS" onchange="drawingEdit.setSelectedDoodle(this, 'isSutured');return false;" />Sutured</label>
+            
+            <!-- Squiggle options -->
+            <span <span class= "squiggle" id="squiggleSpanRPS" style="display:none;">
+                <img class="colourWell" border="0" src="../img/ColourWell.gif" usemap="#colormapRPS" alt='colormap' />
+                <map id="colormapRPS" name="colormapRPS">
+                    <area style="cursor:pointer" shape="rect" coords="0,0,16,16" onclick="drawingEdit.setSquiggleColour('000000');" />
+                    <area style="cursor:pointer" shape="rect" coords="16,0,32,16" onclick="drawingEdit.setSquiggleColour('FF0000');" />
+                    <area style="cursor:pointer" shape="rect" coords="32,0,48,16" onclick="drawingEdit.setSquiggleColour('FF7F00');" />
+                    <area style="cursor:pointer" shape="rect" coords="0,16,16,32" onclick="drawingEdit.setSquiggleColour('0000FF');" />
+                    <area style="cursor:pointer" shape="rect" coords="16,16,32,32" onclick="drawingEdit.setSquiggleColour('00FF00');" />
+                    <area style="cursor:pointer" shape="rect" coords="32,16,48,32" onclick="drawingEdit.setSquiggleColour('FFFF00');" />
+                </map>
+<!--                 <img class="drawingControl" border="0" src="../img/DrawingControl.gif" usemap="#drawingControlRPS" alt='drawingcontrol' /> -->
+                <map id="drawingControlRPS" name="drawingControlRPS">
+                    <area style="cursor:pointer" shape="rect" coords="0,0,16,16" onclick="drawingEdit.setSquiggleWidth(ED.squiggleWidth.Thin);" />
+                    <area style="cursor:pointer" shape="rect" coords="16,0,32,16" onclick="drawingEdit.setSquiggleWidth(ED.squiggleWidth.Medium);" />
+                    <area style="cursor:pointer" shape="rect" coords="32,0,48,16" onclick="drawingEdit.setSquiggleWidth(ED.squiggleWidth.Thick);" />
+                    <area style="cursor:pointer" shape="rect" coords="0,16,24,32" onclick="console.log('one');drawingEdit.setSquiggleStyle(ED.squiggleStyle.Outline);" />
+                    <area style="cursor:pointer" shape="rect" coords="24,16,48,32" onclick="console.log('two');drawingEdit.setSquiggleStyle(ED.squiggleStyle.Solid);" />
+                </map>
+                <canvas id="squiggleSettingsRPS" width="24" height="32"></canvas>
+
+            </span>
+
+            <br />
+        </div>
+            
+        <!-- Doodle selection toolbar -->
+        <div class="ed_toolbar" id="canvasEdit1doodleToolbar">
+ 
+            <button id="LensRPS" class="imgbutton" title="Lens" onclick="drawingEdit.addDoodle('TrabySuture'); return false;" ><img src="../img/TrabySuture.gif" /></button>
+            <button id="LensRPS" class="imgbutton" title="Lens" onclick="drawingEdit.addDoodle('PI', {rotation:0}); return false;" ><img src="../img/PI.gif" /></button>
+
+<!--            <button id="LensRPS" class="imgbutton" title="Lens" onclick="drawingEdit.addDoodle('Cryo'); return false;" ><img src="../img/Cryo.gif" /></button>
+ -->
+
+
+            <br />
+        </div>
+        
+        <!-- <input class="checkbox" type="checkbox" id="chk_phd"> -->
+            
+        <!-- Canvas tooltip -->
+        <span class="canvasTooltip" id="canvasEditTooltip"></span>
+        
+        <!-- Canvas element style="border: none;" style="background-color: #DAE6F1;"-->
+        <canvas id="canvasEdit" class="ed_canvas_edit" width="300" height="300" tabindex="1" style="border: 1px solic gray;"></canvas>
+
+        </br>
+
+
+        <select id="sizeSelect">
+            <option value="4x3">4x3</option>
+            <option value="5x2">5x2</option>
+        </select>
+        
+        <select id="sclerostomySelect">
+            <option value="Punch">Punch</option>
+            <option value="Block">Block</option>
+        </select>
+            
+        <!-- Input element -->
+        <!-- 
+        <input type="text" id="stenosisInput" value="0" />
+        <input type="text" id="typeInput" value="Calcified" />
+         -->        
+        <button onclick="console.log(drawingEdit.report()); return false;" >Report</button>
+
+
+        
+    </body>
+</html>
+ 

@@ -14543,7 +14543,7 @@ ED.ConjunctivalFlap.prototype.setPropertyDefaults = function()
 ED.ConjunctivalFlap.prototype.setParameterDefaults = function()
 {
     this.arc = 120 * Math.PI/180;
-    this.apexY = -620;
+    this.apexY = -660;
 }
 
 /**
@@ -31351,11 +31351,16 @@ ED.TrabyFlap = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _
 
     // Derived parameters (NB must set a value here to define parameter as a property of the object, even though value set later)
     this.size = '4x3';
+    this.sclerostomy = 'Punch';
+    this.height = -580;
     	
 	// Doodle specific parameters
 	this.r = 380;
 	this.right = new ED.Point(0,0);
 	this.left = new ED.Point(0,0);
+	
+	// Additional parameters to save in JSON
+    //this.savedParams = ['height'];
     
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
@@ -31376,7 +31381,7 @@ ED.TrabyFlap.prototype.setHandles = function()
 {
 	this.handleArray[0] = new ED.Handle(null, true, ED.Mode.Arc, false);
 	this.handleArray[3] = new ED.Handle(null, true, ED.Mode.Arc, false);
-	//.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
 }
 
 /**
@@ -31390,12 +31395,13 @@ ED.TrabyFlap.prototype.setPropertyDefaults = function()
     this.snapToArc = true;
     
     // Update component of validation array for simple parameters
-    this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
-    this.parameterValidationArray['apexY']['range'].setMinAndMax(-580, -510);
+    this.parameterValidationArray['apexX']['range'].setMinAndMax(-50, +50);
+    this.parameterValidationArray['apexY']['range'].setMinAndMax(-440, -440);
     
     // Add complete validation arrays for derived parameters
     this.parameterValidationArray['size'] = {kind:'derived', type:'string', list:['4x3', '5x2'], animate:false};
-    
+    this.parameterValidationArray['sclerostomy'] = {kind:'derived', type:'string', list:['Punch', 'Block'], animate:false};
+        
     // Array of arcs to snap to
     this.arcArray = [0.9, 1.13];
 }
@@ -31405,7 +31411,10 @@ ED.TrabyFlap.prototype.setPropertyDefaults = function()
  */
 ED.TrabyFlap.prototype.setParameterDefaults = function()
 {
+	this.apexY = -440;
+	this.height = -580;
     this.setParameterFromString('size', '4x3');
+	this.setParameterFromString('sclerostomy', 'Punch');
 }
 
 /**
@@ -31426,12 +31435,12 @@ ED.TrabyFlap.prototype.dependentParameterValues = function(_parameter, _value)
 			if (_value < 1.0)
 			{
 				returnArray['size'] = '4x3';
-				returnArray['apexY'] = -580;
+				returnArray['height'] = -580;
 			}
 			else
 			{
 				returnArray['size'] = '5x2';
-				returnArray['apexY'] = -510;
+				returnArray['height'] = -510;
 			}
             break;
 
@@ -31440,13 +31449,30 @@ ED.TrabyFlap.prototype.dependentParameterValues = function(_parameter, _value)
             {
                 case '4x3':
                     returnArray['arc'] = 0.9;
-                    returnArray['apexY'] = -580;
+                    returnArray['height'] = -580;
                     this.right.setCoordinates(this.r * Math.sin(this.arc/2), - this.r * Math.cos(this.arc/2));
                     break;
                 case '5x2':
                     returnArray['arc'] = 1.13;
-                    returnArray['apexY'] = -510;
+                    returnArray['height'] = -510;
                     this.right.setCoordinates(this.r * Math.sin(this.arc/2), - this.r * Math.cos(this.arc/2));
+                    break;
+            }
+            break;
+
+        case 'apexX':
+        	if (_value < 0) returnArray['sclerostomy'] = 'Punch';
+        	else returnArray['sclerostomy'] = 'Block';
+            break;
+                        
+        case 'sclerostomy':
+            switch (_value)
+            {
+                case 'Punch':
+                    returnArray['apexX'] = -50;
+                    break;
+                case 'Block':
+                    returnArray['apexX'] = +50;
                     break;
             }
             break;
@@ -31480,7 +31506,7 @@ ED.TrabyFlap.prototype.draw = function(_point)
     var phi = this.arc/6;
     
     // Apex point
-    var apex = new ED.Point(this.apexX, this.apexY);
+    var apex = new ED.Point(0, this.height);
     
 	this.right.x = this.r * Math.sin(theta);
 	this.right.y = - this.r * Math.cos(theta);
@@ -31494,8 +31520,8 @@ ED.TrabyFlap.prototype.draw = function(_point)
 	ctx.arc(0, 0, this.r, arcStart, arcEnd, true);
     
     // Rectangular flap
-    ctx.lineTo(this.left.x, this.apexY);
-    ctx.lineTo(this.right.x, this.apexY);
+    ctx.lineTo(this.left.x, this.height);
+    ctx.lineTo(this.right.x, this.height);
     ctx.closePath();
     
     // Colour of fill
@@ -31513,34 +31539,33 @@ ED.TrabyFlap.prototype.draw = function(_point)
     // Other stuff here
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
 	{
-        // Draw sclerotomy at half width and height    
-        var angle = theta/2;
-        arcStart = - Math.PI/2 + angle;
-        arcEnd = - Math.PI/2 - angle;
-        var top = new ED.Point(this.apexX, -this.r + (this.apexY + this.r)/2);
-        
-        ctx.beginPath();
-        ctx.arc(0, 0, this.r, arcStart, arcEnd, true);
-        ctx.lineTo(- this.r * Math.sin(angle), top.y);
-        ctx.lineTo(this.r * Math.sin(angle), top.y);
-        ctx.closePath();
+		ctx.beginPath();
+		
+		if (this.sclerostomy == 'Punch') {
+			ctx.arc(0, this.apexY, 50, 0, 2 * Math.PI, true);
+		}
+		else {
+			// Draw block at half width and height    
+			var angle = theta/2;
+			arcStart = - Math.PI/2 + angle;
+			arcEnd = - Math.PI/2 - angle;
+			var top = new ED.Point(0, -this.r + (this.height + this.r)/2);
+
+			ctx.arc(0, 0, this.r, arcStart, arcEnd, true);
+			ctx.lineTo(- this.r * Math.sin(angle), top.y);
+			ctx.lineTo(this.r * Math.sin(angle), top.y);
+			ctx.closePath();
+        }
         
         // Colour of fill
         ctx.fillStyle = "gray";
         ctx.fill();
-        
-//         ctx.beginPath();
-// 		ctx.moveTo(-400, 0);
-// 		ctx.lineTo(+400, 0);
-// 		ctx.moveTo(0, -400);
-// 		ctx.lineTo(0, +400);
-// 		ctx.stroke();
 	}
     
 	// Coordinates of handles (in canvas plane)
 	this.handleArray[0].location = this.transform.transformPoint(this.left);
 	this.handleArray[3].location = this.transform.transformPoint(this.right);
-	//this.handleArray[4].location = this.transform.transformPoint(apex);
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 	
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -31556,7 +31581,7 @@ ED.TrabyFlap.prototype.draw = function(_point)
  */
 ED.TrabyFlap.prototype.description = function()
 {
-    return (this.apexY < -280?"Fornix based ":"Limbus based ") + "flap";
+     return "Trabeculectomy flap at " + this.clockHour() + " o'clock with " + this.sclerostomy.firstLetterToLowerCase() + " sclerostomy";
 }
 /**
  * OpenEyes
@@ -31738,7 +31763,23 @@ ED.TrabySuture.prototype.draw = function(_point)
 				ctx.bezierCurveTo(2, 20, -4, 24, -3, 29);
 				ctx.bezierCurveTo(-3, 36, 14, 37, 23, 56);
 				ctx.bezierCurveTo(32, 74, 34, 100, 34, 100);
-				ctx.bezierCurveTo(34, 150, -34, 150, -34, 100);
+				
+				// Suture exit through cornea
+				var ep = new ED.Point(this.firstOriginX, -60);
+				
+				// Set up a new transform and centre in canvas
+				var at = new ED.AffineTransform();
+				at.translate(150, 150);
+				
+				// Add rotation of traby flap and transform
+				var trab = this.drawing.lastDoodleOfClass('TrabyFlap');
+				if (trab) at.rotate(trab.rotation);
+				var np = at.transformPoint(ep);
+
+				// Tranform back to get fixed point in canvas
+				var pp = this.inverseTransform.transformPoint(np);
+				ctx.lineTo(pp.x, pp.y);
+
 				break;
 
 			case 'Adjustable':
