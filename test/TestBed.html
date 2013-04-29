@@ -276,18 +276,18 @@
     
         <!-- Doodle controls toolbar -->
         <div class="ed_toolbar">
-            <button class="imgbutton" class="imgbutton" disabled="true" id="moveToFrontRPS" title="Move to front" onclick="drawingEdit.moveToFront(); return false;" ><img src="../img/moveToFront.gif"/></button>
-            <button class="imgbutton" disabled="true" id="moveToBackRPS" title="Move to back" onclick="drawingEdit.moveToBack(); return false;" ><img src="../img/moveToBack.gif" /></button>
-            <button class="imgbutton" disabled="true" id="flipVerRPS" title="Flip around vertical axis" onclick="drawingEdit.flipVer(); return false;" ><img src="../img/flipVer.gif" /></button>
-            <button class="imgbutton" disabled="true" id="flipHorRPS" title="Flip around horizontal axis" onclick="drawingEdit.flipHor(); return false;" ><img src="../img/flipHor.gif" /></button>
-            <button class="imgbutton" disabled="true" id="deleteSelectedDoodleRPS" title="Delete" onclick="drawingEdit.deleteSelectedDoodle(); return false;" ><img src="../img/deleteSelectedDoodle.gif" /></button>
-            <button class="imgbutton" disabled="true" id="lockRPS" title="Lock" onclick="drawingEdit.lock(); return false;" ><img src="../img/lock.gif" /></button>
-            <button class="imgbutton" disabled="true" id="unlockRPS" title="Unlock" onclick="drawingEdit.unlock(); return false;" ><img src="../img/unlock.gif" /></button>
+            <button class="imgbutton" class="imgbutton" disabled="disabled" id="moveToFrontRPS" title="Move to front" onclick="drawingEdit.moveToFront(); return false;" ><img src="../img/moveToFront.gif"/></button>
+            <button class="imgbutton" disabled="disabled" id="moveToBackRPS" title="Move to back" onclick="drawingEdit.moveToBack(); return false;" ><img src="../img/moveToBack.gif" /></button>
+            <button class="imgbutton" disabled="disabled" id="flipVerRPS" title="Flip around vertical axis" onclick="drawingEdit.flipVer(); return false;" ><img src="../img/flipVer.gif" /></button>
+            <button class="imgbutton" disabled="disabled" id="flipHorRPS" title="Flip around horizontal axis" onclick="drawingEdit.flipHor(); return false;" ><img src="../img/flipHor.gif" /></button>
+            <button class="imgbutton" disabled="disabled" id="deleteSelectedDoodleRPS" title="Delete" onclick="drawingEdit.deleteSelectedDoodle(); return false;" ><img src="../img/deleteSelectedDoodle.gif" /></button>
+            <button class="imgbutton" disabled="disabled" id="lockRPS" title="Lock" onclick="drawingEdit.lock(); return false;" ><img src="../img/lock.gif" /></button>
+            <button class="imgbutton" disabled="disabled" id="unlockRPS" title="Unlock" onclick="drawingEdit.unlock(); return false;" ><img src="../img/unlock.gif" /></button>
             
             <label style="display:none;" ><input class="checkbox" type="checkbox" id="isSuturedSclerostomyRPS" onchange="drawingEdit.setSelectedDoodle(this, 'isSutured');return false;" />Sutured</label>
             
             <!-- Squiggle options -->
-            <span <span class= "squiggle" id="squiggleSpanRPS" style="display:none;">
+            <span class= "squiggle" id="squiggleSpanRPS" style="display:none;">
                 <img class="colourWell" border="0" src="../img/ColourWell.gif" usemap="#colormapRPS" alt='colormap' />
                 <map id="colormapRPS" name="colormapRPS">
                     <area style="cursor:pointer" shape="rect" coords="0,0,16,16" onclick="drawingEdit.setSquiggleColour('000000');" />
@@ -333,7 +333,7 @@
         <!-- Canvas element style="border: none;" style="background-color: #DAE6F1;"-->
         <canvas id="canvasEdit" class="ed_canvas_edit" width="300" height="300" tabindex="1" style="border: 1px solic gray;"></canvas>
 
-        </br>
+        <br/>
 
 		<select id="methodSelect">
 			<option value="Fornix-based">Fornix-based</option>

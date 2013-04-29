@@ -71,10 +71,10 @@
                                 _drawing.addDoodle('AntSeg');
                                 _drawing.addDoodle('PhakoIncision');
                                 _drawing.addBindings({PhakoIncision:{
-                                                         incisionSite:{id:'Eyedraw_stringField1', attribute:'ed_val'},
+                                                         incisionSite:{id:'Eyedraw_stringField1', attribute:'data-ed-val'},
                                                          incisionLength:{id:'Eyedraw_stringField2'},
                                                          incisionMeridian:{id:'Eyedraw_stringField3'},
-                                                         incisionType:{id:'Eyedraw_stringField4', attribute:'ed_val'},
+                                                         incisionType:{id:'Eyedraw_stringField4', attribute:'data-ed-val'},
                                                      }});
                                 _drawing.addDeleteValues({Eyedraw_stringField1:'None'});
                                 _drawing.deselectDoodles();
@@ -269,16 +269,16 @@
         <button onclick="changeEye(); return false;" >Change eye</button>
         
         <select id="Eyedraw_stringField1">
-            <option value="0" ed_val="None">None</option>
-            <option value="1" selected="selected" ed_val="Corneal">Corneal</option>
-            <option value="2" ed_val="Limbal">Limbal</option>
-            <option value="3" ed_val="Scleral">Scleral</option>
+            <option value="0" data-ed-val="None">None</option>
+            <option value="1" selected="selected" data-ed-val="Corneal">Corneal</option>
+            <option value="2" data-ed-val="Limbal">Limbal</option>
+            <option value="3" data-ed-val="Scleral">Scleral</option>
         </select>
         <input type="text" id="Eyedraw_stringField2" value="2.8">
         <input type="text" id="Eyedraw_stringField3" value="180">
         <select id="Eyedraw_stringField4">
-            <option value="1" selected="selected" ed_val="Pocket">Pocket</option>
-            <option value="2" ed_val="Section">Section</option>
+            <option value="1" selected="selected" data-ed-val="Pocket">Pocket</option>
+            <option value="2" data-ed-val="Section">Section</option>
         </select>
         
         <br/>
