@@ -39,6 +39,7 @@ ED.TrabyFlap = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _
 	this.className = "TrabyFlap";
 
     // Derived parameters (NB must set a value here to define parameter as a property of the object, even though value set later)
+    this.site = 'Superior';
     this.size = '4x3';
     this.sclerostomy = 'Punch';
     this.height = -580;
@@ -59,7 +60,6 @@ ED.TrabyFlap.prototype = new ED.Doodle;
 ED.TrabyFlap.prototype.constructor = ED.TrabyFlap;
 ED.TrabyFlap.superclass = ED.Doodle.prototype;
 
-
 /**
  * Sets handle attributes
  */
@@ -79,12 +79,15 @@ ED.TrabyFlap.prototype.setPropertyDefaults = function()
 	this.isMoveable = false;
     this.isArcSymmetrical = true;
     this.snapToArc = true;
+    this.isDeletable = false;
     
     // Update component of validation array for simple parameters
     this.parameterValidationArray['apexX']['range'].setMinAndMax(-50, +50);
     this.parameterValidationArray['apexY']['range'].setMinAndMax(-440, -440);
+    this.parameterValidationArray['rotation']['delta'] = 0.1;
     
     // Add complete validation arrays for derived parameters
+    this.parameterValidationArray['site'] = {kind:'derived', type:'string', list:['Superior', 'Superonasal', 'Superotemporal'], animate:true};
     this.parameterValidationArray['size'] = {kind:'derived', type:'string', list:['4x3', '5x2'], animate:false};
     this.parameterValidationArray['sclerostomy'] = {kind:'derived', type:'string', list:['Punch', 'Block'], animate:false};
         
@@ -99,6 +102,7 @@ ED.TrabyFlap.prototype.setParameterDefaults = function()
 {
 	this.apexY = -440;
 	this.height = -580;
+	this.setParameterFromString('size', 'Superior');
     this.setParameterFromString('size', '4x3');
 	this.setParameterFromString('sclerostomy', 'Punch');
 }
@@ -117,6 +121,12 @@ ED.TrabyFlap.prototype.dependentParameterValues = function(_parameter, _value)
 
     switch (_parameter)
     {
+
+        case 'apexX':
+        	if (_value < 0) returnArray['sclerostomy'] = 'Punch';
+        	else returnArray['sclerostomy'] = 'Block';
+            break;
+            
         case 'arc':
 			if (_value < 1.0)
 			{
@@ -129,7 +139,28 @@ ED.TrabyFlap.prototype.dependentParameterValues = function(_parameter, _value)
 				returnArray['height'] = -510;
 			}
             break;
+            
+        case 'rotation':
+        	if (_value > Math.PI/16 && _value < Math.PI) returnArray['site'] = this.drawing.eye == ED.eye.Right?'Superonasal':'Superotemporal';
+			else if (_value >= Math.PI && _value < 31 * Math.PI/16) returnArray['site'] = this.drawing.eye == ED.eye.Right?'Superotemporal':'Superonasal';
+			else returnArray['site'] = 'Superior';
+            break;
 
+        case 'site':
+            switch (_value)
+            {
+                case 'Superior':
+                    returnArray['rotation'] = 0;
+                    break;
+                case 'Superonasal':
+                    returnArray['rotation'] = this.drawing.eye == ED.eye.Right?Math.PI/4:(7 * Math.PI/4);
+                    break;
+                case 'Superotemporal':
+                    returnArray['rotation'] = this.drawing.eye == ED.eye.Right?(7 * Math.PI/4):Math.PI/4;
+                    break;
+            }
+            break;
+            
         case 'size':
             switch (_value)
             {
@@ -144,11 +175,6 @@ ED.TrabyFlap.prototype.dependentParameterValues = function(_parameter, _value)
                     this.right.setCoordinates(this.r * Math.sin(this.arc/2), - this.r * Math.cos(this.arc/2));
                     break;
             }
-            break;
-
-        case 'apexX':
-        	if (_value < 0) returnArray['sclerostomy'] = 'Punch';
-        	else returnArray['sclerostomy'] = 'Block';
             break;
                         
         case 'sclerostomy':
@@ -261,6 +287,7 @@ ED.TrabyFlap.prototype.draw = function(_point)
  * Returns a string containing a text description of the doodle
  *
  * @returns {String} Description of doodle
+ */
 ED.TrabyFlap.prototype.description = function()
 {
      return "Trabeculectomy flap at " + this.clockHour() + " o'clock with " + this.sclerostomy.firstLetterToLowerCase() + " sclerostomy";

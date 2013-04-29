@@ -89,11 +89,15 @@
 							this.drawing.globalScaleFactor = this.gsf;
 
 							this.drawing.addDoodle('AntSeg');
-							this.drawing.addDoodle('ConjunctivalFlap');
+							this.drawing.addDoodle('ConjunctivalFlap', {}, {method:{id:'methodSelect', attribute:'value'}});
 							this.drawing.addDoodle('PI', {rotation:0});
 						
 							// Add trabeculectomy flap
-							var trab = this.drawing.addDoodle('TrabyFlap', {size:'5x2'}, {size:{id:'sizeSelect', attribute:'value'}, sclerostomy:{id:'sclerostomySelect', attribute:'value'}});
+							var trab = this.drawing.addDoodle('TrabyFlap', {size:'5x2'}, {
+							site:{id:'siteSelect', attribute:'value'}, 
+							size:{id:'sizeSelect', attribute:'value'}, 
+							sclerostomy:{id:'sclerostomySelect', attribute:'value'}
+							});
 
 							// Iterate through sutures creating an array of objects representing 'ideal' sutures, and another array of the sutures themselves
 							for (var i in sutureSet)
@@ -257,6 +261,10 @@
 								}
 							}
 							break;
+							
+						case 'hover':
+							console.log('hover');
+							break;
                     }
                 }
             }
@@ -327,7 +335,17 @@
 
         </br>
 
-
+		<select id="methodSelect">
+			<option value="Fornix-based">Fornix-based</option>
+			<option value="Limbus-based">Limbus-based</option>
+		</select>
+		
+		<select id="siteSelect">
+			<option value="Superior">Superior</option>
+			<option value="Superonasal">Superonasal</option>
+			<option value="Superotemporal">Superotemporal</option>
+		</select>
+							        
         <select id="sizeSelect">
             <option value="4x3">4x3</option>
             <option value="5x2">5x2</option>

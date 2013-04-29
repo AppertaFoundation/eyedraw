@@ -6458,6 +6458,7 @@ ED.trans['ChandelierDouble'] = 'Double chandelier illumination<br/><br/>Drag to 
 ED.trans['CiliaryInjection'] = 'Ciliary injection<br/><br/>Drag to rotate around centre<br/>Drag handles to change extent';
 ED.trans['Circinate'] = 'Circinate (Ring of exudates)<br/><br/>Drag to position<br/>Drag handle to change size';
 ED.trans['CircumferentialBuckle'] = 'Circumferential buckle<br/><br/>Drag to position<br/>Drag outer handles to change extent<br/>Drag middle handle to change width';
+ED.trans['ConjunctivalFlap'] = 'Conjunctival flap<br/><br/>Drag to move around the limbus<br/>Drag handles to change size and depth';
 ED.trans['CornealAbrasion'] = 'Corneal abrasion<br/><br/>Drag to position<br/>Drag handle to change size';
 ED.trans['CorneaCrossSection'] = 'Corneal cross section';
 ED.trans['CornealErosion'] = 'Removal of corneal epithelium<br/><br/>Drag to position<br/>Drag handle to change size';
@@ -6540,6 +6541,8 @@ ED.trans['SubretinalPFCL'] = 'Subretinal PFCL<br/><br/>Drag to position<br/>Drag
 ED.trans['Surgeon'] = 'Surgeon';
 ED.trans['ToricPCIOL'] = 'Toric posterior chamber IOL<br/><br/>Drag to move<br/>Drag the handle to rotate';
 ED.trans['Trabectome'] = 'Trabectome<br/><br/>Drag to position<br/>Drag either end handle to adjust extent';
+ED.trans['TrabyFlap'] = 'Trabeculectomy flap<br/><br/>Drag to position<br/>Drag either end handle to adjust size</br>Drag middle handle to change sclerostomy';
+ED.trans['TrabySuture'] = 'Trabeculectomy suture<br/><br/>Drag to position<br/>Drag corner handle to adjust orientation</br>Drag lower handle to change suture type';
 ED.trans['TractionRetinalDetachment'] = 'Traction retinal detachment<br/><br/>Drag to position<br/>Drag inner handle to change shape and size<br/>Drag outer handle to rotate';
 ED.trans['TransilluminationDefect'] = 'Transillumination defects of the iris<br/><br/>Drag to rotate around centre<br/>Drag each end handle to alter extent';
 ED.trans['UTear'] = '';
@@ -14208,6 +14211,9 @@ ED.CircumferentialBuckle.prototype.description = function() {
 ED.ConjunctivalFlap = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
 	// Set classname
 	this.className = "ConjunctivalFlap";
+	
+    // Derived parameters (NB must set a value here to define parameter as a property of the object, even though value set later)
+    this.method = 'Fornix-based';
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
@@ -14241,7 +14247,11 @@ ED.ConjunctivalFlap.prototype.setPropertyDefaults = function() {
 	// Update component of validation array for simple parameters
 	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
 	this.parameterValidationArray['apexY']['range'].setMinAndMax(-640, -100);
+	this.parameterValidationArray['apexY']['delta'] = 30;
 	this.parameterValidationArray['arc']['range'].setMinAndMax(60 * Math.PI / 180, 160 * Math.PI / 180);
+	
+    // Add complete validation arrays for derived parameters
+    this.parameterValidationArray['method'] = {kind:'derived', type:'string', list:['Fornix-based', 'Limbus-based'], animate:true};
 }
 
 /**
@@ -14250,7 +14260,43 @@ ED.ConjunctivalFlap.prototype.setPropertyDefaults = function() {
 ED.ConjunctivalFlap.prototype.setParameterDefaults = function()
 {
     this.arc = 120 * Math.PI/180;
-    this.apexY = -660;
+    this.setParameterFromString('method', 'Fornix-based');
+    //this.apexY = -660;
+}
+
+/**
+ * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
+ * The returned parameters are animated if their 'animate' property is set to true
+ *
+ * @param {String} _parameter Name of parameter that has changed
+ * @value {Undefined} _value Value of parameter to calculate
+ * @returns {Array} Associative array of values of dependent parameters
+ */
+ED.ConjunctivalFlap.prototype.dependentParameterValues = function(_parameter, _value)
+{
+    var returnArray = new Array();
+
+    switch (_parameter)
+    {
+        case 'apexY':
+        	if (_value < -380) returnArray['method'] = 'Fornix-based';
+        	else returnArray['method'] = 'Limbus-based';
+            break;
+
+        case 'method':
+            switch (_value)
+            {
+                case 'Fornix-based':
+                    returnArray['apexY'] = -660;
+                    break;
+                case 'Limbus-based':
+                    returnArray['apexY'] = -100;
+                    break;
+            }
+            break;
+    }
+    
+    return returnArray;
 }
 
 /**
@@ -30323,6 +30369,7 @@ ED.TrabyFlap = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _
 	this.className = "TrabyFlap";
 
     // Derived parameters (NB must set a value here to define parameter as a property of the object, even though value set later)
+    this.site = 'Superior';
     this.size = '4x3';
     this.sclerostomy = 'Punch';
     this.height = -580;
@@ -30343,7 +30390,6 @@ ED.TrabyFlap.prototype = new ED.Doodle;
 ED.TrabyFlap.prototype.constructor = ED.TrabyFlap;
 ED.TrabyFlap.superclass = ED.Doodle.prototype;
 
-
 /**
  * Sets handle attributes
  */
@@ -30363,12 +30409,15 @@ ED.TrabyFlap.prototype.setPropertyDefaults = function()
 	this.isMoveable = false;
     this.isArcSymmetrical = true;
     this.snapToArc = true;
+    this.isDeletable = false;
     
     // Update component of validation array for simple parameters
     this.parameterValidationArray['apexX']['range'].setMinAndMax(-50, +50);
     this.parameterValidationArray['apexY']['range'].setMinAndMax(-440, -440);
+    this.parameterValidationArray['rotation']['delta'] = 0.1;
     
     // Add complete validation arrays for derived parameters
+    this.parameterValidationArray['site'] = {kind:'derived', type:'string', list:['Superior', 'Superonasal', 'Superotemporal'], animate:true};
     this.parameterValidationArray['size'] = {kind:'derived', type:'string', list:['4x3', '5x2'], animate:false};
     this.parameterValidationArray['sclerostomy'] = {kind:'derived', type:'string', list:['Punch', 'Block'], animate:false};
         
@@ -30383,6 +30432,7 @@ ED.TrabyFlap.prototype.setParameterDefaults = function()
 {
 	this.apexY = -440;
 	this.height = -580;
+	this.setParameterFromString('size', 'Superior');
     this.setParameterFromString('size', '4x3');
 	this.setParameterFromString('sclerostomy', 'Punch');
 }
@@ -30401,6 +30451,12 @@ ED.TrabyFlap.prototype.dependentParameterValues = function(_parameter, _value)
 
     switch (_parameter)
     {
+
+        case 'apexX':
+        	if (_value < 0) returnArray['sclerostomy'] = 'Punch';
+        	else returnArray['sclerostomy'] = 'Block';
+            break;
+            
         case 'arc':
 			if (_value < 1.0)
 			{
@@ -30413,7 +30469,28 @@ ED.TrabyFlap.prototype.dependentParameterValues = function(_parameter, _value)
 				returnArray['height'] = -510;
 			}
             break;
+            
+        case 'rotation':
+        	if (_value > Math.PI/16 && _value < Math.PI) returnArray['site'] = this.drawing.eye == ED.eye.Right?'Superonasal':'Superotemporal';
+			else if (_value >= Math.PI && _value < 31 * Math.PI/16) returnArray['site'] = this.drawing.eye == ED.eye.Right?'Superotemporal':'Superonasal';
+			else returnArray['site'] = 'Superior';
+            break;
 
+        case 'site':
+            switch (_value)
+            {
+                case 'Superior':
+                    returnArray['rotation'] = 0;
+                    break;
+                case 'Superonasal':
+                    returnArray['rotation'] = this.drawing.eye == ED.eye.Right?Math.PI/4:(7 * Math.PI/4);
+                    break;
+                case 'Superotemporal':
+                    returnArray['rotation'] = this.drawing.eye == ED.eye.Right?(7 * Math.PI/4):Math.PI/4;
+                    break;
+            }
+            break;
+            
         case 'size':
             switch (_value)
             {
@@ -30428,11 +30505,6 @@ ED.TrabyFlap.prototype.dependentParameterValues = function(_parameter, _value)
                     this.right.setCoordinates(this.r * Math.sin(this.arc/2), - this.r * Math.cos(this.arc/2));
                     break;
             }
-            break;
-
-        case 'apexX':
-        	if (_value < 0) returnArray['sclerostomy'] = 'Punch';
-        	else returnArray['sclerostomy'] = 'Block';
             break;
                         
         case 'sclerostomy':
@@ -30545,6 +30617,7 @@ ED.TrabyFlap.prototype.draw = function(_point)
  * Returns a string containing a text description of the doodle
  *
  * @returns {String} Description of doodle
+ */
 ED.TrabyFlap.prototype.description = function()
 {
      return "Trabeculectomy flap at " + this.clockHour() + " o'clock with " + this.sclerostomy.firstLetterToLowerCase() + " sclerostomy";
@@ -30615,8 +30688,6 @@ ED.TrabySuture.prototype.setHandles = function() {
  * Sets default dragging attributes
  */
 ED.TrabySuture.prototype.setPropertyDefaults = function() {
-	//this.isMoveable = false;
-	//this.isRotatable = false;
 
 	// Update component of validation array for simple parameters
 	this.parameterValidationArray['apexX']['range'].setMinAndMax(-50, +50);
@@ -30724,6 +30795,23 @@ ED.TrabySuture.prototype.draw = function(_point) {
 				ctx.bezierCurveTo(32, 74, 34, 100, 34, 100);
 				
 				// Suture exit through cornea
+// 				var ep = new ED.Point(this.firstOriginX, -60);
+// 				
+// 				// Set up a new transform and centre in canvas
+// 				var at = new ED.AffineTransform();
+// 				at.translate(150, 150);
+// 				
+// 				// Add rotation of traby flap and transform
+// 				var trab = this.drawing.lastDoodleOfClass('TrabyFlap');
+// 				if (trab) at.rotate(trab.rotation);
+// 				var np = at.transformPoint(ep);
+// 
+// 				// Tranform back to get fixed point in canvas
+// 				var pp = this.inverseTransform.transformPoint(np);
+// 				ctx.lineTo(pp.x, pp.y);
+				
+
+				// Suture exit through cornea
 				var ep = new ED.Point(this.firstOriginX, -60);
 				
 				// Set up a new transform and centre in canvas
@@ -30733,11 +30821,26 @@ ED.TrabySuture.prototype.draw = function(_point) {
 				// Add rotation of traby flap and transform
 				var trab = this.drawing.lastDoodleOfClass('TrabyFlap');
 				if (trab) at.rotate(trab.rotation);
-				var np = at.transformPoint(ep);
+				
+				var tep = at.transformPoint(ep);
 
-				// Tranform back to get fixed point in canvas
-				var pp = this.inverseTransform.transformPoint(np);
-				ctx.lineTo(pp.x, pp.y);
+				// Tranform back to get fixed point
+				var fep = this.inverseTransform.transformPoint(tep);
+				
+				// Calculate a midpoint
+				var d = 119/8;
+				if (this.id == 5) d = d * 0;
+				else if (this.id == 6) d = d * +1;
+				else d = d * -1;
+
+				var mp = new ED.Point(this.firstOriginX - d , -90);
+				var tmp = at.transformPoint(mp);
+				var fmp = this.inverseTransform.transformPoint(tmp);
+
+				ctx.bezierCurveTo(fmp.x, fmp.y, fmp.x, fmp.y, fep.x, fep.y);
+				//ctx.lineTo(fmp.x, fmp.y);
+				//ctx.lineTo(fep.x, fep.y);
+
 
 				break;
 
