@@ -1504,15 +1504,14 @@ ED.OpticDisc = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _
     
     // Derived parameters (NB must set a value here to define parameter as a property of the object, even though value set later)
     this.mode = "Basic";
+    this.hasBeenExpert = false;
     this.cdRatio = '0';
 
-    this.savedParams = ['mode'];
+	// Make parameters saveable (NB Order is important since dependentParameterValues gets triggered after loading each item)
+    this.savedParams = ['hasBeenExpert', 'mode'];
     
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
-    
-    // Set visibility of handles
-    //this.setHandleProperties();
 }
 
 /**
@@ -1554,6 +1553,7 @@ ED.OpticDisc.prototype.setPropertyDefaults = function()
     
     // Add complete validation arrays for derived parameters
     this.parameterValidationArray['mode'] = {kind:'derived', type:'string', list:['Basic', 'Expert'], animate:false};
+    this.parameterValidationArray['hasBeenExpert'] = {kind:'derived', type:'bool'};
     this.parameterValidationArray['cdRatio'] = {kind:'derived', type:'string', list:['0.1','0.2','0.3','0.4','0.5','0.6','0.7','0.8','0.9','1.0','No view'], animate:true};
     
     // Create ranges to constrain handles
@@ -1578,6 +1578,7 @@ ED.OpticDisc.prototype.setParameterDefaults = function()
 {
     this.apexY = -150;    
     this.setParameterFromString('mode', 'Basic');
+    this.setParameterFromString('hasBeenExpert', 'false');
     this.setParameterFromString('cdRatio', '0.3');
 
     // Create a squiggle to store the handles points
@@ -1611,17 +1612,26 @@ ED.OpticDisc.prototype.dependentParameterValues = function(_parameter, _value)
     {
         case 'mode':
         	this.setHandleProperties();
-//			This is commented out since it was causing recursive setting of cdRation and altering position of points in expert mode
-//			Not sure what the code did in the first place anyway!
-//             if (this.apexY < -300)
-//             {
-//                 returnArray['cdRatio'] = "No view";
-//             }
-//             else
-//             {
-//                 returnArray['cdRatio'] = (-this.apexY/300).toFixed(1);
-//             }
-//             console.log("mode: Setting cdRatio to " + returnArray['cdRatio']);
+        	if (_value == 'Expert')
+        	{
+        		// Set points in expert mode according to C/D ratio, but only the first time
+        		if (!this.hasBeenExpert)
+        		{
+        			// Set flag
+        			this.hasBeenExpert = true;
+        			
+					// Set points to mean
+					this.setMeanRadius(-this.apexY);
+        		}
+        	}
+        	else
+        	{
+        		// If coming from expert mode, reset points
+        		if (this.hasBeenExpert)
+        		{
+        			this.resetHandles();
+        		}
+        	}
             break;
                         
         case 'apexY':
@@ -1640,27 +1650,6 @@ ED.OpticDisc.prototype.dependentParameterValues = function(_parameter, _value)
             {
                 var newValue = parseFloat(_value) * 300;
                 returnArray['apexY'] = -newValue;
-                
-                // Alter position of top and bottom points accordingly, then average the others
-                if (this.mode == "Expert")
-                {
-                    var ti = 0;
-                    var bi = this.numberOfHandles/2;
-                    var meanOldValue = (this.squiggleArray[0].pointsArray[ti].length() + this.squiggleArray[0].pointsArray[bi].length())/2;
-                    this.squiggleArray[0].pointsArray[ti].setWithPolars(newValue, this.squiggleArray[0].pointsArray[ti].direction());
-                    this.squiggleArray[0].pointsArray[bi].setWithPolars(newValue, this.squiggleArray[0].pointsArray[bi].direction());
-                    
-                    // Adjust others proportionately
-                    for (var i = 0; i < this.numberOfHandles; i++)
-                    {
-                        if (i != ti && i != bi)
-                        {
-                            var newLength = this.squiggleArray[0].pointsArray[i].length() * newValue/meanOldValue;
-                            newLength = newLength>300?300:newLength;
-                            this.squiggleArray[0].pointsArray[i].setWithPolars(newLength, this.squiggleArray[0].pointsArray[i].direction());
-                        }
-                    }
-                }
             }
             else
             {
@@ -2002,7 +1991,7 @@ ED.OpticDisc.prototype.description = function()
 }
 
 /**
- * Defines handles visibility
+ * Defines visibility of handles
  */
 ED.OpticDisc.prototype.setHandleProperties = function()
 {
@@ -2015,9 +2004,6 @@ ED.OpticDisc.prototype.setHandleProperties = function()
             this.handleArray[i].isVisible = false;
         }
         this.handleArray[this.numberOfHandles].isVisible = true;
-        
-        // Set to mean of expert handles
-        this.apexY = -this.getMeanRadius();
     }
     // Expert mode
     else
@@ -2026,12 +2012,8 @@ ED.OpticDisc.prototype.setHandleProperties = function()
         for (var i = 0; i < this.numberOfHandles; i++)
         {
             this.handleArray[i].isVisible = true;
-            
         }
         this.handleArray[this.numberOfHandles].isVisible = false;
-        
-        // Set points to mean
-        this.setMeanRadius(-this.apexY);
     }
 }
 
@@ -2076,13 +2058,6 @@ ED.OpticDisc.prototype.getMeanRadius = function()
     // Sum distances of (vertical) control points from centre
     if (typeof(this.squiggleArray[0]) != 'undefined')
     {
-//        var sum = 0;
-//        var ti = 0;
-//        var bi = this.numberOfHandles/2;
-//        sum += this.squiggleArray[0].pointsArray[ti].length();
-//        sum += this.squiggleArray[0].pointsArray[bi].length();
-//        return sum/2;
-        
         var sum = 0;
         for (var i = 0; i < this.numberOfHandles; i++)
         {
@@ -2119,6 +2094,18 @@ ED.OpticDisc.prototype.setMeanRadius = function(_radius)
         
         // Set point
         this.squiggleArray[0].pointsArray[i].setWithPolars(newLength, direction);
+    }
+}
+
+/**
+ * Resets radius of handle points to equal values corresponding to c/d ratio
+ */
+ED.OpticDisc.prototype.resetHandles = function()
+{
+    // Reset handles to equidistant points around circumference
+    for (var i = 0; i < this.numberOfHandles; i++)
+    {
+        this.squiggleArray[0].pointsArray[i].setWithPolars(-this.apexY, i * 2 * Math.PI/this.numberOfHandles);
     }
 }
 

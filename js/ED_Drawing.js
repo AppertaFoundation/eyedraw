@@ -4551,6 +4551,11 @@ ED.Doodle.prototype.addBinding = function(_parameter, _fieldParameters)
 {
     var elementId = _fieldParameters['id'];
     var attribute = _fieldParameters['attribute'];
+    
+    // NB this approach would be simpler than the various if thens below
+//     if (typeof(attribute == 'undefined')) {
+//     	attribute = 'value';
+//     }
 
     // Check that doodle has a parameter of this name
     if (typeof(this[_parameter]) != 'undefined')
@@ -4604,7 +4609,11 @@ ED.Doodle.prototype.addBinding = function(_parameter, _fieldParameters)
                     }
                     else
                     {
-                        this.setParameterFromString(_parameter, element.value);
+                    	// For parameters linked to a saved value, set value to that of bound element NB if this works, all the cases in this switch need updating
+                        if (this.savedParams.indexOf(_parameter) < 0)
+                        {
+                        	this.setParameterFromString(_parameter, element.value);
+                        }
                         element.addEventListener('change', listener = function (event) {
                                                  drawing.eventHandler('onchange', id, className, this.id, this.value);
                                                  },false);
