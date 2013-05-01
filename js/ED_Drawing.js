@@ -3529,6 +3529,9 @@ ED.Doodle = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _sca
             arc:{kind:'simple', type:'float', range:new ED.Range(Math.PI/12, Math.PI * 2), precision:6, delta:0.1},
             rotation:{kind:'simple', type:'float', range:new ED.Range(0, 2 * Math.PI), precision:6, delta:0.2},
         };
+        
+        // Optional array for saving non-bound parameters
+        this.savedParams = new Array();
 
         // Grid properties
         this.gridSpacing = 200;
