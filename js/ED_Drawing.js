@@ -3531,7 +3531,9 @@ ED.Doodle = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _sca
         };
         
         // Optional array for saving non-bound parameters
-        this.savedParams = new Array();
+        if(!this.savedParams) {
+          this.savedParams = [];
+        }
 
         // Grid properties
         this.gridSpacing = 200;
