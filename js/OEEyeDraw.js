@@ -222,6 +222,7 @@ function eyeDrawInit(_properties)
                     {
                         canvas.focus();
                     }
+                    this.drawing.isReady = true;
                     break;
 
                 case 'doodlesLoaded':

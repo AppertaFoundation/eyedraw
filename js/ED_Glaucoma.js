@@ -1504,11 +1504,10 @@ ED.OpticDisc = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _
     
     // Derived parameters (NB must set a value here to define parameter as a property of the object, even though value set later)
     this.mode = "Basic";
-    this.hasBeenExpert = false;
     this.cdRatio = '0';
 
 	// Make parameters saveable (NB Order is important since dependentParameterValues gets triggered after loading each item)
-    this.savedParams = ['hasBeenExpert', 'mode'];
+    this.savedParams = ['mode'];
     
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
@@ -1553,7 +1552,6 @@ ED.OpticDisc.prototype.setPropertyDefaults = function()
     
     // Add complete validation arrays for derived parameters
     this.parameterValidationArray['mode'] = {kind:'derived', type:'string', list:['Basic', 'Expert'], animate:false};
-    this.parameterValidationArray['hasBeenExpert'] = {kind:'derived', type:'bool'};
     this.parameterValidationArray['cdRatio'] = {kind:'derived', type:'string', list:['0.1','0.2','0.3','0.4','0.5','0.6','0.7','0.8','0.9','1.0','No view'], animate:true};
     
     // Create ranges to constrain handles
@@ -1578,7 +1576,6 @@ ED.OpticDisc.prototype.setParameterDefaults = function()
 {
     this.apexY = -150;    
     this.setParameterFromString('mode', 'Basic');
-    this.setParameterFromString('hasBeenExpert', 'false');
     this.setParameterFromString('cdRatio', '0.3');
 
     // Create a squiggle to store the handles points
@@ -1614,21 +1611,15 @@ ED.OpticDisc.prototype.dependentParameterValues = function(_parameter, _value)
         	this.setHandleProperties();
         	if (_value == 'Expert')
         	{
-        		// Set points in expert mode according to C/D ratio, but only the first time
-        		if (!this.hasBeenExpert)
-        		{
-        			// Set flag
-        			this.hasBeenExpert = true;
-        			
-					// Set points to mean
+				// Set points to mean
+				if (this.drawing.isReady) {
 					this.setMeanRadius(-this.apexY);
-        		}
+				}
         	}
         	else
         	{
-        		// If coming from expert mode, reset points
-        		if (this.hasBeenExpert)
-        		{
+        		// First calls to resetHandles occur prior to squiggleArray being initialised
+        		if (this.drawing.isReady) {
         			this.resetHandles();
         		}
         	}
