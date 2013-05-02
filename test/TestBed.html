@@ -56,7 +56,7 @@
             function eyeDrawController(_drawing)
             {
                 this.drawing = _drawing;
-                this.gsf = 0.72;
+                this.gsf = 1;
                 
                 // Specify call back function
                 this.callBack = callBack;
@@ -64,18 +64,6 @@
                 // Register for notifications with drawing object
                 this.drawing.registerForNotifications(this, 'callBack', []);
                 
-                // Arrays to handle sutures
-                var suturePointsArray = new Array();
-                var sutureArray = new Array();
-                
-				// 'Prototype position' of trabeculectomy Sutures (relative position, angle and type)
-				var sutureSet = [
-					{xd: -1, yd: 0, a: 7 * Math.PI/4, t:'Releasable', ex: -25},
-					{xd: 0, yd: 0, a: 0, t:'Releasable', ex: 0},
- 					{xd: +1, yd: 0, a: 1 * Math.PI/4, t:'Releasable', ex: +25},
- 					{xd: -1, yd: 0.5, a: Math.PI/2, t:'Fixed', ex: 0},
- 					{xd: +1, yd: 0.5, a: 3 * Math.PI/2, t:'Fixed', ex: 0},
-				];
                 
                 // Method called for notification
                 function callBack(_messageArray)
@@ -88,34 +76,9 @@
 							//Scale down for glaucoma drawings
 							this.drawing.globalScaleFactor = this.gsf;
 
-							this.drawing.addDoodle('AntSeg');
-							this.drawing.addDoodle('ConjunctivalFlap', {}, {method:{id:'methodSelect', attribute:'value'}});
-							this.drawing.addDoodle('PI', {rotation:0});
-						
-							// Add trabeculectomy flap
-							var trab = this.drawing.addDoodle('TrabyFlap', {size:'5x2'}, {
-							site:{id:'siteSelect', attribute:'value'}, 
-							size:{id:'sizeSelect', attribute:'value'}, 
-							sclerostomy:{id:'sclerostomySelect', attribute:'value'}
-							});
-
-							// Iterate through sutures creating an array of objects representing 'ideal' sutures, and another array of the sutures themselves
-							for (var i in sutureSet)
-							{
-								// Create point from ideal with added attributes
-								var p = new ED.Point(sutureSet[i].xd * trab.right.x * this.gsf, (trab.height + sutureSet[i].yd * (trab.right.y - trab.height)) * this.gsf);
-								p.angle = sutureSet[i].a;
-								p.type = sutureSet[i].t;
-								p.ex = sutureSet[i].ex;
-							
-								// Add it to an array
-								suturePointsArray[suturePointsArray.length] = p;
-							
-								// Create a suture and add that to an array
-								var suture = this.drawing.addDoodle('TrabySuture', {originX:p.x, originY:p.y, rotation:p.angle, type:p.type});
-								suture.firstOriginX = p.ex;
-								sutureArray[sutureArray.length] = suture;
-							}                        
+							this.drawing.addDoodle('Patch');
+// 							this.drawing.addDoodle('ConjunctivalFlap', {}, {method:{id:'methodSelect', attribute:'value'}});
+// 							this.drawing.addDoodle('PI', {rotation:0});                      
 
 							this.drawing.deselectDoodles();
                             break;
@@ -123,74 +86,7 @@
                         case 'parameterChanged':
                             var doodle = _messageArray['object'].doodle;
                             
-                            // TrabyFlap has changed size or rotated
-                            if (doodle.className == 'TrabyFlap')
-                            {
-                            	var trab = doodle;
-                            	if (_messageArray['object']['parameter'] == 'size')
-                            	{
-                            		for (var i = 0; i < sutureArray.length; i++)
-									{
-										sutureArray[i].originX = sutureSet[i].xd * trab.right.x * 0.72;
-										sutureArray[i].originY = (trab.height + sutureSet[i].yd * (trab.right.y - trab.height)) * 0.72;
-										
-										// Reset reference points (in doodle coordinates but before rotation applied)
-										suturePointsArray[i].x = sutureArray[i].originX;
-										suturePointsArray[i].y = sutureArray[i].originY;
-									}
-									
-									// Trigger notification to apply rotation to sutures
-									var object = {doodle:trab, parameter:'rotation', value:trab.rotation, oldValue:trab.rotation};
-									this.drawing.notify('parameterChanged', object);
-                            	}
-                            	
-                            	if (_messageArray['object']['parameter'] == 'rotation')
-                            	{
-                            		// Rotate sutures with flap
-									for (var i = 0; i < sutureArray.length; i++)
-									{
-										// Get original position
-										var p = suturePointsArray[i];
-									
-										// Calculate radius to this point
-										var r = Math.sqrt(p.x * p.x + p.y * p.y);
-									
-										// Calculate new position
-										var np = p.pointAtRadiusAndClockwiseAngle(r, trab.rotation);
-									
-										// Apply it to suture
-										var sut = sutureArray[i];
-										if (sut != null)
-										{
-											sut.originX = np.x;
-											sut.originY = np.y;
-									
-											// Apply rotation
-											sut.rotation = ED.Mod(p.angle + trab.rotation, 2 * Math.PI);
-										}
-									}
-									
-									// Also rotate a conjunctival flap if present
-									var conjFlap = this.drawing.lastDoodleOfClass('ConjunctivalFlap');
-									if (conjFlap) {
-										conjFlap.rotation = trab.rotation;
-									}
-                            	}
-                            }
-                        
-                        	// Suture has moved (a refinement would be to feed back movement to suture plan so that movement of flap carries sutures with it)
-                        	if (doodle.className == 'TrabySuture')
-                        	{
-                        		if (_messageArray['object']['parameter'] == 'originX' || _messageArray['object']['parameter'] == 'originY')
-                        		{
-                        			//console.log('TrabySuture moved ', doodle.originX, doodle.originY);
-                        		}
-                        		
-                        		if (_messageArray['object']['parameter'] == 'rotation')
-                        		{
-                        			//console.log('TrabySuture rotated ', doodle.rotation);
-                        		}
-                        	}
+
                             break;
                         
                         case 'doodleAdded':
