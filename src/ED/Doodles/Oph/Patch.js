@@ -37,6 +37,9 @@ ED.Patch = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scal
 	// Set classname
 	this.className = "Patch";
 
+	this.width = 200;
+	this.height = 120;
+	
 	// Derived parameters (NB must set a value here to define parameter as a property of the object, even though value set later)
 	this.material = 'Sclera';
 	
@@ -55,7 +58,7 @@ ED.Patch.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.Patch.prototype.setHandles = function() {
-	this.handleArray[3] = new ED.Handle(null, true, ED.Mode.Scale, false);
+	this.handleArray[3] = new ED.Handle(null, true, ED.Mode.Size, false);
 	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
 }
 
@@ -63,8 +66,8 @@ ED.Patch.prototype.setHandles = function() {
  * Sets default dragging attributes
  */
 ED.Patch.prototype.setPropertyDefaults = function() {
-	this.isOrientated = true;
-	this.isSqueezable = true;
+	//this.isOrientated = true;
+	//this.isSqueezable = true;
 
 	// Update component of validation array for simple parameters
 	this.parameterValidationArray['apexX']['range'].setMinAndMax(-50, +50);
@@ -84,7 +87,7 @@ ED.Patch.prototype.setPropertyDefaults = function() {
  */
 ED.Patch.prototype.setParameterDefaults = function() {
 	this.apexX = 0;
-	this.originY = -260;
+	//this.originY = -260;
 	
 	this.setParameterFromString('material', 'Sclera');
 
@@ -134,7 +137,7 @@ ED.Patch.prototype.dependentParameterValues = function(_parameter, _value) {
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.Patch.prototype.draw = function(_point) {console.log(this.material);
+ED.Patch.prototype.draw = function(_point) {console.log(this.width);
 	// Get context
 	var ctx = this.drawing.context;
 
@@ -144,7 +147,7 @@ ED.Patch.prototype.draw = function(_point) {console.log(this.material);
 	// Boundary path
 	ctx.beginPath();
 
-	ctx.rect(-50, -60, 100, 120);
+	ctx.rect(-this.width/2, -this.height/2, this.width, this.height);
 
 	// Close path
 	ctx.closePath();
@@ -170,24 +173,24 @@ ED.Patch.prototype.draw = function(_point) {console.log(this.material);
 	// Other stuff here
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
 		// Suture knots
-		this.drawSpot(ctx, -50, -50, 5, "blue");
-		this.drawSpot(ctx, -50, 50, 5, "blue");
-		this.drawSpot(ctx, 50, -50, 5, "blue");
-		this.drawSpot(ctx, 50, 50, 5, "blue");
-
-		// Suture thread ends
-		this.drawLine(ctx, -60, -60, -50, -50, 2, "blue");
-		this.drawLine(ctx, -50, -50, -60, -40, 2, "blue");
-		this.drawLine(ctx, -60, 60, -50, 50, 2, "blue");
-		this.drawLine(ctx, -50, 50, -60, 40, 2, "blue");
-		this.drawLine(ctx, 60, -60, 50, -50, 2, "blue");
-		this.drawLine(ctx, 50, -50, 60, -40, 2, "blue");
-		this.drawLine(ctx, 60, 60, 50, 50, 2, "blue");
-		this.drawLine(ctx, 50, 50, 60, 40, 2, "blue");
+// 		this.drawSpot(ctx, -50, -50, 5, "blue");
+// 		this.drawSpot(ctx, -50, 50, 5, "blue");
+// 		this.drawSpot(ctx, 50, -50, 5, "blue");
+// 		this.drawSpot(ctx, 50, 50, 5, "blue");
+// 
+// 		// Suture thread ends
+// 		this.drawLine(ctx, -60, -60, -50, -50, 2, "blue");
+// 		this.drawLine(ctx, -50, -50, -60, -40, 2, "blue");
+// 		this.drawLine(ctx, -60, 60, -50, 50, 2, "blue");
+// 		this.drawLine(ctx, -50, 50, -60, 40, 2, "blue");
+// 		this.drawLine(ctx, 60, -60, 50, -50, 2, "blue");
+// 		this.drawLine(ctx, 50, -50, 60, -40, 2, "blue");
+// 		this.drawLine(ctx, 60, 60, 50, 50, 2, "blue");
+// 		this.drawLine(ctx, 50, 50, 60, 40, 2, "blue");
 	}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[3].location = this.transform.transformPoint(new ED.Point(50, -60));
+	this.handleArray[3].location = this.transform.transformPoint(new ED.Point(this.width/2, -this.height/2));
 	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected

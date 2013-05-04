@@ -90,7 +90,8 @@ ED.Mode = {
 	Apex: 5,
 	Handles: 6,
 	Draw: 7,
-	Select: 8
+	Select: 8,
+	Size: 9
 }
 
 /**
@@ -654,7 +655,8 @@ ED.Drawing.prototype.load = function(_doodleSet) {
 			_doodleSet[i].scaleY,
 			_doodleSet[i].arc,
 			_doodleSet[i].rotation,
-			_doodleSet[i].order);
+			_doodleSet[i].order
+		);
 
 		this.doodleArray[i].id = i;
 
@@ -1157,6 +1159,12 @@ ED.Drawing.prototype.mousemove = function(_point) {
 					doodle.updateDependentParameters('apexY');
 					break;
 
+				case ED.Mode.Size:
+					// Alter width and height accordingly
+					doodle.width = doodle.width + 2 * (mousePosSelectedDoodlePlane.x - lastMousePosSelectedDoodlePlane.x);
+					doodle.height = doodle.height - 2 * (mousePosSelectedDoodlePlane.y - lastMousePosSelectedDoodlePlane.y);
+					break;
+					
 				case ED.Mode.Handles:
 					// Move handles to new position (Stored in a squiggle)
 					var index = doodle.draggingHandleIndex;
