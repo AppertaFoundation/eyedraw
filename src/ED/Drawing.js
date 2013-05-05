@@ -45,8 +45,8 @@ ED.arrowDelta = 4;
  */
 ED.squiggleWidth = {
 	Thin: 4,
-	Medium: 8,
-	Thick: 12
+	Medium: 12,
+	Thick: 20
 }
 
 /**
@@ -303,7 +303,7 @@ ED.Drawing = function(_canvas, _eye, _IDSuffix, _isEditable, _options) {
 	this.isReady = false;
 
 	// Freehand drawing properties
-	this.squiggleColour = '00FF00';
+	this.squiggleColour = new ED.Colour(0, 255, 0, 1);
 	this.squiggleWidth = ED.squiggleWidth.Medium;
 	this.squiggleStyle = ED.squiggleStyle.Outline;
 
@@ -666,7 +666,8 @@ ED.Drawing.prototype.load = function(_doodleSet) {
 		if (typeof(_doodleSet[i].squiggleArray) != 'undefined') {
 			for (var j = 0; j < _doodleSet[i].squiggleArray.length; j++) {
 				// Get parameters and create squiggle
-				var colour = _doodleSet[i].squiggleArray[j].colour;
+                var c = _doodleSet[i].squiggleArray[j].colour;
+                var colour = new ED.Colour(c.red, c.green, c.blue, c.alpha);
 				var thickness = _doodleSet[i].squiggleArray[j].thickness;
 				var filled = _doodleSet[i].squiggleArray[j].filled;
 				var squiggle = new ED.Squiggle(this.doodleArray[i], colour, thickness, filled);
@@ -3365,6 +3366,11 @@ ED.Doodle = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _sca
 			},
 		};
 
+        // Optional array for saving non-bound parameters
+        if (!this.savedParams) {
+            this.savedParams = [];
+        }
+        
 		// Grid properties
 		this.gridSpacing = 200;
 		this.gridDisplacementX = 0;
@@ -4111,6 +4117,16 @@ ED.Doodle.prototype.setParameterFromString = function(_parameter, _value) {
 				this.updateDependentParameters(parameter);
 			}
 		}
+
+        // Create notification message var messageArray = {eventName:_eventName, selectedDoodle:this.selectedDoodle, object:_object};
+        var object = new Object;
+        object.doodle = this;
+        object.parameter = _parameter;
+        object.value = _value;
+        object.oldValue = this[_parameter];
+
+        // Trigger notification
+        this.drawing.notify('parameterChanged', object);
 	} else {
 		ED.errorHandler('ED.Doodle', 'setParameterFromString', 'No item in parameterValidationArray corresponding to parameter: ' + _parameter);
 	}
@@ -4332,14 +4348,20 @@ ED.Doodle.prototype.addBinding = function(_parameter, _fieldParameters) {
 				case 'select-one':
 					if (attribute) {
 						if (element.selectedIndex > -1) {
-							this.setParameterFromString(_parameter, element.options[element.selectedIndex].getAttribute(attribute));
+							// For parameters linked to a saved value, set value to that of bound element NB if this works, all the cases in this switch need updating
+							if (this.savedParams.indexOf(_parameter) < 0) {
+								this.setParameterFromString(_parameter, element.options[element.selectedIndex].getAttribute(attribute));
+							}
 						}
-						element.addEventListener('change', listener = function(event) {
+						element.addEventListener('change', listener = function (event) {
 							drawing.eventHandler('onchange', id, className, this.id, this.options[this.selectedIndex].getAttribute(attribute));
 						}, false);
 					} else {
-						this.setParameterFromString(_parameter, element.value);
-						element.addEventListener('change', listener = function(event) {
+						// For parameters linked to a saved value, set value to that of bound element NB if this works, all the cases in this switch need updating
+						if (this.savedParams.indexOf(_parameter) < 0) {
+							this.setParameterFromString(_parameter, element.value);
+						}
+						element.addEventListener('change', listener = function (event) {
 							drawing.eventHandler('onchange', id, className, this.id, this.value);
 						}, false);
 					}
@@ -4558,22 +4580,42 @@ ED.Doodle.prototype.locationRelativeToFovea = function() {
 /**
  * Adds a new squiggle to the doodle's squiggle array
  */
-ED.Doodle.prototype.addSquiggle = function() {
-	// Get preview colour (returned as rgba(r,g,b))
-	//var colourString = this.drawing.squiggleColour;
+ED.Doodle.prototype.addSquiggle = function () {
+    // Get preview colour (returned as rgba(r,g,b))
+    var colourString = this.drawing.colourPreview.style.backgroundColor;
 
-	// Use regular expression to extract rgb values from returned value
-	//var colourArray = colourString.match(/\d+/g);
+    // Use regular expression to extract rgb values from returned value
+    var colourArray = colourString.match(/\d+/g);
 
-	// True if solid
-	var filled = this.drawing.squiggleStyle == ED.squiggleStyle.Solid;
+    // Get solid or clear
+    var filled = this.drawing.fillRadio.checked;
 
-	// Create new squiggle of selected colour
-	var squiggle = new ED.Squiggle(this, this.drawing.squiggleColour, this.drawing.squiggleWidth, filled);
+    // Line thickness
+    var thickness = this.drawing.thickness.value;
+    var lineThickness;
+    switch (thickness) {
+    case "Thin":
+        lineThickness = ED.squiggleWidth.Thin;
+        break;
+    case "Medium":
+        lineThickness = ED.squiggleWidth.Medium;
+        break;
+    case "Thick":
+        lineThickness = ED.squiggleWidth.Thick;
+        break;
+    default:
+        lineThickness = ED.squiggleWidth.Thin;
+        break;
+    }
 
-	// Add it to squiggle array
-	this.squiggleArray.push(squiggle);
+    // Create new squiggle of selected colour
+    var colour = new ED.Colour(colourArray[0], colourArray[1], colourArray[2], 1);
+    var squiggle = new ED.Squiggle(this, colour, lineThickness, filled);
+
+    // Add it to squiggle array
+    this.squiggleArray.push(squiggle);
 }
+
 
 /**
  * Adds a point to the active squiggle (the last in the squiggle array)
@@ -5394,7 +5436,7 @@ ED.AffineTransform.prototype.createInverse = function() {
  *
  * @class Squiggle
  * @property {Doodle} doodle The doodle to which this squiggle belongs
- * @property {String} colour Colour of the squiggle
+ * @property {Colour} colour Colour of the squiggle
  * @property {Int} thickness Thickness of the squiggle in pixels
  * @property {Bool} filled True if squiggle is solid (filled)
  * @property {Array} pointsArray Array of points making up the squiggle
@@ -5430,15 +5472,15 @@ ED.Squiggle.prototype.addPoint = function(_point) {
  */
 ED.Squiggle.prototype.json = function() {
 	var s = '{';
-	s = s + '"colour": "' + this.colour + '", ';
-	s = s + '"thickness": ' + this.thickness + ', ';
-	s = s + '"filled": "' + this.filled + '", ';
+    s = s + '"colour":' + this.colour.json() + ',';
+	s = s + '"thickness": ' + this.thickness + ',';
+	s = s + '"filled": "' + this.filled + '",';
 
-	s = s + '"pointsArray": [';
+	s = s + '"pointsArray":[';
 	for (var i = 0; i < this.pointsArray.length; i++) {
 		s = s + this.pointsArray[i].json();
 		if (this.pointsArray.length - i > 1) {
-			s = s + ', ';
+			s = s + ',';
 		}
 	}
 	s = s + ']';
