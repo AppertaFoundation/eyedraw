@@ -242,6 +242,7 @@ ED.randomArray = [0.6570, 0.2886, 0.7388, 0.1621, 0.9896, 0.0434, 0.1695, 0.9099
  * @property {Int} lastDoodleId id of last doodle to be added
  * @property {Bool} isActive Flag indicating that the mouse is interacting with the drawing
  * @property {Bool} isNew Flag indicating that the drawing is new (false after doodles loaded from an input string)
+ * @property {Bool} isReady Flag indicating that the drawing has finished loading (set by widget controller)
  * @property {String} squiggleColour Colour of line for freehand drawing
  * @property {Int} squiggleWidth Width of line for freehand drawing
  * @property {Int} squiggleStyle Style of freehand drawing (solid or outline)
@@ -299,6 +300,7 @@ ED.Drawing = function(_canvas, _eye, _IDSuffix, _isEditable, _options) {
 	this.lastDoodleId = 0;
 	this.isActive = false;
 	this.isNew = true;
+	this.isReady = false;
 
 	// Freehand drawing properties
 	this.squiggleColour = '00FF00';
