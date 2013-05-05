@@ -33,7 +33,7 @@
  * @param {Float} _rotation
  * @param {Int} _order
  */
-ED.OpticDisc = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.OpticDisc = function(_drawing, _parameterValueArray, _order) {
 	// Set classname
 	this.className = "OpticDisc";
 
@@ -48,7 +48,7 @@ ED.OpticDisc = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _
 	this.savedParams = ['mode'];
 
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterValueArray, _order);
 }
 
 /**

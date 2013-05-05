@@ -33,7 +33,7 @@
  * @param {Float} _rotation
  * @param {Int} _order
  */
-ED.Patch = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.Patch = function(_drawing, _parameterValueArray, _order) {
 	// Set classname
 	this.className = "Patch";
 
@@ -44,7 +44,7 @@ ED.Patch = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scal
 	this.material = 'Sclera';
 	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterValueArray, _order);
 }
 
 /**
@@ -66,7 +66,7 @@ ED.Patch.prototype.setHandles = function() {
  * Sets default dragging attributes
  */
 ED.Patch.prototype.setPropertyDefaults = function() {
-	//this.isOrientated = true;
+	this.isOrientated = true;
 	//this.isSqueezable = true;
 
 	// Update component of validation array for simple parameters
@@ -86,7 +86,7 @@ ED.Patch.prototype.setPropertyDefaults = function() {
  * Sets default parameters
  */
 ED.Patch.prototype.setParameterDefaults = function() {
-	this.apexX = 0;
+	//this.apexX = 0;
 	//this.originY = -260;
 	
 	this.setParameterFromString('material', 'Sclera');
@@ -137,7 +137,7 @@ ED.Patch.prototype.dependentParameterValues = function(_parameter, _value) {
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.Patch.prototype.draw = function(_point) {console.log(this.width);
+ED.Patch.prototype.draw = function(_point) {
 	// Get context
 	var ctx = this.drawing.context;
 

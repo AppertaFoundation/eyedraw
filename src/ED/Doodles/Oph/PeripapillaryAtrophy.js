@@ -33,7 +33,7 @@
  * @param {Float} _rotation
  * @param {Int} _order
  */
-ED.PeripapillaryAtrophy = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.PeripapillaryAtrophy = function(_drawing, _parameterValueArray, _order) {
 	// Set classname
 	this.className = "PeripapillaryAtrophy";
 
@@ -41,7 +41,7 @@ ED.PeripapillaryAtrophy = function(_drawing, _originX, _originY, _radius, _apexX
 	this.outerRadius = 340;
 
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterValueArray, _order);
 }
 
 /**

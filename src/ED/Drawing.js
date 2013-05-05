@@ -252,7 +252,6 @@ ED.randomArray = [0.6570, 0.2886, 0.7388, 0.1621, 0.9896, 0.0434, 0.1695, 0.9099
  * @param {Bool} _isEditable Flag indicating whether canvas is editable or not
  * @param {Array} _options Associative array of optional parameters
  */
-//ED.Drawing = function(_canvas, _eye, _IDSuffix, _isEditable, _offsetX, _offsetY, _toImage)
 ED.Drawing = function(_canvas, _eye, _IDSuffix, _isEditable, _options) {
 	// Defaults for optional parameters
 	var offsetX = 0;
@@ -642,7 +641,21 @@ ED.Drawing.prototype.load = function(_doodleSet) {
 			break;
 		}
 
+		// Simple parameters (NB if new ones are added, they should be placed here AND in Doodle class definition)
+		var parameterArray = new Array('originX', 'originY', 'radius', 'apexX', 'apexY', 'scaleX', 'scaleY', 'arc', 'rotation');
+		
+		var parameterValueArray = new Array();
+		
+		// Load parameter array with any values in doodleSet
+		for (var j in parameterArray) {
+			var parameter = parameterArray[j];
+			if (_doodleSet[i].hasOwnProperty(parameter)) {
+				parameterValueArray[parameter] = _doodleSet[i][parameter];
+			}
+		}
+		
 		// Instantiate a new doodle object with parameters from doodle set
+		/*
 		this.doodleArray[i] = new ED[_doodleSet[i].subclass]
 		(
 			this,
@@ -657,6 +670,14 @@ ED.Drawing.prototype.load = function(_doodleSet) {
 			_doodleSet[i].rotation,
 			_doodleSet[i].order
 		);
+		*/
+		
+		this.doodleArray[i] = new ED[_doodleSet[i].subclass]		
+		(
+			this,
+			parameterValueArray,
+			_doodleSet[i].order
+		);	
 
 		this.doodleArray[i].id = i;
 
@@ -3244,18 +3265,10 @@ ED.Report.prototype.isMacOff = function() {
  * @property {Int} gridDisplacementY Displacement of grid matrix from origin along y axis
  * @property {Float} version Version of doodle
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
+ * @param {Array} _parameterValueArray
  * @param {Int} _order
  */
-ED.Doodle = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.Doodle = function(_drawing, _parameterValueArray, _order) {
 	// Function called as part of prototype assignment has no parameters passed
 	if (typeof(_drawing) != 'undefined') {
 		// Drawing containing this doodle
@@ -3306,12 +3319,14 @@ ED.Doodle = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _sca
 				kind: 'simple',
 				type: 'int',
 				range: new ED.Range(-halfWidth, +halfWidth),
+				defaultValue: +0,
 				delta: 15
 			},
 			originY: {
 				kind: 'simple',
 				type: 'int',
 				range: new ED.Range(-halfHeight, +halfHeight),
+				defaultValue: +0,
 				delta: 15
 			},
 			radius: {
@@ -3319,11 +3334,13 @@ ED.Doodle = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _sca
 				type: 'float',
 				range: new ED.Range(+100, +450),
 				precision: 6,
+				defaultValue: +100,
 				delta: 15
 			},
 			apexX: {
 				kind: 'simple',
 				type: 'int',
+				defaultValue: +0,
 				range: new ED.Range(-500, +500),
 				delta: 15
 			},
@@ -3331,6 +3348,7 @@ ED.Doodle = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _sca
 				kind: 'simple',
 				type: 'int',
 				range: new ED.Range(-500, +500),
+				defaultValue: +0,
 				delta: 15
 			},
 			scaleX: {
@@ -3338,6 +3356,7 @@ ED.Doodle = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _sca
 				type: 'float',
 				range: new ED.Range(+0.5, +4.0),
 				precision: 6,
+				defaultValue: +1,
 				delta: 0.1
 			},
 			scaleY: {
@@ -3345,6 +3364,7 @@ ED.Doodle = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _sca
 				type: 'float',
 				range: new ED.Range(+0.5, +4.0),
 				precision: 6,
+				defaultValue: +1,
 				delta: 0.1
 			},
 			arc: {
@@ -3352,6 +3372,7 @@ ED.Doodle = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _sca
 				type: 'float',
 				range: new ED.Range(Math.PI / 12, Math.PI * 2),
 				precision: 6,
+				defaultValue: Math.PI,
 				delta: 0.1
 			},
 			rotation: {
@@ -3359,6 +3380,7 @@ ED.Doodle = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _sca
 				type: 'float',
 				range: new ED.Range(0, 2 * Math.PI),
 				precision: 6,
+				defaultValue: +0,
 				delta: 0.2
 			},
 		};
@@ -3411,8 +3433,10 @@ ED.Doodle = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _sca
 		this.setPropertyDefaults();
 
 		// New doodle (constructor called with _drawing parameter only)
-		if (typeof(_originX) == 'undefined') {
-			// Default set of parameters (Note use of unary + operator to type convert to numbers)
+		if (typeof(_parameterValueArray) == 'undefined') {
+			// Default set of parameters
+
+			/*
 			this.originX = +0;
 			this.originY = +0;
 			this.radius = +100;
@@ -3422,8 +3446,21 @@ ED.Doodle = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _sca
 			this.scaleY = +1;
 			this.arc = Math.PI;
 			this.rotation = +0;
+			*/
+			
+			// Assign default values to simple parameters
+			for (var parameter in this.parameterValidationArray)
+			{
+				var validation = this.parameterValidationArray[parameter];
+				if (validation.kind == 'simple') {
+					this[parameter] = validation.defaultValue;
+				}
+			}
+			
+			// Default is to put new doodle in front
 			this.order = this.drawing.doodleArray.length;
 
+			// Other initialisation
 			this.setParameterDefaults();
 
 			// Newly added doodles are selected
@@ -3432,6 +3469,7 @@ ED.Doodle = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _sca
 		// Doodle with passed parameters
 		else {
 			// Parameters
+			/*
 			this.originX = +_originX;
 			this.originY = +_originY;
 			this.radius = +_radius;
@@ -3442,7 +3480,28 @@ ED.Doodle = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _sca
 			this.arc = _arc * Math.PI / 180;
 			this.rotation = _rotation * Math.PI / 180;
 			this.order = +_order;
-
+			*/
+			
+			// Load passed parameters, or default values if not present
+			for (var parameter in this.parameterValidationArray) {
+				var validation = this.parameterValidationArray[parameter];
+				
+				if (typeof(_parameterValueArray[parameter]) != 'undefined') {
+					if (parameter == 'arc' || parameter == 'rotation') {
+						this[parameter] = _parameterValueArray[parameter] * Math.PI / 180;
+					}
+					else  {
+						this[parameter] = _parameterValueArray[parameter];
+					}
+				}
+				else {
+					this[parameter] = validation.defaultValue;
+				}
+			}
+			
+			// Order
+			this.order = +_order;
+			
 			// Update any derived parameters
 			for (var parameter in this.parameterValidationArray) {
 				var validation = this.parameterValidationArray[parameter];
@@ -4718,40 +4777,71 @@ ED.Doodle.prototype.nearestArcTo = function(_arc) {
  */
 ED.Doodle.prototype.json = function() {
 	var s = '{';
-	s = s + '"version": ' + this.version.toFixed(1) + ', ';
-	s = s + '"subclass": ' + '"' + this.className + '", ';
-	s = s + '"originX": ' + this.originX.toFixed(0) + ', ';
-	s = s + '"originY": ' + this.originY.toFixed(0) + ', ';
-	s = s + '"radius": ' + this.radius.toFixed(0) + ', ';
-	s = s + '"apexX": ' + this.apexX.toFixed(0) + ', ';
-	s = s + '"apexY": ' + this.apexY.toFixed(0) + ', ';
-	s = s + '"scaleX": ' + this.scaleX.toFixed(2) + ', ';
-	s = s + '"scaleY": ' + this.scaleY.toFixed(2) + ', ';
-	s = s + '"arc": ' + (this.arc * 180 / Math.PI).toFixed(0) + ', ';
-	s = s + '"rotation": ' + (this.rotation * 180 / Math.PI).toFixed(0) + ', ';
-	s = s + '"order": ' + this.order.toFixed(0) + ', ';
-
-	s = s + '"squiggleArray": [';
-	for (var j = 0; j < this.squiggleArray.length; j++) {
-		s = s + this.squiggleArray[j].json();
-		if (this.squiggleArray.length - j > 1) {
-			s = s + ', ';
-		}
-	}
-	s = s + '], ';
-
-	s = s + '"params": [';
-	if (typeof(this.savedParams) != 'undefined') {
-		for (var j = 0; j < this.savedParams.length; j++) {
-			var param = this.savedParams[j];
-			s = s + '{ "name": "' + param + '", "value": "' + this[param] + '" }';
-			if (this.savedParams.length - j > 1) {
-				s = s + ', ';
+	s = s + '"version":' + this.version.toFixed(1) + ',';
+	s = s + '"subclass":' + '"' + this.className + '",';
+	
+	/*
+	s = s + '"originX":' + this.originX.toFixed(0) + ', ';
+	s = s + '"originY":' + this.originY.toFixed(0) + ', ';
+	s = s + '"radius":' + this.radius.toFixed(0) + ', ';
+	s = s + '"apexX":' + this.apexX.toFixed(0) + ', ';
+	s = s + '"apexY":' + this.apexY.toFixed(0) + ', ';
+	s = s + '"scaleX":' + this.scaleX.toFixed(2) + ', ';
+	s = s + '"scaleY":' + this.scaleY.toFixed(2) + ', ';
+	s = s + '"arc":' + (this.arc * 180 / Math.PI).toFixed(0) + ', ';
+	s = s + '"rotation":' + (this.rotation * 180 / Math.PI).toFixed(0) + ', ';
+	*/
+	
+	// Write out values of simple parameters, but only if different from defaults
+	for (var parameter in this.parameterValidationArray)
+	{
+		var validation = this.parameterValidationArray[parameter];
+		if (validation.kind == 'simple') {
+			if (this[parameter] != validation.defaultValue) {
+				if (parameter == 'scaleX' || parameter == 'scaleY') {
+					s = s + '"' + parameter + '":' + this[parameter].toFixed(2) + ',';
+				}
+				else if (parameter == 'arc' || parameter == 'rotation') {
+					s = s + '"' + parameter + '":' + (this[parameter] * 180 / Math.PI).toFixed(0) + ',';
+				}
+				else {
+					s = s + '"' + parameter + '":' + this[parameter].toFixed(0) + ',';
+				}
 			}
 		}
 	}
-	s = s + ']';
+	
+	// Optional squiggle array
+	if (this.squiggleArray.length > 0) {
+		s = s + '"squiggleArray":[';
+		for (var j = 0; j < this.squiggleArray.length; j++) {
+			s = s + this.squiggleArray[j].json();
+			if (this.squiggleArray.length - j > 1) {
+				s = s + ',';
+			}
+		}
+		s = s + '],';
+	}
 
+	// Optional saved parameters
+	if (typeof(this.savedParams) != 'undefined') {
+		if (this.savedParams.length > 0) {
+			s = s + '"params":[';
+			for (var j = 0; j < this.savedParams.length; j++) {
+				var param = this.savedParams[j];
+				s = s + '{ "name":"' + param + '","value":"' + this[param] + '"}';
+				if (this.savedParams.length - j > 1) {
+					s = s + ', ';
+				}
+			}
+			s = s + '],';
+		}
+	}
+
+	// Order
+	s = s + '"order":' + this.order.toFixed(0);
+
+	// End of JSON
 	s = s + '}';
 
 	return s;
@@ -5223,7 +5313,6 @@ ED.Point.prototype.json = function() {
 	return "{\"x\":" + this.x.toFixed(2) + ",\"y\":" + this.y.toFixed(2) + "}";
 }
 
-
 /**
  * Creates a new transformation matrix initialised to the identity matrix
  *
@@ -5428,15 +5517,15 @@ ED.Squiggle.prototype.addPoint = function(_point) {
  */
 ED.Squiggle.prototype.json = function() {
 	var s = '{';
-	s = s + '"colour": "' + this.colour + '", ';
-	s = s + '"thickness": ' + this.thickness + ', ';
-	s = s + '"filled": "' + this.filled + '", ';
+	s = s + '"colour":"' + this.colour + '",';
+	s = s + '"thickness":' + this.thickness + ',';
+	s = s + '"filled":"' + this.filled + '",';
 
-	s = s + '"pointsArray": [';
+	s = s + '"pointsArray":[';
 	for (var i = 0; i < this.pointsArray.length; i++) {
 		s = s + this.pointsArray[i].json();
 		if (this.pointsArray.length - i > 1) {
-			s = s + ', ';
+			s = s + ',';
 		}
 	}
 	s = s + ']';
