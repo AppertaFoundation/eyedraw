@@ -242,7 +242,7 @@ ED.randomArray = [0.6570, 0.2886, 0.7388, 0.1621, 0.9896, 0.0434, 0.1695, 0.9099
  * @property {Int} lastDoodleId id of last doodle to be added
  * @property {Bool} isActive Flag indicating that the mouse is interacting with the drawing
  * @property {Bool} isNew Flag indicating that the drawing is new (false after doodles loaded from an input string)
- * @property {String} squiggleColour Colour of line for freehand drawing
+ * @property {Object} squiggleColour Colour of line for freehand drawing
  * @property {Int} squiggleWidth Width of line for freehand drawing
  * @property {Int} squiggleStyle Style of freehand drawing (solid or outline)
  * @property {Float} scaleOn Options for setting scale to either width or height
@@ -300,7 +300,7 @@ ED.Drawing = function(_canvas, _eye, _IDSuffix, _isEditable, _options) {
 	this.isNew = true;
 
 	// Freehand drawing properties
-	this.squiggleColour = '00FF00';
+	this.squiggleColour = new ED.Colour(0, 255, 0, 1);
 	this.squiggleWidth = ED.squiggleWidth.Medium;
 	this.squiggleStyle = ED.squiggleStyle.Outline;
 
@@ -2917,10 +2917,11 @@ ED.Drawing.prototype.nextDoodleId = function() {
 /**
  * Changes the drawing colour of freehand drawing
  *
+ * @param {Object} _colour Colour object
  * @returns {String} _hexColour A string describing the colour to use for freehand drawing
  */
-ED.Drawing.prototype.setSquiggleColour = function(_hexColour) {
-	this.squiggleColour = _hexColour;
+ED.Drawing.prototype.setSquiggleColour = function(_colour) {
+	this.squiggleColour = _colour;
 
 	this.refreshSquiggleSettings()
 }
@@ -2965,8 +2966,8 @@ ED.Drawing.prototype.refreshSquiggleSettings = function() {
 		ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
 		// Set colours
-		ctx.strokeStyle = "#" + this.squiggleColour;
-		ctx.fillStyle = "#" + this.squiggleColour;
+		ctx.strokeStyle = this.squiggleColour.rgba();
+		ctx.fillStyle = this.squiggleColour.rgba();;
 
 		// Line width
 		ctx.beginPath();
@@ -5494,6 +5495,7 @@ ED.AffineTransform.prototype.createInverse = function() {
 ED.Squiggle = function(_doodle, _colour, _thickness, _filled) {
 	this.doodle = _doodle;
 	this.colour = _colour;
+	console.log(this.colour.json());
 	this.thickness = _thickness;
 	this.filled = _filled;
 
@@ -5517,7 +5519,7 @@ ED.Squiggle.prototype.addPoint = function(_point) {
  */
 ED.Squiggle.prototype.json = function() {
 	var s = '{';
-	s = s + '"colour":"' + this.colour + '",';
+	s = s + '"colour":' + this.colour.json() + ',';
 	s = s + '"thickness":' + this.thickness + ',';
 	s = s + '"filled":"' + this.filled + '",';
 
