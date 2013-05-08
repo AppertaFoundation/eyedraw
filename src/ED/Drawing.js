@@ -45,8 +45,8 @@ ED.arrowDelta = 4;
  */
 ED.squiggleWidth = {
 	Thin: 4,
-	Medium: 8,
-	Thick: 12
+	Medium: 12,
+	Thick: 20
 }
 
 /**
@@ -243,6 +243,8 @@ ED.randomArray = [0.6570, 0.2886, 0.7388, 0.1621, 0.9896, 0.0434, 0.1695, 0.9099
  * @property {Bool} isActive Flag indicating that the mouse is interacting with the drawing
  * @property {Bool} isNew Flag indicating that the drawing is new (false after doodles loaded from an input string)
  * @property {Object} squiggleColour Colour of line for freehand drawing
+ * @property {Bool} isReady Flag indicating that the drawing has finished loading (set by widget controller)
+ * @property {String} squiggleColour Colour of line for freehand drawing
  * @property {Int} squiggleWidth Width of line for freehand drawing
  * @property {Int} squiggleStyle Style of freehand drawing (solid or outline)
  * @property {Float} scaleOn Options for setting scale to either width or height
@@ -298,6 +300,7 @@ ED.Drawing = function(_canvas, _eye, _IDSuffix, _isEditable, _options) {
 	this.lastDoodleId = 0;
 	this.isActive = false;
 	this.isNew = true;
+	this.isReady = false;
 
 	// Freehand drawing properties
 	this.squiggleColour = new ED.Colour(0, 255, 0, 1);
@@ -685,7 +688,8 @@ ED.Drawing.prototype.load = function(_doodleSet) {
 		if (typeof(_doodleSet[i].squiggleArray) != 'undefined') {
 			for (var j = 0; j < _doodleSet[i].squiggleArray.length; j++) {
 				// Get parameters and create squiggle
-				var colour = _doodleSet[i].squiggleArray[j].colour;
+                var c = _doodleSet[i].squiggleArray[j].colour;
+                var colour = new ED.Colour(c.red, c.green, c.blue, c.alpha);
 				var thickness = _doodleSet[i].squiggleArray[j].thickness;
 				var filled = _doodleSet[i].squiggleArray[j].filled;
 				var squiggle = new ED.Squiggle(this.doodleArray[i], colour, thickness, filled);
@@ -3386,6 +3390,11 @@ ED.Doodle = function(_drawing, _parameterValueArray, _order) {
 			},
 		};
 
+        // Optional array for saving non-bound parameters
+        if (!this.savedParams) {
+            this.savedParams = [];
+        }
+        
 		// Grid properties
 		this.gridSpacing = 200;
 		this.gridDisplacementX = 0;
@@ -4169,6 +4178,16 @@ ED.Doodle.prototype.setParameterFromString = function(_parameter, _value) {
 				this.updateDependentParameters(parameter);
 			}
 		}
+
+        // Create notification message var messageArray = {eventName:_eventName, selectedDoodle:this.selectedDoodle, object:_object};
+        var object = new Object;
+        object.doodle = this;
+        object.parameter = _parameter;
+        object.value = _value;
+        object.oldValue = this[_parameter];
+
+        // Trigger notification
+        this.drawing.notify('parameterChanged', object);
 	} else {
 		ED.errorHandler('ED.Doodle', 'setParameterFromString', 'No item in parameterValidationArray corresponding to parameter: ' + _parameter);
 	}
@@ -4390,13 +4409,19 @@ ED.Doodle.prototype.addBinding = function(_parameter, _fieldParameters) {
 				case 'select-one':
 					if (attribute) {
 						if (element.selectedIndex > -1) {
+							// For parameters linked to a saved value, set value to that of bound element NB if this works, all the cases in this switch need updating
+							if (this.savedParams.indexOf(_parameter) < 0) {
 							this.setParameterFromString(_parameter, element.options[element.selectedIndex].getAttribute(attribute));
+						}
 						}
 						element.addEventListener('change', listener = function(event) {
 							drawing.eventHandler('onchange', id, className, this.id, this.options[this.selectedIndex].getAttribute(attribute));
 						}, false);
 					} else {
+						// For parameters linked to a saved value, set value to that of bound element NB if this works, all the cases in this switch need updating
+						if (this.savedParams.indexOf(_parameter) < 0) {
 						this.setParameterFromString(_parameter, element.value);
+						}
 						element.addEventListener('change', listener = function(event) {
 							drawing.eventHandler('onchange', id, className, this.id, this.value);
 						}, false);
@@ -4618,16 +4643,35 @@ ED.Doodle.prototype.locationRelativeToFovea = function() {
  */
 ED.Doodle.prototype.addSquiggle = function() {
 	// Get preview colour (returned as rgba(r,g,b))
-	//var colourString = this.drawing.squiggleColour;
+    var colourString = this.drawing.colourPreview.style.backgroundColor;
 
 	// Use regular expression to extract rgb values from returned value
-	//var colourArray = colourString.match(/\d+/g);
+    var colourArray = colourString.match(/\d+/g);
 
-	// True if solid
-	var filled = this.drawing.squiggleStyle == ED.squiggleStyle.Solid;
+    // Get solid or clear
+    var filled = this.drawing.fillRadio.checked;
+
+    // Line thickness
+    var thickness = this.drawing.thickness.value;
+    var lineThickness;
+    switch (thickness) {
+    case "Thin":
+        lineThickness = ED.squiggleWidth.Thin;
+        break;
+    case "Medium":
+        lineThickness = ED.squiggleWidth.Medium;
+        break;
+    case "Thick":
+        lineThickness = ED.squiggleWidth.Thick;
+        break;
+    default:
+        lineThickness = ED.squiggleWidth.Thin;
+        break;
+    }
 
 	// Create new squiggle of selected colour
-	var squiggle = new ED.Squiggle(this, this.drawing.squiggleColour, this.drawing.squiggleWidth, filled);
+    var colour = new ED.Colour(colourArray[0], colourArray[1], colourArray[2], 1);
+    var squiggle = new ED.Squiggle(this, colour, lineThickness, filled);
 
 	// Add it to squiggle array
 	this.squiggleArray.push(squiggle);
@@ -5482,7 +5526,7 @@ ED.AffineTransform.prototype.createInverse = function() {
  *
  * @class Squiggle
  * @property {Doodle} doodle The doodle to which this squiggle belongs
- * @property {String} colour Colour of the squiggle
+ * @property {Colour} colour Colour of the squiggle
  * @property {Int} thickness Thickness of the squiggle in pixels
  * @property {Bool} filled True if squiggle is solid (filled)
  * @property {Array} pointsArray Array of points making up the squiggle
@@ -5495,7 +5539,6 @@ ED.AffineTransform.prototype.createInverse = function() {
 ED.Squiggle = function(_doodle, _colour, _thickness, _filled) {
 	this.doodle = _doodle;
 	this.colour = _colour;
-	console.log(this.colour.json());
 	this.thickness = _thickness;
 	this.filled = _filled;
 
