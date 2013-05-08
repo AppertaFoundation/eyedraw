@@ -535,20 +535,12 @@ ED.Label.prototype.draw = function(_point) {
 		var arrowEnd = new ED.Point(this.apexX, this.apexY);
 
 		// Draw arrow
-		ctx.strokeStyle = "Gray";
-		ctx.fillStyle = "Gray";
-		ctx.lineWidth = 4;
-
 		ctx.beginPath();
 		ctx.moveTo(arrowStart.x, arrowStart.y);
 		ctx.lineTo(arrowEnd.x, arrowEnd.y);
+		ctx.strokeStyle = "Gray";
+		ctx.lineWidth = 4;
 		ctx.stroke();
-
-		ctx.beginPath();
-		ctx.arc(arrowEnd.x, arrowEnd.y, 16, 0, Math.PI * 2, true);
-		ctx.closePath();
-		ctx.moveTo(arrowEnd.x, arrowEnd.y);
-		ctx.fill();
 	}
 
 	// Coordinates of handles (in canvas plane)
@@ -591,15 +583,6 @@ ED.Label.prototype.addLetter = function(_keyCode) {
 		// Trigger notification
 		this.drawing.notify('parameterChanged', object);
 	}
-}
-
-/**
- * Returns a string containing a text description of the doodle
- *
- * @returns {String} Description of doodle
- */
-ED.Label.prototype.description = function() {
-	return "Peripheral iridectomy at " + this.clockHour() + " o'clock";
 }
 
 /**

@@ -44,7 +44,7 @@ ED.OpticDisc = function(_drawing, _parameterValueArray, _order) {
 	this.mode = "Basic";
 	this.cdRatio = '0';
 
-	// Additional parameters to save in JSON
+	// Make parameters saveable (NB Order is important since dependentParameterValues gets triggered after loading each item)
 	this.savedParams = ['mode'];
 
 	// Call superclass constructor
@@ -149,6 +149,17 @@ ED.OpticDisc.prototype.dependentParameterValues = function(_parameter, _value) {
 	switch (_parameter) {
 		case 'mode':
 			this.setHandleProperties();
+			if (_value == 'Expert') {
+				// Set points to mean
+				if (this.drawing.isReady) {
+					this.setMeanRadius(-this.apexY);
+				}
+			} else {
+				// First calls to resetHandles occur prior to squiggleArray being initialised
+				if (this.drawing.isReady) {
+					this.resetHandles();
+				}
+			}
 			break;
 
 		case 'apexY':
@@ -163,24 +174,6 @@ ED.OpticDisc.prototype.dependentParameterValues = function(_parameter, _value) {
 			if (_value != "No view") {
 				var newValue = parseFloat(_value) * 300;
 				returnArray['apexY'] = -newValue;
-
-				// Alter position of top and bottom points accordingly, then average the others
-				if (this.mode == "Expert") {
-					var ti = 0;
-					var bi = this.numberOfHandles / 2;
-					var meanOldValue = (this.squiggleArray[0].pointsArray[ti].length() + this.squiggleArray[0].pointsArray[bi].length()) / 2;
-					this.squiggleArray[0].pointsArray[ti].setWithPolars(newValue, this.squiggleArray[0].pointsArray[ti].direction());
-					this.squiggleArray[0].pointsArray[bi].setWithPolars(newValue, this.squiggleArray[0].pointsArray[bi].direction());
-
-					// Adjust others proportionately
-					for (var i = 0; i < this.numberOfHandles; i++) {
-						if (i != ti && i != bi) {
-							var newLength = this.squiggleArray[0].pointsArray[i].length() * newValue / meanOldValue;
-							newLength = newLength > 300 ? 300 : newLength;
-							this.squiggleArray[0].pointsArray[i].setWithPolars(newLength, this.squiggleArray[0].pointsArray[i].direction());
-						}
-					}
-				}
 			} else {
 				returnArray['apexY'] = -320;
 			}
@@ -485,7 +478,7 @@ ED.OpticDisc.prototype.description = function() {
 }
 
 /**
- * Defines handles visibility
+ * Defines visibility of handles
  */
 ED.OpticDisc.prototype.setHandleProperties = function() {
 	// Basic mode
@@ -495,21 +488,14 @@ ED.OpticDisc.prototype.setHandleProperties = function() {
 			this.handleArray[i].isVisible = false;
 		}
 		this.handleArray[this.numberOfHandles].isVisible = true;
-
-		// Set to mean of expert handles
-		this.apexY = -this.getMeanRadius();
 	}
 	// Expert mode
 	else {
 		// Make handles visible, except for apex handle,
 		for (var i = 0; i < this.numberOfHandles; i++) {
 			this.handleArray[i].isVisible = true;
-
 		}
 		this.handleArray[this.numberOfHandles].isVisible = false;
-
-		// Set points to mean
-		this.setMeanRadius(-this.apexY);
 	}
 }
 
@@ -577,5 +563,15 @@ ED.OpticDisc.prototype.setMeanRadius = function(_radius) {
 
 		// Set point
 		this.squiggleArray[0].pointsArray[i].setWithPolars(newLength, direction);
+	}
+}
+
+/**
+ * Resets radius of handle points to equal values corresponding to c/d ratio
+ */
+ED.OpticDisc.prototype.resetHandles = function() {
+	// Reset handles to equidistant points around circumference
+	for (var i = 0; i < this.numberOfHandles; i++) {
+		this.squiggleArray[0].pointsArray[i].setWithPolars(-this.apexY, i * 2 * Math.PI / this.numberOfHandles);
 	}
 }

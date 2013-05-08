@@ -196,8 +196,7 @@ function eyeDrawInit(_properties) {
 						}
 					}
 
-					// Apply bindings (some weirdness here, sometimes interpreted as an array, sometimes as an object
-					//if (_properties.bindingArray.length > 0)
+					// Apply bindings
 					if (!ED.objectIsEmpty(_properties.bindingArray)) {
 						this.drawing.addBindings(_properties.bindingArray);
 					}
@@ -216,6 +215,9 @@ function eyeDrawInit(_properties) {
 					if (_properties.focus) {
 						canvas.focus();
 					}
+					
+					// Mark drawing object as ready
+					this.drawing.isReady = true;
 					break;
 
 				case 'doodlesLoaded':

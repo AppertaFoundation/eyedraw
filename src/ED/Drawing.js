@@ -242,7 +242,6 @@ ED.randomArray = [0.6570, 0.2886, 0.7388, 0.1621, 0.9896, 0.0434, 0.1695, 0.9099
  * @property {Int} lastDoodleId id of last doodle to be added
  * @property {Bool} isActive Flag indicating that the mouse is interacting with the drawing
  * @property {Bool} isNew Flag indicating that the drawing is new (false after doodles loaded from an input string)
- * @property {Object} squiggleColour Colour of line for freehand drawing
  * @property {Bool} isReady Flag indicating that the drawing has finished loading (set by widget controller)
  * @property {String} squiggleColour Colour of line for freehand drawing
  * @property {Int} squiggleWidth Width of line for freehand drawing
@@ -1119,7 +1118,7 @@ ED.Drawing.prototype.mousemove = function(_point) {
 						if (rotationCorrection < 0) {
 							newAngle = 2 * Math.PI - ED.positiveAngle(newAngle);
 						}
-						doodle.setSimpleParameter('arc', doodle.nearestArcTo(doodle.arc/2 + newAngle));
+						doodle.setSimpleParameter('arc', doodle.nearestArcTo(doodle.arc / 2 + newAngle));
 					} else {
 						// Check for permitted range and stop dragging if exceeded
 						if (doodle.parameterValidationArray['arc']['range'].isBelow(doodle.arc + deltaAngle)) {
@@ -1189,7 +1188,7 @@ ED.Drawing.prototype.mousemove = function(_point) {
 					doodle.width = doodle.width + 2 * (mousePosSelectedDoodlePlane.x - lastMousePosSelectedDoodlePlane.x);
 					doodle.height = doodle.height - 2 * (mousePosSelectedDoodlePlane.y - lastMousePosSelectedDoodlePlane.y);
 					break;
-					
+
 				case ED.Mode.Handles:
 					// Move handles to new position (Stored in a squiggle)
 					var index = doodle.draggingHandleIndex;
@@ -4179,15 +4178,15 @@ ED.Doodle.prototype.setParameterFromString = function(_parameter, _value) {
 			}
 		}
 
-        // Create notification message var messageArray = {eventName:_eventName, selectedDoodle:this.selectedDoodle, object:_object};
-        var object = new Object;
-        object.doodle = this;
-        object.parameter = _parameter;
-        object.value = _value;
-        object.oldValue = this[_parameter];
+		// Create notification message var messageArray = {eventName:_eventName, selectedDoodle:this.selectedDoodle, object:_object};
+		var object = new Object;
+		object.doodle = this;
+		object.parameter = _parameter;
+		object.value = _value;
+		object.oldValue = this[_parameter];
 
-        // Trigger notification
-        this.drawing.notify('parameterChanged', object);
+		// Trigger notification
+		this.drawing.notify('parameterChanged', object);
 	} else {
 		ED.errorHandler('ED.Doodle', 'setParameterFromString', 'No item in parameterValidationArray corresponding to parameter: ' + _parameter);
 	}
@@ -4411,7 +4410,8 @@ ED.Doodle.prototype.addBinding = function(_parameter, _fieldParameters) {
 						if (element.selectedIndex > -1) {
 							// For parameters linked to a saved value, set value to that of bound element NB if this works, all the cases in this switch need updating
 							if (this.savedParams.indexOf(_parameter) < 0) {
-							this.setParameterFromString(_parameter, element.options[element.selectedIndex].getAttribute(attribute));
+								this.setParameterFromString(_parameter, element.options[element.selectedIndex].getAttribute(attribute));
+							}
 						}
 						}
 						element.addEventListener('change', listener = function(event) {
@@ -4420,7 +4420,7 @@ ED.Doodle.prototype.addBinding = function(_parameter, _fieldParameters) {
 					} else {
 						// For parameters linked to a saved value, set value to that of bound element NB if this works, all the cases in this switch need updating
 						if (this.savedParams.indexOf(_parameter) < 0) {
-						this.setParameterFromString(_parameter, element.value);
+							this.setParameterFromString(_parameter, element.value);
 						}
 						element.addEventListener('change', listener = function(event) {
 							drawing.eventHandler('onchange', id, className, this.id, this.value);
@@ -4643,39 +4643,40 @@ ED.Doodle.prototype.locationRelativeToFovea = function() {
  */
 ED.Doodle.prototype.addSquiggle = function() {
 	// Get preview colour (returned as rgba(r,g,b))
-    var colourString = this.drawing.colourPreview.style.backgroundColor;
+	var colourString = this.drawing.colourPreview.style.backgroundColor;
 
 	// Use regular expression to extract rgb values from returned value
-    var colourArray = colourString.match(/\d+/g);
+	var colourArray = colourString.match(/\d+/g);
 
-    // Get solid or clear
-    var filled = this.drawing.fillRadio.checked;
+	// Get solid or clear
+	var filled = this.drawing.fillRadio.checked;
 
-    // Line thickness
-    var thickness = this.drawing.thickness.value;
-    var lineThickness;
-    switch (thickness) {
-    case "Thin":
-        lineThickness = ED.squiggleWidth.Thin;
-        break;
-    case "Medium":
-        lineThickness = ED.squiggleWidth.Medium;
-        break;
-    case "Thick":
-        lineThickness = ED.squiggleWidth.Thick;
-        break;
-    default:
-        lineThickness = ED.squiggleWidth.Thin;
-        break;
-    }
+	// Line thickness
+	var thickness = this.drawing.thickness.value;
+	var lineThickness;
+	switch (thickness) {
+		case "Thin":
+			lineThickness = ED.squiggleWidth.Thin;
+			break;
+		case "Medium":
+			lineThickness = ED.squiggleWidth.Medium;
+			break;
+		case "Thick":
+			lineThickness = ED.squiggleWidth.Thick;
+			break;
+		default:
+			lineThickness = ED.squiggleWidth.Thin;
+			break;
+	}
 
 	// Create new squiggle of selected colour
-    var colour = new ED.Colour(colourArray[0], colourArray[1], colourArray[2], 1);
-    var squiggle = new ED.Squiggle(this, colour, lineThickness, filled);
+	var colour = new ED.Colour(colourArray[0], colourArray[1], colourArray[2], 1);
+	var squiggle = new ED.Squiggle(this, colour, lineThickness, filled);
 
 	// Add it to squiggle array
 	this.squiggleArray.push(squiggle);
 }
+
 
 /**
  * Adds a point to the active squiggle (the last in the squiggle array)
@@ -5563,8 +5564,8 @@ ED.Squiggle.prototype.addPoint = function(_point) {
 ED.Squiggle.prototype.json = function() {
 	var s = '{';
 	s = s + '"colour":' + this.colour.json() + ',';
-	s = s + '"thickness":' + this.thickness + ',';
-	s = s + '"filled":"' + this.filled + '",';
+	s = s + '"thickness": ' + this.thickness + ',';
+	s = s + '"filled": "' + this.filled + '",';
 
 	s = s + '"pointsArray":[';
 	for (var i = 0; i < this.pointsArray.length; i++) {
