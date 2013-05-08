@@ -89,6 +89,7 @@ ED.AntSynech.prototype.setPropertyDefaults = function() {
 ED.AntSynech.prototype.setParameterDefaults = function() {
 	this.arc = 30 * Math.PI / 180;
 	this.apexY = -this.rtmi;
+	this.setRotationWithDisplacements(0, -60);
 }
 
 /**
