@@ -1122,6 +1122,7 @@ ED.AngleNV.prototype.setPropertyDefaults = function()
 ED.AngleNV.prototype.setParameterDefaults = function()
 {
     this.arc = 30 * Math.PI/180;
+    this.setRotationWithDisplacements(0, -60);
 }
 
 /**
@@ -1262,6 +1263,7 @@ ED.AntSynech.prototype.setParameterDefaults = function()
 {
     this.arc = 30 * Math.PI/180;
     this.apexY = -rtmi;
+    this.setRotationWithDisplacements(0, -60);
 }
 
 /**
@@ -1403,6 +1405,7 @@ ED.AngleRecession.prototype.setPropertyDefaults = function()
 ED.AngleRecession.prototype.setParameterDefaults = function()
 {
     this.arc = 30 * Math.PI/180;
+    this.setRotationWithDisplacements(0, -90);
 }
 
 /**
