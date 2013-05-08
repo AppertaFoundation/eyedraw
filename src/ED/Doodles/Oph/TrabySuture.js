@@ -168,47 +168,47 @@ ED.TrabySuture.prototype.draw = function(_point) {
 				ctx.bezierCurveTo(2, 20, -4, 24, -3, 29);
 				ctx.bezierCurveTo(-3, 36, 14, 37, 23, 56);
 				ctx.bezierCurveTo(32, 74, 34, 100, 34, 100);
-				
+
 				// Suture exit through cornea
-// 				var ep = new ED.Point(this.firstOriginX, -60);
-// 				
-// 				// Set up a new transform and centre in canvas
-// 				var at = new ED.AffineTransform();
-// 				at.translate(150, 150);
-// 				
-// 				// Add rotation of traby flap and transform
-// 				var trab = this.drawing.lastDoodleOfClass('TrabyFlap');
-// 				if (trab) at.rotate(trab.rotation);
-// 				var np = at.transformPoint(ep);
-// 
-// 				// Tranform back to get fixed point in canvas
-// 				var pp = this.inverseTransform.transformPoint(np);
-// 				ctx.lineTo(pp.x, pp.y);
-				
+				// 				var ep = new ED.Point(this.firstOriginX, -60);
+				// 				
+				// 				// Set up a new transform and centre in canvas
+				// 				var at = new ED.AffineTransform();
+				// 				at.translate(150, 150);
+				// 				
+				// 				// Add rotation of traby flap and transform
+				// 				var trab = this.drawing.lastDoodleOfClass('TrabyFlap');
+				// 				if (trab) at.rotate(trab.rotation);
+				// 				var np = at.transformPoint(ep);
+				// 
+				// 				// Tranform back to get fixed point in canvas
+				// 				var pp = this.inverseTransform.transformPoint(np);
+				// 				ctx.lineTo(pp.x, pp.y);
+
 
 				// Suture exit through cornea
 				var ep = new ED.Point(this.firstOriginX, -60);
-				
+
 				// Set up a new transform and centre in canvas
 				var at = new ED.AffineTransform();
 				at.translate(150, 150);
-				
+
 				// Add rotation of traby flap and transform
 				var trab = this.drawing.lastDoodleOfClass('TrabyFlap');
 				if (trab) at.rotate(trab.rotation);
-				
+
 				var tep = at.transformPoint(ep);
 
 				// Tranform back to get fixed point
 				var fep = this.inverseTransform.transformPoint(tep);
-				
+
 				// Calculate a midpoint
-				var d = 119/8;
+				var d = 119 / 8;
 				if (this.id == 5) d = d * 0;
 				else if (this.id == 6) d = d * +1;
 				else d = d * -1;
 
-				var mp = new ED.Point(this.firstOriginX - d , -90);
+				var mp = new ED.Point(this.firstOriginX - d, -90);
 				var tmp = at.transformPoint(mp);
 				var fmp = this.inverseTransform.transformPoint(tmp);
 

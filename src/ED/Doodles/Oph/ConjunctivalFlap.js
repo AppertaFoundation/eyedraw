@@ -36,9 +36,9 @@
 ED.ConjunctivalFlap = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
 	// Set classname
 	this.className = "ConjunctivalFlap";
-	
-    // Derived parameters (NB must set a value here to define parameter as a property of the object, even though value set later)
-    this.method = 'Fornix-based';
+
+	// Derived parameters (NB must set a value here to define parameter as a property of the object, even though value set later)
+	this.method = 'Fornix-based';
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
@@ -74,19 +74,23 @@ ED.ConjunctivalFlap.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['apexY']['range'].setMinAndMax(-640, -100);
 	this.parameterValidationArray['apexY']['delta'] = 30;
 	this.parameterValidationArray['arc']['range'].setMinAndMax(60 * Math.PI / 180, 160 * Math.PI / 180);
-	
-    // Add complete validation arrays for derived parameters
-    this.parameterValidationArray['method'] = {kind:'derived', type:'string', list:['Fornix-based', 'Limbus-based'], animate:true};
+
+	// Add complete validation arrays for derived parameters
+	this.parameterValidationArray['method'] = {
+		kind: 'derived',
+		type: 'string',
+		list: ['Fornix-based', 'Limbus-based'],
+		animate: true
+	};
 }
 
 /**
  * Sets default parameters
  */
-ED.ConjunctivalFlap.prototype.setParameterDefaults = function()
-{
-    this.arc = 120 * Math.PI/180;
-    this.setParameterFromString('method', 'Fornix-based');
-    //this.apexY = -660;
+ED.ConjunctivalFlap.prototype.setParameterDefaults = function() {
+	this.arc = 120 * Math.PI / 180;
+	this.setParameterFromString('method', 'Fornix-based');
+	//this.apexY = -660;
 }
 
 /**
@@ -97,31 +101,28 @@ ED.ConjunctivalFlap.prototype.setParameterDefaults = function()
  * @value {Undefined} _value Value of parameter to calculate
  * @returns {Array} Associative array of values of dependent parameters
  */
-ED.ConjunctivalFlap.prototype.dependentParameterValues = function(_parameter, _value)
-{
-    var returnArray = new Array();
+ED.ConjunctivalFlap.prototype.dependentParameterValues = function(_parameter, _value) {
+	var returnArray = new Array();
 
-    switch (_parameter)
-    {
-        case 'apexY':
-        	if (_value < -380) returnArray['method'] = 'Fornix-based';
-        	else returnArray['method'] = 'Limbus-based';
-            break;
+	switch (_parameter) {
+		case 'apexY':
+			if (_value < -380) returnArray['method'] = 'Fornix-based';
+			else returnArray['method'] = 'Limbus-based';
+			break;
 
-        case 'method':
-            switch (_value)
-            {
-                case 'Fornix-based':
-                    returnArray['apexY'] = -660;
-                    break;
-                case 'Limbus-based':
-                    returnArray['apexY'] = -100;
-                    break;
-            }
-            break;
-    }
-    
-    return returnArray;
+		case 'method':
+			switch (_value) {
+				case 'Fornix-based':
+					returnArray['apexY'] = -660;
+					break;
+				case 'Limbus-based':
+					returnArray['apexY'] = -100;
+					break;
+			}
+			break;
+	}
+
+	return returnArray;
 }
 
 /**
