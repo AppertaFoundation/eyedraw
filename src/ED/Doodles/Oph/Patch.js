@@ -22,29 +22,20 @@
  * @class Patch
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.Patch = function(_drawing, _parameterValueArray, _order) {
+ED.Patch = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "Patch";
 
-	this.width = 200;
-	this.height = 120;
-
-	// Derived parameters (NB must set a value here to define parameter as a property of the object, even though value set later)
+	// Derived parameters
 	this.material = 'Sclera';
 
+	// Saved parameters
+	this.savedParameterArray = ['originX', 'originY', 'width', 'height', 'apexX'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _parameterValueArray, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -67,7 +58,6 @@ ED.Patch.prototype.setHandles = function() {
  */
 ED.Patch.prototype.setPropertyDefaults = function() {
 	this.isOrientated = true;
-	//this.isSqueezable = true;
 
 	// Update component of validation array for simple parameters
 	this.parameterValidationArray['apexX']['range'].setMinAndMax(-50, +50);
@@ -86,22 +76,23 @@ ED.Patch.prototype.setPropertyDefaults = function() {
  * Sets default parameters
  */
 ED.Patch.prototype.setParameterDefaults = function() {
-	//this.apexX = 0;
-	//this.originY = -260;
+	this.width = 120;
+	this.height = 200;
+	this.originY = -260;
 
 	this.setParameterFromString('material', 'Sclera');
 
-	// Patchs are usually temporal
-	//    if(this.drawing.eye == ED.eye.Right)
-	//    {
-	//        this.originX = -260;
-	//        this.rotation = -Math.PI/4;
-	//    }
-	//    else
-	//    {
-	//        this.originX = 260;
-	//        this.rotation = Math.PI/4;
-	//    }
+	// Patches are usually temporal
+// 	if(this.drawing.eye == ED.eye.Right)
+// 	{
+// 	   this.originX = -260;
+// 	   this.rotation = -Math.PI/4;
+// 	}
+// 	else
+// 	{
+// 	   this.originX = 260;
+// 	   this.rotation = Math.PI/4;
+// 	}
 }
 
 /**
@@ -169,23 +160,27 @@ ED.Patch.prototype.draw = function(_point) {
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 
-	// Other stuff here
+	// Non boundary paths
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+	
+		var xd = this.width/2;
+		var yd = this.height/2 - 10;
+		
 		// Suture knots
-		// 		this.drawSpot(ctx, -50, -50, 5, "blue");
-		// 		this.drawSpot(ctx, -50, 50, 5, "blue");
-		// 		this.drawSpot(ctx, 50, -50, 5, "blue");
-		// 		this.drawSpot(ctx, 50, 50, 5, "blue");
-		// 
-		// 		// Suture thread ends
-		// 		this.drawLine(ctx, -60, -60, -50, -50, 2, "blue");
-		// 		this.drawLine(ctx, -50, -50, -60, -40, 2, "blue");
-		// 		this.drawLine(ctx, -60, 60, -50, 50, 2, "blue");
-		// 		this.drawLine(ctx, -50, 50, -60, 40, 2, "blue");
-		// 		this.drawLine(ctx, 60, -60, 50, -50, 2, "blue");
-		// 		this.drawLine(ctx, 50, -50, 60, -40, 2, "blue");
-		// 		this.drawLine(ctx, 60, 60, 50, 50, 2, "blue");
-		// 		this.drawLine(ctx, 50, 50, 60, 40, 2, "blue");
+		this.drawSpot(ctx, -xd, -yd, 5, "blue");
+		this.drawSpot(ctx, -xd, yd, 5, "blue");
+		this.drawSpot(ctx, xd, -yd, 5, "blue");
+		this.drawSpot(ctx, xd, yd, 5, "blue");
+
+		// Suture thread ends
+// 		this.drawLine(ctx, -60, -60, -50, -50, 2, "blue");
+// 		this.drawLine(ctx, -50, -50, -60, -40, 2, "blue");
+// 		this.drawLine(ctx, -60, 60, -50, 50, 2, "blue");
+// 		this.drawLine(ctx, -50, 50, -60, 40, 2, "blue");
+// 		this.drawLine(ctx, 60, -60, 50, -50, 2, "blue");
+// 		this.drawLine(ctx, 50, -50, 60, -40, 2, "blue");
+// 		this.drawLine(ctx, 60, 60, 50, 50, 2, "blue");
+// 		this.drawLine(ctx, 50, 50, 60, 40, 2, "blue");
 	}
 
 	// Coordinates of handles (in canvas plane)
@@ -206,7 +201,7 @@ ED.Patch.prototype.drawHighlightExtras = function() {
 	// Get context
 	var ctx = this.drawing.context;
 
-	// Draw text description of gauge
+	// Draw text description of material
 	ctx.lineWidth = 1;
 	ctx.fillStyle = "gray";
 	ctx.font = "48px sans-serif";

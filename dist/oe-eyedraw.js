@@ -215,7 +215,7 @@ function eyeDrawInit(_properties) {
 					if (_properties.focus) {
 						canvas.focus();
 					}
-					
+
 					// Mark drawing object as ready
 					this.drawing.isReady = true;
 					break;
