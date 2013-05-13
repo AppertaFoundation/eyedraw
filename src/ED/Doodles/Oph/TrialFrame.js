@@ -22,23 +22,14 @@
  * @class TrialFrame
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.TrialFrame = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.TrialFrame = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "TrialFrame";
-
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -107,7 +98,7 @@ ED.TrialFrame.prototype.draw = function(_point) {
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 
-	// Other stuff here
+	// Non boundary paths
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
 		// Set font and colour
 		ctx.font = height + "px sans-serif";

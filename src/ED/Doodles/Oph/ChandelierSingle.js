@@ -22,26 +22,20 @@
  * @class ChandelierSingle
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.ChandelierSingle = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.ChandelierSingle = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "ChandelierSingle";
 
 	// Private parameters
 	this.parsPlana = -560;
 
+	// Saved parameters
+	this.savedParameterArray = ['rotation'];
+
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -93,7 +87,7 @@ ED.ChandelierSingle.prototype.draw = function(_point) {
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 
-	// Other stuff here
+	// Non boundary paths
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
 		// Trocar
 		ctx.beginPath();

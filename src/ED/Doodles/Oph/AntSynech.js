@@ -22,34 +22,21 @@
  * @class AntSynech
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.AntSynech = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.AntSynech = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "AntSynech";
 
 	// Private parameters
-	this.rsl = 480;
-	this.rsli = 470;
-	this.rtmo = 404;
 	this.rtmi = 304;
-	this.rcbo = 270;
-	this.rcbi = 190;
-	this.riro = 190;
 	this.riri = 176;
-	this.rpu = 100;
+	
+	// Saved parameters
+	this.savedParameterArray = ['arc', 'rotation', 'apexY'];
 
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**

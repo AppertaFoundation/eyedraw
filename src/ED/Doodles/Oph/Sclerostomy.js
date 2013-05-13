@@ -24,31 +24,25 @@
  * @class Sclerostomy
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.Sclerostomy = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.Sclerostomy = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "Sclerostomy";
 
 	// Private parameters
 	this.parsPlana = -560;
 
-	// Derived parameters (NB must set a value here to define parameter as a property of the object, even though value set later)
+	// Derived parameters
 	this.overallGauge = '23g';
 	this.gauge = '23g';
 	this.isSutured = false;
-
+	
+	// Saved parameters
+	this.savedParameterArray = ['apexY', 'arc', 'rotation'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -180,7 +174,7 @@ ED.Sclerostomy.prototype.draw = function(_point) {
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 
-	// Other stuff here
+	// Non boundary paths
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
 		// Draw different shape according to gauge
 		switch (this.gauge) {

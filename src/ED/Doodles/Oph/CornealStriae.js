@@ -22,23 +22,14 @@
  * @class CornealStriae
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.CornealStriae = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.CornealStriae = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "CornealStriae";
 
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -49,30 +40,11 @@ ED.CornealStriae.prototype.constructor = ED.CornealStriae;
 ED.CornealStriae.superclass = ED.Doodle.prototype;
 
 /**
- * Sets handle attributes
- */
-// ED.CornealStriae.prototype.setHandles = function()
-// {
-//     this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
-// }
-
-/**
  * Sets default dragging attributes
  */
 ED.CornealStriae.prototype.setPropertyDefaults = function() {
 	this.isMoveable = false;
 	this.isRotatable = false;
-
-	// Update component of validation array for simple parameters
-	this.parameterValidationArray['apexX']['range'].setMinAndMax(-50, +50);
-	this.parameterValidationArray['apexY']['range'].setMinAndMax(-380, -100);
-}
-
-/**
- * Sets default parameters
- */
-ED.CornealStriae.prototype.setParameterDefaults = function() {
-	this.apexY = -350;
 }
 
 /**
@@ -91,7 +63,7 @@ ED.CornealStriae.prototype.draw = function(_point) {
 	ctx.beginPath();
 
 	// CornealStriae
-	var r = -this.apexY;
+	var r = 300;
 	ctx.arc(0, 0, r, 0, Math.PI * 2, false);
 
 	// Close path

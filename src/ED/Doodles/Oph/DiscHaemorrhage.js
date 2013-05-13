@@ -22,23 +22,17 @@
  * @class DiscHaemorrhage
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.DiscHaemorrhage = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.DiscHaemorrhage = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "DiscHaemorrhage";
 
+	// Saved parameters
+	this.savedParameterArray = ['rotation'];
+	
 	// Call super-class constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -53,19 +47,12 @@ ED.DiscHaemorrhage.superclass = ED.Doodle.prototype;
  */
 ED.DiscHaemorrhage.prototype.setPropertyDefaults = function() {
 	this.isMoveable = false;
-
-	// Update component of validation array for simple parameters
-	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
-	this.parameterValidationArray['apexY']['range'].setMinAndMax(-490, -400);
 }
 
 /**
  * Sets default parameters
  */
 ED.DiscHaemorrhage.prototype.setParameterDefaults = function() {
-	this.arc = 10 * Math.PI / 180;
-	this.apexY = -350;
-
 	this.setRotationWithDisplacements(150, -120);
 }
 
@@ -82,12 +69,12 @@ ED.DiscHaemorrhage.prototype.draw = function(_point) {
 	ED.DiscHaemorrhage.superclass.draw.call(this, _point);
 
 	// Radius of outer curve just inside ora on right and left fundus diagrams
-	var ro = -this.apexY;
+	var ro = 350;
 	var ri = 250;
 	var r = ri + (ro - ri) / 2;
 
 	// Calculate parameters for arcs
-	var theta = this.arc / 2;
+	var theta = 5 * Math.PI / 180;
 	var arcStart = -Math.PI / 2 + theta;
 	var arcEnd = -Math.PI / 2 - theta;
 

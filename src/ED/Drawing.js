@@ -647,6 +647,10 @@ ED.Drawing.prototype.load = function(_doodleSet) {
 		// Instantiate a new doodle object with parameters from doodle set	
 		this.doodleArray[i] = new ED[_doodleSet[i].subclass](this, _doodleSet[i]);	
 		this.doodleArray[i].id = i;
+		
+		// Apply global scale factor
+		this.doodleArray[i].scaleX = this.doodleArray[i].scaleX * this.globalScaleFactor;
+		this.doodleArray[i].scaleY = this.doodleArray[i].scaleY * this.globalScaleFactor;
 	}
 
 	// Sort array by order (puts back doodle first)
@@ -4806,7 +4810,7 @@ ED.Doodle.prototype.json = function() {
 				
 				// String to output
 				var o;
-				
+
 				// Special treatment according to parameter
 				if (p == 'scaleX' || p == 'scaleY') {
 					o = this[p].toFixed(2);
@@ -4823,11 +4827,14 @@ ED.Doodle.prototype.json = function() {
 				else if (typeof(this[p]) == 'string') {
 					o = '"' + this[p] + '"';
 				}
+				else if (typeof(this[p]) == 'boolean') {
+					o = this[p];
+				}
 				else if (typeof(this[p]) == 'object') {
 					o = JSON.stringify(this[p]);
 				}
 				else {
-					ED.errorHandler('ED.Doodle', 'json', 'Attempt create json for an unknown parameter type');
+					ED.errorHandler('ED.Doodle', 'json', 'Attempt to create json for an unhandled parameter type: ' + typeof(this[p]));
 					o = "ERROR";
 				}
 				

@@ -647,6 +647,10 @@ ED.Drawing.prototype.load = function(_doodleSet) {
 		// Instantiate a new doodle object with parameters from doodle set	
 		this.doodleArray[i] = new ED[_doodleSet[i].subclass](this, _doodleSet[i]);	
 		this.doodleArray[i].id = i;
+		
+		// Apply global scale factor
+		this.doodleArray[i].scaleX = this.doodleArray[i].scaleX * this.globalScaleFactor;
+		this.doodleArray[i].scaleY = this.doodleArray[i].scaleY * this.globalScaleFactor;
 	}
 
 	// Sort array by order (puts back doodle first)
@@ -4806,7 +4810,7 @@ ED.Doodle.prototype.json = function() {
 				
 				// String to output
 				var o;
-				
+
 				// Special treatment according to parameter
 				if (p == 'scaleX' || p == 'scaleY') {
 					o = this[p].toFixed(2);
@@ -4823,11 +4827,14 @@ ED.Doodle.prototype.json = function() {
 				else if (typeof(this[p]) == 'string') {
 					o = '"' + this[p] + '"';
 				}
+				else if (typeof(this[p]) == 'boolean') {
+					o = this[p];
+				}
 				else if (typeof(this[p]) == 'object') {
 					o = JSON.stringify(this[p]);
 				}
 				else {
-					ED.errorHandler('ED.Doodle', 'json', 'Attempt create json for an unknown parameter type');
+					ED.errorHandler('ED.Doodle', 'json', 'Attempt to create json for an unhandled parameter type: ' + typeof(this[p]));
 					o = "ERROR";
 				}
 				
@@ -5736,26 +5743,17 @@ if (ED == null || typeof(ED) != "object") {
  * @class Surgeon
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.Surgeon = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.Surgeon = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "Surgeon";
 
-	// Derived parameters (NB must set a value here to define parameter as a property of the object, even though value set later)
+	// Derived parameters
 	this.surgeonPosition = 'Temporal';
 
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -5970,23 +5968,14 @@ ED.Surgeon.prototype.draw = function(_point) {
  * @class  OperatingTable
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.OperatingTable = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.OperatingTable = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "OperatingTable";
 
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -6055,18 +6044,9 @@ ED.OperatingTable.prototype.draw = function(_point) {
  * @class Label
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.Label = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.Label = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "Label";
 
@@ -6095,7 +6075,7 @@ ED.Label = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scal
 	this.lastOriginY = 0;
 
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -6291,23 +6271,14 @@ ED.Label.prototype.addLetter = function(_keyCode) {
  * @class Freehand
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.Freehand = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.Freehand = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "Freehand";
 
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -6412,23 +6383,14 @@ ED.Freehand.prototype.draw = function(_point) {
  * @class  MouseTest
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.MouseTest = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.MouseTest = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "MouseTest";
 
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -6492,23 +6454,14 @@ ED.MouseTest.prototype.draw = function(_point) {
  * @class GraphAxes
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.GraphAxes = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.GraphAxes = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "GraphAxes";
 
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -6602,22 +6555,13 @@ ED.GraphAxes.prototype.draw = function(_point) {
  * @class Slider2D
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.Slider2D = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.Slider2D = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "Slider2D";
 
-	// Derived parameters (NB must set a value here to define parameter as a property of the object, even though value set later)
+	// Derived parameters
 	this.sphereSign = ' ';
 	this.sphereInteger = 0;
 	this.sphereFractional = 0;
@@ -6626,7 +6570,7 @@ ED.Slider2D = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _s
 	this.cylinderFractional = 0;
 
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -7163,23 +7107,14 @@ if (ED == null || typeof(ED) != "object") {
  * @class Heart
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.Heart = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.Heart = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "Heart";
 
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -7310,23 +7245,14 @@ ED.Heart.prototype.description = function() {
  * @class Aorta
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.Aorta = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.Aorta = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "Aorta";
 
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -7463,23 +7389,14 @@ ED.Aorta.prototype.description = function() {
  * @class RightCoronaryArtery
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.RightCoronaryArtery = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.RightCoronaryArtery = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "RightCoronaryArtery";
 
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -7608,23 +7525,14 @@ ED.RightCoronaryArtery.prototype.description = function() {
  * @class LeftCoronaryArtery
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.LeftCoronaryArtery = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.LeftCoronaryArtery = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "LeftCoronaryArtery";
 
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -7812,23 +7720,14 @@ ED.LeftCoronaryArtery.prototype.description = function() {
  * @class AnomalousVessels
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.AnomalousVessels = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.AnomalousVessels = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "AnomalousVessels";
 
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -8027,23 +7926,14 @@ ED.AnomalousVessels.prototype.description = function() {
  * @class Lungs
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.Lungs = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.Lungs = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "Lungs";
 
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -8153,23 +8043,14 @@ ED.Lungs.prototype.description = function() {
  * @class Effusion
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.Effusion = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.Effusion = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "Effusion";
 
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -8277,23 +8158,14 @@ ED.Effusion.prototype.description = function() {
  * @class Bypass
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.Bypass = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.Bypass = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "Bypass";
 
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -8456,23 +8328,14 @@ ED.Bypass.prototype.description = function() {
  * @class Crepitations
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.Crepitations = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.Crepitations = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "Crepitations";
 
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -8597,23 +8460,14 @@ ED.Crepitations.prototype.description = function() {
  * @class Wheeze
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.Wheeze = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.Wheeze = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "Wheeze";
 
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -8752,23 +8606,14 @@ ED.Wheeze.prototype.description = function() {
  * @class MetalStent
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.MetalStent = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.MetalStent = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "MetalStent";
 
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -8882,23 +8727,14 @@ ED.MetalStent.prototype.description = function() {
  * @class DrugStent
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.DrugStent = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.DrugStent = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "DrugStent";
 
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -9014,27 +8850,18 @@ ED.DrugStent.prototype.description = function() {
  * @class Stenosis
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.Stenosis = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.Stenosis = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "Stenosis";
 
-	// Derived parameters (NB must set a value here to define parameter as a property of the object, even though value set later)
+	// Derived parameters
 	this.degree = 0;
 	this.type = "Calcified";
 
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -9221,23 +9048,14 @@ ED.Stenosis.prototype.description = function() {
  * @class Groin
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.Groin = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.Groin = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "Groin";
 
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -9368,23 +9186,14 @@ ED.Groin.prototype.description = function() {
  * @class Haematoma
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.Haematoma = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.Haematoma = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "Haematoma";
 
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -9466,23 +9275,14 @@ ED.Haematoma.prototype.groupDescription = function() {
  * @class Bruising
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.Bruising = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.Bruising = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "Bruising";
 
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -9582,23 +9382,14 @@ ED.Bruising.prototype.description = function() {
  * @class Bruit
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.Bruit = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.Bruit = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "Bruit";
 
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -9962,23 +9753,21 @@ ED.Bruit.prototype.description = function() {
  * @class ACIOL
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.ACIOL = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.ACIOL = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "ACIOL";
 
+	// Saved parameters
+	this.savedParameterArray = ['originX', 'originY', 'rotation'];
+
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
+	
+	// Invariate parameters
+	this.scaleX = 0.8;
+	this.scaleY = 0.8;
 }
 
 /**
@@ -10001,14 +9790,6 @@ ED.ACIOL.prototype.setHandles = function() {
 ED.ACIOL.prototype.setPropertyDefaults = function() {
 	this.isScaleable = false;
 	this.isUnique = true;
-}
-
-/**
- * Sets default parameters
- */
-ED.ACIOL.prototype.setParameterDefaults = function() {
-	this.scaleX = 0.8;
-	this.scaleY = 0.8;
 }
 
 /**
@@ -10152,26 +9933,20 @@ ED.ACIOL.prototype.description = function() {
  * @class Ahmed
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.Ahmed = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.Ahmed = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "Ahmed";
 
-	// Derived parameters (NB must set a value here to define parameter as a property of the object, even though value set later)
+	// Derived parameters
 	this.platePosition = 'STQ';
 
+	// Saved parameters
+	this.savedParameterArray = ['rotation', 'apexY'];
+
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -10328,7 +10103,7 @@ ED.Ahmed.prototype.draw = function(_point) {
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 
-	// Other stuff here
+	// Non boundary paths
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
 		// Spots
 		this.drawSpot(ctx, 0 * s, -230 * s + d, 20 * s, "white");
@@ -10425,18 +10200,9 @@ ED.Ahmed.prototype.description = function() {
  * @class AngleGradeEast
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.AngleGradeEast = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.AngleGradeEast = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "AngleGradeEast";
 
@@ -10451,12 +10217,19 @@ ED.AngleGradeEast = function(_drawing, _originX, _originY, _radius, _apexX, _ape
 	this.riri = 176;
 	this.rpu = 100;
 
-	// Derived parameters (NB must set a value here to define parameter as a property of the object, even though value set later)
+	// Derived parameters
 	this.grade = "4";
 	this.seen = "Yes";
-
+	
+	// Saved parameters
+	this.savedParameterArray = ['apexY'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
+	
+	// Invariant simple parameters
+	this.arc = 90 * Math.PI / 180;
+	this.rotation = Math.PI / 2;
 }
 
 /**
@@ -10507,9 +10280,7 @@ ED.AngleGradeEast.prototype.setPropertyDefaults = function() {
  * Sets default parameters
  */
 ED.AngleGradeEast.prototype.setParameterDefaults = function() {
-	this.arc = 90 * Math.PI / 180;
 	this.apexY = -this.riri;
-	this.rotation = Math.PI / 2;
 	this.setParameterFromString('grade', '4');
 	this.setParameterFromString('seen', 'Yes');
 }
@@ -10650,18 +10421,9 @@ ED.AngleGradeEast.prototype.draw = function(_point) {
  * @class AngleGradeNorth
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.AngleGradeNorth = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.AngleGradeNorth = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "AngleGradeNorth";
 
@@ -10676,12 +10438,19 @@ ED.AngleGradeNorth = function(_drawing, _originX, _originY, _radius, _apexX, _ap
 	this.riri = 176;
 	this.rpu = 100;
 
-	// Derived parameters (NB must set a value here to define parameter as a property of the object, even though value set later)
+	// Derived parameters
 	this.grade = "4";
 	this.seen = "Yes";
-
+	
+	// Saved parameters
+	this.savedParameterArray = ['apexY'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
+	
+	// Invariant simple parameters
+	this.arc = 90 * Math.PI / 180;
+	this.rotation = 0;
 }
 
 /**
@@ -10732,7 +10501,6 @@ ED.AngleGradeNorth.prototype.setPropertyDefaults = function() {
  * Sets default parameters
  */
 ED.AngleGradeNorth.prototype.setParameterDefaults = function() {
-	this.arc = 90 * Math.PI / 180;
 	this.apexY = -this.riri;
 	this.setParameterFromString('grade', '4');
 	this.setParameterFromString('seen', 'Yes');
@@ -10874,18 +10642,9 @@ ED.AngleGradeNorth.prototype.draw = function(_point) {
  * @class AngleGradeSouth
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.AngleGradeSouth = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.AngleGradeSouth = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "AngleGradeSouth";
 
@@ -10900,12 +10659,19 @@ ED.AngleGradeSouth = function(_drawing, _originX, _originY, _radius, _apexX, _ap
 	this.riri = 176;
 	this.rpu = 100;
 
-	// Derived parameters (NB must set a value here to define parameter as a property of the object, even though value set later)
+	// Derived parameters
 	this.grade = "4";
 	this.seen = "Yes";
-
+	
+	// Saved parameters
+	this.savedParameterArray = ['apexY'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
+	
+	// Invariant simple parameters
+	this.arc = 90 * Math.PI / 180;
+	this.rotation = Math.PI;
 }
 
 /**
@@ -10956,9 +10722,7 @@ ED.AngleGradeSouth.prototype.setPropertyDefaults = function() {
  * Sets default parameters
  */
 ED.AngleGradeSouth.prototype.setParameterDefaults = function() {
-	this.arc = 90 * Math.PI / 180;
 	this.apexY = -this.riri;
-	this.rotation = Math.PI;
 	this.setParameterFromString('grade', '4');
 	this.setParameterFromString('seen', 'Yes');
 }
@@ -11099,18 +10863,9 @@ ED.AngleGradeSouth.prototype.draw = function(_point) {
  * @class AngleGradeWest
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.AngleGradeWest = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.AngleGradeWest = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "AngleGradeWest";
 
@@ -11125,12 +10880,19 @@ ED.AngleGradeWest = function(_drawing, _originX, _originY, _radius, _apexX, _ape
 	this.riri = 176;
 	this.rpu = 100;
 
-	// Derived parameters (NB must set a value here to define parameter as a property of the object, even though value set later)
+	// Derived parameters
 	this.grade = "4";
 	this.seen = "Yes";
 
+	// Saved parameters
+	this.savedParameterArray = ['apexY'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
+	
+	// Invariant simple parameters
+	this.arc = 90 * Math.PI / 180;
+	this.rotation = 3 * Math.PI / 2;
 }
 
 /**
@@ -11181,9 +10943,7 @@ ED.AngleGradeWest.prototype.setPropertyDefaults = function() {
  * Sets default parameters
  */
 ED.AngleGradeWest.prototype.setParameterDefaults = function() {
-	this.arc = 90 * Math.PI / 180;
 	this.apexY = -this.riri;
-	this.rotation = 3 * Math.PI / 2;
 	this.setParameterFromString('grade', '4');
 	this.setParameterFromString('seen', 'Yes');
 }
@@ -11324,23 +11084,21 @@ ED.AngleGradeWest.prototype.draw = function(_point) {
  * @class AngleNV
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.AngleNV = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.AngleNV = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "AngleNV";
 
+	// Private parameters
+	this.rtmo = 404;
+	this.rtmi = 304;
+		
+	// Saved parameters
+	this.savedParameterArray = ['arc', 'rotation'];
+
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -11474,23 +11232,20 @@ ED.AngleNV.prototype.groupDescription = function() {
  * @class AngleRecession
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.AngleRecession = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
-	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
-
+ED.AngleRecession = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "AngleRecession";
+
+	// Private parameters	
+	this.riri = 176;
+			
+	// Saved parameters
+	this.savedParameterArray = ['arc', 'rotation'];
+	
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -11516,8 +11271,6 @@ ED.AngleRecession.prototype.setPropertyDefaults = function() {
 	this.isMoveable = false;
 
 	// Update component of validation array for simple parameters
-	this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.125, +1.5);
-	this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.125, +1.5);
 	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
 	this.parameterValidationArray['apexY']['range'].setMinAndMax(+50, +250);
 }
@@ -11624,29 +11377,21 @@ ED.AngleRecession.prototype.groupDescription = function() {
  * @class AntSeg
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.AntSeg = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.AntSeg = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "AntSeg";
 
-	// Derived parameters (NB must set a value here to define parameter as a property of the object, even though value set later)
+	// Derived parameters
 	this.pupilSize = 'Large';
 	this.pxe = false;
 
-	this.savedParams = ['pxe'];
+	// Saved parameters
+	this.savedParameterArray = ['apexY', 'pxe'];
 
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -11846,31 +11591,28 @@ ED.AntSeg.prototype.description = function() {
 
 
 /**
- * Anterior Segment Cross Section
+ * Anterior Segment Cross Section ***TODO***
  *
  * @class AntSegCrossSection
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.AntSegCrossSection = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.AntSegCrossSection = function(_drawing, _parameterJSON) {debugger;
 	// Set classname
 	this.className = "AntSegCrossSection";
 
-	// Derived parameters (NB must set a value here to define parameter as a property of the object, even though value set later)
+	// Derived parameters
 	this.pupilSize = 'Large';
 
+	// Saved parameters
+	this.savedParameterArray = ['apexY', 'apexX'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
+
+	// Invariant simple parameters	
+	this.originX = 44;
 }
 
 /**
@@ -11916,7 +11658,6 @@ ED.AntSegCrossSection.prototype.setPropertyDefaults = function() {
 ED.AntSegCrossSection.prototype.setParameterDefaults = function() {
 	this.setParameterFromString('pupilSize', 'Large');
 	this.apexX = 24;
-	this.originX = 44;
 }
 
 /**
@@ -11932,6 +11673,7 @@ ED.AntSegCrossSection.prototype.dependentParameterValues = function(_parameter, 
 
 	switch (_parameter) {
 		case 'apexY':
+			// ***TOSDP*** Putting this here will cancel out any saved value of apexX
 			// Set apexX and its limits for apexX according to value of apexY (prevents collisions with cornea and lens)
 			this.parameterValidationArray['apexX']['range'].setMinAndMax(-40 - (140 / 220) * (this.apexY + 280), 32 - (72 / 220) * (this.apexY + 280));
 
@@ -12062,34 +11804,21 @@ ED.AntSegCrossSection.prototype.draw = function(_point) {
  * @class AntSynech
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.AntSynech = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.AntSynech = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "AntSynech";
 
 	// Private parameters
-	this.rsl = 480;
-	this.rsli = 470;
-	this.rtmo = 404;
 	this.rtmi = 304;
-	this.rcbo = 270;
-	this.rcbi = 190;
-	this.riro = 190;
 	this.riri = 176;
-	this.rpu = 100;
+	
+	// Saved parameters
+	this.savedParameterArray = ['arc', 'rotation', 'apexY'];
 
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -12225,28 +11954,19 @@ ED.AntSynech.prototype.groupDescription = function() {
  */
 
 /**
- * Anterior capsulotomy
+ * Anterior capsulotomy ***TODO***
  *
  * @class AnteriorCapsulotomy
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.AnteriorCapsulotomy = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.AnteriorCapsulotomy = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "AnteriorCapsulotomy";
 
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -12348,23 +12068,17 @@ ED.AnteriorCapsulotomy.prototype.draw = function(_point) {
  * @class ArcuateScotoma
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.ArcuateScotoma = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.ArcuateScotoma = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "ArcuateScotoma";
 
+	// Saved parameters
+	this.savedParameterArray = ['scaleX', 'scaleY', 'apexY', 'arc'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -12497,26 +12211,20 @@ ED.ArcuateScotoma.prototype.description = function() {
  * @class Baerveldt
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.Baerveldt = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.Baerveldt = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "Baerveldt";
 
-	// Derived parameters (NB must set a value here to define parameter as a property of the object, even though value set later)
+	// Derived parameters
 	this.platePosition = 'STQ';
+	
+	// Saved parameters
+	this.savedParameterArray = ['rotation', 'apexY'];
 
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -12675,7 +12383,7 @@ ED.Baerveldt.prototype.draw = function(_point) {
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 
-	// Other stuff here
+	// Non boundary paths
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
 		// Spots
 		this.drawSpot(ctx, -240 * s, -40 * s + d, 10, "rgba(150,150,150,0.5)");
@@ -12752,23 +12460,17 @@ ED.Baerveldt.prototype.description = function() {
  * @class BiopsySite
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.BiopsySite = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.BiopsySite = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "BiopsySite";
+	
+	// Saved parameters
+	this.savedParameterArray = ['originX', 'originY', 'scaleX', 'scaleY'];
 
 	// Call super-class constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -12883,23 +12585,17 @@ ED.BiopsySite.prototype.description = function() {
  * @class Bleb
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.Bleb = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.Bleb = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "Bleb";
-
+	
+	// Saved parameters
+	this.savedParameterArray = ['rotation'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -13008,23 +12704,17 @@ ED.Bleb.prototype.description = function() {
  * @class BlotHaemorrhage
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.BlotHaemorrhage = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.BlotHaemorrhage = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "BlotHaemorrhage";
-
+	
+	// Saved parameters
+	this.savedParameterArray = ['originX', 'originY', 'scaleX', 'scaleY'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -13123,23 +12813,14 @@ ED.BlotHaemorrhage.prototype.groupDescription = function() {
  * @class BuckleOperation
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.BuckleOperation = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.BuckleOperation = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "BuckleOperation";
-
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -13187,7 +12868,7 @@ ED.BuckleOperation.prototype.draw = function(_point) {
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 
-	// Other stuff here
+	// Non boundary paths
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
 		// Recti
 		this.drawRectus(ctx, 'Sup');
@@ -13302,23 +12983,20 @@ ED.BuckleOperation.prototype.drawRectus = function(_ctx, _quad) {
  * @class BuckleSuture
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.BuckleSuture = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.BuckleSuture = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "BuckleSuture";
 
+	// Saved parameters
+	this.savedParameterArray = ['rotation'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
+	
+	// Invariant simple parameters
+	this.arc = 15 * Math.PI/180;
 }
 
 /**
@@ -13327,13 +13005,6 @@ ED.BuckleSuture = function(_drawing, _originX, _originY, _radius, _apexX, _apexY
 ED.BuckleSuture.prototype = new ED.Doodle;
 ED.BuckleSuture.prototype.constructor = ED.BuckleSuture;
 ED.BuckleSuture.superclass = ED.Doodle.prototype;
-
-/**
- * Sets handle attributes
- */
-ED.BuckleSuture.prototype.setHandles = function() {
-	//this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, true);
-}
 
 /**
  * Sets default dragging attributes
@@ -13348,16 +13019,7 @@ ED.BuckleSuture.prototype.setPropertyDefaults = function() {
  * Sets default parameters
  */
 ED.BuckleSuture.prototype.setParameterDefaults = function() {
-	this.arc = 15 * Math.PI / 180;
-	this.apexY = -320;
-
-	// Make rotation 30 degrees to last one of same class
-	var doodle = this.drawing.lastDoodleOfClass(this.className);
-	if (doodle) {
-		this.rotation = doodle.rotation + Math.PI / 6;
-	} else {
-		this.rotation = -60 * Math.PI / 180
-	}
+	this.setRotationWithDisplacements(30, 30);
 }
 
 /**
@@ -13404,7 +13066,7 @@ ED.BuckleSuture.prototype.draw = function(_point) {
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 
-	// Other stuff here
+	// Non boundary paths
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
 		// Calculate location of suture
 		r = ri + (ro - ri) / 2;
@@ -13451,23 +13113,17 @@ ED.BuckleSuture.prototype.draw = function(_point) {
  * @class CNV
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.CNV = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.CNV = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "CNV";
-
+	
+	// Saved parameters
+	this.savedParameterArray = ['originX', 'originY', 'scaleX', 'scaleY'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -13491,8 +13147,6 @@ ED.CNV.prototype.setPropertyDefaults = function() {
 	this.isRotatable = false;
 
 	// Update component of validation array for simple parameters
-	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
-	this.parameterValidationArray['apexY']['range'].setMinAndMax(-80, +0);
 	this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.5, +2);
 	this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.5, +2);
 }
@@ -13651,23 +13305,17 @@ ED.CNV.prototype.diagnosticHierarchy = function() {
  * @class CapsularTensionRing
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.CapsularTensionRing = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.CapsularTensionRing = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "CapsularTensionRing";
 
+	// Saved parameters
+	this.savedParameterArray = ['rotation'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -13835,26 +13483,20 @@ ED.CapsularTensionRing.prototype.description = function() {
  * @class ChandelierDouble
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.ChandelierDouble = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.ChandelierDouble = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "ChandelierDouble";
 
 	// Private parameters
 	this.parsPlana = -560;
 
+	// Saved parameters
+	this.savedParameterArray = ['rotation'];
+
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -13906,7 +13548,7 @@ ED.ChandelierDouble.prototype.draw = function(_point) {
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 
-	// Other stuff here
+	// Non boundary paths
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
 		// Trocars
 		ctx.beginPath();
@@ -13989,26 +13631,20 @@ ED.ChandelierDouble.prototype.description = function() {
  * @class ChandelierSingle
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.ChandelierSingle = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.ChandelierSingle = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "ChandelierSingle";
 
 	// Private parameters
 	this.parsPlana = -560;
 
+	// Saved parameters
+	this.savedParameterArray = ['rotation'];
+
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -14060,7 +13696,7 @@ ED.ChandelierSingle.prototype.draw = function(_point) {
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 
-	// Other stuff here
+	// Non boundary paths
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
 		// Trocar
 		ctx.beginPath();
@@ -14135,23 +13771,17 @@ ED.ChandelierSingle.prototype.description = function() {
  * @class CiliaryInjection
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.CiliaryInjection = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.CiliaryInjection = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "CiliaryInjection";
 
+	// Saved parameters
+	this.savedParameterArray = ['arc', 'rotation'];
+
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -14322,23 +13952,17 @@ ED.CiliaryInjection.prototype.groupDescription = function() {
  * @class Circinate
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.Circinate = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.Circinate = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "Circinate";
-
+	
+	// Saved parameters
+	this.savedParameterArray = ['originX', 'originY', 'scaleX', 'scaleY'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -14489,23 +14113,17 @@ ED.Circinate.prototype.description = function() {
  * @class CircumferentialBuckle
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.CircumferentialBuckle = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.CircumferentialBuckle = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "CircumferentialBuckle";
 
+	// Saved parameters
+	this.savedParameterArray = ['apexY', 'arc', 'rotation'];
+	
 	// Call super-class constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -14534,8 +14152,6 @@ ED.CircumferentialBuckle.prototype.setPropertyDefaults = function() {
 	// Update component of validation array for simple parameters
 	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
 	this.parameterValidationArray['apexY']['range'].setMinAndMax(-410, -320);
-	this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.25, +4);
-	this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.25, +4);
 }
 
 /**
@@ -14675,26 +14291,20 @@ ED.CircumferentialBuckle.prototype.description = function() {
  * @class ConjunctivalFlap
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.ConjunctivalFlap = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.ConjunctivalFlap = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "ConjunctivalFlap";
 
-	// Derived parameters (NB must set a value here to define parameter as a property of the object, even though value set later)
+	// Derived parameters
 	this.method = 'Fornix-based';
 
+	// Saved parameters
+	this.savedParameterArray = ['apexY', 'arc', 'rotation'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -14743,7 +14353,6 @@ ED.ConjunctivalFlap.prototype.setPropertyDefaults = function() {
 ED.ConjunctivalFlap.prototype.setParameterDefaults = function() {
 	this.arc = 120 * Math.PI / 180;
 	this.setParameterFromString('method', 'Fornix-based');
-	//this.apexY = -660;
 }
 
 /**
@@ -14871,28 +14480,22 @@ ED.ConjunctivalFlap.prototype.description = function() {
  */
 
 /**
- * Cornea Cross Section
+ * Cornea Cross Section ***TODO***
  *
  * @class CorneaCrossSection
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.CorneaCrossSection = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.CorneaCrossSection = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "CorneaCrossSection";
 
+	// Saved parameters
+	//this.savedParameterArray = ['apexY', 'apexX'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -15014,26 +14617,20 @@ ED.CorneaCrossSection.prototype.draw = function(_point) {
  * @class CornealAbrasion
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.CornealAbrasion = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.CornealAbrasion = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "CornealAbrasion";
 
-	// Doodle specific property
+	// Private property
 	this.isInVisualAxis = false;
 
+	// Saved parameters
+	this.savedParameterArray = ['originX', 'originY', 'scaleX', 'scaleY'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -15066,10 +14663,8 @@ ED.CornealAbrasion.prototype.setPropertyDefaults = function() {
  * Sets default parameters
  */
 ED.CornealAbrasion.prototype.setParameterDefaults = function() {
-	this.apexY = -50;
 	this.scaleX = 1.5;
 	this.scaleY = 1;
-
 	this.setOriginWithDisplacements(0, 25);
 }
 
@@ -15162,26 +14757,20 @@ ED.CornealAbrasion.prototype.description = function() {
  * @class CornealErosion
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.CornealErosion = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.CornealErosion = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "CornealErosion";
 
 	// Doodle specific property
 	this.isInVisualAxis = false;
 
+	// Saved parameters
+	this.savedParameterArray = ['originX', 'originY', 'scaleX', 'scaleY'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -15216,10 +14805,8 @@ ED.CornealErosion.prototype.setPropertyDefaults = function() {
  * Sets default parameters
  */
 ED.CornealErosion.prototype.setParameterDefaults = function() {
-	this.apexY = -50;
 	this.scaleX = 1.5;
 	this.scaleY = 1;
-
 	this.setOriginWithDisplacements(0, 25);
 }
 
@@ -15298,23 +14885,17 @@ ED.CornealErosion.prototype.groupDescription = function() {
  * @class CornealOedema
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.CornealOedema = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.CornealOedema = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "CornealOedema";
-
+	
+	// Saved parameters
+	this.savedParameterArray = ['originX', 'originY', 'apexY', 'apexX'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -15420,26 +15001,20 @@ ED.CornealOedema.prototype.description = function() {
  * @class CornealScar
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.CornealScar = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.CornealScar = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "CornealScar";
 
 	// Doodle specific property
 	this.isInVisualAxis = false;
 
+	// Saved parameters
+	this.savedParameterArray = ['originX', 'originY', 'apexY', 'scaleX', 'scaleY'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -15600,23 +15175,14 @@ ED.CornealScar.prototype.diagnosticHierarchy = function() {
  * @class CornealStriae
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.CornealStriae = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.CornealStriae = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "CornealStriae";
 
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -15627,30 +15193,11 @@ ED.CornealStriae.prototype.constructor = ED.CornealStriae;
 ED.CornealStriae.superclass = ED.Doodle.prototype;
 
 /**
- * Sets handle attributes
- */
-// ED.CornealStriae.prototype.setHandles = function()
-// {
-//     this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
-// }
-
-/**
  * Sets default dragging attributes
  */
 ED.CornealStriae.prototype.setPropertyDefaults = function() {
 	this.isMoveable = false;
 	this.isRotatable = false;
-
-	// Update component of validation array for simple parameters
-	this.parameterValidationArray['apexX']['range'].setMinAndMax(-50, +50);
-	this.parameterValidationArray['apexY']['range'].setMinAndMax(-380, -100);
-}
-
-/**
- * Sets default parameters
- */
-ED.CornealStriae.prototype.setParameterDefaults = function() {
-	this.apexY = -350;
 }
 
 /**
@@ -15669,7 +15216,7 @@ ED.CornealStriae.prototype.draw = function(_point) {
 	ctx.beginPath();
 
 	// CornealStriae
-	var r = -this.apexY;
+	var r = 300;
 	ctx.arc(0, 0, r, 0, Math.PI * 2, false);
 
 	// Close path
@@ -15748,23 +15295,17 @@ ED.CornealStriae.prototype.description = function() {
  * @class CornealSuture
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.CornealSuture = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.CornealSuture = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "CornealSuture";
 
+	// Saved parameters
+	this.savedParameterArray = ['radius', 'rotation'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -15822,7 +15363,7 @@ ED.CornealSuture.prototype.draw = function(_point) {
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 
-	// Other stuff here
+	// Non boundary paths
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
 		ctx.beginPath();
 		ctx.moveTo(0, -r - 40);
@@ -15882,26 +15423,20 @@ ED.CornealSuture.prototype.description = function() {
  * @class CorticalCataract
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.CorticalCataract = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.CorticalCataract = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "CorticalCataract";
 
-	// Derived parameters (NB must set a value here to define parameter as a property of the object, even though value set later)
+	// Derived parameters
 	this.grade = 'Mild';
 
+	// Saved parameters
+	this.savedParameterArray = ['originX', 'originY', 'apexY'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -16103,31 +15638,22 @@ ED.CorticalCataract.prototype.diagnosticHierarchy = function() {
  */
 
 /**
- * Cortical Cataract Cross Section
+ * Cortical Cataract Cross Section ***TODO***
  *
  * @class CorticalCataractCrossSection
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.CorticalCataractCrossSection = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.CorticalCataractCrossSection = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "CorticalCataractCrossSection";
 
-	// Derived parameters (NB must set a value here to define parameter as a property of the object, even though value set later)
+	// Derived parameters
 	this.grade = 'Mild';
 
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -16274,7 +15800,7 @@ ED.CorticalCataractCrossSection.prototype.draw = function(_point) {
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 
-	// Other stuff here
+	// Non boundary paths
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {}
 
 	// Coordinates of handles (in canvas plane)
@@ -16311,23 +15837,17 @@ ED.CorticalCataractCrossSection.prototype.draw = function(_point) {
  * @class CottonWoolSpot
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.CottonWoolSpot = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.CottonWoolSpot = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "CottonWoolSpot";
 
+	// Saved parameters
+	this.savedParameterArray = ['originX', 'originY', 'scaleX', 'scaleY'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -16455,22 +15975,17 @@ ED.CottonWoolSpot.prototype.groupDescription = function() {
  * @class Cryo
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.Cryo = function(_drawing, _originX, _originY, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.Cryo = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "Cryo";
 
+	// Saved parameters
+	this.savedParameterArray = ['originX', 'originY', 'apexY'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON)
 }
 
 /**
@@ -16592,23 +16107,17 @@ ED.Cryo.prototype.groupDescription = function() {
  * @class CutterPI
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.CutterPI = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.CutterPI = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "CutterPI";
 
+	// Saved parameters
+	this.savedParameterArray = ['rotation'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -16700,23 +16209,17 @@ ED.CutterPI.prototype.groupDescription = function() {
  * @class CystoidMacularOedema
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.CystoidMacularOedema = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.CystoidMacularOedema = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "CystoidMacularOedema";
-
+	
+	// Saved parameters
+	this.savedParameterArray = ['scaleX', 'scaleY'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -16862,23 +16365,17 @@ ED.CystoidMacularOedema.prototype.diagnosticHierarchy = function() {
  * @class DiabeticNV
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.DiabeticNV = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.DiabeticNV = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "DiabeticNV";
-
+	
+	// Saved parameters
+	this.savedParameterArray = ['originX', 'originY', 'scaleX', 'scaleY'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -17047,23 +16544,17 @@ ED.DiabeticNV.prototype.snomedCode = function() {
  * @class DiscHaemorrhage
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.DiscHaemorrhage = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.DiscHaemorrhage = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "DiscHaemorrhage";
 
+	// Saved parameters
+	this.savedParameterArray = ['rotation'];
+	
 	// Call super-class constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -17078,19 +16569,12 @@ ED.DiscHaemorrhage.superclass = ED.Doodle.prototype;
  */
 ED.DiscHaemorrhage.prototype.setPropertyDefaults = function() {
 	this.isMoveable = false;
-
-	// Update component of validation array for simple parameters
-	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
-	this.parameterValidationArray['apexY']['range'].setMinAndMax(-490, -400);
 }
 
 /**
  * Sets default parameters
  */
 ED.DiscHaemorrhage.prototype.setParameterDefaults = function() {
-	this.arc = 10 * Math.PI / 180;
-	this.apexY = -350;
-
 	this.setRotationWithDisplacements(150, -120);
 }
 
@@ -17107,12 +16591,12 @@ ED.DiscHaemorrhage.prototype.draw = function(_point) {
 	ED.DiscHaemorrhage.superclass.draw.call(this, _point);
 
 	// Radius of outer curve just inside ora on right and left fundus diagrams
-	var ro = -this.apexY;
+	var ro = 350;
 	var ri = 250;
 	var r = ri + (ro - ri) / 2;
 
 	// Calculate parameters for arcs
-	var theta = this.arc / 2;
+	var theta = 5 * Math.PI / 180;
 	var arcStart = -Math.PI / 2 + theta;
 	var arcEnd = -Math.PI / 2 - theta;
 
@@ -17191,26 +16675,20 @@ ED.DiscHaemorrhage.prototype.description = function() {
  * @class DiscPallor
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.DiscPallor = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.DiscPallor = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "DiscPallor";
 
-	// Derived parameters (NB must set a value here to define parameter as a property of the object, even though value set later)
+	// Derived parameters
 	this.grade = 'Sectorial';
 
+	// Saved parameters
+	this.savedParameterArray = ['arc', 'rotation'];
+	
 	// Call super-class constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -17405,23 +16883,17 @@ ED.DiscPallor.prototype.description = function() {
  * @class DrainageRetinotomy
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.DrainageRetinotomy = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.DrainageRetinotomy = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "DrainageRetinotomy";
 
+	// Saved parameters
+	this.savedParameterArray = ['originX', 'originY'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -17505,23 +16977,17 @@ ED.DrainageRetinotomy.prototype.description = function() {
  * @class DrainageSite
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.DrainageSite = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.DrainageSite = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "DrainageSite";
 
+	// Saved parameters
+	this.savedParameterArray = ['rotation'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -17642,23 +17108,17 @@ ED.DrainageSite.prototype.description = function() {
  * @class EncirclingBand
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.EncirclingBand = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.EncirclingBand = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "EncirclingBand";
 
+	// Saved parameters
+	this.savedParameterArray = ['rotation'];
+	
 	// Call super-class constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -17800,23 +17260,17 @@ ED.EncirclingBand.prototype.description = function() {
  * @class EntrySiteBreak
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.EntrySiteBreak = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.EntrySiteBreak = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "EntrySiteBreak";
 
+	// Saved parameters
+	this.savedParameterArray = ['arc', 'rotation']
+	
 	// Call super-class constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -17933,23 +17387,17 @@ ED.EntrySiteBreak.prototype.draw = function(_point) {
  * @class EpiretinalMembrane
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.EpiretinalMembrane = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
-	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
-
+ED.EpiretinalMembrane = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "EpiretinalMembrane";
+
+	// Saved parameters
+	this.savedParameterArray = ['originX', 'originY', 'scaleX', 'scaleY', 'rotation'];
+	
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -17967,19 +17415,16 @@ ED.EpiretinalMembrane.prototype.setHandles = function() {
 }
 
 /**
- * Sets default dragging attributes
+ * Sets default properties
  */
 ED.EpiretinalMembrane.prototype.setPropertyDefaults = function() {
-	this.isSelectable = true;
-	this.isOrientated = false;
-	this.isScaleable = true;
 	this.isSqueezable = true;
-	this.isMoveable = true;
-	this.isRotatable = true;
-	this.rangeOfScale = new ED.Range(+0.5, +1.5);
-	this.rangeOfArc = new ED.Range(Math.PI / 6, Math.PI * 2);
-	this.rangeOfApexX = new ED.Range(-0, +0);
-	this.rangeOfApexY = new ED.Range(-40, +30);
+
+	// Update component of validation array for simple parameters
+	this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.5, +1.5);
+	this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.5, +1.5);
+// 	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
+// 	this.parameterValidationArray['apexY']['range'].setMinAndMax(-40, +30);
 }
 
 /**
@@ -18025,7 +17470,7 @@ ED.EpiretinalMembrane.prototype.draw = function(_point) {
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 
-	// Other stuff here
+	// Non boundary paths
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
 		// Greenish semi-transparent
 		ctx.strokeStyle = "rgba(0, 255, 0, 0.7)";
@@ -18124,23 +17569,17 @@ ED.EpiretinalMembrane.prototype.diagnosticHierarchy = function() {
  * @class FibrousProliferation
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.FibrousProliferation = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.FibrousProliferation = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "FibrousProliferation";
 
+	// Saved parameters
+	this.savedParameterArray = ['originX', 'originY', 'scaleX', 'scaleY', 'rotation']
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -18162,7 +17601,6 @@ ED.FibrousProliferation.prototype.setHandles = function() {
  */
 ED.FibrousProliferation.prototype.setPropertyDefaults = function() {
 	this.isSqueezable = true;
-
 	this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.5, +2);
 	this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.5, +2);
 }
@@ -18258,23 +17696,17 @@ ED.FibrousProliferation.prototype.description = function() {
  * @class FocalLaser
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.FocalLaser = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.FocalLaser = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "FocalLaser";
 
+	// Saved parameters
+	this.savedParameterArray = ['originX', 'originY', 'apexY'];
+	
 	// Call super-class constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -18300,7 +17732,6 @@ ED.FocalLaser.prototype.setPropertyDefaults = function() {
 	// Update component of validation array for simple parameters
 	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
 	this.parameterValidationArray['apexY']['range'].setMinAndMax(-75, -50);
-	this.parameterValidationArray['radius']['range'].setMinAndMax(50, 75);
 }
 
 /**
@@ -18309,7 +17740,6 @@ ED.FocalLaser.prototype.setPropertyDefaults = function() {
  */
 ED.FocalLaser.prototype.setParameterDefaults = function() {
 	this.apexY = -50;
-
 	this.setOriginWithDisplacements(150, 80);
 }
 
@@ -18417,23 +17847,17 @@ ED.FocalLaser.prototype.groupDescription = function() {
  * @class Fuchs
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.Fuchs = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.Fuchs = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "Fuchs";
 
+	// Saved parameters
+	this.savedParameterArray = ['originX', 'originY', 'scaleX', 'scaleY'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -18554,23 +17978,14 @@ ED.Fuchs.prototype.diagnosticHierarchy = function() {
  * @class Fundus
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.Fundus = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.Fundus = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "Fundus";
 
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -18689,23 +18104,17 @@ ED.Fundus.prototype.draw = function(_point) {
  * @class Geographic
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.Geographic = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.Geographic = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "Geographic";
 
+	// Saved parameters
+	this.savedParameterArray = ['apexX', 'apexY', 'scaleX', 'scaleY'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -18860,18 +18269,9 @@ ED.Geographic.prototype.diagnosticHierarchy = function() {
  * @class Gonioscopy
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.Gonioscopy = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.Gonioscopy = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "Gonioscopy";
 
@@ -18885,9 +18285,12 @@ ED.Gonioscopy = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, 
 	this.riro = 190;
 	this.riri = 176;
 	this.rpu = 100;
-
+	
+	// Saved parameters
+	this.savedParameterArray = ['apexX', 'apexY'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -19110,31 +18513,22 @@ ED.Gonioscopy.prototype.description = function() {
 /**
  * HVT
  *
- * @class HVT
+ * @class HVT ***TODO***
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.HVT = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.HVT = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "HVT";
 
-	// Derived parameters (NB must set a value here to define parameter as a property of the object, even though value set later)
+	// Derived parameters
 	this.hor = 'None';
 	this.ver = 'None';
 	this.tor = 'None';
 
 	// Call super-class constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -19391,26 +18785,17 @@ ED.HVT.prototype.draw = function(_point) {
 /**
  * HVTGrid
  *
- * @class HVTGrid
+ * @class HVTGrid ***TODO***
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.HVTGrid = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.HVTGrid = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "HVTGrid";
 
 	// Call super-class constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -19489,23 +18874,17 @@ ED.HVTGrid.prototype.draw = function(_point) {
  * @class HardDrusen
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.HardDrusen = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.HardDrusen = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "HardDrusen";
 
+	// Saved parameters
+	this.savedParameterArray = ['apexY', 'scaleX', 'scaleY'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -19534,7 +18913,6 @@ ED.HardDrusen.prototype.setPropertyDefaults = function() {
 	// Update component of validation array for simple parameters
 	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
 	this.parameterValidationArray['apexY']['range'].setMinAndMax(-160, +0);
-	this.parameterValidationArray['arc']['range'].setMinAndMax(Math.PI / 6, Math.PI * 2);
 	this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.5, +1.5);
 	this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.5, +1.5);
 }
@@ -19582,7 +18960,7 @@ ED.HardDrusen.prototype.draw = function(_point) {
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 
-	// Other stuff here
+	// Non boundary paths
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
 		// Colours
 		var fill = "yellow";
@@ -19645,23 +19023,17 @@ ED.HardDrusen.prototype.description = function() {
  * @class HardExudate
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.HardExudate = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.HardExudate = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "HardExudate";
 
+	// Saved parameters
+	this.savedParameterArray = ['originX', 'originY'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -19745,18 +19117,9 @@ ED.HardExudate.prototype.groupDescription = function() {
  * @class Hyphaema
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.Hyphaema = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.Hyphaema = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "Hyphaema";
 
@@ -19764,8 +19127,11 @@ ED.Hyphaema = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _s
 	this.ro = 380;
 	this.minimum = 304;
 
+	// Saved parameters
+	this.savedParameterArray = ['apexX', 'apexY'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -19791,10 +19157,8 @@ ED.Hyphaema.prototype.setPropertyDefaults = function() {
 	this.isUnique = true;
 
 	// Update component of validation array for simple parameters
-	this.parameterValidationArray['arc']['range'].setMinAndMax(20 * Math.PI / 180, 2 * Math.PI);
 	this.parameterValidationArray['apexX']['range'].setMinAndMax(-50, +50);
 	this.parameterValidationArray['apexY']['range'].setMinAndMax(-380, this.minimum);
-	this.parameterValidationArray['radius']['range'].setMinAndMax(250, 450);
 }
 
 /**
@@ -19885,18 +19249,9 @@ ED.Hyphaema.prototype.description = function() {
  * @class Hypopyon
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.Hypopyon = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.Hypopyon = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "Hypopyon";
 
@@ -19904,8 +19259,11 @@ ED.Hypopyon = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _s
 	this.ro = 380;
 	this.minimum = 304;
 
+	// Saved parameters
+	this.savedParameterArray = ['apexY'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -19931,10 +19289,8 @@ ED.Hypopyon.prototype.setPropertyDefaults = function() {
 	this.isUnique = true;
 
 	// Update component of validation array for simple parameters
-	this.parameterValidationArray['arc']['range'].setMinAndMax(20 * Math.PI / 180, 2 * Math.PI);
 	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
 	this.parameterValidationArray['apexY']['range'].setMinAndMax(-380, this.minimum);
-	this.parameterValidationArray['radius']['range'].setMinAndMax(250, 450);
 }
 
 /**
@@ -20021,25 +19377,20 @@ ED.Hypopyon.prototype.description = function() {
 /**
  * ILM peel
  *
- * @class ILMPeel
+ * @class ILMPeel ***TODO***
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.ILMPeel = function(_drawing, _originX, _originY, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.ILMPeel = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "ILMPeel";
 
+	// Saved parameters
+	this.savedParameterArray = ['originX', 'originY', 'apexX', 'apexY'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -20149,23 +19500,17 @@ ED.ILMPeel.prototype.groupDescription = function() {
  * @class IRMA
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.IRMA = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.IRMA = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "IRMA";
 
+	// Saved parameters
+	this.savedParameterArray = ['originX', 'originY', 'scaleX', 'scaleY', 'rotation'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -20284,23 +19629,17 @@ ED.IRMA.prototype.description = function() {
  * @class IatrogenicBreak
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.IatrogenicBreak = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.IatrogenicBreak = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "IatrogenicBreak";
 
+	// Saved parameters
+	this.savedParameterArray = ['originX', 'originY', 'scaleX', 'scaleY', 'rotation'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -20411,23 +19750,17 @@ ED.IatrogenicBreak.prototype.description = function() {
  * @class IrisHook
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.IrisHook = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.IrisHook = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "IrisHook";
 
+	// Saved parameters
+	this.savedParameterArray = ['rotation']
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -20490,7 +19823,7 @@ ED.IrisHook.prototype.draw = function(_point) {
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 
-	// Other stuff here
+	// Non boundary paths
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
 		// Drawing path
 		ctx.beginPath();
@@ -20574,23 +19907,17 @@ ED.IrisHook.prototype.groupDescriptionEnd = function() {
  * @class IrisNaevus
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.IrisNaevus = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.IrisNaevus = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "IrisNaevus";
 
+	// Saved parameters
+	this.savedParameterArray = ['originX', 'originY', 'scaleX', 'scaleY'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -20700,23 +20027,17 @@ ED.IrisNaevus.prototype.description = function() {
  * @class KeraticPrecipitates
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.KeraticPrecipitates = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.KeraticPrecipitates = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "KeraticPrecipitates";
 
+	// Saved parameters
+	this.savedParameterArray = ['apexX', 'apexY', 'scaleX', 'scaleY'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -20745,7 +20066,6 @@ ED.KeraticPrecipitates.prototype.setPropertyDefaults = function() {
 	// Update component of validation array for simple parameters
 	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +40);
 	this.parameterValidationArray['apexY']['range'].setMinAndMax(-160, +0);
-	this.parameterValidationArray['arc']['range'].setMinAndMax(Math.PI / 6, Math.PI * 2);
 	this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.5, +1.5);
 	this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.5, +1.5);
 }
@@ -20793,7 +20113,7 @@ ED.KeraticPrecipitates.prototype.draw = function(_point) {
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 
-	// Other stuff here
+	// Non boundary paths
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
 		// Colours
 		var fill = "rgba(110, 110, 110, 0.5)";
@@ -20853,23 +20173,17 @@ ED.KeraticPrecipitates.prototype.description = function() {
  * @class KrukenbergSpindle
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.KrukenbergSpindle = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.KrukenbergSpindle = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "KrukenbergSpindle";
 
+	// Saved parameters
+	this.savedParameterArray = ['originX', 'originY', 'scaleX', 'scaleY'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -20984,23 +20298,17 @@ ED.KrukenbergSpindle.prototype.description = function() {
  * @class LaserCircle
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.LaserCircle = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.LaserCircle = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "LaserCircle";
 
+	// Saved parameters
+	this.savedParameterArray = ['originX', 'originY', 'apexX', 'apexY', 'rotation'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -21021,10 +20329,7 @@ ED.LaserCircle.prototype.setHandles = function() {
  * Set default properties
  */
 ED.LaserCircle.prototype.setPropertyDefaults = function() {
-	//this.isOrientated = true;
-
 	// Update component of validation array for simple parameters
-	this.parameterValidationArray['arc']['range'].setMinAndMax(Math.PI / 6, Math.PI * 2);
 	this.parameterValidationArray['apexX']['range'].setMinAndMax(50, +400);
 	this.parameterValidationArray['apexY']['range'].setMinAndMax(-400, -50);
 }
@@ -21184,23 +20489,17 @@ ED.LaserCircle.prototype.groupDescription = function() {
  * @class LaserDemarcation
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.LaserDemarcation = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.LaserDemarcation = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "LaserDemarcation";
 
+	// Saved parameters
+	this.savedParameterArray = ['apexY', 'arc', 'rotation'];
+	
 	// Call super-class constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -21421,23 +20720,17 @@ ED.LaserDemarcation.prototype.description = function() {
  * @class LaserSpot
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.LaserSpot = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.LaserSpot = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "LaserSpot";
 
+	// Saved parameters
+	this.savedParameterArray = ['originX', 'originY', 'scaleX', 'scaleY'];
+	
 	// Call super-class constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -21549,23 +20842,17 @@ ED.LaserSpot.prototype.groupDescription = function() {
  * @class LasikFlap
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.LasikFlap = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.LasikFlap = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "LasikFlap";
 
+	// Saved parameters
+	this.savedParameterArray = ['scaleX', 'scaleY', 'rotation'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -21592,8 +20879,6 @@ ED.LasikFlap.prototype.setPropertyDefaults = function() {
 	// Update component of validation array for simple parameters
 	this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.75, +1.15);
 	this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.75, +1.15);
-	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
-	this.parameterValidationArray['apexY']['range'].setMinAndMax(-200, -60);
 }
 
 /**
@@ -21710,23 +20995,17 @@ ED.LasikFlap.prototype.description = function() {
  * @class Lens
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.Lens = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.Lens = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "Lens";
 
+	// Saved parameters
+	this.savedParameterArray = ['originX', 'originY'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -21823,28 +21102,19 @@ ED.Lens.prototype.draw = function(_point) {
  */
 
 /**
- * Lens Cross Section
+ * Lens Cross Section ***TODO***
  *
  * @class LensCrossSection
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.LensCrossSection = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.LensCrossSection = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "LensCrossSection";
 
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -21994,23 +21264,17 @@ ED.LensCrossSection.prototype.draw = function(_point) {
  * @class LimbalRelaxingIncision
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.LimbalRelaxingIncision = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.LimbalRelaxingIncision = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "LimbalRelaxingIncision";
 
+	// Saved parameters
+	this.savedParameterArray = ['arc', 'rotation'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -22038,9 +21302,6 @@ ED.LimbalRelaxingIncision.prototype.setPropertyDefaults = function() {
 
 	// Update component of validation array for simple parameters
 	this.parameterValidationArray['arc']['range'].setMinAndMax(20 * Math.PI / 180, Math.PI / 2);
-	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
-	this.parameterValidationArray['apexY']['range'].setMinAndMax(-334, -300);
-	this.parameterValidationArray['radius']['range'].setMinAndMax(250, 450);
 }
 
 /**
@@ -22050,7 +21311,7 @@ ED.LimbalRelaxingIncision.prototype.setParameterDefaults = function() {
 	// Default arc
 	this.arc = 30 * Math.PI / 180;
 
-	// Make it 180 degress to last one of same class
+	// Make it 180 degrees to last one of same class
 	var doodle = this.drawing.lastDoodleOfClass(this.className);
 	if (doodle) {
 		this.rotation = doodle.rotation + Math.PI;
@@ -22158,23 +21419,17 @@ ED.LimbalRelaxingIncision.prototype.description = function() {
  * @class MacularGrid
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.MacularGrid = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.MacularGrid = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "MacularGrid";
 
+	// Saved parameters
+	this.savedParameterArray = ['apexY', 'scaleX', 'scaleY'];
+	
 	// Call super-class constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -22324,23 +21579,17 @@ ED.MacularGrid.prototype.description = function() {
  * @class MacularHole
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.MacularHole = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.MacularHole = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "MacularHole";
 
+	// Saved parameters
+	this.savedParameterArray = ['originX', 'scaleX', 'scaleY'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -22366,8 +21615,6 @@ ED.MacularHole.prototype.setPropertyDefaults = function() {
 	this.isUnique = true;
 
 	// Update component of validation array for simple parameters
-	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
-	this.parameterValidationArray['apexY']['range'].setMinAndMax(-40, +30);
 	this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.5, +1.5);
 	this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.5, +1.5);
 }
@@ -22376,7 +21623,7 @@ ED.MacularHole.prototype.setPropertyDefaults = function() {
  * Sets default parameters
  */
 ED.MacularHole.prototype.setParameterDefaults = function() {
-	// CMO is displaced for Fundus, central for others
+	// Macular hole is displaced for Fundus, central for others
 	if (this.drawing.hasDoodleOfClass('Fundus')) {
 		this.originX = this.drawing.eye == ED.eye.Right ? -100 : 100;
 		this.scaleX = 0.5;
@@ -22416,7 +21663,7 @@ ED.MacularHole.prototype.draw = function(_point) {
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 
-	// Other stuff here
+	// Non boundary paths
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
 		ctx.beginPath();
 		ctx.arc(0, 0, 2 * r / 3, 0, Math.PI * 2, true);
@@ -22489,23 +21736,20 @@ ED.MacularHole.prototype.diagnosticHierarchy = function() {
  * @class MacularThickening
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.MacularThickening = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.MacularThickening = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "MacularThickening";
 
+	// Saved parameters
+	this.savedParameterArray = ['originX', 'originY', 'apexX', 'apexY'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
+	
+	// Invariate parameters
+	this.rotation = -Math.PI / 4;
 }
 
 /**
@@ -22536,7 +21780,7 @@ ED.MacularThickening.prototype.setPropertyDefaults = function() {
  * Use the setParameter function for derived parameters, as this will also update dependent variables
  */
 ED.MacularThickening.prototype.setParameterDefaults = function() {
-	this.rotation = -Math.PI / 4;
+
 	this.apexX = 100;
 	this.apexY = 0;
 
@@ -22654,23 +21898,17 @@ ED.MacularThickening.prototype.description = function() {
  * @class MattressSuture
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.MattressSuture = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.MattressSuture = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "MattressSuture";
 
+	// Saved parameters
+	this.savedParameterArray = ['radius', 'rotation'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -22728,7 +21966,7 @@ ED.MattressSuture.prototype.draw = function(_point) {
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 
-	// Other stuff here
+	// Non boundary paths
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
 		ctx.beginPath();
 		ctx.moveTo(-40, -(r + 40));
@@ -22788,23 +22026,17 @@ ED.MattressSuture.prototype.description = function() {
  * @class Microaneurysm
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.Microaneurysm = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.Microaneurysm = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "Microaneurysm";
 
+	// Saved parameters
+	this.savedParameterArray = ['originX', 'originY'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -22888,26 +22120,20 @@ ED.Microaneurysm.prototype.groupDescription = function() {
  * @class Molteno
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.Molteno = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.Molteno = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "Molteno";
 
-	// Derived parameters (NB must set a value here to define parameter as a property of the object, even though value set later)
+	// Derived parameters
 	this.platePosition = 'STQ';
 
+	// Saved parameters
+	this.savedParameterArray = ['rotation', 'apexY'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -23053,7 +22279,7 @@ ED.Molteno.prototype.draw = function(_point) {
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 
-	// Other stuff here
+	// Non boundary paths
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
 		// Inner ring
 		ctx.beginPath();
@@ -23126,23 +22352,17 @@ ED.Molteno.prototype.description = function() {
  * @class NerveFibreDefect
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.NerveFibreDefect = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.NerveFibreDefect = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "NerveFibreDefect";
 
+	// Saved parameters
+	this.savedParameterArray = ['apexY', 'arc', 'rotation'];
+	
 	// Call super-class constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -23284,26 +22504,20 @@ ED.NerveFibreDefect.prototype.description = function() {
  * @class NuclearCataract
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.NuclearCataract = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.NuclearCataract = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "NuclearCataract";
 
-	// Derived parameters (NB must set a value here to define parameter as a property of the object, even though value set later)
+	// Derived parameters
 	this.grade = 'Mild';
 
+	// Saved parameters
+	this.savedParameterArray = ['originX', 'originY', 'apexY'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -23428,7 +22642,7 @@ ED.NuclearCataract.prototype.draw = function(_point) {
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 
-	// Other stuff here
+	// Non boundary paths
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {}
 
 	// Coordinates of handles (in canvas plane)
@@ -23487,31 +22701,22 @@ ED.NuclearCataract.prototype.diagnosticHierarchy = function() {
  */
 
 /**
- * Nuclear Cataract Cross Section
+ * Nuclear Cataract Cross Section ***TODO***
  *
  * @class NuclearCataractCrossSection
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.NuclearCataractCrossSection = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.NuclearCataractCrossSection = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "NuclearCataractCrossSection";
 
-	// Derived parameters (NB must set a value here to define parameter as a property of the object, even though value set later)
+	// Derived parameters
 	this.grade = 'Mild';
 
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -23708,7 +22913,7 @@ ED.OpticDisc = function(_drawing, _parameterJSON) {
 	this.cdRatio = '0';
 
 	// Saved parameters
-	this.savedParameterArray = ['mode'];
+	this.savedParameterArray = ['apexY', 'mode'];
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -24263,23 +23468,17 @@ ED.OpticDisc.prototype.resetHandles = function() {
  * @class OpticDiscPit
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.OpticDiscPit = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.OpticDiscPit = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "OpticDiscPit";
 
+	// Saved parameters
+	this.savedParameterArray = ['originX', 'originY', 'scaleX', 'scaleY'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -24405,23 +23604,21 @@ ED.OpticDiscPit.prototype.description = function() {
  * @class PCIOL
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.PCIOL = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.PCIOL = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "PCIOL";
 
+	// Saved parameters
+	this.savedParameterArray = ['originX', 'originY', 'rotation'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
+	
+	// Invariate parameters
+	this.scaleX = 0.75;
+	this.scaleY = 0.75;
 }
 
 /**
@@ -24445,14 +23642,6 @@ ED.PCIOL.prototype.setPropertyDefaults = function() {
 	this.addAtBack = true;
 	this.isScaleable = false;
 	this.isUnique = true;
-}
-
-/**
- * Sets default parameters
- */
-ED.PCIOL.prototype.setParameterDefaults = function() {
-	this.scaleX = 0.75;
-	this.scaleY = 0.75;
 }
 
 /**
@@ -24576,23 +23765,17 @@ ED.PCIOL.prototype.description = function() {
  * @class PI
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.PI = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.PI = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "PI";
 
+	// Saved parameters
+	this.savedParameterArray = ['rotation'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -24690,23 +23873,14 @@ ED.PI.prototype.description = function() {
  * @class PRPPostPole
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.PRPPostPole = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.PRPPostPole = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "PRPPostPole";
-
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -24832,23 +24006,14 @@ ED.PRPPostPole.prototype.description = function() {
  * @class Papilloedema
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.Papilloedema = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.Papilloedema = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "Papilloedema";
-
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -24869,13 +24034,6 @@ ED.Papilloedema.prototype.setPropertyDefaults = function() {
 }
 
 /**
- * Sets default parameters
- */
-ED.Papilloedema.prototype.setParameterDefaults = function() {
-	this.radius = 375;
-}
-
-/**
  * Draws doodle or performs a hit test if a Point parameter is passed
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
@@ -24887,13 +24045,9 @@ ED.Papilloedema.prototype.draw = function(_point) {
 	// Call draw method in superclass
 	ED.Papilloedema.superclass.draw.call(this, _point);
 
-	var ro = this.radius + 75;
-	var ri = this.radius - 75;
-
-	// Calculate parameters for arcs
-	var theta = this.arc / 2;
-	var arcStart = -Math.PI / 2 + theta;
-	var arcEnd = -Math.PI / 2 - theta;
+	// Radii
+	var ro = 450;
+	var ri = 300;
 
 	// Boundary path
 	ctx.beginPath();
@@ -24915,7 +24069,7 @@ ED.Papilloedema.prototype.draw = function(_point) {
 	var brownColour = "rgba(240, 140, 40, 0.75)";
 
 	// Radial gradient
-	var gradient = ctx.createRadialGradient(0, 0, this.radius + 75, 0, 0, this.radius - 75);
+	var gradient = ctx.createRadialGradient(0, 0, ro, 0, 0, ri);
 	gradient.addColorStop(0, yellowColour);
 	gradient.addColorStop(1, brownColour);
 
@@ -25418,23 +24572,17 @@ ED.PeripapillaryAtrophy.prototype.description = function() {
  * @class PeripheralRRD
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.PeripheralRRD = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.PeripheralRRD = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "PeripheralRRD";
 
+	// Saved parameters
+	this.savedParameterArray = ['apexY', 'arc', 'rotation'];
+	
 	// Call super-class constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -25610,26 +24758,20 @@ ED.PeripheralRRD.prototype.diagnosticHierarchy = function() {
  * @class PeripheralRetinectomy
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.PeripheralRetinectomy = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.PeripheralRetinectomy = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "PeripheralRetinectomy";
 
 	// Private parameter
 	this.extent = "";
 
+	// Saved parameters
+	this.savedParameterArray = ['apexY', 'arc', 'rotation'];
+	
 	// Call super-class constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -25818,34 +24960,30 @@ ED.PeripheralRetinectomy.prototype.description = function() {
  * @class PhakoIncision
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.PhakoIncision = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.PhakoIncision = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "PhakoIncision";
 
 	// Private parameters
 	this.defaultRadius = 330;
 	this.sutureSeparation = 1.5;
-	this.apexYDelta = _radius + _apexY;
+	//this.apexYDelta = _radius + _apexY;
 
-	// Derived parameters (NB must set a value here to define parameter as a property of the object, even though value set later)
-	this.incisionLength = (_arc * Math.PI / 180) * (6 * _radius) / this.defaultRadius;
+	// Derived parameters
+	//this.incisionLength = (_arc * Math.PI / 180) * (6 * _radius) / this.defaultRadius;
 	this.incisionSite = 'Corneal';
 	this.incisionType = 'Pocket';
 	this.incisionMeridian = 0;
 
+	// Saved parameters
+	this.savedParameterArray = ['apexY', 'arc', 'rotation', 'radius'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
+	
+	this.apexYDelta = this.radius + this.apexY;
 }
 
 /**
@@ -26169,29 +25307,23 @@ ED.PhakoIncision.prototype.description = function() {
  * @class PostPole
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.PostPole = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.PostPole = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "PostPole";
 
 	// Private parameters
 	this.discRadius = 84;
 
-	// Derived parameters (NB must set a value here to define parameter as a property of the object, even though value set later)
+	// Derived parameters
 	this.cdRatio = '0';
-
+	
+	// Saved parameters
+	this.savedParameterArray = ['apexX', 'apexY'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -26432,23 +25564,17 @@ ED.PostPole.prototype.isWithinArcades = function(_doodle) {
  * @class PostSubcapCataract
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.PostSubcapCataract = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.PostSubcapCataract = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "PostSubcapCataract";
 
+	// Saved parameters
+	this.savedParameterArray = ['apexX', 'apexY'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -26548,7 +25674,7 @@ ED.PostSubcapCataract.prototype.draw = function(_point) {
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 
-	// Other stuff here
+	// Non boundary paths
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {}
 
 	// Coordinates of handles (in canvas plane)
@@ -26609,31 +25735,22 @@ ED.PostSubcapCataract.prototype.diagnosticHierarchy = function() {
  */
 
 /**
- * Posterior subcapsular cataract Cross Section
+ * Posterior subcapsular cataract Cross Section ***TODO***
  *
  * @class PostSubcapCataractCrossSection
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.PostSubcapCataractCrossSection = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.PostSubcapCataractCrossSection = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "PostSubcapCataractCrossSection";
 
-	// Derived parameters (NB must set a value here to define parameter as a property of the object, even though value set later)
+	// Derived parameters
 	this.grade = 'Mild';
 
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -26726,7 +25843,7 @@ ED.PostSubcapCataractCrossSection.prototype.draw = function(_point) {
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 
-	// Other stuff here
+	// Non boundary paths
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {}
 
 	// Coordinates of handles (in canvas plane)
@@ -26763,23 +25880,14 @@ ED.PostSubcapCataractCrossSection.prototype.draw = function(_point) {
  * @class PosteriorEmbryotoxon
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.PosteriorEmbryotoxon = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.PosteriorEmbryotoxon = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "PosteriorEmbryotoxon";
 
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -26875,22 +25983,17 @@ ED.PosteriorEmbryotoxon.prototype.description = function() {
  * @class PosteriorRetinectomy
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.PosteriorRetinectomy = function(_drawing, _originX, _originY, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.PosteriorRetinectomy = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "PosteriorRetinectomy";
 
+	// Saved parameters
+	this.savedParameterArray = ['originX', 'originY', 'apexY'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -27028,26 +26131,20 @@ ED.PosteriorRetinectomy.prototype.groupDescription = function() {
  * @class PosteriorSynechia
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.PosteriorSynechia = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.PosteriorSynechia = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "PosteriorSynechia";
 
-	// Derived parameters (NB must set a value here to define parameter as a property of the object, even though value set later)
+	// Derived parameters
 	this.size = 150;
 
+	// Saved parameters
+	this.savedParameterArray = ['apexY', 'arc', 'rotation'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -27277,23 +26374,17 @@ ED.PosteriorSynechia.prototype.description = function() {
  * @class PreRetinalHaemorrhage
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.PreRetinalHaemorrhage = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.PreRetinalHaemorrhage = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "PreRetinalHaemorrhage";
 
+	// Saved parameters
+	this.savedParameterArray = ['originX', 'originY', 'apexY', 'scaleX', 'scaleY'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -27416,23 +26507,17 @@ ED.PreRetinalHaemorrhage.prototype.groupDescription = function() {
  * @class RK
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.RK = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.RK = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "RK";
 
+	// Saved parameters
+	this.savedParameterArray = ['apexY', 'scaleX', 'scaleY', 'rotation'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -27584,23 +26669,17 @@ ED.RK.prototype.description = function() {
  * @class RRD
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.RRD = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.RRD = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "RRD";
 
+	// Saved parameters
+	this.savedParameterArray = ['apexY', 'arc', 'rotation'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -27626,8 +26705,8 @@ ED.RRD.prototype.setPropertyDefaults = function() {
 	this.isMoveable = false;
 
 	// Update component of validation array for simple parameters
-	this.parameterValidationArray['scaleX']['range'].setMinAndMax(+1, +4);
-	this.parameterValidationArray['scaleY']['range'].setMinAndMax(+1, +4);
+// 	this.parameterValidationArray['scaleX']['range'].setMinAndMax(+1, +4);
+// 	this.parameterValidationArray['scaleY']['range'].setMinAndMax(+1, +4);
 	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
 	this.parameterValidationArray['apexY']['range'].setMinAndMax(-400, +400);
 }
@@ -27804,23 +26883,17 @@ ED.RRD.prototype.isMacOff = function() {
  * @class RadialSponge
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.RadialSponge = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.RadialSponge = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "RadialSponge";
 
+	// Saved parameters
+	this.savedParameterArray = ['rotation'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -27888,7 +26961,7 @@ ED.RadialSponge.prototype.draw = function(_point) {
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 
-	// Other stuff here
+	// Non boundary paths
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
 		ctx.beginPath();
 
@@ -27958,19 +27031,10 @@ ED.RadialSponge.prototype.description = function() {
  * @class Rectus
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  * @constructor
  */
-ED.Rectus = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.Rectus = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "Rectus";
 
@@ -27979,12 +27043,15 @@ ED.Rectus = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _sca
 	this.hangback = false;
 	this.canTranspose = true;
 
-	// Derived parameters (NB must set a value here to define parameter as a property of the object, even though value set later)
+	// Derived parameters
 	this.recession = 0;
 	this.transposition = 'None';
 
+	// Saved parameters
+	this.savedParameterArray = ['apexX', 'apexY', 'rotation'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -28249,23 +27316,17 @@ ED.Rectus.prototype.draw = function(_point) {
  * @class RetinalTouch
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.RetinalTouch = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.RetinalTouch = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "RetinalTouch";
 
+	// Saved parameters
+	this.savedParameterArray = ['originX', 'originY'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -28369,23 +27430,17 @@ ED.RetinalTouch.prototype.draw = function(_point) {
  * @class RoundHole
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.RoundHole = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.RoundHole = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "RoundHole";
 
+	// Saved parameters
+	this.savedParameterArray = ['originX', 'originY', 'scaleX', 'scaleY'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -28459,7 +27514,7 @@ ED.RoundHole.prototype.draw = function(_point) {
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 
-	// Other stuff here
+	// Non boundary paths
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {}
 
 	// Coordinates of handles (in canvas plane)
@@ -28545,26 +27600,20 @@ ED.RoundHole.prototype.diagnosticHierarchy = function() {
  * @class Rubeosis
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.Rubeosis = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.Rubeosis = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "Rubeosis";
 
-	// Derived parameters (NB must set a value here to define parameter as a property of the object, even though value set later)
+	// Derived parameters
 	this.severity = 50;
 
+	// Saved parameters
+	this.savedParameterArray = ['apexY', 'arc', 'rotation'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -28610,7 +27659,7 @@ ED.Rubeosis.prototype.setPropertyDefaults = function() {
 ED.Rubeosis.prototype.setParameterDefaults = function() {
 	this.arc = Math.PI / 12;
 	this.setRotationWithDisplacements(90, 45);
-	//this.setParameterFromString('apexY', '-320');
+
 	var doodle = this.drawing.lastDoodleOfClass("AntSeg");
 	if (doodle) {
 		this.apexY = doodle.apexY - this.severity;
@@ -28808,23 +27857,17 @@ ED.Rubeosis.prototype.description = function() {
  * @class ScleralIncision
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.ScleralIncision = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.ScleralIncision = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "ScleralIncision";
-
+	
+	// Saved parameters
+	this.savedParameterArray = ['arc', 'rotation'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -29005,31 +28048,25 @@ ED.ScleralIncision.prototype.groupDescriptionEnd = function() {
  * @class Sclerostomy
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.Sclerostomy = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.Sclerostomy = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "Sclerostomy";
 
 	// Private parameters
 	this.parsPlana = -560;
 
-	// Derived parameters (NB must set a value here to define parameter as a property of the object, even though value set later)
+	// Derived parameters
 	this.overallGauge = '23g';
 	this.gauge = '23g';
 	this.isSutured = false;
-
+	
+	// Saved parameters
+	this.savedParameterArray = ['apexY', 'arc', 'rotation'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -29161,7 +28198,7 @@ ED.Sclerostomy.prototype.draw = function(_point) {
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 
-	// Other stuff here
+	// Non boundary paths
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
 		// Draw different shape according to gauge
 		switch (this.gauge) {
@@ -29317,23 +28354,17 @@ ED.Sclerostomy.prototype.groupDescriptionEnd = function() {
  * @class SectorIridectomy
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.SectorIridectomy = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.SectorIridectomy = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "SectorIridectomy";
-
+	
+	// Saved parameters
+	this.savedParameterArray = ['apexY', 'arc', 'rotation'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -29364,7 +28395,6 @@ ED.SectorIridectomy.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['arc']['range'].setMinAndMax(20 * Math.PI / 180, Math.PI / 2);
 	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
 	this.parameterValidationArray['apexY']['range'].setMinAndMax(-334, -300);
-	this.parameterValidationArray['radius']['range'].setMinAndMax(250, 450);
 }
 
 /**
@@ -29489,23 +28519,17 @@ ED.SectorIridectomy.prototype.description = function() {
  * @class SectorPRP
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.SectorPRP = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.SectorPRP = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "SectorPRP";
-
+	
+	// Saved parameters
+	this.savedParameterArray = ['arc', 'rotation'];
+	
 	// Call super-class constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -29532,7 +28556,6 @@ ED.SectorPRP.prototype.setPropertyDefaults = function() {
 	// Update component of validation array for simple parameters
 	this.parameterValidationArray['arc']['range'].setMinAndMax(Math.PI / 6, Math.PI * 2);
 	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
-	this.parameterValidationArray['apexY']['range'].setMinAndMax(-400, -100);
 }
 
 /**
@@ -29541,7 +28564,6 @@ ED.SectorPRP.prototype.setPropertyDefaults = function() {
  */
 ED.SectorPRP.prototype.setParameterDefaults = function() {
 	this.arc = 55 * Math.PI / 180;
-	this.apexY = -100;
 
 	var doodle = this.drawing.lastDoodleOfClass(this.className);
 	if (doodle) {
@@ -29565,7 +28587,7 @@ ED.SectorPRP.prototype.draw = function(_point) {
 
 	// Radius of outer curve just inside ora on right and left fundus diagrams
 	var ro = 952 / 2;
-	var ri = -this.apexY;
+	var ri = 100;
 	var r = ri + (ro - ri) / 2;
 
 	// Calculate parameters for arcs
@@ -29662,23 +28684,17 @@ ED.SectorPRP.prototype.draw = function(_point) {
  * @class SectorPRPPostPole
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.SectorPRPPostPole = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.SectorPRPPostPole = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "SectorPRPPostPole";
+	
+	// Saved parameters
+	this.savedParameterArray = ['arc', 'rotation'];
 
 	// Call super-class constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -29704,8 +28720,6 @@ ED.SectorPRPPostPole.prototype.setPropertyDefaults = function() {
 
 	// Update component of validation array for simple parameters
 	this.parameterValidationArray['arc']['range'].setMinAndMax(Math.PI / 6, Math.PI * 2);
-	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
-	this.parameterValidationArray['apexY']['range'].setMinAndMax(-400, -100);
 }
 
 /**
@@ -29714,7 +28728,6 @@ ED.SectorPRPPostPole.prototype.setPropertyDefaults = function() {
  */
 ED.SectorPRPPostPole.prototype.setParameterDefaults = function() {
 	this.arc = 55 * Math.PI / 180;
-	this.apexY = -300;
 
 	var doodle = this.drawing.lastDoodleOfClass(this.className);
 	if (doodle) {
@@ -29738,7 +28751,7 @@ ED.SectorPRPPostPole.prototype.draw = function(_point) {
 
 	// Radius of outer curve just inside ora on right and left fundus diagrams
 	var ro = 1000 / 2;
-	var ri = -this.apexY;
+	var ri = 300;
 	var r = ri + (ro - ri) / 2;
 
 	// Calculate parameters for arcs
@@ -29844,26 +28857,17 @@ ED.SectorPRPPostPole.prototype.description = function() {
  * @class SidePort
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.SidePort = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.SidePort = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "SidePort";
 
-	// Private parameters
-	this.incisionLength = 1.5;
-
+	// Saved parameters
+	this.savedParameterArray = ['arc', 'rotation'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -29881,21 +28885,12 @@ ED.SidePort.prototype.setPropertyDefaults = function() {
 	this.isMoveable = false;
 	this.isRotatable = true;
 	this.isArcSymmetrical = true;
-
-	// Update validation array for simple parameters
-	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
-	this.parameterValidationArray['apexY']['range'].setMinAndMax(-334, -300);
-	this.parameterValidationArray['arc']['range'].setMinAndMax(0, Math.PI);
-	this.parameterValidationArray['radius']['range'].setMinAndMax(250, 450);
 }
 
 /**
  * Sets default parameters
  */
 ED.SidePort.prototype.setParameterDefaults = function() {
-	// Incision length based on an average corneal radius of 6mm
-	this.arc = this.incisionLength / 6;
-
 	this.setRotationWithDisplacements(90, 180);
 }
 
@@ -29921,7 +28916,7 @@ ED.SidePort.prototype.draw = function(_point) {
 	ctx.beginPath();
 
 	// Half angle of arc
-	var theta = this.arc / 2;
+	var theta = 0.125;
 
 	// Arc across
 	ctx.arc(0, 0, ro, -Math.PI / 2 + theta, -Math.PI / 2 - theta, true);
@@ -29999,23 +28994,14 @@ ED.SidePort.prototype.groupDescriptionEnd = function() {
  * @class StrabOpTemplate
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.StrabOpTemplate = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.StrabOpTemplate = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "StrabOpTemplate";
 
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -30121,22 +29107,20 @@ ED.StrabOpTemplate.prototype.draw = function(_point) {
  * @class SubretinalPFCL
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.SubretinalPFCL = function(_drawing, _originX, _originY, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.SubretinalPFCL = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "SubretinalPFCL";
 
+	// Saved parameters
+	this.savedParameterArray = ['apexY', 'originX', 'originY'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
+	
+	// Invariate parameters
+	this.rotation = Math.PI / 4;
 }
 
 /**
@@ -30169,9 +29153,6 @@ ED.SubretinalPFCL.prototype.setPropertyDefaults = function() {
  */
 ED.SubretinalPFCL.prototype.setParameterDefaults = function() {
 	this.apexY = -40;
-
-	// Put control handle at 45 degrees
-	this.rotation = Math.PI / 4;
 
 	// Displacement from fovea, and from last doodle
 	var doodle = this.drawing.lastDoodleOfClass(this.className);
@@ -30266,23 +29247,17 @@ ED.SubretinalPFCL.prototype.groupDescription = function() {
  * @class Supramid
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.Supramid = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.Supramid = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "Supramid";
-
+	
+	// Saved parameters
+	this.savedParameterArray = ['apexY', 'originX', 'originY'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -30376,7 +29351,7 @@ ED.Supramid.prototype.draw = function(_point) {
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 
-	// Other stuff here
+	// Non boundary paths
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
 		// Suture
 		ctx.beginPath()
@@ -30464,23 +29439,17 @@ ED.Supramid.prototype.description = function() {
  * @class ToricPCIOL
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.ToricPCIOL = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.ToricPCIOL = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "ToricPCIOL";
 
+	// Saved parameters
+	this.savedParameterArray = ['originX', 'originY', 'rotation'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -30564,7 +29533,7 @@ ED.ToricPCIOL.prototype.draw = function(_point) {
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 
-	// Other stuff here
+	// Non boundary paths
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
 		// Lines for toric IOL
 		ctx.beginPath();
@@ -30669,23 +29638,17 @@ ED.ToricPCIOL.prototype.description = function() {
  * @class Trabectome
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.Trabectome = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.Trabectome = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "Trabectome";
 
+	// Saved parameters
+	this.savedParameterArray = ['arc', 'rotation'];
+	
 	// Call super-class constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -30788,7 +29751,7 @@ ED.Trabectome.prototype.draw = function(_point) {
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 
-	// Other stuff here
+	// Non boundary paths
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
 		// Re-do ablation area
 		ctx.beginPath();
@@ -30858,22 +29821,13 @@ ED.Trabectome.prototype.description = function() {
  * @class TrabyFlap
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.TrabyFlap = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.TrabyFlap = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "TrabyFlap";
 
-	// Derived parameters (NB must set a value here to define parameter as a property of the object, even though value set later)
+	// Derived parameters
 	this.site = 'Superior';
 	this.size = '4x3';
 	this.sclerostomy = 'Punch';
@@ -30884,8 +29838,11 @@ ED.TrabyFlap = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _
 	this.right = new ED.Point(0, 0);
 	this.left = new ED.Point(0, 0);
 
+	// Saved parameters
+	this.savedParameterArray = ['apexX', 'apexY', 'arc', 'rotation'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -31083,7 +30040,7 @@ ED.TrabyFlap.prototype.draw = function(_point) {
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 
-	// Other stuff here
+	// Non boundary paths
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
 		ctx.beginPath();
 
@@ -31152,26 +30109,20 @@ ED.TrabyFlap.prototype.description = function() {
  * @class TrabySuture
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.TrabySuture = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.TrabySuture = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "TrabySuture";
 
-	// Derived parameters (NB must set a value here to define parameter as a property of the object, even though value set later)
+	// Derived parameters
 	this.type = 'Fixed';
 
+	// Saved parameters
+	this.savedParameterArray = ['originX', 'originY', 'apexX', 'apexY', 'arc', 'rotation'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -31281,7 +30232,7 @@ ED.TrabySuture.prototype.draw = function(_point) {
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 
-	// Other stuff here
+	// Non boundary paths
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
 		// Suture path
 		ctx.beginPath();
@@ -31429,23 +30380,17 @@ ED.TrabySuture.prototype.drawHighlightExtras = function() {
  * @class TractionRetinalDetachment
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.TractionRetinalDetachment = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.TractionRetinalDetachment = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "TractionRetinalDetachment";
 
+	// Saved parameters
+	this.savedParameterArray = ['originX', 'originY', 'scaleX', 'scaleY', 'rotation'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -31568,23 +30513,17 @@ ED.TractionRetinalDetachment.prototype.description = function() {
  * @class TransilluminationDefect
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.TransilluminationDefect = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.TransilluminationDefect = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "TransilluminationDefect";
 
+	// Saved parameters
+	this.savedParameterArray = ['apexY', 'arc', 'rotation'];
+	
 	// Call super-class constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -31735,23 +30674,14 @@ ED.TransilluminationDefect.prototype.description = function() {
  * @class TrialFrame
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.TrialFrame = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.TrialFrame = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "TrialFrame";
-
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -31820,7 +30750,7 @@ ED.TrialFrame.prototype.draw = function(_point) {
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 
-	// Other stuff here
+	// Non boundary paths
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
 		// Set font and colour
 		ctx.font = height + "px sans-serif";
@@ -31899,26 +30829,20 @@ ED.TrialFrame.prototype.draw = function(_point) {
  * @class TrialLens
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.TrialLens = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.TrialLens = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "TrialLens";
 
-	// Derived parameters (NB must set a value here to define parameter as a property of the object, even though value set later)
+	// Derived parameters
 	this.axis = '0';
 
+	// Saved parameters
+	this.savedParameterArray = ['rotation'];
+	
 	// Call super-class constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -32058,23 +30982,17 @@ ED.TrialLens.prototype.draw = function(_point) {
  * @class UTear
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.UTear = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.UTear = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "UTear";
 
+	// Saved parameters
+	this.savedParameterArray = ['originX', 'originY', 'apexY', 'scaleX', 'scaleY'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -32223,23 +31141,17 @@ ED.UTear.prototype.groupDescriptionEnd = function() {
  * @class Vicryl
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.Vicryl = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.Vicryl = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "Vicryl";
 
+	// Saved parameters
+	this.savedParameterArray = ['originX', 'originY'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -32262,7 +31174,6 @@ ED.Vicryl.prototype.setPropertyDefaults = function() {
  */
 ED.Vicryl.prototype.setParameterDefaults = function() {
 	this.originY = -240;
-	this.apexY = 400;
 
 	// Tubes are usually STQ
 	if (this.drawing.eye == ED.eye.Right) {
@@ -32302,7 +31213,7 @@ ED.Vicryl.prototype.draw = function(_point) {
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 
-	// Other stuff here
+	// Non boundary paths
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
 		// Ends of suture
 		ctx.beginPath();
@@ -32355,18 +31266,9 @@ ED.Vicryl.prototype.description = function() {
  * @class VisualField
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.VisualField = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.VisualField = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "VisualField";
 
@@ -32376,8 +31278,11 @@ ED.VisualField = function(_drawing, _originX, _originY, _radius, _apexX, _apexY,
 	// Blind spot x coordinate
 	this.blindSpotX = 0;
 
+	// Saved parameters
+	this.savedParameterArray = ['apexY'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -32591,18 +31496,9 @@ ED.VisualField.prototype.description = function() {
  * @class VisualFieldChart
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.VisualFieldChart = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.VisualFieldChart = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "VisualFieldChart";
 
@@ -32613,7 +31509,7 @@ ED.VisualFieldChart = function(_drawing, _originX, _originY, _radius, _apexX, _a
 	this.blindSpotX = 0;
 
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -32749,23 +31645,17 @@ ED.VisualFieldChart.prototype.draw = function(_point) {
  * @class VitreousOpacity
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.VitreousOpacity = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.VitreousOpacity = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "VitreousOpacity";
 
+	// Saved parameters
+	this.savedParameterArray = ['originX', 'originY', 'apexY', 'scaleX', 'scaleY'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -32793,9 +31683,6 @@ ED.VitreousOpacity.prototype.setPropertyDefaults = function() {
 	// Update component of validation array for simple parameters
 	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
 	this.parameterValidationArray['apexY']['range'].setMinAndMax(-100, +0);
-	this.parameterValidationArray['arc']['range'].setMinAndMax(Math.PI / 6, Math.PI * 2);
-	this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.5, +4);
-	this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.5, +4);
 }
 
 /**
@@ -32841,7 +31728,7 @@ ED.VitreousOpacity.prototype.draw = function(_point) {
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 
-	// Other stuff here
+	// Non boundary paths
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {}
 
 	// Coordinates of handles (in canvas plane)

@@ -22,34 +22,30 @@
  * @class PhakoIncision
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.PhakoIncision = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.PhakoIncision = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "PhakoIncision";
 
 	// Private parameters
 	this.defaultRadius = 330;
 	this.sutureSeparation = 1.5;
-	this.apexYDelta = _radius + _apexY;
+	//this.apexYDelta = _radius + _apexY;
 
-	// Derived parameters (NB must set a value here to define parameter as a property of the object, even though value set later)
-	this.incisionLength = (_arc * Math.PI / 180) * (6 * _radius) / this.defaultRadius;
+	// Derived parameters
+	//this.incisionLength = (_arc * Math.PI / 180) * (6 * _radius) / this.defaultRadius;
 	this.incisionSite = 'Corneal';
 	this.incisionType = 'Pocket';
 	this.incisionMeridian = 0;
 
+	// Saved parameters
+	this.savedParameterArray = ['apexY', 'arc', 'rotation', 'radius'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
+	
+	this.apexYDelta = this.radius + this.apexY;
 }
 
 /**

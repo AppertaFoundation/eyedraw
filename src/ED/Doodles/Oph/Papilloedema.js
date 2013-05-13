@@ -22,23 +22,14 @@
  * @class Papilloedema
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.Papilloedema = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.Papilloedema = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "Papilloedema";
-
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -59,13 +50,6 @@ ED.Papilloedema.prototype.setPropertyDefaults = function() {
 }
 
 /**
- * Sets default parameters
- */
-ED.Papilloedema.prototype.setParameterDefaults = function() {
-	this.radius = 375;
-}
-
-/**
  * Draws doodle or performs a hit test if a Point parameter is passed
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
@@ -77,13 +61,9 @@ ED.Papilloedema.prototype.draw = function(_point) {
 	// Call draw method in superclass
 	ED.Papilloedema.superclass.draw.call(this, _point);
 
-	var ro = this.radius + 75;
-	var ri = this.radius - 75;
-
-	// Calculate parameters for arcs
-	var theta = this.arc / 2;
-	var arcStart = -Math.PI / 2 + theta;
-	var arcEnd = -Math.PI / 2 - theta;
+	// Radii
+	var ro = 450;
+	var ri = 300;
 
 	// Boundary path
 	ctx.beginPath();
@@ -105,7 +85,7 @@ ED.Papilloedema.prototype.draw = function(_point) {
 	var brownColour = "rgba(240, 140, 40, 0.75)";
 
 	// Radial gradient
-	var gradient = ctx.createRadialGradient(0, 0, this.radius + 75, 0, 0, this.radius - 75);
+	var gradient = ctx.createRadialGradient(0, 0, ro, 0, 0, ri);
 	gradient.addColorStop(0, yellowColour);
 	gradient.addColorStop(1, brownColour);
 

@@ -22,18 +22,9 @@
  * @class VisualField
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.VisualField = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.VisualField = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "VisualField";
 
@@ -43,8 +34,11 @@ ED.VisualField = function(_drawing, _originX, _originY, _radius, _apexX, _apexY,
 	// Blind spot x coordinate
 	this.blindSpotX = 0;
 
+	// Saved parameters
+	this.savedParameterArray = ['apexY'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**

@@ -22,23 +22,17 @@
  * @class MacularHole
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.MacularHole = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.MacularHole = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "MacularHole";
 
+	// Saved parameters
+	this.savedParameterArray = ['originX', 'scaleX', 'scaleY'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -64,8 +58,6 @@ ED.MacularHole.prototype.setPropertyDefaults = function() {
 	this.isUnique = true;
 
 	// Update component of validation array for simple parameters
-	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
-	this.parameterValidationArray['apexY']['range'].setMinAndMax(-40, +30);
 	this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.5, +1.5);
 	this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.5, +1.5);
 }
@@ -74,7 +66,7 @@ ED.MacularHole.prototype.setPropertyDefaults = function() {
  * Sets default parameters
  */
 ED.MacularHole.prototype.setParameterDefaults = function() {
-	// CMO is displaced for Fundus, central for others
+	// Macular hole is displaced for Fundus, central for others
 	if (this.drawing.hasDoodleOfClass('Fundus')) {
 		this.originX = this.drawing.eye == ED.eye.Right ? -100 : 100;
 		this.scaleX = 0.5;
@@ -114,7 +106,7 @@ ED.MacularHole.prototype.draw = function(_point) {
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 
-	// Other stuff here
+	// Non boundary paths
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
 		ctx.beginPath();
 		ctx.arc(0, 0, 2 * r / 3, 0, Math.PI * 2, true);

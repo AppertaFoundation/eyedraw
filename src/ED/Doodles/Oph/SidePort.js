@@ -22,26 +22,17 @@
  * @class SidePort
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.SidePort = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.SidePort = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "SidePort";
 
-	// Private parameters
-	this.incisionLength = 1.5;
-
+	// Saved parameters
+	this.savedParameterArray = ['arc', 'rotation'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -59,21 +50,12 @@ ED.SidePort.prototype.setPropertyDefaults = function() {
 	this.isMoveable = false;
 	this.isRotatable = true;
 	this.isArcSymmetrical = true;
-
-	// Update validation array for simple parameters
-	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
-	this.parameterValidationArray['apexY']['range'].setMinAndMax(-334, -300);
-	this.parameterValidationArray['arc']['range'].setMinAndMax(0, Math.PI);
-	this.parameterValidationArray['radius']['range'].setMinAndMax(250, 450);
 }
 
 /**
  * Sets default parameters
  */
 ED.SidePort.prototype.setParameterDefaults = function() {
-	// Incision length based on an average corneal radius of 6mm
-	this.arc = this.incisionLength / 6;
-
 	this.setRotationWithDisplacements(90, 180);
 }
 
@@ -99,7 +81,7 @@ ED.SidePort.prototype.draw = function(_point) {
 	ctx.beginPath();
 
 	// Half angle of arc
-	var theta = this.arc / 2;
+	var theta = 0.125;
 
 	// Arc across
 	ctx.arc(0, 0, ro, -Math.PI / 2 + theta, -Math.PI / 2 - theta, true);

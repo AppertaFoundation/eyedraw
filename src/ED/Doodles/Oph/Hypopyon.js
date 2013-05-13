@@ -22,18 +22,9 @@
  * @class Hypopyon
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.Hypopyon = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.Hypopyon = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "Hypopyon";
 
@@ -41,8 +32,11 @@ ED.Hypopyon = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _s
 	this.ro = 380;
 	this.minimum = 304;
 
+	// Saved parameters
+	this.savedParameterArray = ['apexY'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -68,10 +62,8 @@ ED.Hypopyon.prototype.setPropertyDefaults = function() {
 	this.isUnique = true;
 
 	// Update component of validation array for simple parameters
-	this.parameterValidationArray['arc']['range'].setMinAndMax(20 * Math.PI / 180, 2 * Math.PI);
 	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
 	this.parameterValidationArray['apexY']['range'].setMinAndMax(-380, this.minimum);
-	this.parameterValidationArray['radius']['range'].setMinAndMax(250, 450);
 }
 
 /**

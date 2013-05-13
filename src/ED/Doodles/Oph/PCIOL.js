@@ -22,23 +22,21 @@
  * @class PCIOL
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.PCIOL = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.PCIOL = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "PCIOL";
 
+	// Saved parameters
+	this.savedParameterArray = ['originX', 'originY', 'rotation'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
+	
+	// Invariate parameters
+	this.scaleX = 0.75;
+	this.scaleY = 0.75;
 }
 
 /**
@@ -62,14 +60,6 @@ ED.PCIOL.prototype.setPropertyDefaults = function() {
 	this.addAtBack = true;
 	this.isScaleable = false;
 	this.isUnique = true;
-}
-
-/**
- * Sets default parameters
- */
-ED.PCIOL.prototype.setParameterDefaults = function() {
-	this.scaleX = 0.75;
-	this.scaleY = 0.75;
 }
 
 /**

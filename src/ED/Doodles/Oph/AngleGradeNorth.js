@@ -22,18 +22,9 @@
  * @class AngleGradeNorth
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.AngleGradeNorth = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.AngleGradeNorth = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "AngleGradeNorth";
 
@@ -48,12 +39,19 @@ ED.AngleGradeNorth = function(_drawing, _originX, _originY, _radius, _apexX, _ap
 	this.riri = 176;
 	this.rpu = 100;
 
-	// Derived parameters (NB must set a value here to define parameter as a property of the object, even though value set later)
+	// Derived parameters
 	this.grade = "4";
 	this.seen = "Yes";
-
+	
+	// Saved parameters
+	this.savedParameterArray = ['apexY'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
+	
+	// Invariant simple parameters
+	this.arc = 90 * Math.PI / 180;
+	this.rotation = 0;
 }
 
 /**
@@ -104,7 +102,6 @@ ED.AngleGradeNorth.prototype.setPropertyDefaults = function() {
  * Sets default parameters
  */
 ED.AngleGradeNorth.prototype.setParameterDefaults = function() {
-	this.arc = 90 * Math.PI / 180;
 	this.apexY = -this.riri;
 	this.setParameterFromString('grade', '4');
 	this.setParameterFromString('seen', 'Yes');

@@ -22,23 +22,20 @@
  * @class BuckleSuture
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.BuckleSuture = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.BuckleSuture = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "BuckleSuture";
 
+	// Saved parameters
+	this.savedParameterArray = ['rotation'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
+	
+	// Invariant simple parameters
+	this.arc = 15 * Math.PI/180;
 }
 
 /**
@@ -47,13 +44,6 @@ ED.BuckleSuture = function(_drawing, _originX, _originY, _radius, _apexX, _apexY
 ED.BuckleSuture.prototype = new ED.Doodle;
 ED.BuckleSuture.prototype.constructor = ED.BuckleSuture;
 ED.BuckleSuture.superclass = ED.Doodle.prototype;
-
-/**
- * Sets handle attributes
- */
-ED.BuckleSuture.prototype.setHandles = function() {
-	//this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, true);
-}
 
 /**
  * Sets default dragging attributes
@@ -68,16 +58,7 @@ ED.BuckleSuture.prototype.setPropertyDefaults = function() {
  * Sets default parameters
  */
 ED.BuckleSuture.prototype.setParameterDefaults = function() {
-	this.arc = 15 * Math.PI / 180;
-	this.apexY = -320;
-
-	// Make rotation 30 degrees to last one of same class
-	var doodle = this.drawing.lastDoodleOfClass(this.className);
-	if (doodle) {
-		this.rotation = doodle.rotation + Math.PI / 6;
-	} else {
-		this.rotation = -60 * Math.PI / 180
-	}
+	this.setRotationWithDisplacements(30, 30);
 }
 
 /**
@@ -124,7 +105,7 @@ ED.BuckleSuture.prototype.draw = function(_point) {
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 
-	// Other stuff here
+	// Non boundary paths
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
 		// Calculate location of suture
 		r = ri + (ro - ri) / 2;

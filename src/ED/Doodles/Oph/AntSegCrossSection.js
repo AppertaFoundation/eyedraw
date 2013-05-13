@@ -18,31 +18,28 @@
 
 
 /**
- * Anterior Segment Cross Section
+ * Anterior Segment Cross Section ***TODO***
  *
  * @class AntSegCrossSection
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Float} _radius
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.AntSegCrossSection = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order) {
+ED.AntSegCrossSection = function(_drawing, _parameterJSON) {debugger;
 	// Set classname
 	this.className = "AntSegCrossSection";
 
-	// Derived parameters (NB must set a value here to define parameter as a property of the object, even though value set later)
+	// Derived parameters
 	this.pupilSize = 'Large';
 
+	// Saved parameters
+	this.savedParameterArray = ['apexY', 'apexX'];
+	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
+
+	// Invariant simple parameters	
+	this.originX = 44;
 }
 
 /**
@@ -88,7 +85,6 @@ ED.AntSegCrossSection.prototype.setPropertyDefaults = function() {
 ED.AntSegCrossSection.prototype.setParameterDefaults = function() {
 	this.setParameterFromString('pupilSize', 'Large');
 	this.apexX = 24;
-	this.originX = 44;
 }
 
 /**
@@ -104,6 +100,7 @@ ED.AntSegCrossSection.prototype.dependentParameterValues = function(_parameter, 
 
 	switch (_parameter) {
 		case 'apexY':
+			// ***TOSDP*** Putting this here will cancel out any saved value of apexX
 			// Set apexX and its limits for apexX according to value of apexY (prevents collisions with cornea and lens)
 			this.parameterValidationArray['apexX']['range'].setMinAndMax(-40 - (140 / 220) * (this.apexY + 280), 32 - (72 / 220) * (this.apexY + 280));
 
