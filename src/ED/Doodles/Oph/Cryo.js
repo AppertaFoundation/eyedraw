@@ -32,7 +32,7 @@ ED.Cryo = function(_drawing, _parameterJSON) {
 	this.savedParameterArray = ['originX', 'originY', 'apexY'];
 	
 	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _parameterJSON)
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
