@@ -24,9 +24,9 @@
  * @param {Drawing} _drawing
  * @param {Object} _parameterJSON
  */
-ED.PI = function(_drawing, _parameterJSON) {
+ED.BusaccaNodule = function(_drawing, _parameterJSON) {
 	// Set classname
-	this.className = "PI";
+	this.className = "BusaccaNodule";
 
 	// Saved parameters
 	this.savedParameterArray = ['rotation'];
@@ -38,14 +38,14 @@ ED.PI = function(_drawing, _parameterJSON) {
 /**
  * Sets superclass and constructor
  */
-ED.PI.prototype = new ED.Doodle;
-ED.PI.prototype.constructor = ED.PI;
-ED.PI.superclass = ED.Doodle.prototype;
+ED.BusaccaNodule.prototype = new ED.Doodle;
+ED.BusaccaNodule.prototype.constructor = ED.BusaccaNodule;
+ED.BusaccaNodule.superclass = ED.Doodle.prototype;
 
 /**
  * Sets default properties
  */
-ED.PI.prototype.setPropertyDefaults = function() {
+ED.BusaccaNodule.prototype.setPropertyDefaults = function() {
 	this.isScaleable = false;
 	this.isMoveable = false;
 }
@@ -53,7 +53,7 @@ ED.PI.prototype.setPropertyDefaults = function() {
 /**
  * Sets default parameters
  */
-ED.PI.prototype.setParameterDefaults = function() {
+ED.BusaccaNodule.prototype.setParameterDefaults = function() {
 	this.setRotationWithDisplacements(30, 30);
 }
 
@@ -62,33 +62,38 @@ ED.PI.prototype.setParameterDefaults = function() {
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.PI.prototype.draw = function(_point) {
+ED.BusaccaNodule.prototype.draw = function(_point) {
 	// Get context
 	var ctx = this.drawing.context;
 
 	// Call draw method in superclass
-	ED.PI.superclass.draw.call(this, _point);
+	ED.BusaccaNodule.superclass.draw.call(this, _point);
 
 	// Outer radius
-	var r = 360;
-
+	var ro = 380;
+	var ri = 260;
+	
+	// If iris there, take account of pupil size
+	var doodle = this.drawing.lastDoodleOfClass("AntSeg");
+	if (doodle) ri = -doodle.apexY;
+	
+	// Calculate distance of nodule from centre
+	var r = ri + (ro - ri) / 2;
+	
 	// Boundary path
 	ctx.beginPath();
 
-	// Draw base
-	var phi = Math.PI / 24;
-	ctx.arc(0, 0, r, -phi - Math.PI / 2, phi - Math.PI / 2, false);
-	ctx.lineTo(0, -r * 0.8);
-	ctx.closePath();
+	// Draw nodule
+	ctx.arc(0, -r, 30, 0, 2 * Math.PI, false);
 
 	// Colour of fill
-	ctx.fillStyle = "rgba(218,230,241,1)";
+	ctx.fillStyle = "rgba(237,174,94,1)";
 
 	// Set line attributes
-	ctx.lineWidth = 4;
+	ctx.lineWidth = 1;
 
 	// Colour of outer line is dark gray
-	ctx.strokeStyle = "rgba(120,120,120,0.75)";;
+	ctx.strokeStyle = ctx.fillStyle;
 
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
@@ -102,6 +107,6 @@ ED.PI.prototype.draw = function(_point) {
  *
  * @returns {String} Description of doodle
  */
-ED.PI.prototype.description = function() {
-	return "Peripheral iridectomy at " + this.clockHour() + " o'clock";
+ED.BusaccaNodule.prototype.groupDescription = function() {
+	return "BusaccaNodules";
 }

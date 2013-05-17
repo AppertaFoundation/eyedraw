@@ -54,7 +54,6 @@ ED.KeraticPrecipitates.prototype.setHandles = function() {
  * Sets default dragging attributes
  */
 ED.KeraticPrecipitates.prototype.setPropertyDefaults = function() {
-	this.isMoveable = false;
 	this.isRotatable = false;
 	this.isUnique = true;
 

@@ -643,11 +643,11 @@ ED.Drawing.prototype.load = function(_doodleSet) {
 			ED.errorHandler('ED.Drawing', 'load', 'Unrecognised doodle: ' + _doodleSet[i].subclass);
 			break;
 		}
-		
+
 		// Instantiate a new doodle object with parameters from doodle set	
-		this.doodleArray[i] = new ED[_doodleSet[i].subclass](this, _doodleSet[i]);	
+		this.doodleArray[i] = new ED[_doodleSet[i].subclass](this, _doodleSet[i]);
 		this.doodleArray[i].id = i;
-		
+
 		// Apply global scale factor
 		this.doodleArray[i].scaleX = this.doodleArray[i].scaleX * this.globalScaleFactor;
 		this.doodleArray[i].scaleY = this.doodleArray[i].scaleY * this.globalScaleFactor;
@@ -1124,7 +1124,7 @@ ED.Drawing.prototype.mousemove = function(_point) {
 					// Alter width and height accordingly
 					var newWidth = doodle.width + 2 * (mousePosSelectedDoodlePlane.x - lastMousePosSelectedDoodlePlane.x);
 					var newHeight = doodle.height - 2 * (mousePosSelectedDoodlePlane.y - lastMousePosSelectedDoodlePlane.y);
-					
+
 					// Enforce bounds
 					doodle.setSimpleParameter('width', doodle.parameterValidationArray['width']['range'].constrain(newWidth));
 					doodle.setSimpleParameter('height', doodle.parameterValidationArray['height']['range'].constrain(newHeight));
@@ -1305,90 +1305,87 @@ ED.Drawing.prototype.mouseout = function(_point) {
  * @param {event} e Keyboard event
  */
 ED.Drawing.prototype.keydown = function(e) {
-	//console.log(e.keyCode);
 	// Keyboard action works on selected doodle
 	if (this.selectedDoodle != null) {
-		// Delete or move doodle
-		switch (e.keyCode) {
-			case 8:
-				// Backspace
-				if (this.selectedDoodle.className != "Label") this.deleteSelectedDoodle();
-				break;
-			case 37:
-				// Left arrow
-				this.selectedDoodle.move(-ED.arrowDelta, 0);
-				break;
-			case 38:
-				// Up arrow
-				this.selectedDoodle.move(0, -ED.arrowDelta);
-				break;
-			case 39:
-				// Right arrow
-				this.selectedDoodle.move(ED.arrowDelta, 0);
-				break;
-			case 40:
-				// Down arrow
-				this.selectedDoodle.move(0, ED.arrowDelta);
-				break;
-			default:
-				break;
-		}
+		// Label doodle is special case
+		if (this.selectedDoodle.className == "Label") {
+			// Code to send to doodle
+			var code = 0;
 
-		// If alphanumeric, send to Lable doodle
-		var code = 0;
-
-		// Shift key has code 16
-		if (e.keyCode != 16) {
-			// Alphabetic
-			if (e.keyCode >= 65 && e.keyCode <= 90) {
-				if (e.shiftKey) {
+			// Shift key has code 16
+			if (e.keyCode != 16) {
+				// Alphabetic
+				if (e.keyCode >= 65 && e.keyCode <= 90) {
+					if (e.shiftKey) {
+						code = e.keyCode;
+					} else {
+						code = e.keyCode + 32;
+					}
+				}
+				// Space or numeric
+				else if (e.keyCode == 32 || (e.keyCode > 47 && e.keyCode < 58)) {
 					code = e.keyCode;
-				} else {
-					code = e.keyCode + 32;
+				}
+				// Apostrophes
+				else if (e.keyCode == 222) {
+					if (e.shiftKey) {
+						code = 34;
+					} else {
+						code = 39;
+					}
+				}
+				// Colon and semicolon
+				else if (e.keyCode == 186) {
+					if (e.shiftKey) {
+						code = 58;
+					} else {
+						code = 59;
+					}
+				}
+				// Other punctuation
+				else if (e.keyCode == 188 || e.keyCode == 190) {
+					if (e.keyCode == 188) code = 44;
+					if (e.keyCode == 190) code = 46;
+				}
+				// Backspace
+				else if (e.keyCode == 8) {
+					code = e.keyCode;
+				}
+				// Carriage return
+				else if (e.keyCode == 13) {
+					code = 13;
 				}
 			}
-			// Space or numeric
-			else if (e.keyCode == 32 || (e.keyCode > 47 && e.keyCode < 58)) {
-				code = e.keyCode;
-			}
-			// Apostrophes
-			else if (e.keyCode == 222) {
-				if (e.shiftKey) {
-					code = 34;
-				} else {
-					code = 39;
-				}
-			}
-			// Colon and semicolon
-			else if (e.keyCode == 186) {
-				if (e.shiftKey) {
-					code = 58;
-				} else {
-					code = 59;
-				}
-			}
-			// Other punctuation
-			else if (e.keyCode == 188 || e.keyCode == 190) {
-				if (e.keyCode == 188) code = 44;
-				if (e.keyCode == 190) code = 46;
-			}
-			// Backspace
-			else if (e.keyCode == 8) {
-				if (this.selectedDoodle.className == "Label") code = e.keyCode;
-			}
-			// Carriage return
-			else if (e.keyCode == 13) {
-				code = 13;
-			}
-		}
 
-		// Carriage return stops editing
-		if (code == 13) {
-			this.deselectDoodles();
-		}
-		// Currently only doodles of Lable class accept alphanumeric input
-		else if (code > 0 && this.selectedDoodle.className == "Label") {
-			this.selectedDoodle.addLetter(code);
+			// Carriage return stops editing
+			if (code == 13) {
+				this.deselectDoodles();
+			}
+			// Send code to label doodle
+			else if (code > 0) {
+				this.selectedDoodle.addLetter(code);
+			}
+		} else {
+			// Delete or move doodle
+			switch (e.keyCode) {
+				case 8: // Backspace
+					if (this.selectedDoodle.className != "Label") this.deleteSelectedDoodle();
+					break;
+				case 37: // Left arrow
+					this.selectedDoodle.move(-ED.arrowDelta, 0);
+					break;
+				case 38: // Up arrow
+					this.selectedDoodle.move(0, -ED.arrowDelta);
+					break;
+				case 39: // Right arrow
+					this.selectedDoodle.move(ED.arrowDelta, 0);
+					break;
+				case 40: // Down arrow
+					this.selectedDoodle.move(0, ED.arrowDelta);
+					break;
+				default:
+					break;
+			}
 		}
 
 		// Refresh canvas
@@ -2677,8 +2674,7 @@ ED.Drawing.prototype.diagnosis = function() {
 			if (codePosition > topOfHierarchy) {
 				topOfHierarchy = codePosition;
 				returnCodes.push(code);
-			}
-			else if (codePosition == topOfHierarchy) {
+			} else if (codePosition == topOfHierarchy) {
 				if (returnCodes.indexOf(code) < 0) {
 					returnCodes.push(code);
 				}
@@ -3353,11 +3349,11 @@ ED.Doodle = function(_drawing, _parameterJSON) {
 			},
 		};
 
-        // Optional array for saving non-bound parameters
-        if (!this.savedParameterArray) {
-            this.savedParameterArray = [];
-        }
-        
+		// Optional array for saving non-bound parameters
+		if (!this.savedParameterArray) {
+			this.savedParameterArray = [];
+		}
+
 		// Grid properties
 		this.gridSpacing = 200;
 		this.gridDisplacementX = 0;
@@ -3404,10 +3400,9 @@ ED.Doodle = function(_drawing, _parameterJSON) {
 
 		// Set dragging default settings
 		this.setPropertyDefaults();
-		
+
 		// Assign default values to simple parameters
-		for (var parameter in this.parameterValidationArray)
-		{
+		for (var parameter in this.parameterValidationArray) {
 			var validation = this.parameterValidationArray[parameter];
 			if (validation.kind == 'simple') {
 				this[parameter] = validation.defaultValue;
@@ -3416,7 +3411,7 @@ ED.Doodle = function(_drawing, _parameterJSON) {
 
 		// New doodle (constructor called with _drawing parameter only)
 		if (typeof(_parameterJSON) == 'undefined') {
-			
+
 			// Default is to put new doodle in front
 			this.order = this.drawing.doodleArray.length;
 
@@ -3455,7 +3450,7 @@ ED.Doodle = function(_drawing, _parameterJSON) {
 
 						// Add squiggle to doodle's squiggle array
 						this.squiggleArray.push(squiggle);
-					}					
+					}
 				}
 				// Saved parameters (V1.3 method - keep for legacy data)
 				else if (p == 'params') {
@@ -3463,7 +3458,7 @@ ED.Doodle = function(_drawing, _parameterJSON) {
 						var param_name = _parameterJSON[p][j].name;
 						var param_value = _parameterJSON[p][j].value;
 						this.setParameterFromString(param_name, param_value);
-					}					
+					}
 				}
 				// Other parameters
 				else {
@@ -3478,14 +3473,14 @@ ED.Doodle = function(_drawing, _parameterJSON) {
 
 			// Order
 			this.order = +_parameterJSON['order'];
-			
+
 			// Update values of any derived parameters
-// 			for (var parameter in this.parameterValidationArray) {
-// 				var validation = this.parameterValidationArray[parameter];
-// 				if (validation.kind == 'simple') {
-// 					this.updateDependentParameters(parameter);
-// 				}
-// 			}
+			// 			for (var parameter in this.parameterValidationArray) {
+			// 				var validation = this.parameterValidationArray[parameter];
+			// 				if (validation.kind == 'simple') {
+			// 					this.updateDependentParameters(parameter);
+			// 				}
+			// 			}
 			for (var p in this.savedParameterArray) {
 				this.updateDependentParameters(this.savedParameterArray[p]);
 			}
@@ -3582,7 +3577,7 @@ ED.Doodle.prototype.orientation = function() {
 
 	// New position of doodle
 	var newDoodleOrigin = new ED.Point(this.originX, this.originY);
-	
+
 	// Calculate angle to current position from centre relative to north
 	return this.drawing.innerAngle(canvasTop, canvasCentre, newDoodleOrigin);
 }
@@ -4802,53 +4797,46 @@ ED.Doodle.prototype.nearestArcTo = function(_arc) {
 ED.Doodle.prototype.json = function() {
 	// Start of JSON string
 	var s = '{';
-	
+
 	// Version and doodle subclass
 	s = s + '"version":' + this.version.toFixed(1) + ',';
 	s = s + '"subclass":' + '"' + this.className + '",';
-	
+
 	// Only save values of parameters specified in savedParameterArray
 	if (typeof(this.savedParameterArray) != 'undefined') {
 		if (this.savedParameterArray.length > 0) {
 			for (var i = 0; i < this.savedParameterArray.length; i++) {
 				var p = this.savedParameterArray[i];
-				
+
 				// String to output
 				var o;
 
 				// Special treatment according to parameter
 				if (p == 'scaleX' || p == 'scaleY') {
 					o = this[p].toFixed(2);
-				}
-				else if (p == 'arc' || p == 'rotation') {
+				} else if (p == 'arc' || p == 'rotation') {
 					o = (this[p] * 180 / Math.PI).toFixed(0);
-				}
-				else if (p == 'originX' || p == 'originY' || p == 'radius' || p == 'apexX' || p == 'apexY' || p == 'width' || p == 'height') {
+				} else if (p == 'originX' || p == 'originY' || p == 'radius' || p == 'apexX' || p == 'apexY' || p == 'width' || p == 'height') {
 					o = this[p].toFixed(0);
-				}
-				else if (typeof(this[p]) == 'number') {
+				} else if (typeof(this[p]) == 'number') {
 					o = this[p].toFixed(2);
-				}
-				else if (typeof(this[p]) == 'string') {
+				} else if (typeof(this[p]) == 'string') {
 					o = '"' + this[p] + '"';
-				}
-				else if (typeof(this[p]) == 'boolean') {
+				} else if (typeof(this[p]) == 'boolean') {
 					o = this[p];
-				}
-				else if (typeof(this[p]) == 'object') {
+				} else if (typeof(this[p]) == 'object') {
 					o = JSON.stringify(this[p]);
-				}
-				else {
+				} else {
 					ED.errorHandler('ED.Doodle', 'json', 'Attempt to create json for an unhandled parameter type: ' + typeof(this[p]));
 					o = "ERROR";
 				}
-				
+
 				// Construct json
 				s = s + '"' + p + '":' + o + ',';
 			}
 		}
 	}
-	
+
 	// Optional squiggle array
 	if (this.squiggleArray.length > 0) {
 		s = s + '"squiggleArray":[';

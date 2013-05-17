@@ -80,9 +80,9 @@
 							this.drawing.globalScaleFactor = this.gsf;
 
 							//this.drawing.load(doodleSet);
-							this.drawing.addDoodle('RRD');
-							this.drawing.addDoodle('UTear');
-							this.drawing.addDoodle('UTear');
+							this.drawing.addDoodle('AntSeg');
+							this.drawing.addDoodle('KoeppeNodule');
+//							this.drawing.addDoodle('UTear');
 // 							this.drawing.addDoodle('ConjunctivalFlap', {}, {method:{id:'methodSelect', attribute:'value'}});
 // 							this.drawing.addDoodle('PI', {rotation:0});                      
 
@@ -214,7 +214,7 @@
         <!-- Doodle selection toolbar -->
         <div class="ed_toolbar" id="canvasEdit1doodleToolbar">
  
-            <button id="LensRPS" class="imgbutton" title="Lens" onclick="drawingEdit.addDoodle('TrabySuture'); return false;" ><img src="../img/TrabySuture.gif" /></button>
+            <button id="LensRPS" class="imgbutton" title="Lens" onclick="drawingEdit.addDoodle('KoeppeNodule'); return false;" ><img src="../img/KoeppeNodule.gif" /></button>
             <button id="LensRPS" class="imgbutton" title="Lens" onclick="drawingEdit.addDoodle('PI', {rotation:0}); return false;" ><img src="../img/PI.gif" /></button>
 
 <!--            <button id="LensRPS" class="imgbutton" title="Lens" onclick="drawingEdit.addDoodle('Cryo'); return false;" ><img src="../img/Cryo.gif" /></button>
@@ -261,7 +261,7 @@
         <input type="text" id="typeInput" value="Calcified" />
          --> 
          
-        <button onclick="console.log(drawingEdit.diagnosis()); return false;" >Save</button>
+        <button onclick="console.log(drawingEdit.report()); return false;" >Report</button>
         
 
 
