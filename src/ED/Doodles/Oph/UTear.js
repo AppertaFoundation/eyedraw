@@ -156,3 +156,22 @@ ED.UTear.prototype.description = function() {
 ED.UTear.prototype.groupDescriptionEnd = function() {
 	return " o'clock";
 }
+
+/**
+ * Returns the SnoMed code of the doodle
+ *
+ * @returns {Int} SnoMed code of entity representated by doodle
+ */
+ED.UTear.prototype.snomedCode = function() {
+	return 247168006;
+}
+
+/**
+ * Returns a number indicating position in a hierarchy of diagnoses from 0 to 9 (highest)
+ *
+ * @returns {Int} Position in diagnostic hierarchy
+ */
+ED.UTear.prototype.diagnosticHierarchy = function() {
+	return 6;
+}
+

@@ -2660,28 +2660,33 @@ ED.Drawing.prototype.report = function() {
 
 
 /**
- * Returns a SNOMED diagnostic code derived from the drawing, returns zero if no code
+ * Returns a SNOMED diagnostic code derived from the drawing, returns empty array if no code
  *
- * @returns {Int} SnoMed code of doodle with highest postion in hierarchy
+ * @returns {Int} SnoMed code of doodle with highest position in hierarchy
  */
 ED.Drawing.prototype.diagnosis = function() {
-	var positionInHierarchy = 0;
-	var returnCode = 0;
+	var topOfHierarchy = 0;
+	var returnCodes = new Array();
 
-	// Loop through doodles with diagnoses, taking one highest in hierarchy
+	// Loop through doodles with diagnoses, taking one highest in hierarchy, or those that are equal
 	for (var i = 0; i < this.doodleArray.length; i++) {
 		var doodle = this.doodleArray[i];
 		var code = doodle.snomedCode();
 		if (code > 0) {
 			var codePosition = doodle.diagnosticHierarchy();
-			if (codePosition > positionInHierarchy) {
-				positionInHierarchy = codePosition;
-				returnCode = code;
+			if (codePosition > topOfHierarchy) {
+				topOfHierarchy = codePosition;
+				returnCodes.push(code);
+			}
+			else if (codePosition == topOfHierarchy) {
+				if (returnCodes.indexOf(code) < 0) {
+					returnCodes.push(code);
+				}
 			}
 		}
 	}
 
-	return returnCode;
+	return returnCodes;
 }
 
 /**
