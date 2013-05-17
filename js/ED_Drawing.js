@@ -1357,107 +1357,112 @@ ED.Drawing.prototype.mouseout = function(_point)
  */  
 ED.Drawing.prototype.keydown = function(e)
 {
-    //console.log(e.keyCode);
 	// Keyboard action works on selected doodle
 	if (this.selectedDoodle != null)
 	{
-        // Delete or move doodle
-        switch (e.keyCode) {
-            case 8:			// Backspace
-                if (this.selectedDoodle.className != "Label") this.deleteSelectedDoodle();
-                break;
-            case 37:		// Left arrow
-                this.selectedDoodle.move(-ED.arrowDelta,0);
-                break;
-            case 38:		// Up arrow
-                this.selectedDoodle.move(0,-ED.arrowDelta);
-                break;
-            case 39:		// Right arrow
-                this.selectedDoodle.move(ED.arrowDelta,0);
-                break;
-            case 40:		// Down arrow
-                this.selectedDoodle.move(0,ED.arrowDelta);
-                break;
-            default:
-                break;
+		// Label doodle is special case
+		if (this.selectedDoodle.className == "Label")
+		{
+			// Code to send to doodle
+			var code = 0;
+		
+			// Shift key has code 16
+			if (e.keyCode != 16)
+			{
+				// Alphabetic
+				if (e.keyCode >= 65 && e.keyCode <= 90)
+				{
+					if (e.shiftKey)
+					{
+						code = e.keyCode;
+					}
+					else
+					{
+						code = e.keyCode + 32;
+					}
+				}
+				// Space or numeric
+				else if (e.keyCode == 32 || (e.keyCode > 47 && e.keyCode < 58))
+				{
+					code = e.keyCode;
+				}
+				// Apostrophes
+				else if (e.keyCode == 222)
+				{
+					if (e.shiftKey)
+					{
+						code = 34;
+					}
+					else
+					{
+						code = 39;
+					}
+				}
+				// Colon and semicolon
+				else if (e.keyCode == 186)
+				{
+					if (e.shiftKey)
+					{
+						code = 58;
+					}
+					else
+					{
+						code = 59;
+					}
+				}
+				// Other punctuation
+				else if (e.keyCode == 188 || e.keyCode == 190)
+				{
+					if (e.keyCode == 188) code = 44;
+					if (e.keyCode == 190) code = 46;
+				}
+				// Backspace
+				else if (e.keyCode == 8)
+				{
+					code = e.keyCode;
+				}
+				// Carriage return
+				else if (e.keyCode == 13)
+				{
+					code = 13;
+				}
+			}
+		
+			// Carriage return stops editing
+			if (code == 13)
+			{
+				this.deselectDoodles();
+			}
+			// Send code to label doodle
+			else if (code > 0)
+			{
+				this.selectedDoodle.addLetter(code);
+			}
+		}
+		else
+		{
+			// Delete or move doodle
+			switch (e.keyCode) {
+				case 8:			// Backspace
+					if (this.selectedDoodle.className != "Label") this.deleteSelectedDoodle();
+					break;
+				case 37:		// Left arrow
+					this.selectedDoodle.move(-ED.arrowDelta,0);
+					break;
+				case 38:		// Up arrow
+					this.selectedDoodle.move(0,-ED.arrowDelta);
+					break;
+				case 39:		// Right arrow
+					this.selectedDoodle.move(ED.arrowDelta,0);
+					break;
+				case 40:		// Down arrow
+					this.selectedDoodle.move(0,ED.arrowDelta);
+					break;
+				default:
+					break;
+			}
         }
-        
-        // If alphanumeric, send to Lable doodle
-        var code = 0;
-        
-        // Shift key has code 16
-        if (e.keyCode != 16)
-        {
-            // Alphabetic
-            if (e.keyCode >= 65 && e.keyCode <= 90)
-            {
-                if (e.shiftKey)
-                {
-                    code = e.keyCode;
-                }
-                else
-                {
-                    code = e.keyCode + 32;
-                }
-            }
-            // Space or numeric
-            else if (e.keyCode == 32 || (e.keyCode > 47 && e.keyCode < 58))
-            {
-                code = e.keyCode;
-            }
-            // Apostrophes
-            else if (e.keyCode == 222)
-            {
-                if (e.shiftKey)
-                {
-                    code = 34;
-                }
-                else
-                {
-                    code = 39;
-                }
-            }
-            // Colon and semicolon
-            else if (e.keyCode == 186)
-            {
-                if (e.shiftKey)
-                {
-                    code = 58;
-                }
-                else
-                {
-                    code = 59;
-                }
-            }
-            // Other punctuation
-            else if (e.keyCode == 188 || e.keyCode == 190)
-            {
-                if (e.keyCode == 188) code = 44;
-                if (e.keyCode == 190) code = 46;
-            }
-            // Backspace
-            else if (e.keyCode == 8)
-            {
-                if (this.selectedDoodle.className == "Label") code = e.keyCode;
-            }
-            // Carriage return
-            else if (e.keyCode == 13)
-            {
-                code = 13;
-            }
-        }
-        
-        // Carriage return stops editing
-        if (code == 13)
-        {
-            this.deselectDoodles();
-        }
-        // Currently only doodles of Lable class accept alphanumeric input
-        else if (code > 0 && this.selectedDoodle.className == "Label")
-        {
-            this.selectedDoodle.addLetter(code);
-        }
-        
+                
         // Refresh canvas
         this.repaint();
         
