@@ -26,6 +26,7 @@
 				'moveToFront' => 'Move to front',
 				'moveToBack' => 'Move to back',
 				'deleteSelectedDoodle' => 'Delete',
+				'resetEyedraw' => 'Reset eyedraw',
 				'lock' => 'Lock',
 				'unlock' => 'Unlock',
 			);

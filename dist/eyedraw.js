@@ -1786,6 +1786,16 @@ ED.Drawing.prototype.deleteSelectedDoodle = function() {
 }
 
 /**
+ * Resets the eyedraw canvas completely including any related form inputs
+ */
+
+ED.Drawing.prototype.resetEyedraw = function() {
+	this.deleteAllDoodles();
+	this.deselectDoodles();
+	this.drawAllDoodles();
+}
+
+/**
  * Sets a property on currently selected doodle NB currently only supports boolean properties
  *
  * @param {Object} _element An HTML element which called this function
