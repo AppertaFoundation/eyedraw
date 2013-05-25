@@ -96,6 +96,7 @@ ED.trans['Hyphaema'] = 'Hyphaema<br/><br/>Drag handle vertically to change size<
 ED.trans['Hypopyon'] = 'Hypopyon<br/><br/>Drag handle vertically to change size';
 ED.trans['IatrogenicBreak'] = 'Iatrogenic Break<br/><br/>Drag to position<br/>Drag inner handle to change size<br/>Drag outer handle to rotate';
 ED.trans['ILMPeel'] = 'ILM peel<br/><br/>Drag to position<br/>Drag handle to change size';
+ED.trans['InjectionSite'] = 'Injection site<br/><br/>Drag to position<br/>Drag handle to adjust distance from limbus';
 ED.trans['IrisHook'] = 'Iris hook<br/><br/>Drag to move around the clock<br/><br/>The hook will match the size of the pupil as it changes<br/>Subsequent hooks are added to the next quadrant';
 ED.trans['IrisNaevus'] = 'Iris naevus<br/><br/>Drag to move<br/>Drag handle to change size';
 ED.trans['IRMA'] = 'Intraretinal microvascular abnormalities<br/><br/>Drag to move<br/>Drag inner handle to change size<br/>Drag outer handle to rotate';

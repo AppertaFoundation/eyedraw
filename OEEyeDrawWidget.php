@@ -467,6 +467,7 @@ class DoodleInfo
         "Hypopyon" => "Hypopyon",
         "IatrogenicBreak" => "IatrogenicBreak",
         "ILMPeel" => "ILM peel",
+        "InjectionSite" => "Injection site",
         "InnerLeafBreak" => "Inner leaf break",
         "Iris" => "Iris",
         "IrisHook" => "Iris hook",

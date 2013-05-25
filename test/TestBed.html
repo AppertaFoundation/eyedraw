@@ -59,7 +59,7 @@
             function eyeDrawController(_drawing)
             {
                 this.drawing = _drawing;
-                this.gsf = 1;
+                this.gsf = 0.56;
                 
                 // Specify call back function
                 this.callBack = callBack;
@@ -78,7 +78,12 @@
                         
 							//Scale down for glaucoma drawings
 							this.drawing.globalScaleFactor = this.gsf;
+							
+							var antseg = this.drawing.addDoodle('AntSeg');
+							antseg.isSelectable = false;
+							this.drawing.addDoodle('InjectionSite');
 
+/*
 							// Column 1
 							this.drawing.addDoodle('FieldCircle', {originX:-450, originY:-150, colour:"FF0000"});
 							this.drawing.addDoodle('FieldCircle', {originX:-450, originY:-50, colour:"FF0000"});
@@ -154,7 +159,7 @@
 							// Column 10
 							this.drawing.addDoodle('FieldCircle', {originX:+350, originY:-50, colour:"008000"});
 							this.drawing.addDoodle('FieldCircle', {originX:+350, originY:+50, colour:"008000"});
-																																			
+*/																												
 							this.drawing.deselectDoodles();
                             break;
                             
@@ -330,7 +335,7 @@
         <input type="text" id="typeInput" value="Calcified" />
          --> 
          
-        <button onclick="console.log(drawingEdit.save()); return false;" >Save</button>
+        <button onclick="console.log(drawingEdit.report()); return false;" >Report</button>
         
 
 
