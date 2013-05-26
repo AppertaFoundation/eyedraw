@@ -59,7 +59,7 @@
             function eyeDrawController(_drawing)
             {
                 this.drawing = _drawing;
-                this.gsf = 0.56;
+                this.gsf = 1;
                 
                 // Specify call back function
                 this.callBack = callBack;
@@ -79,9 +79,8 @@
 							//Scale down for glaucoma drawings
 							this.drawing.globalScaleFactor = this.gsf;
 							
-							var antseg = this.drawing.addDoodle('AntSeg');
-							antseg.isSelectable = false;
-							this.drawing.addDoodle('InjectionSite');
+							//this.drawing.addDoodle('PostPole');
+							this.drawing.addDoodle('RPERip');
 
 /*
 							// Column 1

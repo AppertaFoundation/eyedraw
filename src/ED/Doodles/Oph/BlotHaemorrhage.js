@@ -75,7 +75,7 @@ ED.BlotHaemorrhage.prototype.draw = function(_point) {
 	// Boundary path
 	ctx.beginPath();
 
-	// Exudate
+	// Haemorrhage
 	ctx.arc(0, 0, r, 0, 2 * Math.PI, true);
 
 	// Set attributes
