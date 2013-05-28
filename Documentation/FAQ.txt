@@ -1,0 +1,48 @@
+Q:  How do I slow down an animation for a particular doodle?
+
+A:  Animation rates are set for simple parameters, but this can be overidden using the following code in the setPropertyDefaults method
+    this.parameterValidationArray['apexY']['delta'] = 1;
+    Default values can be found in the doodle constructor method
+    
+EG: PostPole
+
+
+Q:  How can I constrain a parameter to a range which is dependent on another parameter?
+
+A:  Any change in a parameter either by user interaction with the mouse, or during an animation, results in a call to the doodle's 'dependentParameterValues' function. Put code in this function to change the range and the value of any such parameters
+    
+EG: AntSegCrossSection
+
+Q:  A bound parameter is a list with a wide range of values of a simple parameter between valid values. How can the granularity of the simple parameter be preserved withour breaking the binding?
+
+A:  When calculating the value of the simple parameter, check that it is within the range of the bound element value, and if so preserver it
+
+EG: AngleGrade
+
+
+Notes:
+
+Bindings
+
+The value of an HTML element can be bound to a derived parameter of a doodle, so that the value and the parameter are in sync. If the doodle has the appropriate setting (see paramter validation array), then a change in the value of the element will result in the change in the parameter value being animated. Each parameter can be bound to only one HTML element, but an HTML element can be bound to any number of doodles.
+
+Adding a binding
+
+    1) doodle.addBinding(parameter, id);
+    
+    2) On creation of the doodle by passing a binding array as a third parameter to the addDoodle method of the drawing object
+    
+        doodle = this.drawing.addDoodle('CorticalCataract', {}, {grade:"gradeSelect"});
+        
+    3) If the doodle does not yet exist, or there is no reference to it, use the 
+    
+                                    bindingsArray['CorticalCataract'] = {
+                                    grade:'gradeSelect',
+                                };
+                                self.drawing.addBindings(bindingsArray);
+        This method checks to see if the doodle aleadys exists, and if not, it adds an event listener to the element which will respond to a 'change' event by adding a doodle of the appropriate class
+    
+    
+Removing a binding
+
+    1) doodle.removeBinding(parameter);
