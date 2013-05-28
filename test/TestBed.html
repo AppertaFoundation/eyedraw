@@ -78,14 +78,87 @@
                         
 							//Scale down for glaucoma drawings
 							this.drawing.globalScaleFactor = this.gsf;
+							
+							//this.drawing.addDoodle('PostPole');
+							this.drawing.addDoodle('RPERip');
 
-							//this.drawing.load(doodleSet);
-							this.drawing.addDoodle('AntSeg');
-							this.drawing.addDoodle('KoeppeNodule');
-//							this.drawing.addDoodle('UTear');
-// 							this.drawing.addDoodle('ConjunctivalFlap', {}, {method:{id:'methodSelect', attribute:'value'}});
-// 							this.drawing.addDoodle('PI', {rotation:0});                      
+/*
+							// Column 1
+							this.drawing.addDoodle('FieldCircle', {originX:-450, originY:-150, colour:"FF0000"});
+							this.drawing.addDoodle('FieldCircle', {originX:-450, originY:-50, colour:"FF0000"});
+							this.drawing.addDoodle('FieldCircle', {originX:-450, originY:+50, colour:"FF0000"});
+							this.drawing.addDoodle('FieldCircle', {originX:-450, originY:+150, colour:"FF0000"});
 
+							// Column 2
+							this.drawing.addDoodle('FieldCircle', {originX:-350, originY:-250, colour:"FF0000"});
+							this.drawing.addDoodle('FieldCircle', {originX:-350, originY:-150, colour:"FF0000"});
+							this.drawing.addDoodle('FieldCircle', {originX:-350, originY:-50, colour:"FF0000"});
+							this.drawing.addDoodle('FieldCircle', {originX:-350, originY:+50, colour:"FF0000"});
+							this.drawing.addDoodle('FieldCircle', {originX:-350, originY:+150, colour:"FF0000"});
+							this.drawing.addDoodle('FieldCircle', {originX:-350, originY:+250, colour:"FF0000"});                   
+
+							// Column 3
+							this.drawing.addDoodle('FieldCircle', {originX:-250, originY:-350, colour:"008000"});
+							this.drawing.addDoodle('FieldCircle', {originX:-250, originY:-250, colour:"FF0000"});
+							this.drawing.addDoodle('FieldCircle', {originX:-250, originY:-150, colour:"FF0000"});
+
+							this.drawing.addDoodle('FieldCircle', {originX:-250, originY:+150, colour:"FF0000"});
+							this.drawing.addDoodle('FieldCircle', {originX:-250, originY:+250, colour:"FF0000"}); 
+							this.drawing.addDoodle('FieldCircle', {originX:-250, originY:+350, colour:"008000"});
+
+							// Column 4
+							this.drawing.addDoodle('FieldCircle', {originX:-150, originY:-350, colour:"FF0000"});
+							this.drawing.addDoodle('FieldCircle', {originX:-150, originY:-250, colour:"008000"});
+							this.drawing.addDoodle('FieldCircle', {originX:-150, originY:-150, colour:"008000"});
+
+							this.drawing.addDoodle('FieldCircle', {originX:-150, originY:+150, colour:"008000"});
+							this.drawing.addDoodle('FieldCircle', {originX:-150, originY:+250, colour:"008000"}); 
+							this.drawing.addDoodle('FieldCircle', {originX:-150, originY:+350, colour:"FF0000"});
+
+							// Column 5
+							this.drawing.addDoodle('FieldCircle', {originX:-50, originY:-350, colour:"008000"});
+							this.drawing.addDoodle('FieldCircle', {originX:-50, originY:-250, colour:"008000"});
+							this.drawing.addDoodle('FieldCircle', {originX:-50, originY:-150, colour:"008000"});
+							this.drawing.addDoodle('FieldCircle', {originX:-50, originY:-50, colour:"008000"});
+							this.drawing.addDoodle('FieldCircle', {originX:-50, originY:+50, colour:"008000"});
+							this.drawing.addDoodle('FieldCircle', {originX:-50, originY:+150, colour:"008000"});
+							this.drawing.addDoodle('FieldCircle', {originX:-50, originY:+250, colour:"008000"}); 
+							this.drawing.addDoodle('FieldCircle', {originX:-50, originY:+350, colour:"008000"});
+
+							// Column 6
+							this.drawing.addDoodle('FieldCircle', {originX:+50, originY:-350, colour:"FFA400"});
+							this.drawing.addDoodle('FieldCircle', {originX:+50, originY:-250, colour:"008000"});
+							this.drawing.addDoodle('FieldCircle', {originX:+50, originY:-150, colour:"008000"});
+							this.drawing.addDoodle('FieldCircle', {originX:+50, originY:-50, colour:"008000"});
+							this.drawing.addDoodle('FieldCircle', {originX:+50, originY:+50, colour:"008000"});
+							this.drawing.addDoodle('FieldCircle', {originX:+50, originY:+150, colour:"008000"});
+							this.drawing.addDoodle('FieldCircle', {originX:+50, originY:+250, colour:"008000"}); 
+							this.drawing.addDoodle('FieldCircle', {originX:+50, originY:+350, colour:"FFA400"});
+
+							// Column 7
+							this.drawing.addDoodle('FieldCircle', {originX:+150, originY:-250, colour:"008000"});
+							this.drawing.addDoodle('FieldCircle', {originX:+150, originY:-150, colour:"008000"});
+							this.drawing.addDoodle('FieldCircle', {originX:+150, originY:-50, colour:"008000"});
+							this.drawing.addDoodle('FieldCircle', {originX:+150, originY:+50, colour:"008000"});
+							this.drawing.addDoodle('FieldCircle', {originX:+150, originY:+150, colour:"008000"});
+							this.drawing.addDoodle('FieldCircle', {originX:+150, originY:+250, colour:"008000"});
+							
+							// Column 8
+							this.drawing.addDoodle('FieldCircle', {originX:+150, originY:-150, colour:"008000"});
+							this.drawing.addDoodle('FieldCircle', {originX:+150, originY:-50, colour:"008000"});
+							this.drawing.addDoodle('FieldCircle', {originX:+150, originY:+50, colour:"008000"});
+							this.drawing.addDoodle('FieldCircle', {originX:+150, originY:+150, colour:"008000"});
+
+							// Column 9
+							this.drawing.addDoodle('FieldCircle', {originX:+250, originY:-150, colour:"008000"});
+							this.drawing.addDoodle('FieldCircle', {originX:+250, originY:-50, colour:"008000"});
+							this.drawing.addDoodle('FieldCircle', {originX:+250, originY:+50, colour:"008000"});
+							this.drawing.addDoodle('FieldCircle', {originX:+250, originY:+150, colour:"008000"});
+							
+							// Column 10
+							this.drawing.addDoodle('FieldCircle', {originX:+350, originY:-50, colour:"008000"});
+							this.drawing.addDoodle('FieldCircle', {originX:+350, originY:+50, colour:"008000"});
+*/																												
 							this.drawing.deselectDoodles();
                             break;
                             

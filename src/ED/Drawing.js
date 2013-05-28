@@ -3992,6 +3992,11 @@ ED.Doodle.prototype.validateParameter = function(_parameter, _value) {
 					valid = true;
 				}
 				break;
+				
+			case 'colour':
+				// ***TODO*** add some actual validation here
+				valid = true;
+				break;
 
 			default:
 				ED.errorHandler('ED.Drawing', 'eventHandler', 'Illegal validation type');
@@ -4145,6 +4150,10 @@ ED.Doodle.prototype.setParameterFromString = function(_parameter, _value) {
 				this[_parameter] = (_value == 'true');
 				break;
 
+			case 'colour':
+				this[_parameter].setWithHexString(_value);
+				break;
+				
 			default:
 				ED.errorHandler('ED.Doodle', 'setParameterFromString', 'Illegal validation type: ' + validation.type);
 				break;
@@ -5585,6 +5594,9 @@ ED.Colour.prototype.setWithHexString = function(_hexString) {
 	this.red = parseInt((_hexString.charAt(0) + _hexString.charAt(1)), 16);
 	this.green = parseInt((_hexString.charAt(2) + _hexString.charAt(3)), 16);
 	this.blue = parseInt((_hexString.charAt(4) + _hexString.charAt(5)), 16);
+	if (_hexString.length > 6) {
+		this.alpha = parseInt((_hexString.charAt(6) + _hexString.charAt(7)), 16);
+	}
 }
 
 /**

@@ -271,7 +271,7 @@ class OEEyeDrawWidget extends CWidget
 
             if (isset($_POST[get_class($this->model)][$this->attribute]))
             {
-                $this->model->{$this->attribute} = $_POST[get_class($this->model)][$this->attribute];
+                $this->model->{$this->attribute} = $_GET[get_class($this->model)][$this->attribute];
             }
         }
 
@@ -467,6 +467,7 @@ class DoodleInfo
         "Hypopyon" => "Hypopyon",
         "IatrogenicBreak" => "IatrogenicBreak",
         "ILMPeel" => "ILM peel",
+        "InjectionSite" => "Injection site",
         "InnerLeafBreak" => "Inner leaf break",
         "Iris" => "Iris",
         "IrisHook" => "Iris hook",
@@ -516,6 +517,7 @@ class DoodleInfo
         "Retinoschisis" => "Retinoschisis",
         "RK" => "Radial keratotomy",
         "RoundHole" => "Round hole",
+        "RPERip" => "RPE rip",
         "RRD" => "Rhegmatogenous retinal detachment",
         "Rubeosis" => "Rubeosis iridis",
         "SectorPRPPostPole" => "Sector PRP (posterior pole)",
@@ -526,6 +528,7 @@ class DoodleInfo
         "SidePort" => "Side port",
         "Slider" => "Slider",
         "StarFold" => "Star fold",
+        "SubretinalFluid" => "Subretinal fluid",
         "SubretinalPFCL" => "Subretinal PFCL",
         "Supramid" => "Supramid suture",
         "Trabectome" => "Trabectome",

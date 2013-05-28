@@ -17,19 +17,22 @@
  */
 
 /**
- * Blot Haemorrhage
+ * Round hole
  *
- * @class BlotHaemorrhage
+ * @class FieldCircle
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
  * @param {Object} _parameterJSON
  */
-ED.BlotHaemorrhage = function(_drawing, _parameterJSON) {
+ED.FieldCircle = function(_drawing, _parameterJSON) {
 	// Set classname
-	this.className = "BlotHaemorrhage";
+	this.className = "FieldCircle";
+
+	// Derived parameters
+	this.colour = new ED.Colour(255,0,0,1);
 	
 	// Saved parameters
-	this.savedParameterArray = ['originX', 'originY', 'scaleX', 'scaleY'];
+	this.savedParameterArray = ['originX', 'originY', 'colour'];
 	
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -38,23 +41,30 @@ ED.BlotHaemorrhage = function(_drawing, _parameterJSON) {
 /**
  * Sets superclass and constructor
  */
-ED.BlotHaemorrhage.prototype = new ED.Doodle;
-ED.BlotHaemorrhage.prototype.constructor = ED.BlotHaemorrhage;
-ED.BlotHaemorrhage.superclass = ED.Doodle.prototype;
+ED.FieldCircle.prototype = new ED.Doodle;
+ED.FieldCircle.prototype.constructor = ED.FieldCircle;
+ED.FieldCircle.superclass = ED.Doodle.prototype;
 
 /**
- * Sets handle attributes
+ * Sets default properties
  */
-ED.BlotHaemorrhage.prototype.setHandles = function() {
-	this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, false);
+ED.FieldCircle.prototype.setPropertyDefaults = function() {
+	this.isMoveable = false;
+	this.isRotatable = false;
+	
+	// Add complete validation arrays for derived parameters
+	this.parameterValidationArray['colour'] = {
+		kind: 'derived',
+		type: 'colour',
+	};
 }
 
 /**
  * Sets default parameters (Only called for new doodles)
  * Use the setParameter function for derived parameters, as this will also update dependent variables
  */
-ED.BlotHaemorrhage.prototype.setParameterDefaults = function() {
-	this.setOriginWithDisplacements(-60, -60);
+ED.FieldCircle.prototype.setParameterDefaults = function() {
+
 }
 
 /**
@@ -62,47 +72,30 @@ ED.BlotHaemorrhage.prototype.setParameterDefaults = function() {
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.BlotHaemorrhage.prototype.draw = function(_point) {
+ED.FieldCircle.prototype.draw = function(_point) {
 	// Get context
 	var ctx = this.drawing.context;
 
 	// Call draw method in superclass
-	ED.BlotHaemorrhage.superclass.draw.call(this, _point);
-
-	// Exudate radius
-	var r = 30;
+	ED.FieldCircle.superclass.draw.call(this, _point);
 
 	// Boundary path
 	ctx.beginPath();
 
-	// Haemorrhage
-	ctx.arc(0, 0, r, 0, 2 * Math.PI, true);
+	// Round hole
+	ctx.arc(0, 0, 50, 0, Math.PI * 2, true);
 
-	// Set attributes
+	// Close path
+	ctx.closePath();
+
+	// Set line attributes
 	ctx.lineWidth = 1;
-	ctx.strokeStyle = "red";
-	ctx.fillStyle = "red";
+	ctx.fillStyle = this.colour.rgba();
+	ctx.strokeStyle = ctx.fillStyle;
 
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 
-	// Coordinates of handles (in canvas plane)
-	var point = new ED.Point(0, 0);
-	point.setWithPolars(r, Math.PI / 4);
-	this.handleArray[2].location = this.transform.transformPoint(point);
-
-	// Draw handles if selected
-	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
-
 	// Return value indicating successful hittest
 	return this.isClicked;
-}
-
-/**
- * Returns a String which, if not empty, determines the root descriptions of multiple instances of the doodle
- *
- * @returns {String} Group description
- */
-ED.BlotHaemorrhage.prototype.groupDescription = function() {
-	return "Blot haemorrhages";
 }
