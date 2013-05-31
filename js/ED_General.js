@@ -53,9 +53,6 @@ ED.Surgeon = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _sc
     // Derived parameters (NB must set a value here to define parameter as a property of the object, even though value set later)
     this.surgeonPosition = 'Temporal';
 
-	// originX is no longer used, so we set it to 0 to avoid offset problems with earlier saved data
-	_originX = 0;
-    
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
 }
