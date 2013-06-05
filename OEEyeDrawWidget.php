@@ -271,7 +271,7 @@ class OEEyeDrawWidget extends CWidget
 
             if (isset($_POST[get_class($this->model)][$this->attribute]))
             {
-                $this->model->{$this->attribute} = $_GET[get_class($this->model)][$this->attribute];
+                $this->model->{$this->attribute} = $_POST[get_class($this->model)][$this->attribute];
             }
         }
 
