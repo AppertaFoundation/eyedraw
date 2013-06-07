@@ -32775,6 +32775,7 @@ ED.VeinOcclusion.prototype.setHandles = function() {
  */
 ED.VeinOcclusion.prototype.setPropertyDefaults = function() {
 	this.isMoveable = false;
+	//this.isRotatable = false;
 
 	// Update component of validation array for simple parameters
 	this.parameterValidationArray['arc']['range'].setMinAndMax(Math.PI / 6, Math.PI * 2);
@@ -32840,6 +32841,9 @@ ED.VeinOcclusion.prototype.draw = function(_point) {
 
 	// Non boundary drawing
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+	
+		this.haem(-100, -100, 0);
+	
 	/*
 		// PRP spot data
 		var si = 30;
@@ -32877,6 +32881,23 @@ ED.VeinOcclusion.prototype.draw = function(_point) {
 
 	// Return value indicating successful hit test
 	return this.isClicked;
+}
+
+ED.VeinOcclusion.prototype.haem = function(_x, _y, _angle) {
+	// Get context
+	var ctx = this.drawing.context;
+	
+	var h = 40;
+
+	ctx.beginPath();
+	ctx.moveTo(_x, _y);
+	ctx.lineTo(_x + 100, _y);
+	//ctx.lineTo(_x + h * Math.sin(_angle), _y + h * Math.cos(_angle));
+	
+	ctx.lineWidth = 16;
+	ctx.strokeStyle = "rgba(255,0,0,0.5)";
+	
+	ctx.stroke();	
 }
 
 /**
