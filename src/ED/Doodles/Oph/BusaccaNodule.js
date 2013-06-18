@@ -108,5 +108,5 @@ ED.BusaccaNodule.prototype.draw = function(_point) {
  * @returns {String} Description of doodle
  */
 ED.BusaccaNodule.prototype.groupDescription = function() {
-	return "BusaccaNodules";
+	return "Busacca nodules";
 }

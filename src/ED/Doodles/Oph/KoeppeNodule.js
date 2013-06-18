@@ -104,5 +104,5 @@ ED.KoeppeNodule.prototype.draw = function(_point) {
  * @returns {String} Description of doodle
  */
 ED.KoeppeNodule.prototype.groupDescription = function() {
-	return "KoeppeNodules";
+	return "Koeppe nodules";
 }

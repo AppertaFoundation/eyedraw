@@ -78,10 +78,19 @@
                         
 							//Scale down for glaucoma drawings
 							this.drawing.globalScaleFactor = this.gsf;
-							
-							this.drawing.addDoodle('PostPole');
-							this.drawing.addDoodle('BranchRetinalVeinOcclusionPostPole');
+
+// 							this.drawing.addDoodle('AntSeg');
+// 							this.drawing.addDoodle('TransilluminationDefect');
+
+														
+							//this.drawing.addDoodle('PostPole');
+							//this.drawing.addDoodle('BranchRetinalVeinOcclusionPostPole');
 							//this.drawing.addDoodle('SectorPRP');
+
+							this.drawing.addDoodle('Fundus');
+							this.drawing.addDoodle('ChoroidalHaemorrhage');
+
+
 
 /*
 							// Column 1
@@ -288,7 +297,7 @@
         <!-- Doodle selection toolbar -->
         <div class="ed_toolbar" id="canvasEdit1doodleToolbar">
  
-            <button id="LensRPS" class="imgbutton" title="Lens" onclick="drawingEdit.addDoodle('KoeppeNodule'); return false;" ><img src="../img/KoeppeNodule.gif" /></button>
+            <button id="LensRPS" class="imgbutton" title="Lens" onclick="drawingEdit.addDoodle('ChoroidalHaemorrhage'); return false;" ><img src="../img/ChoroidalHaemorrhage.gif" /></button>
             <button id="LensRPS" class="imgbutton" title="Lens" onclick="drawingEdit.addDoodle('PI', {rotation:0}); return false;" ><img src="../img/PI.gif" /></button>
 
 <!--            <button id="LensRPS" class="imgbutton" title="Lens" onclick="drawingEdit.addDoodle('Cryo'); return false;" ><img src="../img/Cryo.gif" /></button>

@@ -67,7 +67,7 @@ ED.TransilluminationDefect.prototype.setPropertyDefaults = function() {
  * Use the setParameter function for derived parameters, as this will also update dependent variables
  */
 ED.TransilluminationDefect.prototype.setParameterDefaults = function() {
-	this.arc = 360 * Math.PI / 180;
+	this.arc = 60 * Math.PI / 180;
 
 	var doodle = this.drawing.lastDoodleOfClass(this.className);
 	if (doodle) {
@@ -155,6 +155,6 @@ ED.TransilluminationDefect.prototype.draw = function(_point) {
  *
  * @returns {String} Description of doodle
  */
-ED.TransilluminationDefect.prototype.description = function() {
+ED.TransilluminationDefect.prototype.groupDescription = function() {
 	return "Transillumination defects of iris";
 }
