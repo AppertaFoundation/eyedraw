@@ -4934,7 +4934,6 @@ ED.Doodle.prototype.drawLine = function(_ctx, _x1, _y1, _x2, _y2, _w, _colour) {
 	_ctx.stroke();
 }
 
-
 /**
  * Draws a laser spot
  *
@@ -4944,6 +4943,40 @@ ED.Doodle.prototype.drawLine = function(_ctx, _x1, _y1, _x2, _y2, _w, _colour) {
  */
 ED.Doodle.prototype.drawLaserSpot = function(_ctx, _x, _y) {
 	this.drawCircle(_ctx, _x, _y, 15, "Yellow", 10, "rgba(255, 128, 0, 1)");
+}
+
+/**
+ * Draws a haemorrhage orientated to be parallel to nerve fibre layer
+ *
+ * @param {Object} _ctx Context of canvas
+ * @param {Float} _x X-coordinate of origin
+ * @param {Float} _y Y-coordinate of origin
+ */
+ED.Doodle.prototype.drawNFLHaem = function(_ctx, _x, _y) {
+	// Parameters
+	var r = 10;
+	
+	// Create point from parameters
+	var p = new ED.Point(_x, _y);
+
+	// Create two new points 'tangential'
+	var phi1 = p.direction() + Math.PI/2;
+	var phi2 = p.direction() + 3 * Math.PI/2;
+	var p1 = new ED.Point(0,0);
+	p1.setWithPolars(r, phi1);
+	var p2 = new ED.Point(0,0);
+	p2.setWithPolars(r, phi2);
+
+	// Draw line
+	_ctx.beginPath();
+	_ctx.moveTo(_x + p1.x, _y + p1.y);
+	_ctx.lineTo(_x + p2.x, _y + p2.y);
+	
+	_ctx.lineWidth = 16;
+	_ctx.lineCap = 'round';
+	_ctx.strokeStyle = "rgba(255,0,0,0.5)";
+	
+	_ctx.stroke();	
 }
 
 /**
