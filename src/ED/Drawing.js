@@ -4216,6 +4216,36 @@ ED.Doodle.prototype.setOriginWithDisplacements = function(_first, _next) {
 }
 
 /**
+ * Set the value of a doodle's origin as if rotating
+ *
+ * @param {Int} _radius The radius of rotation
+ * @param {Int} _first Rotation in degrees of first doodle anticlockwise right eye, clockwise left eye
+ * @param {Int} _next Additional rotation of subsequent doodles
+ */
+ED.Doodle.prototype.setOriginWithRotations = function(_radius, _first, _next) {
+	var direction = this.drawing.eye == ED.eye.Right ? -1 : 1;
+	
+	var origin = new ED.Point(0,0);
+	origin.setWithPolars(_radius, direction * _first * Math.PI / 180);
+
+	// Get last doodle to be added
+	if (this.addAtBack) {
+		var doodle = this.drawing.firstDoodleOfClass(this.className);
+	} else {
+		var doodle = this.drawing.lastDoodleOfClass(this.className);
+	}
+
+	// If there is one, make position relative to it
+	if (doodle) {
+		var doodleOrigin = new ED.Point(doodle.originX, doodle.originY);
+		origin.setWithPolars(_radius, doodleOrigin.direction() + direction * _next * Math.PI / 180);
+	}
+	
+	this.originX = origin.x;
+	this.originY = origin.y;
+}
+
+/**
  * Set the value of a doodle's rotation to avoid overlapping other doodles
  *
  * @param {Int} _first Rotation in degrees of first doodle anticlockwise right eye, clockwise left eye

@@ -19,14 +19,14 @@
 /**
  * Sector PRP
  *
- * @class RetinalVeinOcclusionPostPole
+ * @class RetinalArteryOcclusionPostPole
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
  * @param {Object} _parameterJSON
  */
-ED.RetinalVeinOcclusionPostPole = function(_drawing, _parameterJSON) {
+ED.RetinalArteryOcclusionPostPole = function(_drawing, _parameterJSON) {
 	// Set classname
-	this.className = "RetinalVeinOcclusionPostPole";
+	this.className = "RetinalArteryOcclusionPostPole";
 	
 	// Saved parameters
 	this.savedParameterArray = ['arc', 'rotation'];
@@ -38,14 +38,14 @@ ED.RetinalVeinOcclusionPostPole = function(_drawing, _parameterJSON) {
 /**
  * Sets superclass and constructor
  */
-ED.RetinalVeinOcclusionPostPole.prototype = new ED.Doodle;
-ED.RetinalVeinOcclusionPostPole.prototype.constructor = ED.RetinalVeinOcclusionPostPole;
-ED.RetinalVeinOcclusionPostPole.superclass = ED.Doodle.prototype;
+ED.RetinalArteryOcclusionPostPole.prototype = new ED.Doodle;
+ED.RetinalArteryOcclusionPostPole.prototype.constructor = ED.RetinalArteryOcclusionPostPole;
+ED.RetinalArteryOcclusionPostPole.superclass = ED.Doodle.prototype;
 
 /**
  * Sets handle attributes
  */
-ED.RetinalVeinOcclusionPostPole.prototype.setHandles = function() {
+ED.RetinalArteryOcclusionPostPole.prototype.setHandles = function() {
 	this.handleArray[0] = new ED.Handle(null, true, ED.Mode.Arc, false);
 	this.handleArray[3] = new ED.Handle(null, true, ED.Mode.Arc, false);
 	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
@@ -54,9 +54,8 @@ ED.RetinalVeinOcclusionPostPole.prototype.setHandles = function() {
 /**
  * Set default properties
  */
-ED.RetinalVeinOcclusionPostPole.prototype.setPropertyDefaults = function() {
+ED.RetinalArteryOcclusionPostPole.prototype.setPropertyDefaults = function() {
 	this.isMoveable = false;
-	this.isUnique = true;
 
 	// Update component of validation array for simple parameters
 	this.parameterValidationArray['arc']['range'].setMinAndMax(Math.PI / 6, Math.PI * 2);
@@ -68,10 +67,10 @@ ED.RetinalVeinOcclusionPostPole.prototype.setPropertyDefaults = function() {
  * Sets default parameters (Only called for new doodles)
  * Use the setParameter function for derived parameters, as this will also update dependent variables
  */
-ED.RetinalVeinOcclusionPostPole.prototype.setParameterDefaults = function() {
+ED.RetinalArteryOcclusionPostPole.prototype.setParameterDefaults = function() {
 	this.arc = Math.PI / 2;
 	this.apexY = -100;
-	this.setRotationWithDisplacements(45, 120);;
+	this.setRotationWithDisplacements(45, 120);
 }
 
 /**
@@ -79,12 +78,12 @@ ED.RetinalVeinOcclusionPostPole.prototype.setParameterDefaults = function() {
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.RetinalVeinOcclusionPostPole.prototype.draw = function(_point) {
+ED.RetinalArteryOcclusionPostPole.prototype.draw = function(_point) {
 	// Get context
 	var ctx = this.drawing.context;
 
 	// Call draw method in superclass
-	ED.RetinalVeinOcclusionPostPole.superclass.draw.call(this, _point);
+	ED.RetinalArteryOcclusionPostPole.superclass.draw.call(this, _point);
 	
 	// Radii
 	var ro = 420;
@@ -116,38 +115,20 @@ ED.RetinalVeinOcclusionPostPole.prototype.draw = function(_point) {
 
 	// Set line attributes
 	ctx.lineWidth = 4;
-	ctx.fillStyle = "rgba(255,255,0,0)";
-	ctx.strokeStyle = "rgba(255,255,0,0)";
+	ctx.fillStyle = "rgba(200,200,200,0.5)";
+	ctx.strokeStyle = "rgba(200,200,200,0)";
 
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 
 	// Non boundary drawing
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
-	
-		// Distribution data
-		var si = 30;
-		var sd = (30 + si);
-
-		// Array of number of spots for each radius value
-		var count = [26, 24, 22, 18, 14, 10];
-
-		// Iterate through radius and angle to draw sector
-		var i = 0;
-		for (var r = ro - si; r > ri; r -= sd) {
-			var j = 0;
-
-			for (var a = -Math.PI / 2 - arcStart; a < this.arc - Math.PI / 2 - arcStart; a += sd / r) {
-				a = -Math.PI / 2 - arcStart + j * 2 * Math.PI / count[i];
-
-				var p = new ED.Point(0, 0);
-				p.setWithPolars(r, a);
-				this.drawNFLHaem(ctx, p.x, p.y);
-
-				j++;
-			}
-
-			i++;
+		// Cherry red spot
+		if (this.apexY > -70) {
+			ctx.beginPath();
+			ctx.arc(0, 0, -this.apexY, 0, 2 * Math.PI, true);
+			ctx.fillStyle = "rgba(200,0,0,0.5)";
+			ctx.fill();
 		}
 	}
 
@@ -168,7 +149,7 @@ ED.RetinalVeinOcclusionPostPole.prototype.draw = function(_point) {
  *
  * @returns {String} Description of doodle
  */
-ED.RetinalVeinOcclusionPostPole.prototype.description = function() {
+ED.RetinalArteryOcclusionPostPole.prototype.description = function() {
 	var returnString = "";
 	
 	// Type
@@ -198,17 +179,19 @@ ED.RetinalVeinOcclusionPostPole.prototype.description = function() {
 			returnString += 'Central ';
 			break;
 	}
-	returnString += "retinal vein occlusion ";
+	returnString += "retinal artery occlusion";
 	
 	// Macula
 	if (this.apexY < -150) {
-		returnString += 'sparing ';
+		returnString += ' sparing';
 	}
 	else {
-		returnString += 'involving ';
+		returnString += ' involving';
 	}
 	
-	returnString += 'the macula ';
+	returnString += ' the macula';
+	
+	if (this.apexY > -70) returnString += ' with a cherry red spot';
 	
 	return returnString;
 }
@@ -218,18 +201,18 @@ ED.RetinalVeinOcclusionPostPole.prototype.description = function() {
  *
  * @returns {Int} SnoMed code of entity representated by doodle
  */
-ED.RetinalVeinOcclusionPostPole.prototype.snomedCode = function() {
+ED.RetinalArteryOcclusionPostPole.prototype.snomedCode = function() {
 	// Type
 	var type = this.type();
 	switch (type) {
 		case 'branch':
-			return 24596005;
+			return 232035005;
 			break;
 		case 'hemispheric':
-			return 232043000;
+			return 232035005;
 			break;
 		case 'central':
-			return 68478007;
+			return 38742007;
 			break;
 	}	
 }
@@ -239,7 +222,7 @@ ED.RetinalVeinOcclusionPostPole.prototype.snomedCode = function() {
  *
  * @returns {String} String describing type of occlusion
  */
-ED.RetinalVeinOcclusionPostPole.prototype.type = function() {
+ED.RetinalArteryOcclusionPostPole.prototype.type = function() {
 	// Arc defines type
 	if (this.arc > 1.5 * Math.PI) return "central";
 	else if (this.arc > 0.8 * Math.PI) return 'hemispheric';

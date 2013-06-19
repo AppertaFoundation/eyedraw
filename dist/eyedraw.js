@@ -4216,6 +4216,36 @@ ED.Doodle.prototype.setOriginWithDisplacements = function(_first, _next) {
 }
 
 /**
+ * Set the value of a doodle's origin as if rotating
+ *
+ * @param {Int} _radius The radius of rotation
+ * @param {Int} _first Rotation in degrees of first doodle anticlockwise right eye, clockwise left eye
+ * @param {Int} _next Additional rotation of subsequent doodles
+ */
+ED.Doodle.prototype.setOriginWithRotations = function(_radius, _first, _next) {
+	var direction = this.drawing.eye == ED.eye.Right ? -1 : 1;
+	
+	var origin = new ED.Point(0,0);
+	origin.setWithPolars(_radius, direction * _first * Math.PI / 180);
+
+	// Get last doodle to be added
+	if (this.addAtBack) {
+		var doodle = this.drawing.firstDoodleOfClass(this.className);
+	} else {
+		var doodle = this.drawing.lastDoodleOfClass(this.className);
+	}
+
+	// If there is one, make position relative to it
+	if (doodle) {
+		var doodleOrigin = new ED.Point(doodle.originX, doodle.originY);
+		origin.setWithPolars(_radius, doodleOrigin.direction() + direction * _next * Math.PI / 180);
+	}
+	
+	this.originX = origin.x;
+	this.originY = origin.y;
+}
+
+/**
  * Set the value of a doodle's rotation to avoid overlapping other doodles
  *
  * @param {Int} _first Rotation in degrees of first doodle anticlockwise right eye, clockwise left eye
@@ -6975,6 +7005,7 @@ ED.trans['LaserSpot'] = 'A single laser spot<br/><br/>Drag to position<br/>Drag 
 ED.trans['LasikFlap'] = 'LASIK flap<br/><br/>Drag to rotate<br/>Drag the handle to scale';
 ED.trans['LensCrossSection'] = '';
 ED.trans['LimbalRelaxingIncision'] = 'Limbal relaxing incision<br/><br/>Drag to move';
+ED.trans['Macroaneurysm'] = 'Macroaneurysm<br/><br/>Drag to move';
 ED.trans['MacularGrid'] = 'Macular grid<br/><br/>Drag the handle to scale';
 ED.trans['MacularHole'] = 'Macular hole<br/><br/>Drag the handle to scale';
 ED.trans['MacularThickening'] = 'Macular thickening<br/><br/>Drag to position<br/>Drag handle to change size';
@@ -6998,6 +7029,7 @@ ED.trans['PostPole'] = 'Posterior pole<br/><br/>The disc cup can be edited by cl
 ED.trans['PreRetinalHaemorrhage'] = 'Preretinal haemorrhage<br/><br/>Drag to position<br/>Drag handles to change shape and size';
 ED.trans['PRPPostPole'] = 'Pan-retinal photocoagulation';
 ED.trans['RadialSponge'] = 'Radial sponge<br/><br/>Drag to change position';
+ED.trans['RetinalArteryOcclusionPostPole'] = 'Retinal artery occlusion<br/><br/>Drag to position<br/>Drag handles to change extent<br/>Drag central handle to alter macular involvement';
 ED.trans['RetinalTouch'] = 'Retinal touch<br/><br/>Drag to change position';
 ED.trans['RetinalVeinOcclusionPostPole'] = 'Retinal vein occlusion<br/><br/>Drag to position<br/>Drag handles to change extent<br/>Drag central handle to alter macular involvement';
 ED.trans['RK'] = 'Radial keratotomy<br/><br/>Drag to rotate<br/>Drag outer handle to resize<br/>Drag inner handle to adjust central extent';
@@ -22713,6 +22745,120 @@ ED.LimbalRelaxingIncision.prototype.description = function() {
  */
 
 /**
+ * Blot Haemorrhage
+ *
+ * @class Macroaneurysm
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Object} _parameterJSON
+ */
+ED.Macroaneurysm = function(_drawing, _parameterJSON) {
+	// Set classname
+	this.className = "Macroaneurysm";
+	
+	// Saved parameters
+	this.savedParameterArray = ['originX', 'originY', 'scaleX', 'scaleY'];
+	
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _parameterJSON);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.Macroaneurysm.prototype = new ED.Doodle;
+ED.Macroaneurysm.prototype.constructor = ED.Macroaneurysm;
+ED.Macroaneurysm.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets default parameters (Only called for new doodles)
+ * Use the setParameter function for derived parameters, as this will also update dependent variables
+ */
+ED.Macroaneurysm.prototype.setParameterDefaults = function() {
+	this.setOriginWithRotations(300, 60, 60);
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.Macroaneurysm.prototype.draw = function(_point) {
+	// Get context
+	var ctx = this.drawing.context;
+
+	// Call draw method in superclass
+	ED.Macroaneurysm.superclass.draw.call(this, _point);
+
+	// Aneurysm radius
+	var r = 50;
+
+	// Boundary path
+	ctx.beginPath();
+
+	// Haemorrhage
+	ctx.arc(0, 0, r, 0, 2 * Math.PI, true);
+
+	// Set attributes
+	ctx.lineWidth = 1;
+	ctx.strokeStyle = "red";
+	ctx.fillStyle = "red";
+
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+
+	// Non boundary drawing
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+		// yellow centre spot
+		if (this.apexY > -70) {
+			ctx.beginPath();
+			ctx.arc(0, 0, 25, 0, 2 * Math.PI, true);
+			ctx.fillStyle = "rgba(197,186,80,1)";
+			ctx.fill();
+		}
+	}
+
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * Returns a String which, if not empty, determines the root descriptions of multiple instances of the doodle
+ *
+ * @returns {String} Group description
+ */
+ED.Macroaneurysm.prototype.description = function() {
+	return "Macroaneurysm";
+}
+
+/**
+ * Returns the SnoMed code of the doodle
+ *
+ * @returns {Int} SnoMed code of entity representated by doodle
+ */
+ED.Macroaneurysm.prototype.snomedCode = function() {
+	return 247124009;
+}
+
+/**
+ * OpenEyes
+ *
+ * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
+ * (C) OpenEyes Foundation, 2011-2013
+ * This file is part of OpenEyes.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package OpenEyes
+ * @link http://www.openeyes.org.uk
+ * @author OpenEyes <info@openeyes.org.uk>
+ * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
+ * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ */
+
+/**
  * Macular Grid
  *
  * @class MacularGrid
@@ -28777,6 +28923,236 @@ ED.Rectus.prototype.draw = function(_point) {
  */
 
 /**
+ * Sector PRP
+ *
+ * @class RetinalArteryOcclusionPostPole
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Object} _parameterJSON
+ */
+ED.RetinalArteryOcclusionPostPole = function(_drawing, _parameterJSON) {
+	// Set classname
+	this.className = "RetinalArteryOcclusionPostPole";
+	
+	// Saved parameters
+	this.savedParameterArray = ['arc', 'rotation'];
+	
+	// Call super-class constructor
+	ED.Doodle.call(this, _drawing, _parameterJSON);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.RetinalArteryOcclusionPostPole.prototype = new ED.Doodle;
+ED.RetinalArteryOcclusionPostPole.prototype.constructor = ED.RetinalArteryOcclusionPostPole;
+ED.RetinalArteryOcclusionPostPole.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.RetinalArteryOcclusionPostPole.prototype.setHandles = function() {
+	this.handleArray[0] = new ED.Handle(null, true, ED.Mode.Arc, false);
+	this.handleArray[3] = new ED.Handle(null, true, ED.Mode.Arc, false);
+	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+}
+
+/**
+ * Set default properties
+ */
+ED.RetinalArteryOcclusionPostPole.prototype.setPropertyDefaults = function() {
+	this.isMoveable = false;
+
+	// Update component of validation array for simple parameters
+	this.parameterValidationArray['arc']['range'].setMinAndMax(Math.PI / 6, Math.PI * 2);
+	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
+	this.parameterValidationArray['apexY']['range'].setMinAndMax(-200, -30);
+}
+
+/**
+ * Sets default parameters (Only called for new doodles)
+ * Use the setParameter function for derived parameters, as this will also update dependent variables
+ */
+ED.RetinalArteryOcclusionPostPole.prototype.setParameterDefaults = function() {
+	this.arc = Math.PI / 2;
+	this.apexY = -100;
+	this.setRotationWithDisplacements(45, 120);
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.RetinalArteryOcclusionPostPole.prototype.draw = function(_point) {
+	// Get context
+	var ctx = this.drawing.context;
+
+	// Call draw method in superclass
+	ED.RetinalArteryOcclusionPostPole.superclass.draw.call(this, _point);
+	
+	// Radii
+	var ro = 420;
+	var ri = -this.apexY;
+	var r = ri + (ro - ri) / 2;
+
+	// Calculate parameters for arcs
+	var theta = this.arc / 2;
+	var arcStart = -Math.PI / 2 + theta;
+	var arcEnd = -Math.PI / 2 - theta;
+
+	// Coordinates of 'corners' of CircumferentialBuckle
+	var topRightX = ro * Math.sin(theta);
+	var topRightY = -ro * Math.cos(theta);
+	var topLeftX = -ro * Math.sin(theta);
+	var topLeftY = topRightY;
+
+	// Boundary path
+	ctx.beginPath();
+
+	// Arc across to mirror image point on the other side
+	ctx.arc(0, 0, ro, arcStart, arcEnd, true);
+
+	// Arc back to mirror image point on the other side
+	ctx.arc(0, 0, ri, arcEnd, arcStart, false);
+
+	// Close path
+	ctx.closePath();
+
+	// Set line attributes
+	ctx.lineWidth = 4;
+	ctx.fillStyle = "rgba(200,200,200,0.5)";
+	ctx.strokeStyle = "rgba(200,200,200,0)";
+
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+
+	// Non boundary drawing
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+		// Cherry red spot
+		if (this.apexY > -70) {
+			ctx.beginPath();
+			ctx.arc(0, 0, -this.apexY, 0, 2 * Math.PI, true);
+			ctx.fillStyle = "rgba(200,0,0,0.5)";
+			ctx.fill();
+		}
+	}
+
+	// Coordinates of handles (in canvas plane)
+	this.handleArray[0].location = this.transform.transformPoint(new ED.Point(topLeftX, topLeftY));
+	this.handleArray[3].location = this.transform.transformPoint(new ED.Point(topRightX, topRightY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
+
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+
+	// Return value indicating successful hit test
+	return this.isClicked;
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.RetinalArteryOcclusionPostPole.prototype.description = function() {
+	var returnString = "";
+	
+	// Type
+	var type = this.type();
+	switch (type){
+		case 'branch':
+			if (this.rotation > Math.PI / 2 && this.rotation < 3 * Math.PI / 2) {
+				returnString = 'Inferotemporal ';
+			}
+			else {
+				returnString = 'Superotemporal ';
+			}
+			returnString += 'branch ';
+			break;
+		
+		case 'hemispheric':
+			if (this.rotation > Math.PI / 2 && this.rotation < 3 * Math.PI / 2) {
+				returnString = 'Inferior ';
+			}
+			else {
+				returnString = 'Superior ';
+			}
+			returnString += 'hemispheric ';
+			break;
+			
+		case 'central':
+			returnString += 'Central ';
+			break;
+	}
+	returnString += "retinal artery occlusion";
+	
+	// Macula
+	if (this.apexY < -150) {
+		returnString += ' sparing';
+	}
+	else {
+		returnString += ' involving';
+	}
+	
+	returnString += ' the macula';
+	
+	if (this.apexY > -70) returnString += ' with a cherry red spot';
+	
+	return returnString;
+}
+
+/**
+ * Returns the SnoMed code of the doodle
+ *
+ * @returns {Int} SnoMed code of entity representated by doodle
+ */
+ED.RetinalArteryOcclusionPostPole.prototype.snomedCode = function() {
+	// Type
+	var type = this.type();
+	switch (type) {
+		case 'branch':
+			return 232035005;
+			break;
+		case 'hemispheric':
+			return 232035005;
+			break;
+		case 'central':
+			return 38742007;
+			break;
+	}	
+}
+
+/**
+ * Determines type of the vein occlusion
+ *
+ * @returns {String} String describing type of occlusion
+ */
+ED.RetinalArteryOcclusionPostPole.prototype.type = function() {
+	// Arc defines type
+	if (this.arc > 1.5 * Math.PI) return "central";
+	else if (this.arc > 0.8 * Math.PI) return 'hemispheric';
+	else return 'branch';
+}
+/**
+ * OpenEyes
+ *
+ * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
+ * (C) OpenEyes Foundation, 2011-2013
+ * This file is part of OpenEyes.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package OpenEyes
+ * @link http://www.openeyes.org.uk
+ * @author OpenEyes <info@openeyes.org.uk>
+ * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
+ * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ */
+
+/**
  * RetinalTouch
  *
  * @class RetinalTouch
@@ -28945,7 +29321,7 @@ ED.RetinalVeinOcclusionPostPole.prototype.setPropertyDefaults = function() {
 ED.RetinalVeinOcclusionPostPole.prototype.setParameterDefaults = function() {
 	this.arc = Math.PI / 2;
 	this.apexY = -100;
-	this.rotation = ((this.drawing.eye == ED.eye.Right)?7:1) * Math.PI / 4;
+	this.setRotationWithDisplacements(45, 120);;
 }
 
 /**
@@ -29059,11 +29435,11 @@ ED.RetinalVeinOcclusionPostPole.prototype.description = function() {
 			break;
 		
 		case 'hemispheric':
-			if (this.rotation > 0 && this.rotation < Math.PI) {
-				returnString = 'Superior ';
+			if (this.rotation > Math.PI / 2 && this.rotation < 3 * Math.PI / 2) {
+				returnString = 'Inferior ';
 			}
 			else {
-				returnString = 'Inferior ';
+				returnString = 'Superior ';
 			}
 			returnString += 'hemispheric ';
 			break;
