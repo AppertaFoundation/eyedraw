@@ -67,8 +67,9 @@ ED.ChoroidalHaemorrhage.prototype.setPropertyDefaults = function() {
  * Use the setParameter function for derived parameters, as this will also update dependent variables
  */
 ED.ChoroidalHaemorrhage.prototype.setParameterDefaults = function() {
-	this.arc = 120 * Math.PI / 180;
-	this.apexY = -100;
+	this.arc = 60 * Math.PI / 180;
+	this.apexY = -200;
+	this.setRotationWithDisplacements(315, 60);
 }
 
 /**

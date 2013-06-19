@@ -71,6 +71,7 @@ ED.RRD.prototype.setPropertyDefaults = function() {
 ED.RRD.prototype.setParameterDefaults = function() {
 	this.arc = 120 * Math.PI / 180;
 	this.apexY = -100;
+	this.setRotationWithDisplacements(45, 120);
 }
 
 /**

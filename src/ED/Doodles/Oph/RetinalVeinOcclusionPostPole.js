@@ -19,14 +19,14 @@
 /**
  * Sector PRP
  *
- * @class BranchRetinalVeinOcclusionPostPole
+ * @class RetinalVeinOcclusionPostPole
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
  * @param {Object} _parameterJSON
  */
-ED.BranchRetinalVeinOcclusionPostPole = function(_drawing, _parameterJSON) {
+ED.RetinalVeinOcclusionPostPole = function(_drawing, _parameterJSON) {
 	// Set classname
-	this.className = "BranchRetinalVeinOcclusionPostPole";
+	this.className = "RetinalVeinOcclusionPostPole";
 	
 	// Saved parameters
 	this.savedParameterArray = ['arc', 'rotation'];
@@ -38,14 +38,14 @@ ED.BranchRetinalVeinOcclusionPostPole = function(_drawing, _parameterJSON) {
 /**
  * Sets superclass and constructor
  */
-ED.BranchRetinalVeinOcclusionPostPole.prototype = new ED.Doodle;
-ED.BranchRetinalVeinOcclusionPostPole.prototype.constructor = ED.BranchRetinalVeinOcclusionPostPole;
-ED.BranchRetinalVeinOcclusionPostPole.superclass = ED.Doodle.prototype;
+ED.RetinalVeinOcclusionPostPole.prototype = new ED.Doodle;
+ED.RetinalVeinOcclusionPostPole.prototype.constructor = ED.RetinalVeinOcclusionPostPole;
+ED.RetinalVeinOcclusionPostPole.superclass = ED.Doodle.prototype;
 
 /**
  * Sets handle attributes
  */
-ED.BranchRetinalVeinOcclusionPostPole.prototype.setHandles = function() {
+ED.RetinalVeinOcclusionPostPole.prototype.setHandles = function() {
 	this.handleArray[0] = new ED.Handle(null, true, ED.Mode.Arc, false);
 	this.handleArray[3] = new ED.Handle(null, true, ED.Mode.Arc, false);
 	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
@@ -54,7 +54,7 @@ ED.BranchRetinalVeinOcclusionPostPole.prototype.setHandles = function() {
 /**
  * Set default properties
  */
-ED.BranchRetinalVeinOcclusionPostPole.prototype.setPropertyDefaults = function() {
+ED.RetinalVeinOcclusionPostPole.prototype.setPropertyDefaults = function() {
 	this.isMoveable = false;
 	this.isUnique = true;
 
@@ -68,10 +68,10 @@ ED.BranchRetinalVeinOcclusionPostPole.prototype.setPropertyDefaults = function()
  * Sets default parameters (Only called for new doodles)
  * Use the setParameter function for derived parameters, as this will also update dependent variables
  */
-ED.BranchRetinalVeinOcclusionPostPole.prototype.setParameterDefaults = function() {
-	this.arc = 7 * Math.PI / 8;
+ED.RetinalVeinOcclusionPostPole.prototype.setParameterDefaults = function() {
+	this.arc = Math.PI / 2;
 	this.apexY = -100;
-	this.rotation = ((this.drawing.eye == ED.eye.Right)?31:1) * Math.PI / 16;
+	this.rotation = ((this.drawing.eye == ED.eye.Right)?7:1) * Math.PI / 4;
 }
 
 /**
@@ -79,12 +79,12 @@ ED.BranchRetinalVeinOcclusionPostPole.prototype.setParameterDefaults = function(
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.BranchRetinalVeinOcclusionPostPole.prototype.draw = function(_point) {
+ED.RetinalVeinOcclusionPostPole.prototype.draw = function(_point) {
 	// Get context
 	var ctx = this.drawing.context;
 
 	// Call draw method in superclass
-	ED.BranchRetinalVeinOcclusionPostPole.superclass.draw.call(this, _point);
+	ED.RetinalVeinOcclusionPostPole.superclass.draw.call(this, _point);
 	
 	// Radii
 	var ro = 420;
@@ -168,18 +168,39 @@ ED.BranchRetinalVeinOcclusionPostPole.prototype.draw = function(_point) {
  *
  * @returns {String} Description of doodle
  */
-ED.BranchRetinalVeinOcclusionPostPole.prototype.description = function() {
+ED.RetinalVeinOcclusionPostPole.prototype.description = function() {
 	var returnString = "";
 	
-	if (this.rotation > Math.PI / 2 && this.rotation < 3 * Math.PI / 2) {
-		returnString = 'Inferotemporal ';
+	// Type
+	var type = this.type();
+	switch (type){
+		case 'branch':
+			if (this.rotation > Math.PI / 2 && this.rotation < 3 * Math.PI / 2) {
+				returnString = 'Inferotemporal ';
+			}
+			else {
+				returnString = 'Superotemporal ';
+			}
+			returnString += 'branch ';
+			break;
+		
+		case 'hemispheric':
+			if (this.rotation > 0 && this.rotation < Math.PI) {
+				returnString = 'Superior ';
+			}
+			else {
+				returnString = 'Inferior ';
+			}
+			returnString += 'hemispheric ';
+			break;
+			
+		case 'central':
+			returnString += 'Central ';
+			break;
 	}
-	else {
-		returnString = 'Superotemporal ';
-	}
-
-	returnString += "vein occlusion ";
+	returnString += "retinal vein occlusion ";
 	
+	// Macula
 	if (this.apexY < -150) {
 		returnString += 'sparing ';
 	}
@@ -187,7 +208,7 @@ ED.BranchRetinalVeinOcclusionPostPole.prototype.description = function() {
 		returnString += 'involving ';
 	}
 	
-	returnString += 'the macula';
+	returnString += 'the macula ';
 	
 	return returnString;
 }
@@ -197,6 +218,30 @@ ED.BranchRetinalVeinOcclusionPostPole.prototype.description = function() {
  *
  * @returns {Int} SnoMed code of entity representated by doodle
  */
-ED.BranchRetinalVeinOcclusionPostPole.prototype.snomedCode = function() {
-	return 24596005;
+ED.RetinalVeinOcclusionPostPole.prototype.snomedCode = function() {
+	// Type
+	var type = this.type();
+	switch (type) {
+		case 'branch':
+			return 24596005;
+			break;
+		case 'hemispheric':
+			return 232043000;
+			break;
+		case 'central':
+			return 68478007;
+			break;
+	}	
+}
+
+/**
+ * Determines type of the vein occlusion
+ *
+ * @returns {String} String describing type of occlusion
+ */
+ED.RetinalVeinOcclusionPostPole.prototype.type = function() {
+	// Arc defines type
+	if (this.arc > 1.5 * Math.PI) return "central";
+	else if (this.arc > 0.8 * Math.PI) return 'hemispheric';
+	else return 'branch';
 }
