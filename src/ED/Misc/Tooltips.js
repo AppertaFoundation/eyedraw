@@ -60,6 +60,7 @@ ED.trans['CapsularTensionRing'] = 'Capsular Tension Ring<br/><br/>This cannot be
 ED.trans['ChandelierSingle'] = 'Chandelier illumination<br/><br/>Drag to rotate around centre<br/>';
 ED.trans['ChandelierDouble'] = 'Double chandelier illumination<br/><br/>Drag to rotate around centre<br/>';
 ED.trans['ChoroidalHameorrhage'] = 'Choroidal haemorrhage<br/><br/>Drag to move around eye<br/>Drag outer handles to change size</br>Drag middle handle to change posterior extent';
+ED.trans['ChoroidalNaevus'] = 'Choroidal naevust<br/><br/>Drag to position<br/>Drag outer handles to change shape<br/>Drag outer ring of top handles to rotate<br/>Drag middle handle to add drusen';
 ED.trans['CiliaryInjection'] = 'Ciliary injection<br/><br/>Drag to rotate around centre<br/>Drag handles to change extent';
 ED.trans['Circinate'] = 'Circinate (Ring of exudates)<br/><br/>Drag to position<br/>Drag handle to change size';
 ED.trans['CircumferentialBuckle'] = 'Circumferential buckle<br/><br/>Drag to position<br/>Drag outer handles to change extent<br/>Drag middle handle to change width';

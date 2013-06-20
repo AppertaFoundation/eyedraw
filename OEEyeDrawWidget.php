@@ -429,6 +429,7 @@ class DoodleInfo
         "ChandelierDouble" => "Double chandelier",
         "ChandelierSingle" => "Chandelier",
         "ChoroidalHaemorrhage" => "Choroidal haemorrhage",
+        "ChoroidalNaevus" => "Choroidal naevus",
         "CiliaryInjection" => "Cilary injection",
         "Circinate" => "Circinate retinopathy",
         "CircumferentialBuckle" => "Circumferential buckle",
