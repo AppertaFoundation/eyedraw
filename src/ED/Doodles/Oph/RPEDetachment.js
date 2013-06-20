@@ -19,17 +19,17 @@
 /**
  * The optic disc
  *
- * @class SubretinalFluid
+ * @class RPEDetachment
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
  * @param {Object} _parameterJSON
  */
-ED.SubretinalFluid = function(_drawing, _parameterJSON) {
+ED.RPEDetachment = function(_drawing, _parameterJSON) {
 	// Set classname
-	this.className = "SubretinalFluid";
+	this.className = "RPEDetachment";
 
 	// Private parameters
-	this.numberOfHandles = 8;
+	this.numberOfHandles = 4;
 	this.initialRadius = 80;
 
 	// Saved parameters
@@ -42,14 +42,14 @@ ED.SubretinalFluid = function(_drawing, _parameterJSON) {
 /**
  * Sets superclass and constructor
  */
-ED.SubretinalFluid.prototype = new ED.Doodle;
-ED.SubretinalFluid.prototype.constructor = ED.SubretinalFluid;
-ED.SubretinalFluid.superclass = ED.Doodle.prototype;
+ED.RPEDetachment.prototype = new ED.Doodle;
+ED.RPEDetachment.prototype.constructor = ED.RPEDetachment;
+ED.RPEDetachment.superclass = ED.Doodle.prototype;
 
 /**
  * Sets handle attributes
  */
-ED.SubretinalFluid.prototype.setHandles = function() {
+ED.RPEDetachment.prototype.setHandles = function() {
 	// Array of handles
 	for (var i = 0; i < this.numberOfHandles; i++) {
 		this.handleArray[i] = new ED.Handle(null, true, ED.Mode.Handles, false);
@@ -62,7 +62,7 @@ ED.SubretinalFluid.prototype.setHandles = function() {
 /**
  * Sets default properties
  */
-ED.SubretinalFluid.prototype.setPropertyDefaults = function() {
+ED.RPEDetachment.prototype.setPropertyDefaults = function() {
 	// Create ranges to constrain handles
 	this.handleVectorRangeArray = new Array();
 	for (var i = 0; i < this.numberOfHandles; i++) {
@@ -81,13 +81,13 @@ ED.SubretinalFluid.prototype.setPropertyDefaults = function() {
 /**
  * Sets default parameters
  */
-ED.SubretinalFluid.prototype.setParameterDefaults = function() {
+ED.RPEDetachment.prototype.setParameterDefaults = function() {
 	var doodle = this.drawing.lastDoodleOfClass(this.className);
 	if (doodle) {
-		var np = new ED.Point(doodle.originX + 100, 0);
+		var np = new ED.Point(doodle.originX + 150, 0);
 		this.move(np.x, np.y);
 	} else {
-		this.move((this.drawing.eye == ED.eye.Right ? -1 : 1) * 100, 0);
+		//this.move((this.drawing.eye == ED.eye.Right ? -1 : 1) * 100, 0);
 	}
 	
 	// Create a squiggle to store the handles points
@@ -109,12 +109,12 @@ ED.SubretinalFluid.prototype.setParameterDefaults = function() {
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.SubretinalFluid.prototype.draw = function(_point) {
+ED.RPEDetachment.prototype.draw = function(_point) {
 	// Get context
 	var ctx = this.drawing.context;
 
 	// Call draw method in superclass
-	ED.SubretinalFluid.superclass.draw.call(this, _point);
+	ED.RPEDetachment.superclass.draw.call(this, _point);
 
 	// Boundary path
 	ctx.beginPath();
@@ -151,8 +151,8 @@ ED.SubretinalFluid.prototype.draw = function(_point) {
 
 	// Set attributes
 	ctx.lineWidth = 4;
-	ctx.fillStyle = "rgba(0, 0, 255, 0.75)";
-	ctx.strokeStyle = "blue";
+	ctx.fillStyle = "rgba(173, 48, 14, 1)";
+	ctx.strokeStyle = "brown";
 
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
@@ -174,6 +174,6 @@ ED.SubretinalFluid.prototype.draw = function(_point) {
  *
  * @returns {String} Description of doodle
  */
-ED.SubretinalFluid.prototype.description = function() {
-	return 'Subretinal fluid';
+ED.RPEDetachment.prototype.description = function() {
+	return 'Retinal pigment epithelial detachment';
 }
