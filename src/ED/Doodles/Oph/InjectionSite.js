@@ -66,7 +66,7 @@ ED.InjectionSite.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
 	this.parameterValidationArray['apexY']['range'].setMinAndMax(-550, -470);
 	
-	this.parameterValidationArray['gauge'] = {
+	this.parameterValidationArray['distance'] = {
 		kind: 'derived',
 		type: 'string',
 		list: ['4.5', '4.0', '3.5', '3.0', '2.5'],
