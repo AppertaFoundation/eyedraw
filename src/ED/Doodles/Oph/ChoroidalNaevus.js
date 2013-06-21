@@ -193,7 +193,7 @@ ED.ChoroidalNaevus.prototype.draw = function(_point) {
  * @returns {String} Description of doodle
  */
 ED.ChoroidalNaevus.prototype.description = function() {
-	return 'Choroidal naevus with';
+	return 'Choroidal naevus';
 }
 
 /**

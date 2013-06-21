@@ -113,6 +113,7 @@ ED.trans['LasikFlap'] = 'LASIK flap<br/><br/>Drag to rotate<br/>Drag the handle 
 ED.trans['LensCrossSection'] = '';
 ED.trans['LimbalRelaxingIncision'] = 'Limbal relaxing incision<br/><br/>Drag to move';
 ED.trans['Macroaneurysm'] = 'Macroaneurysm<br/><br/>Drag to move';
+ED.trans['MacularDystrophy'] = 'Macular dystrophy<br/><br/>Drag outer handle to change size<br/>Drag middle handle to change type';
 ED.trans['MacularGrid'] = 'Macular grid<br/><br/>Drag the handle to scale';
 ED.trans['MacularHole'] = 'Macular hole<br/><br/>Drag the handle to scale';
 ED.trans['MacularThickening'] = 'Macular thickening<br/><br/>Drag to position<br/>Drag handle to change size';

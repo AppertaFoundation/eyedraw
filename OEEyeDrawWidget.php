@@ -485,6 +485,7 @@ class DoodleInfo
         "Lattice" => "Lattice",
         "LimbalRelaxingIncision" => "Limbal relaxing incision",
         "Macroaneurysm" => "Macroaneurysm",
+        "MacularDystrophy" => "Macular dystrophy",
         "MacularGrid" => "Macular grid laser",
         "MacularHole" => "Macular hole",
         "MacularThickening" => "Macular thickening",
