@@ -517,7 +517,7 @@ class DoodleInfo
         "PRPPostPole" => "Panretinal photocoagulation (posterior pole)",
         "Pupil" => "Pupil",
         "RadialSponge" => "Radial sponge",
-        "RetinalArteryOcclusionPostPole" => "RetinalArteryOcclusionPostPole",
+        "RetinalArteryOcclusionPostPole" => "Retinal artery occlusion",
         "RetinalTouch" => "Retinal touch",
         "RetinalVeinOcclusionPostPole" => "Retinal vein occluson",
         "Retinoschisis" => "Retinoschisis",
