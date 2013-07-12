@@ -22,4 +22,3 @@ return array(
 				'application.modules.eyedraw.*',
 		),
 );
-

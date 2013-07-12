@@ -18,7 +18,7 @@
  */
 
 /**
- * EyeDraw widget for the Yii framework 
+ * EyeDraw widget for the Yii framework
  * This widget inserts a canvas element into a view, and registers all required javascript and css files.
  * - When in edit mode, toolbars are displayed with control buttons and the doodle buttons specified in the optional 'doodleToolBarArray'.
  * - Data is stored and loaded from a hidden input element the name of which corresponds to the attribute of the data model
@@ -52,7 +52,7 @@ class OEEyeDrawWidget extends CWidget
 	 * @var array
 	 */
     public $scriptArray = array();
-    
+
     /**
     * View file for rendering the eyeDraw
     * @var string
@@ -82,13 +82,13 @@ class OEEyeDrawWidget extends CWidget
 	 * @var int
 	 */
     public $width = 300;
-    
+
 	/**
 	 * Height of canvas element in pixels
 	 * @var int
 	 */
     public $height = 300;
-    
+
     /**
 	 * Global scale factor
 	 * @var int
@@ -109,7 +109,7 @@ class OEEyeDrawWidget extends CWidget
 
 	/**
 	 * Array of doodles to appear in doodle selection toolbar
-	 * or 
+	 * or
 	 * Array of array of doodles to appear in multiple rows in doodle selection toolbar
 	 * @var array
 	 */
@@ -121,7 +121,7 @@ class OEEyeDrawWidget extends CWidget
 	 * @var array
 	 */
     public $displayParameterArray = array();
-    
+
 	/**
 	 * Array of commands to apply to the drawing object once images have loaded
 	 * @var array
@@ -133,13 +133,13 @@ class OEEyeDrawWidget extends CWidget
 	 * @var array
 	 */
     public $onDoodlesLoadedCommandArray = array();
-    
+
 	/**
 	 * Array of bindings to apply to doodles, applied after onLoaded commands
 	 * @var array
 	 */
     public $bindingArray = array();
-    
+
 	/**
 	 * Array of delete values to apply to doodles, applied after bindings commands
 	 * @var array
@@ -151,54 +151,54 @@ class OEEyeDrawWidget extends CWidget
 	 * @var array
 	 */
     public $syncArray = array();
-    
+
     /*
      * Array of javascript objects to be used as listeners on the drawing
      */
     public $listenerArray = array();
-    
+
 	/**
 	 * Optional inline styling for the canvas element
 	 * @var string
 	 */
 	public $canvasStyle;
-    
+
 	/**
 	 * Whether to show the toolbar or not
 	 * @var boolean
 	 */
 	public $toolbar = true;
-    
+
 	/**
 	 * Whether to focus the canvas element after rendering it on the page
 	 * @var boolean
 	 */
 	public $focus = false;
-    
+
 	/**
 	 * x offset
 	 * @var integer
 	 */
 	public $offsetX = 0;
-    
+
 	/**
 	 * y offset
 	 * @var integer
 	 */
 	public $offsetY = 0;
-	
+
 	/**
 	 * Whether to convert the canvas to an image
 	 * @var bool
 	 */
 	public $toImage = false;
-    
+
 	/**
 	 * Whether the eyedraw should be rendered with a div wrapper
 	 * @var boolean
 	 */
 	public $divWrapper = true;
-    
+
    /**
 	 * Paths for the subdirectories for javascript, css and images
 	 * @var string
@@ -211,31 +211,31 @@ class OEEyeDrawWidget extends CWidget
 	 * Unique name for the EyeDraw drawing object ('ed_drawing_'.$mode.'_'.$idSuffix).
 	 * For example, ed_drawing_edit_RPS
 	 * @var string
-	 */	
+	 */
 	private $drawingName;
 
 	/**
 	 * Unique id of the canvas element
 	 * @var string
-	 */		
+	 */
 	private $canvasId;
 
 	/**
 	 * Unique name for the input element containing EyeDraw data
 	 * @var string
-	 */	
+	 */
 	private $inputName;
 
 	/**
 	 * Unique id for the input element containing EyeDraw data
 	 * @var string
-	 */	
+	 */
 	private $inputId;
 
 	/**
 	 * Represents the eye using the ED object enumeration (0 = right, 1 = left)
 	 * @var int
-	 */	
+	 */
 	private $eye;
 
 	/**
@@ -243,7 +243,7 @@ class OEEyeDrawWidget extends CWidget
 	 * @var bool
 	 */
 	private $isEditable;
-	
+
 	/**
 	 * Initializes the widget.
 	 * This method registers all needed client scripts and renders the EyeDraw content
@@ -254,37 +254,35 @@ class OEEyeDrawWidget extends CWidget
         $this->cssPath = Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('application.modules.eyedraw.css'), false, -1, YII_DEBUG);
         $this->jsPath = Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('application.modules.eyedraw.dist'), false, -1, YII_DEBUG);
         $this->imgPath = Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('application.modules.eyedraw.img'), false, -1, YII_DEBUG).'/';
-        
+
         // Create a unique and descriptive variable name for the drawing object and the corresponding canvas element
         $this->drawingName = 'ed_drawing_'.$this->mode.'_'.$this->idSuffix;
         $this->canvasId = 'ed_canvas_'.$this->mode.'_'.$this->idSuffix;
-        
+
         // Create matching name and id in 'Yii' format for loading and saving using POST
-        if (isset($this->model) && isset($this->attribute))
-        {
-          if($this->mode == 'edit') {
+        if (isset($this->model) && isset($this->attribute)) {
+          if ($this->mode == 'edit') {
 						$this->inputName = get_class($this->model).'['. $this->attribute.']';
           	$this->inputId = get_class($this->model).'_'. $this->attribute;
           } else {
 						$this->inputId = 'ed_input_'.$this->mode.'_'.$this->idSuffix;
           }
 
-            if (isset($_POST[get_class($this->model)][$this->attribute]))
-            {
+            if (isset($_POST[get_class($this->model)][$this->attribute])) {
                 $this->model->{$this->attribute} = $_POST[get_class($this->model)][$this->attribute];
             }
         }
 
         // Numeric flag corresponding to EyeDraw ED.eye  ***TODO*** may require additional options
         $this->eye = $this->side == "R"?0:1;
-        
+
         // Flag indicating whether the drawing is editable or not (normally corresponded to edit and view mode)
         $this->isEditable = $this->mode == 'edit'?true:false;
-		
+
         // jquery dependency
         $cs = Yii::app()->clientScript;
         $cs->registerCoreScript('jquery');
-        
+
         // Register the chosen scripts and CSS files
         $this->registerScripts();
         $this->registerCss();
@@ -295,20 +293,16 @@ class OEEyeDrawWidget extends CWidget
         		$this->doodleToolBarArray = array($this->doodleToolBarArray);
         	}
         }
-        
+
         // Iterate through any button array
-        $finalToolBar = array(); 
+        $finalToolBar = array();
         foreach ($this->doodleToolBarArray as $row => $rowButtons) {
         	$finalToolBar[] = array();
-	        foreach($rowButtons as $i => $doodleClassName)
-	        {
+	        foreach ($rowButtons as $i => $doodleClassName) {
 	            // Get title attribute from language specific array
-	            if (array_key_exists($doodleClassName, DoodleInfo::$titles))
-	            {
+	            if (array_key_exists($doodleClassName, DoodleInfo::$titles)) {
 	                $title = DoodleInfo::$titles[$doodleClassName];
-	            }
-	            else
-	            {
+	            } else {
 	                $title = DoodleInfo::$titles['NONE'];
 	            }
 	            $finalToolBar[$row][$i] = array(
@@ -326,17 +320,17 @@ class OEEyeDrawWidget extends CWidget
 	 * Runs after init and can be used to capture content
 	 */
 	public function run()
-	{		
+	{
 	}
 
 	/**
 	 * Registers all necessary javascript files
-	 */			
+	 */
 	protected function registerScripts()
 	{
         // Get client script object
 		$cs = Yii::app()->getClientScript();
- 
+
 		$minified = (YII_DEBUG) ? '' : '.min';
 
 		// Register the EyeDraw mandatory scripts
@@ -344,7 +338,7 @@ class OEEyeDrawWidget extends CWidget
     // For languages that require utf8, use the following line in the view file (***TODO*** should be possible using Yii function)
     // <script src="dist/eyedraw.js" type="text/javascript" charset="utf-8"></script>
 		$cs->registerScriptFile($this->jsPath.'/eyedraw'.$minified.'.js', CClientScript::POS_HEAD);
-        
+
 		// Create array of parameters to pass to the javascript function which runs on page load
 		$properties = array(
             'drawingName'=>$this->drawingName,
@@ -370,7 +364,7 @@ class OEEyeDrawWidget extends CWidget
 		foreach ($this->listenerArray as $listener) {
 			$properties['listenerArray'][] = "js:" . $listener;
 		}
-		
+
 		// Encode parameters and pass to a javascript function to set up canvas
 		$properties = CJavaScript::encode($properties);
 		$cs->registerScript('scr_'.$this->canvasId, "eyeDrawInit($properties)", CClientScript::POS_READY);
@@ -378,13 +372,13 @@ class OEEyeDrawWidget extends CWidget
 
 	/**
 	 * Registers all necessary css files
-	 */	
+	 */
     protected function registerCss()
     {
         $cssFile = $this->cssPath.'/oe-eyedraw.css';
-        Yii::app()->getClientScript()->registerCssFile($cssFile);				 
+        Yii::app()->getClientScript()->registerCssFile($cssFile);
     }
-    
+
     public function getDrawingName()
     {
     	return $this->drawingName;
@@ -393,7 +387,7 @@ class OEEyeDrawWidget extends CWidget
 
 /**
  * Language specific doodle descriptions (used for title attributes of doodle toolbar buttons)
- * 
+ *
  * @package EyeDraw
  * @author Bill Aylward <bill.aylward@openeyes.org>
  * @version 0.9
@@ -552,7 +546,7 @@ class DoodleInfo
         "Vicryl" => "Vicryl suture",
         "VitreousOpacity" => "Vitreous opacity",
         "VPattern" => "V pattern",
-                                   
+
         "Crepitations" => "Crepitations",
         "Stenosis" => "Stenosis",
         "Wheeze" => "Wheeze",

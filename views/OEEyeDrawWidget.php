@@ -30,7 +30,7 @@
 				'lock' => 'Lock',
 				'unlock' => 'Unlock',
 			);
-			foreach($buttons as $prefix => $label) {
+			foreach ($buttons as $prefix => $label) {
 		?>
 		<li class="ed_img_button action" id="<?php echo $prefix.$idSuffix ?>">
 			<a href="#" data-function="<?php echo $prefix ?>">
@@ -47,7 +47,7 @@
 		</li>
 	</ul>
 	<?php } ?>
-	
+
 	<?php if ($isEditable && count($doodleToolBarArray) > 0) {
 		foreach ($doodleToolBarArray as $row => $rowItems) { ?>
 	<ul class="ed_toolbar clearfix" id="<?php echo $canvasId.'doodleToolbar' . $row ?>">
@@ -64,7 +64,7 @@
 		</li>
 		<?php
 			}
-			if(count($extra_items)) {
+			if (count($extra_items)) {
 		?>
 		<li class="ed_img_button drawer">
 			<a href="#">
@@ -72,7 +72,7 @@
 			</a>
 			<span>More...</span>
 			<ul class="clearfix">
-				<?php foreach($extra_items as $item) { ?>
+				<?php foreach ($extra_items as $item) { ?>
 				<li class="ed_img_button action"  id="<?php echo $item['classname'].$idSuffix ?>">
 					<a href="" data-function="addDoodle" data-arg="<?php echo $item['classname'] ?>">
 						<img src="<?php echo $imgPath.$item['classname'] ?>.gif" />
@@ -86,7 +86,7 @@
 	</ul>
 	<?php } ?>
 	<?php } ?>
-	
+
 	<span class="canvasTooltip" id="<?php echo $canvasId.'Tooltip' ?>"></span>
 	<canvas id="<?php echo $canvasId ?>"
 		class="<?php if ($isEditable) { echo 'ed_canvas_edit'; } else { echo 'ed_canvas_display'; } ?>"
@@ -94,7 +94,7 @@
 		tabindex="1" data-drawing-name="<?php echo $drawingName ?>"
 		<?php if ($canvasStyle) { ?> style="<?php echo $canvasStyle ?>"<?php } ?>>
 	</canvas>
-	<?php if($inputId) { ?>
+	<?php if ($inputId) { ?>
 	<input type="hidden" id="<?php echo $inputId ?>"
 		name="<?php echo $inputName ?>"
 		value='<?php echo $this->model[$this->attribute] ?>' />
@@ -105,7 +105,7 @@
 
 	// Use jQuery.hoverIntent if available
 	var hover_event = 'hover';
-	if($.fn.hoverIntent) {
+	if ($.fn.hoverIntent) {
 		hover_event = 'hoverIntent';
 	}
 	$('#eyedrawwidget_<?php echo $idSuffix ?> .ed_toolbar a')[hover_event](
@@ -116,11 +116,11 @@
 				$(this).next().removeClass('active');
 			}
 	);
-	
+
 	$('#eyedrawwidget_<?php echo $idSuffix ?> .ed_toolbar li.action a').click(function(e) {
 		var fn = $(this).attr('data-function');
 		var arg = $(this).attr('data-arg');
-		if(typeof(<?php echo $drawingName?>[fn]) == "function") {
+		if (typeof(<?php echo $drawingName?>[fn]) == "function") {
 			<?php echo $drawingName?>[fn](arg);
 		}
 		$(".EyeDrawWidget .drawer").removeClass('active');
@@ -137,5 +137,5 @@
 		e.stopPropagation();
 		e.preventDefault();
 	});
-	
+
 </script>
