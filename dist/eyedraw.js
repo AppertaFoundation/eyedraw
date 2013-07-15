@@ -14307,7 +14307,7 @@ ED.ChoroidalNaevus = function(_drawing, _parameterJSON) {
 	this.initialRadius = 120;
 
 	// Saved parameters
-	this.savedParameterArray = ['originX', 'originY', 'rotation'];
+	this.savedParameterArray = ['originX', 'originY', 'apexX', 'apexY', 'rotation'];
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -14355,7 +14355,7 @@ ED.ChoroidalNaevus.prototype.setPropertyDefaults = function() {
 	}
 	
 	// Update component of validation array for simple parameters
-	this.parameterValidationArray['apexX']['range'].setMinAndMax(-50, +50);
+	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
 	this.parameterValidationArray['apexY']['range'].setMinAndMax(-50, +50);
 
 	this.addAtBack = true;
@@ -23081,7 +23081,7 @@ ED.MacularDystrophy = function(_drawing, _parameterJSON) {
 	this.className = "MacularDystrophy";
 	
 	// Saved parameters
-	this.savedParameterArray = ['originX', 'originY', 'scaleX', 'scaleY'];
+	this.savedParameterArray = ['apexX', 'apexY', 'scaleX', 'scaleY'];
 	
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -23135,13 +23135,13 @@ ED.MacularDystrophy.prototype.draw = function(_point) {
 	// Call draw method in superclass
 	ED.MacularDystrophy.superclass.draw.call(this, _point);
 
-	// Exudate radius
+	// Radius
 	var r = 150;
 
 	// Boundary pathß
 	ctx.beginPath();
 
-	// Haemorrhage
+	// Dystrophy
 	ctx.arc(0, 0, r, 0, 2 * Math.PI, true);
 
 	// Set attributes
@@ -28701,7 +28701,7 @@ ED.RPERip = function(_drawing, _parameterJSON) {
 	this.initialRadius = 150;
 
 	// Saved parameters
-	this.savedParameterArray = ['originX', 'originY', 'apexY', 'arc', 'rotation'];
+	this.savedParameterArray = ['originX', 'originY', 'apexY', 'scaleX', 'scaleY', 'arc', 'rotation'];
 	
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -29512,7 +29512,7 @@ ED.RetinalArteryOcclusionPostPole = function(_drawing, _parameterJSON) {
 	this.className = "RetinalArteryOcclusionPostPole";
 	
 	// Saved parameters
-	this.savedParameterArray = ['arc', 'rotation'];
+	this.savedParameterArray = ['apexX', 'apexY', 'arc', 'rotation'];
 	
 	// Call super-class constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -29856,7 +29856,7 @@ ED.RetinalVeinOcclusionPostPole = function(_drawing, _parameterJSON) {
 	this.className = "RetinalVeinOcclusionPostPole";
 	
 	// Saved parameters
-	this.savedParameterArray = ['arc', 'rotation'];
+	this.savedParameterArray = ['apexX', 'apexY', 'arc', 'rotation'];
 	
 	// Call super-class constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -32446,7 +32446,10 @@ ED.Supramid.prototype.description = function() {
 ED.SwollenDisc = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "SwollenDisc";
-	
+
+	// Saved parameters
+	this.savedParameterArray = ['originX'];
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
@@ -32569,7 +32572,7 @@ ED.Telangiectasis = function(_drawing, _parameterJSON) {
 	this.className = "Telangiectasis";
 
 	// Saved parameters
-	this.savedParameterArray = ['apexY', 'scaleX', 'scaleY'];
+	this.savedParameterArray = ['originX', 'apexX', 'apexY'];
 	
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -32600,8 +32603,6 @@ ED.Telangiectasis.prototype.setPropertyDefaults = function() {
 	// Update component of validation array for simple parameters
 	this.parameterValidationArray['apexX']['range'].setMinAndMax(-100, +0);
 	this.parameterValidationArray['apexY']['range'].setMinAndMax(-100, +0);
-	this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.5, +1.5);
-	this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.5, +1.5);
 }
 
 /**

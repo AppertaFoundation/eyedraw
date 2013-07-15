@@ -33,7 +33,7 @@ ED.ChoroidalNaevus = function(_drawing, _parameterJSON) {
 	this.initialRadius = 120;
 
 	// Saved parameters
-	this.savedParameterArray = ['originX', 'originY', 'rotation'];
+	this.savedParameterArray = ['originX', 'originY', 'apexX', 'apexY', 'rotation'];
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -81,7 +81,7 @@ ED.ChoroidalNaevus.prototype.setPropertyDefaults = function() {
 	}
 	
 	// Update component of validation array for simple parameters
-	this.parameterValidationArray['apexX']['range'].setMinAndMax(-50, +50);
+	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
 	this.parameterValidationArray['apexY']['range'].setMinAndMax(-50, +50);
 
 	this.addAtBack = true;

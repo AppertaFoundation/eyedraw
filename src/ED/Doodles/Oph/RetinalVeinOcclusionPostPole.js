@@ -29,7 +29,7 @@ ED.RetinalVeinOcclusionPostPole = function(_drawing, _parameterJSON) {
 	this.className = "RetinalVeinOcclusionPostPole";
 	
 	// Saved parameters
-	this.savedParameterArray = ['arc', 'rotation'];
+	this.savedParameterArray = ['apexX', 'apexY', 'arc', 'rotation'];
 	
 	// Call super-class constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
