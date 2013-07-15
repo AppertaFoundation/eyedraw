@@ -521,6 +521,7 @@ class DoodleInfo
         "RPERip" => "RPE rip",
         "RRD" => "Rhegmatogenous retinal detachment",
         "Rubeosis" => "Rubeosis iridis",
+        "SectorPRP" => "Sector PRP",
         "SectorPRPPostPole" => "Sector PRP (posterior pole)",
         "ScleralIncision" => "Scleral Incision",
         "Sclerostomy" => "Sclerostomy",
