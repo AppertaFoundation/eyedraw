@@ -19687,7 +19687,7 @@ ED.Gonioscopy.prototype.description = function() {
 /**
  * HVT
  *
- * @class HVT ***TODO***
+ * @class HVT Horizontal Vertical Torsion indicator
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
  * @param {Object} _parameterJSON
@@ -19702,7 +19702,7 @@ ED.HVT = function(_drawing, _parameterJSON) {
 	this.tor = 'None';
 
 	// Call super-class constructor
-ED.Doodle.call(this, _drawing, _parameterJSON);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -19923,7 +19923,9 @@ ED.HVT.prototype.draw = function(_point) {
 
 		// Draw it
 		ctx.lineWidth = 20;
-		ctx.strokeStyle = "rgba(100, 100, 100, 0.5)";
+		if (this.originX > 0) ctx.strokeStyle = "rgba(255, 0, 0, 0.8)";
+		else ctx.strokeStyle = "rgba(0, 155, 0, 0.8)";
+		//ctx.strokeStyle = "rgba(100, 100, 100, 0.5)";
 		ctx.stroke();
 	}
 
@@ -19969,7 +19971,7 @@ ED.HVTGrid = function(_drawing, _parameterJSON) {
 	this.className = "HVTGrid";
 
 	// Call super-class constructor
-ED.Doodle.call(this, _drawing, _parameterJSON);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**

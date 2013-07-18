@@ -29,7 +29,7 @@ ED.HVTGrid = function(_drawing, _parameterJSON) {
 	this.className = "HVTGrid";
 
 	// Call super-class constructor
-ED.Doodle.call(this, _drawing, _parameterJSON);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
