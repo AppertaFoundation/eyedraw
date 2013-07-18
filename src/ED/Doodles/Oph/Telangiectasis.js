@@ -29,7 +29,7 @@ ED.Telangiectasis = function(_drawing, _parameterJSON) {
 	this.className = "Telangiectasis";
 
 	// Saved parameters
-	this.savedParameterArray = ['apexY', 'scaleX', 'scaleY'];
+	this.savedParameterArray = ['originX', 'apexX', 'apexY'];
 	
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -60,8 +60,6 @@ ED.Telangiectasis.prototype.setPropertyDefaults = function() {
 	// Update component of validation array for simple parameters
 	this.parameterValidationArray['apexX']['range'].setMinAndMax(-100, +0);
 	this.parameterValidationArray['apexY']['range'].setMinAndMax(-100, +0);
-	this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.5, +1.5);
-	this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.5, +1.5);
 }
 
 /**

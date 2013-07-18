@@ -29,7 +29,7 @@ ED.MacularDystrophy = function(_drawing, _parameterJSON) {
 	this.className = "MacularDystrophy";
 	
 	// Saved parameters
-	this.savedParameterArray = ['originX', 'originY', 'scaleX', 'scaleY'];
+	this.savedParameterArray = ['apexX', 'apexY', 'scaleX', 'scaleY'];
 	
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -83,13 +83,13 @@ ED.MacularDystrophy.prototype.draw = function(_point) {
 	// Call draw method in superclass
 	ED.MacularDystrophy.superclass.draw.call(this, _point);
 
-	// Exudate radius
+	// Radius
 	var r = 150;
 
 	// Boundary pathß
 	ctx.beginPath();
 
-	// Haemorrhage
+	// Dystrophy
 	ctx.arc(0, 0, r, 0, 2 * Math.PI, true);
 
 	// Set attributes

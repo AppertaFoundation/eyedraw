@@ -32,7 +32,7 @@ ED.RPERip = function(_drawing, _parameterJSON) {
 	this.initialRadius = 150;
 
 	// Saved parameters
-	this.savedParameterArray = ['originX', 'originY', 'apexY', 'arc', 'rotation'];
+	this.savedParameterArray = ['originX', 'originY', 'apexY', 'scaleX', 'scaleY', 'arc', 'rotation'];
 	
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);

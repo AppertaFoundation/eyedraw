@@ -27,7 +27,10 @@
 ED.SwollenDisc = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "SwollenDisc";
-	
+
+	// Saved parameters
+	this.savedParameterArray = ['originX'];
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
