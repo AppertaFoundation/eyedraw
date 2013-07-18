@@ -474,6 +474,7 @@ class DoodleInfo
         "KrukenbergSpindle" => "Krukenberg spindle",
         "Label" => "Label",
         "LaserCircle" => "Circle of laser photocoagulation",
+        "LaserDemarcation" => "Laser demarcation",
         "LasikFlap" => "LASIK flap",
         "LaserSpot" => "Laser spot",
         "Lattice" => "Lattice",
