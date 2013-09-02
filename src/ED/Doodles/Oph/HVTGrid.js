@@ -24,7 +24,7 @@
  * @param {Drawing} _drawing
  * @param {Object} _parameterJSON
  */
-ED.HVTGrid = function(_drawing, _parameterJSON) {
+ED.HVTGrid = function(_drawing, _parameterJSON) { 
 	// Set classname
 	this.className = "HVTGrid";
 

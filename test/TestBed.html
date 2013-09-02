@@ -25,6 +25,8 @@
             var doodle;
             var controller;
             
+            var grid;
+            
             // Runs on page load
             function init()
             {
@@ -78,6 +80,8 @@
                         
 							//Scale down for glaucoma drawings
 							this.drawing.globalScaleFactor = this.gsf;
+							
+							// Scale on width for RecordGrid
 
 // 							this.drawing.addDoodle('AntSeg');
 // 							this.drawing.addDoodle('TransilluminationDefect');
@@ -87,14 +91,14 @@
 							//this.drawing.addDoodle('BranchRetinalVeinOcclusionPostPole');
 							//this.drawing.addDoodle('SectorPRP');
 
-<<<<<<< HEAD
-							this.drawing.addDoodle('HVTGrid');
-							this.drawing.addDoodle('HVT');
-							this.drawing.addDoodle('HVT');
-=======
-							this.drawing.addDoodle('PostPole');
-							this.drawing.addDoodle('FibrousProliferation');
->>>>>>> 0737c8e28b776db2b7f1c436fd22a80b700b170c
+							grid = this.drawing.addDoodle('RecordGrid');
+							//this.drawing.addDoodle('BPReading', {'stolic':'sys'});
+							//this.drawing.addDoodle('BPReading', {'stolic':'dia'});
+							
+// 
+// 							this.drawing.addDoodle('PostPole');
+// 							this.drawing.addDoodle('FibrousProliferation');
+
 							//this.drawing.addDoodle('BlotHaemorrhage');
 
 
@@ -304,7 +308,7 @@
         <div class="ed_toolbar" id="canvasEdit1doodleToolbar">
  
             <button id="LensRPS" class="imgbutton" title="Lens" onclick="drawingEdit.addDoodle('MacularDystrophy'); return false;" ><img src="../img/MacularDystrophy.gif" /></button>
-            <button id="LensRPS" class="imgbutton" title="Lens" onclick="drawingEdit.addDoodle('PI', {rotation:0}); return false;" ><img src="../img/PI.gif" /></button>
+            <button id="LensRPS" class="imgbutton" title="Lens" onclick="grid.updateNextValues(); var sys = drawingEdit.addDoodle('BPReading', {'stolic':'sys', 'value':140}); sys.setValueToLast(); var dia = drawingEdit.addDoodle('BPReading', {'stolic':'dia', 'value':80}); dia.setValueToLast(); return false;" ><img src="../img/PI.gif" /></button>
 
 <!--            <button id="LensRPS" class="imgbutton" title="Lens" onclick="drawingEdit.addDoodle('Cryo'); return false;" ><img src="../img/Cryo.gif" /></button>
  -->
@@ -319,7 +323,7 @@
         <span class="canvasTooltip" id="canvasEditTooltip"></span>
         
         <!-- Canvas element style="border: none;" style="background-color: #DAE6F1;"-->
-        <canvas id="canvasEdit" class="ed_canvas_edit" width="300" height="300" tabindex="1" style="border: 1px solic gray;"></canvas>
+        <canvas id="canvasEdit" class="ed_canvas_edit" width="750" height="300" tabindex="1" style="border: 1px solic gray;"></canvas>
 
         <br/>
 
