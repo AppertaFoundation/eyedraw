@@ -5830,6 +5830,9 @@ ED.Surgeon = function(_drawing, _parameterJSON) {
 	// Derived parameters
 	this.surgeonPosition = 'Temporal';
 
+	// Saved parameters
+	this.savedParameterArray = ['surgeonPosition'];
+
 	// Call superclass constructor
 ED.Doodle.call(this, _drawing, _parameterJSON);
 }
@@ -6041,7 +6044,7 @@ ED.Surgeon.prototype.draw = function(_point) {
 }
 
 /**
- *  OperatingTable
+ *	OperatingTable
  *
  * @class  OperatingTable
  * @property {String} className Name of doodle subclass
@@ -6456,7 +6459,7 @@ ED.Freehand.prototype.draw = function(_point) {
 }
 
 /**
- *  Mouse test - used for testing detection of mouse pointer
+ *	Mouse test - used for testing detection of mouse pointer
  *
  * @class  MouseTest
  * @property {String} className Name of doodle subclass
