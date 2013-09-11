@@ -5827,11 +5827,11 @@ ED.Surgeon = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "Surgeon";
 
-	// Saved parameters
-	this.savedParameterArray = ['rotation'];
-
 	// Derived parameters
 	this.surgeonPosition = 'Temporal';
+
+	// Saved parameters
+	this.savedParameterArray = ['surgeonPosition'];
 
 	// Call superclass constructor
 ED.Doodle.call(this, _drawing, _parameterJSON);
