@@ -2425,7 +2425,7 @@ ED.Drawing.prototype.lastDoodleOfClass = function(_className) {
  * Returns all doodles of the passed className
  *
  * @param {String} _className Classname of doodle
- * @returns {Doodle} The last doodle of the passed className
+ * @returns {Array} Array of doodles of the passed className
  */
 ED.Drawing.prototype.allDoodlesOfClass = function(_className) {
 	var returnValue = [];

@@ -2425,7 +2425,7 @@ ED.Drawing.prototype.lastDoodleOfClass = function(_className) {
  * Returns all doodles of the passed className
  *
  * @param {String} _className Classname of doodle
- * @returns {Doodle} The last doodle of the passed className
+ * @returns {Array} Array of doodles of the passed className
  */
 ED.Drawing.prototype.allDoodlesOfClass = function(_className) {
 	var returnValue = [];
@@ -6153,7 +6153,7 @@ ED.Label = function(_drawing, _parameterJSON) {
 	this.lastOriginY = 0;
 
 	// Call superclass constructor
-ED.Doodle.call(this, _drawing, _parameterJSON);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -20190,7 +20190,6 @@ ED.Gonioscopy.prototype.description = function() {
  * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
  */
 
-
 /**
  * HVT
  *
@@ -20204,9 +20203,12 @@ ED.HVT = function(_drawing, _parameterJSON) {
 	this.className = "HVT";
 
 	// Derived parameters
+	//this.eye = 'R';
 	this.hor = 'None';
 	this.ver = 'None';
 	this.tor = 'None';
+	this.horValue = 0;
+	this.verValue = 0;
 
 	// Call super-class constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -20234,14 +20236,21 @@ ED.HVT.prototype.setPropertyDefaults = function() {
 	this.isShowHighlight = false;
 
 	// Adjust ranges for simple parameters
+	this.parameterValidationArray['originX']['range'] = new ED.Range(-350, -150);
 	this.parameterValidationArray['originY']['range'] = new ED.Range(-100, +100);
 	this.parameterValidationArray['rotation']['range'] = new ED.Range(0, Math.PI / 2);
 
 	// Speed up horizontal and vertical animation
-	this.parameterValidationArray['originX']['delta'] = 30;
-	this.parameterValidationArray['originY']['delta'] = 30;
+	//this.parameterValidationArray['originX']['delta'] = 30;
+	//this.parameterValidationArray['originY']['delta'] = 30;
 
 	// Add complete validation arrays for derived parameters
+// 	this.parameterValidationArray['eye'] = {
+// 		kind: 'derived',
+// 		type: 'string',
+// 		list: ['R', 'L'],
+// 		animate: false
+// 	};
 	this.parameterValidationArray['hor'] = {
 		kind: 'derived',
 		type: 'string',
@@ -20260,6 +20269,18 @@ ED.HVT.prototype.setPropertyDefaults = function() {
 		list: ['Excyclotorsion', 'None', 'Incyclotorsion'],
 		animate: true
 	};
+	this.parameterValidationArray['horValue'] = {
+		kind: 'derived',
+		type: 'int',
+		range: new ED.Range(0, 50),
+		animate: true
+	};
+	this.parameterValidationArray['verValue'] = {
+		kind: 'derived',
+		type: 'int',
+		range: new ED.Range(0, 50),
+		animate: true
+	};
 }
 
 /**
@@ -20267,9 +20288,11 @@ ED.HVT.prototype.setPropertyDefaults = function() {
  * Use the setParameter function for derived parameters, as this will also update dependent variables
  */
 ED.HVT.prototype.setParameterDefaults = function() {
+	this.originX = -250;
+	this.rotation = Math.PI/4;
 	this.setParameterFromString('hor', 'None');
-	this.setParameterFromString('tor', 'None');
-	//this.setParameterFromString('axis', '0');
+	//this.setParameterFromString('tor', 'None');
+	//this.setParameterFromString('horValue', '0');
 }
 
 /**
@@ -20283,11 +20306,17 @@ ED.HVT.prototype.setParameterDefaults = function() {
 ED.HVT.prototype.dependentParameterValues = function(_parameter, _value) {
 	var returnArray = new Array();
 
-	// Value of centre for right eye
+	// Convert range into positive integer value
+	//var xRange = this.parameterValidationArray['originX']['range'];
+	//var xRangeSize = xRange.max - xRange.min;
+	//var xRangeMiddle = xRange.min + xRangeSize/2;
+			
+	// Value of centre for right eye (binding done on right eye only, left eye values handled by syncing)
 	var centre = -250;
 
 	switch (_parameter) {
 		case 'originX':
+			// hor
 			var fudge = 20;
 			if (_value < centre - fudge) {
 				returnArray['hor'] = 'XT';
@@ -20296,6 +20325,8 @@ ED.HVT.prototype.dependentParameterValues = function(_parameter, _value) {
 			} else {
 				returnArray['hor'] = 'None';
 			}
+			// horValue
+			returnArray['horValue'] = Math.abs(Math.round((centre - _value)/2));
 			break;
 
 		case 'originY':
@@ -20307,6 +20338,8 @@ ED.HVT.prototype.dependentParameterValues = function(_parameter, _value) {
 			} else {
 				returnArray['ver'] = 'None';
 			}
+			// verValue
+			returnArray['verValue'] = Math.abs(Math.round((- _value/2)));
 			break;
 
 		case 'rotation':
@@ -20364,6 +20397,34 @@ ED.HVT.prototype.dependentParameterValues = function(_parameter, _value) {
 
 				default:
 					returnArray['rotation'] = Math.PI / 4;
+					break;
+			}
+			break;
+			
+		case 'horValue':
+			switch (this.hor) {
+				case 'XT':
+					returnArray['originX'] = centre - _value * 2;
+					break;
+				case 'None':
+					returnArray['originX'] = centre;
+					break;
+				case 'ET':
+					returnArray['originX'] = centre + _value * 2;
+					break;
+			}
+			break;
+			
+		case 'verValue':
+			switch (this.ver) {
+				case 'R/L':
+					returnArray['originY'] = - _value * 2;
+					break;
+				case 'None':
+					returnArray['originY'] = 0;
+					break;
+				case 'L/R':
+					returnArray['originY'] = _value * 2;
 					break;
 			}
 			break;

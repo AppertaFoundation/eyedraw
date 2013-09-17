@@ -368,7 +368,7 @@ ED.Label = function(_drawing, _parameterJSON) {
 	this.lastOriginY = 0;
 
 	// Call superclass constructor
-ED.Doodle.call(this, _drawing, _parameterJSON);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
