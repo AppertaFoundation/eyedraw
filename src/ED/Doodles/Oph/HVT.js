@@ -29,12 +29,12 @@ ED.HVT = function(_drawing, _parameterJSON) {
 	this.className = "HVT";
 
 	// Derived parameters
-	//this.eye = 'R';
 	this.hor = 'None';
 	this.ver = 'None';
 	this.tor = 'None';
 	this.horValue = 0;
 	this.verValue = 0;
+	this.torValue = 0;
 
 	// Call super-class constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -71,12 +71,6 @@ ED.HVT.prototype.setPropertyDefaults = function() {
 	//this.parameterValidationArray['originY']['delta'] = 30;
 
 	// Add complete validation arrays for derived parameters
-// 	this.parameterValidationArray['eye'] = {
-// 		kind: 'derived',
-// 		type: 'string',
-// 		list: ['R', 'L'],
-// 		animate: false
-// 	};
 	this.parameterValidationArray['hor'] = {
 		kind: 'derived',
 		type: 'string',
@@ -107,6 +101,12 @@ ED.HVT.prototype.setPropertyDefaults = function() {
 		range: new ED.Range(0, 50),
 		animate: true
 	};
+	this.parameterValidationArray['torValue'] = {
+		kind: 'derived',
+		type: 'int',
+		range: new ED.Range(0, 20),
+		animate: true
+	};
 }
 
 /**
@@ -114,9 +114,9 @@ ED.HVT.prototype.setPropertyDefaults = function() {
  * Use the setParameter function for derived parameters, as this will also update dependent variables
  */
 ED.HVT.prototype.setParameterDefaults = function() {
-	this.originX = -250;
-	this.rotation = Math.PI/4;
-	this.setParameterFromString('hor', 'None');
+	//this.originX = -250;
+	//this.rotation = Math.PI/4;
+	//this.setParameterFromString('hor', 'None');
 	//this.setParameterFromString('tor', 'None');
 	//this.setParameterFromString('horValue', '0');
 }
@@ -131,11 +131,6 @@ ED.HVT.prototype.setParameterDefaults = function() {
  */
 ED.HVT.prototype.dependentParameterValues = function(_parameter, _value) {
 	var returnArray = new Array();
-
-	// Convert range into positive integer value
-	//var xRange = this.parameterValidationArray['originX']['range'];
-	//var xRangeSize = xRange.max - xRange.min;
-	//var xRangeMiddle = xRange.min + xRangeSize/2;
 			
 	// Value of centre for right eye (binding done on right eye only, left eye values handled by syncing)
 	var centre = -250;
@@ -177,6 +172,8 @@ ED.HVT.prototype.dependentParameterValues = function(_parameter, _value) {
 			} else {
 				returnArray['tor'] = 'None';
 			}
+			// torValue
+			returnArray['torValue'] = Math.abs(Math.round((_value - Math.PI/4) * 80/Math.PI));
 			break;
 
 		case 'hor':
@@ -247,10 +244,24 @@ ED.HVT.prototype.dependentParameterValues = function(_parameter, _value) {
 					returnArray['originY'] = - _value * 2;
 					break;
 				case 'None':
-					returnArray['originY'] = 0;
+					returnArray['originY'] = Math.PI / 4;
 					break;
 				case 'L/R':
 					returnArray['originY'] = _value * 2;
+					break;
+			}
+			break;
+			
+		case 'torValue':
+			switch (this.tor) {
+				case 'Excyclotorsion':
+					returnArray['rotation'] = - _value * Math.PI/80 + Math.PI/4;
+					break;
+				case 'None':
+					returnArray['rotation'] = Math.PI/4;
+					break;
+				case 'Incyclotorsion':
+					returnArray['rotation'] = _value * Math.PI/80 + Math.PI/4;
 					break;
 			}
 			break;

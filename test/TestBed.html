@@ -93,6 +93,7 @@
 					        		hor:{id:'horSelect', attribute:'value'}, ver:{id:'verSelect', attribute:'value'}, tor:{id:'torSelect', attribute:'value'},  
 					        		horValue:{id:'horValueSelect', attribute:'value'},
 					        		verValue:{id:'verValueSelect', attribute:'value'},
+					        		torValue:{id:'torValueSelect', attribute:'value'},
 								}
 					        );
 					    
@@ -100,8 +101,9 @@
 					        //rightEye.parameterValidationArray['originX']['range'] = new ED.Range(-350, -150);
 					        
 					        // Left eye
-// 					        leftEye = this.drawing.addDoodle('HVT', {originX:+250, rotation:Math.PI/4});
-// 					        leftEye.parameterValidationArray['originX']['range'] = new ED.Range(+150, +350);
+					        leftEye = this.drawing.addDoodle('HVT', {rotation:Math.PI/4});
+					        leftEye.parameterValidationArray['originX']['range'] = new ED.Range(+150, +350);
+					        leftEye.originX = +250;
 					    
 					        this.drawing.deselectDoodles();
 
@@ -480,6 +482,30 @@
 			<option value=48>48</option>
 			<option value=49>49</option>
 			<option value=50>50</option>
+		</select>
+
+		<select id="torValueSelect">
+			<option value=0>0</option>
+			<option value=1>1</option>
+			<option value=2>2</option>
+			<option value=3>3</option>
+			<option value=4>4</option>
+			<option value=5>5</option>
+			<option value=6>6</option>
+			<option value=7>7</option>
+			<option value=8>8</option>
+			<option value=9>9</option>
+			<option value=10>10</option>
+			<option value=11>11</option>
+			<option value=12>12</option>
+			<option value=13>13</option>
+			<option value=14>14</option>
+			<option value=15>15</option>
+			<option value=16>16</option>
+			<option value=17>17</option>
+			<option value=18>18</option>
+			<option value=19>19</option>
+			<option value=20>20</option>
 		</select>
 		
 		</br>
