@@ -416,27 +416,32 @@ ED.Drawing = function(_canvas, _eye, _IDSuffix, _isEditable, _options) {
 		//                                     }, false);
 
 		// iOS listeners
-		this.canvas.addEventListener('touchstart', function(e) {
-			if (e.targetTouches[0] !== undefined) {
-				var point = new ED.Point(e.targetTouches[0].pageX - this.offsetLeft, e.targetTouches[0].pageY - this.offsetTop);
-				e.preventDefault();
-			}
-			drawing.mousedown(point);
-		}, false);
+    this.canvas.addEventListener('touchstart', function(e) {
+      if (e.targetTouches[0] !== undefined) {
+        var canvas_pos = drawing.getPositionOfElement(drawing.canvas);
+        var point = new ED.Point(e.targetTouches[0].pageX - canvas_pos[0] - this.offsetLeft, e.targetTouches[0].pageY - canvas_pos[1]);
+        e.preventDefault();
+      } else {
+        console.log('touches undefined');
+      }
+      drawing.mousedown(point);
+    }, false);
 
-		this.canvas.addEventListener('touchend', function(e) {
-			if (e.targetTouches[0] !== undefined) {
-				var point = new ED.Point(e.targetTouches[0].pageX - this.offsetLeft, e.targetTouches[0].pageY - this.offsetTop);
-				drawing.mouseup(point);
-			}
-		}, false);
+    this.canvas.addEventListener('touchend', function(e) {
+      if (e.targetTouches[0] !== undefined) {
+        var canvas_pos = drawing.getPositionOfElement(drawing.canvas);
+        var point = new ED.Point(e.targetTouches[0].pageX - canvas_pos[0] - this.offsetLeft, e.targetTouches[0].pageY - canvas_pos[1]);
+        drawing.mouseup(point);
+      }
+    }, false);
 
-		this.canvas.addEventListener('touchmove', function(e) {
-			if (e.targetTouches[0] !== undefined) {
-				var point = new ED.Point(e.targetTouches[0].pageX - this.offsetLeft, e.targetTouches[0].pageY - this.offsetTop);
-				drawing.mousemove(point);
-			}
-		}, false);
+    this.canvas.addEventListener('touchmove', function(e) {
+      if (e.targetTouches[0] !== undefined) {
+        var canvas_pos = drawing.getPositionOfElement(drawing.canvas);
+        var point = new ED.Point(e.targetTouches[0].pageX - canvas_pos[0] - this.offsetLeft, e.targetTouches[0].pageY - canvas_pos[1]);
+        drawing.mousemove(point);
+      }
+    }, false);
 
 		// Keyboard listener
 		window.addEventListener('keydown', function(e) {
@@ -449,6 +454,20 @@ ED.Drawing = function(_canvas, _eye, _IDSuffix, _isEditable, _options) {
 			return false;
 		}
 	}
+}
+
+ED.Drawing.prototype.getPositionOfElement = function(element) {
+    var x=0;
+    var y=0;
+    while(true){
+        x += element.offsetLeft;
+        y += element.offsetTop;
+        if(element.offsetParent === null){
+            break;
+        }
+        element = element.offsetParent;
+    }
+    return [x, y];
 }
 
 /**
