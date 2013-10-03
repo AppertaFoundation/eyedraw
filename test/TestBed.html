@@ -83,27 +83,27 @@
 													
 
 							// Grid
-					    	this.drawing.addDoodle('HVTGrid');
+					    	this.drawing.addDoodle('Lungs');
 					    	
 							// Right eye
-					    	rightEye = this.drawing.addDoodle(
-					    		'HVT', 
-					    		{},
-					        	{
-					        		hor:{id:'horSelect', attribute:'value'}, ver:{id:'verSelect', attribute:'value'}, tor:{id:'torSelect', attribute:'value'},  
-					        		horValue:{id:'horValueSelect', attribute:'value'},
-					        		verValue:{id:'verValueSelect', attribute:'value'},
-					        		torValue:{id:'torValueSelect', attribute:'value'},
-								}
-					        );
-					    
-					        // Constrain x movement
-					        //rightEye.parameterValidationArray['originX']['range'] = new ED.Range(-350, -150);
-					        
-					        // Left eye
-					        leftEye = this.drawing.addDoodle('HVT', {rotation:Math.PI/4});
-					        leftEye.parameterValidationArray['originX']['range'] = new ED.Range(+150, +350);
-					        leftEye.originX = +250;
+// 					    	rightEye = this.drawing.addDoodle(
+// 					    		'HVT', 
+// 					    		{},
+// 					        	{
+// 					        		hor:{id:'horSelect', attribute:'value'}, ver:{id:'verSelect', attribute:'value'}, tor:{id:'torSelect', attribute:'value'},  
+// 					        		horValue:{id:'horValueSelect', attribute:'value'},
+// 					        		verValue:{id:'verValueSelect', attribute:'value'},
+// 					        		torValue:{id:'torValueSelect', attribute:'value'},
+// 								}
+// 					        );
+// 					    
+// 					        // Constrain x movement
+// 					        //rightEye.parameterValidationArray['originX']['range'] = new ED.Range(-350, -150);
+// 					        
+// 					        // Left eye
+// 					        leftEye = this.drawing.addDoodle('HVT', {rotation:Math.PI/4});
+// 					        leftEye.parameterValidationArray['originX']['range'] = new ED.Range(+150, +350);
+// 					        leftEye.originX = +250;
 					    
 					        this.drawing.deselectDoodles();
 
@@ -340,8 +340,8 @@
             <button id="LensRPS" class="imgbutton" title="Lens" onclick="drawingEdit.addDoodle('Pulse'); return false;" ><img src="../img/MacularDystrophy.gif" /></button>
             <button id="LensRPS" class="imgbutton" title="Lens" onclick="grid.updateNextValues(); var sys = drawingEdit.addDoodle('BPReading', {'stolic':'sys', 'value':140}); sys.setValueToLast(); var dia = drawingEdit.addDoodle('BPReading', {'stolic':'dia', 'value':80}); dia.setValueToLast(); return false;" ><img src="../img/PI.gif" /></button>
 
-<!--            <button id="LensRPS" class="imgbutton" title="Lens" onclick="drawingEdit.addDoodle('Cryo'); return false;" ><img src="../img/Cryo.gif" /></button>
- -->
+            <button id="LensRPS" class="imgbutton" title="Lens" onclick="drawingEdit.addDoodle('Effusion'); return false;" ><img src="../img/Cryo.gif" /></button>
+
 
 
             <br />

@@ -8541,236 +8541,8 @@ ED.AnomalousVessels.prototype.description = function() {
 	return "AnomalousVessels";
 }
 
-/**
- * Lungs
- *
- * @class Lungs
- * @property {String} className Name of doodle subclass
- * @param {Drawing} _drawing
- * @param {Object} _parameterJSON
- */
-ED.Lungs = function(_drawing, _parameterJSON) {
-	// Set classname
-	this.className = "Lungs";
 
-	// Call superclass constructor
-ED.Doodle.call(this, _drawing, _parameterJSON);
-}
 
-/**
- * Sets superclass and constructor
- */
-ED.Lungs.prototype = new ED.Doodle;
-ED.Lungs.prototype.constructor = ED.Lungs;
-ED.Lungs.superclass = ED.Doodle.prototype;
-
-/**
- * Sets handle attributes
- */
-ED.Lungs.prototype.setHandles = function() {
-	this.handleArray[3] = new ED.Handle(null, true, ED.Mode.Scale, false);
-	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
-}
-
-/**
- * Sets default properties
- */
-ED.Lungs.prototype.setPropertyDefaults = function() {
-	this.isSelectable = false;
-	this.isDeletable = false;
-
-	// Update component of validation array for simple parameters
-	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
-	this.parameterValidationArray['apexY']['range'].setMinAndMax(-40, +30);
-}
-
-/**
- * Sets default parameters (Only called for new doodles)
- * Use the setParameter function for derived parameters, as this will also update dependent variables
- */
-ED.Lungs.prototype.setParameterDefaults = function() {
-	this.apexY = -20;
-}
-
-/**
- * Draws doodle or performs a hit test if a Point parameter is passed
- *
- * @param {Point} _point Optional point in canvas plane, passed if performing hit test
- */
-ED.Lungs.prototype.draw = function(_point) {
-	// Get context
-	var ctx = this.drawing.context;
-
-	// Call draw method in superclass
-	ED.Lungs.superclass.draw.call(this, _point);
-
-	// Boundary path
-	ctx.beginPath();
-
-	// Right lung
-	ctx.moveTo(-147, -281);
-	ctx.bezierCurveTo(-224, -279, -414, 29, -426, 289);
-	ctx.bezierCurveTo(-334, 226, -219, 196, -79, 236);
-	ctx.bezierCurveTo(-6, 231, -71, -284, -147, -281);
-
-	// Left Lung
-	ctx.moveTo(147, -281);
-	ctx.bezierCurveTo(224, -279, 414, 29, 426, 289);
-	ctx.bezierCurveTo(334, 226, 219, 196, 79, 236);
-	ctx.bezierCurveTo(6, 231, 71, -284, 147, -281);
-
-	// Close path
-	ctx.closePath();
-
-	// Set line attributes
-	ctx.lineWidth = 4;
-	ctx.fillStyle = "white";
-	ctx.strokeStyle = "gray";
-
-	// Draw boundary path (also hit testing)
-	this.drawBoundary(_point);
-
-	// Non boundary drawing
-	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {}
-
-	// Coordinates of handles (in canvas plane)
-	this.handleArray[3].location = this.transform.transformPoint(new ED.Point(40, -40));
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
-
-	// Draw handles if selected
-	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
-
-	// Calculate arc (Arc property not used naturally in this doodle)
-	this.leftExtremity = this.transform.transformPoint(new ED.Point(-40, -40));
-	this.rightExtremity = this.transform.transformPoint(new ED.Point(40, -40));
-	this.arc = this.calculateArc();
-
-	// Return value indicating successful hittest
-	return this.isClicked;
-}
-
-/**
- * Returns a string containing a text description of the doodle
- *
- * @returns {String} Description of doodle
- */
-ED.Lungs.prototype.description = function() {
-	return this.drawing.doodleArray.length == 1 ? "No abnormality" : "";
-}
-
-/**
- * Effusion
- *
- * @class Effusion
- * @property {String} className Name of doodle subclass
- * @param {Drawing} _drawing
- * @param {Object} _parameterJSON
- */
-ED.Effusion = function(_drawing, _parameterJSON) {
-	// Set classname
-	this.className = "Effusion";
-
-	// Call superclass constructor
-ED.Doodle.call(this, _drawing, _parameterJSON);
-}
-
-/**
- * Sets superclass and constructor
- */
-ED.Effusion.prototype = new ED.Doodle;
-ED.Effusion.prototype.constructor = ED.Effusion;
-ED.Effusion.superclass = ED.Doodle.prototype;
-
-/**
- * Sets handle attributes
- */
-ED.Effusion.prototype.setHandles = function() {
-	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
-}
-
-/**
- * Sets default properties
- */
-ED.Effusion.prototype.setPropertyDefaults = function() {
-	this.isMoveable = false;
-	this.isRotatable = false;
-	// Update component of validation array for simple parameters
-	//this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
-	//this.parameterValidationArray['apexY']['range'].setMinAndMax(-40, +30);
-}
-
-/**
- * Sets default parameters (Only called for new doodles)
- * Use the setParameter function for derived parameters, as this will also update dependent variables
- */
-ED.Effusion.prototype.setParameterDefaults = function() {
-	this.apexX = -231;
-	this.apexY = 136;
-}
-
-/**
- * Draws doodle or performs a hit test if a Point parameter is passed
- *
- * @param {Point} _point Optional point in canvas plane, passed if performing hit test
- */
-ED.Effusion.prototype.draw = function(_point) {
-	// Get context
-	var ctx = this.drawing.context;
-
-	// Call draw method in superclass
-	ED.Effusion.superclass.draw.call(this, _point);
-
-	// Boundary path
-	ctx.beginPath();
-
-	// Right effusion
-	ctx.moveTo(this.apexX, this.apexY);
-	ctx.lineTo(-400 + (-136 + this.apexY) * -0.3, this.apexY);
-	ctx.lineTo(-426, 289);
-	//ctx.bezierCurveTo(-224, -279, -414, 29, -426, 289);
-	ctx.bezierCurveTo(-334, 226, -219, 196, -79, 236);
-	ctx.lineTo(-44, this.apexY);
-	ctx.lineTo(this.apexX, this.apexY);
-	//ctx.bezierCurveTo(-6, 231, -71, -284,this.apexX, this.apexY);
-
-	// Left Lung
-	//    ctx.moveTo(147, -281);
-	//    ctx.bezierCurveTo(224, -279, 414, 29, 426, 289);
-	//    ctx.bezierCurveTo(334, 226, 219, 196, 79, 236);
-	//    ctx.bezierCurveTo(6, 231, 71, -284, 147, -281);
-
-	// Close path
-	ctx.closePath();
-
-	// Set line attributes
-	ctx.lineWidth = 4;
-	ctx.fillStyle = "yellow";
-	ctx.strokeStyle = "gray";
-
-	// Draw boundary path (also hit testing)
-	this.drawBoundary(_point);
-
-	// Non boundary drawing
-	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {}
-
-	// Coordinates of handles (in canvas plane)
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
-
-	// Draw handles if selected
-	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
-
-	// Return value indicating successful hittest
-	return this.isClicked;
-}
-
-/**
- * Returns a string containing a text description of the doodle
- *
- * @returns {String} Description of doodle
- */
-ED.Effusion.prototype.description = function() {
-	return "pleural effusion in right lung";
-}
 
 
 /**
@@ -8943,283 +8715,7 @@ ED.Bypass.prototype.description = function() {
 	return "Bypass graft to " + artery;
 }
 
-/**
- * Macular Thickening
- *
- * @class Crepitations
- * @property {String} className Name of doodle subclass
- * @param {Drawing} _drawing
- * @param {Object} _parameterJSON
- */
-ED.Crepitations = function(_drawing, _parameterJSON) {
-	// Set classname
-	this.className = "Crepitations";
 
-	// Call superclass constructor
-ED.Doodle.call(this, _drawing, _parameterJSON);
-}
-
-/**
- * Sets superclass and constructor
- */
-ED.Crepitations.prototype = new ED.Doodle;
-ED.Crepitations.prototype.constructor = ED.Crepitations;
-ED.Crepitations.superclass = ED.Doodle.prototype;
-
-/**
- * Sets handle attributes
- */
-ED.Crepitations.prototype.setHandles = function() {
-	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
-}
-
-/**
- * Set default properties
- */
-ED.Crepitations.prototype.setPropertyDefaults = function() {
-	// Update component of validation array for simple parameters
-	this.parameterValidationArray['apexX']['range'].setMinAndMax(+50, +200);
-	this.parameterValidationArray['apexY']['range'].setMinAndMax(-0, +0);
-}
-
-/**
- * Sets default parameters (Only called for new doodles)
- * Use the setParameter function for derived parameters, as this will also update dependent variables
- */
-ED.Crepitations.prototype.setParameterDefaults = function() {
-	this.rotation = -Math.PI / 4;
-	this.apexX = 50;
-	this.apexY = 0;
-
-	this.setOriginWithDisplacements(-150, 300);
-}
-
-/**
- * Draws doodle or performs a hit test if a Point parameter is passed
- *
- * @param {Point} _point Optional point in canvas plane, passed if performing hit test
- */
-ED.Crepitations.prototype.draw = function(_point) {
-	// Get context
-	var ctx = this.drawing.context;
-
-	// Call draw method in superclass
-	ED.Crepitations.superclass.draw.call(this, _point);
-
-	// Exudate radius
-	var r = Math.sqrt(this.apexX * this.apexX + this.apexY * this.apexY);
-
-	// Boundary path
-	ctx.beginPath();
-
-	// Exudate
-	ctx.arc(0, 0, r, 0, 2 * Math.PI, true);
-
-	// Set attributes
-	ctx.lineWidth = 3;
-	ctx.strokeStyle = "rgba(255, 255, 255, 0)";
-	ctx.fillStyle = "rgba(255, 255, 255, 0)";
-
-	// Draw boundary path (also hit testing)
-	this.drawBoundary(_point);
-
-	// Other paths and drawing here
-	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
-		// Start path
-		ctx.beginPath();
-
-		// Spacing of lines
-		var d = 30;
-
-		// Draw central line
-		ctx.moveTo(-r, 0);
-		ctx.lineTo(r, 0);
-
-		// Draw other lines
-		for (var s = -1; s < 2; s += 2) {
-			for (var y = d; y < r; y += d) {
-				var x = this.xForY(r, y);
-				ctx.moveTo(-x, s * y);
-				ctx.lineTo(x, s * y);
-			}
-		}
-
-		// Set attributes
-		ctx.lineWidth = 15;
-		ctx.lineCap = "round";
-		ctx.strokeStyle = "rgba(200, 200, 200, 0.75)";
-
-		// Draw lines
-		ctx.stroke();
-	}
-
-	// Coordinates of handles (in canvas plane)
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
-
-	// Draw handles if selected
-	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
-
-	// Return value indicating successful hittest
-	return this.isClicked;
-}
-
-/**
- * Returns a string containing a text description of the doodle
- *
- * @returns {String} Description of doodle
- */
-ED.Crepitations.prototype.description = function() {
-	var lung = this.originX > 0 ? " left lung" : " right lung";
-	var lobe = this.originY > 0 ? " lower lobe of" : " upper lobe of";
-
-	return 'crepitations' + lobe + lung;
-}
-
-/**
- * Wheeze
- *
- * @class Wheeze
- * @property {String} className Name of doodle subclass
- * @param {Drawing} _drawing
- * @param {Object} _parameterJSON
- */
-ED.Wheeze = function(_drawing, _parameterJSON) {
-	// Set classname
-	this.className = "Wheeze";
-
-	// Call superclass constructor
-ED.Doodle.call(this, _drawing, _parameterJSON);
-}
-
-/**
- * Sets superclass and constructor
- */
-ED.Wheeze.prototype = new ED.Doodle;
-ED.Wheeze.prototype.constructor = ED.Wheeze;
-ED.Wheeze.superclass = ED.Doodle.prototype;
-
-/**
- * Sets handle attributes
- */
-ED.Wheeze.prototype.setHandles = function() {
-	//	this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, false);
-	//	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
-}
-
-/**
- * Sets default dragging attributes
- */
-ED.Wheeze.prototype.setPropertyDefaults = function() {
-	// Update component of validation array for simple parameters
-	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
-	this.parameterValidationArray['apexY']['range'].setMinAndMax(-160, +0);
-	this.parameterValidationArray['arc']['range'].setMinAndMax(Math.PI / 6, Math.PI * 2);
-	this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.5, +1.5);
-	this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.5, +1.5);
-}
-
-/**
- * Sets default parameters (Only called for new doodles)
- * Use the setParameter function for derived parameters, as this will also update dependent variables
- */
-ED.Wheeze.prototype.setParameterDefaults = function() {
-	this.scaleX = 0.6;
-	this.scaleY = 0.6;
-
-	this.originX = 172;
-	this.originY = -62;
-}
-
-/**
- * Draws doodle or performs a hit test if a Point parameter is passed
- *
- * @param {Point} _point Optional point in canvas plane, passed if performing hit test
- */
-ED.Wheeze.prototype.draw = function(_point) {
-	//console.log(this.originX, this.originY);
-	// Get context
-	var ctx = this.drawing.context;
-
-	// Call draw method in superclass
-	ED.Wheeze.superclass.draw.call(this, _point);
-
-	// Exudate radius
-	var r = 100;
-
-	// Boundary path
-	ctx.beginPath();
-
-	// Exudate
-	ctx.arc(0, -50, r, 0, 2 * Math.PI, true);
-
-	// Set attributes
-	ctx.lineWidth = 2;
-	ctx.strokeStyle = "rgba(255, 255, 255, 0)";
-	ctx.fillStyle = "rgba(255, 255, 255, 0)";
-
-	// Draw boundary path (also hit testing)
-	this.drawBoundary(_point);
-
-	// Other paths and drawing here
-	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
-		ctx.fillStyle = "gray";
-		ctx.strokeStyle = "gray";
-		ctx.lineWidth = 8;
-
-		// Red centre
-		ctx.beginPath();
-		ctx.arc(-50, 0, 20, 0, 2 * Math.PI, false);
-		ctx.fill();
-
-		ctx.beginPath();
-		ctx.moveTo(-34, 0);
-		ctx.lineTo(-34, -100);
-		ctx.lineTo(66, -150);
-		ctx.lineTo(66, -50);
-
-		ctx.stroke();
-
-		ctx.beginPath();
-		ctx.arc(50, -50, 20, 0, 2 * Math.PI, false);
-		ctx.fill();
-
-		//ctx.lin
-		ctx.closePath();
-		ctx.fillStyle = "gray";
-		ctx.fill();
-	}
-
-	// Coordinates of handles (in canvas plane)
-	//    var point = new ED.Point(0, 0);
-	//    point.setWithPolars(rc, Math.PI/4);
-	//	this.handleArray[2].location = this.transform.transformPoint(point);
-
-	// Draw handles if selected
-	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
-
-	// Coordinates of handles (in canvas plane)
-	var point = new ED.Point(0, 0);
-	point.setWithPolars(r, Math.PI / 4);
-	this.handleArray[2].location = this.transform.transformPoint(point);
-
-	// Draw handles if selected
-	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
-
-	// Return value indicating successful hittest
-	return this.isClicked;
-}
-
-/**
- * Returns a string containing a text description of the doodle
- *
- * @returns {String} Description of doodle
- */
-ED.Wheeze.prototype.description = function() {
-	var lung = this.originX > 0 ? " left lung" : " right lung";
-	var lobe = this.originY > 0 ? " lower lobe of" : " upper lobe of";
-
-	return 'wheeze' + lobe + lung;
-}
 
 /**
  * MetalStent
@@ -10153,6 +9649,141 @@ ED.Bruit.prototype.description = function() {
  */
 
 /**
+ * Crepitations
+ *
+ * @class Crepitations
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Object} _parameterJSON
+ */
+ED.Crepitations = function(_drawing, _parameterJSON) {
+	// Set classname
+	this.className = "Crepitations";
+	
+	// Saved parameters
+	this.savedParameterArray = ['originX', 'originY', 'apexX', 'apexY'];
+
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _parameterJSON);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.Crepitations.prototype = new ED.Doodle;
+ED.Crepitations.prototype.constructor = ED.Crepitations;
+ED.Crepitations.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.Crepitations.prototype.setHandles = function() {
+	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+}
+
+/**
+ * Set default properties
+ */
+ED.Crepitations.prototype.setPropertyDefaults = function() {
+	// Update component of validation array for simple parameters
+	this.parameterValidationArray['apexX']['range'].setMinAndMax(+50, +200);
+	this.parameterValidationArray['apexY']['range'].setMinAndMax(-0, +0);
+}
+
+/**
+ * Sets default parameters (Only called for new doodles)
+ * Use the setParameter function for derived parameters, as this will also update dependent variables
+ */
+ED.Crepitations.prototype.setParameterDefaults = function() {
+	this.rotation = -Math.PI / 4;
+	this.apexX = 50;
+	this.apexY = 0;
+
+	this.setOriginWithDisplacements(-150, 300);
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.Crepitations.prototype.draw = function(_point) {
+	// Get context
+	var ctx = this.drawing.context;
+
+	// Call draw method in superclass
+	ED.Crepitations.superclass.draw.call(this, _point);
+
+	// Crepitation radius
+	var r = Math.sqrt(this.apexX * this.apexX + this.apexY * this.apexY);
+
+	// Boundary path
+	ctx.beginPath();
+
+	// Crepitation
+	ctx.arc(0, 0, r, 0, 2 * Math.PI, true);
+
+	// Set attributes
+	ctx.lineWidth = 3;
+	ctx.strokeStyle = "rgba(255, 255, 255, 0)";
+	ctx.fillStyle = "rgba(255, 255, 255, 0)";
+
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+
+	// Other paths and drawing here
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+		// Start path
+		ctx.beginPath();
+
+		// Spacing of lines
+		var d = 30;
+
+		// Draw central line
+		ctx.moveTo(-r, 0);
+		ctx.lineTo(r, 0);
+
+		// Draw other lines
+		for (var s = -1; s < 2; s += 2) {
+			for (var y = d; y < r; y += d) {
+				var x = this.xForY(r, y);
+				ctx.moveTo(-x, s * y);
+				ctx.lineTo(x, s * y);
+			}
+		}
+
+		// Set attributes
+		ctx.lineWidth = 15;
+		ctx.lineCap = "round";
+		ctx.strokeStyle = "rgba(200, 200, 200, 0.75)";
+
+		// Draw lines
+		ctx.stroke();
+	}
+
+	// Coordinates of handles (in canvas plane)
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
+
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.Crepitations.prototype.description = function() {
+	var lung = this.originX > 0 ? " left lung" : " right lung";
+	var lobe = this.originY > 0 ? " lower lobe of" : " upper lobe of";
+
+	return 'crepitations' + lobe + lung;
+}
+
+/**
  * OpenEyes
  *
  * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
@@ -10170,6 +9801,130 @@ ED.Bruit.prototype.description = function() {
  * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
  */
 
+/**
+ * OpenEyes
+ *
+ * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
+ * (C) OpenEyes Foundation, 2011-2013
+ * This file is part of OpenEyes.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package OpenEyes
+ * @link http://www.openeyes.org.uk
+ * @author OpenEyes <info@openeyes.org.uk>
+ * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
+ * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ */
+
+/**
+ * Effusion
+ *
+ * @class Effusion
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Object} _parameterJSON
+ */
+ED.Effusion = function(_drawing, _parameterJSON) {
+	// Set classname
+	this.className = "Effusion";
+
+	// Saved parameters
+	this.savedParameterArray = ['apexX', 'apexY'];
+
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _parameterJSON);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.Effusion.prototype = new ED.Doodle;
+ED.Effusion.prototype.constructor = ED.Effusion;
+ED.Effusion.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.Effusion.prototype.setHandles = function() {
+	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+}
+
+/**
+ * Sets default properties
+ */
+ED.Effusion.prototype.setPropertyDefaults = function() {
+	this.isMoveable = false;
+	this.isRotatable = false;
+}
+
+/**
+ * Sets default parameters (Only called for new doodles)
+ * Use the setParameter function for derived parameters, as this will also update dependent variables
+ */
+ED.Effusion.prototype.setParameterDefaults = function() {
+	this.apexX = -231;
+	this.apexY = 136;
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.Effusion.prototype.draw = function(_point) {
+	// Get context
+	var ctx = this.drawing.context;
+
+	// Call draw method in superclass
+	ED.Effusion.superclass.draw.call(this, _point);
+
+	// Boundary path
+	ctx.beginPath();
+
+	// Right effusion
+	ctx.moveTo(this.apexX, this.apexY);
+	ctx.lineTo(-400 + (-136 + this.apexY) * -0.3, this.apexY);
+	ctx.lineTo(-426, 289);
+
+	ctx.bezierCurveTo(-334, 226, -219, 196, -79, 236);
+	ctx.lineTo(-44, this.apexY);
+	ctx.lineTo(this.apexX, this.apexY);
+
+	// Close path
+	ctx.closePath();
+
+	// Set line attributes
+	ctx.lineWidth = 4;
+	ctx.fillStyle = "yellow";
+	ctx.strokeStyle = "gray";
+
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+
+	// Non boundary drawing
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {}
+
+	// Coordinates of handles (in canvas plane)
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
+
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.Effusion.prototype.description = function() {
+	return "pleural effusion in right lung";
+}
 /**
  * OpenEyes
  *
@@ -10259,6 +10014,93 @@ ED.Bruit.prototype.description = function() {
  * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
  * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
  */
+ 
+/**
+ * Lungs
+ *
+ * @class Lungs
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Object} _parameterJSON
+ */
+ED.Lungs = function(_drawing, _parameterJSON) {
+	// Set classname
+	this.className = "Lungs";
+
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _parameterJSON);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.Lungs.prototype = new ED.Doodle;
+ED.Lungs.prototype.constructor = ED.Lungs;
+ED.Lungs.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets default properties
+ */
+ED.Lungs.prototype.setPropertyDefaults = function() {
+	this.isSelectable = false;
+	this.isDeletable = false;
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.Lungs.prototype.draw = function(_point) {
+	// Get context
+	var ctx = this.drawing.context;
+
+	// Call draw method in superclass
+	ED.Lungs.superclass.draw.call(this, _point);
+
+	// Boundary path
+	ctx.beginPath();
+
+	// Right lung
+	ctx.moveTo(-147, -281);
+	ctx.bezierCurveTo(-224, -279, -414, 29, -426, 289);
+	ctx.bezierCurveTo(-334, 226, -219, 196, -79, 236);
+	ctx.bezierCurveTo(-6, 231, -71, -284, -147, -281);
+
+	// Left Lung
+	ctx.moveTo(147, -281);
+	ctx.bezierCurveTo(224, -279, 414, 29, 426, 289);
+	ctx.bezierCurveTo(334, 226, 219, 196, 79, 236);
+	ctx.bezierCurveTo(6, 231, 71, -284, 147, -281);
+
+	// Close path
+	ctx.closePath();
+
+	// Set line attributes
+	ctx.lineWidth = 4;
+	ctx.fillStyle = "white";
+	ctx.strokeStyle = "gray";
+
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+
+	// Calculate arc (Arc property not used naturally in this doodle)
+// 	this.leftExtremity = this.transform.transformPoint(new ED.Point(-40, -40));
+// 	this.rightExtremity = this.transform.transformPoint(new ED.Point(40, -40));
+// 	this.arc = this.calculateArc();
+
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.Lungs.prototype.description = function() {
+	return this.drawing.doodleArray.length == 1 ? "No abnormality" : "";
+}
 
 /**
  * OpenEyes
@@ -10333,23 +10175,113 @@ ED.Bruit.prototype.description = function() {
  */
 
 /**
- * OpenEyes
+ * Wheeze
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
- * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
- *
- * @package OpenEyes
- * @link http://www.openeyes.org.uk
- * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @class Wheeze
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Object} _parameterJSON
  */
+ED.Wheeze = function(_drawing, _parameterJSON) {
+	// Set classname
+	this.className = "Wheeze";
+	
+	// Saved parameters
+	this.savedParameterArray = ['originX', 'originY', 'scaleX', 'scaleY'];
 
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _parameterJSON);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.Wheeze.prototype = new ED.Doodle;
+ED.Wheeze.prototype.constructor = ED.Wheeze;
+ED.Wheeze.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets default parameters (Only called for new doodles)
+ * Use the setParameter function for derived parameters, as this will also update dependent variables
+ */
+ED.Wheeze.prototype.setParameterDefaults = function() {
+	this.scaleX = 0.6;
+	this.scaleY = 0.6;
+	
+	this.setOriginWithDisplacements(-200, 100);
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.Wheeze.prototype.draw = function(_point) {
+	// Get context
+	var ctx = this.drawing.context;
+
+	// Call draw method in superclass
+	ED.Wheeze.superclass.draw.call(this, _point);
+
+	// Exudate radius
+	var r = 100;
+
+	// Boundary path
+	ctx.beginPath();
+
+	// Boundary
+	ctx.arc(0, -50, r, 0, 2 * Math.PI, true);
+
+	// Set attributes
+	ctx.lineWidth = 2;
+	ctx.strokeStyle = "rgba(255, 255, 255, 0)";
+	ctx.fillStyle = "rgba(255, 255, 255, 0)";
+
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+
+	// Other paths and drawing here
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+		ctx.fillStyle = "gray";
+		ctx.strokeStyle = "gray";
+		ctx.lineWidth = 8;
+
+		ctx.beginPath();
+		ctx.arc(-50, 0, 20, 0, 2 * Math.PI, false);
+		ctx.fill();
+
+		ctx.beginPath();
+		ctx.moveTo(-34, 0);
+		ctx.lineTo(-34, -100);
+		ctx.lineTo(66, -150);
+		ctx.lineTo(66, -50);
+
+		ctx.stroke();
+
+		ctx.beginPath();
+		ctx.arc(50, -50, 20, 0, 2 * Math.PI, false);
+		ctx.fill();
+
+		ctx.closePath();
+		ctx.fillStyle = "gray";
+		ctx.fill();
+	}
+
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.Wheeze.prototype.description = function() {
+	var lung = this.originX > 0 ? " left lung" : " right lung";
+	var lobe = this.originY > 0 ? " lower lobe of" : " upper lobe of";
+
+	return 'wheeze' + lobe + lung;
+}
 /**
  * OpenEyes
  *
