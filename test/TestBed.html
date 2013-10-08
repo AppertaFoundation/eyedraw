@@ -12,11 +12,14 @@
         <!--   This script handles the drawings for the page   -->
         <script type="text/javascript">
         
-            var doodleSet = [{"version": 1.0, "subclass": "Patch", "originX": -130, "originY": -183, "apexX": -50, "rotation": 325, "order": 0, }];
+            //var doodleSet = [{"version": 1.0, "subclass": "Patch", "originX": -130, "originY": -183, "apexX": -50, "rotation": 325, "order": 0, }];
+            
+        
+        	var doodleSet = [{"subclass": "OpticDisc", "originX": 0, "originY": 0, "radius": 200, "apexX": 0, "apexY": -223, "scaleX": 1.00, "scaleY": 1.00, "arc": 180, "rotation": 0, "order": 1, "squiggleArray": [{"colour": {"red":100,"green":100,"blue":100,"alpha":1}, "thickness": 4, "filled": "true", "pointsArray": []}], "mode": "Basic"}];
             
             
             // This set can be written by PHP and contains doodle data for this drawing from a database
-//            var doodleSet = [{"subclass": "PhakoIncision", "originX": 0, "originY": 0, "radius": 250, "apexX": 0, "apexY": -250, "scaleX": 1.00, "scaleY": 1.00, "arc": 90, "rotation": 319, "order": 0, "squiggleArray": []}];
+            //var doodleSet = [{"subclass": "PhakoIncision", "originX": 0, "originY": 0, "radius": 250, "apexX": 0, "apexY": -250, "scaleX": 1.00, "scaleY": 1.00, "arc": 90, "rotation": 319, "order": 0, "squiggleArray": []}];
             
             
             // Unique variable assigned to the drawing
@@ -78,8 +81,10 @@
                         
 							//Scale down for glaucoma drawings
 							this.drawing.globalScaleFactor = this.gsf;
+							
+							this.drawing.load(doodleSet);
 
-// 							this.drawing.addDoodle('AntSeg');
+ 							//this.drawing.addDoodle('OpticDisc');
 // 							this.drawing.addDoodle('TransilluminationDefect');
 
 														
@@ -87,8 +92,8 @@
 							//this.drawing.addDoodle('BranchRetinalVeinOcclusionPostPole');
 							//this.drawing.addDoodle('SectorPRP');
 
-							this.drawing.addDoodle('PostPole');
-							this.drawing.addDoodle('FibrousProliferation');
+							//this.drawing.addDoodle('PostPole');
+							//this.drawing.addDoodle('FibrousProliferation');
 							//this.drawing.addDoodle('BlotHaemorrhage');
 
 
@@ -344,7 +349,8 @@
         <input type="text" id="typeInput" value="Calcified" />
          --> 
          
-        <button onclick="console.log(drawingEdit.report()); return false;" >Report</button>
+        <button onclick="console.log(drawingEdit.report()); return false;">Report</button>
+        <button onclick="console.log(drawingEdit.save()); return false;">Save</button>
         
 
 
