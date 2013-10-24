@@ -19,23 +19,23 @@
 /**
  * Blood pressure reading
  *
- * @class BPReading
+ * @class RecordReading
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
  * @param {Object} _parameterJSON
  */
-ED.BPReading = function(_drawing, _parameterJSON) {
+ED.RecordReading = function(_drawing, _parameterJSON) {
 	// Set classname
-	this.className = "BPReading";
+	this.className = "RecordReading";
 
 	// Private parameters
-	this.stolic = 'sys';
+	this.type = 'sys';			// Can be either 'sys', 'dia', 'pul', 'res'
 		
 	// Derived parameters
-	this.value = '0';
+	this.value = '0';			// Numerical value of reading
 	
 	// Saved parameters
-	this.savedParameterArray = ['originX', 'originY', 'value', 'stolic'];
+	this.savedParameterArray = ['originX', 'originY', 'value', 'type'];
 	
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -44,14 +44,14 @@ ED.BPReading = function(_drawing, _parameterJSON) {
 /**
  * Sets superclass and constructor
  */
-ED.BPReading.prototype = new ED.Doodle;
-ED.BPReading.prototype.constructor = ED.BPReading;
-ED.BPReading.superclass = ED.Doodle.prototype;
+ED.RecordReading.prototype = new ED.Doodle;
+ED.RecordReading.prototype.constructor = ED.RecordReading;
+ED.RecordReading.superclass = ED.Doodle.prototype;
 
 /**
  * Sets default properties
  */
-ED.BPReading.prototype.setPropertyDefaults = function() {
+ED.RecordReading.prototype.setPropertyDefaults = function() {
 	this.isRotatable = false;
 	
 	// Add complete validation arrays for derived parameters
@@ -61,28 +61,12 @@ ED.BPReading.prototype.setPropertyDefaults = function() {
 		range: new ED.Range(0, 240),
 		animate: false
 	};
-	this.parameterValidationArray['stolic'] = {
+	this.parameterValidationArray['type'] = {
 		kind: 'derived',
 		type: 'string',
-		list: ['sys', 'dia'],
+		list: ['sys', 'dia', 'pul', 'res'],
 		animate: false
 	};
-}
-
-/**
- * Sets default parameters (only called for new doodles)
- * Use the setParameter function for derived parameters, as this will also update dependent variables
- */
-ED.BPReading.prototype.setParameterDefaults = function() {
-	this.setParameterFromString('value', '120');
-	
-	// Get x separation of drawing
-	var recordGrid = this.drawing.lastDoodleOfClass('RecordGrid');
-	if (recordGrid) {
-		var xd = this.drawing.doodlePlaneWidth/recordGrid.numberCellsHorizontal;
-		this.originX = recordGrid.firstCoordinate + recordGrid.index * xd;
-		this.parameterValidationArray['originX']['range'].setMinAndMax(this.originX, this.originX);
-	}
 }
 
 /**
@@ -93,7 +77,7 @@ ED.BPReading.prototype.setParameterDefaults = function() {
  * @value {Undefined} _value Value of parameter to calculate
  * @returns {Array} Associative array of values of dependent parameters
  */
-ED.BPReading.prototype.dependentParameterValues = function(_parameter, _value) {
+ED.RecordReading.prototype.dependentParameterValues = function(_parameter, _value) {
 	var returnArray = new Array();
 
 	switch (_parameter) {
@@ -104,18 +88,14 @@ ED.BPReading.prototype.dependentParameterValues = function(_parameter, _value) {
 		case 'value':
 			returnArray['originY'] = - (_value * this.drawing.doodlePlaneHeight/240) + this.drawing.doodlePlaneHeight/2;
 			break;
+			
+		case 'originX':
+			// When originX is set, ensure user cannot move doodle to left and right
+			this.parameterValidationArray['originX']['range'].setMinAndMax(this.originX, this.originX);
+			break;
 	}
 
 	return returnArray;
-}
-
-/**
- * Sets value to that of previous doodle of same type
- *
- */
-ED.BPReading.prototype.setValueToLast = function() {
-	var recordGrid = this.drawing.lastDoodleOfClass('RecordGrid');
-	this.setParameterFromString('value', recordGrid.values[this.stolic].toString());
 }
 
 /**
@@ -123,32 +103,40 @@ ED.BPReading.prototype.setValueToLast = function() {
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.BPReading.prototype.draw = function(_point) { //console.log(this.originX);
+ED.RecordReading.prototype.draw = function(_point) { //console.log(this.originX);
 	// Get context
 	var ctx = this.drawing.context;
 
 	// Call draw method in superclass
-	ED.BPReading.superclass.draw.call(this, _point);
+	ED.RecordReading.superclass.draw.call(this, _point);
 
 	// Boundary path
 	ctx.beginPath();
 
-	// BPReading
+	// Width and half height
 	var w = 60;
 	var h = 30;
 
-	if (this.stolic == 'sys') {	
-		ctx.rect(-w/2, -h, w, h);
-	}
-	else {
-		ctx.rect(-w/2, 0, w, h);
+	switch (this.type) {
+		case 'sys':
+			ctx.rect(-w/2, -h, w, h);
+			break;
+		case 'dia':
+			ctx.rect(-w/2, 0, w, h);
+			break;
+		case 'pul':
+			ctx.arc(0, 0, h, 0, Math.PI * 2, true);
+			break;
+		case 'res':
+			ctx.arc(0, 0, h, 0, Math.PI * 2, true);
+			break;			
 	}
 
 	// Close path
 	ctx.closePath();
 
 	// Transparent stroke and fill
-	ctx.strokeStyle = "red";//"rgba(255,255,255,0)";
+	ctx.strokeStyle = "rgba(255,255,255,0)";
 	ctx.fillStyle = "rgba(255,255,255,0)";
 
 	// Draw boundary path (also hit testing)
@@ -158,16 +146,23 @@ ED.BPReading.prototype.draw = function(_point) { //console.log(this.originX);
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
 		ctx.beginPath();
 
-		// Arrow
-		if (this.stolic == 'sys') {
-			ctx.moveTo(-w/2, -h);
-			ctx.lineTo(0, 0);
-			ctx.lineTo(w/2, -h);
-		}
-		else {
-			ctx.moveTo(-w/2, h);
-			ctx.lineTo(0, 0);
-			ctx.lineTo(w/2, h);		
+		switch (this.type) {
+			case 'sys':
+				ctx.moveTo(-w/2, -h);
+				ctx.lineTo(0, 0);
+				ctx.lineTo(w/2, -h);
+				break;
+			case 'dia':
+				ctx.moveTo(-w/2, h);
+				ctx.lineTo(0, 0);
+				ctx.lineTo(w/2, h);	
+				break;
+			case 'pul':
+				ctx.arc(0, 0, 20, 0, Math.PI * 2, true);
+				break;
+			case 'res':
+				ctx.arc(0, 0, 20, 0, Math.PI * 2, true);
+				break;			
 		}
 		
 		// Set line attributes
@@ -175,9 +170,11 @@ ED.BPReading.prototype.draw = function(_point) { //console.log(this.originX);
 		ctx.lineJoin = 'round';
 		ctx.lineCap = 'round';
 		ctx.strokeStyle = "gray";
+		ctx.fillStyle= ctx.strokeStyle;
 
-		// Draw vessels
+		// Draw symbol
 		ctx.stroke();
+		if (this.type == 'pul') ctx.fill();
 	}
 
 	// Return value indicating successful hittest
@@ -187,11 +184,11 @@ ED.BPReading.prototype.draw = function(_point) { //console.log(this.originX);
 /**
  * Draws extra items if the doodle is highlighted
  */
-ED.BPReading.prototype.drawHighlightExtras = function() {
+ED.RecordReading.prototype.drawHighlightExtras = function() {
 	// Get context
 	var ctx = this.drawing.context;
 
-	// Draw text description of gauge
+	// Draw value
 	ctx.lineWidth = 1;
 	ctx.font = "64px sans-serif";
 	ctx.strokeStyle = "blue";

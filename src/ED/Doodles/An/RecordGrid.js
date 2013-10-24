@@ -19,7 +19,7 @@
 /**
  * RecordGrid
  *
- * @class RecordGrid ***TODO***
+ * @class RecordGrid
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
  * @param {Object} _parameterJSON
@@ -29,11 +29,17 @@ ED.RecordGrid = function(_drawing, _parameterJSON) {
 	this.className = "RecordGrid";
 
 	// Private parameters
-	this.numberCellsHorizontal = 30;
+	this.values = {'sys':160, 'dia':80, 'pul':60, 'res':30};		// Default values
+	this.minutesPerCell = 5;					// 'Width' of each cell in minutes (default: 5 - try 1 for demo)
+	this.minutesLabelArray = [0, 30];			// Labels for these minutes past the hour
+	this.totalMinutes = 180;						// Total duration of record (default: 180 - try 30 for demo)
+	this.numberCellsHorizontal = Math.round(this.totalMinutes/this.minutesPerCell) + 2;
 	this.numberCellsVertical = 12;
-	this.index = 0;
-	this.firstCoordinate = 0;
-	this.values = {'sys':160, 'dia':80};
+	this.separationOfVerticalGridLines = _drawing.doodlePlaneWidth/this.numberCellsHorizontal;	
+	this.index = 0;								// Index property is the number of the vertical line where a reading is entered
+	this.firstCoordinate = - _drawing.doodlePlaneWidth/2;
+	this.startDate = new Date();				// Starting date 2013,2,1,10,35
+	this.setGridStartDate(this.startDate);		// Date of left hand edge of grid
 	
 	// Saved parameters
 	//this.savedParameterArray = [];
@@ -59,14 +65,6 @@ ED.RecordGrid.prototype.setPropertyDefaults = function() {
 }
 
 /**
- * Sets default parameters (only called for new doodles)
- * Use the setParameter function for derived parameters, as this will also update dependent variables
- */
-ED.RecordGrid.prototype.setParameterDefaults = function() {
-	this.firstCoordinate = -this.drawing.doodlePlaneWidth/2;
-}
-
-/**
  * Draws doodle or performs a hit test if a Point parameter is passed
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
@@ -88,7 +86,7 @@ ED.RecordGrid.prototype.draw = function(_point) {
 
 	// Set line attributes
 	ctx.lineWidth = 4;
-	ctx.strokeStyle = "red";
+	ctx.strokeStyle = "gray";
 	ctx.fillStyle = "rgba(255,255,255,0)";
 
 	// Draw boundary path (also hit testing)
@@ -99,43 +97,135 @@ ED.RecordGrid.prototype.draw = function(_point) {
 		ctx.beginPath();
 
 		// Horizontal grid lines
+		for (var j = 0; j < this.numberCellsVertical; j++) {
+			ctx.moveTo(xs, ys + j * yd);
+			ctx.lineTo(xs + this.drawing.doodlePlaneWidth, ys + j * yd);
+		}
+
+		// Vertical grid lines
 		for (var i = 0; i < this.numberCellsHorizontal; i++) {
 			ctx.moveTo(xs + i * xd, ys);
 			ctx.lineTo(xs + i * xd, ys + this.drawing.doodlePlaneHeight);
 		}
-
-		// Vertical grid lines
-		for (var j = 0; j < this.numberCellsVertical; j++) {
-			ctx.moveTo(xs, ys + j * yd);
-			ctx.lineTo(xs + this.drawing.doodlePlaneWidth, ys + j * yd);
-		} 
 		
 		// Set line attributes
 		ctx.lineWidth = 4;
-		ctx.strokeStyle = "gray";
+		ctx.strokeStyle = "rgba(200,200,200,1)";
 
-		// Draw vessels
+		// Draw grid lines
 		ctx.stroke();
-	}
+		
+		// Draw timeLine in red
+		var ms = new Date() - this.gridStartDate;
+		this.timeLineX = this.firstCoordinate + (this.drawing.doodlePlaneWidth/this.numberCellsHorizontal) * ms/(60 * 1000 * this.minutesPerCell);
+		ctx.beginPath();
+		ctx.moveTo(this.timeLineX, ys);
+		ctx.lineTo(this.timeLineX,  ys + this.drawing.doodlePlaneHeight);
+		ctx.lineWidth = 4;
+		ctx.strokeStyle = "red";
+		ctx.stroke();
+		
+		// Draw time values at top, but leave out edges
+		for (var i = 1; i < this.numberCellsHorizontal; i++) {
+		
+			// Calculate date of line
+			dateOfGridLine = new Date(this.gridStartDate.getTime() + i * this.minutesPerCell * 60000);
+			var hour = dateOfGridLine.getHours();
+			var minutes = dateOfGridLine.getMinutes();
 
+			// Only put in markers for major timepoints		
+			if (this.minutesLabelArray.indexOf(minutes) >= 0) {
+				// Text of time display
+				var hourText = hour.toString();
+				if (hourText.length < 2) hourText = '0' + hourText;
+				var minutesText = minutes.toString();
+				if (minutesText.length < 2) minutesText = '0' + minutesText;
+				var text = hourText + ':' + minutesText;
+				
+				// Text properties
+				ctx.lineWidth = 1;
+				ctx.font = "48px sans-serif";
+				ctx.strokeStyle = "gray";
+				ctx.fillStyle = "gray";
+			
+				// Draw text centred on grid line
+				var textWidth = ctx.measureText(text).width;
+				ctx.fillText(text, xs + i * xd - textWidth/2, ys + 50);
+			}
+		}
+	}
 
 	// Return value indicating successful hit test
 	return this.isClicked;
 }
 
 /**
- * Sets default parameters (only called for new doodles)
- * Use the setParameter function for derived parameters, as this will also update dependent variables
+ * Returns an array of the values of the last entry if present
+ *
+ * @param {String} _type Type of readings
+ * @return {Mixed} The last value if present, otherwise false
  */
-ED.RecordGrid.prototype.updateNextValues = function() {
-	var readingArray = this.drawing.allDoodlesOfClass('BPReading');
+ED.RecordGrid.prototype.getNextValues = function(_type) {
+	// Get array of all the BPReading doodles (of both 'sys' and 'dia' stolic types
+	var readingArray = this.drawing.allDoodlesOfClass('RecordReading');
+	
+	// Set default to beyond left border
+	var lastX = -2000;
 	
 	// Set values to that of last entry
-	if (readingArray.length > 0) {
-		this.values['sys'] = readingArray[1].value;
-		this.values['dia'] = readingArray[0].value;
+	for (var i = 0; i < readingArray.length; i++) {
+		if (readingArray[i].type == _type) {
+			this.values[_type] = readingArray[i].value;
+			lastX = readingArray[i].originX;
+			break;
+		}
 	}
 	
-	// Increase index
-	this.index++;
+	// Get current x coordinate for the time point
+	var x = this.getGridX();
+	
+	// If its different from the last entry, then return the next values
+	if (x > lastX) {
+		return {'value':this.values[_type], 'originX':x};
+	}
+	else {
+		return false;
+	}
+}
+
+/**
+ * Sets date properties so that a time may be displayed clearly
+ *
+ * @param {Date} _date Date object representing the date of the record grid start
+ */
+ED.RecordGrid.prototype.setGridStartDate = function(_date) {
+	// Determine time coordinate of start of grid
+	var nearestGridLine = Math.round(_date.getMinutes()/this.minutesPerCell) * this.minutesPerCell;
+	var nearestGridLineBefore = Math.floor(_date.getMinutes()/this.minutesPerCell) * this.minutesPerCell;
+	
+	// Set grid start date to allow first reading to be on first line to right of left hand edge
+	this.gridStartDate = _date;
+	this.gridStartDate.setMinutes(nearestGridLineBefore);
+	
+	// Shave off one grid width if label is on left hand edge
+	if (nearestGridLine == nearestGridLineBefore) {
+		this.gridStartDate = new Date(this.gridStartDate.getTime() - this.minutesPerCell * 60000);
+	}
+		
+	// Zero seconds
+	this.gridStartDate.setSeconds(0);
+}
+
+/**
+ * Gets X coordinate of nearest vertical grid line to current time
+ */
+ED.RecordGrid.prototype.getGridX = function() {
+	// Get time diff in milliseconds from start of grid until now
+	var ms = new Date() - this.gridStartDate;
+	
+	// Set index
+	this.index = Math.round(ms/(60 * 1000 * this.minutesPerCell));
+	
+	// Return integer pixel value to allow reliable test of whether reading is already there
+	return Math.round(this.firstCoordinate + this.index * this.separationOfVerticalGridLines);
 }

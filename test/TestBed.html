@@ -30,6 +30,10 @@
             // Runs on page load
             function init()
             {
+            	var d = new Date();
+            	//debugger;
+            	
+            	//console.log(d.toLocaleTimeString());
                 // Get reference to the drawingEdit canvas
                 var canvasEdit = document.getElementById('canvasEdit');
                 
@@ -83,7 +87,7 @@
 													
 
 							// Grid
-					    	this.drawing.addDoodle('Lungs');
+					    	//this.drawing.addDoodle('Lungs');
 					    	
 							// Right eye
 // 					    	rightEye = this.drawing.addDoodle(
@@ -121,9 +125,19 @@
 							//this.drawing.addDoodle('BranchRetinalVeinOcclusionPostPole');
 							//this.drawing.addDoodle('SectorPRP');
 
-							//grid = this.drawing.addDoodle('RecordGrid');
-							//this.drawing.addDoodle('BPReading', {'stolic':'sys'});
+							grid = this.drawing.addDoodle('RecordGrid');
+							//this.drawing.addDoodle('RecordReading', {'type':'sys'});
 							//this.drawing.addDoodle('BPReading', {'stolic':'dia'});
+							
+							//this.drawing.addDoodle('AgentDuration');
+
+							
+							var drawing = this.drawing;
+							
+							// Animation to update timeline every second
+							setInterval(function() {
+								drawing.repaint();
+							}, 1000);
 							
 // 
 // 							this.drawing.addDoodle('PostPole');
@@ -337,9 +351,21 @@
         <!-- Doodle selection toolbar -->
         <div class="ed_toolbar" id="canvasEdit1doodleToolbar">
  
-            <button id="LensRPS" class="imgbutton" title="Lens" onclick="drawingEdit.addDoodle('Pulse'); return false;" ><img src="../img/MacularDystrophy.gif" /></button>
-            <button id="LensRPS" class="imgbutton" title="Lens" onclick="grid.updateNextValues(); var sys = drawingEdit.addDoodle('BPReading', {'stolic':'sys', 'value':140}); sys.setValueToLast(); var dia = drawingEdit.addDoodle('BPReading', {'stolic':'dia', 'value':80}); dia.setValueToLast(); return false;" ><img src="../img/PI.gif" /></button>
 
+
+            <button id="LensRPS" class="imgbutton" title="Lens" onclick="
+				var vals = grid.getNextValues('sys');
+				if (vals) var sys = drawingEdit.addDoodle('RecordReading', {'type':'sys', 'value':vals['value'], 'originX':vals['originX']});
+				var vals = grid.getNextValues('dia');
+				if (vals) var dia = drawingEdit.addDoodle('RecordReading', {'type':'dia', 'value':vals['value'], 'originX':vals['originX']});
+				var vals = grid.getNextValues('pul');
+				if (vals) var pul = drawingEdit.addDoodle('RecordReading', {'type':'pul', 'value':vals['value'], 'originX':vals['originX']});
+				var vals = grid.getNextValues('res');
+				if (vals) var res = drawingEdit.addDoodle('RecordReading', {'type':'res', 'value':vals['value'], 'originX':vals['originX']});
+				drawingEdit.deselectDoodles();           
+				return false;
+            " ><img src="../img/RecordReading.gif" /></button>
+            
             <button id="LensRPS" class="imgbutton" title="Lens" onclick="drawingEdit.addDoodle('Effusion'); return false;" ><img src="../img/Cryo.gif" /></button>
 
 
@@ -353,7 +379,7 @@
         <span class="canvasTooltip" id="canvasEditTooltip"></span>
         
         <!-- Canvas element style="border: none;" style="background-color: #DAE6F1;"-->
-        <canvas id="canvasEdit" class="ed_canvas_edit" width="300" height="300" tabindex="1" style="border: 1px solic gray;"></canvas>
+        <canvas id="canvasEdit" class="ed_canvas_edit" width="760" height="300" tabindex="1" style="border: 1px solid gray;"></canvas>
 
         <br/>
 
@@ -538,8 +564,9 @@
         <input type="text" id="typeInput" value="Calcified" />
          --> 
          
-        <button onclick="console.log(drawingEdit.report()); return false;" >Report</button>
-        
+        <button onclick="console.log(drawingEdit.report()); return false;">Report</button>
+        <button onclick="var startDate = new Date(); grid.setDate(startDate); console.log(grid.date); return false;">Start</button>
+        <button onclick="console.log(grid.getGridX()); return false;">Grid</button>
 
 
         

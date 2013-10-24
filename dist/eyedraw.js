@@ -7113,25 +7113,27 @@ ED.trans['Haematoma'] = 'Haematoma<br/><br/>Drag to move<br/>Drag handle to resi
  */
 
 /**
- * Blood pressure reading
+ * Agent Duration
  *
- * @class BPReading
+ * @class AgentDuration
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
  * @param {Object} _parameterJSON
  */
-ED.BPReading = function(_drawing, _parameterJSON) {
+ED.AgentDuration = function(_drawing, _parameterJSON) {
 	// Set classname
-	this.className = "BPReading";
-
-	// Private parameters
-	this.stolic = 'sys';
+	this.className = "AgentDuration";
 		
 	// Derived parameters
-	this.value = '0';
+	//this.value = '0';
+	
+	// Private parameters
+	this.halfWidth = 200;
+	this.halfHeight = 20;
+	this.minimumWidth = 40;
 	
 	// Saved parameters
-	this.savedParameterArray = ['originX', 'originY', 'value', 'stolic'];
+	//this.savedParameterArray = ['originX', 'originY', 'value'];
 	
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -7140,45 +7142,60 @@ ED.BPReading = function(_drawing, _parameterJSON) {
 /**
  * Sets superclass and constructor
  */
-ED.BPReading.prototype = new ED.Doodle;
-ED.BPReading.prototype.constructor = ED.BPReading;
-ED.BPReading.superclass = ED.Doodle.prototype;
+ED.AgentDuration.prototype = new ED.Doodle;
+ED.AgentDuration.prototype.constructor = ED.AgentDuration;
+ED.AgentDuration.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.AgentDuration.prototype.setHandles = function() {
+	this.handleArray[3] = new ED.Handle(null, true, ED.Mode.Apex, false);
+}
 
 /**
  * Sets default properties
  */
-ED.BPReading.prototype.setPropertyDefaults = function() {
+ED.AgentDuration.prototype.setPropertyDefaults = function() {
 	this.isRotatable = false;
 	
 	// Add complete validation arrays for derived parameters
-	this.parameterValidationArray['value'] = {
-		kind: 'derived',
-		type: 'int',
-		range: new ED.Range(0, 240),
-		animate: false
-	};
-	this.parameterValidationArray['stolic'] = {
-		kind: 'derived',
-		type: 'string',
-		list: ['sys', 'dia'],
-		animate: false
-	};
+// 	this.parameterValidationArray['value'] = {
+// 		kind: 'derived',
+// 		type: 'int',
+// 		range: new ED.Range(0, 240),
+// 		animate: false
+// 	};
+	// Update component of validation array for simple parameters
+	//this.parameterValidationArray['arc']['range'].setMinAndMax(Math.PI / 6, Math.PI * 2);
+	this.parameterValidationArray['originX']['range'].setMinAndMax(-1000 + this.halfWidth, +900);
+	this.parameterValidationArray['originY']['range'].setMinAndMax(-0, +0);
+	this.parameterValidationArray['apexX']['range'].setMinAndMax(-this.halfWidth + this.minimumWidth, +1500);
+	this.parameterValidationArray['apexY']['range'].setMinAndMax(-0, +0);
 }
 
 /**
  * Sets default parameters (only called for new doodles)
  * Use the setParameter function for derived parameters, as this will also update dependent variables
  */
-ED.BPReading.prototype.setParameterDefaults = function() {
-	this.setParameterFromString('value', '120');
+ED.AgentDuration.prototype.setParameterDefaults = function() {
+	this.apexX = 100;
+// 	
+// 	var lastAgentDuration = this.drawing.lastDoodleOfClass('AgentDuration');
+// 	if (lastAgentDuration) {
+// 		this.setParameterFromString('value', lastAgentDuration.value.toString());
+// 	}
+// 	else {
+// 		this.setParameterFromString('value', '80');
+// 	}
 	
 	// Get x separation of drawing
-	var recordGrid = this.drawing.lastDoodleOfClass('RecordGrid');
-	if (recordGrid) {
-		var xd = this.drawing.doodlePlaneWidth/recordGrid.numberCellsHorizontal;
-		this.originX = recordGrid.firstCoordinate + recordGrid.index * xd;
-		this.parameterValidationArray['originX']['range'].setMinAndMax(this.originX, this.originX);
-	}
+// 	var recordGrid = this.drawing.lastDoodleOfClass('RecordGrid');
+// 	if (recordGrid) {
+// 		var xd = this.drawing.doodlePlaneWidth/recordGrid.numberCellsHorizontal;
+// 		this.originX = recordGrid.firstCoordinate + recordGrid.index * xd;
+// 		this.parameterValidationArray['originX']['range'].setMinAndMax(this.originX, this.originX);
+// 	}
 }
 
 /**
@@ -7189,255 +7206,76 @@ ED.BPReading.prototype.setParameterDefaults = function() {
  * @value {Undefined} _value Value of parameter to calculate
  * @returns {Array} Associative array of values of dependent parameters
  */
-ED.BPReading.prototype.dependentParameterValues = function(_parameter, _value) {
-	var returnArray = new Array();
-
-	switch (_parameter) {
-		case 'originY':
-			returnArray['value'] = Math.round(240 * (this.drawing.doodlePlaneHeight/2 - _value)/this.drawing.doodlePlaneHeight);
-			break;
-
-		case 'value':
-			returnArray['originY'] = - (_value * this.drawing.doodlePlaneHeight/240) + this.drawing.doodlePlaneHeight/2;
-			break;
-	}
-
-	return returnArray;
-}
-
-/**
- * Sets value to that of previous doodle of same type
- *
- */
-ED.BPReading.prototype.setValueToLast = function() {
-	var recordGrid = this.drawing.lastDoodleOfClass('RecordGrid');
-	this.setParameterFromString('value', recordGrid.values[this.stolic].toString());
-}
+// ED.AgentDuration.prototype.dependentParameterValues = function(_parameter, _value) {
+// 	var returnArray = new Array();
+// 
+// 	switch (_parameter) {
+// 		case 'originY':
+// 			returnArray['value'] = Math.round(240 * (this.drawing.doodlePlaneHeight/2 - _value)/this.drawing.doodlePlaneHeight);
+// 			break;
+// 
+// 		case 'value':
+// 			returnArray['originY'] = - (_value * this.drawing.doodlePlaneHeight/240) + this.drawing.doodlePlaneHeight/2;
+// 			break;
+// 	}
+// 
+// 	return returnArray;
+// }
 
 /**
  * Draws doodle or performs a hit test if a Point parameter is passed
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.BPReading.prototype.draw = function(_point) { //console.log(this.originX);
+ED.AgentDuration.prototype.draw = function(_point) { //console.log(this.originX);
 	// Get context
 	var ctx = this.drawing.context;
 
 	// Call draw method in superclass
-	ED.BPReading.superclass.draw.call(this, _point);
+	ED.AgentDuration.superclass.draw.call(this, _point);
 
 	// Boundary path
 	ctx.beginPath();
 
-	// BPReading
-	var w = 60;
-	var h = 30;
-
-	if (this.stolic == 'sys') {	
-		ctx.rect(-w/2, -h, w, h);
-	}
-	else {
-		ctx.rect(-w/2, 0, w, h);
-	}
+	// Boundary
+	ctx.rect(-this.halfWidth, -this.halfHeight, this.halfWidth + this.apexX, this.halfHeight);
 
 	// Close path
 	ctx.closePath();
 
-	// Transparent stroke and fill
-	ctx.strokeStyle = "red";//"rgba(255,255,255,0)";
-	ctx.fillStyle = "rgba(255,255,255,0)";
+	// Set attributes
+	ctx.lineWidth = 1;
+	ctx.strokeStyle = "rgba(125,125,125,0.5)";
+	ctx.fillStyle =  "rgba(125,125,125,0)";
 
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 	
-	// Non-boundary paths
+	// Non boundary drawing
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+		// Draw line with end bars
 		ctx.beginPath();
-
-		// Arrow
-		if (this.stolic == 'sys') {
-			ctx.moveTo(-w/2, -h);
-			ctx.lineTo(0, 0);
-			ctx.lineTo(w/2, -h);
-		}
-		else {
-			ctx.moveTo(-w/2, h);
-			ctx.lineTo(0, 0);
-			ctx.lineTo(w/2, h);		
-		}
+		ctx.moveTo(-this.halfWidth, -this.halfHeight);
+		ctx.lineTo(-this.halfWidth, this.halfHeight);
+		ctx.moveTo(-this.halfWidth, 0);
+		ctx.lineTo(this.apexX, 0);
+		ctx.moveTo(this.apexX, -this.halfHeight);
+		ctx.lineTo(this.apexX, this.halfHeight);
 		
-		// Set line attributes
-		ctx.lineWidth = 8;
-		ctx.lineJoin = 'round';
-		ctx.lineCap = 'round';
-		ctx.strokeStyle = "gray";
-
-		// Draw vessels
+		// Set attributes
+		ctx.lineWidth = 4;
+		ctx.strokeStyle = "rgba(50,50,50,1)";
+		
+		// Draw
 		ctx.stroke();
 	}
 
-	// Return value indicating successful hittest
-	return this.isClicked;
-}
+	// Coordinates of handles (in canvas plane)
+	this.handleArray[3].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
-/**
- * Draws extra items if the doodle is highlighted
- */
-ED.BPReading.prototype.drawHighlightExtras = function() {
-	// Get context
-	var ctx = this.drawing.context;
-
-	// Draw text description of gauge
-	ctx.lineWidth = 1;
-	ctx.font = "64px sans-serif";
-	ctx.strokeStyle = "blue";
-	ctx.fillStyle = "blue";
-	ctx.fillText(this.value, +40, +20);
-}
-
-
-/**
- * OpenEyes
- *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
- * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
- *
- * @package OpenEyes
- * @link http://www.openeyes.org.uk
- * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
- */
-
-/**
- * Pulse (Heart rate) reading
- *
- * @class Pulse
- * @property {String} className Name of doodle subclass
- * @param {Drawing} _drawing
- * @param {Object} _parameterJSON
- */
-ED.Pulse = function(_drawing, _parameterJSON) {
-	// Set classname
-	this.className = "Pulse";
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
 		
-	// Derived parameters
-	this.value = '0';
-	
-	// Saved parameters
-	this.savedParameterArray = ['originX', 'originY', 'value'];
-	
-	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _parameterJSON);
-}
-
-/**
- * Sets superclass and constructor
- */
-ED.Pulse.prototype = new ED.Doodle;
-ED.Pulse.prototype.constructor = ED.Pulse;
-ED.Pulse.superclass = ED.Doodle.prototype;
-
-/**
- * Sets default properties
- */
-ED.Pulse.prototype.setPropertyDefaults = function() {
-	this.isRotatable = false;
-	
-	// Add complete validation arrays for derived parameters
-	this.parameterValidationArray['value'] = {
-		kind: 'derived',
-		type: 'int',
-		range: new ED.Range(0, 240),
-		animate: false
-	};
-}
-
-/**
- * Sets default parameters (only called for new doodles)
- * Use the setParameter function for derived parameters, as this will also update dependent variables
- */
-ED.Pulse.prototype.setParameterDefaults = function() {
-	
-	
-	var lastPulse = this.drawing.lastDoodleOfClass('Pulse');
-	if (lastPulse) {
-		this.setParameterFromString('value', lastPulse.value.toString());
-	}
-	else {
-		this.setParameterFromString('value', '80');
-	}
-	
-	// Get x separation of drawing
-	var recordGrid = this.drawing.lastDoodleOfClass('RecordGrid');
-	if (recordGrid) {
-		var xd = this.drawing.doodlePlaneWidth/recordGrid.numberCellsHorizontal;
-		this.originX = recordGrid.firstCoordinate + recordGrid.index * xd;
-		this.parameterValidationArray['originX']['range'].setMinAndMax(this.originX, this.originX);
-	}
-}
-
-/**
- * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
- * The returned parameters are animated if their 'animate' property is set to true
- *
- * @param {String} _parameter Name of parameter that has changed
- * @value {Undefined} _value Value of parameter to calculate
- * @returns {Array} Associative array of values of dependent parameters
- */
-ED.Pulse.prototype.dependentParameterValues = function(_parameter, _value) {
-	var returnArray = new Array();
-
-	switch (_parameter) {
-		case 'originY':
-			returnArray['value'] = Math.round(240 * (this.drawing.doodlePlaneHeight/2 - _value)/this.drawing.doodlePlaneHeight);
-			break;
-
-		case 'value':
-			returnArray['originY'] = - (_value * this.drawing.doodlePlaneHeight/240) + this.drawing.doodlePlaneHeight/2;
-			break;
-	}
-
-	return returnArray;
-}
-
-/**
- * Draws doodle or performs a hit test if a Point parameter is passed
- *
- * @param {Point} _point Optional point in canvas plane, passed if performing hit test
- */
-ED.Pulse.prototype.draw = function(_point) { //console.log(this.originX);
-	// Get context
-	var ctx = this.drawing.context;
-
-	// Call draw method in superclass
-	ED.Pulse.superclass.draw.call(this, _point);
-
-	// Boundary path
-	ctx.beginPath();
-
-	// Pulse
-	var r = 20;
-
-	// Boundary path
-	ctx.beginPath();
-
-	// Haemorrhage
-	ctx.arc(0, 0, r, 0, 2 * Math.PI, true);
-
-	// Set attributes
-	ctx.lineWidth = 1;
-	ctx.strokeStyle = "rgba(125,125,125,1)";
-	ctx.fillStyle = ctx.strokeStyle;
-
-	// Draw boundary path (also hit testing)
-	this.drawBoundary(_point);
-	
 	// Return value indicating successful hittest
 	return this.isClicked;
 }
@@ -7445,7 +7283,7 @@ ED.Pulse.prototype.draw = function(_point) { //console.log(this.originX);
 /**
  * Draws extra items if the doodle is highlighted
  */
-// ED.Pulse.prototype.drawHighlightExtras = function() {
+// ED.AgentDuration.prototype.drawHighlightExtras = function() {
 // 	// Get context
 // 	var ctx = this.drawing.context;
 // 
@@ -7479,7 +7317,7 @@ ED.Pulse.prototype.draw = function(_point) { //console.log(this.originX);
 /**
  * RecordGrid
  *
- * @class RecordGrid ***TODO***
+ * @class RecordGrid
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
  * @param {Object} _parameterJSON
@@ -7489,11 +7327,17 @@ ED.RecordGrid = function(_drawing, _parameterJSON) {
 	this.className = "RecordGrid";
 
 	// Private parameters
-	this.numberCellsHorizontal = 30;
+	this.values = {'sys':160, 'dia':80, 'pul':60, 'res':30};		// Default values
+	this.minutesPerCell = 5;					// 'Width' of each cell in minutes (default: 5 - try 1 for demo)
+	this.minutesLabelArray = [0, 30];			// Labels for these minutes past the hour
+	this.totalMinutes = 180;						// Total duration of record (default: 180 - try 30 for demo)
+	this.numberCellsHorizontal = Math.round(this.totalMinutes/this.minutesPerCell) + 2;
 	this.numberCellsVertical = 12;
-	this.index = 0;
-	this.firstCoordinate = 0;
-	this.values = {'sys':160, 'dia':80};
+	this.separationOfVerticalGridLines = _drawing.doodlePlaneWidth/this.numberCellsHorizontal;	
+	this.index = 0;								// Index property is the number of the vertical line where a reading is entered
+	this.firstCoordinate = - _drawing.doodlePlaneWidth/2;
+	this.startDate = new Date();				// Starting date 2013,2,1,10,35
+	this.setGridStartDate(this.startDate);		// Date of left hand edge of grid
 	
 	// Saved parameters
 	//this.savedParameterArray = [];
@@ -7519,14 +7363,6 @@ ED.RecordGrid.prototype.setPropertyDefaults = function() {
 }
 
 /**
- * Sets default parameters (only called for new doodles)
- * Use the setParameter function for derived parameters, as this will also update dependent variables
- */
-ED.RecordGrid.prototype.setParameterDefaults = function() {
-	this.firstCoordinate = -this.drawing.doodlePlaneWidth/2;
-}
-
-/**
  * Draws doodle or performs a hit test if a Point parameter is passed
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
@@ -7548,7 +7384,7 @@ ED.RecordGrid.prototype.draw = function(_point) {
 
 	// Set line attributes
 	ctx.lineWidth = 4;
-	ctx.strokeStyle = "red";
+	ctx.strokeStyle = "gray";
 	ctx.fillStyle = "rgba(255,255,255,0)";
 
 	// Draw boundary path (also hit testing)
@@ -7559,46 +7395,337 @@ ED.RecordGrid.prototype.draw = function(_point) {
 		ctx.beginPath();
 
 		// Horizontal grid lines
+		for (var j = 0; j < this.numberCellsVertical; j++) {
+			ctx.moveTo(xs, ys + j * yd);
+			ctx.lineTo(xs + this.drawing.doodlePlaneWidth, ys + j * yd);
+		}
+
+		// Vertical grid lines
 		for (var i = 0; i < this.numberCellsHorizontal; i++) {
 			ctx.moveTo(xs + i * xd, ys);
 			ctx.lineTo(xs + i * xd, ys + this.drawing.doodlePlaneHeight);
 		}
-
-		// Vertical grid lines
-		for (var j = 0; j < this.numberCellsVertical; j++) {
-			ctx.moveTo(xs, ys + j * yd);
-			ctx.lineTo(xs + this.drawing.doodlePlaneWidth, ys + j * yd);
-		} 
 		
 		// Set line attributes
 		ctx.lineWidth = 4;
-		ctx.strokeStyle = "gray";
+		ctx.strokeStyle = "rgba(200,200,200,1)";
 
-		// Draw vessels
+		// Draw grid lines
 		ctx.stroke();
-	}
+		
+		// Draw timeLine in red
+		var ms = new Date() - this.gridStartDate;
+		this.timeLineX = this.firstCoordinate + (this.drawing.doodlePlaneWidth/this.numberCellsHorizontal) * ms/(60 * 1000 * this.minutesPerCell);
+		ctx.beginPath();
+		ctx.moveTo(this.timeLineX, ys);
+		ctx.lineTo(this.timeLineX,  ys + this.drawing.doodlePlaneHeight);
+		ctx.lineWidth = 4;
+		ctx.strokeStyle = "red";
+		ctx.stroke();
+		
+		// Draw time values at top, but leave out edges
+		for (var i = 1; i < this.numberCellsHorizontal; i++) {
+		
+			// Calculate date of line
+			dateOfGridLine = new Date(this.gridStartDate.getTime() + i * this.minutesPerCell * 60000);
+			var hour = dateOfGridLine.getHours();
+			var minutes = dateOfGridLine.getMinutes();
 
+			// Only put in markers for major timepoints		
+			if (this.minutesLabelArray.indexOf(minutes) >= 0) {
+				// Text of time display
+				var hourText = hour.toString();
+				if (hourText.length < 2) hourText = '0' + hourText;
+				var minutesText = minutes.toString();
+				if (minutesText.length < 2) minutesText = '0' + minutesText;
+				var text = hourText + ':' + minutesText;
+				
+				// Text properties
+				ctx.lineWidth = 1;
+				ctx.font = "48px sans-serif";
+				ctx.strokeStyle = "gray";
+				ctx.fillStyle = "gray";
+			
+				// Draw text centred on grid line
+				var textWidth = ctx.measureText(text).width;
+				ctx.fillText(text, xs + i * xd - textWidth/2, ys + 50);
+			}
+		}
+	}
 
 	// Return value indicating successful hit test
 	return this.isClicked;
 }
 
 /**
- * Sets default parameters (only called for new doodles)
- * Use the setParameter function for derived parameters, as this will also update dependent variables
+ * Returns an array of the values of the last entry if present
+ *
+ * @param {String} _type Type of readings
+ * @return {Mixed} The last value if present, otherwise false
  */
-ED.RecordGrid.prototype.updateNextValues = function() {
-	var readingArray = this.drawing.allDoodlesOfClass('BPReading');
+ED.RecordGrid.prototype.getNextValues = function(_type) {
+	// Get array of all the BPReading doodles (of both 'sys' and 'dia' stolic types
+	var readingArray = this.drawing.allDoodlesOfClass('RecordReading');
+	
+	// Set default to beyond left border
+	var lastX = -2000;
 	
 	// Set values to that of last entry
-	if (readingArray.length > 0) {
-		this.values['sys'] = readingArray[1].value;
-		this.values['dia'] = readingArray[0].value;
+	for (var i = 0; i < readingArray.length; i++) {
+		if (readingArray[i].type == _type) {
+			this.values[_type] = readingArray[i].value;
+			lastX = readingArray[i].originX;
+			break;
+		}
 	}
 	
-	// Increase index
-	this.index++;
+	// Get current x coordinate for the time point
+	var x = this.getGridX();
+	
+	// If its different from the last entry, then return the next values
+	if (x > lastX) {
+		return {'value':this.values[_type], 'originX':x};
+	}
+	else {
+		return false;
+	}
 }
+
+/**
+ * Sets date properties so that a time may be displayed clearly
+ *
+ * @param {Date} _date Date object representing the date of the record grid start
+ */
+ED.RecordGrid.prototype.setGridStartDate = function(_date) {
+	// Determine time coordinate of start of grid
+	var nearestGridLine = Math.round(_date.getMinutes()/this.minutesPerCell) * this.minutesPerCell;
+	var nearestGridLineBefore = Math.floor(_date.getMinutes()/this.minutesPerCell) * this.minutesPerCell;
+	
+	// Set grid start date to allow first reading to be on first line to right of left hand edge
+	this.gridStartDate = _date;
+	this.gridStartDate.setMinutes(nearestGridLineBefore);
+	
+	// Shave off one grid width if label is on left hand edge
+	if (nearestGridLine == nearestGridLineBefore) {
+		this.gridStartDate = new Date(this.gridStartDate.getTime() - this.minutesPerCell * 60000);
+	}
+		
+	// Zero seconds
+	this.gridStartDate.setSeconds(0);
+}
+
+/**
+ * Gets X coordinate of nearest vertical grid line to current time
+ */
+ED.RecordGrid.prototype.getGridX = function() {
+	// Get time diff in milliseconds from start of grid until now
+	var ms = new Date() - this.gridStartDate;
+	
+	// Set index
+	this.index = Math.round(ms/(60 * 1000 * this.minutesPerCell));
+	
+	// Return integer pixel value to allow reliable test of whether reading is already there
+	return Math.round(this.firstCoordinate + this.index * this.separationOfVerticalGridLines);
+}
+
+/**
+ * OpenEyes
+ *
+ * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
+ * (C) OpenEyes Foundation, 2011-2013
+ * This file is part of OpenEyes.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package OpenEyes
+ * @link http://www.openeyes.org.uk
+ * @author OpenEyes <info@openeyes.org.uk>
+ * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
+ * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ */
+
+/**
+ * Blood pressure reading
+ *
+ * @class RecordReading
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Object} _parameterJSON
+ */
+ED.RecordReading = function(_drawing, _parameterJSON) {
+	// Set classname
+	this.className = "RecordReading";
+
+	// Private parameters
+	this.type = 'sys';			// Can be either 'sys', 'dia', 'pul', 'res'
+		
+	// Derived parameters
+	this.value = '0';			// Numerical value of reading
+	
+	// Saved parameters
+	this.savedParameterArray = ['originX', 'originY', 'value', 'type'];
+	
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _parameterJSON);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.RecordReading.prototype = new ED.Doodle;
+ED.RecordReading.prototype.constructor = ED.RecordReading;
+ED.RecordReading.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets default properties
+ */
+ED.RecordReading.prototype.setPropertyDefaults = function() {
+	this.isRotatable = false;
+	
+	// Add complete validation arrays for derived parameters
+	this.parameterValidationArray['value'] = {
+		kind: 'derived',
+		type: 'int',
+		range: new ED.Range(0, 240),
+		animate: false
+	};
+	this.parameterValidationArray['type'] = {
+		kind: 'derived',
+		type: 'string',
+		list: ['sys', 'dia', 'pul', 'res'],
+		animate: false
+	};
+}
+
+/**
+ * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
+ * The returned parameters are animated if their 'animate' property is set to true
+ *
+ * @param {String} _parameter Name of parameter that has changed
+ * @value {Undefined} _value Value of parameter to calculate
+ * @returns {Array} Associative array of values of dependent parameters
+ */
+ED.RecordReading.prototype.dependentParameterValues = function(_parameter, _value) {
+	var returnArray = new Array();
+
+	switch (_parameter) {
+		case 'originY':
+			returnArray['value'] = Math.round(240 * (this.drawing.doodlePlaneHeight/2 - _value)/this.drawing.doodlePlaneHeight);
+			break;
+
+		case 'value':
+			returnArray['originY'] = - (_value * this.drawing.doodlePlaneHeight/240) + this.drawing.doodlePlaneHeight/2;
+			break;
+			
+		case 'originX':
+			// When originX is set, ensure user cannot move doodle to left and right
+			this.parameterValidationArray['originX']['range'].setMinAndMax(this.originX, this.originX);
+			break;
+	}
+
+	return returnArray;
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.RecordReading.prototype.draw = function(_point) { //console.log(this.originX);
+	// Get context
+	var ctx = this.drawing.context;
+
+	// Call draw method in superclass
+	ED.RecordReading.superclass.draw.call(this, _point);
+
+	// Boundary path
+	ctx.beginPath();
+
+	// Width and half height
+	var w = 60;
+	var h = 30;
+
+	switch (this.type) {
+		case 'sys':
+			ctx.rect(-w/2, -h, w, h);
+			break;
+		case 'dia':
+			ctx.rect(-w/2, 0, w, h);
+			break;
+		case 'pul':
+			ctx.arc(0, 0, h, 0, Math.PI * 2, true);
+			break;
+		case 'res':
+			ctx.arc(0, 0, h, 0, Math.PI * 2, true);
+			break;			
+	}
+
+	// Close path
+	ctx.closePath();
+
+	// Transparent stroke and fill
+	ctx.strokeStyle = "rgba(255,255,255,0)";
+	ctx.fillStyle = "rgba(255,255,255,0)";
+
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+	
+	// Non-boundary paths
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+		ctx.beginPath();
+
+		switch (this.type) {
+			case 'sys':
+				ctx.moveTo(-w/2, -h);
+				ctx.lineTo(0, 0);
+				ctx.lineTo(w/2, -h);
+				break;
+			case 'dia':
+				ctx.moveTo(-w/2, h);
+				ctx.lineTo(0, 0);
+				ctx.lineTo(w/2, h);	
+				break;
+			case 'pul':
+				ctx.arc(0, 0, 20, 0, Math.PI * 2, true);
+				break;
+			case 'res':
+				ctx.arc(0, 0, 20, 0, Math.PI * 2, true);
+				break;			
+		}
+		
+		// Set line attributes
+		ctx.lineWidth = 8;
+		ctx.lineJoin = 'round';
+		ctx.lineCap = 'round';
+		ctx.strokeStyle = "gray";
+		ctx.fillStyle= ctx.strokeStyle;
+
+		// Draw symbol
+		ctx.stroke();
+		if (this.type == 'pul') ctx.fill();
+	}
+
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * Draws extra items if the doodle is highlighted
+ */
+ED.RecordReading.prototype.drawHighlightExtras = function() {
+	// Get context
+	var ctx = this.drawing.context;
+
+	// Draw value
+	ctx.lineWidth = 1;
+	ctx.font = "64px sans-serif";
+	ctx.strokeStyle = "blue";
+	ctx.fillStyle = "blue";
+	ctx.fillText(this.value, +40, +20);
+}
+
 
 /**
  * OpenEyes
