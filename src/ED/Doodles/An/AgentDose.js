@@ -19,22 +19,24 @@
 /**
  * Agent Duration
  *
- * @class AgentDuration
+ * @class AgentDose
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
  * @param {Object} _parameterJSON
  */
-ED.AgentDuration = function(_drawing, _parameterJSON) {
+ED.AgentDose = function(_drawing, _parameterJSON) {
 	// Set classname
-	this.className = "AgentDuration";
+	this.className = "AgentDose";
 		
 	// Derived parameters
 	//this.value = '0';
 	
 	// Private parameters
-	this.halfWidth = 200;
+	this.halfWidth = 50;
 	this.halfHeight = 20;
 	this.minimumWidth = 40;
+	
+	this.valueString = "200mg";
 	
 	// Saved parameters
 	//this.savedParameterArray = ['originX', 'originY', 'value'];
@@ -46,21 +48,21 @@ ED.AgentDuration = function(_drawing, _parameterJSON) {
 /**
  * Sets superclass and constructor
  */
-ED.AgentDuration.prototype = new ED.Doodle;
-ED.AgentDuration.prototype.constructor = ED.AgentDuration;
-ED.AgentDuration.superclass = ED.Doodle.prototype;
+ED.AgentDose.prototype = new ED.Doodle;
+ED.AgentDose.prototype.constructor = ED.AgentDose;
+ED.AgentDose.superclass = ED.Doodle.prototype;
 
 /**
  * Sets handle attributes
  */
-ED.AgentDuration.prototype.setHandles = function() {
+ED.AgentDose.prototype.setHandles = function() {
 	this.handleArray[3] = new ED.Handle(null, true, ED.Mode.Apex, false);
 }
 
 /**
  * Sets default properties
  */
-ED.AgentDuration.prototype.setPropertyDefaults = function() {
+ED.AgentDose.prototype.setPropertyDefaults = function() {
 	this.isRotatable = false;
 	
 	// Add complete validation arrays for derived parameters
@@ -82,12 +84,12 @@ ED.AgentDuration.prototype.setPropertyDefaults = function() {
  * Sets default parameters (only called for new doodles)
  * Use the setParameter function for derived parameters, as this will also update dependent variables
  */
-ED.AgentDuration.prototype.setParameterDefaults = function() {
+ED.AgentDose.prototype.setParameterDefaults = function() {
 	this.apexX = 100;
 // 	
-// 	var lastAgentDuration = this.drawing.lastDoodleOfClass('AgentDuration');
-// 	if (lastAgentDuration) {
-// 		this.setParameterFromString('value', lastAgentDuration.value.toString());
+// 	var lastAgentDose = this.drawing.lastDoodleOfClass('AgentDose');
+// 	if (lastAgentDose) {
+// 		this.setParameterFromString('value', lastAgentDose.value.toString());
 // 	}
 // 	else {
 // 		this.setParameterFromString('value', '80');
@@ -110,7 +112,7 @@ ED.AgentDuration.prototype.setParameterDefaults = function() {
  * @value {Undefined} _value Value of parameter to calculate
  * @returns {Array} Associative array of values of dependent parameters
  */
-// ED.AgentDuration.prototype.dependentParameterValues = function(_parameter, _value) {
+// ED.AgentDose.prototype.dependentParameterValues = function(_parameter, _value) {
 // 	var returnArray = new Array();
 // 
 // 	switch (_parameter) {
@@ -131,54 +133,60 @@ ED.AgentDuration.prototype.setParameterDefaults = function() {
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.AgentDuration.prototype.draw = function(_point) { //console.log(this.originX);
+ED.AgentDose.prototype.draw = function(_point) { //console.log(this.originX);
 	// Get context
 	var ctx = this.drawing.context;
 
 	// Call draw method in superclass
-	ED.AgentDuration.superclass.draw.call(this, _point);
+	ED.AgentDose.superclass.draw.call(this, _point);
 
 	// Boundary path
 	ctx.beginPath();
 
 	// Boundary
-	ctx.rect(-this.halfWidth, -this.halfHeight, this.halfWidth + this.apexX, this.halfHeight * 2);
+	var d = 5;
+	var f = 1.5;
+	this.halfWidth = ctx.measureText(this.valueString).width * f;
+	
+	ctx.moveTo(-this.halfWidth, -this.halfHeight + d);
+	ctx.lineTo(-d, -this.halfHeight + d);
+	ctx.lineTo(0, -this.halfHeight);
+	ctx.lineTo(d, -this.halfHeight + d);
+	ctx.lineTo(this.halfWidth, -this.halfHeight + d);
+	ctx.lineTo(this.halfWidth, this.halfHeight - d);
+	ctx.lineTo(d, this.halfHeight - d);
+	ctx.lineTo(0, this.halfHeight);
+	ctx.lineTo(-d, this.halfHeight - d);
+	ctx.lineTo(-this.halfWidth, this.halfHeight - d);
 
 	// Close path
 	ctx.closePath();
 
 	// Set attributes
-	ctx.lineWidth = 1;
-	ctx.strokeStyle = "rgba(125,125,125,0)";
-	ctx.fillStyle =  "rgba(125,125,125,0)";
+	ctx.lineWidth = 4;
+	ctx.strokeStyle = "rgba(50,50,50,1)";
+	ctx.fillStyle =  "white";
 
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 	
 	// Non boundary drawing
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
-		// Draw line with end bars
-		ctx.beginPath();
-		ctx.moveTo(-this.halfWidth, -this.halfHeight);
-		ctx.lineTo(-this.halfWidth, this.halfHeight);
-		ctx.moveTo(-this.halfWidth, 0);
-		ctx.lineTo(this.apexX, 0);
-		ctx.moveTo(this.apexX, -this.halfHeight);
-		ctx.lineTo(this.apexX, this.halfHeight);
-		
-		// Set attributes
-		ctx.lineWidth = 4;
-		ctx.strokeStyle = "rgba(50,50,50,1)";
-		
-		// Draw
-		ctx.stroke();
+		// Text properties
+		ctx.font = "24px sans-serif";
+		ctx.strokeStyle = "gray";
+		ctx.fillStyle = "gray";
+	
+		// Draw text centred on grid line
+		var textWidth = ctx.measureText(this.valueString).width;
+		ctx.fillText(this.valueString, - textWidth/2, 8);
 	}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[3].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
+	//this.handleArray[3].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
-	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+	//if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
 		
 	// Return value indicating successful hittest
 	return this.isClicked;
@@ -187,7 +195,7 @@ ED.AgentDuration.prototype.draw = function(_point) { //console.log(this.originX)
 /**
  * Draws extra items if the doodle is highlighted
  */
-// ED.AgentDuration.prototype.drawHighlightExtras = function() {
+// ED.AgentDose.prototype.drawHighlightExtras = function() {
 // 	// Get context
 // 	var ctx = this.drawing.context;
 // 

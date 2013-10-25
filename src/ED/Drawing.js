@@ -3383,6 +3383,11 @@ ED.Doodle = function(_drawing, _parameterJSON) {
 			this.savedParameterArray = [];
 		}
 
+		// Optional array for saving details of object parameters for reconstitution from string
+		if (!this.parameterObjectTypeArray) {
+			this.parameterObjectTypeArray = [];
+		}
+		
 		// Grid properties
 		this.gridSpacing = 200;
 		this.gridDisplacementX = 0;
@@ -3491,7 +3496,14 @@ ED.Doodle = function(_drawing, _parameterJSON) {
 				}
 				// Other parameters
 				else {
-					this[p] = _parameterJSON[p];
+					// Complex objects (e.g. date)
+					if (p in this.parameterObjectTypeArray) {
+						this[p] = this.parseObjectString(_parameterJSON[p], this.parameterObjectTypeArray[p]);
+					}
+					// Other parameters are simple assignments
+					else {
+						this[p] = _parameterJSON[p];
+					}
 				}
 			}
 
@@ -3519,6 +3531,28 @@ ED.Doodle = function(_drawing, _parameterJSON) {
 			this.isForDrawing = false;
 		}
 	}
+}
+
+/**
+ * Parses JSON string to reconstitute parameters which are entries in this.parameterObjectTypeArray
+ *
+ * @param {String} _string String containing object from JSON string
+ * @param {String} _type Type of object
+ */
+ED.Doodle.prototype.parseObjectString = function(_string, _type) {
+	var returnObject = false;
+	switch (_type) {
+		case 'date':
+			var a = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2}(?:\.\d*)?)Z$/.exec(_string);
+			returnObject = new Date(Date.UTC(+a[1], +a[2] - 1, +a[3], +a[4], +a[5], +a[6]));
+			break;
+			
+		default:
+			ED.errorHandler('ED.Doodle', 'parseObjectString', 'Object type: ' + _type + ' currently not supported');
+			break;
+	}
+	
+	return returnObject;
 }
 
 /**

@@ -38,11 +38,15 @@ ED.RecordGrid = function(_drawing, _parameterJSON) {
 	this.separationOfVerticalGridLines = _drawing.doodlePlaneWidth/this.numberCellsHorizontal;	
 	this.index = 0;								// Index property is the number of the vertical line where a reading is entered
 	this.firstCoordinate = - _drawing.doodlePlaneWidth/2;
+	
 	this.startDate = new Date();				// Starting date 2013,2,1,10,35
 	this.setGridStartDate(this.startDate);		// Date of left hand edge of grid
 	
 	// Saved parameters
-	//this.savedParameterArray = [];
+	this.savedParameterArray = ['startDate'];
+	
+	// Date objects need to be flagged to save and load properly
+	this.parameterObjectTypeArray = {startDate:'date', gridStartDate:'date'};
 	
 	// Call super-class constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
