@@ -12,11 +12,14 @@
         <!--   This script handles the drawings for the page   -->
         <script type="text/javascript">
         
-            var doodleSet = [{"version": 1.0, "subclass": "Patch", "originX": -130, "originY": -183, "apexX": -50, "rotation": 325, "order": 0, }];
+            //var doodleSet = [{"version": 1.0, "subclass": "Patch", "originX": -130, "originY": -183, "apexX": -50, "rotation": 325, "order": 0, }];
+            
+        
+        	var doodleSet = [{"subclass": "OpticDisc", "originX": 0, "originY": 0, "radius": 200, "apexX": -13, "apexY": -167, "scaleX": 1.00, "scaleY": 1.00, "arc": 180, "rotation": 0, "order": 0, "squiggleArray": [{"colour": {"red":100,"green":100,"blue":100,"alpha":1}, "thickness": 4, "filled": "true", "pointsArray": []}], "mode" : "Basic"}];
             
             
             // This set can be written by PHP and contains doodle data for this drawing from a database
-//            var doodleSet = [{"subclass": "PhakoIncision", "originX": 0, "originY": 0, "radius": 250, "apexX": 0, "apexY": -250, "scaleX": 1.00, "scaleY": 1.00, "arc": 90, "rotation": 319, "order": 0, "squiggleArray": []}];
+            //var doodleSet = [{"subclass": "PhakoIncision", "originX": 0, "originY": 0, "radius": 250, "apexX": 0, "apexY": -250, "scaleX": 1.00, "scaleY": 1.00, "arc": 90, "rotation": 319, "order": 0, "squiggleArray": []}];
             
             
             // Unique variable assigned to the drawing
@@ -25,9 +28,15 @@
             var doodle;
             var controller;
             
+            var grid;
+            
             // Runs on page load
             function init()
             {
+            	var d = new Date();
+            	//debugger;
+            	
+            	//console.log(d.toLocaleTimeString());
                 // Get reference to the drawingEdit canvas
                 var canvasEdit = document.getElementById('canvasEdit');
                 
@@ -78,8 +87,40 @@
                         
 							//Scale down for glaucoma drawings
 							this.drawing.globalScaleFactor = this.gsf;
+													
 
-// 							this.drawing.addDoodle('AntSeg');
+							// Grid
+					    	//this.drawing.addDoodle('Lungs');
+					    	
+							// Right eye
+// 					    	rightEye = this.drawing.addDoodle(
+// 					    		'HVT', 
+// 					    		{},
+// 					        	{
+// 					        		hor:{id:'horSelect', attribute:'value'}, ver:{id:'verSelect', attribute:'value'}, tor:{id:'torSelect', attribute:'value'},  
+// 					        		horValue:{id:'horValueSelect', attribute:'value'},
+// 					        		verValue:{id:'verValueSelect', attribute:'value'},
+// 					        		torValue:{id:'torValueSelect', attribute:'value'},
+// 								}
+// 					        );
+// 					    
+// 					        // Constrain x movement
+// 					        //rightEye.parameterValidationArray['originX']['range'] = new ED.Range(-350, -150);
+// 					        
+// 					        // Left eye
+// 					        leftEye = this.drawing.addDoodle('HVT', {rotation:Math.PI/4});
+// 					        leftEye.parameterValidationArray['originX']['range'] = new ED.Range(+150, +350);
+// 					        leftEye.originX = +250;
+					    
+					        this.drawing.deselectDoodles();
+
+
+
+
+							
+							// Scale on width for RecordGrid
+
+ 							//this.drawing.addDoodle('OpticDisc');
 // 							this.drawing.addDoodle('TransilluminationDefect');
 
 														
@@ -87,14 +128,26 @@
 							//this.drawing.addDoodle('BranchRetinalVeinOcclusionPostPole');
 							//this.drawing.addDoodle('SectorPRP');
 
-<<<<<<< HEAD
-							this.drawing.addDoodle('HVTGrid');
-							this.drawing.addDoodle('HVT');
-							this.drawing.addDoodle('HVT');
-=======
-							this.drawing.addDoodle('PostPole');
-							this.drawing.addDoodle('FibrousProliferation');
->>>>>>> 0737c8e28b776db2b7f1c436fd22a80b700b170c
+							grid = this.drawing.addDoodle('RecordGrid');
+							//this.drawing.addDoodle('RecordReading', {'type':'sys'});
+							//this.drawing.addDoodle('BPReading', {'stolic':'dia'});
+							
+							//this.drawing.addDoodle('AgentDuration');
+
+							
+							var drawing = this.drawing;
+							
+							// Animation to update timeline every second
+							setInterval(function() {
+								console.log('Hello');
+								grid.nowDate.setMinutes(grid.nowDate.getMinutes() + 1);
+								drawing.repaint();
+							}, 5000);
+							
+// 
+// 							this.drawing.addDoodle('PostPole');
+// 							this.drawing.addDoodle('FibrousProliferation');
+
 							//this.drawing.addDoodle('BlotHaemorrhage');
 
 
@@ -303,11 +356,23 @@
         <!-- Doodle selection toolbar -->
         <div class="ed_toolbar" id="canvasEdit1doodleToolbar">
  
-            <button id="LensRPS" class="imgbutton" title="Lens" onclick="drawingEdit.addDoodle('MacularDystrophy'); return false;" ><img src="../img/MacularDystrophy.gif" /></button>
-            <button id="LensRPS" class="imgbutton" title="Lens" onclick="drawingEdit.addDoodle('PI', {rotation:0}); return false;" ><img src="../img/PI.gif" /></button>
 
-<!--            <button id="LensRPS" class="imgbutton" title="Lens" onclick="drawingEdit.addDoodle('Cryo'); return false;" ><img src="../img/Cryo.gif" /></button>
- -->
+
+            <button id="LensRPS" class="imgbutton" title="Lens" onclick="
+				var vals = grid.getNextValues('sys');
+				if (vals) var sys = drawingEdit.addDoodle('RecordReading', {'type':'sys', 'value':vals['value'], 'originX':vals['originX']});
+				var vals = grid.getNextValues('dia');
+				if (vals) var dia = drawingEdit.addDoodle('RecordReading', {'type':'dia', 'value':vals['value'], 'originX':vals['originX']});
+				var vals = grid.getNextValues('pul');
+				if (vals) var pul = drawingEdit.addDoodle('RecordReading', {'type':'pul', 'value':vals['value'], 'originX':vals['originX']});
+				var vals = grid.getNextValues('res');
+				if (vals) var res = drawingEdit.addDoodle('RecordReading', {'type':'res', 'value':vals['value'], 'originX':vals['originX']});
+				drawingEdit.deselectDoodles();           
+				return false;
+            " ><img src="../img/RecordReading.gif" /></button>
+            
+            <button id="LensRPS" class="imgbutton" title="Lens" onclick="drawingEdit.addDoodle('AgentDose'); return false;" ><img src="../img/Cryo.gif" /></button>
+
 
 
             <br />
@@ -319,10 +384,163 @@
         <span class="canvasTooltip" id="canvasEditTooltip"></span>
         
         <!-- Canvas element style="border: none;" style="background-color: #DAE6F1;"-->
-        <canvas id="canvasEdit" class="ed_canvas_edit" width="300" height="300" tabindex="1" style="border: 1px solic gray;"></canvas>
+        <canvas id="canvasEdit" class="ed_canvas_edit" width="760" height="300" tabindex="1" style="border: 1px solid gray;"></canvas>
 
         <br/>
 
+		<select id="horSelect">
+			<option value="XT">XT</option>
+			<option value="None" selected="true" >None</option>
+			<option value="ET">ET</option>
+		</select>
+
+		<select id="verSelect">
+			<option value="R/L">R/L</option>
+			<option value="None" selected="true" >None</option>
+			<option value="L/R">L/R</option>
+		</select>
+			
+		<select id="torSelect">
+			<option value="Excyclotorsion">Excyclotorsion</option>
+			<option value="None" selected="true" >None</option>
+			<option value="Incyclotorsion">Incyclotorsion</option>
+		</select>
+		
+		</br>
+		<select id="horValueSelect">
+			<option value=0>0</option>
+			<option value=1>1</option>
+			<option value=2>2</option>
+			<option value=3>3</option>
+			<option value=4>4</option>
+			<option value=5>5</option>
+			<option value=6>6</option>
+			<option value=7>7</option>
+			<option value=8>8</option>
+			<option value=9>9</option>
+			<option value=10>10</option>
+			<option value=11>11</option>
+			<option value=12>12</option>
+			<option value=13>13</option>
+			<option value=14>14</option>
+			<option value=15>15</option>
+			<option value=16>16</option>
+			<option value=17>17</option>
+			<option value=18>18</option>
+			<option value=19>19</option>
+			<option value=20>20</option>
+			<option value=21>21</option>
+			<option value=22>22</option>
+			<option value=23>23</option>
+			<option value=24>24</option>
+			<option value=25>25</option>
+			<option value=26>26</option>
+			<option value=27>27</option>
+			<option value=28>28</option>
+			<option value=29>29</option>
+			<option value=30>30</option>
+			<option value=31>31</option>
+			<option value=32>32</option>
+			<option value=33>33</option>
+			<option value=34>34</option>
+			<option value=35>35</option>
+			<option value=36>36</option>
+			<option value=37>37</option>
+			<option value=38>38</option>
+			<option value=39>39</option>
+			<option value=40>40</option>
+			<option value=41>41</option>
+			<option value=42>42</option>
+			<option value=43>43</option>
+			<option value=44>44</option>
+			<option value=45>45</option>
+			<option value=46>46</option>
+			<option value=47>47</option>
+			<option value=48>48</option>
+			<option value=49>49</option>
+			<option value=50>50</option>
+		</select>
+		
+		<select id="verValueSelect">
+			<option value=0>0</option>
+			<option value=1>1</option>
+			<option value=2>2</option>
+			<option value=3>3</option>
+			<option value=4>4</option>
+			<option value=5>5</option>
+			<option value=6>6</option>
+			<option value=7>7</option>
+			<option value=8>8</option>
+			<option value=9>9</option>
+			<option value=10>10</option>
+			<option value=11>11</option>
+			<option value=12>12</option>
+			<option value=13>13</option>
+			<option value=14>14</option>
+			<option value=15>15</option>
+			<option value=16>16</option>
+			<option value=17>17</option>
+			<option value=18>18</option>
+			<option value=19>19</option>
+			<option value=20>20</option>
+			<option value=21>21</option>
+			<option value=22>22</option>
+			<option value=23>23</option>
+			<option value=24>24</option>
+			<option value=25>25</option>
+			<option value=26>26</option>
+			<option value=27>27</option>
+			<option value=28>28</option>
+			<option value=29>29</option>
+			<option value=30>30</option>
+			<option value=31>31</option>
+			<option value=32>32</option>
+			<option value=33>33</option>
+			<option value=34>34</option>
+			<option value=35>35</option>
+			<option value=36>36</option>
+			<option value=37>37</option>
+			<option value=38>38</option>
+			<option value=39>39</option>
+			<option value=40>40</option>
+			<option value=41>41</option>
+			<option value=42>42</option>
+			<option value=43>43</option>
+			<option value=44>44</option>
+			<option value=45>45</option>
+			<option value=46>46</option>
+			<option value=47>47</option>
+			<option value=48>48</option>
+			<option value=49>49</option>
+			<option value=50>50</option>
+		</select>
+
+		<select id="torValueSelect">
+			<option value=0>0</option>
+			<option value=1>1</option>
+			<option value=2>2</option>
+			<option value=3>3</option>
+			<option value=4>4</option>
+			<option value=5>5</option>
+			<option value=6>6</option>
+			<option value=7>7</option>
+			<option value=8>8</option>
+			<option value=9>9</option>
+			<option value=10>10</option>
+			<option value=11>11</option>
+			<option value=12>12</option>
+			<option value=13>13</option>
+			<option value=14>14</option>
+			<option value=15>15</option>
+			<option value=16>16</option>
+			<option value=17>17</option>
+			<option value=18>18</option>
+			<option value=19>19</option>
+			<option value=20>20</option>
+		</select>
+		
+		</br>
+<!-- 
 		<select id="methodSelect">
 			<option value="Fornix-based">Fornix-based</option>
 			<option value="Limbus-based">Limbus-based</option>
@@ -343,6 +561,7 @@
             <option value="Punch">Punch</option>
             <option value="Block">Block</option>
         </select>
+ -->
             
         <!-- Input element -->
         <!-- 
@@ -350,8 +569,10 @@
         <input type="text" id="typeInput" value="Calcified" />
          --> 
          
-        <button onclick="console.log(drawingEdit.report()); return false;" >Report</button>
-        
+        <button onclick="console.log(drawingEdit.report()); return false;">Report</button>
+        <button onclick="var startDate = new Date(); grid.setDate(startDate); console.log(grid.date); return false;">Start</button>
+        <button onclick="console.log(grid.getGridX()); return false;">Grid</button>
+        <button onclick="console.log(drawingEdit.save()); return false;">Save</button>
 
 
         

@@ -416,27 +416,32 @@ ED.Drawing = function(_canvas, _eye, _IDSuffix, _isEditable, _options) {
 		//                                     }, false);
 
 		// iOS listeners
-		this.canvas.addEventListener('touchstart', function(e) {
-			if (e.targetTouches[0] !== undefined) {
-				var point = new ED.Point(e.targetTouches[0].pageX - this.offsetLeft, e.targetTouches[0].pageY - this.offsetTop);
-				e.preventDefault();
-			}
-			drawing.mousedown(point);
-		}, false);
+    this.canvas.addEventListener('touchstart', function(e) {
+      if (e.targetTouches[0] !== undefined) {
+        var canvas_pos = drawing.getPositionOfElement(drawing.canvas);
+        var point = new ED.Point(e.targetTouches[0].pageX - canvas_pos[0] - this.offsetLeft, e.targetTouches[0].pageY - canvas_pos[1]);
+        e.preventDefault();
+      } else {
+        console.log('touches undefined');
+      }
+      drawing.mousedown(point);
+    }, false);
 
-		this.canvas.addEventListener('touchend', function(e) {
-			if (e.targetTouches[0] !== undefined) {
-				var point = new ED.Point(e.targetTouches[0].pageX - this.offsetLeft, e.targetTouches[0].pageY - this.offsetTop);
-				drawing.mouseup(point);
-			}
-		}, false);
+    this.canvas.addEventListener('touchend', function(e) {
+      if (e.targetTouches[0] !== undefined) {
+        var canvas_pos = drawing.getPositionOfElement(drawing.canvas);
+        var point = new ED.Point(e.targetTouches[0].pageX - canvas_pos[0] - this.offsetLeft, e.targetTouches[0].pageY - canvas_pos[1]);
+        drawing.mouseup(point);
+      }
+    }, false);
 
-		this.canvas.addEventListener('touchmove', function(e) {
-			if (e.targetTouches[0] !== undefined) {
-				var point = new ED.Point(e.targetTouches[0].pageX - this.offsetLeft, e.targetTouches[0].pageY - this.offsetTop);
-				drawing.mousemove(point);
-			}
-		}, false);
+    this.canvas.addEventListener('touchmove', function(e) {
+      if (e.targetTouches[0] !== undefined) {
+        var canvas_pos = drawing.getPositionOfElement(drawing.canvas);
+        var point = new ED.Point(e.targetTouches[0].pageX - canvas_pos[0] - this.offsetLeft, e.targetTouches[0].pageY - canvas_pos[1]);
+        drawing.mousemove(point);
+      }
+    }, false);
 
 		// Keyboard listener
 		window.addEventListener('keydown', function(e) {
@@ -449,6 +454,20 @@ ED.Drawing = function(_canvas, _eye, _IDSuffix, _isEditable, _options) {
 			return false;
 		}
 	}
+}
+
+ED.Drawing.prototype.getPositionOfElement = function(element) {
+    var x=0;
+    var y=0;
+    while(true){
+        x += element.offsetLeft;
+        y += element.offsetTop;
+        if(element.offsetParent === null){
+            break;
+        }
+        element = element.offsetParent;
+    }
+    return [x, y];
 }
 
 /**
@@ -2425,7 +2444,7 @@ ED.Drawing.prototype.lastDoodleOfClass = function(_className) {
  * Returns all doodles of the passed className
  *
  * @param {String} _className Classname of doodle
- * @returns {Doodle} The last doodle of the passed className
+ * @returns {Array} Array of doodles of the passed className
  */
 ED.Drawing.prototype.allDoodlesOfClass = function(_className) {
 	var returnValue = [];
@@ -3364,6 +3383,11 @@ ED.Doodle = function(_drawing, _parameterJSON) {
 			this.savedParameterArray = [];
 		}
 
+		// Optional array for saving details of object parameters for reconstitution from string
+		if (!this.parameterObjectTypeArray) {
+			this.parameterObjectTypeArray = [];
+		}
+		
 		// Grid properties
 		this.gridSpacing = 200;
 		this.gridDisplacementX = 0;
@@ -3472,7 +3496,14 @@ ED.Doodle = function(_drawing, _parameterJSON) {
 				}
 				// Other parameters
 				else {
-					this[p] = _parameterJSON[p];
+					// Complex objects (e.g. date)
+					if (p in this.parameterObjectTypeArray) {
+						this[p] = this.parseObjectString(_parameterJSON[p], this.parameterObjectTypeArray[p]);
+					}
+					// Other parameters are simple assignments
+					else {
+						this[p] = _parameterJSON[p];
+					}
 				}
 			}
 
@@ -3500,6 +3531,28 @@ ED.Doodle = function(_drawing, _parameterJSON) {
 			this.isForDrawing = false;
 		}
 	}
+}
+
+/**
+ * Parses JSON string to reconstitute parameters which are entries in this.parameterObjectTypeArray
+ *
+ * @param {String} _string String containing object from JSON string
+ * @param {String} _type Type of object
+ */
+ED.Doodle.prototype.parseObjectString = function(_string, _type) {
+	var returnObject = false;
+	switch (_type) {
+		case 'date':
+			var a = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2}(?:\.\d*)?)Z$/.exec(_string);
+			returnObject = new Date(Date.UTC(+a[1], +a[2] - 1, +a[3], +a[4], +a[5], +a[6]));
+			break;
+			
+		default:
+			ED.errorHandler('ED.Doodle', 'parseObjectString', 'Object type: ' + _type + ' currently not supported');
+			break;
+	}
+	
+	return returnObject;
 }
 
 /**
