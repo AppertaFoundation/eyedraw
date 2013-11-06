@@ -139,8 +139,10 @@
 							
 							// Animation to update timeline every second
 							setInterval(function() {
+								console.log('Hello');
+								grid.nowDate.setMinutes(grid.nowDate.getMinutes() + 1);
 								drawing.repaint();
-							}, 1000);
+							}, 5000);
 							
 // 
 // 							this.drawing.addDoodle('PostPole');

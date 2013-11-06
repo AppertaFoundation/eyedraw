@@ -7623,7 +7623,7 @@ ED.RecordGrid = function(_drawing, _parameterJSON) {
 	this.className = "RecordGrid";
 
 	// Private parameters
-	this.values = {'sys':160, 'dia':80, 'pul':60, 'res':30};		// Default values
+	this.values = {'sys':160, 'dia':80, 'pul':60, 'res':30, 'oxi':100};		// Default values
 	this.minutesPerCell = 5;					// 'Width' of each cell in minutes (default: 5 - try 1 for demo)
 	this.minutesLabelArray = [0, 30];			// Labels for these minutes past the hour
 	this.totalMinutes = 180;						// Total duration of record (default: 180 - try 30 for demo)
@@ -7634,6 +7634,8 @@ ED.RecordGrid = function(_drawing, _parameterJSON) {
 	this.firstCoordinate = - _drawing.doodlePlaneWidth/2;
 	
 	this.startDate = new Date();				// Starting date 2013,2,1,10,35
+	this.gridStartDate = new Date();			// Starting date rounded to nearest minutesPerCell
+	this.nowDate = new Date();					// The current date set by a timer
 	this.setGridStartDate(this.startDate);		// Date of left hand edge of grid
 	
 	// Saved parameters
@@ -7714,7 +7716,7 @@ ED.RecordGrid.prototype.draw = function(_point) {
 		ctx.stroke();
 		
 		// Draw timeLine in red
-		var ms = new Date() - this.gridStartDate;
+		var ms = this.nowDate - this.gridStartDate;
 		this.timeLineX = this.firstCoordinate + (this.drawing.doodlePlaneWidth/this.numberCellsHorizontal) * ms/(60 * 1000 * this.minutesPerCell);
 		ctx.beginPath();
 		ctx.moveTo(this.timeLineX, ys);
@@ -7722,10 +7724,9 @@ ED.RecordGrid.prototype.draw = function(_point) {
 		ctx.lineWidth = 4;
 		ctx.strokeStyle = "red";
 		ctx.stroke();
-		
+
 		// Draw time values at top, but leave out edges
 		for (var i = 1; i < this.numberCellsHorizontal; i++) {
-		
 			// Calculate date of line
 			dateOfGridLine = new Date(this.gridStartDate.getTime() + i * this.minutesPerCell * 60000);
 			var hour = dateOfGridLine.getHours();
@@ -7819,7 +7820,7 @@ ED.RecordGrid.prototype.setGridStartDate = function(_date) {
  */
 ED.RecordGrid.prototype.getGridX = function() {
 	// Get time diff in milliseconds from start of grid until now
-	var ms = new Date() - this.gridStartDate;
+	var ms = this.nowDate - this.gridStartDate;
 	
 	// Set index
 	this.index = Math.round(ms/(60 * 1000 * this.minutesPerCell));
@@ -7859,7 +7860,7 @@ ED.RecordReading = function(_drawing, _parameterJSON) {
 	this.className = "RecordReading";
 
 	// Private parameters
-	this.type = 'sys';			// Can be either 'sys', 'dia', 'pul', 'res'
+	this.type = 'sys';			// Can be either 'sys', 'dia', 'pul', 'res', 'oxi'
 		
 	// Derived parameters
 	this.value = '0';			// Numerical value of reading
@@ -7894,7 +7895,7 @@ ED.RecordReading.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['type'] = {
 		kind: 'derived',
 		type: 'string',
-		list: ['sys', 'dia', 'pul', 'res'],
+		list: ['sys', 'dia', 'pul', 'res', 'oxi'],
 		animate: false
 	};
 }
@@ -7944,7 +7945,7 @@ ED.RecordReading.prototype.draw = function(_point) { //console.log(this.originX)
 	ctx.beginPath();
 
 	// Width and half height
-	var w = 60;
+	var w = 56;
 	var h = 30;
 
 	switch (this.type) {
@@ -7959,7 +7960,10 @@ ED.RecordReading.prototype.draw = function(_point) { //console.log(this.originX)
 			break;
 		case 'res':
 			ctx.arc(0, 0, h, 0, Math.PI * 2, true);
-			break;			
+			break;
+		case 'oxi':
+			ctx.rect(-w/2, -h/2, w, h);
+			break;		
 	}
 
 	// Close path
@@ -7992,6 +7996,9 @@ ED.RecordReading.prototype.draw = function(_point) { //console.log(this.originX)
 				break;
 			case 'res':
 				ctx.arc(0, 0, 20, 0, Math.PI * 2, true);
+				break;
+			case 'oxi':
+				ctx.rect(-w/2, -h/2, w, h);
 				break;			
 		}
 		

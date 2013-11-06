@@ -29,7 +29,7 @@ ED.RecordReading = function(_drawing, _parameterJSON) {
 	this.className = "RecordReading";
 
 	// Private parameters
-	this.type = 'sys';			// Can be either 'sys', 'dia', 'pul', 'res'
+	this.type = 'sys';			// Can be either 'sys', 'dia', 'pul', 'res', 'oxi'
 		
 	// Derived parameters
 	this.value = '0';			// Numerical value of reading
@@ -64,7 +64,7 @@ ED.RecordReading.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['type'] = {
 		kind: 'derived',
 		type: 'string',
-		list: ['sys', 'dia', 'pul', 'res'],
+		list: ['sys', 'dia', 'pul', 'res', 'oxi'],
 		animate: false
 	};
 }
@@ -114,7 +114,7 @@ ED.RecordReading.prototype.draw = function(_point) { //console.log(this.originX)
 	ctx.beginPath();
 
 	// Width and half height
-	var w = 60;
+	var w = 56;
 	var h = 30;
 
 	switch (this.type) {
@@ -129,7 +129,10 @@ ED.RecordReading.prototype.draw = function(_point) { //console.log(this.originX)
 			break;
 		case 'res':
 			ctx.arc(0, 0, h, 0, Math.PI * 2, true);
-			break;			
+			break;
+		case 'oxi':
+			ctx.rect(-w/2, -h/2, w, h);
+			break;		
 	}
 
 	// Close path
@@ -162,6 +165,9 @@ ED.RecordReading.prototype.draw = function(_point) { //console.log(this.originX)
 				break;
 			case 'res':
 				ctx.arc(0, 0, 20, 0, Math.PI * 2, true);
+				break;
+			case 'oxi':
+				ctx.rect(-w/2, -h/2, w, h);
 				break;			
 		}
 		
