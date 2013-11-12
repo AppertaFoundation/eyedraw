@@ -777,8 +777,9 @@ ED.Drawing.prototype.mousedown = function(_point) {
 	ED.recentClick = true;
 	var t = setTimeout("ED.recentClick = false;", this.doubleClickMilliSeconds);
 
-	// Set flag to indicate success
+	// Set flags
 	var found = false;
+	this.lastSelectedDoodle = this.selectedDoodle;
 	this.selectedDoodle = null;
 
 	// Cycle through doodles from front to back doing hit test
@@ -824,6 +825,13 @@ ED.Drawing.prototype.mousedown = function(_point) {
 
 		// Ensure drag flagged is off for each doodle
 		this.doodleArray[i].isBeingDragged = false;
+	}
+	
+	// Notify if doodle is deselected
+	if (this.lastSelectedDoodle) {
+		if (!this.selectedDoodle) {
+			this.notify("doodleDeselected");
+		}
 	}
 
 	// Drawing
@@ -2849,6 +2857,9 @@ ED.Drawing.prototype.repaint = function() {
 
 		ctx.stroke();
 	}
+	
+	// Notify
+	this.notify("drawingRepainted");
 }
 
 /**

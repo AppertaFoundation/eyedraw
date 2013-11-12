@@ -777,8 +777,9 @@ ED.Drawing.prototype.mousedown = function(_point) {
 	ED.recentClick = true;
 	var t = setTimeout("ED.recentClick = false;", this.doubleClickMilliSeconds);
 
-	// Set flag to indicate success
+	// Set flags
 	var found = false;
+	this.lastSelectedDoodle = this.selectedDoodle;
 	this.selectedDoodle = null;
 
 	// Cycle through doodles from front to back doing hit test
@@ -824,6 +825,13 @@ ED.Drawing.prototype.mousedown = function(_point) {
 
 		// Ensure drag flagged is off for each doodle
 		this.doodleArray[i].isBeingDragged = false;
+	}
+	
+	// Notify if doodle is deselected
+	if (this.lastSelectedDoodle) {
+		if (!this.selectedDoodle) {
+			this.notify("doodleDeselected");
+		}
 	}
 
 	// Drawing
@@ -2849,6 +2857,9 @@ ED.Drawing.prototype.repaint = function() {
 
 		ctx.stroke();
 	}
+	
+	// Notify
+	this.notify("drawingRepainted");
 }
 
 /**
@@ -7421,13 +7432,14 @@ ED.AgentDuration = function(_drawing, _parameterJSON) {
 	this.className = "AgentDuration";
 		
 	// Derived parameters
-	//this.value = '0';
+	this.unit = 'mg';
+	this.type = 'range';
 	
 	// Private parameters
-	this.halfWidth = 200;
 	this.halfHeight = 20;
 	this.minimumWidth = 40;
-	
+	this.dose = '';
+
 	// Saved parameters
 	//this.savedParameterArray = ['originX', 'originY', 'value'];
 	
@@ -7456,17 +7468,23 @@ ED.AgentDuration.prototype.setPropertyDefaults = function() {
 	this.isRotatable = false;
 	
 	// Add complete validation arrays for derived parameters
-// 	this.parameterValidationArray['value'] = {
-// 		kind: 'derived',
-// 		type: 'int',
-// 		range: new ED.Range(0, 240),
-// 		animate: false
-// 	};
+	this.parameterValidationArray['unit'] = {
+		kind: 'derived',
+		type: 'string',
+		list: ['mg', 'mls', 'ug', 'mg/kg/hr', 'ug/kg/hr', 'drops', 'IU'],
+		animate: false
+	};
+	this.parameterValidationArray['type'] = {
+		kind: 'derived',
+		type: 'string',
+		list: ['range', 'fixed'],
+		animate: false
+	};
+		
 	// Update component of validation array for simple parameters
-	//this.parameterValidationArray['arc']['range'].setMinAndMax(Math.PI / 6, Math.PI * 2);
-	this.parameterValidationArray['originX']['range'].setMinAndMax(-1000 + this.halfWidth, +900);
+	this.parameterValidationArray['originX']['range'].setMinAndMax(-500, +900);
 	this.parameterValidationArray['originY']['range'].setMinAndMax(-0, +0);
-	this.parameterValidationArray['apexX']['range'].setMinAndMax(-this.halfWidth + this.minimumWidth, +1500);
+	this.parameterValidationArray['apexX']['range'].setMinAndMax(this.minimumWidth, +1500);
 	this.parameterValidationArray['apexY']['range'].setMinAndMax(-0, +0);
 }
 
@@ -7475,23 +7493,7 @@ ED.AgentDuration.prototype.setPropertyDefaults = function() {
  * Use the setParameter function for derived parameters, as this will also update dependent variables
  */
 ED.AgentDuration.prototype.setParameterDefaults = function() {
-	this.apexX = 100;
-// 	
-// 	var lastAgentDuration = this.drawing.lastDoodleOfClass('AgentDuration');
-// 	if (lastAgentDuration) {
-// 		this.setParameterFromString('value', lastAgentDuration.value.toString());
-// 	}
-// 	else {
-// 		this.setParameterFromString('value', '80');
-// 	}
-	
-	// Get x separation of drawing
-// 	var recordGrid = this.drawing.lastDoodleOfClass('RecordGrid');
-// 	if (recordGrid) {
-// 		var xd = this.drawing.doodlePlaneWidth/recordGrid.numberCellsHorizontal;
-// 		this.originX = recordGrid.firstCoordinate + recordGrid.index * xd;
-// 		this.parameterValidationArray['originX']['range'].setMinAndMax(this.originX, this.originX);
-// 	}
+	this.apexX = this.minimumWidth;
 }
 
 /**
@@ -7502,28 +7504,25 @@ ED.AgentDuration.prototype.setParameterDefaults = function() {
  * @value {Undefined} _value Value of parameter to calculate
  * @returns {Array} Associative array of values of dependent parameters
  */
-// ED.AgentDuration.prototype.dependentParameterValues = function(_parameter, _value) {
-// 	var returnArray = new Array();
-// 
-// 	switch (_parameter) {
-// 		case 'originY':
-// 			returnArray['value'] = Math.round(240 * (this.drawing.doodlePlaneHeight/2 - _value)/this.drawing.doodlePlaneHeight);
-// 			break;
-// 
-// 		case 'value':
-// 			returnArray['originY'] = - (_value * this.drawing.doodlePlaneHeight/240) + this.drawing.doodlePlaneHeight/2;
-// 			break;
-// 	}
-// 
-// 	return returnArray;
-// }
+ED.AgentDuration.prototype.dependentParameterValues = function(_parameter, _value) {
+	var returnArray = new Array();
+
+	switch (_parameter) {
+		case 'type':
+			if (_value == 'range') this.apexX = 200;
+			else this.apexX = 40;
+			break;
+	}
+
+	return returnArray;
+}
 
 /**
  * Draws doodle or performs a hit test if a Point parameter is passed
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.AgentDuration.prototype.draw = function(_point) { //console.log(this.originX);
+ED.AgentDuration.prototype.draw = function(_point) {
 	// Get context
 	var ctx = this.drawing.context;
 
@@ -7534,7 +7533,9 @@ ED.AgentDuration.prototype.draw = function(_point) { //console.log(this.originX)
 	ctx.beginPath();
 
 	// Boundary
-	ctx.rect(-this.halfWidth, -this.halfHeight, this.halfWidth + this.apexX, this.halfHeight * 2);
+	var offset = this.minimumWidth/2;
+	if (this.type == 'range') offset = 0;
+	ctx.rect(0 - offset, -this.halfHeight, this.apexX, this.halfHeight * 2);
 
 	// Close path
 	ctx.closePath();
@@ -7549,14 +7550,25 @@ ED.AgentDuration.prototype.draw = function(_point) { //console.log(this.originX)
 	
 	// Non boundary drawing
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
-		// Draw line with end bars
 		ctx.beginPath();
-		ctx.moveTo(-this.halfWidth, -this.halfHeight);
-		ctx.lineTo(-this.halfWidth, this.halfHeight);
-		ctx.moveTo(-this.halfWidth, 0);
-		ctx.lineTo(this.apexX, 0);
-		ctx.moveTo(this.apexX, -this.halfHeight);
-		ctx.lineTo(this.apexX, this.halfHeight);
+		
+		if (this.type == 'range') {
+			// Draw line with end bars
+			ctx.moveTo(0 - offset, -this.halfHeight);
+			ctx.lineTo(0 - offset, this.halfHeight);
+			ctx.moveTo(0 - offset, 0);
+			ctx.lineTo(this.apexX - offset, 0);
+			ctx.moveTo(this.apexX - offset, -this.halfHeight);
+			ctx.lineTo(this.apexX - offset, this.halfHeight);
+		}
+		else {
+			// Draw diamond
+			ctx.moveTo(-offset, 0);
+			ctx.lineTo(0, this.halfHeight);
+			ctx.lineTo(offset, 0);
+			ctx.lineTo(0, -this.halfHeight);
+			ctx.closePath();
+		}
 		
 		// Set attributes
 		ctx.lineWidth = 4;
@@ -7564,13 +7576,26 @@ ED.AgentDuration.prototype.draw = function(_point) { //console.log(this.originX)
 		
 		// Draw
 		ctx.stroke();
+
+		// Draw dose
+		ctx.lineWidth = 1;
+		ctx.font = "24px sans-serif";
+		ctx.strokeStyle = "blue";
+		ctx.fillStyle = "blue";
+		var text = String(this.dose);
+		if (text.length > 0) text = text + ' ' + this.unit;
+		var textWidth = ctx.measureText(text).width;
+		var padding = 10;
+		ctx.fillText(text, offset + padding, -8);
 	}
 
-	// Coordinates of handles (in canvas plane)
-	this.handleArray[3].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
+	if (this.type == 'range') {
+		// Coordinates of handles (in canvas plane)
+		this.handleArray[3].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
-	// Draw handles if selected
-	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+		// Draw handles if selected
+		if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+	}
 		
 	// Return value indicating successful hittest
 	return this.isClicked;
