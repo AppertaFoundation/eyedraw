@@ -38,7 +38,7 @@ ED.AgentDuration = function(_drawing, _parameterJSON) {
 	this.dose = '';
 
 	// Saved parameters
-	//this.savedParameterArray = ['originX', 'originY', 'value'];
+	this.savedParameterArray = ['originX', 'apexX', 'unit', 'type', 'dose'];
 	
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -186,6 +186,7 @@ ED.AgentDuration.prototype.draw = function(_point) {
 		ctx.fillText(text, offset + padding, -8);
 	}
 
+	// Only draw handle for range, not fixed
 	if (this.type == 'range') {
 		// Coordinates of handles (in canvas plane)
 		this.handleArray[3].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
@@ -198,18 +199,4 @@ ED.AgentDuration.prototype.draw = function(_point) {
 	return this.isClicked;
 }
 
-/**
- * Draws extra items if the doodle is highlighted
- */
-// ED.AgentDuration.prototype.drawHighlightExtras = function() {
-// 	// Get context
-// 	var ctx = this.drawing.context;
-// 
-// 	// Draw text description of gauge
-// 	ctx.lineWidth = 1;
-// 	ctx.font = "64px sans-serif";
-// 	ctx.strokeStyle = "blue";
-// 	ctx.fillStyle = "blue";
-// 	ctx.fillText(this.value, +40, +20);
-// }
 
