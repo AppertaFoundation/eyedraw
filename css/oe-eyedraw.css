@@ -5,19 +5,19 @@
  * @copyright Copyright &copy; 2012 OpenEyes Foundation
  * @license http://www.yiiframework.com/license/
  * Modification date: 9th February 2012
- * 
+ *
  * This file is part of OpenEyes.
- * 
+ *
  * OpenEyes is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * OpenEyes is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with OpenEyes.  If not, see <http://www.gnu.org/licenses/>.
  * @package EyeDraw
@@ -55,9 +55,11 @@ button.ed_img_button {
 	width: 36px;
 	height: 36px;
 	padding: 0px;
-    margin: 0px;
-	background-color: #eeeeee;
+  margin: 0px;
+	background: #eeeeee;
 	border: 1px solid gray;
+	border-radius: 0;
+	box-shadow: none;
 }
 
 /* Control button - hover */
@@ -138,7 +140,7 @@ span.squiggle {
 	font-family: sans-serif;
 	font-size: 12px;
 	background: #fff;
-	border: 1px solid #ccc; 
+	border: 1px solid #ccc;
 	z-index:99;
 }
 
@@ -171,7 +173,7 @@ ul.ed_toolbar li span {
 }
 ul.ed_toolbar li img { float: left; }
 ul.ed_toolbar li span.active { display: block;}
-ul.ed_toolbar li ul { 
+ul.ed_toolbar li ul {
 	background: #fff;
 	position: absolute;
 	top: 36px;
