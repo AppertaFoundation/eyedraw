@@ -199,4 +199,26 @@ ED.AgentDuration.prototype.draw = function(_point) {
 	return this.isClicked;
 }
 
+/**
+ * Draws extra items if the doodle is highlighted
+ */
+ED.AgentDuration.prototype.drawHighlightExtras = function() {
+	// Get context
+	var ctx = this.drawing.context;
+
+	// Repeat Boundary
+	ctx.beginPath();
+	var offset = this.minimumWidth/2;
+	if (this.type == 'range') offset = 0;
+	
+	var margin = 3;
+	ctx.rect(0 - offset - margin, -this.halfHeight - margin, this.apexX + margin * 2, this.halfHeight * 2 + margin * 2);
+
+	// Set attributes
+	ctx.lineWidth = 3;
+	ctx.strokeStyle = "yellow";
+
+	// Draw
+	ctx.stroke();
+}
 
