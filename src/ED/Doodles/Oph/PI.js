@@ -28,8 +28,11 @@ ED.PI = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "PI";
 
+	// Derived parameters
+	this.type = 'Surgical';
+	
 	// Saved parameters
-	this.savedParameterArray = ['rotation'];
+	this.savedParameterArray = ['rotation', 'type'];
 	
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -48,6 +51,14 @@ ED.PI.superclass = ED.Doodle.prototype;
 ED.PI.prototype.setPropertyDefaults = function() {
 	this.isScaleable = false;
 	this.isMoveable = false;
+	
+	// Add complete validation arrays for derived parameters
+	this.parameterValidationArray['type'] = {
+		kind: 'derived',
+		type: 'string',
+		list: ['Surgical', 'Laser'],
+		animate: false
+	};
 }
 
 /**
@@ -74,15 +85,17 @@ ED.PI.prototype.draw = function(_point) {
 
 	// Boundary path
 	ctx.beginPath();
-
-	// Draw base
-	var phi = Math.PI / 24;
-	ctx.arc(0, 0, r, -phi - Math.PI / 2, phi - Math.PI / 2, false);
-	ctx.lineTo(0, -r * 0.8);
-	ctx.closePath();
-
-	// Colour of fill
-	ctx.fillStyle = "rgba(218,230,241,1)";
+	switch (this.type) {
+		case 'Surgical':
+			var phi = Math.PI / 24;
+			ctx.arc(0, 0, r, -phi - Math.PI / 2, phi - Math.PI / 2, false);
+			ctx.lineTo(0, -r * 0.8);
+			ctx.closePath();
+			break;
+		case 'Laser':
+			ctx.arc(0, -r * 0.9, 36, 0, Math.PI * 2, true);
+			break;
+	}
 
 	// Set line attributes
 	ctx.lineWidth = 4;
@@ -90,6 +103,9 @@ ED.PI.prototype.draw = function(_point) {
 	// Colour of outer line is dark gray
 	ctx.strokeStyle = "rgba(120,120,120,0.75)";;
 
+	// Colour of fill
+	ctx.fillStyle = "rgba(218,230,241,1)";
+	
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 
@@ -104,4 +120,35 @@ ED.PI.prototype.draw = function(_point) {
  */
 ED.PI.prototype.description = function() {
 	return "Peripheral iridectomy at " + this.clockHour() + " o'clock";
+}
+
+/**
+ * Runs when doodle is selected by the user
+ */
+ED.PI.prototype.onSelection = function() {
+	console.log('PI selected' + this.drawing.IDSuffix);
+	
+	var tableSelect = document.createElement('select');
+	tableSelect.setAttribute('id', 'piTypeSelect');
+	
+	var option = document.createElement('option');
+	//if (selectedValue == optionArray[i]) option.setAttribute('selected', 'true');
+	option.innerText = 'Surgical';
+	tableSelect.appendChild(option);
+	option = document.createElement('option');
+	option.innerText = 'Laser';
+	tableSelect.appendChild(option);
+	
+	document.getElementById('doodleControls').appendChild(tableSelect);
+	
+	this.addBinding('type', {id:'piTypeSelect'});
+}
+
+/**
+ * Runs when doodle is deselected by the user
+ */
+ED.PI.prototype.onDeselection = function() {
+	console.log('PI deselected');
+	this.removeBinding('type');
+	document.getElementById('doodleControls').removeChild(document.getElementById('piTypeSelect'));
 }

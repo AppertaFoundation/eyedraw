@@ -799,6 +799,9 @@ ED.Drawing.prototype.mousedown = function(_point) {
 					this.doodleArray[i].isSelected = true;
 					this.selectedDoodle = this.doodleArray[i];
 					found = true;
+					
+					// Run onSelection code
+					this.selectedDoodle.onSelection();
 
 					// Notify
 					this.notify("doodleSelected");
@@ -829,7 +832,11 @@ ED.Drawing.prototype.mousedown = function(_point) {
 	
 	// Notify if doodle is deselected
 	if (this.lastSelectedDoodle) {
-		if (!this.selectedDoodle) {
+		if (this.lastSelectedDoodle != this.selectedDoodle) {
+			// Run onDeselection code
+			this.lastSelectedDoodle.onDeselection();
+			
+			// Notify
 			this.notify("doodleDeselected");
 		}
 	}
@@ -3880,6 +3887,18 @@ ED.Doodle.prototype.groupDescription = function() {
 }
 
 /**
+ * Runs when doodle is selected by the user
+ */
+ED.Doodle.prototype.onSelection = function() {
+}
+
+/**
+ * Runs when doodle is deselected by the user
+ */
+ED.Doodle.prototype.onDeselection = function() {
+}
+
+/**
  * Returns a string containing a text description of the doodle (overridden by subclasses)
  *
  * @returns {String} Description of doodle
@@ -4504,9 +4523,13 @@ ED.Doodle.prototype.addBinding = function(_parameter, _fieldParameters) {
 							drawing.eventHandler('onchange', id, className, this.id, this.options[this.selectedIndex].getAttribute(attribute));
 						}, false);
 					} else {
-						// For parameters linked to a saved value, set value to that of bound element NB if this works, all the cases in this switch need updating
+						// For parameters linked to an element with a saved value, set value to that of bound element NB if this works, all the cases in this switch need updating
 						if (this.savedParameterArray.indexOf(_parameter) < 0) {
 							this.setParameterFromString(_parameter, element.value);
+						}
+						// Otherwise set element value to saved doodle parameter
+						else {
+							this.drawing.updateBindings(this);
 						}
 						element.addEventListener('change', listener = function(event) {
 							drawing.eventHandler('onchange', id, className, this.id, this.value);

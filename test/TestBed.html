@@ -87,9 +87,11 @@
                         
 							//Scale down for glaucoma drawings
 							this.drawing.globalScaleFactor = this.gsf;
-													
+							
+							this.drawing.addDoodle('AntSeg');
+							this.drawing.addDoodle('PI', {type:'Surgical'});				
 
-							// Grid
+							// Grid , {type:{id:'piTypeSelect'}}
 					    	//this.drawing.addDoodle('Lungs');
 					    	
 							// Right eye
@@ -128,21 +130,21 @@
 							//this.drawing.addDoodle('BranchRetinalVeinOcclusionPostPole');
 							//this.drawing.addDoodle('SectorPRP');
 
-							grid = this.drawing.addDoodle('RecordGrid');
+							//grid = this.drawing.addDoodle('RecordGrid');
 							//this.drawing.addDoodle('RecordReading', {'type':'sys'});
 							//this.drawing.addDoodle('BPReading', {'stolic':'dia'});
 							
 							//this.drawing.addDoodle('AgentDuration');
 
 							
-							var drawing = this.drawing;
+							//var drawing = this.drawing;
 							
-							// Animation to update timeline every second
-							setInterval(function() {
-								console.log('Hello');
-								grid.nowDate.setMinutes(grid.nowDate.getMinutes() + 1);
-								drawing.repaint();
-							}, 5000);
+// Animation to update timeline every second
+// 							setInterval(function() {
+// 								console.log('Hello');
+// 								grid.nowDate.setMinutes(grid.nowDate.getMinutes() + 1);
+// 								drawing.repaint();
+// 							}, 5000);
 							
 // 
 // 							this.drawing.addDoodle('PostPole');
@@ -384,7 +386,11 @@
         <span class="canvasTooltip" id="canvasEditTooltip"></span>
         
         <!-- Canvas element style="border: none;" style="background-color: #DAE6F1;"-->
-        <canvas id="canvasEdit" class="ed_canvas_edit" width="760" height="300" tabindex="1" style="border: 1px solid gray;"></canvas>
+        <canvas id="canvasEdit" class="ed_canvas_edit" width="300" height="300" tabindex="1" style="border: 1px solid gray;"></canvas>
+        
+        <div id="doodleControls" style="background-color: #DAE6F1;">
+        </div>
+
 
         <br/>
 
@@ -539,6 +545,13 @@
 			<option value=20>20</option>
 		</select>
 		
+<!-- 
+		<select id="piTypeSelect">
+			<option>Surgical</option>
+			<option>Laser</option>
+		</select>
+ -->
+				
 		</br>
 <!-- 
 		<select id="methodSelect">
