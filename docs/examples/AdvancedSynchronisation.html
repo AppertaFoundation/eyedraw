@@ -67,7 +67,7 @@
                 
                 // Create an array of synchronisations
                 var syncArray = new Array();
-                if (_drawing.IDSuffix == 'RPS')
+                if (_drawing.idSuffix == 'RPS')
                 {
                     syncArray['LPS'] = {
                         AntSeg:{AntSegCrossSection:{parameters:['apexY']}},
@@ -87,7 +87,7 @@
                         CorticalCataract:{Lens:{parameters:['originX', 'originY']}},
                     };
                 }
-                if (_drawing.IDSuffix == 'LPS')
+                if (_drawing.idSuffix == 'LPS')
                 {
                     syncArray['RPS'] = {
                         AntSegCrossSection:{AntSeg:{parameters:['apexY']}},
@@ -109,7 +109,7 @@
                 
                 // Array of paired doodles which add and delete together between the two diagrams
                 var pairArray = new Array();
-                if (_drawing.IDSuffix == 'RPS')
+                if (_drawing.idSuffix == 'RPS')
                 {
                     pairArray = {
                         Lens:'LensCrossSection',
@@ -126,12 +126,12 @@
                     {
                         // Eye draw image files all loaded
                         case 'ready':
-                            if (self.drawing.IDSuffix == 'RPS')
+                            if (self.drawing.idSuffix == 'RPS')
                             {
                                 doodle = this.drawing.addDoodle('Lens');
                                 doodle = this.drawing.addDoodle('AntSeg', {}, {pupilSize:"pupilSize"});
                             }
-                            if (self.drawing.IDSuffix == 'LPS')
+                            if (self.drawing.idSuffix == 'LPS')
                             {
                                 doodle = this.drawing.addDoodle('CorneaCrossSection');
                                 doodle = this.drawing.addDoodle('AntSegCrossSection');
@@ -142,7 +142,7 @@
                         
                         case 'doodleSelected':
                             // To avoid infinite loops, ensure that selecting a doodle in one drawing de-deselects the others
-                            var otherDrawing = (_messageArray['selectedDoodle'].drawing.IDSuffix == 'RPS')?drawingEdit2:drawingEdit1;
+                            var otherDrawing = (_messageArray['selectedDoodle'].drawing.idSuffix == 'RPS')?drawingEdit2:drawingEdit1;
                             otherDrawing.deselectDoodles();
                             break;
                         
@@ -180,16 +180,16 @@
                             var parentDoodle = newDoodle.drawing.firstDoodleOfClass(newDoodle.parentClass);
                             if (parentDoodle)
                             {                     
-                                for (var className in syncArray[newDoodle.drawing.IDSuffix])
+                                for (var className in syncArray[newDoodle.drawing.idSuffix])
                                 {
                                     if (className == parentDoodle.className)
                                     {
-                                        for (var slaveClassName in syncArray[newDoodle.drawing.IDSuffix][className])
+                                        for (var slaveClassName in syncArray[newDoodle.drawing.idSuffix][className])
                                         {
                                             if (slaveClassName == newDoodle.className)
                                             {
                                                 // Get array of parameters to sync
-                                                var parameterArray = syncArray[newDoodle.drawing.IDSuffix][className][slaveClassName]['parameters'];
+                                                var parameterArray = syncArray[newDoodle.drawing.idSuffix][className][slaveClassName]['parameters'];
                                                 
                                                 if (typeof(parameterArray) != 'undefined')
                                                 {
@@ -237,7 +237,7 @@
                             }
                         
                             // Look for any doodles which are children of the deleted one
-                            var drawing = (_drawing.IDSuffix == 'RPS')?thisDrawing:otherDrawing;
+                            var drawing = (_drawing.idSuffix == 'RPS')?thisDrawing:otherDrawing;
                             for (var i = 0; i < drawing.doodleArray.length; i++)
                             {
                                 if (deletedDoodleClass == drawing.doodleArray[i].parentClass)

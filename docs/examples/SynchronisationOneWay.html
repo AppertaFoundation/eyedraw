@@ -45,7 +45,7 @@
                 
                 // Create an array of synchronisations
                 var syncArray = new Array();
-                if (_drawing.IDSuffix == 'RPS')
+                if (_drawing.idSuffix == 'RPS')
                 {
                     syncArray['LPS'] = {Surgeon:{PhakoIncision:{parameters:['rotation']}}};
                 }
@@ -60,7 +60,7 @@
                     {
                         // Ready notification
                         case 'ready':
-                            if (_drawing.IDSuffix == 'RPS')
+                            if (_drawing.idSuffix == 'RPS')
                             {
                                 //_drawing.addDoodle('OperatingTable');
                                 _drawing.addDoodle('Surgeon');
@@ -146,19 +146,19 @@
                                     }
                                 }
                             }
-                            if (_drawing.IDSuffix == 'LPS') saveInput.value = _drawing.save();
+                            if (_drawing.idSuffix == 'LPS') saveInput.value = _drawing.save();
                             break;
                         
                         case 'doodleAdded':
-                            if (_drawing.IDSuffix == 'LPS') saveInput.value = _drawing.save();
+                            if (_drawing.idSuffix == 'LPS') saveInput.value = _drawing.save();
                             break;
                         
                         case 'doodleDeleted':
-                            if (_drawing.IDSuffix == 'LPS') saveInput.value = _drawing.save();
+                            if (_drawing.idSuffix == 'LPS') saveInput.value = _drawing.save();
                             break;
                         
                         case 'mousedragged':
-                            if (_drawing.IDSuffix == 'LPS') saveInput.value = _drawing.save();
+                            if (_drawing.idSuffix == 'LPS') saveInput.value = _drawing.save();
                             break;
                     }
                 }

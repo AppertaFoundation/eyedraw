@@ -41,11 +41,11 @@
                 
                 // Create an array of synchronisations
                 var syncArray = new Array();
-                if (_drawing.IDSuffix == 'RPS')
+                if (_drawing.idSuffix == 'RPS')
                 {
                     syncArray['LPS'] = {AntSeg:{AntSeg:{parameters:['apexY']}}};
                 }
-                if (_drawing.IDSuffix == 'LPS')
+                if (_drawing.idSuffix == 'LPS')
                 {
                     syncArray['RPS'] = {AntSeg:{AntSeg:{parameters:['apexY']}}};
                 }
@@ -63,7 +63,7 @@
                         
                         case 'doodleSelected':
                             // To avoid infinite loops, ensure that selecting a doodle in one drawing de-deselects the others
-                            var otherDrawing = (_messageArray['selectedDoodle'].drawing.IDSuffix == 'RPS')?drawingEdit2:drawingEdit1;
+                            var otherDrawing = (_messageArray['selectedDoodle'].drawing.idSuffix == 'RPS')?drawingEdit2:drawingEdit1;
                             otherDrawing.deselectDoodles();
                             break;
                         

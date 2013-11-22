@@ -30,9 +30,13 @@ ED.PI = function(_drawing, _parameterJSON) {
 
 	// Derived parameters
 	this.type = 'Surgical';
-	
+	this.suture = false;
+
 	// Saved parameters
-	this.savedParameterArray = ['rotation', 'type'];
+	this.savedParameterArray = ['rotation', 'type', 'suture'];
+	
+	// Parameters in doodle control bar (parameter name: parameter label)
+	this.controlParameterArray = {'type':'Type', 'suture':'Suture'};
 	
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -57,6 +61,11 @@ ED.PI.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'string',
 		list: ['Surgical', 'Laser'],
+		animate: false
+	};
+	this.parameterValidationArray['suture'] = {
+		kind: 'derived',
+		type: 'bool',
 		animate: false
 	};
 }
@@ -108,6 +117,16 @@ ED.PI.prototype.draw = function(_point) {
 	
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
+	
+	// Other paths and drawing here
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+		if (this.suture) {
+			ctx.beginPath();
+			ctx.moveTo(0,0);
+			ctx.lineTo(0, -r * 0.8);
+			ctx.stroke();
+		}
+	}
 
 	// Return value indicating successful hittest
 	return this.isClicked;
@@ -120,35 +139,4 @@ ED.PI.prototype.draw = function(_point) {
  */
 ED.PI.prototype.description = function() {
 	return "Peripheral iridectomy at " + this.clockHour() + " o'clock";
-}
-
-/**
- * Runs when doodle is selected by the user
- */
-ED.PI.prototype.onSelection = function() {
-	console.log('PI selected' + this.drawing.IDSuffix);
-	
-	var tableSelect = document.createElement('select');
-	tableSelect.setAttribute('id', 'piTypeSelect');
-	
-	var option = document.createElement('option');
-	//if (selectedValue == optionArray[i]) option.setAttribute('selected', 'true');
-	option.innerText = 'Surgical';
-	tableSelect.appendChild(option);
-	option = document.createElement('option');
-	option.innerText = 'Laser';
-	tableSelect.appendChild(option);
-	
-	document.getElementById('doodleControls').appendChild(tableSelect);
-	
-	this.addBinding('type', {id:'piTypeSelect'});
-}
-
-/**
- * Runs when doodle is deselected by the user
- */
-ED.PI.prototype.onDeselection = function() {
-	console.log('PI deselected');
-	this.removeBinding('type');
-	document.getElementById('doodleControls').removeChild(document.getElementById('piTypeSelect'));
 }

@@ -249,11 +249,11 @@ ED.randomArray = [0.6570, 0.2886, 0.7388, 0.1621, 0.9896, 0.0434, 0.1695, 0.9099
  * @property {Float} scaleOn Options for setting scale to either width or height
  * @param {Canvas} _canvas Canvas element
  * @param {Eye} _eye Right or left eye
- * @param {String} _IDSuffix String suffix to identify HTML elements related to this drawing
+ * @param {String} _idSuffix String suffix to identify HTML elements related to this drawing
  * @param {Bool} _isEditable Flag indicating whether canvas is editable or not
  * @param {Array} _options Associative array of optional parameters
  */
-ED.Drawing = function(_canvas, _eye, _IDSuffix, _isEditable, _options) {
+ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 	// Defaults for optional parameters
 	var offsetX = 0;
 	var offsetY = 0;
@@ -275,7 +275,7 @@ ED.Drawing = function(_canvas, _eye, _IDSuffix, _isEditable, _options) {
 	// Initialise properties
 	this.canvas = _canvas;
 	this.eye = _eye;
-	this.IDSuffix = _IDSuffix;
+	this.idSuffix = _idSuffix;
 	this.isEditable = _isEditable;
 	this.hoverTimer = null;
 	this.convertToImage = (toImage && !this.isEditable) ? true : false;
@@ -358,17 +358,17 @@ ED.Drawing = function(_canvas, _eye, _IDSuffix, _isEditable, _options) {
 	this.clear();
 
 	// Get reference to button elements
-	this.moveToFrontButton = document.getElementById('moveToFront' + this.IDSuffix);
-	this.moveToBackButton = document.getElementById('moveToBack' + this.IDSuffix);
-	this.flipVerButton = document.getElementById('flipVer' + this.IDSuffix);
-	this.flipHorButton = document.getElementById('flipHor' + this.IDSuffix);
-	this.deleteSelectedDoodleButton = document.getElementById('deleteSelectedDoodle' + this.IDSuffix);
-	this.lockButton = document.getElementById('lock' + this.IDSuffix);
-	this.unlockButton = document.getElementById('unlock' + this.IDSuffix);
-	this.squiggleSpan = document.getElementById('squiggleSpan' + this.IDSuffix);
-	this.colourPreview = document.getElementById('colourPreview' + this.IDSuffix);
-	this.fillRadio = document.getElementById('fillRadio' + this.IDSuffix);
-	this.thickness = document.getElementById('thicknessSelect' + this.IDSuffix);
+	this.moveToFrontButton = document.getElementById('moveToFront' + this.idSuffix);
+	this.moveToBackButton = document.getElementById('moveToBack' + this.idSuffix);
+	this.flipVerButton = document.getElementById('flipVer' + this.idSuffix);
+	this.flipHorButton = document.getElementById('flipHor' + this.idSuffix);
+	this.deleteSelectedDoodleButton = document.getElementById('deleteSelectedDoodle' + this.idSuffix);
+	this.lockButton = document.getElementById('lock' + this.idSuffix);
+	this.unlockButton = document.getElementById('unlock' + this.idSuffix);
+	this.squiggleSpan = document.getElementById('squiggleSpan' + this.idSuffix);
+	this.colourPreview = document.getElementById('colourPreview' + this.idSuffix);
+	this.fillRadio = document.getElementById('fillRadio' + this.idSuffix);
+	this.thickness = document.getElementById('thicknessSelect' + this.idSuffix);
 
 	// Selection rectangle
 	this.selectionRectangleIsBeingDragged = false;
@@ -781,7 +781,7 @@ ED.Drawing.prototype.mousedown = function(_point) {
 	var found = false;
 	this.lastSelectedDoodle = this.selectedDoodle;
 	this.selectedDoodle = null;
-
+	
 	// Cycle through doodles from front to back doing hit test
 	for (var i = this.doodleArray.length - 1; i > -1; i--) {
 		if (!found) {
@@ -800,11 +800,17 @@ ED.Drawing.prototype.mousedown = function(_point) {
 					this.selectedDoodle = this.doodleArray[i];
 					found = true;
 					
-					// Run onSelection code
-					this.selectedDoodle.onSelection();
+					// Check if newly selected
+					if (this.lastSelectedDoodle != this.selectedDoodle) {
+						// Run onDeselection code for last doodle
+						if (this.lastSelectedDoodle) this.lastSelectedDoodle.onDeselection();
+						
+						// Run onSelection code
+						this.selectedDoodle.onSelection();
 
-					// Notify
-					this.notify("doodleSelected");
+						// Notify
+						this.notify("doodleSelected");
+					}
 
 					// If for drawing, mouse down starts a new squiggle
 					if (!this.doubleClick && this.doodleArray[i].isForDrawing) {
@@ -829,18 +835,20 @@ ED.Drawing.prototype.mousedown = function(_point) {
 		// Ensure drag flagged is off for each doodle
 		this.doodleArray[i].isBeingDragged = false;
 	}
-	
-	// Notify if doodle is deselected
+
+	// If no doodles selected, run onDeselection code for last doodle
+	if (!this.selectedDoodle) {
+		if (this.lastSelectedDoodle) this.lastSelectedDoodle.onDeselection();
+	}
+			
+	// Notify if doodle is deselected ***TODO*** move to onDeselection code for doodle to make this trigger for all deselections
 	if (this.lastSelectedDoodle) {
 		if (this.lastSelectedDoodle != this.selectedDoodle) {
-			// Run onDeselection code
-			this.lastSelectedDoodle.onDeselection();
-			
 			// Notify
 			this.notify("doodleDeselected");
 		}
 	}
-
+	
 	// Drawing
 	if (this.newPointOnClick && !found) {
 		var mousePosDoodlePlane = this.inverseTransform.transformPoint(_point);
@@ -1713,6 +1721,7 @@ ED.Drawing.prototype.deleteDoodle = function(_doodle) {
 
 					// If its selected, deselect it
 					if (this.selectedDoodle != null && this.selectedDoodle.id == _doodle.id) {
+						this.selectedDoodle.onDeselection();
 						this.selectedDoodle = null;
 					}
 
@@ -1911,6 +1920,7 @@ ED.Drawing.prototype.deselectDoodles = function() {
 		this.doodleArray[i].isSelected = false;
 	}
 
+	if (this.selectedDoodle) this.selectedDoodle.onDeselection();
 	this.selectedDoodle = null;
 
 	// Refresh drawing
@@ -2018,8 +2028,9 @@ ED.Drawing.prototype.addDoodle = function(_className, _parameterDefaults, _param
 
 	// Check if one is already there if unique)
 	if (!(newDoodle.isUnique && this.hasDoodleOfClass(_className))) {
-		// Ensure no other doodles are selected
+		// Ensure no other doodles are selected, and run onDeselection code if appropriate
 		for (var i = 0; i < this.doodleArray.length; i++) {
+			if (this.doodleArray[i].isSelected) this.doodleArray[i].onDeselection();
 			this.doodleArray[i].isSelected = false;
 		}
 
@@ -2136,6 +2147,9 @@ ED.Drawing.prototype.addDoodle = function(_className, _parameterDefaults, _param
 			this.repaint();
 		}
 
+		// Run onSelection code
+		this.selectedDoodle.onSelection();
+		
 		// Notify
 		this.notify("doodleAdded", newDoodle);
 
@@ -2829,7 +2843,7 @@ ED.Drawing.prototype.repaint = function() {
 		// Go through doodles looking for any that unique, and disable the corresponding add button
 		for (var i = 0; i < this.doodleArray.length; i++) {
 			// Button ID is concatenation of class name and id suffix
-			var addButton = document.getElementById(this.doodleArray[i].className + this.IDSuffix);
+			var addButton = document.getElementById(this.doodleArray[i].className + this.idSuffix);
 			if (addButton) {
 				addButton.disabled = this.doodleArray[i].isUnique;
 			}
@@ -2951,7 +2965,7 @@ ED.Drawing.prototype.setSquiggleStyle = function(_style) {
  */
 ED.Drawing.prototype.refreshSquiggleSettings = function() {
 	// Get reference to canvas
-	var displayCanvas = document.getElementById("squiggleSettings" + this.IDSuffix);
+	var displayCanvas = document.getElementById("squiggleSettings" + this.idSuffix);
 
 	if (displayCanvas) {
 		// Get context
@@ -3399,6 +3413,11 @@ ED.Doodle = function(_drawing, _parameterJSON) {
 		// Optional array for saving non-bound parameters
 		if (!this.savedParameterArray) {
 			this.savedParameterArray = [];
+		}
+		
+		// Optional array for parameters linked to elements in doodle control panel
+		if (!this.controlParameterArray) {
+			this.controlParameterArray = [];
 		}
 
 		// Optional array for saving details of object parameters for reconstitution from string
@@ -3857,7 +3876,7 @@ ED.Doodle.prototype.setDisplayOfParameterControls = function(_flag) {
 		var validation = this.parameterValidationArray[parameter];
 		if (validation.display) {
 			// Construct id of element
-			var id = parameter + this.className + this.drawing.IDSuffix;
+			var id = parameter + this.className + this.drawing.idSuffix;
 
 			// Look for corresponding element and toggle display
 			var element = document.getElementById(id);
@@ -4100,6 +4119,104 @@ ED.Doodle.prototype.validateParameter = function(_parameter, _value) {
 	returnArray['valid'] = valid;
 	returnArray['value'] = value;
 	return returnArray;
+}
+
+/**
+ * Generates a unique id for a control element bound to a parameter ***TODO*** improve this
+ *
+ * @param {String} _parameter Name of the parameter
+ * @returns {String} ID for a control element
+ */
+ED.Doodle.prototype.parameterControlElementId = function(_parameter) {
+	return this.drawing.canvas.id + '_' + _parameter + '_control';
+}
+
+/**
+ * Runs when doodle is selected by the user
+ */
+ED.Doodle.prototype.onSelection = function() {
+
+	var controlDiv = document.getElementById(this.drawing.canvas.id + '_' + 'controls');
+
+	for (var parameter in this.controlParameterArray) {
+// 		var labelText = this.controlParameterArray[parameter];
+// 		
+// 		// Create label  ***TODO*** deal with optional label and language
+// 		var label = document.createElement('label');
+// 		label.innerText = labelText;
+// 		controlDiv.appendChild(label);
+		
+		// Create element and add to control bar
+		var element = this.parameterElement(parameter);
+		controlDiv.appendChild(element);
+		
+		// Add binding
+		this.addBinding(parameter, {id:this.parameterControlElementId(parameter)});
+	}
+}
+
+/**
+ * Runs when doodle is deselected by the user
+ */
+ED.Doodle.prototype.onDeselection = function() {
+	// Remove all bindings
+	for (var parameter in this.controlParameterArray) {
+		//var parameter = this.controlParameterArray[i];
+		this.removeBinding(parameter);
+	}
+	
+	// Remove all child elements in control div
+	var controlDiv = document.getElementById(this.drawing.canvas.id + '_' + 'controls');
+	while(controlDiv.hasChildNodes()){
+		controlDiv.removeChild(controlDiv.lastChild);
+	}
+}
+
+
+/**
+ * Creates element for parameter ***TODO*** move to parent class
+ *
+ * @param {String} _parameter Name of the parameter
+ * @returns {String} _id ID for a control element
+ */
+ED.Doodle.prototype.parameterElement = function(_parameter) {
+	var element;
+	switch (this.parameterValidationArray[_parameter].type) {
+		case 'string':
+			// Create a select element
+			element = document.createElement('select');
+			element.setAttribute('id', this.parameterControlElementId(_parameter));
+			
+			// Add options from validation array
+			for (var i in this.parameterValidationArray[_parameter].list) {
+				var option = document.createElement('option');
+				option.innerText = this.parameterValidationArray[_parameter].list[i];
+				//if (option.innerText == this[_parameter]) option.selected = true;
+				element.appendChild(option);
+			}
+			break;
+			
+		case 'bool':
+			// Create a checkbox element
+			element = document.createElement('input');
+    		element.type = 'checkbox';
+    		element.setAttribute('id', this.parameterControlElementId(_parameter));
+    		break;
+			
+		default:
+			ED.errorHandler('ED.Doodle', 'parameterElement', 'Unexpected type: ' + this.parameterValidationArray[_parameter].type + ' for parameter: ' + _parameter);
+			break;
+	}
+	// Create label  ***TODO*** deal with optional label and language
+	var label = document.createElement('label');
+	label.innerText = this.controlParameterArray[_parameter];
+		
+	// Wrap in Div
+	var div = document.createElement('div');
+	div.appendChild(label);
+	div.appendChild(element);
+	
+	return div;
 }
 
 /**
@@ -4504,7 +4621,14 @@ ED.Doodle.prototype.addBinding = function(_parameter, _fieldParameters) {
 					if (attribute) {
 						ED.errorHandler('ED.Doodle', 'addBinding', 'Binding to a checkbox with a non-standard attribute not yet supported');
 					} else {
-						this.setParameterFromString(_parameter, element.checked.toString());
+						// For parameters linked to an element with a saved value, set value to that of bound element
+						if (this.savedParameterArray.indexOf(_parameter) < 0) {
+							this.setParameterFromString(_parameter, element.checked.toString());
+						}
+						// Otherwise set element value to saved doodle parameter
+						else {
+							this.drawing.updateBindings(this);
+						}
 						element.addEventListener('change', listener = function(event) {
 							drawing.eventHandler('onchange', id, className, this.id, this.checked.toString());
 						}, false);
@@ -4514,7 +4638,7 @@ ED.Doodle.prototype.addBinding = function(_parameter, _fieldParameters) {
 				case 'select-one':
 					if (attribute) {
 						if (element.selectedIndex > -1) {
-							// For parameters linked to a saved value, set value to that of bound element NB if this works, all the cases in this switch need updating
+							// For parameters linked to a saved value, set value to that of bound element
 							if (this.savedParameterArray.indexOf(_parameter) < 0) {
 								this.setParameterFromString(_parameter, element.options[element.selectedIndex].getAttribute(attribute));
 							}
@@ -4523,7 +4647,7 @@ ED.Doodle.prototype.addBinding = function(_parameter, _fieldParameters) {
 							drawing.eventHandler('onchange', id, className, this.id, this.options[this.selectedIndex].getAttribute(attribute));
 						}, false);
 					} else {
-						// For parameters linked to an element with a saved value, set value to that of bound element NB if this works, all the cases in this switch need updating
+						// For parameters linked to an element with a saved value, set value to that of bound element
 						if (this.savedParameterArray.indexOf(_parameter) < 0) {
 							this.setParameterFromString(_parameter, element.value);
 						}
@@ -26641,9 +26765,13 @@ ED.PI = function(_drawing, _parameterJSON) {
 
 	// Derived parameters
 	this.type = 'Surgical';
-	
+	this.suture = false;
+
 	// Saved parameters
-	this.savedParameterArray = ['rotation', 'type'];
+	this.savedParameterArray = ['rotation', 'type', 'suture'];
+	
+	// Parameters in doodle control bar (parameter name: parameter label)
+	this.controlParameterArray = {'type':'Type', 'suture':'Suture'};
 	
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -26668,6 +26796,11 @@ ED.PI.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'string',
 		list: ['Surgical', 'Laser'],
+		animate: false
+	};
+	this.parameterValidationArray['suture'] = {
+		kind: 'derived',
+		type: 'bool',
 		animate: false
 	};
 }
@@ -26719,6 +26852,16 @@ ED.PI.prototype.draw = function(_point) {
 	
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
+	
+	// Other paths and drawing here
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+		if (this.suture) {
+			ctx.beginPath();
+			ctx.moveTo(0,0);
+			ctx.lineTo(0, -r * 0.8);
+			ctx.stroke();
+		}
+	}
 
 	// Return value indicating successful hittest
 	return this.isClicked;
@@ -26732,38 +26875,6 @@ ED.PI.prototype.draw = function(_point) {
 ED.PI.prototype.description = function() {
 	return "Peripheral iridectomy at " + this.clockHour() + " o'clock";
 }
-
-/**
- * Runs when doodle is selected by the user
- */
-ED.PI.prototype.onSelection = function() {
-	console.log('PI selected' + this.drawing.IDSuffix);
-	
-	var tableSelect = document.createElement('select');
-	tableSelect.setAttribute('id', 'piTypeSelect');
-	
-	var option = document.createElement('option');
-	//if (selectedValue == optionArray[i]) option.setAttribute('selected', 'true');
-	option.innerText = 'Surgical';
-	tableSelect.appendChild(option);
-	option = document.createElement('option');
-	option.innerText = 'Laser';
-	tableSelect.appendChild(option);
-	
-	document.getElementById('doodleControls').appendChild(tableSelect);
-	
-	this.addBinding('type', {id:'piTypeSelect'});
-}
-
-/**
- * Runs when doodle is deselected by the user
- */
-ED.PI.prototype.onDeselection = function() {
-	console.log('PI deselected');
-	this.removeBinding('type');
-	document.getElementById('doodleControls').removeChild(document.getElementById('piTypeSelect'));
-}
-
 /**
  * OpenEyes
  *

@@ -89,9 +89,9 @@
 							this.drawing.globalScaleFactor = this.gsf;
 							
 							this.drawing.addDoodle('AntSeg');
-							this.drawing.addDoodle('PI', {type:'Surgical'});				
+							this.drawing.addDoodle('PI');				
 
-							// Grid , {type:{id:'piTypeSelect'}}
+							// Grid , {type:{id:'piTypeSelect'}}  , {type:'Laser'}, {suture:{id:'Eyedraw_boolField'}}
 					    	//this.drawing.addDoodle('Lungs');
 					    	
 							// Right eye
@@ -373,7 +373,7 @@
 				return false;
             " ><img src="../img/RecordReading.gif" /></button>
             
-            <button id="LensRPS" class="imgbutton" title="Lens" onclick="drawingEdit.addDoodle('AgentDose'); return false;" ><img src="../img/Cryo.gif" /></button>
+            <button id="LensRPS" class="imgbutton" title="Lens" onclick="drawingEdit.addDoodle('PI'); return false;" ><img src="../img/PI.gif" /></button>
 
 
 
@@ -386,12 +386,16 @@
         <span class="canvasTooltip" id="canvasEditTooltip"></span>
         
         <!-- Canvas element style="border: none;" style="background-color: #DAE6F1;"-->
-        <canvas id="canvasEdit" class="ed_canvas_edit" width="300" height="300" tabindex="1" style="border: 1px solid gray;"></canvas>
+        <canvas id="canvasEdit" class="ed_canvas_edit" width="300" height="300" tabindex="1" style="border: 1px solid gray; float:left;"></canvas>
         
-        <div id="doodleControls" style="background-color: #DAE6F1;">
+        <!-- Doodle control panel -->
+        <div id="canvasEdit_controls" style="background-color: #DAE6F1; float:left;">
         </div>
+        
+        <!-- <input id="Eyedraw_boolField" type="checkbox"> -->
 
 
+<!-- 
         <br/>
 
 		<select id="horSelect">
@@ -544,6 +548,7 @@
 			<option value=19>19</option>
 			<option value=20>20</option>
 		</select>
+ -->
 		
 <!-- 
 		<select id="piTypeSelect">
@@ -582,10 +587,12 @@
         <input type="text" id="typeInput" value="Calcified" />
          --> 
          
+<!-- 
         <button onclick="console.log(drawingEdit.report()); return false;">Report</button>
         <button onclick="var startDate = new Date(); grid.setDate(startDate); console.log(grid.date); return false;">Start</button>
         <button onclick="console.log(grid.getGridX()); return false;">Grid</button>
         <button onclick="console.log(drawingEdit.save()); return false;">Save</button>
+ -->
 
 
         
