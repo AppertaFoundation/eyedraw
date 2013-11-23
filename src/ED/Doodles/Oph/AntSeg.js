@@ -31,9 +31,13 @@ ED.AntSeg = function(_drawing, _parameterJSON) {
 	// Derived parameters
 	this.pupilSize = 'Large';
 	this.pxe = false;
+	this.coloboma = false;
 
 	// Saved parameters
-	this.savedParameterArray = ['apexY', 'pxe'];
+	this.savedParameterArray = ['apexY', 'pxe', 'coloboma'];
+	
+	// Parameters in doodle control bar (parameter name: parameter label)
+	this.controlParameterArray = {'coloboma':'Coloboma'};
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -75,6 +79,11 @@ ED.AntSeg.prototype.setPropertyDefaults = function() {
 		animate: true
 	};
 	this.parameterValidationArray['pxe'] = {
+		kind: 'derived',
+		type: 'bool',
+		display: true
+	};
+	this.parameterValidationArray['coloboma'] = {
 		kind: 'derived',
 		type: 'bool',
 		display: true
@@ -134,7 +143,7 @@ ED.AntSeg.prototype.dependentParameterValues = function(_parameter, _value) {
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.AntSeg.prototype.draw = function(_point) {
+ED.AntSeg.prototype.draw = function(_point) {console.log(this.coloboma);
 	// Get context
 	var ctx = this.drawing.context;
 
