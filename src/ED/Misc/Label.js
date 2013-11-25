@@ -29,7 +29,7 @@ ED.Label = function(_drawing, _parameterJSON) {
 	this.className = "Label";
 
 	// Private parameters
-	this.labelText = "Start typing..";
+	this.labelText = "";
 	this.lastOriginX = 0;
 	this.lastOriginY = 0;
 
@@ -51,6 +51,9 @@ ED.Label = function(_drawing, _parameterJSON) {
 	
 	// Saved parameters
 	this.savedParameterArray = ['originX', 'originY', 'apexX', 'apexY', 'labelText', 'lastOriginX', 'lastOriginY'];
+	
+	// Parameters in doodle control bar (parameter name: parameter label)
+	this.controlParameterArray = {'labelText':'Text'};
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -80,7 +83,7 @@ ED.Label.prototype.setPropertyDefaults = function() {
 	// Add complete validation arrays for derived parameters
 	this.parameterValidationArray['labelText'] = {
 		kind: 'derived',
-		type: 'string',
+		type: 'freeText',
 		animate: false
 	};
 }
@@ -89,7 +92,6 @@ ED.Label.prototype.setPropertyDefaults = function() {
  * Sets default parameters
  */
 ED.Label.prototype.setParameterDefaults = function() {
-	this.setParameterFromString('labelText', 'Start typing..');
 	this.setOriginWithDisplacements(0, -100);
 	this.lastOriginX = this.originX;
 	this.lastOriginY = this.originY;
@@ -212,33 +214,44 @@ ED.Label.prototype.draw = function(_point) {
 }
 
 /**
+ * Runs when doodle is selected by the user
+ */
+ED.Label.prototype.onSelection = function() {
+	// Call method in superclass
+	ED.Label.superclass.onSelection.call(this);
+	
+	// Set focus to control to allow immediate typing
+	document.getElementById(this.parameterControlElementId('labelText')).focus();
+}
+
+/**
  * Adds a letter to the label text
  *
  * @param {Int} _keyCode Keycode of pressed key
  */
-ED.Label.prototype.addLetter = function(_keyCode) {
-	// Need code here to convert to character
-	var character = String.fromCharCode(_keyCode);
-
-	if (!this.isEdited) {
-		this.labelText = "";
-		this.isEdited = true;
-	}
-
-	// Use backspace to edit
-	if (_keyCode == 8) {
-		if (this.labelText.length > 0) this.labelText = this.labelText.substring(0, this.labelText.length - 1);
-	} else {
-		if (this.labelText.length < this.maximumLength) this.labelText += character;
-	}
-
-	// Save changes by triggering parameterChanged method in controller
-	if (this.isEdited) {
-		// Create notification message
-		var object = new Object;
-		object.doodle = this;
-
-		// Trigger notification
-		this.drawing.notify('parameterChanged', object);
-	}
-}
+// ED.Label.prototype.addLetter = function(_keyCode) {
+// 	// Need code here to convert to character
+// 	var character = String.fromCharCode(_keyCode);
+// 
+// 	if (!this.isEdited) {
+// 		this.labelText = "";
+// 		this.isEdited = true;
+// 	}
+// 
+// 	// Use backspace to edit
+// 	if (_keyCode == 8) {
+// 		if (this.labelText.length > 0) this.labelText = this.labelText.substring(0, this.labelText.length - 1);
+// 	} else {
+// 		if (this.labelText.length < this.maximumLength) this.labelText += character;
+// 	}
+// 
+// 	// Save changes by triggering parameterChanged method in controller
+// 	if (this.isEdited) {
+// 		// Create notification message
+// 		var object = new Object;
+// 		object.doodle = this;
+// 
+// 		// Trigger notification
+// 		this.drawing.notify('parameterChanged', object);
+// 	}
+// }

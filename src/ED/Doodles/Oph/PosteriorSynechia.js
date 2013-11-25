@@ -63,7 +63,7 @@ ED.PosteriorSynechia.prototype.setPropertyDefaults = function() {
 	// Update component of validation array for simple parameters
 	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
 	this.parameterValidationArray['apexY']['range'].setMinAndMax(-380, -0);
-	this.parameterValidationArray['arc']['range'].setMinAndMax(Math.PI / 12, Math.PI * 2 / 3);
+	this.parameterValidationArray['arc']['range'].setMinAndMax(Math.PI / 6, Math.PI * 2 / 3);
 
 	// Add complete validation arrays for derived parameters
 	this.parameterValidationArray['size'] = {
@@ -135,8 +135,8 @@ ED.PosteriorSynechia.prototype.draw = function(_point) {
 
 	// Set outer radius according to pupil
 	var ro = 200;
-	var doodle = this.drawing.lastDoodleOfClass("AntSeg");
-	if (doodle) ro = -doodle.apexY;
+	var iris = this.drawing.lastDoodleOfClass("AntSeg");
+	if (iris) ro = -iris.apexY;
 
 	// Outer radius is position of apex handle
 	var ri = -this.apexY;
@@ -178,8 +178,21 @@ ED.PosteriorSynechia.prototype.draw = function(_point) {
 	// Close path
 	ctx.closePath();
 
-	// Colour of fill
-	ctx.fillStyle = "rgba(100, 200, 250, 0.5)";
+	// Iris colour
+	switch (iris.colour) {
+		case 'Blue':
+			ctx.fillStyle = "rgba(100, 200, 250, 0.5)";
+			break;
+		case 'Brown':
+			ctx.fillStyle = "rgba(172, 100, 55, 0.5)";
+			break;
+		case 'Gray':
+			ctx.fillStyle = "rgba(125, 132, 116, 0.5)";
+			break;
+		case 'Green':
+			ctx.fillStyle = "rgba(114, 172, 62, 0.5)";
+			break;			
+	}
 
 	// Set line attributes
 	ctx.lineWidth = 4;
@@ -198,7 +211,7 @@ ED.PosteriorSynechia.prototype.draw = function(_point) {
 		ctx.lineWidth = 6;
 		ctx.strokeStyle = "white";
 		ctx.stroke();
-		ctx.strokeStyle = "rgba(100, 200, 250, 0.5)";
+		ctx.strokeStyle = ctx.fillStyle;
 		ctx.stroke();
 
 		// Re-do the boundary to match pupil edge and overlap gaps at join

@@ -32,12 +32,14 @@ ED.AntSeg = function(_drawing, _parameterJSON) {
 	this.pupilSize = 'Large';
 	this.pxe = false;
 	this.coloboma = false;
+	this.colour = 'Blue';
+	this.ectropion = false;
 
 	// Saved parameters
-	this.savedParameterArray = ['apexY', 'pxe', 'coloboma'];
+	this.savedParameterArray = ['apexY', 'pxe', 'coloboma', 'colour', 'ectropion'];
 	
 	// Parameters in doodle control bar (parameter name: parameter label)
-	this.controlParameterArray = {'coloboma':'Coloboma'};
+	this.controlParameterArray = {'pxe':'PXE', 'coloboma':'Coloboma', 'colour':'Colour', 'ectropion':'Ectropion uveae'};
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -64,7 +66,7 @@ ED.AntSeg.prototype.setPropertyDefaults = function() {
 	this.version = 1.1;
 	this.isDeletable = false;
 	this.isMoveable = false;
-	this.isRotatable = false;
+	this.isRotatable = true;
 	this.isUnique = true;
 
 	// Update component of validation array for simple parameters (enable 2D control by adding -50,+50 apexX range
@@ -84,6 +86,17 @@ ED.AntSeg.prototype.setPropertyDefaults = function() {
 		display: true
 	};
 	this.parameterValidationArray['coloboma'] = {
+		kind: 'derived',
+		type: 'bool',
+		display: true
+	};
+	this.parameterValidationArray['colour'] = {
+		kind: 'derived',
+		type: 'string',
+		list: ['Blue', 'Brown', 'Gray', 'Green'],
+		animate: false
+	};
+	this.parameterValidationArray['ectropion'] = {
 		kind: 'derived',
 		type: 'bool',
 		display: true
@@ -133,6 +146,9 @@ ED.AntSeg.prototype.dependentParameterValues = function(_parameter, _value) {
 					break;
 			}
 			break;
+		case 'coloboma':
+			this.isRotatable = _value == "true"?true:false;
+			break;
 	}
 
 	return returnArray;
@@ -143,7 +159,7 @@ ED.AntSeg.prototype.dependentParameterValues = function(_parameter, _value) {
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.AntSeg.prototype.draw = function(_point) {console.log(this.coloboma);
+ED.AntSeg.prototype.draw = function(_point) {
 	// Get context
 	var ctx = this.drawing.context;
 
@@ -163,17 +179,55 @@ ED.AntSeg.prototype.draw = function(_point) {console.log(this.coloboma);
 
 	// Do a 360 arc
 	ctx.arc(0, 0, ro, arcStart, arcEnd, true);
+					
+	if (!this.coloboma) {
+		// Move to inner circle
+		ctx.moveTo(ri, 0);
 
-	// Move to inner circle
-	ctx.moveTo(ri, 0);
+		// Arc round edge of pupil
+		ctx.arc(0, 0, ri, arcEnd, arcStart, false);
+	}
+	else {
+		// Angular size of coloboma
+		var colAngle = (Math.PI/3) * 280/ri;
+		var colAngleOuter = Math.PI/6;
+		var rimSize = 20;
+		
+		var p1 = new ED.Point(0,0);
+		p1.setWithPolars(ri, Math.PI + colAngle/2);
+		var p2 = new ED.Point(0,0);
+		p2.setWithPolars(ro - rimSize, Math.PI + colAngleOuter/2);
+		
+		// Coloboma
+		ctx.moveTo(-p2.x, p2.y);
+		ctx.arc(0, 0, ro - rimSize, Math.PI/2 - colAngleOuter/2, Math.PI/2 + colAngleOuter/2, false);
 
-	// Arc back the other way
-	ctx.arc(0, 0, ri, arcEnd, arcStart, false);
+		// Arc round edge of pupil
+		ctx.arc(0, 0, ri, Math.PI/2 + colAngle/2, Math.PI/2 - colAngle/2, false);
+		
+		// Back to start
+		ctx.lineTo(-p2.x, p2.y);
+	}
 
-	// Set line attributes
+	// Edge attributes
 	ctx.lineWidth = 4;
-	ctx.fillStyle = "rgba(100, 200, 250, 0.5)";
 	ctx.strokeStyle = "gray";
+	
+	// Iris colour
+	switch (this.colour) {
+		case 'Blue':
+			ctx.fillStyle = "rgba(100, 200, 250, 0.5)";
+			break;
+		case 'Brown':
+			ctx.fillStyle = "rgba(172, 100, 55, 0.5)";
+			break;
+		case 'Gray':
+			ctx.fillStyle = "rgba(125, 132, 116, 0.5)";
+			break;
+		case 'Green':
+			ctx.fillStyle = "rgba(114, 172, 62, 0.5)";
+			break;			
+	}
 
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
@@ -203,6 +257,21 @@ ED.AntSeg.prototype.draw = function(_point) {console.log(this.coloboma);
 				ctx.arc(0, 0, rp, i * phi, i * phi + phi / 2, false);
 				ctx.stroke();
 			}
+		}
+		
+		// Ectropion uveae
+		if (this.ectropion) {
+			ctx.beginPath();
+			if (this.coloboma) {
+				ctx.arc(0, 0, ri, Math.PI/2 - colAngle/2, Math.PI/2 + colAngle/2, true);
+			}
+			else {
+				ctx.arc(0, 0, ri + 16, arcStart, arcEnd, true);
+			}
+			ctx.lineWidth = 32;
+			ctx.lineCap = "round";
+			ctx.strokeStyle = "brown";
+			ctx.stroke();
 		}
 	}
 

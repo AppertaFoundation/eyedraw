@@ -83,7 +83,7 @@ ED.KoeppeNodule.prototype.draw = function(_point) {
 	ctx.arc(0, -r, 20, 0, 2 * Math.PI, false);
 
 	// Colour of fill
-	ctx.fillStyle = "rgba(237,194,124,1)";
+	ctx.fillStyle = "rgba(150,100,50,1)";
 
 	// Set line attributes
 	ctx.lineWidth = 1;

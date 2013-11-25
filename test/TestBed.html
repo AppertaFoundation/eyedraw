@@ -76,6 +76,8 @@
                 // Register for notifications with drawing object
                 this.drawing.registerForNotifications(this, 'callBack', []);
                 
+                // Show doodle controls
+                this.drawing.showDoodleControls = true;
                 
                 // Method called for notification
                 function callBack(_messageArray)
@@ -84,12 +86,13 @@
                     {
                         // Eye draw image files all loaded
                         case 'ready':
-                        
+
 							//Scale down for glaucoma drawings
 							this.drawing.globalScaleFactor = this.gsf;
 							
 							this.drawing.addDoodle('AntSeg');
-							//this.drawing.addDoodle('PI');				
+							//this.drawing.addDoodle('Freehand');
+							//this.drawing.addDoodle('Freehand', {}, {colour:{id:'colourSelect'}});				
 
 							// Grid , {type:{id:'piTypeSelect'}}  , {type:'Laser'}, {suture:{id:'Eyedraw_boolField'}}
 					    	//this.drawing.addDoodle('Lungs');
@@ -357,9 +360,6 @@
             
         <!-- Doodle selection toolbar -->
         <div class="ed_toolbar" id="canvasEdit1doodleToolbar">
- 
-
-
             <button id="LensRPS" class="imgbutton" title="Lens" onclick="
 				var vals = grid.getNextValues('sys');
 				if (vals) var sys = drawingEdit.addDoodle('RecordReading', {'type':'sys', 'value':vals['value'], 'originX':vals['originX']});
@@ -374,9 +374,8 @@
             " ><img src="../img/RecordReading.gif" /></button>
             
             <button id="LensRPS" class="imgbutton" title="Lens" onclick="drawingEdit.addDoodle('PI'); return false;" ><img src="../img/PI.gif" /></button>
-
-
-
+            <button id="LensRPS" class="imgbutton" title="Freehand" onclick="drawingEdit.addDoodle('Freehand'); return false;" ><img src="../img/Freehand.gif" /></button>
+            <button id="LensRPS" class="imgbutton" title="Label" onclick="drawingEdit.addDoodle('Label'); return false;" ><img src="../img/Label.gif" /></button>
             <br />
         </div>
         
@@ -392,6 +391,13 @@
         <div id="canvasEdit_controls" style="background-color: #DAE6F1; float:left;">
         </div>
         
+<!-- 
+        <select id="colourSelect">
+			<option value='FF0000FF'>Red</option>
+			<option value='00FF00FF'>Green</option>
+		</select>
+ -->
+		
         <!-- <input id="Eyedraw_boolField" type="checkbox"> -->
 
 

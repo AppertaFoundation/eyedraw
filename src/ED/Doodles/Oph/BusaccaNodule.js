@@ -87,7 +87,7 @@ ED.BusaccaNodule.prototype.draw = function(_point) {
 	ctx.arc(0, -r, 30, 0, 2 * Math.PI, false);
 
 	// Colour of fill
-	ctx.fillStyle = "rgba(237,174,94,1)";
+	ctx.fillStyle = "rgba(150,100,50,1)";
 
 	// Set line attributes
 	ctx.lineWidth = 1;

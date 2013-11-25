@@ -61,7 +61,7 @@ ED.IrisNaevus.prototype.setPropertyDefaults = function() {
  * Sets default parameters
  */
 ED.IrisNaevus.prototype.setParameterDefaults = function() {
-	this.originY = -226;
+	this.originY = -320;
 	this.scaleX = 1.8;
 }
 

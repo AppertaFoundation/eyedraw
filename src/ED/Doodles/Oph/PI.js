@@ -30,12 +30,13 @@ ED.PI = function(_drawing, _parameterJSON) {
 
 	// Derived parameters
 	this.type = 'Surgical';
+	this.patent = true;
 
 	// Saved parameters
-	this.savedParameterArray = ['rotation', 'type'];
+	this.savedParameterArray = ['rotation', 'type', 'patent'];
 	
 	// Parameters in doodle control bar (parameter name: parameter label)
-	this.controlParameterArray = {'type':'Type'};
+	this.controlParameterArray = {'type':'Type', 'patent':'Patent'};
 	
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -61,6 +62,11 @@ ED.PI.prototype.setPropertyDefaults = function() {
 		type: 'string',
 		list: ['Surgical', 'Laser'],
 		animate: false
+	};
+	this.parameterValidationArray['patent'] = {
+		kind: 'derived',
+		type: 'bool',
+		display: true
 	};
 }
 
@@ -107,7 +113,8 @@ ED.PI.prototype.draw = function(_point) {
 	ctx.strokeStyle = "rgba(120,120,120,0.75)";;
 
 	// Colour of fill
-	ctx.fillStyle = "rgba(218,230,241,1)";
+	if (this.patent) ctx.fillStyle = "rgba(255,255,255,1)";
+	else ctx.fillStyle = "rgba(150,150,150,1)";
 	
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
