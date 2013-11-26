@@ -431,6 +431,7 @@ class DoodleInfo
         "ConjunctivalFlap" => "Conjunctival flap",
         "CornealAbrasion" => "Corneal abrasion",
         "CornealErosion" => "Removal of corneal epithelium",
+        "CornealGraft" => "Corneal graft",
         "CornealOedema" => "Corneal oedema",
         "CornealScar" => "Corneal scar",
         "CornealStriae" => "Corneal striae",

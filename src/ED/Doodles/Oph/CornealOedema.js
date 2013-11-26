@@ -27,10 +27,20 @@
 ED.CornealOedema = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "CornealOedema";
+
+	// Private parameters
+	this.numberOfHandles = 4;
+	this.initialRadius = 360;
 	
+	// Derived parameters
+	this.intensity = 'Mild';
+
 	// Saved parameters
-	this.savedParameterArray = ['originX', 'originY', 'apexY', 'apexX'];
-	
+	this.savedParameterArray = ['originX', 'originY', 'apexX', 'apexY', 'rotation', 'intensity'];
+
+	// Parameters in doodle control bar (parameter name: parameter label)
+	this.controlParameterArray = {'intensity':'Intensity'};
+		
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
@@ -47,22 +57,65 @@ ED.CornealOedema.superclass = ED.Doodle.prototype;
  */
 ED.CornealOedema.prototype.setHandles = function() {
 	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+	// Array of handles
+// 	for (var i = 0; i < this.numberOfHandles; i++) {
+// 		this.handleArray[i] = new ED.Handle(null, true, ED.Mode.Handles, false);
+// 	}
 }
 
 /**
- * Sets default dragging attributes
+ * Sets default properties
  */
 ED.CornealOedema.prototype.setPropertyDefaults = function() {
-	// Update component of validation array for simple parameters
-	this.parameterValidationArray['apexX']['range'].setMinAndMax(-50, +50);
-	this.parameterValidationArray['apexY']['range'].setMinAndMax(-380, -100);
+	this.isRotatable = false;
+	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
+	this.parameterValidationArray['apexY']['range'].setMinAndMax(-380, -80);
+	
+	// Add complete validation arrays for derived parameters
+	this.parameterValidationArray['intensity'] = {
+		kind: 'derived',
+		type: 'string',
+		list: ['Mild', 'Moderate', 'Severe'],
+		animate: false
+	};
+	
+	/*
+	// Create ranges to constrain handles
+	this.handleVectorRangeArray = new Array();
+	for (var i = 0; i < this.numberOfHandles; i++) {
+		// Full circle in radians
+		var cir = 2 * Math.PI;
+
+		// Create a range object for each handle
+		var n = this.numberOfHandles;
+		var range = new Object;
+		range.length = new ED.Range(+50, +380);
+		range.angle = new ED.Range((((2 * n - 1) * cir / (2 * n)) + i * cir / n) % cir, ((1 * cir / (2 * n)) + i * cir / n) % cir);
+		this.handleVectorRangeArray[i] = range;
+	}
+	*/
 }
 
 /**
  * Sets default parameters
  */
 ED.CornealOedema.prototype.setParameterDefaults = function() {
-	this.apexY = -350;
+	this.apexY = -this.initialRadius;
+
+/*
+	// Create a squiggle to store the handles points
+	var squiggle = new ED.Squiggle(this, new ED.Colour(100, 100, 100, 1), 4, true);
+
+	// Add it to squiggle array
+	this.squiggleArray.push(squiggle);
+
+	// Populate with handles at equidistant points around circumference
+	for (var i = 0; i < this.numberOfHandles; i++) {
+		var point = new ED.Point(0, 0);
+		point.setWithPolars(this.initialRadius, i * 2 * Math.PI / this.numberOfHandles);
+		this.addPointToSquiggle(point);
+	}
+*/
 }
 
 /**
@@ -80,27 +133,78 @@ ED.CornealOedema.prototype.draw = function(_point) {
 	// Boundary path
 	ctx.beginPath();
 
-	// CornealOedema
-	var r = -this.apexY;
-	ctx.arc(0, 0, r, 0, Math.PI * 2, false);
+	/*
+	// Bezier points
+	var fp;
+	var tp;
+	var cp1;
+	var cp2;
+
+	// Angle of control point from radius line to point (this value makes path a circle Math.PI/12 for 8 points
+	var phi = 2 * Math.PI / (3 * this.numberOfHandles);
+
+	// Start curve
+	ctx.moveTo(this.squiggleArray[0].pointsArray[0].x, this.squiggleArray[0].pointsArray[0].y);
+
+	// Complete curve segments
+	for (var i = 0; i < this.numberOfHandles; i++) {
+		// From and to points
+		fp = this.squiggleArray[0].pointsArray[i];
+		var toIndex = (i < this.numberOfHandles - 1) ? i + 1 : 0;
+		tp = this.squiggleArray[0].pointsArray[toIndex];
+
+		// Control points
+		cp1 = fp.tangentialControlPoint(+phi);
+		cp2 = tp.tangentialControlPoint(-phi);
+
+		// Draw Bezier curve
+		ctx.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, tp.x, tp.y);
+	}
 
 	// Close path
 	ctx.closePath();
+	*/
+	
+	// Round lesion
+	var r = Math.sqrt(this.apexX * this.apexX + this.apexY * this.apexY);
+	ctx.arc(0, 0, r, 0, Math.PI * 2, true);
 
-	// Create fill
-	var alpha = 0.3 + (this.apexX + 50) / 200;
-	ctx.fillStyle = "rgba(100,100,100," + alpha.toFixed(2) + ")";
+	// Set attributes
+	ctx.lineWidth = 4;
+	switch (this.intensity) {
+		case 'Mild':
+			ctx.fillStyle = "rgba(0, 0, 255, 0.2)";
+			break;
+		case 'Moderate':
+			ctx.fillStyle = ctx.createPattern(this.drawing.imageArray['OedemaPattern'], 'repeat');
+			break;
+		case 'Severe':
+			ctx.fillStyle = ctx.createPattern(this.drawing.imageArray['OedemaPatternBullous'], 'repeat');
+			break;
+	}
 	ctx.strokeStyle = ctx.fillStyle;
 
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
-
+	
+	// Non boundary paths
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+		if (false) {
+			var ptrn = ctx.createPattern(this.drawing.imageArray['OedemaPatternBullous'], 'repeat');
+			ctx.fillStyle = ptrn;
+			ctx.fill();
+		}
+	}
+	
 	// Coordinates of handles (in canvas plane)
 	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
-
+// 	for (var i = 0; i < this.numberOfHandles; i++) {
+// 		this.handleArray[i].location = this.transform.transformPoint(this.squiggleArray[0].pointsArray[i]);
+// 	}
+		
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
-
+	
 	// Return value indicating successful hittest
 	return this.isClicked;
 }

@@ -345,6 +345,9 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 	this.imageArray['MeshworkPatternMedium'] = new Image();
 	this.imageArray['MeshworkPatternHeavy'] = new Image();
 	this.imageArray['NewVesselPattern'] = new Image();
+	this.imageArray['OedemaPattern'] = new Image();
+	this.imageArray['OedemaPatternBullous'] = new Image();
+	this.imageArray['BrownSpotPattern'] = new Image();
 
 	// Set transform to map from doodle to canvas plane
 	this.transform.translate(this.canvas.width / 2, this.canvas.height / 2);
@@ -5199,10 +5202,15 @@ ED.Doodle.prototype.json = function() {
  * @param {String} _colour String containing colour
  */
 ED.Doodle.prototype.drawSpot = function(_ctx, _x, _y, _r, _colour) {
+	_ctx.save();
 	_ctx.beginPath();
 	_ctx.arc(_x, _y, _r, 0, Math.PI * 2, true);
 	_ctx.fillStyle = _colour;
+	_ctx.strokeStyle = _colour;
+	_ctx.lineWidth = 0;
 	_ctx.fill();
+	_ctx.stroke();
+	_ctx.restore();
 }
 
 /**
@@ -5217,6 +5225,7 @@ ED.Doodle.prototype.drawSpot = function(_ctx, _x, _y, _r, _colour) {
  * @param {String} _strokeColour String containing stroke colour
  */
 ED.Doodle.prototype.drawCircle = function(_ctx, _x, _y, _r, _fillColour, _lineWidth, _strokeColour) {
+	_ctx.save();
 	_ctx.beginPath();
 	_ctx.arc(_x, _y, _r, 0, Math.PI * 2, true);
 	_ctx.fillStyle = _fillColour;
@@ -5224,6 +5233,7 @@ ED.Doodle.prototype.drawCircle = function(_ctx, _x, _y, _r, _fillColour, _lineWi
 	_ctx.lineWidth = _lineWidth;
 	_ctx.strokeStyle = _strokeColour;
 	_ctx.stroke();
+	_ctx.restore();
 }
 
 /**
@@ -5238,12 +5248,14 @@ ED.Doodle.prototype.drawCircle = function(_ctx, _x, _y, _r, _fillColour, _lineWi
  * @param {String} _colour String containing colour
  */
 ED.Doodle.prototype.drawLine = function(_ctx, _x1, _y1, _x2, _y2, _w, _colour) {
+	_ctx.save();
 	_ctx.beginPath();
 	_ctx.moveTo(_x1, _y1);
 	_ctx.lineTo(_x2, _y2);
 	_ctx.lineWidth = _w;
 	_ctx.strokeStyle = _colour;
 	_ctx.stroke();
+	_ctx.restore();
 }
 
 /**
@@ -5289,6 +5301,27 @@ ED.Doodle.prototype.drawNFLHaem = function(_ctx, _x, _y) {
 	_ctx.strokeStyle = "rgba(255,0,0,0.5)";
 	
 	_ctx.stroke();	
+}
+
+/**
+ * Adds an ellipse to a path
+ *
+ * @param {Object} _ctx Context of canvas
+ * @param {Float} _x X-coordinate of origin
+ * @param {Float} _y Y-coordinate of origin
+ * @param {Float} _w Width
+ * @param {Float} _h Height
+ */
+ED.Doodle.prototype.addEllipseToPath = function(_ctx, _x, _y, _w, _h) {
+  var kappa = 0.5522848;
+  var ox = (_w / 2) * kappa;
+  var oy = (_h / 2) * kappa;
+
+  _ctx.moveTo(-_w/2, 0);
+  _ctx.bezierCurveTo(_x - _w/2, _y - oy, _x - ox, _y - _h/2, _x, _y - _h/2);
+  _ctx.bezierCurveTo(_x + ox, _y - _h/2, _x + _w/2, _y - oy, _x + _w/2, _y);
+  _ctx.bezierCurveTo(_x + _w/2, _y + oy, _x + ox, _y + _h/2, _x, _y + _h/2);
+  _ctx.bezierCurveTo(_x - ox, _y + _h/2, _x - _w/2, _y + oy, _x - _w/2, _y);
 }
 
 /**

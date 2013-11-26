@@ -28,16 +28,22 @@ ED.Freehand = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "Freehand";
 	
+	// Private parameters
+	this.labelWidth = 0;
+	this.labelHeight = 80;
+	this.labelFont = "60px sans-serif";
+	
 	// Derived parameters
-	this.colourString = "FF0000FF";
+	this.colourString = "00FF00FF";
 	this.filled = true;
-	this.thickness = 'Thin'
+	this.thickness = 'Thin';
+	this.labelText = "";
 
 	// Saved parameters
-	this.savedParameterArray = ['originX', 'originY', 'colourString', 'filled', 'thickness'];
+	this.savedParameterArray = ['originX', 'originY', 'colourString', 'filled', 'thickness', 'labelText'];
 	
 	// Parameters in doodle control bar (parameter name: parameter label)
-	this.controlParameterArray = {'colourString':'Colour', 'filled':'Fill', 'thickness':'Thickness'};
+	this.controlParameterArray = {'colourString':'Colour', 'filled':'Fill', 'thickness':'Thickness', 'labelText':'Label'};
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -79,6 +85,11 @@ ED.Freehand.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'string',
 		list: ['Thin', 'Medium', 'Thick'],
+		animate: false
+	};
+	this.parameterValidationArray['labelText'] = {
+		kind: 'derived',
+		type: 'freeText',
 		animate: false
 	};
 }
@@ -151,6 +162,15 @@ ED.Freehand.prototype.draw = function(_point) {
 
 			// Optionally fill if squiggle is complete (stops filling while drawing)
 			if (squiggle.filled && squiggle.complete) ctx.fill();
+		}
+		
+		// Draw optional label
+		if (this.labelText.length > 0) {
+			// Draw text
+			ctx.font = this.labelFont;
+			this.labelWidth = ctx.measureText(this.labelText).width;
+			ctx.fillStyle = "black";
+			ctx.fillText(this.labelText, -this.labelWidth / 2, this.labelHeight / 6);
 		}
 	}
 

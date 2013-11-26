@@ -219,7 +219,7 @@ ED.Label.prototype.draw = function(_point) {
 ED.Label.prototype.onSelection = function() {
 	// Call method in superclass
 	ED.Label.superclass.onSelection.call(this);
-	
+
 	// Set focus to control to allow immediate typing
 	document.getElementById(this.parameterControlElementId('labelText')).focus();
 }

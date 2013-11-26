@@ -91,7 +91,7 @@
 							this.drawing.globalScaleFactor = this.gsf;
 							
 							this.drawing.addDoodle('AntSeg');
-							//this.drawing.addDoodle('Freehand');
+							this.drawing.addDoodle('KrukenbergSpindle');
 							//this.drawing.addDoodle('Freehand', {}, {colour:{id:'colourSelect'}});				
 
 							// Grid , {type:{id:'piTypeSelect'}}  , {type:'Laser'}, {suture:{id:'Eyedraw_boolField'}}
@@ -360,6 +360,7 @@
             
         <!-- Doodle selection toolbar -->
         <div class="ed_toolbar" id="canvasEdit1doodleToolbar">
+<!-- 
             <button id="LensRPS" class="imgbutton" title="Lens" onclick="
 				var vals = grid.getNextValues('sys');
 				if (vals) var sys = drawingEdit.addDoodle('RecordReading', {'type':'sys', 'value':vals['value'], 'originX':vals['originX']});
@@ -374,8 +375,9 @@
             " ><img src="../img/RecordReading.gif" /></button>
             
             <button id="LensRPS" class="imgbutton" title="Lens" onclick="drawingEdit.addDoodle('PI'); return false;" ><img src="../img/PI.gif" /></button>
+ -->
             <button id="LensRPS" class="imgbutton" title="Freehand" onclick="drawingEdit.addDoodle('Freehand'); return false;" ><img src="../img/Freehand.gif" /></button>
-            <button id="LensRPS" class="imgbutton" title="Label" onclick="drawingEdit.addDoodle('Label'); return false;" ><img src="../img/Label.gif" /></button>
+<!--             <button id="LensRPS" class="imgbutton" title="CornealOedema" onclick="drawingEdit.addDoodle('CornealGraft'); return false;" ><img src="../img/CornealGraft.gif" /></button> -->
             <br />
         </div>
         

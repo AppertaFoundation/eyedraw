@@ -46,29 +46,26 @@ ED.KrukenbergSpindle.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.KrukenbergSpindle.prototype.setHandles = function() {
-	this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, false);
+	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
 }
 
 /**
  * Sets default dragging attributes
  */
 ED.KrukenbergSpindle.prototype.setPropertyDefaults = function() {
-	this.isSqueezable = true;
 	this.isRotatable = false;
-	this.isUnique = true;
 
 	// Update component of validation array for simple parameters
-	this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.3, +0.6);
-	this.parameterValidationArray['scaleY']['range'].setMinAndMax(+1, +3);
+	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
+	this.parameterValidationArray['apexY']['range'].setMinAndMax(-380, -80);
 }
 
 /**
  * Sets default parameters
  */
 ED.KrukenbergSpindle.prototype.setParameterDefaults = function() {
-	this.originY = 100;
-	this.scaleX = 0.5;
-	this.scaleY = 2;
+	this.apexY = -150;
+	this.originY = 200;
 }
 
 /**
@@ -76,7 +73,7 @@ ED.KrukenbergSpindle.prototype.setParameterDefaults = function() {
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.KrukenbergSpindle.prototype.draw = function(_point) {
+ED.KrukenbergSpindle.prototype.draw = function(_point) {;
 	// Get context
 	var ctx = this.drawing.context;
 
@@ -86,15 +83,11 @@ ED.KrukenbergSpindle.prototype.draw = function(_point) {
 	// Boundary path
 	ctx.beginPath();
 
-	// Krukenberg Spindle
-	var r = 100;
-	ctx.arc(0, 0, r, 0, Math.PI * 2, false);
-
-	// Close path
-	ctx.closePath();
+	// Ellipse
+	this.addEllipseToPath(ctx, 0, 0, -this.apexY/2, -this.apexY * 2);
 
 	// Create fill
-	ctx.fillStyle = "rgba(255,128,0,0.5)";
+	ctx.fillStyle = ctx.createPattern(this.drawing.imageArray['BrownSpotPattern'], 'repeat');
 
 	// Stroke
 	ctx.strokeStyle = "rgba(255,128,0,0.5)";
@@ -103,9 +96,7 @@ ED.KrukenbergSpindle.prototype.draw = function(_point) {
 	this.drawBoundary(_point);
 
 	// Coordinates of handles (in canvas plane)
-	var point = new ED.Point(0, 0);
-	point.setWithPolars(r, Math.PI / 4);
-	this.handleArray[2].location = this.transform.transformPoint(point);
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
