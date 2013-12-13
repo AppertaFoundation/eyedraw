@@ -445,7 +445,7 @@ ED.Drawing = function(_canvas, _eye, _IDSuffix, _isEditable, _options) {
 
 		// Keyboard listener
 		window.addEventListener('keydown', function(e) {
-			if (document.activeElement && document.activeElement.tagName == 'CANVAS') drawing.keydown(e);
+			if (document.activeElement === _canvas) drawing.keydown(e);
 		}, true);
 
 
