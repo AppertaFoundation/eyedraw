@@ -1987,6 +1987,34 @@ ED.Drawing.prototype.selectNextDoodle = function(_value) {
 }
 
 /**
+ * Sets a doodle as selected
+ *
+ * @param {Int} _doodleId Value of scroll wheel
+ */
+ED.Drawing.prototype.setDoodleAsSelected = function(_doodleId) {
+	var selectedIndex = -1;
+	
+	// Deselect doodles
+	this.deselectDoodles();
+
+	// Iterate through doodles
+	for (var i = 0; i < this.doodleArray.length; i++) {
+		if (this.doodleArray[i].id == _doodleId) {
+			selectedIndex = i;
+		}
+	}
+
+	if (selectedIndex >= 0) {
+		this.doodleArray[selectedIndex].isSelected = true;
+		this.selectedDoodle = this.doodleArray[selectedIndex];
+		this.selectedDoodle.onSelection();
+
+		// Refresh drawing
+		this.repaint();
+	}
+}
+
+/**
  * Marks the doodle as 'unmodified' so we can catch an event when it gets modified by the user
  */
 ED.Drawing.prototype.isReady = function() {
@@ -2140,7 +2168,6 @@ ED.Drawing.prototype.addDoodle = function(_className, _parameterDefaults, _param
 			}
 		}
 
-		// Place doodle and refresh drawing
 		if (newDoodle.addAtBack) {
 			// This method also calls the repaint method
 			this.moveToBack();
@@ -2935,7 +2962,7 @@ ED.Drawing.prototype.togglePointInLine = function() {
 
 /**
  * Generates a numeric id guaranteed to be unique for the lifetime of the drawing object
- * (Index of doodleArray can be repeated if a doodle is deleted before adding another)
+ * (Index of doodleArray could be repeated if a doodle is deleted before adding another)
  * 
  * @returns {Int} Id of next doodle
  */
