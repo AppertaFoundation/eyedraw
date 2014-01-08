@@ -111,6 +111,7 @@ ED.trans['LaserCircle'] = 'A circle of laser spots<br/><br/>Drag handle to chang
 ED.trans['LaserDemarcation'] = 'A row of laser spots for demarcation<br/><br/>Drag to rotate<br/>Drag each end handle to increase extent<br/>Drag the middle handle to move line more posteriorly';
 ED.trans['LaserSpot'] = 'A single laser spot<br/><br/>Drag to position<br/>Drag the handle to change size';
 ED.trans['LasikFlap'] = 'LASIK flap<br/><br/>Drag to rotate<br/>Drag the handle to scale';
+ED.trans['Lens'] = 'Lens<br/><br/>Drag to move<br/>Edit properties when selected<br/>Delete to remove';
 ED.trans['LensCrossSection'] = '';
 ED.trans['LimbalRelaxingIncision'] = 'Limbal relaxing incision<br/><br/>Drag to move';
 ED.trans['Macroaneurysm'] = 'Macroaneurysm<br/><br/>Drag to move';

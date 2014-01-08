@@ -27,9 +27,27 @@
 ED.Lens = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "Lens";
-
+	
+	// Derived parameters
+	this.nuclearGrade = 'None';
+	this.corticalGrade = 'None';
+	this.posteriorSubcapsularGrade = 'None';
+	this.anteriorPolar = false;
+	this.coronary = false;
+	this.phakodonesis = false;
+	
 	// Saved parameters
-	this.savedParameterArray = ['originX', 'originY'];
+	this.savedParameterArray = ['originX', 'originY', 'nuclearGrade', 'corticalGrade', 'posteriorSubcapsularGrade', 'coronary', 'phakodonesis'];
+	
+	// Parameters in doodle control bar (parameter name: parameter label)
+	this.controlParameterArray = {
+		'nuclearGrade':'Nuclear', 
+		'corticalGrade':'Cortical', 
+		'posteriorSubcapsularGrade':'Posterior subcapsular',
+		'anteriorPolar':'Anterior polar',
+		'coronary':'Coronary',
+		'phakodonesis':'Phakodonesis',
+		};
 	
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -52,6 +70,40 @@ ED.Lens.prototype.setPropertyDefaults = function() {
 	// Update component of validation array for simple parameters
 	this.parameterValidationArray['originX']['range'].setMinAndMax(-500, +500);
 	this.parameterValidationArray['originY']['range'].setMinAndMax(-500, +500);
+	
+	this.parameterValidationArray['nuclearGrade'] = {
+		kind: 'derived',
+		type: 'string',
+		list: ['None', 'Mild', 'Moderate', 'Brunescent'],
+		animate: false
+	};
+	this.parameterValidationArray['corticalGrade'] = {
+		kind: 'derived',
+		type: 'string',
+		list: ['None', 'Mild', 'Moderate', 'White'],
+		animate: false
+	};
+	this.parameterValidationArray['posteriorSubcapsularGrade'] = {
+		kind: 'derived',
+		type: 'string',
+		list: ['None', 'Small', 'Medium', 'Large'],
+		animate: false
+	};
+	this.parameterValidationArray['anteriorPolar'] = {
+		kind: 'derived',
+		type: 'bool',
+		display: true
+	};
+	this.parameterValidationArray['coronary'] = {
+		kind: 'derived',
+		type: 'bool',
+		display: true
+	};
+	this.parameterValidationArray['phakodonesis'] = {
+		kind: 'derived',
+		type: 'bool',
+		display: true
+	};
 }
 
 /**
@@ -94,13 +146,136 @@ ED.Lens.prototype.draw = function(_point) {
 
 	// Non boundary drawing
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+			
+		// Posterior subcapsular
+		if (this.posteriorSubcapsularGrade != 'None') {
+			var rp;
+			switch (this.posteriorSubcapsularGrade) {
+				case 'Small':
+					rp = 30;
+					break;
+				case 'Medium':
+					rp = 60;
+					break;
+				case 'Large':
+					rp = 90;
+					break;
+			}
+			ctx.beginPath();
+			ctx.arc(0, 0, rp, 0, Math.PI * 2, false);
+			var ptrn = ctx.createPattern(this.drawing.imageArray['PSCPattern'], 'repeat');
+			ctx.fillStyle = ptrn;
+			ctx.strokeStyle = "lightgray";
+			ctx.fill();
+			ctx.stroke();
+		}
+		
+		// Nuclear cataract
 		var ri = ro - 60;
-
-		// Edge of nucleus
 		ctx.beginPath();
 		ctx.arc(0, 0, ri, 0, 2 * Math.PI, true);
 		ctx.strokeStyle = "rgba(220, 220, 220, 0.75)";
 		ctx.stroke();
+		if (this.nuclearGrade != 'None') {
+			var col;
+			switch (this.nuclearGrade) {
+				case 'Mild':
+					col = -120;
+					break;
+				case 'Moderate':
+					col = -80;
+					break;
+				case 'Brunescent':
+					col = +0;
+					break;
+			}
+			yellowColour = "rgba(255, 255, 0, 0.75)";
+			var brownColour = "rgba(" + Math.round(120 - col) + ", " + Math.round(60 - col) + ", 0, 0.75)";
+			var gradient = ctx.createRadialGradient(0, 0, 210, 0, 0, 50);
+			gradient.addColorStop(0, yellowColour);
+			gradient.addColorStop(1, brownColour);
+			ctx.fillStyle = gradient;
+			ctx.fill();
+		}
+		
+		// Cortical cataract
+		if (this.corticalGrade != 'None') {
+			// Parameters
+			var n = 16; // Number of cortical spokes
+			var ro = 240; // Outer radius of cataract
+			var rs = 230; // Outer radius of spoke
+			var theta = 2 * Math.PI / n; // Angle of outer arc of cortical shard
+			var phi = theta / 2; // Half theta
+			var ri;
+			switch (this.corticalGrade) {
+				case 'Mild':
+					ri = 180;
+					break;
+				case 'Moderate':
+					ri = 100;
+					break;
+				case 'White':
+					ri = 20;
+					break;
+			}
+
+			// Spokes
+			ctx.beginPath();
+			var sp = new ED.Point(0, 0);
+			sp.setWithPolars(rs, -phi);
+			ctx.moveTo(sp.x, sp.y);
+
+			for (var i = 0; i < n; i++) {
+				var startAngle = i * theta - phi;
+				var endAngle = startAngle + theta;
+
+				var op = new ED.Point(0, 0);
+				op.setWithPolars(rs, startAngle);
+				ctx.lineTo(op.x, op.y);
+
+				//ctx.arc(0, 0, ro, startAngle, endAngle, false);
+				var ip = new ED.Point(0, 0);
+				ip.setWithPolars(ri, i * theta);
+				ctx.lineTo(ip.x, ip.y);
+			}
+			ctx.lineTo(sp.x, sp.y);
+			
+			// Ring
+			ctx.moveTo(ro, 0);
+			ctx.arc(0, 0, ro, 0, 2 * Math.PI, true);
+
+			// Set boundary path attributes
+			ctx.lineWidth = 4;
+			ctx.lineJoin = 'bevel';
+			ctx.fillStyle = "rgba(200,200,200,0.75)";
+			ctx.fill();
+		}
+		
+		// Coronary cataracts
+		if (this.coronary) {
+			// Spot data
+			var rc = 130;
+			var sr = 10;
+			var inc = Math.PI / 8;
+
+			// Iterate through radius and angle to draw spots
+			for (var a = 0; a < 2 * Math.PI; a += inc) {
+				var p = new ED.Point(0, 0);
+				p.setWithPolars(rc, a);
+				this.drawCircle(ctx, p.x, p.y, sr, "rgba(200,200,255,1)", 4, "rgba(200,200,255,1)");
+			}
+		}
+		
+		// Anterior Polar
+		if (this.anteriorPolar) {
+			var rap = 40;
+			ctx.beginPath();
+			ctx.arc(0, 0, rap, 0, Math.PI * 2, false);
+			ctx.fillStyle = "rgba(150,150,150,0.5)";
+			ctx.strokeStyle = "gray";
+			ctx.fill();
+			ctx.stroke();
+		}
 	}
 
 	// Draw handles if selected
@@ -108,4 +283,37 @@ ED.Lens.prototype.draw = function(_point) {
 
 	// Return value indicating successful hittest
 	return this.isClicked;
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.Lens.prototype.description = function() {
+	returnValue = "";
+	if (this.nuclearGrade != 'None') {
+		returnValue += this.nuclearGrade + ' nuclear cataract';
+	}
+	if (this.corticalGrade != 'None') {
+		returnValue += returnValue.length > 0?", ":"";
+		returnValue += this.corticalGrade + ' cortical cataract';
+	}
+	if (this.posteriorSubcapsularGrade != 'None') {
+		returnValue += returnValue.length > 0?", ":"";
+		returnValue += this.posteriorSubcapsularGrade + ' posterior subcapsular cataract';
+	}
+	if (this.coronary) {
+		returnValue += returnValue.length > 0?", ":"";
+		returnValue += 'Coronary cataract';
+	}
+	if (this.anteriorPolar) {
+		returnValue += returnValue.length > 0?", ":"";
+		returnValue += 'Anterior polar cataract';
+	}
+	if (this.phakodonesis) {
+		returnValue += returnValue.length > 0?", ":"";
+		returnValue += 'Phakodonesis';
+	}
+	return returnValue;
 }

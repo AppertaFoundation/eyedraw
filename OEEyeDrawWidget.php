@@ -479,6 +479,7 @@ class DoodleInfo
         "LasikFlap" => "LASIK flap",
         "LaserSpot" => "Laser spot",
         "Lattice" => "Lattice",
+        "Lens" => "Lens",
         "LimbalRelaxingIncision" => "Limbal relaxing incision",
         "Macroaneurysm" => "Macroaneurysm",
         "MacularDystrophy" => "Macular dystrophy",
