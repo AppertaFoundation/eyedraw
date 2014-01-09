@@ -251,9 +251,9 @@ class OEEyeDrawWidget extends CWidget
     public function init()
     {
         // Set values of paths
-        $this->cssPath = Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('application.modules.eyedraw.css'), false, -1, YII_DEBUG);
-        $this->jsPath = Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('application.modules.eyedraw.dist'), false, -1, YII_DEBUG);
-        $this->imgPath = Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('application.modules.eyedraw.img'), false, -1, YII_DEBUG).'/';
+        $this->cssPath = Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('application.modules.eyedraw.css'), false, -1);
+        $this->jsPath = Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('application.modules.eyedraw.dist'), false, -1);
+        $this->imgPath = Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('application.modules.eyedraw.img'), false, -1).'/';
 
         // Create a unique and descriptive variable name for the drawing object and the corresponding canvas element
         $this->drawingName = 'ed_drawing_'.$this->mode.'_'.$this->idSuffix;
