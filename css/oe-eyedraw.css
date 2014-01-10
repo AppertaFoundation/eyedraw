@@ -171,7 +171,7 @@ ul.ed_toolbar li span {
 	z-index: 99;
 	white-space:nowrap;
 }
-ul.ed_toolbar li img { float: left; }
+ul.ed_toolbar li img { float: left; width: 32px; height: 32px;  }
 ul.ed_toolbar li span.active { display: block;}
 ul.ed_toolbar li ul {
 	background: #fff;
