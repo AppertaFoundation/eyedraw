@@ -39,7 +39,7 @@ ED.AntSeg = function(_drawing, _parameterJSON) {
 	this.savedParameterArray = ['apexY', 'pxe', 'coloboma', 'colour', 'ectropion'];
 	
 	// Parameters in doodle control bar (parameter name: parameter label)
-	this.controlParameterArray = {'pxe':'PXE', 'coloboma':'Coloboma', 'colour':'Colour', 'ectropion':'Ectropion uveae'};
+	this.controlParameterArray = {'pupilSize':'Pupil size', 'pxe':'PXE', 'coloboma':'Coloboma', 'colour':'Colour', 'ectropion':'Ectropion uveae'};
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
