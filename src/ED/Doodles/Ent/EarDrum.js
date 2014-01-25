@@ -189,14 +189,3 @@ ED.EarDrum.prototype.draw = function(_point) {
 	// Return value indicating successful hittest
 	return this.isClicked;
 }
-
-/**
- * Returns a string containing a text description of the doodle
- *
- * @returns {String} Description of doodle
- */
-ED.EarDrum.prototype.description = function() {
-	var returnString = "Ear drum";
-
-	return returnString;
-}

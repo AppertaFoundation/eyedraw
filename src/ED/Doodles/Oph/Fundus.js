@@ -46,6 +46,7 @@ ED.Fundus.prototype.setPropertyDefaults = function() {
 	this.isSelectable = false;
 	this.isDeletable = false;
 	this.isFilled = false;
+	this.showsToolTip = false;
 }
 
 /**

@@ -30,13 +30,15 @@ ED.AntSeg = function(_drawing, _parameterJSON) {
 
 	// Derived parameters
 	this.pupilSize = 'Large';
+	
+	// Other parameters
 	this.pxe = false;
 	this.coloboma = false;
 	this.colour = 'Blue';
 	this.ectropion = false;
 
 	// Saved parameters
-	this.savedParameterArray = ['apexY', 'pxe', 'coloboma', 'colour', 'ectropion'];
+	this.savedParameterArray = ['apexY', 'rotation', 'pxe', 'coloboma', 'colour', 'ectropion'];
 	
 	// Parameters in doodle control bar (parameter name: parameter label)
 	this.controlParameterArray = {'pupilSize':'Pupil size', 'pxe':'PXE', 'coloboma':'Coloboma', 'colour':'Colour', 'ectropion':'Ectropion uveae'};
@@ -148,6 +150,7 @@ ED.AntSeg.prototype.dependentParameterValues = function(_parameter, _value) {
 			break;
 		case 'coloboma':
 			this.isRotatable = _value == "true"?true:false;
+			this.rotation = _value == "true"?this.rotation:0;
 			break;
 	}
 

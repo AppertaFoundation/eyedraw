@@ -123,5 +123,23 @@ ED.Perforation.prototype.draw = function(_point) {
  * @returns {String} Description of doodle
  */
 ED.Perforation.prototype.groupDescription = function() {
-	return "Removal of some corneal epithelium";
+	return "Perforation of eardrum";
+}
+
+/**
+ * Returns the SnoMed code of the doodle
+ *
+ * @returns {Int} SnoMed code of entity representated by doodle
+ */
+ED.Perforation.prototype.snomedCode = function() {
+	return 60442001;
+}
+
+/**
+ * Returns a number indicating position in a hierarchy of diagnoses from 0 to 9 (highest)
+ *
+ * @returns {Int} Position in diagnostic hierarchy
+ */
+ED.Perforation.prototype.diagnosticHierarchy = function() {
+	return 3;
 }

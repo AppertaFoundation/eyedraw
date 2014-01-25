@@ -17,19 +17,16 @@
  */
 
 /**
- * Grommet
+ * Multifocal Choroiditis
  *
- * @class Grommet
+ * @class MultifocalChoroiditis
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
  * @param {Object} _parameterJSON
  */
-ED.Grommet = function(_drawing, _parameterJSON) {
+ED.MultifocalChoroiditis = function(_drawing, _parameterJSON) {
 	// Set classname
-	this.className = "Grommet";
-
-	// Saved parameters
-	this.savedParameterArray = ['originX', 'originY', 'scaleX', 'scaleY'];
+	this.className = "MultifocalChoroiditis";
 	
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -38,31 +35,18 @@ ED.Grommet = function(_drawing, _parameterJSON) {
 /**
  * Sets superclass and constructor
  */
-ED.Grommet.prototype = new ED.Doodle;
-ED.Grommet.prototype.constructor = ED.Grommet;
-ED.Grommet.superclass = ED.Doodle.prototype;
+ED.MultifocalChoroiditis.prototype = new ED.Doodle;
+ED.MultifocalChoroiditis.prototype.constructor = ED.MultifocalChoroiditis;
+ED.MultifocalChoroiditis.superclass = ED.Doodle.prototype;
 
 /**
- * Sets handle attributes
+ * Sets default dragging attributes
  */
-ED.Grommet.prototype.setHandles = function() {
-	//this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, false);
-}
-
-/**
- * Sets default properties
- */
-ED.Grommet.prototype.setPropertyDefaults = function() {}
-
-/**
- * Sets default parameters (Only called for new doodles)
- * Use the setParameter function for derived parameters, as this will also update dependent variables
- */
-ED.Grommet.prototype.setParameterDefaults = function() {
-	// Displacement from fovea, and from last doodle
-	var d = 100;
-	this.originX = d;
-	this.originY = d;
+ED.MultifocalChoroiditis.prototype.setPropertyDefaults = function() {
+	this.addAtBack = true;
+	this.isUnique = true;
+	this.isMoveable = false;
+	this.isRotatable = false;
 }
 
 /**
@@ -70,48 +54,63 @@ ED.Grommet.prototype.setParameterDefaults = function() {
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.Grommet.prototype.draw = function(_point) {
+ED.MultifocalChoroiditis.prototype.draw = function(_point) {
 	// Get context
 	var ctx = this.drawing.context;
 
 	// Call draw method in superclass
-	ED.Grommet.superclass.draw.call(this, _point);
+	ED.MultifocalChoroiditis.superclass.draw.call(this, _point);
 
 	// Boundary path
 	ctx.beginPath();
+	
+	var rb = 480;
 
-	// Round hole
-	ctx.arc(0, 0, 40, 0, Math.PI * 2, true);
+	// Invisible boundary - matches fundus
+	ctx.arc(0, 0, rb, 0, Math.PI * 2, true);
 
 	// Close path
 	ctx.closePath();
 
-	// Set line attributes
-	ctx.lineWidth = 32;
-	ctx.fillStyle = "rgba(255,255,255,0)";
-	ctx.strokeStyle = "white";
+	// Set line attributes (NB Note strokeStyle in order to get a highlight when selected
+	ctx.lineWidth = 4;
+	ctx.fillStyle = "rgba(0, 0, 0, 0)";
+	ctx.strokeStyle = "rgba(255, 255, 0, 1)";
 
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 
-	// Non boundary paths
-	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {}
+	// Non boundary drawing
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+		// PRP spot data
+		var sr = 15;
+		var si = 30;
+		var ss = 48;
+		var rs = rb * 0.9;
+		var nr = 12;
+		var nd = 3
+// 		var sd = (2 * sr + si);
+// 		var st = 10;
 
-	// Coordinates of handles (in canvas plane)
-	this.handleArray[2].location = this.transform.transformPoint(new ED.Point(21, -21));
+		// Draw spots
+		for (var i = 0; i < nr; i++) {
+			var theta = i * 2 * Math.PI/nr;
+			
+			for (var j = 0; j < nd; j++) {
+				var r = (0.5 + j) * rs/nd;
+				var p = new ED.Point(0,0);
+				p.setWithPolars(r, theta);
+				
+				var dis = 80;
+				var xd = (ED.randomArray[i + j] - 0.5) * dis;
+				var yd = (ED.randomArray[nr * nd + i + j] - 0.5) * dis;
+				this.drawCircle(ctx, p.x + xd, p.y + yd, sr, "Yellow", 3, "rgba(255, 128, 0, 1)");
+			}
+		}
+	}
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
-
-	// Calculate arc (Arc property not used naturally in this doodle ***TODO** more elegant method of doing this possible!)
-	var centre = this.transform.transformPoint(new ED.Point(0, 0));
-	var oneWidthToRight = this.transform.transformPoint(new ED.Point(60, 0));
-	var xco = centre.x - this.drawing.canvas.width / 2;
-	var yco = centre.y - this.drawing.canvas.height / 2;
-	var radius = this.scaleX * Math.sqrt(xco * xco + yco * yco);
-	var width = this.scaleX * (oneWidthToRight.x - centre.x);
-	this.arc = Math.atan(width / radius);
-	//console.log(this.arc * 180/Math.PI + " + " + this.calculateArc() * 180/Math.PI);
 
 	// Return value indicating successful hittest
 	return this.isClicked;
@@ -122,7 +121,6 @@ ED.Grommet.prototype.draw = function(_point) {
  *
  * @returns {String} Description of doodle
  */
-ED.Grommet.prototype.description = function() {
-	return "Grommet";
+ED.MultifocalChoroiditis.prototype.description = function() {
+	return "Panretinal photocoagulation";
 }
-

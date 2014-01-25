@@ -1546,7 +1546,7 @@ ED.Drawing.prototype.showTooltip = function(_point) {
 			this.context.save();
 
 			// Successful hit test?
-			if (this.doodleArray[i].draw(_point)) {
+			if (this.doodleArray[i].draw(_point) && this.doodleArray[i].showsToolTip) {
 				this.canvasTooltip.innerHTML = this.doodleArray[i].tooltip();
 				found = true;
 			}
@@ -3313,6 +3313,7 @@ ED.Report.prototype.isMacOff = function() {
  * @property {Bool} isClicked Hit test flag
  * @property {Enum} drawFunctionMode Mode for boundary path
  * @property {Bool} isFilled True if boundary path is filled as well as stroked
+ * @property {Bool} showsToolTip Shows a tooltip if true
  * @property {Int} frameCounter Keeps track of how many animation frames have been drawn
  * @property {Array} handleArray Array containing handles to be rendered
  * @property {Point} leftExtremity Point at left most extremity of doodle (used to calculate arc)
@@ -3483,6 +3484,7 @@ ED.Doodle = function(_drawing, _parameterJSON) {
 		this.isClicked = false;
 		this.drawFunctionMode = ED.drawFunctionMode.Draw;
 		this.isFilled = true;
+		this.showsToolTip = true;
 		this.derivedParametersArray = new Array(); // Array relating special parameters to corresponding common parameter
 		this.animationFrameRate = 30; // Frames per second
 		this.animationDataArray = new Array(); // Associative array, key = parameter name, value = array with animation info
