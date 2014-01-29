@@ -294,5 +294,23 @@ ED.AntSeg.prototype.draw = function(_point) {
  * @returns {String} Description of doodle
  */
 ED.AntSeg.prototype.description = function() {
-	return this.drawing.doodleArray.length == 1 ? "No abnormality" : "";
+	var returnValue = "";
+	
+	// Pupil size and coloboma
+	if (this.pupilSize != 'Large') returnValue += this.pupilSize.toLowerCase() + " pupil, ";
+	
+	// Coloboma
+	if (this.coloboma) returnValue += "coloboma at " + this.clockHour(6) + " o'clock, ";	
+	
+	// Ectopion
+	if (this.ectropion) returnValue += "ectropion uvaee, ";
+
+	// PXE
+	if (this.pxe) returnValue += "pseudoexfoliation, ";
+	
+	// Remove final comma and space and capitalise first letter
+	returnValue = returnValue.replace(/, +$/, '');
+	returnValue = returnValue.charAt(0).toUpperCase() + returnValue.slice(1);
+	
+	return returnValue;
 }

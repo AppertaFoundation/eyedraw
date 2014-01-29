@@ -33,11 +33,12 @@ ED.Lens = function(_drawing, _parameterJSON) {
 	this.corticalGrade = 'None';
 	this.posteriorSubcapsularGrade = 'None';
 	this.anteriorPolar = false;
+	this.posteriorPolar = false;
 	this.coronary = false;
 	this.phakodonesis = false;
 	
 	// Saved parameters
-	this.savedParameterArray = ['originX', 'originY', 'nuclearGrade', 'corticalGrade', 'posteriorSubcapsularGrade', 'coronary', 'phakodonesis'];
+	this.savedParameterArray = ['originX', 'originY', 'nuclearGrade', 'corticalGrade', 'posteriorSubcapsularGrade', 'anteriorPolar', 'posteriorPolar', 'coronary', 'phakodonesis'];
 	
 	// Parameters in doodle control bar (parameter name: parameter label)
 	this.controlParameterArray = {
@@ -45,6 +46,7 @@ ED.Lens = function(_drawing, _parameterJSON) {
 		'corticalGrade':'Cortical', 
 		'posteriorSubcapsularGrade':'Posterior subcapsular',
 		'anteriorPolar':'Anterior polar',
+		'posteriorPolar':'Posterior polar',
 		'coronary':'Coronary',
 		'phakodonesis':'Phakodonesis',
 		};
@@ -90,6 +92,11 @@ ED.Lens.prototype.setPropertyDefaults = function() {
 		animate: false
 	};
 	this.parameterValidationArray['anteriorPolar'] = {
+		kind: 'derived',
+		type: 'bool',
+		display: true
+	};
+	this.parameterValidationArray['posteriorPolar'] = {
 		kind: 'derived',
 		type: 'bool',
 		display: true
@@ -166,6 +173,17 @@ ED.Lens.prototype.draw = function(_point) {
 			var ptrn = ctx.createPattern(this.drawing.imageArray['PSCPattern'], 'repeat');
 			ctx.fillStyle = ptrn;
 			ctx.strokeStyle = "lightgray";
+			ctx.fill();
+			ctx.stroke();
+		}
+		
+		// Posterior Polar
+		if (this.posteriorPolar) {
+			var rap = 50;
+			ctx.beginPath();
+			ctx.arc(0, 0, rap, 0, Math.PI * 2, false);
+			ctx.fillStyle = "rgba(140,140,140,0.75)";
+			ctx.strokeStyle = "gray";
 			ctx.fill();
 			ctx.stroke();
 		}
@@ -268,10 +286,10 @@ ED.Lens.prototype.draw = function(_point) {
 		
 		// Anterior Polar
 		if (this.anteriorPolar) {
-			var rap = 40;
+			var rap = 30;
 			ctx.beginPath();
 			ctx.arc(0, 0, rap, 0, Math.PI * 2, false);
-			ctx.fillStyle = "rgba(150,150,150,0.5)";
+			ctx.fillStyle = "rgba(120,120,120,0.5)";
 			ctx.strokeStyle = "gray";
 			ctx.fill();
 			ctx.stroke();
@@ -310,6 +328,10 @@ ED.Lens.prototype.description = function() {
 	if (this.anteriorPolar) {
 		returnValue += returnValue.length > 0?", ":"";
 		returnValue += 'Anterior polar cataract';
+	}
+	if (this.posteriorPolar) {
+		returnValue += returnValue.length > 0?", ":"";
+		returnValue += 'Posterior polar cataract';
 	}
 	if (this.phakodonesis) {
 		returnValue += returnValue.length > 0?", ":"";

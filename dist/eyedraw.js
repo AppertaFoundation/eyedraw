@@ -4822,19 +4822,24 @@ ED.Doodle.prototype.removeBinding = function(_parameter) {
 }
 
 /**
- * Returns the position converted to clock hours
+ * Returns the roation converted to clock hours
  *
+ * @param {Int} _Offset Optional integer offset (1 to 11)
  * @returns {Int} Clock hour from 1 to 12
  */
-ED.Doodle.prototype.clockHour = function() {
+ED.Doodle.prototype.clockHour = function(_offset) {
 	var clockHour;
+	var offset;
+	
+	if (typeof(_offset) != 'undefined') offset = _offset
+	else offset = 0;
 
 	if (this.isRotatable && !this.isMoveable) {
-		clockHour = ((this.rotation * 6 / Math.PI) + 12) % 12;
+		clockHour = ((this.rotation * 6 / Math.PI) + 12 + offset) % 12;
 	} else {
 		var twelvePoint = new ED.Point(0, -100);
 		var thisPoint = new ED.Point(this.originX, this.originY);
-		var clockHour = ((twelvePoint.clockwiseAngleTo(thisPoint) * 6 / Math.PI) + 12) % 12;
+		var clockHour = ((twelvePoint.clockwiseAngleTo(thisPoint) * 6 / Math.PI) + 12 + offset) % 12;
 	}
 
 	clockHour = clockHour.toFixed(0);
@@ -14007,7 +14012,25 @@ ED.AntSeg.prototype.draw = function(_point) {
  * @returns {String} Description of doodle
  */
 ED.AntSeg.prototype.description = function() {
-	return this.drawing.doodleArray.length == 1 ? "No abnormality" : "";
+	var returnValue = "";
+	
+	// Pupil size and coloboma
+	if (this.pupilSize != 'Large') returnValue += this.pupilSize.toLowerCase() + " pupil, ";
+	
+	// Coloboma
+	if (this.coloboma) returnValue += "coloboma at " + this.clockHour(6) + " o'clock, ";	
+	
+	// Ectopion
+	if (this.ectropion) returnValue += "ectropion uvaee, ";
+
+	// PXE
+	if (this.pxe) returnValue += "pseudoexfoliation, ";
+	
+	// Remove final comma and space and capitalise first letter
+	returnValue = returnValue.replace(/, +$/, '');
+	returnValue = returnValue.charAt(0).toUpperCase() + returnValue.slice(1);
+	
+	return returnValue;
 }
 
 /**
@@ -25348,11 +25371,12 @@ ED.Lens = function(_drawing, _parameterJSON) {
 	this.corticalGrade = 'None';
 	this.posteriorSubcapsularGrade = 'None';
 	this.anteriorPolar = false;
+	this.posteriorPolar = false;
 	this.coronary = false;
 	this.phakodonesis = false;
 	
 	// Saved parameters
-	this.savedParameterArray = ['originX', 'originY', 'nuclearGrade', 'corticalGrade', 'posteriorSubcapsularGrade', 'coronary', 'phakodonesis'];
+	this.savedParameterArray = ['originX', 'originY', 'nuclearGrade', 'corticalGrade', 'posteriorSubcapsularGrade', 'anteriorPolar', 'posteriorPolar', 'coronary', 'phakodonesis'];
 	
 	// Parameters in doodle control bar (parameter name: parameter label)
 	this.controlParameterArray = {
@@ -25360,6 +25384,7 @@ ED.Lens = function(_drawing, _parameterJSON) {
 		'corticalGrade':'Cortical', 
 		'posteriorSubcapsularGrade':'Posterior subcapsular',
 		'anteriorPolar':'Anterior polar',
+		'posteriorPolar':'Posterior polar',
 		'coronary':'Coronary',
 		'phakodonesis':'Phakodonesis',
 		};
@@ -25405,6 +25430,11 @@ ED.Lens.prototype.setPropertyDefaults = function() {
 		animate: false
 	};
 	this.parameterValidationArray['anteriorPolar'] = {
+		kind: 'derived',
+		type: 'bool',
+		display: true
+	};
+	this.parameterValidationArray['posteriorPolar'] = {
 		kind: 'derived',
 		type: 'bool',
 		display: true
@@ -25481,6 +25511,17 @@ ED.Lens.prototype.draw = function(_point) {
 			var ptrn = ctx.createPattern(this.drawing.imageArray['PSCPattern'], 'repeat');
 			ctx.fillStyle = ptrn;
 			ctx.strokeStyle = "lightgray";
+			ctx.fill();
+			ctx.stroke();
+		}
+		
+		// Posterior Polar
+		if (this.posteriorPolar) {
+			var rap = 50;
+			ctx.beginPath();
+			ctx.arc(0, 0, rap, 0, Math.PI * 2, false);
+			ctx.fillStyle = "rgba(140,140,140,0.75)";
+			ctx.strokeStyle = "gray";
 			ctx.fill();
 			ctx.stroke();
 		}
@@ -25583,10 +25624,10 @@ ED.Lens.prototype.draw = function(_point) {
 		
 		// Anterior Polar
 		if (this.anteriorPolar) {
-			var rap = 40;
+			var rap = 30;
 			ctx.beginPath();
 			ctx.arc(0, 0, rap, 0, Math.PI * 2, false);
-			ctx.fillStyle = "rgba(150,150,150,0.5)";
+			ctx.fillStyle = "rgba(120,120,120,0.5)";
 			ctx.strokeStyle = "gray";
 			ctx.fill();
 			ctx.stroke();
@@ -25625,6 +25666,10 @@ ED.Lens.prototype.description = function() {
 	if (this.anteriorPolar) {
 		returnValue += returnValue.length > 0?", ":"";
 		returnValue += 'Anterior polar cataract';
+	}
+	if (this.posteriorPolar) {
+		returnValue += returnValue.length > 0?", ":"";
+		returnValue += 'Posterior polar cataract';
 	}
 	if (this.phakodonesis) {
 		returnValue += returnValue.length > 0?", ":"";

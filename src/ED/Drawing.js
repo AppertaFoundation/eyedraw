@@ -4822,19 +4822,24 @@ ED.Doodle.prototype.removeBinding = function(_parameter) {
 }
 
 /**
- * Returns the position converted to clock hours
+ * Returns the roation converted to clock hours
  *
+ * @param {Int} _Offset Optional integer offset (1 to 11)
  * @returns {Int} Clock hour from 1 to 12
  */
-ED.Doodle.prototype.clockHour = function() {
+ED.Doodle.prototype.clockHour = function(_offset) {
 	var clockHour;
+	var offset;
+	
+	if (typeof(_offset) != 'undefined') offset = _offset
+	else offset = 0;
 
 	if (this.isRotatable && !this.isMoveable) {
-		clockHour = ((this.rotation * 6 / Math.PI) + 12) % 12;
+		clockHour = ((this.rotation * 6 / Math.PI) + 12 + offset) % 12;
 	} else {
 		var twelvePoint = new ED.Point(0, -100);
 		var thisPoint = new ED.Point(this.originX, this.originY);
-		var clockHour = ((twelvePoint.clockwiseAngleTo(thisPoint) * 6 / Math.PI) + 12) % 12;
+		var clockHour = ((twelvePoint.clockwiseAngleTo(thisPoint) * 6 / Math.PI) + 12 + offset) % 12;
 	}
 
 	clockHour = clockHour.toFixed(0);
