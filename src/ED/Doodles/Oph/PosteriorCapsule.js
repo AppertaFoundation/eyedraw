@@ -30,7 +30,7 @@ ED.PosteriorCapsule = function(_drawing, _parameterJSON) {
 	
 	// Derived parameters
 	this.opacity = 'Mild';
-	this.capsulotomy = 'Diamond';
+	this.capsulotomy = 'None';
 	
 	// Saved parameters
 	this.savedParameterArray = ['originX', 'originY', 'opacity', 'capsulotomy'];
@@ -178,14 +178,16 @@ ED.PosteriorCapsule.prototype.draw = function(_point) {
  * @returns {String} Description of doodle
  */
 ED.PosteriorCapsule.prototype.description = function() {
-	returnValue = "";
-// 	if (this.nuclearGrade != 'None') {
-// 		returnValue += this.nuclearGrade + ' nuclear cataract';
-// 	}
-// 	if (this.corticalGrade != 'None') {
-// 		returnValue += returnValue.length > 0?", ":"";
-// 		returnValue += this.corticalGrade + ' cortical cataract';
-// 	}
+	var returnValue = "";
+	
+	if (this.opacity != 'None') {
+		returnValue += this.opacity + " posterior capsular opacity";
+	}
+	
+	if (this.capsulotomy != 'None') {
+		var shape = this.capsulotomy.toLowerCase();
+		returnValue += " with " + shape + " shaped capsulotomy";
+	}
 
 	return returnValue;
 }

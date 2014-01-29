@@ -504,6 +504,7 @@ class DoodleInfo
         "PhakoIncision" => "Phako incision",
         "PI" => "Peripheral iridectomy",
         "PointInLine" => "Point in line",
+        "PosteriorCapsule" => "Posterior capsule",
         "PosteriorEmbryotoxon" => "Posterior embryotoxon",
         "PostPole" => "Posterior pole",
         "PostSubcapCataract" => "Posterior subcapsular cataract",

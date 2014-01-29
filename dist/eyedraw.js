@@ -7870,6 +7870,7 @@ ED.trans['PeripheralRetinectomy'] = 'Peripheral retinectomy<br/><br/>Drag to rot
 ED.trans['PeripheralRRD'] = 'Peripheral retinal detachment<br/><br/>Drag to rotate<br/>Drag each end handle to increase extent<br/>Drag the middle handle to move posterior limit';
 ED.trans['PhakoIncision'] = 'Phako incision<br/><br/>Drag end handle to change length<br/>Drag the middle handle to change section type<br/>Drag the incision itself to move';
 ED.trans['PI'] = 'Peripheral iridectomy<br/><br/>Drag to move around the iris';
+ED.trans['PosteriorCapsule'] = 'Posterior capsule';
 ED.trans['PosteriorEmbryotoxon'] = 'Posterior embryotoxon';
 ED.trans['PosteriorRetinectomy'] = 'Posterior retinectomy<br/><br/>Drag to position<br/>Drag the handle to change size';
 ED.trans['PosteriorSynechia'] = 'PosteriorSynechia<br/><br/>Drag to rotate around centre<br/>Drag handles to increase extent';
@@ -30890,7 +30891,7 @@ ED.PosteriorCapsule = function(_drawing, _parameterJSON) {
 	
 	// Derived parameters
 	this.opacity = 'Mild';
-	this.capsulotomy = 'Diamond';
+	this.capsulotomy = 'None';
 	
 	// Saved parameters
 	this.savedParameterArray = ['originX', 'originY', 'opacity', 'capsulotomy'];
@@ -31038,14 +31039,16 @@ ED.PosteriorCapsule.prototype.draw = function(_point) {
  * @returns {String} Description of doodle
  */
 ED.PosteriorCapsule.prototype.description = function() {
-	returnValue = "";
-// 	if (this.nuclearGrade != 'None') {
-// 		returnValue += this.nuclearGrade + ' nuclear cataract';
-// 	}
-// 	if (this.corticalGrade != 'None') {
-// 		returnValue += returnValue.length > 0?", ":"";
-// 		returnValue += this.corticalGrade + ' cortical cataract';
-// 	}
+	var returnValue = "";
+	
+	if (this.opacity != 'None') {
+		returnValue += this.opacity + " posterior capsular opacity";
+	}
+	
+	if (this.capsulotomy != 'None') {
+		var shape = this.capsulotomy.toLowerCase();
+		returnValue += " with " + shape + " shaped capsulotomy";
+	}
 
 	return returnValue;
 }
