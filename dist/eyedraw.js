@@ -19526,7 +19526,15 @@ ED.CystoidMacularOedema.prototype.setPropertyDefaults = function() {
  * Sets default parameters (Only called for new doodles)
  * Use the setParameter function for derived parameters, as this will also update dependent variables
  */
-ED.CystoidMacularOedema.prototype.setParameterDefaults = function() {}
+ED.CystoidMacularOedema.prototype.setParameterDefaults = function() {
+	
+	// Set size according to template
+	if (this.drawing.hasDoodleOfClass('Fundus')) {
+		this.scaleX = 0.5;
+		this.scaleY = this.scaleX;
+		this.originX = this.drawing.eye == ED.eye.Right ? -100 : 100;
+	}
+}
 
 /**
  * Draws doodle or performs a hit test if a Point parameter is passed
@@ -20862,10 +20870,11 @@ ED.EpiretinalMembrane.prototype.setPropertyDefaults = function() {
  * Use the setParameter function for derived parameters, as this will also update dependent variables
  */
 ED.EpiretinalMembrane.prototype.setParameterDefaults = function() {
-	this.originY = 0;
-	if (this.drawing.hasDoodleOfClass('PostPole')) {
-		this.originX = 0;
-	} else {
+	
+	// Set size according to template
+	if (this.drawing.hasDoodleOfClass('Fundus')) {
+		this.scaleX = 0.5;
+		this.scaleY = this.scaleX;
 		this.originX = this.drawing.eye == ED.eye.Right ? -100 : 100;
 	}
 }

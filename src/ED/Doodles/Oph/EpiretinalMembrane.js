@@ -67,10 +67,11 @@ ED.EpiretinalMembrane.prototype.setPropertyDefaults = function() {
  * Use the setParameter function for derived parameters, as this will also update dependent variables
  */
 ED.EpiretinalMembrane.prototype.setParameterDefaults = function() {
-	this.originY = 0;
-	if (this.drawing.hasDoodleOfClass('PostPole')) {
-		this.originX = 0;
-	} else {
+	
+	// Set size according to template
+	if (this.drawing.hasDoodleOfClass('Fundus')) {
+		this.scaleX = 0.5;
+		this.scaleY = this.scaleX;
 		this.originX = this.drawing.eye == ED.eye.Right ? -100 : 100;
 	}
 }

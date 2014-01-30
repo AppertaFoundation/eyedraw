@@ -41,7 +41,7 @@
                 var canvasEdit = document.getElementById('canvasEdit');
                 
                 // Create a drawingEdit , {scaleOn:'width'}
-                drawingEdit = new ED.Drawing(canvasEdit, ED.eye.Right, 'RPS', true, {graphicsPath:'../img/'});
+                drawingEdit = new ED.Drawing(canvasEdit, ED.eye.Left, 'RPS', true, {graphicsPath:'../img/'});
                 
                 // Instantiate a controller object
                 controller = new eyeDrawController(drawingEdit);
@@ -91,8 +91,9 @@
 							this.drawing.globalScaleFactor = this.gsf;
 							
 							//this.drawing.addDoodle('AntSeg');
-							this.drawing.addDoodle('PosteriorCapsule');
-							//this.drawing.addDoodle('MultifocalChoroiditis');
+							this.drawing.addDoodle('Fundus');
+							//this.drawing.addDoodle('PostPole');
+							this.drawing.addDoodle('CystoidMacularOedema');
 							//this.drawing.addDoodle('Freehand', {}, {colour:{id:'colourSelect'}});				
 
 							// Grid , {type:{id:'piTypeSelect'}}  , {type:'Laser'}, {suture:{id:'Eyedraw_boolField'}}
