@@ -92,7 +92,7 @@ ED.EarDrum.prototype.draw = function(_point) {
 
 	// Set line attributes
 	ctx.lineWidth = 4;
-	ctx.fillStyle = "rgba(245,224,173,1)";
+	ctx.fillStyle = "rgba(245,224,173,0.5)";
 	ctx.strokeStyle = "gray";
 
 	// Draw boundary path (also hit testing)

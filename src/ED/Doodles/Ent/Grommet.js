@@ -27,9 +27,15 @@
 ED.Grommet = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "Grommet";
-
+	
+	// Other parameters
+	this.type = "Short term";
+	
 	// Saved parameters
-	this.savedParameterArray = ['originX', 'originY', 'scaleX', 'scaleY'];
+	this.savedParameterArray = ['originX', 'originY', 'scaleX', 'scaleY', 'type'];
+
+	// Parameters in doodle control bar (parameter name: parameter label)
+	this.controlParameterArray = {'type':'Type'};
 	
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -52,7 +58,15 @@ ED.Grommet.prototype.setHandles = function() {
 /**
  * Sets default properties
  */
-ED.Grommet.prototype.setPropertyDefaults = function() {}
+ED.Grommet.prototype.setPropertyDefaults = function() {
+	// Add complete validation arrays for derived parameters
+	this.parameterValidationArray['type'] = {
+		kind: 'derived',
+		type: 'string',
+		list: ['Short term', 'Long term'],
+		animate: true
+	};
+}
 
 /**
  * Sets default parameters (Only called for new doodles)
@@ -125,4 +139,3 @@ ED.Grommet.prototype.draw = function(_point) {
 ED.Grommet.prototype.description = function() {
 	return "Grommet";
 }
-

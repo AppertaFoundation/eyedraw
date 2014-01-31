@@ -4282,7 +4282,14 @@ ED.Doodle.prototype.parameterElement = function(_parameter) {
     		element.type = 'text';
     		element.setAttribute('id', this.parameterControlElementId(_parameter));
     		break;
-			
+
+// 		case 'radio':
+// 			// Create a radio button element
+// 			element = document.createElement('input');
+//     		element.type = 'checkbox';
+//     		element.setAttribute('id', this.parameterControlElementId(_parameter));
+//     		break;
+    					
 		default:
 			ED.errorHandler('ED.Doodle', 'parameterElement', 'Unexpected type: ' + this.parameterValidationArray[_parameter].type + ' for parameter: ' + _parameter);
 			break;
@@ -11582,7 +11589,7 @@ ED.EarDrum.prototype.draw = function(_point) {
 
 	// Set line attributes
 	ctx.lineWidth = 4;
-	ctx.fillStyle = "rgba(245,224,173,1)";
+	ctx.fillStyle = "rgba(245,224,173,0.5)";
 	ctx.strokeStyle = "gray";
 
 	// Draw boundary path (also hit testing)
@@ -11708,9 +11715,15 @@ ED.EarDrum.prototype.draw = function(_point) {
 ED.Grommet = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "Grommet";
-
+	
+	// Other parameters
+	this.type = "Short term";
+	
 	// Saved parameters
-	this.savedParameterArray = ['originX', 'originY', 'scaleX', 'scaleY'];
+	this.savedParameterArray = ['originX', 'originY', 'scaleX', 'scaleY', 'type'];
+
+	// Parameters in doodle control bar (parameter name: parameter label)
+	this.controlParameterArray = {'type':'Type'};
 	
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -11733,7 +11746,15 @@ ED.Grommet.prototype.setHandles = function() {
 /**
  * Sets default properties
  */
-ED.Grommet.prototype.setPropertyDefaults = function() {}
+ED.Grommet.prototype.setPropertyDefaults = function() {
+	// Add complete validation arrays for derived parameters
+	this.parameterValidationArray['type'] = {
+		kind: 'derived',
+		type: 'string',
+		list: ['Short term', 'Long term'],
+		animate: true
+	};
+}
 
 /**
  * Sets default parameters (Only called for new doodles)
@@ -11807,7 +11828,6 @@ ED.Grommet.prototype.description = function() {
 	return "Grommet";
 }
 
-
 /**
  * OpenEyes
  *
@@ -11837,12 +11857,21 @@ ED.Grommet.prototype.description = function() {
 ED.Perforation = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "Perforation";
+	
+	// Constants
+	this.margin = 30000;
 
-	// Doodle specific property
-	this.isInVisualAxis = false;
-
+	// Derived parameters
+	this.isMarginal = false;
+	
+	// Other parameters
+	this.safe = true;
+	
 	// Saved parameters
-	this.savedParameterArray = ['originX', 'originY', 'scaleX', 'scaleY'];
+	this.savedParameterArray = ['originX', 'originY', 'scaleX', 'scaleY', 'safe'];
+	
+	// Parameters in doodle control bar (parameter name: parameter label)
+	this.controlParameterArray = {'safe':'Safe'};
 	
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -11874,6 +11903,18 @@ ED.Perforation.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['originY']['range'].setMinAndMax(-300, +300);
 	this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.25, +2);
 	this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.25, +2);
+
+	// Add complete validation arrays for derived parameters
+	this.parameterValidationArray['isMarginal'] = {
+		kind: 'derived',
+		type: 'bool',
+		display: true
+	};
+	this.parameterValidationArray['safe'] = {
+		kind: 'derived',
+		type: 'bool',
+		display: true
+	};
 }
 
 /**
@@ -11883,6 +11924,40 @@ ED.Perforation.prototype.setParameterDefaults = function() {
 	this.scaleX = 0.5;
 	this.scaleY = 0.75;
 	this.setOriginWithDisplacements(-100, 25);
+}
+
+/**
+ * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
+ * The returned parameters are animated if the 'animate' property in the parameterValidationArray is set to true
+ *
+ * @param {String} _parameter Name of parameter that has changed
+ * @value {Undefined} _value Value of parameter to calculate
+ * @returns {Array} Associative array of values of dependent parameters
+ */
+ED.Perforation.prototype.dependentParameterValues = function(_parameter, _value) {
+	var returnArray = new Array();
+
+	switch (_parameter) {
+		case 'originX':
+			if (this.originX * this.originX + this.originY * this.originY > this.margin) {
+				returnArray['isMarginal'] = true;
+			}
+			else {
+				returnArray['isMarginal'] = false;
+			}
+			break;
+
+		case 'originY':
+			if (this.originX * this.originX + this.originY * this.originY > this.margin) {
+				returnArray['isMarginal'] = true;
+			}
+			else {
+				returnArray['isMarginal'] = false;
+			}
+			break;
+	}
+
+	return returnArray;
 }
 
 /**
@@ -11932,8 +12007,11 @@ ED.Perforation.prototype.draw = function(_point) {
  *
  * @returns {String} Description of doodle
  */
-ED.Perforation.prototype.groupDescription = function() {
-	return "Perforation of eardrum";
+ED.Perforation.prototype.description = function() {
+	var returnValue = this.isMarginal?"Marginal":"Central";
+	returnValue += " perforation of eardrum";
+	
+	return returnValue;
 }
 
 /**
@@ -11942,7 +12020,7 @@ ED.Perforation.prototype.groupDescription = function() {
  * @returns {Int} SnoMed code of entity representated by doodle
  */
 ED.Perforation.prototype.snomedCode = function() {
-	return 60442001;
+	return this.isMarginal?39895008:40723007;
 }
 
 /**
