@@ -90,8 +90,8 @@
 							//Scale down for glaucoma drawings
 							this.drawing.globalScaleFactor = this.gsf;
 							
-							this.drawing.addDoodle('EarDrum');
-							this.drawing.addDoodle('Perforation');
+							this.drawing.addDoodle('AxialLengthGraph', {'axialLength':'30'});
+							//this.drawing.addDoodle('Perforation');
 							//this.drawing.addDoodle('PostPole');
 							//this.drawing.addDoodle('CystoidMacularOedema');
 							//this.drawing.addDoodle('Freehand', {}, {colour:{id:'colourSelect'}});				
@@ -390,7 +390,7 @@
         <span class="canvasTooltip" id="canvasEditTooltip"></span>
         
         <!-- Canvas element style="border: none;" style="background-color: #DAE6F1;"-->
-        <canvas id="canvasEdit" class="ed_canvas_edit" width="300" height="300" tabindex="1" style="border: 1px solid gray; float:left;"></canvas>
+        <canvas id="canvasEdit" class="ed_canvas_edit" width="300" height="100" tabindex="1" style="border: 1px solid gray; float:left;"></canvas>
         
         <!-- Doodle control panel -->
         <div id="canvasEdit_controls" style="background-color: #DAE6F1; float:left;">
