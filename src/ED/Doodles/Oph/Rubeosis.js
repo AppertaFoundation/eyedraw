@@ -70,7 +70,7 @@ ED.Rubeosis.prototype.setPropertyDefaults = function() {
 		type: 'float',
 		range: new ED.Range(20, 100),
 		precision: 1,
-		animate: true
+		animate: false
 	};
 }
 

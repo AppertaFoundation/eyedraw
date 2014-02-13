@@ -33,7 +33,7 @@ ED.TrialLens = function(_drawing, _parameterJSON) {
 
 	// Saved parameters
 	this.savedParameterArray = ['rotation'];
-	
+
 	// Call super-class constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
@@ -61,7 +61,7 @@ ED.TrialLens.prototype.setPropertyDefaults = function() {
 		type: 'mod',
 		range: new ED.Range(0, 180),
 		clock: 'bottom',
-		animate: true
+		animate: false
 	};
 }
 

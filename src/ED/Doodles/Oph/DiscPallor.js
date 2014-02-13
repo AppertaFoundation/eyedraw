@@ -65,7 +65,7 @@ ED.DiscPallor.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'string',
 		list: ['Sectorial', 'Diffuse'],
-		animate: true
+		animate: false
 	};
 
 	// Speed up animation for arc

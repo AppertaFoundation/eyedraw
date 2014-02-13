@@ -73,13 +73,13 @@ ED.Rectus.prototype.setPropertyDefaults = function() {
 		type: 'float',
 		range: new ED.Range(-12.5, 6.5),
 		precision: 1,
-		animate: true
+		animate: false
 	};
 	this.parameterValidationArray['transposition'] = {
 		kind: 'derived',
 		type: 'string',
 		list: ['Up', 'None', 'Down'],
-		animate: true
+		animate: false
 	};
 	this.parameterValidationArray['canTranspose'] = {
 		kind: 'derived',
