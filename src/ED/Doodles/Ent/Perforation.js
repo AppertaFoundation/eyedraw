@@ -177,9 +177,20 @@ ED.Perforation.prototype.draw = function(_point) {
  *
  * @returns {String} Description of doodle
  */
-ED.Perforation.prototype.description = function() {
-	var returnValue = this.isMarginal?"Marginal":"Central";
+	ED.Perforation.prototype.description = function() {
+// 	var returnValue = this.isMarginal?"Marginal":"Central";
+// 	returnValue += " perforation of eardrum";
+
+	var returnValue = "";
+	
+	if (this.originX <= 0) returnValue = "Antero";
+	else returnValue = "Postero";
+	
+	if (this.originY <= 0) returnValue += "superior";
+	else returnValue += "inferior";
+	
 	returnValue += " perforation of eardrum";
+	
 	
 	return returnValue;
 }
