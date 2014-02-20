@@ -82,20 +82,20 @@ ED.PhakoIncision.prototype.setPropertyDefaults = function() {
 		type: 'mod',
 		range: new ED.Range(0, 360),
 		clock: 'bottom',
-		animate: true
+		animate: false
 	};
 	this.parameterValidationArray['incisionLength'] = {
 		kind: 'derived',
 		type: 'float',
 		range: new ED.Range(1, 9.9),
 		precision: 1,
-		animate: true
+		animate: false
 	};
 	this.parameterValidationArray['incisionSite'] = {
 		kind: 'derived',
 		type: 'string',
 		list: ['Corneal', 'Limbal', 'Scleral'],
-		animate: true
+		animate: false
 	};
 	this.parameterValidationArray['incisionType'] = {
 		kind: 'derived',

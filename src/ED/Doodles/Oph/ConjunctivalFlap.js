@@ -74,7 +74,7 @@ ED.ConjunctivalFlap.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'string',
 		list: ['Fornix-based', 'Limbus-based'],
-		animate: true
+		animate: false
 	};
 }
 

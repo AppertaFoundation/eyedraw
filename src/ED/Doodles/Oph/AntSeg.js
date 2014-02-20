@@ -80,7 +80,7 @@ ED.AntSeg.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'string',
 		list: ['Large', 'Medium', 'Small'],
-		animate: true
+		animate: false
 	};
 	this.parameterValidationArray['pxe'] = {
 		kind: 'derived',
