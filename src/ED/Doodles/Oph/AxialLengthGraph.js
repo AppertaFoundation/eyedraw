@@ -31,7 +31,8 @@ ED.AxialLengthGraph = function(_drawing, _parameterJSON) {
 	// Private parameters
 	this.padding = 100;	// Gap between axes and left and bottom edges of canvas
 	this.offset = 120;
-	this.xAxis = 40;
+	this.xAxis = 10;
+	this.xFirst = 20;
 	this.interval = 10;
 	this.stubLength = 30;
 	
@@ -68,7 +69,7 @@ ED.AxialLengthGraph.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'float',
 		precision: 2,
-		range: new ED.Range(0, 240),
+		range: new ED.Range(0, 30),
 		animate: false
 	};
 }
@@ -106,14 +107,14 @@ ED.AxialLengthGraph.prototype.draw = function(_point) {
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
 		// Danger areas
 		ctx.beginPath();
-		ctx.rect(xo + this.padding, yo + this.padding, this.lowerLimit * factor, this.drawing.doodlePlaneHeight - 2 * this.padding - this.offset);
-		ctx.rect(xo + this.padding + this.upperLimit * factor, yo + this.padding, this.drawing.doodlePlaneWidth - 2 * this.padding - this.upperLimit * factor, this.drawing.doodlePlaneHeight - 2 * this.padding - this.offset);
+		ctx.rect(xo + this.padding, yo + this.padding, (this.lowerLimit - this.xFirst) * factor, this.drawing.doodlePlaneHeight - 2 * this.padding - this.offset);
+		ctx.rect(xo + this.padding + (this.upperLimit - this.xFirst) * factor, yo + this.padding, this.drawing.doodlePlaneWidth - 2 * this.padding - (this.upperLimit - this.xFirst) * factor, this.drawing.doodlePlaneHeight - 2 * this.padding - this.offset);
 		ctx.fillStyle = "rgba(255,167,152,0.5)";
 		ctx.fill();
 		
 		// Safe areas
 		ctx.beginPath();
-		ctx.rect(xo + this.padding + this.lowerLimit * factor, yo + this.padding, (this.upperLimit - this.lowerLimit) * factor, this.drawing.doodlePlaneHeight - 2 * this.padding - this.offset);
+		ctx.rect(xo + this.padding + (this.lowerLimit - this.xFirst) * factor, yo + this.padding, (this.upperLimit - this.lowerLimit) * factor, this.drawing.doodlePlaneHeight - 2 * this.padding - this.offset);
 		ctx.fillStyle = "rgba(208,255,197,0.5)";
 		ctx.fill();
 		
@@ -136,11 +137,10 @@ ED.AxialLengthGraph.prototype.draw = function(_point) {
 		
 		// Draw time values at top, but leave out edges
 		var n = Math.floor(this.xAxis/this.interval) + 1;
-		console.log(n);
 		for (var i = 0; i < n; i++) {
 
-			// Text of time display
-			var labelText = (i * this.interval).toString();
+			// Text for x-axis
+			var labelText = (this.xFirst + i * this.interval).toString();
 			var increment = i * (this.drawing.doodlePlaneWidth - 2 * this.padding)/(n - 1);
 			
 			// Text properties
@@ -161,7 +161,7 @@ ED.AxialLengthGraph.prototype.draw = function(_point) {
 		}
 		
 		// Draw axial length
-		var x = xo + this.padding + this.axialLength * factor;
+		var x = xo + this.padding + (this.axialLength - this.xFirst) * factor;
 		ctx.beginPath();
 		ctx.moveTo(x, ys - this.padding - this.offset);
 		ctx.lineTo(x, yo + this.padding);
