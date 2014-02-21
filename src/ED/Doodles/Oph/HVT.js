@@ -75,37 +75,37 @@ ED.HVT.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'string',
 		list: ['XT', 'None', 'ET'],
-		animate: true
+		animate: false
 	};
 	this.parameterValidationArray['ver'] = {
 		kind: 'derived',
 		type: 'string',
 		list: ['R/L', 'None', 'L/R'],
-		animate: true
+		animate: false
 	};
 	this.parameterValidationArray['tor'] = {
 		kind: 'derived',
 		type: 'string',
 		list: ['Excyclotorsion', 'None', 'Incyclotorsion'],
-		animate: true
+		animate: false
 	};
 	this.parameterValidationArray['horValue'] = {
 		kind: 'derived',
 		type: 'int',
 		range: new ED.Range(0, 50),
-		animate: true
+		animate: false
 	};
 	this.parameterValidationArray['verValue'] = {
 		kind: 'derived',
 		type: 'int',
 		range: new ED.Range(0, 50),
-		animate: true
+		animate: false
 	};
 	this.parameterValidationArray['torValue'] = {
 		kind: 'derived',
 		type: 'int',
 		range: new ED.Range(0, 20),
-		animate: true
+		animate: false
 	};
 }
 

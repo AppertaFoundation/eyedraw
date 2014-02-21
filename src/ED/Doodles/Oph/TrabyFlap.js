@@ -82,7 +82,7 @@ ED.TrabyFlap.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'string',
 		list: ['Superior', 'Superonasal', 'Superotemporal'],
-		animate: true
+		animate: false
 	};
 	this.parameterValidationArray['size'] = {
 		kind: 'derived',

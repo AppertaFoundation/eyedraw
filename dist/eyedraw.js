@@ -12294,7 +12294,7 @@ ED.Ahmed.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'string',
 		list: ['STQ', 'SNQ', 'INQ', 'ITQ'],
-		animate: true
+		animate: false
 	};
 
 	// Array of angles to snap to
@@ -12580,13 +12580,13 @@ ED.AngleGradeEast.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'string',
 		list: ['4', '3', '2', '1', '0'],
-		animate: true
+		animate: false
 	};
 	this.parameterValidationArray['seen'] = {
 		kind: 'derived',
 		type: 'string',
 		list: ['Yes', 'No'],
-		animate: true
+		animate: false
 	};
 }
 
@@ -12801,13 +12801,13 @@ ED.AngleGradeNorth.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'string',
 		list: ['4', '3', '2', '1', '0'],
-		animate: true
+		animate: false
 	};
 	this.parameterValidationArray['seen'] = {
 		kind: 'derived',
 		type: 'string',
 		list: ['Yes', 'No'],
-		animate: true
+		animate: false
 	};
 }
 
@@ -13022,13 +13022,13 @@ ED.AngleGradeSouth.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'string',
 		list: ['4', '3', '2', '1', '0'],
-		animate: true
+		animate: false
 	};
 	this.parameterValidationArray['seen'] = {
 		kind: 'derived',
 		type: 'string',
 		list: ['Yes', 'No'],
-		animate: true
+		animate: false
 	};
 }
 
@@ -13243,13 +13243,13 @@ ED.AngleGradeWest.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'string',
 		list: ['4', '3', '2', '1', '0'],
-		animate: true
+		animate: false
 	};
 	this.parameterValidationArray['seen'] = {
 		kind: 'derived',
 		type: 'string',
 		list: ['Yes', 'No'],
-		animate: true
+		animate: false
 	};
 }
 
@@ -13887,7 +13887,7 @@ ED.AntSeg.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'string',
 		list: ['Large', 'Medium', 'Small'],
-		animate: true
+		animate: false
 	};
 	this.parameterValidationArray['pxe'] = {
 		kind: 'derived',
@@ -14198,7 +14198,7 @@ ED.AntSegCrossSection.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'string',
 		list: ['Large', 'Medium', 'Small'],
-		animate: true
+		animate: false
 	};
 }
 
@@ -14993,7 +14993,7 @@ ED.Baerveldt.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'string',
 		list: ['STQ', 'SNQ', 'INQ', 'ITQ'],
-		animate: true
+		animate: false
 	};
 
 	// Array of angles to snap to
@@ -16983,6 +16983,7 @@ ED.ChoroidalNaevus.prototype.description = function() {
 ED.ChoroidalNaevus.prototype.snomedCode = function() {
 	return 255024002;
 }
+
 /**
  * OpenEyes
  *
@@ -17579,7 +17580,7 @@ ED.ConjunctivalFlap.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'string',
 		list: ['Fornix-based', 'Limbus-based'],
-		animate: true
+		animate: false
 	};
 }
 
@@ -19020,7 +19021,7 @@ ED.CorticalCataract.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'string',
 		list: ['Mild', 'Moderate', 'White'],
-		animate: true
+		animate: false
 	};
 }
 
@@ -19235,7 +19236,7 @@ ED.CorticalCataractCrossSection.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'string',
 		list: ['Mild', 'Moderate', 'White'],
-		animate: true
+		animate: false
 	};
 }
 
@@ -20429,7 +20430,7 @@ ED.DiscPallor.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'string',
 		list: ['Sectorial', 'Diffuse'],
-		animate: true
+		animate: false
 	};
 
 	// Speed up animation for arc
@@ -22783,37 +22784,37 @@ ED.HVT.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'string',
 		list: ['XT', 'None', 'ET'],
-		animate: true
+		animate: false
 	};
 	this.parameterValidationArray['ver'] = {
 		kind: 'derived',
 		type: 'string',
 		list: ['R/L', 'None', 'L/R'],
-		animate: true
+		animate: false
 	};
 	this.parameterValidationArray['tor'] = {
 		kind: 'derived',
 		type: 'string',
 		list: ['Excyclotorsion', 'None', 'Incyclotorsion'],
-		animate: true
+		animate: false
 	};
 	this.parameterValidationArray['horValue'] = {
 		kind: 'derived',
 		type: 'int',
 		range: new ED.Range(0, 50),
-		animate: true
+		animate: false
 	};
 	this.parameterValidationArray['verValue'] = {
 		kind: 'derived',
 		type: 'int',
 		range: new ED.Range(0, 50),
-		animate: true
+		animate: false
 	};
 	this.parameterValidationArray['torValue'] = {
 		kind: 'derived',
 		type: 'int',
 		range: new ED.Range(0, 20),
-		animate: true
+		animate: false
 	};
 }
 
@@ -27345,7 +27346,7 @@ ED.Molteno.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'string',
 		list: ['STQ', 'SNQ', 'INQ', 'ITQ'],
-		animate: true
+		animate: false
 	};
 
 	// Array of angles to snap to
@@ -27861,7 +27862,7 @@ ED.NuclearCataract.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'string',
 		list: ['Mild', 'Moderate', 'Brunescent'],
-		animate: true
+		animate: false
 	};
 }
 
@@ -28057,7 +28058,7 @@ ED.NuclearCataractCrossSection.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'string',
 		list: ['Mild', 'Moderate', 'Brunescent'],
-		animate: true
+		animate: false
 	};
 }
 
@@ -28269,7 +28270,7 @@ ED.OpticDisc.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'string',
 		list: ['0.1', '0.2', '0.3', '0.4', '0.5', '0.6', '0.7', '0.8', '0.9', '1.0', 'No view'],
-		animate: true
+		animate: false
 	};
 
 	// Create ranges to constrain handles
@@ -29179,6 +29180,7 @@ ED.PI.prototype.draw = function(_point) {
 ED.PI.prototype.description = function() {
 	return "Peripheral iridectomy at " + this.clockHour() + " o'clock";
 }
+
 /**
  * OpenEyes
  *
@@ -30350,20 +30352,20 @@ ED.PhakoIncision.prototype.setPropertyDefaults = function() {
 		type: 'mod',
 		range: new ED.Range(0, 360),
 		clock: 'bottom',
-		animate: true
+		animate: false
 	};
 	this.parameterValidationArray['incisionLength'] = {
 		kind: 'derived',
 		type: 'float',
 		range: new ED.Range(1, 9.9),
 		precision: 1,
-		animate: true
+		animate: false
 	};
 	this.parameterValidationArray['incisionSite'] = {
 		kind: 'derived',
 		type: 'string',
 		list: ['Corneal', 'Limbal', 'Scleral'],
-		animate: true
+		animate: false
 	};
 	this.parameterValidationArray['incisionType'] = {
 		kind: 'derived',
@@ -30691,7 +30693,7 @@ ED.PostPole.prototype.setPropertyDefaults = function() {
 		type: 'float',
 		range: new ED.Range(0, 1),
 		precision: 1,
-		animate: true
+		animate: false
 	};
 
 	// Slow down ApexY animation for this doodle (small scope)
@@ -31704,7 +31706,7 @@ ED.PosteriorSynechia.prototype.setPropertyDefaults = function() {
 		type: 'float',
 		range: new ED.Range(20, 100),
 		precision: 1,
-		animate: true
+		animate: false
 	};
 }
 
@@ -32528,6 +32530,7 @@ ED.RPERip.prototype.description = function() {
 	// Return description
 	return "RPE rip";
 }
+
 /**
  * OpenEyes
  *
@@ -32966,13 +32969,13 @@ ED.Rectus.prototype.setPropertyDefaults = function() {
 		type: 'float',
 		range: new ED.Range(-12.5, 6.5),
 		precision: 1,
-		animate: true
+		animate: false
 	};
 	this.parameterValidationArray['transposition'] = {
 		kind: 'derived',
 		type: 'string',
 		list: ['Up', 'None', 'Down'],
-		animate: true
+		animate: false
 	};
 	this.parameterValidationArray['canTranspose'] = {
 		kind: 'derived',
@@ -33406,6 +33409,7 @@ ED.RetinalArteryOcclusionPostPole.prototype.type = function() {
 	else if (this.arc > 0.8 * Math.PI) return 'hemispheric';
 	else return 'branch';
 }
+
 /**
  * OpenEyes
  *
@@ -33767,6 +33771,7 @@ ED.RetinalVeinOcclusionPostPole.prototype.type = function() {
 	else if (this.arc > 0.8 * Math.PI) return 'hemispheric';
 	else return 'branch';
 }
+
 /**
  * OpenEyes
  *
@@ -34009,7 +34014,7 @@ ED.Rubeosis.prototype.setPropertyDefaults = function() {
 		type: 'float',
 		range: new ED.Range(20, 100),
 		precision: 1,
-		animate: true
+		animate: false
 	};
 }
 
@@ -37012,7 +37017,7 @@ ED.TrabyFlap.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'string',
 		list: ['Superior', 'Superonasal', 'Superotemporal'],
-		animate: true
+		animate: false
 	};
 	this.parameterValidationArray['size'] = {
 		kind: 'derived',
@@ -38009,7 +38014,7 @@ ED.TrialLens = function(_drawing, _parameterJSON) {
 
 	// Saved parameters
 	this.savedParameterArray = ['rotation'];
-	
+
 	// Call super-class constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
@@ -38037,7 +38042,7 @@ ED.TrialLens.prototype.setPropertyDefaults = function() {
 		type: 'mod',
 		range: new ED.Range(0, 180),
 		clock: 'bottom',
-		animate: true
+		animate: false
 	};
 }
 

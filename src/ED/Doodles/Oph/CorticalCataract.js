@@ -73,7 +73,7 @@ ED.CorticalCataract.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'string',
 		list: ['Mild', 'Moderate', 'White'],
-		animate: true
+		animate: false
 	};
 }
 

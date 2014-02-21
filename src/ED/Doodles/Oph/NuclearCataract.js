@@ -74,7 +74,7 @@ ED.NuclearCataract.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'string',
 		list: ['Mild', 'Moderate', 'Brunescent'],
-		animate: true
+		animate: false
 	};
 }
 

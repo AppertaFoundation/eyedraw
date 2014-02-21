@@ -88,13 +88,13 @@ ED.AngleGradeNorth.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'string',
 		list: ['4', '3', '2', '1', '0'],
-		animate: true
+		animate: false
 	};
 	this.parameterValidationArray['seen'] = {
 		kind: 'derived',
 		type: 'string',
 		list: ['Yes', 'No'],
-		animate: true
+		animate: false
 	};
 }
 

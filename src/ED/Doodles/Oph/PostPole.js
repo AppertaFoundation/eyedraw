@@ -76,7 +76,7 @@ ED.PostPole.prototype.setPropertyDefaults = function() {
 		type: 'float',
 		range: new ED.Range(0, 1),
 		precision: 1,
-		animate: true
+		animate: false
 	};
 
 	// Slow down ApexY animation for this doodle (small scope)

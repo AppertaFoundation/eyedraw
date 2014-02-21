@@ -69,7 +69,7 @@ ED.Molteno.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'string',
 		list: ['STQ', 'SNQ', 'INQ', 'ITQ'],
-		animate: true
+		animate: false
 	};
 
 	// Array of angles to snap to
