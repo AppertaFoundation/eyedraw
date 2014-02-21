@@ -33,7 +33,7 @@ ED.AxialLengthGraph = function(_drawing, _parameterJSON) {
 	this.offset = 120;
 	this.xAxis = 10;
 	this.xFirst = 20;
-	this.interval = 10;
+	this.interval = 1;
 	this.stubLength = 30;
 	
 	// Values

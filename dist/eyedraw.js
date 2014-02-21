@@ -14773,7 +14773,7 @@ ED.AxialLengthGraph = function(_drawing, _parameterJSON) {
 	this.offset = 120;
 	this.xAxis = 10;
 	this.xFirst = 20;
-	this.interval = 10;
+	this.interval = 1;
 	this.stubLength = 30;
 	
 	// Values
@@ -37247,10 +37247,15 @@ ED.TrabySuture = function(_drawing, _parameterJSON) {
 	this.className = "TrabySuture";
 
 	// Derived parameters
-	this.type = 'Fixed';
+	this.shape = 'Fixed';
+	this.type = 'Nylon';
+	this.size = '10/0';
 
 	// Saved parameters
 	this.savedParameterArray = ['originX', 'originY', 'apexX', 'apexY', 'arc', 'rotation'];
+	
+	// Parameters in doodle control bar (parameter name: parameter label)
+	this.controlParameterArray = {'shape':'Shape', 'type':'Type', 'size':'Size'};
 	
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -37268,7 +37273,7 @@ ED.TrabySuture.superclass = ED.Doodle.prototype;
  */
 ED.TrabySuture.prototype.setHandles = function() {
 	this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Rotate, false);
-	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+// 	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
 }
 
 /**
@@ -37281,12 +37286,24 @@ ED.TrabySuture.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['apexY']['range'].setMinAndMax(+70, +70);
 
 	// Add complete validation arrays for derived parameters
-	this.parameterValidationArray['type'] = {
+	this.parameterValidationArray['shape'] = {
 		kind: 'derived',
 		type: 'string',
 		list: ['Fixed', 'Adjustable', 'Releasable'],
 		animate: false
 	};
+	this.parameterValidationArray['type'] = {
+		kind: 'derived',
+		type: 'string',
+		list: ['Nylon', 'Prolene'],
+		animate: false
+	}
+	this.parameterValidationArray['size'] = {
+		kind: 'derived',
+		type: 'string',
+		list: ['10/0', '7/0'],
+		animate: false
+	}
 }
 
 /**
@@ -37295,7 +37312,9 @@ ED.TrabySuture.prototype.setPropertyDefaults = function() {
 ED.TrabySuture.prototype.setParameterDefaults = function() {
 	this.apexX = +50;
 	this.apexY = +70;
-	this.type = 'Fixed';
+	this.shape = 'Fixed';
+	this.type = 'Nylon';
+	this.size = '10/0';
 }
 
 /**
@@ -37306,17 +37325,18 @@ ED.TrabySuture.prototype.setParameterDefaults = function() {
  * @value {Undefined} _value Value of parameter to calculate
  * @returns {Array} Associative array of values of dependent parameters
  */
+ /*
 ED.TrabySuture.prototype.dependentParameterValues = function(_parameter, _value) {
 	var returnArray = new Array();
 
 	switch (_parameter) {
 		case 'apexX':
-			if (_value > 17) returnArray['type'] = "Releasable";
-			else if (_value > -17) returnArray['type'] = "Adjustable";
-			else returnArray['type'] = "Fixed";
+			if (_value > 17) returnArray['shape'] = "Releasable";
+			else if (_value > -17) returnArray['shape'] = "Adjustable";
+			else returnArray['shape'] = "Fixed";
 			break;
 
-		case 'type':
+		case 'shape':
 			switch (_value) {
 				case 'Fixed':
 					returnArray['apexX'] = -50;
@@ -37332,6 +37352,7 @@ ED.TrabySuture.prototype.dependentParameterValues = function(_parameter, _value)
 
 	return returnArray;
 }
+*/
 
 /**
  * Draws doodle or performs a hit test if a Point parameter is passed
@@ -37369,7 +37390,7 @@ ED.TrabySuture.prototype.draw = function(_point) {
 		ctx.beginPath();
 
 		// Type of suture
-		switch (this.type) {
+		switch (this.shape) {
 			case 'Releasable':
 				ctx.moveTo(-2, 64);
 				ctx.bezierCurveTo(20, 36, -15, 16, -16, -7);
@@ -37476,6 +37497,7 @@ ED.TrabySuture.prototype.draw = function(_point) {
 /**
  * Draws extra items if the doodle is highlighted
  */
+ /*
 ED.TrabySuture.prototype.drawHighlightExtras = function() {
 	// Get context
 	var ctx = this.drawing.context;
@@ -37484,8 +37506,24 @@ ED.TrabySuture.prototype.drawHighlightExtras = function() {
 	ctx.lineWidth = 1;
 	ctx.fillStyle = "gray";
 	ctx.font = "64px sans-serif";
-	ctx.fillText(this.type, 80, 0 + 20);
+	ctx.fillText(this.shape, 80, 0 + 20);
 }
+*/
+
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.TrabySuture.prototype.description = function() {
+	var returnValue;
+	
+	returnValue = this.size + " " + this.type + " " + this.shape + " suture at " + this.clockHour() + " o'clock";
+	
+	return returnValue;
+}
+
 
 /**
  * OpenEyes

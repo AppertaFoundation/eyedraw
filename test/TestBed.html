@@ -90,7 +90,8 @@
 							//Scale down for glaucoma drawings
 							this.drawing.globalScaleFactor = this.gsf;
 							
-							this.drawing.addDoodle('AxialLengthGraph', {'axialLength':'25'});
+							//this.drawing.addDoodle('AxialLengthGraph', {'axialLength':'25'});
+							this.drawing.addDoodle('TrabySuture');
 							//this.drawing.addDoodle('SteepAxis');
 							//this.drawing.addDoodle('EarDrum');
 							//this.drawing.addDoodle('Perforation');
@@ -250,47 +251,47 @@
 							var dood = _messageArray['object'];
 							if (typeof(dood) != 'undefined')
 							{
-								if (dood.className == 'TrabySuture')
-								{
-									// Add it to first available slot in suture Array
-									for (var i = 0; i < sutureArray.length; i++)
-                            		{
-                            			if (sutureArray[i] == null)
-                            			{
-                            				sutureArray[i] = dood;
-                            				
-											var trab = this.drawing.lastDoodleOfClass("TrabyFlap");
-											if (trab)
-											{
-												// Get original position
-												var p = suturePointsArray[i];
-								
-												// Calculate radius to this point
-												var r = Math.sqrt(p.x * p.x + p.y * p.y);
-								
-												// Calculate new position
-												var np = p.pointAtRadiusAndClockwiseAngle(r, trab.rotation);
-								
-												// Apply it to suture
-												sutureArray[i].originX = np.x;
-												sutureArray[i].originY = np.y;
-								
-												// Apply rotation
-												sutureArray[i].rotation = ED.Mod(p.angle + trab.rotation, 2 * Math.PI);
-												
-												// Apply type
-												sutureArray[i].setParameterFromString('type', p.type);
-												
-												// Apply firstOrginX
-												sutureArray[i].firstOriginX = p.ex;
-												
-												this.drawing.repaint();
-											}
-											                      				
-                            				break;
-                            			}
-                            		}									
-								}
+// 								if (dood.className == 'TrabySuture')
+// 								{
+// 									// Add it to first available slot in suture Array
+// 									for (var i = 0; i < sutureArray.length; i++)
+//                             		{
+//                             			if (sutureArray[i] == null)
+//                             			{
+//                             				sutureArray[i] = dood;
+//                             				
+// 											var trab = this.drawing.lastDoodleOfClass("TrabyFlap");
+// 											if (trab)
+// 											{
+// 												// Get original position
+// 												var p = suturePointsArray[i];
+// 								
+// 												// Calculate radius to this point
+// 												var r = Math.sqrt(p.x * p.x + p.y * p.y);
+// 								
+// 												// Calculate new position
+// 												var np = p.pointAtRadiusAndClockwiseAngle(r, trab.rotation);
+// 								
+// 												// Apply it to suture
+// 												sutureArray[i].originX = np.x;
+// 												sutureArray[i].originY = np.y;
+// 								
+// 												// Apply rotation
+// 												sutureArray[i].rotation = ED.Mod(p.angle + trab.rotation, 2 * Math.PI);
+// 												
+// 												// Apply type
+// 												sutureArray[i].setParameterFromString('type', p.type);
+// 												
+// 												// Apply firstOrginX
+// 												sutureArray[i].firstOriginX = p.ex;
+// 												
+// 												this.drawing.repaint();
+// 											}
+// 											                      				
+//                             				break;
+//                             			}
+//                             		}									
+// 								}
 							}
 							break;
                         
@@ -392,7 +393,7 @@
         <span class="canvasTooltip" id="canvasEditTooltip"></span>
         
         <!-- Canvas element style="border: none;" style="background-color: #DAE6F1;"-->
-        <canvas id="canvasEdit" class="ed_canvas_edit" width="300" height="100" tabindex="1" style="border: 1px solid gray; float:left;"></canvas>
+        <canvas id="canvasEdit" class="ed_canvas_edit" width="300" height="300" tabindex="1" style="border: 1px solid gray; float:left;"></canvas>
         
         <!-- Doodle control panel -->
         <div id="canvasEdit_controls" style="background-color: #DAE6F1; float:left;">
