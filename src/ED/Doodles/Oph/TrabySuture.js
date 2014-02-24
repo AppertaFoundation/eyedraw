@@ -34,7 +34,7 @@ ED.TrabySuture = function(_drawing, _parameterJSON) {
 	this.size = '10/0';
 
 	// Saved parameters
-	this.savedParameterArray = ['originX', 'originY', 'apexX', 'apexY', 'arc', 'rotation'];
+	this.savedParameterArray = ['originX', 'originY', 'apexX', 'apexY', 'arc', 'rotation', 'shape', 'type', 'size'];
 	
 	// Parameters in doodle control bar (parameter name: parameter label)
 	this.controlParameterArray = {'shape':'Shape', 'type':'Type', 'size':'Size'};
@@ -77,13 +77,13 @@ ED.TrabySuture.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['type'] = {
 		kind: 'derived',
 		type: 'string',
-		list: ['Nylon', 'Prolene'],
+		list: ['Nylon', 'Prolene', 'Vicryl', 'Silk'],
 		animate: false
 	}
 	this.parameterValidationArray['size'] = {
 		kind: 'derived',
 		type: 'string',
-		list: ['10/0', '7/0'],
+		list: ['11/0', '10/0', '9/0', '8/0', '7/0', '6/0'],
 		animate: false
 	}
 }

@@ -41,7 +41,7 @@
                 var canvasEdit = document.getElementById('canvasEdit');
                 
                 // Create a drawingEdit , {scaleOn:'width'}
-                drawingEdit = new ED.Drawing(canvasEdit, ED.eye.Left, 'RPS', true, {graphicsPath:'../img/'});
+                drawingEdit = new ED.Drawing(canvasEdit, ED.eye.Right, 'RPS', true, {graphicsPath:'../img/'});
                 
                 // Instantiate a controller object
                 controller = new eyeDrawController(drawingEdit);
@@ -91,8 +91,9 @@
 							this.drawing.globalScaleFactor = this.gsf;
 							
 							//this.drawing.addDoodle('AxialLengthGraph', {'axialLength':'25'});
-							this.drawing.addDoodle('TrabySuture');
-							//this.drawing.addDoodle('SteepAxis');
+							this.drawing.addDoodle('AntSeg');
+							this.drawing.addDoodle('ConjunctivalSuture');
+							this.drawing.addDoodle('ScleralPatch');
 							//this.drawing.addDoodle('EarDrum');
 							//this.drawing.addDoodle('Perforation');
 							//this.drawing.addDoodle('PostPole');
@@ -383,7 +384,7 @@
  -->
             <button id="LensRPS" class="imgbutton" title="Freehand" onclick="drawingEdit.addDoodle('Freehand'); return false;" ><img src="../img/Freehand.gif" /></button>
             <button id="LensRPS" class="imgbutton" title="Perforation" onclick="drawingEdit.addDoodle('Perforation'); return false;" ><img src="../img/CornealErosion.gif" /></button>
-            <button id="LensRPS" class="imgbutton" title="Grommet" onclick="drawingEdit.addDoodle('Grommet'); return false;" ><img src="../img/RoundHole.gif" /></button>
+            <button id="LensRPS" class="imgbutton" title="Grommet" onclick="drawingEdit.addDoodle('ConjunctivalSuture'); return false;" ><img src="../img/ConjunctivalSuture.gif" /></button>
             <br />
         </div>
         
