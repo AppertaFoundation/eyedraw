@@ -25,14 +25,15 @@ ED.ScleralPatch.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.ScleralPatch.prototype.setHandles = function() {
-	this.handleArray[3] = new ED.Handle(null, true, ED.Mode.Scale, false);
+	this.handleArray[3] = new ED.Handle(null, true, ED.Mode.Scale, true);
 }
 
 /**
  * Sets default dragging attributes
  */
 ED.ScleralPatch.prototype.setPropertyDefaults = function() {
-	this.isOrientated = true;
+	//this.isOrientated = true;
+	this.isSqueezable = true;
     
     // Update component of validation array for simple parameters
     this.parameterValidationArray['apexX']['range'].setMinAndMax(-20, +200);
