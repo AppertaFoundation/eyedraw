@@ -3,6 +3,12 @@ Release History
 
 This document is intended to summarise the changes made for each release. It should be noted that this document was only introduced with version 1.4, and therefore doesn't cover earlier releases.
 
+1.6.0
+-----
++ Asset refactoring
++ Scrolling to elements is broken
++ Refraction Axis values are saved incorrectly
+
 1.5.0
 -----
 + Added various new doodles
