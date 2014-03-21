@@ -39,12 +39,16 @@
 			<span><?php echo $label ?></span>
 		</li>
 		<?php } ?>
+
+		<!-- See OE-2743 and OE-4114 -->
+		<!--
 		<li class="ed_img_button action" id="Label<?php echo $idSuffix ?>">
 			<a href="#" data-function="addDoodle" data-arg="Label">
 				<img src="<?php echo $imgPath ?>Label.gif" />
 			</a>
 			<span>Label</span>
-		</li>
+		</li> -->
+
 	</ul>
 	<?php } ?>
 
@@ -129,7 +133,7 @@
 
 	// Show/hide drawer when clicked on/away
 	$(document).click(function() {
-	  $(".EyeDrawWidget .drawer").removeClass('active'); //click came from somewhere else
+		$(".EyeDrawWidget .drawer").removeClass('active'); //click came from somewhere else
 	});
 	$('#eyedrawwidget_<?php echo $idSuffix ?> .ed_toolbar li.drawer > a').click(function(e) {
 		$(".EyeDrawWidget .drawer").removeClass('active');
