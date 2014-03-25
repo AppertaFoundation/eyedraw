@@ -4282,6 +4282,7 @@ ED.Doodle.prototype.parameterElement = function(_parameter) {
     		element.type = 'text';
     		element.setAttribute('id', this.parameterControlElementId(_parameter));
     		break;
+<<<<<<< HEAD
 
 // 		case 'radio':
 // 			// Create a radio button element
@@ -4290,6 +4291,9 @@ ED.Doodle.prototype.parameterElement = function(_parameter) {
 //     		element.setAttribute('id', this.parameterControlElementId(_parameter));
 //     		break;
     					
+=======
+			
+>>>>>>> release/1.6
 		default:
 			ED.errorHandler('ED.Doodle', 'parameterElement', 'Unexpected type: ' + this.parameterValidationArray[_parameter].type + ' for parameter: ' + _parameter);
 			break;
