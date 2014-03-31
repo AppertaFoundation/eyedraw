@@ -14399,7 +14399,7 @@ ED.AntSynech.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.125, +1.5);
 	this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.125, +1.5);
 	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
-	this.parameterValidationArray['apexY']['range'].setMinAndMax(-this.rsli, -this.rcbo);
+	this.parameterValidationArray['apexY']['range'].setMinAndMax(-480, -260);
 	this.parameterValidationArray['arc']['range'].setMinAndMax(30 * Math.PI / 180, Math.PI * 2);
 }
 
@@ -14417,7 +14417,7 @@ ED.AntSynech.prototype.setParameterDefaults = function() {
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.AntSynech.prototype.draw = function(_point) {
+ED.AntSynech.prototype.draw = function(_point) { console.log(this.apexY);
 	// Get context
 	var ctx = this.drawing.context;
 
@@ -14771,9 +14771,9 @@ ED.AxialLengthGraph = function(_drawing, _parameterJSON) {
 	// Private parameters
 	this.padding = 100;	// Gap between axes and left and bottom edges of canvas
 	this.offset = 120;
-	this.xAxis = 10;
-	this.xFirst = 20;
-	this.interval = 1;
+	this.xAxis = 24;
+	this.xFirst = 14;
+	this.interval = 2;
 	this.stubLength = 30;
 	
 	// Values
@@ -14809,7 +14809,7 @@ ED.AxialLengthGraph.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'float',
 		precision: 2,
-		range: new ED.Range(0, 30),
+		range: new ED.Range(14, 38),
 		animate: false
 	};
 }
@@ -37657,9 +37657,12 @@ ED.TrabySuture = function(_drawing, _parameterJSON) {
 	this.className = "TrabySuture";
 
 	// Derived parameters
-	this.shape = 'Fixed';
+	this.shape = 'Releasable';
 	this.type = 'Nylon';
 	this.size = '10/0';
+	
+	// Number of handles for releasable suture
+	this.numberOfHandles = 2;
 
 	// Saved parameters
 	this.savedParameterArray = ['originX', 'originY', 'apexX', 'apexY', 'arc', 'rotation', 'shape', 'type', 'size'];
@@ -37682,8 +37685,12 @@ ED.TrabySuture.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.TrabySuture.prototype.setHandles = function() {
-	this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Rotate, false);
-// 	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+	// Array of handles for releasable suture
+	for (var i = 0; i < this.numberOfHandles; i++) {
+		this.handleArray[i] = new ED.Handle(null, true, ED.Mode.Handles, false);
+	}
+
+	this.handleArray[this.numberOfHandles] = new ED.Handle(null, true, ED.Mode.Rotate, false);
 }
 
 /**
@@ -37722,9 +37729,21 @@ ED.TrabySuture.prototype.setPropertyDefaults = function() {
 ED.TrabySuture.prototype.setParameterDefaults = function() {
 	this.apexX = +50;
 	this.apexY = +70;
-	this.shape = 'Fixed';
+	this.shape = 'Releasable';
 	this.type = 'Nylon';
 	this.size = '10/0';
+	
+	// Create a squiggle to store the handles points
+	var squiggle = new ED.Squiggle(this, new ED.Colour(100, 100, 100, 1), 4, true);
+
+	// Add it to squiggle array
+	this.squiggleArray.push(squiggle);
+
+	// Populate with handles
+	var point = new ED.Point(100, 100);
+	this.addPointToSquiggle(point);
+	point = new ED.Point(-100, 100);
+	this.addPointToSquiggle(point);
 }
 
 /**
@@ -37734,7 +37753,7 @@ ED.TrabySuture.prototype.setParameterDefaults = function() {
  * @param {String} _parameter Name of parameter that has changed
  * @value {Undefined} _value Value of parameter to calculate
  * @returns {Array} Associative array of values of dependent parameters
- */
+ */ 
  /*
 ED.TrabySuture.prototype.dependentParameterValues = function(_parameter, _value) {
 	var returnArray = new Array();
@@ -37811,6 +37830,9 @@ ED.TrabySuture.prototype.draw = function(_point) {
 				ctx.bezierCurveTo(2, 20, -4, 24, -3, 29);
 				ctx.bezierCurveTo(-3, 36, 14, 37, 23, 56);
 				ctx.bezierCurveTo(32, 74, 34, 100, 34, 100);
+				
+				// From point
+				var fp = new ED.Point(34, 100);
 
 				// Suture exit through cornea
 				// 				var ep = new ED.Point(this.firstOriginX, -60);
@@ -37828,7 +37850,7 @@ ED.TrabySuture.prototype.draw = function(_point) {
 				// 				var pp = this.inverseTransform.transformPoint(np);
 				// 				ctx.lineTo(pp.x, pp.y);
 
-
+				/*
 				// Suture exit through cornea
 				var ep = new ED.Point(this.firstOriginX, -60);
 
@@ -37842,7 +37864,7 @@ ED.TrabySuture.prototype.draw = function(_point) {
 
 				var tep = at.transformPoint(ep);
 
-				// Tranform back to get fixed point
+				// Transform back to get fixed point
 				var fep = this.inverseTransform.transformPoint(tep);
 
 				// Calculate a midpoint
@@ -37858,8 +37880,32 @@ ED.TrabySuture.prototype.draw = function(_point) {
 				ctx.bezierCurveTo(fmp.x, fmp.y, fmp.x, fmp.y, fep.x, fep.y);
 				//ctx.lineTo(fmp.x, fmp.y);
 				//ctx.lineTo(fep.x, fep.y);
+				*/
 
+				// Releasable
+				var fp;
+				var tp;
+				var cp1;
+				var cp2;
 
+				// Angle of control point from radius line to point (this value makes path a circle Math.PI/12 for 8 points
+				var phi = 2 * Math.PI / (10 * this.numberOfHandles);
+				
+				for (var i = 0; i < this.numberOfHandles; i++) {
+
+					// To point
+					tp = this.squiggleArray[0].pointsArray[i];
+
+					// Control points
+					cp1 = new ED.Point(fp.x + (tp.x - fp.x)/3, fp.y);
+					cp2 = new ED.Point(fp.x + 2 * (tp.x - fp.x)/3, tp.y);
+
+					// Draw Bezier curve
+					ctx.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, tp.x, tp.y);
+					
+					fp = tp;
+				}
+			
 				break;
 
 			case 'Adjustable':
@@ -37893,9 +37939,15 @@ ED.TrabySuture.prototype.draw = function(_point) {
 		ctx.stroke();
 	}
 
+	// Coordinates of expert handles (in canvas plane)
+	if (this.shape == "Releasable") {
+		for (var i = 0; i < this.numberOfHandles; i++) {
+			this.handleArray[i].location = this.transform.transformPoint(this.squiggleArray[0].pointsArray[i]);
+		}
+	}
+
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[2].location = this.transform.transformPoint(new ED.Point(+40, -70));
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
+	this.handleArray[this.numberOfHandles].location = this.transform.transformPoint(new ED.Point(+40, -70));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);

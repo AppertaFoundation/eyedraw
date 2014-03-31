@@ -31,9 +31,9 @@ ED.AxialLengthGraph = function(_drawing, _parameterJSON) {
 	// Private parameters
 	this.padding = 100;	// Gap between axes and left and bottom edges of canvas
 	this.offset = 120;
-	this.xAxis = 10;
-	this.xFirst = 20;
-	this.interval = 1;
+	this.xAxis = 24;
+	this.xFirst = 14;
+	this.interval = 2;
 	this.stubLength = 30;
 	
 	// Values
@@ -69,7 +69,7 @@ ED.AxialLengthGraph.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'float',
 		precision: 2,
-		range: new ED.Range(0, 30),
+		range: new ED.Range(14, 38),
 		animate: false
 	};
 }
