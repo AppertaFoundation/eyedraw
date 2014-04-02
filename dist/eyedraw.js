@@ -14298,7 +14298,7 @@ ED.AntSynech.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.125, +1.5);
 	this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.125, +1.5);
 	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
-	this.parameterValidationArray['apexY']['range'].setMinAndMax(-this.rsli, -this.rcbo);
+	this.parameterValidationArray['apexY']['range'].setMinAndMax(-480, -260);
 	this.parameterValidationArray['arc']['range'].setMinAndMax(30 * Math.PI / 180, Math.PI * 2);
 }
 
