@@ -32,7 +32,7 @@ ED.CornealGraft = function(_drawing, _parameterJSON) {
 	this.numberOfSutures = 16;
 	this.initialRadius = 320;
 	this.sutureLength = 60;
-	
+
 	// Derived parameters
 	this.sutureType = 'Interrupted';
 	this.opaque = false;
@@ -42,7 +42,7 @@ ED.CornealGraft = function(_drawing, _parameterJSON) {
 
 	// Parameters in doodle control bar (parameter name: parameter label)
 	this.controlParameterArray = {'sutureType':'Suture type', 'opaque':'Opaque'};
-		
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
@@ -67,16 +67,16 @@ ED.CornealGraft.prototype.setHandles = function() {
 ED.CornealGraft.prototype.setPropertyDefaults = function() {
 	this.isRotatable = false;
 	this.isMoveable = false;
-	
+
 	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
 	this.parameterValidationArray['apexY']['range'].setMinAndMax(-380, -80);
-	
+
 	// Add complete validation arrays for derived parameters
 	this.parameterValidationArray['sutureType'] = {
 		kind: 'derived',
 		type: 'string',
 		list: ['Interrupted', 'Continuous', 'None'],
-		animate: false
+		animate: true
 	};
 	this.parameterValidationArray['opaque'] = {
 		kind: 'derived',
@@ -106,14 +106,14 @@ ED.CornealGraft.prototype.draw = function(_point) {
 
 	// Boundary path
 	ctx.beginPath();
-	
+
 	// Circular graft
 	var ro = -this.apexY + this.sutureLength/2;
 	var ri = -this.apexY - this.sutureLength/2
-	
+
 	// Do a 360 arc
 	ctx.arc(0, 0, ro,  0, Math.PI * 2, true);
-					
+
 	// Move to inner circle
 	ctx.moveTo(ri, 0);
 
@@ -127,7 +127,7 @@ ED.CornealGraft.prototype.draw = function(_point) {
 
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
-	
+
 	// Non boundary paths
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
 		// Graft
@@ -139,7 +139,7 @@ ED.CornealGraft.prototype.draw = function(_point) {
 			ctx.fillStyle = "rgba(150, 150, 150, 0.8)";
 			ctx.fill();
 		}
-		
+
 		// Sutures
 		ctx.beginPath();
 		for (var i = 0; i < this.numberOfSutures; i++) {
@@ -149,13 +149,13 @@ ED.CornealGraft.prototype.draw = function(_point) {
 			p1.setWithPolars(ri, phi);
 			var p2 = new ED.Point(0,0);
 			p2.setWithPolars(ro, phi);
-			
+
 			// No sutures
 			if (this.sutureType == 'None') {
 				this.drawSpot(ctx, p1.x, p1.y, 3, "gray");
 				this.drawSpot(ctx, p2.x, p2.y, 3, "gray");
 			}
-			
+
 			// Inner suture point
 			if (phi == 0) {
 				ctx.moveTo(p1.x, p1.y);
@@ -168,7 +168,7 @@ ED.CornealGraft.prototype.draw = function(_point) {
 					ctx.lineTo(p1.x, p1.y);
 				}
 			}
-			
+
 			// Line to outer point
 			if (this.sutureType != 'None') {
 				ctx.lineTo(p2.x, p2.y);
@@ -179,18 +179,18 @@ ED.CornealGraft.prototype.draw = function(_point) {
 		if (this.sutureType == 'Continuous') {
 			ctx.closePath();
 		}
-		
-		// Draw sutures	
+
+		// Draw sutures
 		ctx.strokeStyle = "gray";
 		ctx.stroke();
 	}
-	
+
 	// Coordinates of handles (in canvas plane)
 	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
-		
+
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
-	
+
 	// Return value indicating successful hittest
 	return this.isClicked;
 }

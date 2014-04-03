@@ -27,20 +27,20 @@
 ED.PosteriorCapsule = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "PosteriorCapsule";
-	
+
 	// Derived parameters
 	this.opacity = 'Mild';
 	this.capsulotomy = 'None';
-	
+
 	// Saved parameters
 	this.savedParameterArray = ['originX', 'originY', 'opacity', 'capsulotomy'];
-	
+
 	// Parameters in doodle control bar (parameter name: parameter label)
 	this.controlParameterArray = {
-		'opacity':'Opacity', 
+		'opacity':'Opacity',
 		'capsulotomy':'Capsulotomy',
 		};
-	
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
@@ -62,18 +62,18 @@ ED.PosteriorCapsule.prototype.setPropertyDefaults = function() {
 	// Update component of validation array for simple parameters
 	this.parameterValidationArray['originX']['range'].setMinAndMax(-500, +500);
 	this.parameterValidationArray['originY']['range'].setMinAndMax(-500, +500);
-	
+
 	this.parameterValidationArray['opacity'] = {
 		kind: 'derived',
 		type: 'string',
 		list: ['None', 'Mild', 'Moderate', 'Dense'],
-		animate: false
+		animate: true
 	};
 	this.parameterValidationArray['capsulotomy'] = {
 		kind: 'derived',
 		type: 'string',
 		list: ['None', 'Diamond', 'Circle'],
-		animate: false
+		animate: true
 	};
 }
 
@@ -115,14 +115,14 @@ ED.PosteriorCapsule.prototype.draw = function(_point) {
 
 	// Non boundary drawing
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
-		
+
 		// Capsulotomy
 		if (this.capsulotomy != 'None') {
 			ctx.beginPath();
 			ctx.arc(0, 0, ro, 0, 2 * Math.PI, true);
 			var ri = 140;
 			ctx.moveTo(ri, 0);
-				
+
 			switch (this.capsulotomy) {
 				case 'Diamond':
 					ctx.lineTo(0, ri);
@@ -136,7 +136,7 @@ ED.PosteriorCapsule.prototype.draw = function(_point) {
 					break;
 			}
 		}
-		
+
 		// Opacity
 		if (this.opacity != 'None') {
 			// Pattern
@@ -144,7 +144,7 @@ ED.PosteriorCapsule.prototype.draw = function(_point) {
 			var ptrn = ctx.createPattern(this.drawing.imageArray['PSCPattern'], 'repeat');
 			ctx.fillStyle = ptrn;
 			ctx.fill();
-			
+
 			// Opacity
 
 			switch (this.opacity) {
@@ -179,11 +179,11 @@ ED.PosteriorCapsule.prototype.draw = function(_point) {
  */
 ED.PosteriorCapsule.prototype.description = function() {
 	var returnValue = "";
-	
+
 	if (this.opacity != 'None') {
 		returnValue += this.opacity + " posterior capsular opacity";
 	}
-	
+
 	if (this.capsulotomy != 'None') {
 		var shape = this.capsulotomy.toLowerCase();
 		returnValue += " with " + shape + " shaped capsulotomy";

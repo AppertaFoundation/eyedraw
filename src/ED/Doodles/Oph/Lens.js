@@ -27,7 +27,7 @@
 ED.Lens = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "Lens";
-	
+
 	// Derived parameters
 	this.nuclearGrade = 'None';
 	this.corticalGrade = 'None';
@@ -36,21 +36,21 @@ ED.Lens = function(_drawing, _parameterJSON) {
 	this.posteriorPolar = false;
 	this.coronary = false;
 	this.phakodonesis = false;
-	
+
 	// Saved parameters
 	this.savedParameterArray = ['originX', 'originY', 'nuclearGrade', 'corticalGrade', 'posteriorSubcapsularGrade', 'anteriorPolar', 'posteriorPolar', 'coronary', 'phakodonesis'];
-	
+
 	// Parameters in doodle control bar (parameter name: parameter label)
 	this.controlParameterArray = {
-		'nuclearGrade':'Nuclear', 
-		'corticalGrade':'Cortical', 
+		'nuclearGrade':'Nuclear',
+		'corticalGrade':'Cortical',
 		'posteriorSubcapsularGrade':'Posterior subcapsular',
 		'anteriorPolar':'Anterior polar',
 		'posteriorPolar':'Posterior polar',
 		'coronary':'Coronary',
 		'phakodonesis':'Phakodonesis',
 		};
-	
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
@@ -72,24 +72,24 @@ ED.Lens.prototype.setPropertyDefaults = function() {
 	// Update component of validation array for simple parameters
 	this.parameterValidationArray['originX']['range'].setMinAndMax(-500, +500);
 	this.parameterValidationArray['originY']['range'].setMinAndMax(-500, +500);
-	
+
 	this.parameterValidationArray['nuclearGrade'] = {
 		kind: 'derived',
 		type: 'string',
 		list: ['None', 'Mild', 'Moderate', 'Brunescent'],
-		animate: false
+		animate: true
 	};
 	this.parameterValidationArray['corticalGrade'] = {
 		kind: 'derived',
 		type: 'string',
 		list: ['None', 'Mild', 'Moderate', 'White'],
-		animate: false
+		animate: true
 	};
 	this.parameterValidationArray['posteriorSubcapsularGrade'] = {
 		kind: 'derived',
 		type: 'string',
 		list: ['None', 'Small', 'Medium', 'Large'],
-		animate: false
+		animate: true
 	};
 	this.parameterValidationArray['anteriorPolar'] = {
 		kind: 'derived',
@@ -153,7 +153,7 @@ ED.Lens.prototype.draw = function(_point) {
 
 	// Non boundary drawing
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
-			
+
 		// Posterior subcapsular
 		if (this.posteriorSubcapsularGrade != 'None') {
 			var rp;
@@ -176,7 +176,7 @@ ED.Lens.prototype.draw = function(_point) {
 			ctx.fill();
 			ctx.stroke();
 		}
-		
+
 		// Posterior Polar
 		if (this.posteriorPolar) {
 			var rap = 50;
@@ -187,7 +187,7 @@ ED.Lens.prototype.draw = function(_point) {
 			ctx.fill();
 			ctx.stroke();
 		}
-		
+
 		// Nuclear cataract
 		var ri = ro - 60;
 		ctx.beginPath();
@@ -215,7 +215,7 @@ ED.Lens.prototype.draw = function(_point) {
 			ctx.fillStyle = gradient;
 			ctx.fill();
 		}
-		
+
 		// Cortical cataract
 		if (this.corticalGrade != 'None') {
 			// Parameters
@@ -257,7 +257,7 @@ ED.Lens.prototype.draw = function(_point) {
 				ctx.lineTo(ip.x, ip.y);
 			}
 			ctx.lineTo(sp.x, sp.y);
-			
+
 			// Ring
 			ctx.moveTo(ro, 0);
 			ctx.arc(0, 0, ro, 0, 2 * Math.PI, true);
@@ -268,7 +268,7 @@ ED.Lens.prototype.draw = function(_point) {
 			ctx.fillStyle = "rgba(200,200,200,0.75)";
 			ctx.fill();
 		}
-		
+
 		// Coronary cataracts
 		if (this.coronary) {
 			// Spot data
@@ -283,7 +283,7 @@ ED.Lens.prototype.draw = function(_point) {
 				this.drawCircle(ctx, p.x, p.y, sr, "rgba(200,200,255,1)", 4, "rgba(200,200,255,1)");
 			}
 		}
-		
+
 		// Anterior Polar
 		if (this.anteriorPolar) {
 			var rap = 30;

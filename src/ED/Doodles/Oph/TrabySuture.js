@@ -38,10 +38,10 @@ ED.TrabySuture = function(_drawing, _parameterJSON) {
 
 	// Saved parameters
 	this.savedParameterArray = ['originX', 'originY', 'apexX', 'apexY', 'arc', 'rotation', 'shape', 'type', 'size'];
-	
+
 	// Parameters in doodle control bar (parameter name: parameter label)
 	this.controlParameterArray = {'shape':'Shape', 'type':'Type', 'size':'Size'};
-	
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
@@ -79,19 +79,19 @@ ED.TrabySuture.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'string',
 		list: ['Fixed', 'Adjustable', 'Releasable'],
-		animate: false
+		animate: true
 	};
 	this.parameterValidationArray['type'] = {
 		kind: 'derived',
 		type: 'string',
 		list: ['Nylon', 'Prolene', 'Vicryl', 'Silk'],
-		animate: false
+		animate: true
 	}
 	this.parameterValidationArray['size'] = {
 		kind: 'derived',
 		type: 'string',
 		list: ['11/0', '10/0', '9/0', '8/0', '7/0', '6/0'],
-		animate: false
+		animate: true
 	}
 }
 
@@ -208,16 +208,16 @@ ED.TrabySuture.prototype.draw = function(_point) {
 
 				// Suture exit through cornea
 				// 				var ep = new ED.Point(this.firstOriginX, -60);
-				// 				
+				//
 				// 				// Set up a new transform and centre in canvas
 				// 				var at = new ED.AffineTransform();
 				// 				at.translate(150, 150);
-				// 				
+				//
 				// 				// Add rotation of traby flap and transform
 				// 				var trab = this.drawing.lastDoodleOfClass('TrabyFlap');
 				// 				if (trab) at.rotate(trab.rotation);
 				// 				var np = at.transformPoint(ep);
-				// 
+				//
 				// 				// Tranform back to get fixed point in canvas
 				// 				var pp = this.inverseTransform.transformPoint(np);
 				// 				ctx.lineTo(pp.x, pp.y);
@@ -352,9 +352,9 @@ ED.TrabySuture.prototype.drawHighlightExtras = function() {
  */
 ED.TrabySuture.prototype.description = function() {
 	var returnValue;
-	
+
 	returnValue = this.size + " " + this.type + " " + this.shape + " suture at " + this.clockHour() + " o'clock";
-	
+
 	return returnValue;
 }
 

@@ -33,7 +33,7 @@ ED.Molteno = function(_drawing, _parameterJSON) {
 
 	// Saved parameters
 	this.savedParameterArray = ['rotation', 'apexY'];
-	
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
@@ -69,7 +69,7 @@ ED.Molteno.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'string',
 		list: ['STQ', 'SNQ', 'INQ', 'ITQ'],
-		animate: false
+		animate: true
 	};
 
 	// Array of angles to snap to

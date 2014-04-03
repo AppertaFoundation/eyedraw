@@ -27,7 +27,7 @@
 ED.MemberConnector = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "MemberConnector";
-	
+
 	// Special parameters (passed from Pedigree Object)
 	this.node = null;
 
@@ -37,10 +37,10 @@ ED.MemberConnector = function(_drawing, _parameterJSON) {
 
 	// Saved parameters
 	//this.savedParameterArray = ['rotation', 'gender'];
-	
+
 	// Parameters in doodle control bar (parameter name: parameter label)
 	//this.controlParameterArray = {'gender':'Gender'};
-	
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
@@ -58,19 +58,19 @@ ED.MemberConnector.superclass = ED.Doodle.prototype;
 ED.MemberConnector.prototype.setPropertyDefaults = function() {
 	//this.gridSpacing = 120;
 	//this.snapToGrid = true;
-	
+
 	// Add complete validation arrays for derived parameters
 	this.parameterValidationArray['length'] = {
 		kind: 'derived',
 		type: 'int',
 		range: new ED.Range(0, 1000),
-		animate: false
+		animate: true
 	};
 	this.parameterValidationArray['type'] = {
 		kind: 'derived',
 		type: 'string',
 		list: ['Pair', 'Sibling'],
-		animate: false
+		animate: true
 	};
 }
 
@@ -112,7 +112,7 @@ ED.MemberConnector.prototype.draw = function(_point) {
 
 	// Colour of outer line is dark gray
 	ctx.strokeStyle = "rgba(120,120,120,0.75)";
-	
+
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 

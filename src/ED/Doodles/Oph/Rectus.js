@@ -40,7 +40,7 @@ ED.Rectus = function(_drawing, _parameterJSON) {
 
 	// Saved parameters
 	this.savedParameterArray = ['apexX', 'apexY', 'rotation'];
-	
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
@@ -73,18 +73,18 @@ ED.Rectus.prototype.setPropertyDefaults = function() {
 		type: 'float',
 		range: new ED.Range(-12.5, 6.5),
 		precision: 1,
-		animate: false
+		animate: true
 	};
 	this.parameterValidationArray['transposition'] = {
 		kind: 'derived',
 		type: 'string',
 		list: ['Up', 'None', 'Down'],
-		animate: false
+		animate: true
 	};
 	this.parameterValidationArray['canTranspose'] = {
 		kind: 'derived',
 		type: 'bool',
-		animate: false
+		animate: true
 	};
 }
 

@@ -61,7 +61,7 @@ ED.TrialLens.prototype.setPropertyDefaults = function() {
 		type: 'mod',
 		range: new ED.Range(0, 180),
 		clock: 'bottom',
-		animate: false
+		animate: true
 	};
 }
 

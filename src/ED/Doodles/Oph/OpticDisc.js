@@ -81,13 +81,13 @@ ED.OpticDisc.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'string',
 		list: ['Basic', 'Expert'],
-		animate: false
+		animate: true
 	};
 	this.parameterValidationArray['cdRatio'] = {
 		kind: 'derived',
 		type: 'string',
 		list: ['0.1', '0.2', '0.3', '0.4', '0.5', '0.6', '0.7', '0.8', '0.9', '1.0', 'No view'],
-		animate: false
+		animate: true
 	};
 
 	// Create ranges to constrain handles
@@ -390,7 +390,7 @@ ED.OpticDisc.prototype.draw = function(_point) {
 ED.OpticDisc.prototype.description = function() {
 	var returnString = "";
 
-	// Expert mode 
+	// Expert mode
 	if (this.mode == "Expert") {
 		// Get mean
 		var mean = this.getMeanRadius();

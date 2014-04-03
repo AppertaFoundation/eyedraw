@@ -30,7 +30,7 @@ ED.Baerveldt = function(_drawing, _parameterJSON) {
 
 	// Derived parameters
 	this.platePosition = 'STQ';
-	
+
 	// Saved parameters
 	this.savedParameterArray = ['rotation', 'apexY'];
 
@@ -69,7 +69,7 @@ ED.Baerveldt.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'string',
 		list: ['STQ', 'SNQ', 'INQ', 'ITQ'],
-		animate: false
+		animate: true
 	};
 
 	// Array of angles to snap to

@@ -40,10 +40,10 @@ ED.ConjunctivalSuture = function(_drawing, _parameterJSON) {
 
 	// Saved parameters
 	this.savedParameterArray = ['originX', 'originY', 'rotation', 'orientated', 'shape', 'type', 'size'];
-	
+
 	// Parameters in doodle control bar (parameter name: parameter label)
 	this.controlParameterArray = {'orientated':'Orientated', 'shape':'Shape', 'type':'Type', 'size':'Size'};
-	
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
@@ -69,29 +69,29 @@ ED.ConjunctivalSuture.prototype.setHandles = function() {
 ED.ConjunctivalSuture.prototype.setPropertyDefaults = function() {
 	this.isOrientated = true;
 	this.handleArray[2].isVisible = false;
-	
+
 	// Update component of validation array for simple parameters
 	this.parameterValidationArray['apexX']['range'].setMinAndMax(+80, +220);
 	this.parameterValidationArray['apexY']['range'].setMinAndMax(-0, +0);
-	
+
 	// Add complete validation arrays for derived parameters
 	this.parameterValidationArray['shape'] = {
 		kind: 'derived',
 		type: 'string',
 		list: ['Purse String', 'Mattress', 'Buried Mattress', 'Interrupted', 'Continuous'],
-		animate: false
+		animate: true
 	};
 	this.parameterValidationArray['type'] = {
 		kind: 'derived',
 		type: 'string',
 		list: ['Nylon', 'Prolene', 'Vicryl', 'Silk'],
-		animate: false
+		animate: true
 	}
 	this.parameterValidationArray['size'] = {
 		kind: 'derived',
 		type: 'string',
 		list: ['11/0', '10/0', '9/0', '8/0', '7/0', '6/0'],
-		animate: false
+		animate: true
 	}
 	this.parameterValidationArray['orientated'] = {
 		kind: 'derived',
@@ -107,7 +107,7 @@ ED.ConjunctivalSuture.prototype.setPropertyDefaults = function() {
 ED.ConjunctivalSuture.prototype.setParameterDefaults = function() {
 	this.apexX = this.boundaryWidth/2;
 	this.setParameterFromString('shape', 'Purse String');
-	
+
 	var doodle = this.drawing.lastDoodleOfClass(this.className);
 	if (doodle) {
 		var p = new ED.Point(doodle.originX, doodle.originY);
@@ -151,7 +151,7 @@ ED.ConjunctivalSuture.prototype.dependentParameterValues = function(_parameter, 
 			}
 			this.apexX = this.boundaryWidth/2;
 			break;
-			
+
 		case 'orientated':
 			if (_value == "true") {
 				this.isOrientated = true;
@@ -162,7 +162,7 @@ ED.ConjunctivalSuture.prototype.dependentParameterValues = function(_parameter, 
 				this.handleArray[2].isVisible = true;
 			}
 			break;
-			
+
 		case 'apexX':
 			this.boundaryWidth = this.apexX * 2;
 			break;
@@ -191,7 +191,7 @@ ED.ConjunctivalSuture.prototype.draw = function(_point) {
 
 	// Close path
 	ctx.closePath();
-	
+
 	// Set line attributes
 	ctx.lineWidth = 4;
 	ctx.fillStyle = "rgba(255,255,255,0)";
@@ -214,7 +214,7 @@ ED.ConjunctivalSuture.prototype.draw = function(_point) {
 				ctx.lineTo(0, r);
 				ctx.lineTo(0 + endLength, r + endLength);
 				break;
-				
+
 			case 'Mattress':
 				ctx.rect(-this.boundaryWidth/2, -this.boundaryHeight/2, this.boundaryWidth, this.boundaryHeight);
 				var p = -this.boundaryWidth/2 + 2 * endLength;
@@ -222,7 +222,7 @@ ED.ConjunctivalSuture.prototype.draw = function(_point) {
 				ctx.lineTo(p, r);
 				ctx.lineTo(p + endLength, r + endLength);
 				break;
-				
+
 			case "Buried Mattress":
 				var ti = 10;
 				var bi = 40;
@@ -235,7 +235,7 @@ ED.ConjunctivalSuture.prototype.draw = function(_point) {
 				ctx.lineTo(0, r);
 				ctx.lineTo(0 + endLength, r + endLength);
 				break;
-				
+
 			case "Interrupted":
 				var cpdx = 10;
 				var cpdy = 30
@@ -255,9 +255,9 @@ ED.ConjunctivalSuture.prototype.draw = function(_point) {
 					ctx.lineTo(x, - endLength);
 					x += endLength;
 					ctx.lineTo(x, + endLength);
-				}	
+				}
 				ctx.lineTo(x + endLength, 0);
-				ctx.closePath();			
+				ctx.closePath();
 				break;
 		}
 		ctx.lineWidth = 4;
@@ -283,8 +283,8 @@ ED.ConjunctivalSuture.prototype.draw = function(_point) {
  */
 ED.ConjunctivalSuture.prototype.description = function() {
 	var returnValue;
-	
+
 	returnValue = this.size + " " + this.type + " " + this.shape + " conjunctival suture at " + this.clockHour() + " o'clock";
-	
+
 	return returnValue;
 }

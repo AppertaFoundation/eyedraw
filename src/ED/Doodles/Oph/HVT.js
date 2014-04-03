@@ -75,37 +75,37 @@ ED.HVT.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'string',
 		list: ['XT', 'None', 'ET'],
-		animate: false
+		animate: true
 	};
 	this.parameterValidationArray['ver'] = {
 		kind: 'derived',
 		type: 'string',
 		list: ['R/L', 'None', 'L/R'],
-		animate: false
+		animate: true
 	};
 	this.parameterValidationArray['tor'] = {
 		kind: 'derived',
 		type: 'string',
 		list: ['Excyclotorsion', 'None', 'Incyclotorsion'],
-		animate: false
+		animate: true
 	};
 	this.parameterValidationArray['horValue'] = {
 		kind: 'derived',
 		type: 'int',
 		range: new ED.Range(0, 50),
-		animate: false
+		animate: true
 	};
 	this.parameterValidationArray['verValue'] = {
 		kind: 'derived',
 		type: 'int',
 		range: new ED.Range(0, 50),
-		animate: false
+		animate: true
 	};
 	this.parameterValidationArray['torValue'] = {
 		kind: 'derived',
 		type: 'int',
 		range: new ED.Range(0, 20),
-		animate: false
+		animate: true
 	};
 }
 
@@ -131,7 +131,7 @@ ED.HVT.prototype.setParameterDefaults = function() {
  */
 ED.HVT.prototype.dependentParameterValues = function(_parameter, _value) {
 	var returnArray = new Array();
-			
+
 	// Value of centre for right eye (binding done on right eye only, left eye values handled by syncing)
 	var centre = -250;
 
@@ -223,7 +223,7 @@ ED.HVT.prototype.dependentParameterValues = function(_parameter, _value) {
 					break;
 			}
 			break;
-			
+
 		case 'horValue':
 			switch (this.hor) {
 				case 'XT':
@@ -237,7 +237,7 @@ ED.HVT.prototype.dependentParameterValues = function(_parameter, _value) {
 					break;
 			}
 			break;
-			
+
 		case 'verValue':
 			switch (this.ver) {
 				case 'R/L':
@@ -251,7 +251,7 @@ ED.HVT.prototype.dependentParameterValues = function(_parameter, _value) {
 					break;
 			}
 			break;
-			
+
 		case 'torValue':
 			switch (this.tor) {
 				case 'Excyclotorsion':

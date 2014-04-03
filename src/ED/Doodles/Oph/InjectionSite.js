@@ -30,7 +30,7 @@ ED.InjectionSite = function(_drawing, _parameterJSON) {
 
 	// Private parameters
 	this.parsPlana = -560;
-	
+
 	// Derived parameters
 	this.distance = '3.5';
 
@@ -61,16 +61,16 @@ ED.InjectionSite.prototype.setHandles = function() {
 ED.InjectionSite.prototype.setPropertyDefaults = function() {
 	this.isScaleable = false;
 	this.isMoveable = false;
-	
+
 	// Update component of validation array for simple parameters
 	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
 	this.parameterValidationArray['apexY']['range'].setMinAndMax(-550, -470);
-	
+
 	this.parameterValidationArray['distance'] = {
 		kind: 'derived',
 		type: 'string',
 		list: ['4.5', '4.0', '3.5', '3.0', '2.5'],
-		animate: false
+		animate: true
 	};
 }
 
@@ -169,7 +169,7 @@ ED.InjectionSite.prototype.draw = function(_point) {
 		ctx.lineWidth = 1;
 		ctx.strokeStyle = "rgba(0, 0, 0, 0.5)";
 		ctx.stroke();
-		
+
 		// Flange
 		ctx.beginPath();
 		ctx.moveTo(0, y + 130);
@@ -177,7 +177,7 @@ ED.InjectionSite.prototype.draw = function(_point) {
 		ctx.lineWidth = 32;
 		ctx.strokeStyle = "rgba(120, 120, 120, 0.2)";
 		ctx.stroke();
-				
+
 		// White bit
 		ctx.beginPath();
 		ctx.moveTo(50, y + 240);
@@ -190,7 +190,7 @@ ED.InjectionSite.prototype.draw = function(_point) {
 		ctx.strokeStyle = "rgba(0, 0, 0, 0.5)";
 		ctx.fill();
 		ctx.stroke();
-		
+
 		// Visible needle
 		ctx.beginPath();
 		ctx.moveTo(-10, y + 260);
@@ -200,7 +200,7 @@ ED.InjectionSite.prototype.draw = function(_point) {
 		ctx.closePath();
 		ctx.fillStyle = "rgba(120, 120, 120, 1)";
 		ctx.fill();
-		
+
 		// Hidden needle
 		ctx.beginPath();
 		ctx.moveTo(-10, this.apexY);
@@ -211,20 +211,20 @@ ED.InjectionSite.prototype.draw = function(_point) {
 		ctx.lineWidth = 1;
 		ctx.strokeStyle = "rgba(60, 60, 60, 1)";
 		ctx.stroke();
-		
+
 		// Get apex point in canvas coordinates
 		var ap = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
-		
+
 		// Save context and reset
 		ctx.save();
-      	ctx.setTransform(1, 0, 0, 1, 0, 0);	
+      	ctx.setTransform(1, 0, 0, 1, 0, 0);
 
 		// Draw label to right and up from apex point
 		ctx.lineWidth = 1;
 		ctx.fillStyle = "gray";
 		ctx.font = "18px sans-serif";
 		ctx.fillText(this.distance + ' mm', ap.x + 10, ap.y - 5);
-		
+
 		// Restore context
 		ctx.restore();
 	}
@@ -234,7 +234,7 @@ ED.InjectionSite.prototype.draw = function(_point) {
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
-	
+
 	// Return value indicating successful hittest
 	return this.isClicked;
 }

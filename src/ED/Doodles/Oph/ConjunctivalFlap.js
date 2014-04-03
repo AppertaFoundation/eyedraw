@@ -33,7 +33,7 @@ ED.ConjunctivalFlap = function(_drawing, _parameterJSON) {
 
 	// Saved parameters
 	this.savedParameterArray = ['apexY', 'arc', 'rotation'];
-	
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
@@ -74,7 +74,7 @@ ED.ConjunctivalFlap.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'string',
 		list: ['Fornix-based', 'Limbus-based'],
-		animate: false
+		animate: true
 	};
 }
 

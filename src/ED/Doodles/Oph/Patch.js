@@ -33,7 +33,7 @@ ED.Patch = function(_drawing, _parameterJSON) {
 
 	// Saved parameters
 	this.savedParameterArray = ['originX', 'originY', 'width', 'height', 'apexX'];
-	
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
@@ -68,7 +68,7 @@ ED.Patch.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'string',
 		list: ['Sclera', 'Tenons', 'Tutoplast'],
-		animate: false
+		animate: true
 	};
 }
 
@@ -162,10 +162,10 @@ ED.Patch.prototype.draw = function(_point) {
 
 	// Non boundary paths
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
-	
+
 		var xd = this.width/2;
 		var yd = this.height/2 - 10;
-		
+
 		// Suture knots
 		this.drawSpot(ctx, -xd, -yd, 5, "blue");
 		this.drawSpot(ctx, -xd, yd, 5, "blue");

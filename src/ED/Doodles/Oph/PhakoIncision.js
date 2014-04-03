@@ -41,10 +41,10 @@ ED.PhakoIncision = function(_drawing, _parameterJSON) {
 
 	// Saved parameters
 	this.savedParameterArray = ['apexY', 'arc', 'rotation', 'radius'];
-	
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
-	
+
 	this.apexYDelta = this.radius + this.apexY;
 }
 
@@ -82,26 +82,26 @@ ED.PhakoIncision.prototype.setPropertyDefaults = function() {
 		type: 'mod',
 		range: new ED.Range(0, 360),
 		clock: 'bottom',
-		animate: false
+		animate: true
 	};
 	this.parameterValidationArray['incisionLength'] = {
 		kind: 'derived',
 		type: 'float',
 		range: new ED.Range(1, 9.9),
 		precision: 1,
-		animate: false
+		animate: true
 	};
 	this.parameterValidationArray['incisionSite'] = {
 		kind: 'derived',
 		type: 'string',
 		list: ['Corneal', 'Limbal', 'Scleral'],
-		animate: false
+		animate: true
 	};
 	this.parameterValidationArray['incisionType'] = {
 		kind: 'derived',
 		type: 'string',
 		list: ['Pocket', 'Section'],
-		animate: false
+		animate: true
 	};
 }
 
