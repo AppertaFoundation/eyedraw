@@ -45,10 +45,10 @@ ED.AngleGradeWest = function(_drawing, _parameterJSON) {
 
 	// Saved parameters
 	this.savedParameterArray = ['apexY'];
-	
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
-	
+
 	// Invariant simple parameters
 	this.arc = 90 * Math.PI / 180;
 	this.rotation = 3 * Math.PI / 2;
@@ -88,13 +88,13 @@ ED.AngleGradeWest.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'string',
 		list: ['4', '3', '2', '1', '0'],
-		animate: false
+		animate: true
 	};
 	this.parameterValidationArray['seen'] = {
 		kind: 'derived',
 		type: 'string',
 		list: ['Yes', 'No'],
-		animate: false
+		animate: true
 	};
 }
 

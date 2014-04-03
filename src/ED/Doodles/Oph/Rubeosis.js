@@ -33,7 +33,7 @@ ED.Rubeosis = function(_drawing, _parameterJSON) {
 
 	// Saved parameters
 	this.savedParameterArray = ['apexY', 'arc', 'rotation'];
-	
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
@@ -70,7 +70,7 @@ ED.Rubeosis.prototype.setPropertyDefaults = function() {
 		type: 'float',
 		range: new ED.Range(20, 100),
 		precision: 1,
-		animate: false
+		animate: true
 	};
 }
 

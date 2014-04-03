@@ -30,7 +30,7 @@ ED.AntSeg = function(_drawing, _parameterJSON) {
 
 	// Derived parameters
 	this.pupilSize = 'Large';
-	
+
 	// Other parameters
 	this.pxe = false;
 	this.coloboma = false;
@@ -39,7 +39,7 @@ ED.AntSeg = function(_drawing, _parameterJSON) {
 
 	// Saved parameters
 	this.savedParameterArray = ['apexY', 'rotation', 'pxe', 'coloboma', 'colour', 'ectropion'];
-	
+
 	// Parameters in doodle control bar (parameter name: parameter label)
 	this.controlParameterArray = {'pupilSize':'Pupil size', 'pxe':'PXE', 'coloboma':'Coloboma', 'colour':'Colour', 'ectropion':'Ectropion uveae'};
 
@@ -80,7 +80,7 @@ ED.AntSeg.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'string',
 		list: ['Large', 'Medium', 'Small'],
-		animate: false
+		animate: true
 	};
 	this.parameterValidationArray['pxe'] = {
 		kind: 'derived',
@@ -96,7 +96,7 @@ ED.AntSeg.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'string',
 		list: ['Blue', 'Brown', 'Gray', 'Green'],
-		animate: false
+		animate: true
 	};
 	this.parameterValidationArray['ectropion'] = {
 		kind: 'derived',
@@ -182,7 +182,7 @@ ED.AntSeg.prototype.draw = function(_point) {
 
 	// Do a 360 arc
 	ctx.arc(0, 0, ro, arcStart, arcEnd, true);
-					
+
 	if (!this.coloboma) {
 		// Move to inner circle
 		ctx.moveTo(ri, 0);
@@ -195,19 +195,19 @@ ED.AntSeg.prototype.draw = function(_point) {
 		var colAngle = (Math.PI/3) * 280/ri;
 		var colAngleOuter = Math.PI/6;
 		var rimSize = 20;
-		
+
 		var p1 = new ED.Point(0,0);
 		p1.setWithPolars(ri, Math.PI + colAngle/2);
 		var p2 = new ED.Point(0,0);
 		p2.setWithPolars(ro - rimSize, Math.PI + colAngleOuter/2);
-		
+
 		// Coloboma
 		ctx.moveTo(-p2.x, p2.y);
 		ctx.arc(0, 0, ro - rimSize, Math.PI/2 - colAngleOuter/2, Math.PI/2 + colAngleOuter/2, false);
 
 		// Arc round edge of pupil
 		ctx.arc(0, 0, ri, Math.PI/2 + colAngle/2, Math.PI/2 - colAngle/2, false);
-		
+
 		// Back to start
 		ctx.lineTo(-p2.x, p2.y);
 	}
@@ -215,7 +215,7 @@ ED.AntSeg.prototype.draw = function(_point) {
 	// Edge attributes
 	ctx.lineWidth = 4;
 	ctx.strokeStyle = "gray";
-	
+
 	// Iris colour
 	switch (this.colour) {
 		case 'Blue':
@@ -229,7 +229,7 @@ ED.AntSeg.prototype.draw = function(_point) {
 			break;
 		case 'Green':
 			ctx.fillStyle = "rgba(114, 172, 62, 0.5)";
-			break;			
+			break;
 	}
 
 	// Draw boundary path (also hit testing)
@@ -261,7 +261,7 @@ ED.AntSeg.prototype.draw = function(_point) {
 				ctx.stroke();
 			}
 		}
-		
+
 		// Ectropion uveae
 		if (this.ectropion) {
 			ctx.beginPath();
@@ -295,22 +295,22 @@ ED.AntSeg.prototype.draw = function(_point) {
  */
 ED.AntSeg.prototype.description = function() {
 	var returnValue = "";
-	
+
 	// Pupil size and coloboma
 	if (this.pupilSize != 'Large') returnValue += this.pupilSize.toLowerCase() + " pupil, ";
-	
+
 	// Coloboma
-	if (this.coloboma) returnValue += "coloboma at " + this.clockHour(6) + " o'clock, ";	
-	
+	if (this.coloboma) returnValue += "coloboma at " + this.clockHour(6) + " o'clock, ";
+
 	// Ectopion
 	if (this.ectropion) returnValue += "ectropion uvaee, ";
 
 	// PXE
 	if (this.pxe) returnValue += "pseudoexfoliation, ";
-	
+
 	// Remove final comma and space and capitalise first letter
 	returnValue = returnValue.replace(/, +$/, '');
 	returnValue = returnValue.charAt(0).toUpperCase() + returnValue.slice(1);
-	
+
 	return returnValue;
 }

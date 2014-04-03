@@ -37,10 +37,10 @@ ED.Sclerostomy = function(_drawing, _parameterJSON) {
 	this.overallGauge = '23g';
 	this.gauge = '23g';
 	this.isSutured = false;
-	
+
 	// Saved parameters
 	this.savedParameterArray = ['apexY', 'arc', 'rotation'];
-	
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
@@ -75,13 +75,13 @@ ED.Sclerostomy.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'string',
 		list: ['20g', '23g', '25g', '27g'],
-		animate: false
+		animate: true
 	};
 	this.parameterValidationArray['gauge'] = {
 		kind: 'derived',
 		type: 'string',
 		list: ['20g', '23g', '25g', '27g'],
-		animate: false
+		animate: true
 	};
 	this.parameterValidationArray['isSutured'] = {
 		kind: 'derived',
@@ -98,7 +98,7 @@ ED.Sclerostomy.prototype.setParameterDefaults = function() {
 	this.gauge = "23g";
 	this.isSutured = false;
 
-	// Arc property is unused, so used it to store isSutured property 
+	// Arc property is unused, so used it to store isSutured property
 	this.arc = 1;
 
 	this.setRotationWithDisplacements(60, -45);

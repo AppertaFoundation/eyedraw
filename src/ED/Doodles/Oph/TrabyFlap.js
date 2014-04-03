@@ -41,7 +41,7 @@ ED.TrabyFlap = function(_drawing, _parameterJSON) {
 
 	// Saved parameters
 	this.savedParameterArray = ['apexX', 'apexY', 'arc', 'rotation'];
-	
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
@@ -82,19 +82,19 @@ ED.TrabyFlap.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'string',
 		list: ['Superior', 'Superonasal', 'Superotemporal'],
-		animate: false
+		animate: true
 	};
 	this.parameterValidationArray['size'] = {
 		kind: 'derived',
 		type: 'string',
 		list: ['4x3', '5x2'],
-		animate: false
+		animate: true
 	};
 	this.parameterValidationArray['sclerostomy'] = {
 		kind: 'derived',
 		type: 'string',
 		list: ['Punch', 'Block'],
-		animate: false
+		animate: true
 	};
 
 	// Array of arcs to snap to
@@ -248,7 +248,7 @@ ED.TrabyFlap.prototype.draw = function(_point) {
 		if (this.sclerostomy == 'Punch') {
 			ctx.arc(0, this.apexY, 50, 0, 2 * Math.PI, true);
 		} else {
-			// Draw block at half width and height    
+			// Draw block at half width and height
 			var angle = theta / 2;
 			arcStart = -Math.PI / 2 + angle;
 			arcEnd = -Math.PI / 2 - angle;

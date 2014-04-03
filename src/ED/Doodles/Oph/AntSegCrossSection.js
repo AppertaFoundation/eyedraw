@@ -34,11 +34,11 @@ ED.AntSegCrossSection = function(_drawing, _parameterJSON) {debugger;
 
 	// Saved parameters
 	this.savedParameterArray = ['apexY', 'apexX'];
-	
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 
-	// Invariant simple parameters	
+	// Invariant simple parameters
 	this.originX = 44;
 }
 
@@ -74,7 +74,7 @@ ED.AntSegCrossSection.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'string',
 		list: ['Large', 'Medium', 'Small'],
-		animate: false
+		animate: true
 	};
 }
 

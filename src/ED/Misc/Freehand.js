@@ -27,12 +27,12 @@
 ED.Freehand = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "Freehand";
-	
+
 	// Private parameters
 	this.labelWidth = 0;
 	this.labelHeight = 80;
 	this.labelFont = "60px sans-serif";
-	
+
 	// Derived parameters
 	this.colourString = "00FF00FF";
 	this.filled = true;
@@ -41,7 +41,7 @@ ED.Freehand = function(_drawing, _parameterJSON) {
 
 	// Saved parameters
 	this.savedParameterArray = ['originX', 'originY', 'colourString', 'filled', 'thickness', 'labelText'];
-	
+
 	// Parameters in doodle control bar (parameter name: parameter label)
 	this.controlParameterArray = {'colourString':'Colour', 'filled':'Fill', 'thickness':'Thickness', 'labelText':'Label'};
 
@@ -68,13 +68,13 @@ ED.Freehand.prototype.setHandles = function() {
  */
 ED.Freehand.prototype.setPropertyDefaults = function() {
 	this.isDrawable = true;
-	
+
 	// Add complete validation arrays for derived parameters
 	this.parameterValidationArray['colourString'] = {
 		kind: 'derived',
 		type: 'colourString',
 		list: ['FF0000FF', '00FF00FF', '0000FFFF'],
-		animate: false
+		animate: true
 	};
 	this.parameterValidationArray['filled'] = {
 		kind: 'derived',
@@ -85,12 +85,12 @@ ED.Freehand.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'string',
 		list: ['Thin', 'Medium', 'Thick'],
-		animate: false
+		animate: true
 	};
 	this.parameterValidationArray['labelText'] = {
 		kind: 'derived',
 		type: 'freeText',
-		animate: false
+		animate: true
 	};
 }
 
@@ -127,7 +127,7 @@ ED.Freehand.prototype.draw = function(_point) {
 	// Create colour object for squiggle
 	var colourObject = new ED.Colour(0, 0, 0, 1);
 	colourObject.setWithHexString(this.colourString);
-	
+
 	// Set attributes for border (colour changes to indicate drawing mode)
 	ctx.lineWidth = 2;
 	this.isFilled = false;
@@ -163,7 +163,7 @@ ED.Freehand.prototype.draw = function(_point) {
 			// Optionally fill if squiggle is complete (stops filling while drawing)
 			if (squiggle.filled && squiggle.complete) ctx.fill();
 		}
-		
+
 		// Draw optional label
 		if (this.labelText.length > 0) {
 			// Draw text

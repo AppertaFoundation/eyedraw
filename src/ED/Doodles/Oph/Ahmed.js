@@ -69,7 +69,7 @@ ED.Ahmed.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'string',
 		list: ['STQ', 'SNQ', 'INQ', 'ITQ'],
-		animate: false
+		animate: true
 	};
 
 	// Array of angles to snap to

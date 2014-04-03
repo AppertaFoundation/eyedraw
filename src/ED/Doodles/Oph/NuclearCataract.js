@@ -33,7 +33,7 @@ ED.NuclearCataract = function(_drawing, _parameterJSON) {
 
 	// Saved parameters
 	this.savedParameterArray = ['originX', 'originY', 'apexY'];
-	
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
@@ -74,7 +74,7 @@ ED.NuclearCataract.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'string',
 		list: ['Mild', 'Moderate', 'Brunescent'],
-		animate: false
+		animate: true
 	};
 }
 

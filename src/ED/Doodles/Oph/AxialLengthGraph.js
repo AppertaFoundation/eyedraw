@@ -35,16 +35,16 @@ ED.AxialLengthGraph = function(_drawing, _parameterJSON) {
 	this.xFirst = 20;
 	this.interval = 1;
 	this.stubLength = 30;
-	
+
 	// Values
 	this.axialLength = 25;
 	this.standardDeviation = 1;
 	this.lowerLimit = 21.2;
 	this.upperLimit = 26.6;
-		
+
 	// Saved parameters
 	//this.savedParameterArray = ['startDate'];
-	
+
 	// Call super-class constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
@@ -70,7 +70,7 @@ ED.AxialLengthGraph.prototype.setPropertyDefaults = function() {
 		type: 'float',
 		precision: 2,
 		range: new ED.Range(0, 30),
-		animate: false
+		animate: true
 	};
 }
 
@@ -102,7 +102,7 @@ ED.AxialLengthGraph.prototype.draw = function(_point) {
 
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
-	
+
 	// Non-boundary paths
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
 		// Danger areas
@@ -111,30 +111,30 @@ ED.AxialLengthGraph.prototype.draw = function(_point) {
 		ctx.rect(xo + this.padding + (this.upperLimit - this.xFirst) * factor, yo + this.padding, this.drawing.doodlePlaneWidth - 2 * this.padding - (this.upperLimit - this.xFirst) * factor, this.drawing.doodlePlaneHeight - 2 * this.padding - this.offset);
 		ctx.fillStyle = "rgba(255,167,152,0.5)";
 		ctx.fill();
-		
+
 		// Safe areas
 		ctx.beginPath();
 		ctx.rect(xo + this.padding + (this.lowerLimit - this.xFirst) * factor, yo + this.padding, (this.upperLimit - this.lowerLimit) * factor, this.drawing.doodlePlaneHeight - 2 * this.padding - this.offset);
 		ctx.fillStyle = "rgba(208,255,197,0.5)";
 		ctx.fill();
-		
+
 		// Draw axes
 		ctx.beginPath();
 
 		// X-axis
 		ctx.moveTo(xo + this.padding, ys - this.padding - this.offset);
 		ctx.lineTo(xs - this.padding, ys - this.padding - this.offset);
-		
+
 		// Y-axis
 		ctx.moveTo(xo + this.padding, ys - this.padding - this.offset);
 		ctx.lineTo(xo + this.padding, yo + this.padding);
-		
+
 		// Set line attributes
 		ctx.lineWidth = 4;
 
 		// Draw grid lines
 		ctx.stroke();
-		
+
 		// Draw time values at top, but leave out edges
 		var n = Math.floor(this.xAxis/this.interval) + 1;
 		for (var i = 0; i < n; i++) {
@@ -142,7 +142,7 @@ ED.AxialLengthGraph.prototype.draw = function(_point) {
 			// Text for x-axis
 			var labelText = (this.xFirst + i * this.interval).toString();
 			var increment = i * (this.drawing.doodlePlaneWidth - 2 * this.padding)/(n - 1);
-			
+
 			// Text properties
 			ctx.lineWidth = 4;
 			ctx.font = "112px sans-serif";
@@ -154,12 +154,12 @@ ED.AxialLengthGraph.prototype.draw = function(_point) {
 			ctx.moveTo(xo + this.padding + increment, ys - this.padding - this.offset);
 			ctx.lineTo(xo + this.padding + increment, ys - this.padding - this.offset + this.stubLength);
 			ctx.stroke();
-		
+
 			// Draw text centred on grid line
 			var textWidth = ctx.measureText(labelText).width;
 			ctx.fillText(labelText, xo + this.padding + increment - textWidth/2, ys - this.padding);
 		}
-		
+
 		// Draw axial length
 		var x = xo + this.padding + (this.axialLength - this.xFirst) * factor;
 		ctx.beginPath();
@@ -168,14 +168,14 @@ ED.AxialLengthGraph.prototype.draw = function(_point) {
 		ctx.lineWidth = 16;
 		ctx.strokeStyle = "rgba(50,50,50,1)";
 		ctx.stroke();
-		
+
 		// Draw standard deviation
 		var sd = this.standardDeviation * factor;
 		ctx.beginPath();
 		ctx.rect(x - sd/2, 0 - this.offset/2, sd, 50);
 		ctx.lineWidth = 16;
 		ctx.strokeStyle = "red";
-		ctx.stroke();		
+		ctx.stroke();
 	}
 
 	// Return value indicating successful hit test

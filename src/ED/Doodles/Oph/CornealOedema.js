@@ -31,7 +31,7 @@ ED.CornealOedema = function(_drawing, _parameterJSON) {
 	// Private parameters
 	this.numberOfHandles = 4;
 	this.initialRadius = 360;
-	
+
 	// Derived parameters
 	this.intensity = 'Mild';
 
@@ -40,7 +40,7 @@ ED.CornealOedema = function(_drawing, _parameterJSON) {
 
 	// Parameters in doodle control bar (parameter name: parameter label)
 	this.controlParameterArray = {'intensity':'Intensity'};
-		
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
@@ -70,15 +70,15 @@ ED.CornealOedema.prototype.setPropertyDefaults = function() {
 	this.isRotatable = false;
 	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
 	this.parameterValidationArray['apexY']['range'].setMinAndMax(-380, -80);
-	
+
 	// Add complete validation arrays for derived parameters
 	this.parameterValidationArray['intensity'] = {
 		kind: 'derived',
 		type: 'string',
 		list: ['Mild', 'Moderate', 'Severe'],
-		animate: false
+		animate: true
 	};
-	
+
 	/*
 	// Create ranges to constrain handles
 	this.handleVectorRangeArray = new Array();
@@ -164,7 +164,7 @@ ED.CornealOedema.prototype.draw = function(_point) {
 	// Close path
 	ctx.closePath();
 	*/
-	
+
 	// Round lesion
 	var r = Math.sqrt(this.apexX * this.apexX + this.apexY * this.apexY);
 	ctx.arc(0, 0, r, 0, Math.PI * 2, true);
@@ -186,7 +186,7 @@ ED.CornealOedema.prototype.draw = function(_point) {
 
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
-	
+
 	// Non boundary paths
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
 		if (false) {
@@ -195,16 +195,16 @@ ED.CornealOedema.prototype.draw = function(_point) {
 			ctx.fill();
 		}
 	}
-	
+
 	// Coordinates of handles (in canvas plane)
 	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 // 	for (var i = 0; i < this.numberOfHandles; i++) {
 // 		this.handleArray[i].location = this.transform.transformPoint(this.squiggleArray[0].pointsArray[i]);
 // 	}
-		
+
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
-	
+
 	// Return value indicating successful hittest
 	return this.isClicked;
 }

@@ -27,7 +27,7 @@
 ED.FamilyMember = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "FamilyMember";
-	
+
 	// Special parameters (passed from Pedigree Object)
 	this.node = null;
 
@@ -42,10 +42,10 @@ ED.FamilyMember = function(_drawing, _parameterJSON) {
 
 	// Saved parameters (NB not for saving in JSON, but stops controls resetting values)
 	this.savedParameterArray = ['gender', 'affected', 'deceased', 'condition'];
-	
+
 	// Parameters in doodle control bar (parameter name: parameter label)
 	this.controlParameterArray = {'gender':'Gender', 'affected':'Affected', 'deceased':'Deceased', 'condition':'Text'};
-	
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
@@ -63,19 +63,19 @@ ED.FamilyMember.superclass = ED.Doodle.prototype;
 ED.FamilyMember.prototype.setPropertyDefaults = function() {
 	this.isMoveable = false;
 	this.isRotatable = false;
-	
+
 	// Add complete validation arrays for derived parameters
 	this.parameterValidationArray['dimension'] = {
 		kind: 'derived',
 		type: 'int',
 		range: new ED.Range(0, 1000),
-		animate: false
+		animate: true
 	};
 	this.parameterValidationArray['gender'] = {
 		kind: 'derived',
 		type: 'string',
 		list: ['Male', 'Female', 'Unknown'],
-		animate: false
+		animate: true
 	};
 	this.parameterValidationArray['drawStub'] = {
 		kind: 'derived',
@@ -100,7 +100,7 @@ ED.FamilyMember.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['condition'] = {
 		kind: 'derived',
 		type: 'freeText',
-		animate: false
+		animate: true
 	};
 }
 
@@ -181,12 +181,12 @@ ED.FamilyMember.prototype.draw = function(_point) {
 	ctx.strokeStyle = "rgba(120,120,120,0.75)";
 
 	// Colour of fill
-	if (this.affected) ctx.fillStyle = "rgba(150,150,150,0.75)"; 
-	else ctx.fillStyle = "rgba(255,255,255,0.75)"; 
-	
+	if (this.affected) ctx.fillStyle = "rgba(150,150,150,0.75)";
+	else ctx.fillStyle = "rgba(255,255,255,0.75)";
+
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
-	
+
 	// Non boundary paths
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
 		if (this.drawStub) {
@@ -195,7 +195,7 @@ ED.FamilyMember.prototype.draw = function(_point) {
 			ctx.lineTo(0, -this.dimension * 2);
 			ctx.stroke();
 		}
-		
+
 		if (this.deceased) {
 			var d = this.dimension * 1.2;
 			ctx.beginPath();
@@ -203,7 +203,7 @@ ED.FamilyMember.prototype.draw = function(_point) {
 			ctx.lineTo(d, -d);
 			ctx.stroke();
 		}
-		
+
 		if (this.isProband) {
 			var d = this.dimension * 1.3;
 			var l = 5;
@@ -212,18 +212,18 @@ ED.FamilyMember.prototype.draw = function(_point) {
 			ctx.lineTo(l, d);
 			ctx.lineTo(0, d - l);
 			ctx.closePath()
-			ctx.fillStyle = "rgba(150,150,150,0.75)"; 
+			ctx.fillStyle = "rgba(150,150,150,0.75)";
 			ctx.fill();
 			ctx.stroke();
 		}
-		
+
 		// Draw condition
 		ctx.font = "24px sans-serif";
-		ctx.fillStyle = "rgba(100,100,100,0.75)"; 
+		ctx.fillStyle = "rgba(100,100,100,0.75)";
 		var width = ctx.measureText(this.condition).width + 10 * 2;
-		ctx.fillText(this.condition, -width / 2 + 10, 64);			
+		ctx.fillText(this.condition, -width / 2 + 10, 64);
 	}
-	
+
 	// Return value indicating successful hittest
 	return this.isClicked;
 }
@@ -242,5 +242,5 @@ ED.FamilyMember.prototype.setNode = function(_node) {
 	this.isProband = this.node.member.isProband;
 	this.affected = this.node.member.affected;
 	this.deceased = this.node.member.deceased;
-	this.condition = this.node.member.condition;	
+	this.condition = this.node.member.condition;
 }

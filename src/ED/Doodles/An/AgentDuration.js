@@ -27,11 +27,11 @@
 ED.AgentDuration = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "AgentDuration";
-		
+
 	// Derived parameters
 	this.unit = 'mg';
 	this.type = 'range';
-	
+
 	// Private parameters
 	this.halfHeight = 20;
 	this.minimumWidth = 40;
@@ -39,7 +39,7 @@ ED.AgentDuration = function(_drawing, _parameterJSON) {
 
 	// Saved parameters
 	this.savedParameterArray = ['originX', 'apexX', 'unit', 'type', 'dose'];
-	
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
@@ -63,21 +63,21 @@ ED.AgentDuration.prototype.setHandles = function() {
  */
 ED.AgentDuration.prototype.setPropertyDefaults = function() {
 	this.isRotatable = false;
-	
+
 	// Add complete validation arrays for derived parameters
 	this.parameterValidationArray['unit'] = {
 		kind: 'derived',
 		type: 'string',
 		list: ['mg', 'mls', 'ug', 'mg/kg/hr', 'ug/kg/hr', 'drops', 'IU'],
-		animate: false
+		animate: true
 	};
 	this.parameterValidationArray['type'] = {
 		kind: 'derived',
 		type: 'string',
 		list: ['range', 'fixed'],
-		animate: false
+		animate: true
 	};
-		
+
 	// Update component of validation array for simple parameters
 	this.parameterValidationArray['originX']['range'].setMinAndMax(-500, +900);
 	this.parameterValidationArray['originY']['range'].setMinAndMax(-0, +0);
@@ -144,11 +144,11 @@ ED.AgentDuration.prototype.draw = function(_point) {
 
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
-	
+
 	// Non boundary drawing
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
 		ctx.beginPath();
-		
+
 		if (this.type == 'range') {
 			// Draw line with end bars
 			ctx.moveTo(0 - offset, -this.halfHeight);
@@ -166,11 +166,11 @@ ED.AgentDuration.prototype.draw = function(_point) {
 			ctx.lineTo(0, -this.halfHeight);
 			ctx.closePath();
 		}
-		
+
 		// Set attributes
 		ctx.lineWidth = 4;
 		ctx.strokeStyle = "rgba(50,50,50,1)";
-		
+
 		// Draw
 		ctx.stroke();
 
@@ -194,7 +194,7 @@ ED.AgentDuration.prototype.draw = function(_point) {
 		// Draw handles if selected
 		if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
 	}
-		
+
 	// Return value indicating successful hittest
 	return this.isClicked;
 }
@@ -210,7 +210,7 @@ ED.AgentDuration.prototype.drawHighlightExtras = function() {
 	ctx.beginPath();
 	var offset = this.minimumWidth/2;
 	if (this.type == 'range') offset = 0;
-	
+
 	var margin = 3;
 	ctx.rect(0 - offset - margin, -this.halfHeight - margin, this.apexX + margin * 2, this.halfHeight * 2 + margin * 2);
 

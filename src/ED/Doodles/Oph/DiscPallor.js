@@ -33,7 +33,7 @@ ED.DiscPallor = function(_drawing, _parameterJSON) {
 
 	// Saved parameters
 	this.savedParameterArray = ['arc', 'rotation'];
-	
+
 	// Call super-class constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
@@ -65,7 +65,7 @@ ED.DiscPallor.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'string',
 		list: ['Sectorial', 'Diffuse'],
-		animate: false
+		animate: true
 	};
 
 	// Speed up animation for arc

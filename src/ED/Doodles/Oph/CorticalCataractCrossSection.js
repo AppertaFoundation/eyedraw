@@ -68,7 +68,7 @@ ED.CorticalCataractCrossSection.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'string',
 		list: ['Mild', 'Moderate', 'White'],
-		animate: false
+		animate: true
 	};
 }
 

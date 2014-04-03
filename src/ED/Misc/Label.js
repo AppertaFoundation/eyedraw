@@ -48,10 +48,10 @@ ED.Label = function(_drawing, _parameterJSON) {
 
 	// Flag to indicate first edit
 	this.isEdited = false;
-	
+
 	// Saved parameters
 	this.savedParameterArray = ['originX', 'originY', 'apexX', 'apexY', 'labelText', 'lastOriginX', 'lastOriginY'];
-	
+
 	// Parameters in doodle control bar (parameter name: parameter label)
 	this.controlParameterArray = {'labelText':'Text'};
 
@@ -84,7 +84,7 @@ ED.Label.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['labelText'] = {
 		kind: 'derived',
 		type: 'freeText',
-		animate: false
+		animate: true
 	};
 }
 
@@ -232,25 +232,25 @@ ED.Label.prototype.onSelection = function() {
 // ED.Label.prototype.addLetter = function(_keyCode) {
 // 	// Need code here to convert to character
 // 	var character = String.fromCharCode(_keyCode);
-// 
+//
 // 	if (!this.isEdited) {
 // 		this.labelText = "";
 // 		this.isEdited = true;
 // 	}
-// 
+//
 // 	// Use backspace to edit
 // 	if (_keyCode == 8) {
 // 		if (this.labelText.length > 0) this.labelText = this.labelText.substring(0, this.labelText.length - 1);
 // 	} else {
 // 		if (this.labelText.length < this.maximumLength) this.labelText += character;
 // 	}
-// 
+//
 // 	// Save changes by triggering parameterChanged method in controller
 // 	if (this.isEdited) {
 // 		// Create notification message
 // 		var object = new Object;
 // 		object.doodle = this;
-// 
+//
 // 		// Trigger notification
 // 		this.drawing.notify('parameterChanged', object);
 // 	}

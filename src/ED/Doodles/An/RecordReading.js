@@ -30,13 +30,13 @@ ED.RecordReading = function(_drawing, _parameterJSON) {
 
 	// Private parameters
 	this.type = 'sys';			// Can be either 'sys', 'dia', 'pul', 'res', 'oxi'
-		
+
 	// Derived parameters
 	this.value = '0';			// Numerical value of reading
-	
+
 	// Saved parameters
 	this.savedParameterArray = ['originX', 'originY', 'value', 'type'];
-	
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
@@ -53,19 +53,19 @@ ED.RecordReading.superclass = ED.Doodle.prototype;
  */
 ED.RecordReading.prototype.setPropertyDefaults = function() {
 	this.isRotatable = false;
-	
+
 	// Add complete validation arrays for derived parameters
 	this.parameterValidationArray['value'] = {
 		kind: 'derived',
 		type: 'int',
 		range: new ED.Range(0, 240),
-		animate: false
+		animate: true
 	};
 	this.parameterValidationArray['type'] = {
 		kind: 'derived',
 		type: 'string',
 		list: ['sys', 'dia', 'pul', 'res', 'oxi'],
-		animate: false
+		animate: true
 	};
 }
 
@@ -88,7 +88,7 @@ ED.RecordReading.prototype.dependentParameterValues = function(_parameter, _valu
 		case 'value':
 			returnArray['originY'] = - (_value * this.drawing.doodlePlaneHeight/240) + this.drawing.doodlePlaneHeight/2;
 			break;
-			
+
 		case 'originX':
 			// When originX is set, ensure user cannot move doodle to left and right
 			this.parameterValidationArray['originX']['range'].setMinAndMax(this.originX, this.originX);
@@ -132,7 +132,7 @@ ED.RecordReading.prototype.draw = function(_point) { //console.log(this.originX)
 			break;
 		case 'oxi':
 			ctx.rect(-w/2, -h/2, w, h);
-			break;		
+			break;
 	}
 
 	// Close path
@@ -144,7 +144,7 @@ ED.RecordReading.prototype.draw = function(_point) { //console.log(this.originX)
 
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
-	
+
 	// Non-boundary paths
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
 		ctx.beginPath();
@@ -158,7 +158,7 @@ ED.RecordReading.prototype.draw = function(_point) { //console.log(this.originX)
 			case 'dia':
 				ctx.moveTo(-w/2, h);
 				ctx.lineTo(0, 0);
-				ctx.lineTo(w/2, h);	
+				ctx.lineTo(w/2, h);
 				break;
 			case 'pul':
 				ctx.arc(0, 0, 20, 0, Math.PI * 2, true);
@@ -168,9 +168,9 @@ ED.RecordReading.prototype.draw = function(_point) { //console.log(this.originX)
 				break;
 			case 'oxi':
 				ctx.rect(-w/2, -h/2, w, h);
-				break;			
+				break;
 		}
-		
+
 		// Set line attributes
 		ctx.lineWidth = 8;
 		ctx.lineJoin = 'round';

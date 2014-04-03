@@ -33,7 +33,7 @@ ED.PosteriorSynechia = function(_drawing, _parameterJSON) {
 
 	// Saved parameters
 	this.savedParameterArray = ['apexY', 'arc', 'rotation'];
-	
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
@@ -71,7 +71,7 @@ ED.PosteriorSynechia.prototype.setPropertyDefaults = function() {
 		type: 'float',
 		range: new ED.Range(20, 100),
 		precision: 1,
-		animate: false
+		animate: true
 	};
 }
 
@@ -191,7 +191,7 @@ ED.PosteriorSynechia.prototype.draw = function(_point) {
 			break;
 		case 'Green':
 			ctx.fillStyle = "rgba(114, 172, 62, 0.5)";
-			break;			
+			break;
 	}
 
 	// Set line attributes
