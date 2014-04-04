@@ -1,0 +1,209 @@
+/**
+ * CSS file containing css for the EyeDraw widget
+ *
+ * @link http://www.openeyes.org.uk/
+ * @copyright Copyright &copy; 2012 OpenEyes Foundation
+ * @license http://www.yiiframework.com/license/
+ * Modification date: 9th February 2012
+ *
+ * This file is part of OpenEyes.
+ *
+ * OpenEyes is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * OpenEyes is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with OpenEyes.  If not, see <http://www.gnu.org/licenses/>.
+ * @package EyeDraw
+ * @author Bill Aylward <bill.aylward@openeyes.org>
+ * @version 0.9
+ */
+
+canvas {
+	/* Canvas element in edit mode */
+	&.ed_canvas_edit {
+		border: 1px solid gray;
+		cursor: pointer;
+		margin-top: 5px;
+	}
+	/* Canvas element in display mode */
+	&.ed_canvas_display {
+		border: none;
+		cursor: auto;
+		margin: 0px;
+	}
+	/* Stop canvas being highlighted on mouse click */
+	&:focus {
+		outline: none;
+	}
+}
+
+/* Div containing control buttons */
+div.ed_toolbar {
+	margin-top: 5px;
+	border: none;
+}
+
+/* Control button */
+button.ed_img_button {
+	width: 36px;
+	height: 36px;
+	padding: 0px;
+	margin: 0px;
+	background: #eeeeee;
+	border: 1px solid gray;
+	border-radius: 0;
+	box-shadow: none;
+	/* Control button - hover */
+	&:hover {
+		background-color: #bbbbbb;
+	}
+	/* Control button - active */
+	&:active {
+		background-color: #888888;
+	}
+	/* Control button - disabled */
+	&:disabled {
+		background-color: #dddddd;
+	}
+	/* Image contained within control button */
+	img {
+		padding: 0px;
+		margin: 0px;
+		border: none;
+		width: 32px;
+		height: 32px;
+	}
+	/* Image when disabled ***TODO*** use CSS to grey out image? */
+	&:disabled img {
+		padding: 0px;
+		margin: 0px;
+	}
+}
+
+/* ***TODO *** Tidy up names of the remaining css */
+/* For doodles requiring freehand drawing */
+span.squiggle {
+	display: inline-block;
+	margin-bottom: -4px;
+}
+
+/* Displays selected colour */
+.preview {
+	display: inline-table;
+	margin-bottom: 4px;
+}
+
+/* Thickness of squiggle line */
+.thickness {
+	position: relative;
+	top: -15px;
+	display: inline-block;
+}
+
+/* Squiggle fill */
+.fill {
+	position: relative;
+	top: -5px;
+	display: inline-block;
+}
+
+/* Canvas tooltip */
+.canvasTooltip {
+	display: none;
+	position: absolute;
+	width: auto;
+	height: auto;
+	padding: 4px 6px;
+	box-shadow: 1px 3px 8px 1px rgba(0, 0, 0, 0.3);
+	font-family: sans-serif;
+	font-size: 12px;
+	background: #fff;
+	border: 1px solid #ccc;
+	z-index: 99;
+}
+
+/* Display parameter label and check box */
+
+.displayParameterLabel {
+	font-weight: normal !important;
+}
+
+.displayParameterElement {
+	margin-bottom: 0px !important;
+	margin-right: 5px !important;
+}
+
+ul.ed_toolbar {
+	clear: both;
+	margin: 0;
+	padding: 0;
+	margin: 0 20px 0 0;
+	li {
+		float: left;
+		list-style: none;
+		border: 1px solid #ccc;
+		margin: 0 3px 3px 0;
+		position: relative;
+		a {
+			display: block;
+			height: 32px;
+			width: 32px;
+			position: relative;
+			background: #eee;
+			&:hover {
+				border: none;
+				background: #fff;
+			}
+		}
+		span {
+			display: none;
+			position: absolute;
+			top: 32px;
+			left: -1px;
+			background: #fff;
+			border: 1px solid #ccc;
+			padding: 4px 6px;
+			box-shadow: 1px 3px 8px 1px rgba(0, 0, 0, 0.3);
+			z-index: 99;
+			white-space: nowrap;
+		}
+		img {
+			float: left;
+			width: 32px;
+			height: 32px;
+		}
+		span.active {
+			display: block;
+		}
+		ul {
+			background: #fff;
+			position: absolute;
+			top: 36px;
+			left: 3px;
+			width: 148px;
+			margin: 0;
+			padding: 3px 0 0 3px;
+			border: 1px solid #ccc;
+			box-shadow: 1px 3px 8px 1px rgba(0, 0, 0, 0.3);
+			z-index: 99;
+		}
+		&.drawer ul, &.active > span.active {
+			display: none;
+		}
+		&.drawer.active {
+			ul {
+				display: block;
+			}
+			> a {
+				background: #dae6f1;
+			}
+		}
+	}
+}
