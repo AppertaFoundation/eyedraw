@@ -24,168 +24,211 @@
  * @author Bill Aylward <bill.aylward@openeyes.org>
  * @version 0.9
  */
-
-/* Canvas element in edit mode */
+/* line 28, ../sass/oe-eyedraw.scss */
+canvas {
+  /* Canvas element in edit mode */
+  /* Canvas element in display mode */
+  /* Stop canvas being highlighted on mouse click */
+}
+/* line 30, ../sass/oe-eyedraw.scss */
 canvas.ed_canvas_edit {
-	border: 1px solid gray;
-    cursor: pointer;
-	margin-top: 5px;
+  border: 1px solid gray;
+  cursor: pointer;
+  margin-top: 5px;
 }
-
-/* Canvas element in display mode */
+/* line 36, ../sass/oe-eyedraw.scss */
 canvas.ed_canvas_display {
-	border: none;
-	cursor: auto;
-	margin: 0px;
+  border: none;
+  cursor: auto;
+  margin: 0px;
 }
-
-/* Stop canvas being highlighted on mouse click */
+/* line 42, ../sass/oe-eyedraw.scss */
 canvas:focus {
-	outline: none;
+  outline: none;
 }
 
 /* Div containing control buttons */
+/* line 48, ../sass/oe-eyedraw.scss */
 div.ed_toolbar {
-	margin-top: 5px;
-	border: none;
+  margin-top: 5px;
+  border: none;
 }
 
 /* Control button */
+/* line 54, ../sass/oe-eyedraw.scss */
 button.ed_img_button {
-	width: 36px;
-	height: 36px;
-	padding: 0px;
+  width: 36px;
+  height: 36px;
+  padding: 0px;
   margin: 0px;
-	background: #eeeeee;
-	border: 1px solid gray;
-	border-radius: 0;
-	box-shadow: none;
+  background: #eeeeee;
+  border: 1px solid gray;
+  border-radius: 0;
+  box-shadow: none;
+  /* Control button - hover */
+  /* Control button - active */
+  /* Control button - disabled */
+  /* Image contained within control button */
+  /* Image when disabled ***TODO*** use CSS to grey out image? */
 }
-
-/* Control button - hover */
+/* line 64, ../sass/oe-eyedraw.scss */
 button.ed_img_button:hover {
-	background-color: #bbbbbb;
+  background-color: #bbbbbb;
 }
-
-/* Control button - active */
+/* line 68, ../sass/oe-eyedraw.scss */
 button.ed_img_button:active {
-	background-color: #888888;
+  background-color: #888888;
 }
-
-/* Control button - disabled */
+/* line 72, ../sass/oe-eyedraw.scss */
 button.ed_img_button:disabled {
-	background-color: #dddddd;
+  background-color: #dddddd;
 }
-
-/* Image contained within control button */
+/* line 76, ../sass/oe-eyedraw.scss */
 button.ed_img_button img {
-	padding: 0px;
-    margin: 0px;
-	border: none;
-	width: 32px;
-	height: 32px;
+  padding: 0px;
+  margin: 0px;
+  border: none;
+  width: 32px;
+  height: 32px;
 }
-
-/* Image when disabled ***TODO*** use CSS to grey out image? */
-button.ed_img_button:disabled img{
-	padding: 0px;
-    margin: 0px;
+/* line 84, ../sass/oe-eyedraw.scss */
+button.ed_img_button:disabled img {
+  padding: 0px;
+  margin: 0px;
 }
 
 /* ***TODO *** Tidy up names of the remaining css */
 /* For doodles requiring freehand drawing */
+/* line 92, ../sass/oe-eyedraw.scss */
 span.squiggle {
-	display:inline-block;
-	margin-bottom:-4px;
-}
-
-/* Colour selector */
-.colourWell {
-/*	margin-bottom: 4px;*/
+  display: inline-block;
+  margin-bottom: -4px;
 }
 
 /* Displays selected colour */
+/* line 98, ../sass/oe-eyedraw.scss */
 .preview {
-	display: inline-table;
-    margin-bottom: 4px;
+  display: inline-table;
+  margin-bottom: 4px;
 }
 
 /* Thickness of squiggle line */
+/* line 104, ../sass/oe-eyedraw.scss */
 .thickness {
-	position: relative;
-	top: -15px;
-	display: inline-block;
+  position: relative;
+  top: -15px;
+  display: inline-block;
 }
 
 /* Squiggle fill */
+/* line 111, ../sass/oe-eyedraw.scss */
 .fill {
-	position: relative;
-	top: -5px;
-	display: inline-block;
-}
-
-/* Squiggle fill button */
-.fillbutton {
-/*       display: list-item; */
+  position: relative;
+  top: -5px;
+  display: inline-block;
 }
 
 /* Canvas tooltip */
+/* line 118, ../sass/oe-eyedraw.scss */
 .canvasTooltip {
-	display: none;
-	position: absolute;
-	width: auto;
-	height: auto;
-	padding: 4px 6px;
-	box-shadow: 1px 3px 8px 1px rgba(0, 0, 0, 0.3);
-	font-family: sans-serif;
-	font-size: 12px;
-	background: #fff;
-	border: 1px solid #ccc;
-	z-index:99;
+  display: none;
+  position: absolute;
+  width: auto;
+  height: auto;
+  padding: 4px 6px;
+  box-shadow: 1px 3px 8px 1px rgba(0, 0, 0, 0.3);
+  font-family: sans-serif;
+  font-size: 12px;
+  background: #fff;
+  border: 1px solid #ccc;
+  z-index: 99;
 }
 
 /* Display parameter label and check box */
-
+/* line 134, ../sass/oe-eyedraw.scss */
 .displayParameterLabel {
-    font-weight: normal !important;
+  font-weight: normal !important;
 }
 
+/* line 138, ../sass/oe-eyedraw.scss */
 .displayParameterElement {
-    margin-bottom: 0px !important;
-    margin-right: 5px !important;
+  margin-bottom: 0px !important;
+  margin-right: 5px !important;
 }
 
-ul.ed_toolbar { clear: both; margin: 0; padding: 0; margin: 0 20px 0 0; }
-ul.ed_toolbar li { float: left; list-style: none; border: 1px solid #ccc; margin: 0 3px 3px 0; position: relative; }
-ul.ed_toolbar li a { display: block; height: 32px; width: 32px; position: relative; background: #eee; }
-ul.ed_toolbar li a:hover { border: none; background: #fff; }
+/* line 143, ../sass/oe-eyedraw.scss */
+ul.ed_toolbar {
+  clear: both;
+  margin: 0;
+  padding: 0;
+  margin: 0 20px 0 0;
+}
+/* line 148, ../sass/oe-eyedraw.scss */
+ul.ed_toolbar li {
+  float: left;
+  list-style: none;
+  border: 1px solid #ccc;
+  margin: 0 3px 3px 0;
+  position: relative;
+}
+/* line 154, ../sass/oe-eyedraw.scss */
+ul.ed_toolbar li a {
+  display: block;
+  height: 32px;
+  width: 32px;
+  position: relative;
+  background: #eee;
+}
+/* line 160, ../sass/oe-eyedraw.scss */
+ul.ed_toolbar li a:hover {
+  border: none;
+  background: #fff;
+}
+/* line 165, ../sass/oe-eyedraw.scss */
 ul.ed_toolbar li span {
-	display: none;
-	position: absolute;
-	top: 32px;
-	left: -1px;
-	background: #fff;
-	border: 1px solid #ccc;
-	padding: 4px 6px;
-	box-shadow: 1px 3px 8px 1px rgba(0, 0, 0, 0.3);
-	z-index: 99;
-	white-space:nowrap;
+  display: none;
+  position: absolute;
+  top: 32px;
+  left: -1px;
+  background: #fff;
+  border: 1px solid #ccc;
+  padding: 4px 6px;
+  box-shadow: 1px 3px 8px 1px rgba(0, 0, 0, 0.3);
+  z-index: 99;
+  white-space: nowrap;
 }
-ul.ed_toolbar li img { float: left; width: 32px; height: 32px;  }
-ul.ed_toolbar li span.active { display: block;}
+/* line 177, ../sass/oe-eyedraw.scss */
+ul.ed_toolbar li img {
+  float: left;
+  width: 32px;
+  height: 32px;
+}
+/* line 182, ../sass/oe-eyedraw.scss */
+ul.ed_toolbar li span.active {
+  display: block;
+}
+/* line 185, ../sass/oe-eyedraw.scss */
 ul.ed_toolbar li ul {
-	background: #fff;
-	position: absolute;
-	top: 36px;
-	left: 3px;
-	width: 148px;
-	margin: 0;
-	padding: 3px 0 0 3px;
-	border: 1px solid #ccc;
-	box-shadow: 1px 3px 8px 1px rgba(0, 0, 0, 0.3);
-	z-index: 99;
+  background: #fff;
+  position: absolute;
+  top: 36px;
+  left: 3px;
+  width: 148px;
+  margin: 0;
+  padding: 3px 0 0 3px;
+  border: 1px solid #ccc;
+  box-shadow: 1px 3px 8px 1px rgba(0, 0, 0, 0.3);
+  z-index: 99;
 }
-ul.ed_toolbar li.drawer ul { display: none; }
-ul.ed_toolbar li.active > span.active { display: none;}
-ul.ed_toolbar li.drawer.active ul { display: block; }
-ul.ed_toolbar li.drawer.active > a { background: #dae6f1; }
+/* line 197, ../sass/oe-eyedraw.scss */
+ul.ed_toolbar li.drawer ul, ul.ed_toolbar li.active > span.active {
+  display: none;
+}
+/* line 201, ../sass/oe-eyedraw.scss */
+ul.ed_toolbar li.drawer.active ul {
+  display: block;
+}
+/* line 204, ../sass/oe-eyedraw.scss */
+ul.ed_toolbar li.drawer.active > a {
+  background: #dae6f1;
+}
