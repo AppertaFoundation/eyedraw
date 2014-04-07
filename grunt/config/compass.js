@@ -2,10 +2,10 @@ module.exports = function(grunt) {
 	return {
 		dist: {
 			options: {
-				sassDir: 'sass',
-				cssDir: 'css',
-				imagesDir: 'img',
-				generatedImagesDir: 'img/sprites',
+				sassDir: 'assets/sass',
+				cssDir: 'assets/css',
+				imagesDir: 'assets/img',
+				generatedImagesDir: 'assets/img/sprites',
 				outputStyle: 'expanded',
 				relativeAssets: true,
 				httpPath: '',
