@@ -51,25 +51,25 @@ class OEEyeDrawWidget extends CWidget
 	 * @todo Search model attribute and contents of doodleToolBarArray to determine subset of files to register
 	 * @var array
 	 */
-    public $scriptArray = array();
+	public $scriptArray = array();
 
-    /**
-    * View file for rendering the eyeDraw
-    * @var string
-    */
-    public $template = 'OEEyeDrawWidget';
+	/**
+	 * View file for rendering the eyeDraw
+	 * @var string
+	 */
+	public $template = 'OEEyeDrawWidget';
 
 	/**
 	 * Unique identifier for the drawing on the current page
 	 * @var string
 	 */
-    public $idSuffix = 'EDI';
+	public $idSuffix = 'EDI';
 
 	/**
 	 * Side (R or L)
 	 * @var string
 	 */
-    public $side = 'R';
+	public $side = 'R';
 
 	/**
 	 * Mode ('edit' or 'view')
@@ -81,31 +81,31 @@ class OEEyeDrawWidget extends CWidget
 	 * Width of canvas element in pixels
 	 * @var int
 	 */
-    public $width = 300;
+	public $width = 300;
 
 	/**
 	 * Height of canvas element in pixels
 	 * @var int
 	 */
-    public $height = 300;
+	public $height = 300;
 
-    /**
+	/**
 	 * Global scale factor
 	 * @var int
 	 */
-    public $scale = 1;
+	public $scale = 1;
 
 	/**
 	 * The model possessing an attribute to store JSON data
 	 * @var CActiveRecord
 	 */
-    public $model;
+	public $model;
 
 	/**
 	 * Name of the attribute
 	 * @var string
 	 */
-    public $attribute;
+	public $attribute;
 
 	/**
 	 * Array of doodles to appear in doodle selection toolbar
@@ -113,49 +113,49 @@ class OEEyeDrawWidget extends CWidget
 	 * Array of array of doodles to appear in multiple rows in doodle selection toolbar
 	 * @var array
 	 */
-    public $doodleToolBarArray = array();
+	public $doodleToolBarArray = array();
 
-    /**
+	/**
 	 * Array of doodles with properties to display
-     *
+	 *
 	 * @var array
 	 */
-    public $displayParameterArray = array();
+	public $displayParameterArray = array();
 
 	/**
 	 * Array of commands to apply to the drawing object once images have loaded
 	 * @var array
 	 */
-    public $onReadyCommandArray = array();
+	public $onReadyCommandArray = array();
 
-    /**
+	/**
 	 * Array of commands to apply to the drawing object once doodles have been loaded from a saved JSON string
 	 * @var array
 	 */
-    public $onDoodlesLoadedCommandArray = array();
+	public $onDoodlesLoadedCommandArray = array();
 
 	/**
 	 * Array of bindings to apply to doodles, applied after onLoaded commands
 	 * @var array
 	 */
-    public $bindingArray = array();
+	public $bindingArray = array();
 
 	/**
 	 * Array of delete values to apply to doodles, applied after bindings commands
 	 * @var array
 	 */
-    public $deleteValueArray = array();
+	public $deleteValueArray = array();
 
-    /**
+	/**
 	 * Array of syncs to apply to doodles, applied after bindings commands
 	 * @var array
 	 */
-    public $syncArray = array();
+	public $syncArray = array();
 
-    /*
-     * Array of javascript objects to be used as listeners on the drawing
-     */
-    public $listenerArray = array();
+	/*
+	 * Array of javascript objects to be used as listeners on the drawing
+	 */
+	public $listenerArray = array();
 
 	/**
 	 * Optional inline styling for the canvas element
@@ -199,7 +199,7 @@ class OEEyeDrawWidget extends CWidget
 	 */
 	public $divWrapper = true;
 
-   /**
+	/**
 	 * Paths for the subdirectories for javascript, css and images
 	 * @var string
 	 */
@@ -248,72 +248,72 @@ class OEEyeDrawWidget extends CWidget
 	 * Initializes the widget.
 	 * This method registers all needed client scripts and renders the EyeDraw content
 	 */
-    public function init()
-    {
-        // Set values of paths
-        $this->cssPath = Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('application.modules.eyedraw.css'), false, -1);
-        $this->jsPath = Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('application.modules.eyedraw.dist'), false, -1);
-        $this->imgPath = Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('application.modules.eyedraw.img'), false, -1).'/';
+	public function init()
+	{
+		// Set values of paths
+		$this->cssPath = Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('application.modules.eyedraw.css'), false, -1);
+		$this->jsPath = Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('application.modules.eyedraw.dist'), false, -1);
+		$this->imgPath = Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('application.modules.eyedraw.img'), false, -1).'/';
 
-        // Create a unique and descriptive variable name for the drawing object and the corresponding canvas element
-        $this->drawingName = 'ed_drawing_'.$this->mode.'_'.$this->idSuffix;
-        $this->canvasId = 'ed_canvas_'.$this->mode.'_'.$this->idSuffix;
+		// Create a unique and descriptive variable name for the drawing object and the corresponding canvas element
+		$this->drawingName = 'ed_drawing_'.$this->mode.'_'.$this->idSuffix;
+		$this->canvasId = 'ed_canvas_'.$this->mode.'_'.$this->idSuffix;
 
-        // Create matching name and id in 'Yii' format for loading and saving using POST
-        if (isset($this->model) && isset($this->attribute)) {
-          if ($this->mode == 'edit') {
+		// Create matching name and id in 'Yii' format for loading and saving using POST
+		if (isset($this->model) && isset($this->attribute)) {
+		  if ($this->mode == 'edit') {
 						$this->inputName = CHtml::modelName($this->model).'['. $this->attribute.']';
-          	$this->inputId = CHtml::modelName($this->model).'_'. $this->attribute;
-          } else {
+			$this->inputId = CHtml::modelName($this->model).'_'. $this->attribute;
+		  } else {
 						$this->inputId = 'ed_input_'.$this->mode.'_'.$this->idSuffix;
-          }
+		  }
 
-            if (isset($_POST[CHtml::modelName($this->model)][$this->attribute])) {
-                $this->model->{$this->attribute} = $_POST[CHtml::modelName($this->model)][$this->attribute];
-            }
-        }
+			if (isset($_POST[CHtml::modelName($this->model)][$this->attribute])) {
+				$this->model->{$this->attribute} = $_POST[CHtml::modelName($this->model)][$this->attribute];
+			}
+		}
 
-        // Numeric flag corresponding to EyeDraw ED.eye  ***TODO*** may require additional options
-        $this->eye = $this->side == "R"?0:1;
+		// Numeric flag corresponding to EyeDraw ED.eye  ***TODO*** may require additional options
+		$this->eye = $this->side == "R"?0:1;
 
-        // Flag indicating whether the drawing is editable or not (normally corresponded to edit and view mode)
-        $this->isEditable = $this->mode == 'edit'?true:false;
+		// Flag indicating whether the drawing is editable or not (normally corresponded to edit and view mode)
+		$this->isEditable = $this->mode == 'edit'?true:false;
 
-        // jquery dependency
-        $cs = Yii::app()->clientScript;
-        $cs->registerCoreScript('jquery');
+		// jquery dependency
+		$cs = Yii::app()->clientScript;
+		$cs->registerCoreScript('jquery');
 
-        // Register the chosen scripts and CSS files
-        $this->registerScripts();
-        $this->registerCss();
+		// Register the chosen scripts and CSS files
+		$this->registerScripts();
+		$this->registerCss();
 
-        if (sizeof($this->doodleToolBarArray) > 0) {
-        	// check if need to convert into one row array to have all buttons in one row
-        	if (!is_array($this->doodleToolBarArray[0])) {
-        		$this->doodleToolBarArray = array($this->doodleToolBarArray);
-        	}
-        }
+		if (sizeof($this->doodleToolBarArray) > 0) {
+			// check if need to convert into one row array to have all buttons in one row
+			if (!is_array($this->doodleToolBarArray[0])) {
+				$this->doodleToolBarArray = array($this->doodleToolBarArray);
+			}
+		}
 
-        // Iterate through any button array
-        $finalToolBar = array();
-        foreach ($this->doodleToolBarArray as $row => $rowButtons) {
-        	$finalToolBar[] = array();
-	        foreach ($rowButtons as $i => $doodleClassName) {
-	            // Get title attribute from language specific array
-	            if (array_key_exists($doodleClassName, DoodleInfo::$titles)) {
-	                $title = DoodleInfo::$titles[$doodleClassName];
-	            } else {
-	                $title = DoodleInfo::$titles['NONE'];
-	            }
-	            $finalToolBar[$row][$i] = array(
-	                'title' => $title,
-	                'classname' => $doodleClassName
-	            );
-	        }
-        }
-        $this->doodleToolBarArray = $finalToolBar;
-        // Render the widget
-        $this->render($this->template, get_object_vars($this));
+		// Iterate through any button array
+		$finalToolBar = array();
+		foreach ($this->doodleToolBarArray as $row => $rowButtons) {
+			$finalToolBar[] = array();
+			foreach ($rowButtons as $i => $doodleClassName) {
+				// Get title attribute from language specific array
+				if (array_key_exists($doodleClassName, DoodleInfo::$titles)) {
+					$title = DoodleInfo::$titles[$doodleClassName];
+				} else {
+					$title = DoodleInfo::$titles['NONE'];
+				}
+				$finalToolBar[$row][$i] = array(
+					'title' => $title,
+					'classname' => $doodleClassName
+				);
+			}
+		}
+		$this->doodleToolBarArray = $finalToolBar;
+		// Render the widget
+		$this->render($this->template, get_object_vars($this));
 	}
 
 	/**
@@ -328,37 +328,37 @@ class OEEyeDrawWidget extends CWidget
 	 */
 	protected function registerScripts()
 	{
-        // Get client script object
+				// Get client script object
 		$cs = Yii::app()->getClientScript();
 
 		$minified = (YII_DEBUG) ? '' : '.min';
 
 		// Register the EyeDraw mandatory scripts
 		$cs->registerScriptFile($this->jsPath.'/oe-eyedraw'.$minified.'.js', CClientScript::POS_HEAD);
-    // For languages that require utf8, use the following line in the view file (***TODO*** should be possible using Yii function)
-    // <script src="dist/eyedraw.js" type="text/javascript" charset="utf-8"></script>
+		// For languages that require utf8, use the following line in the view file (***TODO*** should be possible using Yii function)
+		// <script src="dist/eyedraw.js" type="text/javascript" charset="utf-8"></script>
 		$cs->registerScriptFile($this->jsPath.'/eyedraw'.$minified.'.js', CClientScript::POS_HEAD);
 
 		// Create array of parameters to pass to the javascript function which runs on page load
 		$properties = array(
-            'drawingName'=>$this->drawingName,
-            'canvasId'=>$this->canvasId,
-            'eye'=>$this->eye,
-            'scale'=>$this->scale,
-            'idSuffix'=>$this->idSuffix,
-            'isEditable'=>$this->isEditable,
-            'focus'=>$this->focus,
-            'graphicsPath'=>$this->imgPath,
-            'inputId'=>$this->inputId,
-            'onReadyCommandArray'=>$this->onReadyCommandArray,
-            'onDoodlesLoadedCommandArray'=>$this->onDoodlesLoadedCommandArray,
-            'bindingArray'=>$this->bindingArray,
-            'deleteValueArray'=>$this->deleteValueArray,
-            'syncArray'=>$this->syncArray,
+			'drawingName'=>$this->drawingName,
+			'canvasId'=>$this->canvasId,
+			'eye'=>$this->eye,
+			'scale'=>$this->scale,
+			'idSuffix'=>$this->idSuffix,
+			'isEditable'=>$this->isEditable,
+			'focus'=>$this->focus,
+			'graphicsPath'=>$this->imgPath,
+			'inputId'=>$this->inputId,
+			'onReadyCommandArray'=>$this->onReadyCommandArray,
+			'onDoodlesLoadedCommandArray'=>$this->onDoodlesLoadedCommandArray,
+			'bindingArray'=>$this->bindingArray,
+			'deleteValueArray'=>$this->deleteValueArray,
+			'syncArray'=>$this->syncArray,
 			'listenerArray'=>array(),
-            'offsetX'=>$this->offsetX,
-            'offsetY'=>$this->offsetY,
-            'toImage'=>$this->toImage,
+			'offsetX'=>$this->offsetX,
+			'offsetY'=>$this->offsetY,
+			'toImage'=>$this->toImage,
 		);
 		// need to escape the listener names so that they are not treated as string vars in javascript
 		foreach ($this->listenerArray as $listener) {
@@ -373,16 +373,16 @@ class OEEyeDrawWidget extends CWidget
 	/**
 	 * Registers all necessary css files
 	 */
-    protected function registerCss()
-    {
-        $cssFile = $this->cssPath.'/oe-eyedraw.css';
-        Yii::app()->getClientScript()->registerCssFile($cssFile);
-    }
+	protected function registerCss()
+	{
+		$cssFile = $this->cssPath.'/oe-eyedraw.css';
+		Yii::app()->getClientScript()->registerCssFile($cssFile);
+	}
 
-    public function getDrawingName()
-    {
-    	return $this->drawingName;
-    }
+	public function getDrawingName()
+	{
+		return $this->drawingName;
+	}
 }
 
 /**
@@ -398,171 +398,170 @@ class DoodleInfo
 	 * @static array
 	 */
 	public static $titles = array (
-        "NONE" => "No description available for this doodle",
-        "ACIOL" => "Anterior chamber IOL",
-        "AdnexalEye" => "Adnexal eye template",
-        "Ahmed" => "Ahmed tube",
-        "AngleGrade" => "Angle grade",
-        "AngleNV" => "Angle new vessels",
-        "AngleRecession" => "Angle recession",
-        "AntPVR" => "Anterior PVR",
-        "AntSeg" => "Anterior segment",
-        "AntSynech" => "Anterior synechiae",
-        "APattern" => "A pattern",
-        "ArcuateScotoma" => "Arcuate scotoma",
-        "Arrow" => "Arrow",
-        "Baerveldt" => "Baerveld tube",
-        "BiopsySite" => "Biopsy site",
-        "Bleb" => "Trabeculectomy bleb",
-        "BlotHaemorrhage" => "Blot haemorrhage",
-        "Buckle" => "Buckle",
-        "BuckleOperation" => "Buckle operation",
-        "BuckleSuture" => "Buckle suture",
-        "BusaccaNodule" => "Busacca nodule",
-        "CapsularTensionRing" => "Capsular Tension Ring",
-        "ChandelierDouble" => "Double chandelier",
-        "ChandelierSingle" => "Chandelier",
-        "ChoroidalHaemorrhage" => "Choroidal haemorrhage",
-        "ChoroidalNaevus" => "Choroidal naevus",
-        "CiliaryInjection" => "Cilary injection",
-        "Circinate" => "Circinate retinopathy",
-        "CircumferentialBuckle" => "Circumferential buckle",
-        "CNV" => "Choroidal new vessels",
-        "ConjunctivalFlap" => "Conjunctival flap",
-        "CornealAbrasion" => "Corneal abrasion",
-        "CornealErosion" => "Removal of corneal epithelium",
-        "CornealGraft" => "Corneal graft",
-        "CornealOedema" => "Corneal oedema",
-        "CornealScar" => "Corneal scar",
-        "CornealStriae" => "Corneal striae",
-        "CornealSuture" => "Corneal suture",
-        "CorticalCataract" => "Cortical cataract",
-        "CottonWoolSpot" => "Cotton wool spot",
-        "Cryo" => "Cryotherapy scar",
-        "CutterPI" => "Cutter iridectomy",
-        "CystoidMacularOedema" => "Cystoid macular oedema",
-        "DiabeticNV" => "Diabetic new vessels",
-        "Dialysis" => "Dialysis",
-        "DiscHaemorrhage" => "Disc haemorrhage",
-        "DiscPallor" => "Disc pallor",
-        "DrainageRetinotomy" => "Drainage retinotomy",
-        "DrainageSite" => "Drainage site",
-        "EncirclingBand" => "Encircling band",
-        "EntrySiteBreak" => "Entry site break",
-        "EpiretinalMembrane" => "Epiretinal membrane",
-        "FibrousProliferation" => "Fibrous proliferation",
-        "FocalLaser" => "Focal laser",
-        "Freehand" => "Freehand drawing",
-        "Fuchs" => "Fuchs endothelial dystrophy",
-        "Fundus" => "Fundus",
-        "Geographic" => "Geographic atrophy",
-        "Gonioscopy" => "Gonioscopy",
-        "GRT" => "Giant retinal tear",
-        "HardDrusen" => "Hard drusen",
-        "HardExudate" => "Hard exudate",
-        "Hyphaema" => "Hyphaema",
-        "Hypopyon" => "Hypopyon",
-        "IatrogenicBreak" => "IatrogenicBreak",
-        "ILMPeel" => "ILM peel",
-        "InjectionSite" => "Injection site",
-        "InnerLeafBreak" => "Inner leaf break",
-        "Iris" => "Iris",
-        "IrisHook" => "Iris hook",
-        "IrisNaevus" => "Iris naevus",
-        "IRMA" => "Intraretinal microvascular abnormalities",
-        "KeraticPrecipitates" => "Keratic precipitates",
-        "KoeppeNodule" => "Koeppe nodule",
-        "KrukenbergSpindle" => "Krukenberg spindle",
-        "Label" => "Label",
-        "LaserCircle" => "Circle of laser photocoagulation",
-        "LaserDemarcation" => "Laser demarcation",
-        "LasikFlap" => "LASIK flap",
-        "LaserSpot" => "Laser spot",
-        "Lattice" => "Lattice",
-        "Lens" => "Lens",
-        "LimbalRelaxingIncision" => "Limbal relaxing incision",
-        "Macroaneurysm" => "Macroaneurysm",
-        "MacularDystrophy" => "Macular dystrophy",
-        "MacularGrid" => "Macular grid laser",
-        "MacularHole" => "Macular hole",
-        "MacularThickening" => "Macular thickening",
-        "MattressSuture" => "Mattress suture",
-        "Microaneurysm" => "Microaneurysm",
-        "Molteno" => "Molteno tube",
-        "NerveFibreDefect" => "Nerve fibre defect",
-        "NuclearCataract" => "Nuclear cataract",
-        "OpticCup" => "Optic cup",
-        "OpticDisc" => "Optic disc",
-        "OpticDiscPit" => "Optic disc pit",
-        "OrthopticEye" => "Orthoptic eye",
-        "OuterLeafBreak" => "Outer leaf break",
-        "Papilloedema" => "Papilloedema",
-        "Patch" => "Tube patch",
-        "PCIOL" => "Posterior chamber IOL",
-        "PeripapillaryAtrophy" => "Peripapillary atrophy",
-        "PeripheralRetinectomy" => "Peripheral retinectomy",
-        "PhakoIncision" => "Phako incision",
-        "PI" => "Peripheral iridectomy",
-        "PointInLine" => "Point in line",
-        "PosteriorCapsule" => "Posterior capsule",
-        "PosteriorEmbryotoxon" => "Posterior embryotoxon",
-        "PostPole" => "Posterior pole",
-        "PostSubcapCataract" => "Posterior subcapsular cataract",
-        "PosteriorRetinectomy" => "Posterior retinectomy",
-        "PosteriorSynechia" => "Posterior synechia",
-        "PreRetinalHaemorrhage" => "Pre-retinal haemorrhage",
-        "PRP" => "Panretinal photocoagulation",
-        "PRPPostPole" => "Panretinal photocoagulation (posterior pole)",
-        "Pupil" => "Pupil",
-        "RadialSponge" => "Radial sponge",
-        "RetinalArteryOcclusionPostPole" => "Retinal artery occlusion",
-        "RetinalTouch" => "Retinal touch",
-        "RetinalVeinOcclusionPostPole" => "Retinal vein occluson",
-        "Retinoschisis" => "Retinoschisis",
-        "RK" => "Radial keratotomy",
-        "RoundHole" => "Round hole",
-        "RPEDetachment" => "RPE detachment",
-        "RPERip" => "RPE rip",
-        "RRD" => "Rhegmatogenous retinal detachment",
-        "Rubeosis" => "Rubeosis iridis",
-        "SectorPRP" => "Sector PRP",
-        "SectorPRPPostPole" => "Sector PRP (posterior pole)",
-        "ScleralIncision" => "Scleral Incision",
-        "Sclerostomy" => "Sclerostomy",
-        "SectorIridectomy" => "Sector iridectomy",
-        "Shading" => "Shading",
-        "SidePort" => "Side port",
-        "Slider" => "Slider",
-        "StarFold" => "Star fold",
-        "SubretinalFluid" => "Subretinal fluid",
-        "SubretinalPFCL" => "Subretinal PFCL",
-        "Supramid" => "Supramid suture",
-        "SwollenDisc" => "Swollen disc",
-        "Telangiectasis" => "Parafoveal telangiectasia",
-        "Trabectome" => "Trabectome",
-        "TrabyFlap" => "Trabeculectomy flap",
-        "TrabySuture" => "Trabeculectomy suture",
-        "ToricPCIOL" => "Toric posterior chamber IOL",
-        "TractionRetinalDetachment" => "Traction retinal detachment",
-        "TransilluminationDefect" =>"Transillumination defect",
-        "UpDrift" => "Up drift",
-        "UpShoot" => "Up shoot",
-        "UTear" => "Traction ‘U’ tear",
-        "Vicryl" => "Vicryl suture",
-        "ViewObscured" => "View obscured",
-        "VitreousOpacity" => "Vitreous opacity",
-        "VPattern" => "V pattern",
-
-        "Crepitations" => "Crepitations",
-        "Stenosis" => "Stenosis",
-        "Wheeze" => "Wheeze",
-        "Effusion" => "Pleural effusion",
-        "LeftCoronaryArtery" => "Left coronary artery",
-        "DrugStent" => "Drug eluting stent",
-        "MetalStent" => "Metal stent",
-        "Bypass" => "Coronary artery bypass",
-        "Bruit" => "Bruit",
-        "Bruising" => "Bruising",
-        "Haematoma" => "Haematoma",
-        );
+		"NONE" => "No description available for this doodle",
+		"ACIOL" => "Anterior chamber IOL",
+		"AdnexalEye" => "Adnexal eye template",
+		"Ahmed" => "Ahmed tube",
+		"AngleGrade" => "Angle grade",
+		"AngleNV" => "Angle new vessels",
+		"AngleRecession" => "Angle recession",
+		"AntPVR" => "Anterior PVR",
+		"AntSeg" => "Anterior segment",
+		"AntSynech" => "Anterior synechiae",
+		"APattern" => "A pattern",
+		"ArcuateScotoma" => "Arcuate scotoma",
+		"Arrow" => "Arrow",
+		"Baerveldt" => "Baerveld tube",
+		"BiopsySite" => "Biopsy site",
+		"Bleb" => "Trabeculectomy bleb",
+		"BlotHaemorrhage" => "Blot haemorrhage",
+		"Buckle" => "Buckle",
+		"BuckleOperation" => "Buckle operation",
+		"BuckleSuture" => "Buckle suture",
+		"BusaccaNodule" => "Busacca nodule",
+		"CapsularTensionRing" => "Capsular Tension Ring",
+		"ChandelierDouble" => "Double chandelier",
+		"ChandelierSingle" => "Chandelier",
+		"ChoroidalHaemorrhage" => "Choroidal haemorrhage",
+		"ChoroidalNaevus" => "Choroidal naevus",
+		"CiliaryInjection" => "Cilary injection",
+		"Circinate" => "Circinate retinopathy",
+		"CircumferentialBuckle" => "Circumferential buckle",
+		"CNV" => "Choroidal new vessels",
+		"ConjunctivalFlap" => "Conjunctival flap",
+		"CornealAbrasion" => "Corneal abrasion",
+		"CornealErosion" => "Removal of corneal epithelium",
+		"CornealGraft" => "Corneal graft",
+		"CornealOedema" => "Corneal oedema",
+		"CornealScar" => "Corneal scar",
+		"CornealStriae" => "Corneal striae",
+		"CornealSuture" => "Corneal suture",
+		"CorticalCataract" => "Cortical cataract",
+		"CottonWoolSpot" => "Cotton wool spot",
+		"Cryo" => "Cryotherapy scar",
+		"CutterPI" => "Cutter iridectomy",
+		"CystoidMacularOedema" => "Cystoid macular oedema",
+		"DiabeticNV" => "Diabetic new vessels",
+		"Dialysis" => "Dialysis",
+		"DiscHaemorrhage" => "Disc haemorrhage",
+		"DiscPallor" => "Disc pallor",
+		"DrainageRetinotomy" => "Drainage retinotomy",
+		"DrainageSite" => "Drainage site",
+		"EncirclingBand" => "Encircling band",
+		"EntrySiteBreak" => "Entry site break",
+		"EpiretinalMembrane" => "Epiretinal membrane",
+		"FibrousProliferation" => "Fibrous proliferation",
+		"FocalLaser" => "Focal laser",
+		"Freehand" => "Freehand drawing",
+		"Fuchs" => "Fuchs endothelial dystrophy",
+		"Fundus" => "Fundus",
+		"Geographic" => "Geographic atrophy",
+		"Gonioscopy" => "Gonioscopy",
+		"GRT" => "Giant retinal tear",
+		"HardDrusen" => "Hard drusen",
+		"HardExudate" => "Hard exudate",
+		"Hyphaema" => "Hyphaema",
+		"Hypopyon" => "Hypopyon",
+		"IatrogenicBreak" => "IatrogenicBreak",
+		"ILMPeel" => "ILM peel",
+		"InjectionSite" => "Injection site",
+		"InnerLeafBreak" => "Inner leaf break",
+		"Iris" => "Iris",
+		"IrisHook" => "Iris hook",
+		"IrisNaevus" => "Iris naevus",
+		"IRMA" => "Intraretinal microvascular abnormalities",
+		"KeraticPrecipitates" => "Keratic precipitates",
+		"KoeppeNodule" => "Koeppe nodule",
+		"KrukenbergSpindle" => "Krukenberg spindle",
+		"Label" => "Label",
+		"LaserCircle" => "Circle of laser photocoagulation",
+		"LaserDemarcation" => "Laser demarcation",
+		"LasikFlap" => "LASIK flap",
+		"LaserSpot" => "Laser spot",
+		"Lattice" => "Lattice",
+		"Lens" => "Lens",
+		"LimbalRelaxingIncision" => "Limbal relaxing incision",
+		"Macroaneurysm" => "Macroaneurysm",
+		"MacularDystrophy" => "Macular dystrophy",
+		"MacularGrid" => "Macular grid laser",
+		"MacularHole" => "Macular hole",
+		"MacularThickening" => "Macular thickening",
+		"MattressSuture" => "Mattress suture",
+		"Microaneurysm" => "Microaneurysm",
+		"Molteno" => "Molteno tube",
+		"NerveFibreDefect" => "Nerve fibre defect",
+		"NuclearCataract" => "Nuclear cataract",
+		"OpticCup" => "Optic cup",
+		"OpticDisc" => "Optic disc",
+		"OpticDiscPit" => "Optic disc pit",
+		"OrthopticEye" => "Orthoptic eye",
+		"OuterLeafBreak" => "Outer leaf break",
+		"Papilloedema" => "Papilloedema",
+		"Patch" => "Tube patch",
+		"PCIOL" => "Posterior chamber IOL",
+		"PeripapillaryAtrophy" => "Peripapillary atrophy",
+		"PeripheralRetinectomy" => "Peripheral retinectomy",
+		"PhakoIncision" => "Phako incision",
+		"PI" => "Peripheral iridectomy",
+		"PointInLine" => "Point in line",
+		"PosteriorCapsule" => "Posterior capsule",
+		"PosteriorEmbryotoxon" => "Posterior embryotoxon",
+		"PostPole" => "Posterior pole",
+		"PostSubcapCataract" => "Posterior subcapsular cataract",
+		"PosteriorRetinectomy" => "Posterior retinectomy",
+		"PosteriorSynechia" => "Posterior synechia",
+		"PreRetinalHaemorrhage" => "Pre-retinal haemorrhage",
+		"PRP" => "Panretinal photocoagulation",
+		"PRPPostPole" => "Panretinal photocoagulation (posterior pole)",
+		"Pupil" => "Pupil",
+		"RadialSponge" => "Radial sponge",
+		"RetinalArteryOcclusionPostPole" => "Retinal artery occlusion",
+		"RetinalTouch" => "Retinal touch",
+		"RetinalVeinOcclusionPostPole" => "Retinal vein occluson",
+		"Retinoschisis" => "Retinoschisis",
+		"RK" => "Radial keratotomy",
+		"RoundHole" => "Round hole",
+		"RPEDetachment" => "RPE detachment",
+		"RPERip" => "RPE rip",
+		"RRD" => "Rhegmatogenous retinal detachment",
+		"Rubeosis" => "Rubeosis iridis",
+		"SectorPRP" => "Sector PRP",
+		"SectorPRPPostPole" => "Sector PRP (posterior pole)",
+		"ScleralIncision" => "Scleral Incision",
+		"Sclerostomy" => "Sclerostomy",
+		"SectorIridectomy" => "Sector iridectomy",
+		"Shading" => "Shading",
+		"SidePort" => "Side port",
+		"Slider" => "Slider",
+		"StarFold" => "Star fold",
+		"SubretinalFluid" => "Subretinal fluid",
+		"SubretinalPFCL" => "Subretinal PFCL",
+		"Supramid" => "Supramid suture",
+		"SwollenDisc" => "Swollen disc",
+		"Telangiectasis" => "Parafoveal telangiectasia",
+		"Trabectome" => "Trabectome",
+		"TrabyFlap" => "Trabeculectomy flap",
+		"TrabySuture" => "Trabeculectomy suture",
+		"ToricPCIOL" => "Toric posterior chamber IOL",
+		"TractionRetinalDetachment" => "Traction retinal detachment",
+		"TransilluminationDefect" =>"Transillumination defect",
+		"UpDrift" => "Up drift",
+		"UpShoot" => "Up shoot",
+		"UTear" => "Traction ‘U’ tear",
+		"Vicryl" => "Vicryl suture",
+		"ViewObscured" => "View obscured",
+		"VitreousOpacity" => "Vitreous opacity",
+		"VPattern" => "V pattern",
+		"Crepitations" => "Crepitations",
+		"Stenosis" => "Stenosis",
+		"Wheeze" => "Wheeze",
+		"Effusion" => "Pleural effusion",
+		"LeftCoronaryArtery" => "Left coronary artery",
+		"DrugStent" => "Drug eluting stent",
+		"MetalStent" => "Metal stent",
+		"Bypass" => "Coronary artery bypass",
+		"Bruit" => "Bruit",
+		"Bruising" => "Bruising",
+		"Haematoma" => "Haematoma",
+	);
 }
