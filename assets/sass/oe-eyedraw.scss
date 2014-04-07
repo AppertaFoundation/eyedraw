@@ -24,6 +24,9 @@
  * @version 0.9
  */
 
+@import "mixins";
+@import "placeholders";
+
 @import "components/canvas";
 @import "components/squiggle";
 @import "components/labels";
