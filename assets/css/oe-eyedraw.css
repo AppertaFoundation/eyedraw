@@ -23,9 +23,23 @@
  * @author Bill Aylward <bill.aylward@openeyes.org>
  * @version 0.9
  */
+/* line 1, ../sass/_placeholders.scss */
+.eyedraw-toolbar .panel {
+  *zoom: 1;
+}
+/* line 3, ../sass/_mixins.scss */
+.eyedraw-toolbar .panel:before, .eyedraw-toolbar .panel:after {
+  content: " ";
+  display: table;
+}
+/* line 7, ../sass/_mixins.scss */
+.eyedraw-toolbar .panel:after {
+  clear: both;
+}
+
 /* line 19, ../sass/components/_canvas.scss */
 canvas.ed_canvas_edit {
-  border: 1px solid gray;
+  border: 1px solid #ccc;
   cursor: pointer;
   margin-top: 5px;
 }
@@ -77,124 +91,83 @@ span.squiggle {
   margin-right: 5px !important;
 }
 
-/* line 18, ../sass/components/_toolbar.scss */
-div.ed_toolbar {
-  margin-top: 5px;
-  border: none;
+/* line 26, ../sass/components/_toolbar.scss */
+.eyedraw-toolbar .panel {
+  background: none;
+  border: 0;
 }
-
-/* line 24, ../sass/components/_toolbar.scss */
-button.ed_img_button {
-  width: 36px;
-  height: 36px;
-  padding: 0px;
-  margin: 0px;
-  background: #eeeeee;
-  border: 1px solid gray;
-  border-radius: 0;
-  box-shadow: none;
-}
-/* line 34, ../sass/components/_toolbar.scss */
-button.ed_img_button:hover {
-  background-color: #bbbbbb;
-}
-/* line 38, ../sass/components/_toolbar.scss */
-button.ed_img_button:active {
-  background-color: #888888;
-}
-/* line 42, ../sass/components/_toolbar.scss */
-button.ed_img_button:disabled {
-  background-color: #dddddd;
-}
-/* line 46, ../sass/components/_toolbar.scss */
-button.ed_img_button img {
-  padding: 0px;
-  margin: 0px;
-  border: none;
-  width: 32px;
-  height: 32px;
-}
-/* line 54, ../sass/components/_toolbar.scss */
-button.ed_img_button:disabled img {
-  padding: 0px;
-  margin: 0px;
-}
-
-/* line 60, ../sass/components/_toolbar.scss */
-ul.ed_toolbar {
-  clear: both;
+/* line 30, ../sass/components/_toolbar.scss */
+.eyedraw-toolbar .panel, .eyedraw-toolbar .panel ul {
+  list-style-type: none;
   margin: 0;
   padding: 0;
-  margin: 0 20px 0 0;
 }
-/* line 65, ../sass/components/_toolbar.scss */
-ul.ed_toolbar li {
+/* line 35, ../sass/components/_toolbar.scss */
+.eyedraw-toolbar .panel li {
   float: left;
-  list-style: none;
-  border: 1px solid #ccc;
   margin: 0 3px 3px 0;
   position: relative;
 }
-/* line 71, ../sass/components/_toolbar.scss */
-ul.ed_toolbar li a {
-  display: block;
-  height: 32px;
-  width: 32px;
-  position: relative;
-  background: #eee;
-}
-/* line 77, ../sass/components/_toolbar.scss */
-ul.ed_toolbar li a:hover {
-  border: none;
-  background: #fff;
-}
-/* line 82, ../sass/components/_toolbar.scss */
-ul.ed_toolbar li span {
-  display: none;
-  position: absolute;
-  top: 32px;
-  left: -1px;
+/* line 40, ../sass/components/_toolbar.scss */
+.eyedraw-toolbar .panel li ul {
+  -webkit-box-shadow: 1px 3px 8px 1px rgba(0, 0, 0, 0.3);
+  -moz-box-shadow: 1px 3px 8px 1px rgba(0, 0, 0, 0.3);
+  box-shadow: 1px 3px 8px 1px rgba(0, 0, 0, 0.3);
   background: #fff;
   border: 1px solid #ccc;
-  padding: 4px 6px;
-  box-shadow: 1px 3px 8px 1px rgba(0, 0, 0, 0.3);
-  z-index: 99;
-  white-space: nowrap;
-}
-/* line 94, ../sass/components/_toolbar.scss */
-ul.ed_toolbar li img {
-  float: left;
-  width: 32px;
-  height: 32px;
-}
-/* line 99, ../sass/components/_toolbar.scss */
-ul.ed_toolbar li span.active {
-  display: block;
-}
-/* line 102, ../sass/components/_toolbar.scss */
-ul.ed_toolbar li ul {
-  background: #fff;
-  position: absolute;
-  top: 36px;
+  display: none;
   left: 3px;
-  width: 148px;
   margin: 0;
   padding: 3px 0 0 3px;
-  border: 1px solid #ccc;
-  box-shadow: 1px 3px 8px 1px rgba(0, 0, 0, 0.3);
+  position: absolute;
+  top: 36px;
+  width: 148px;
   z-index: 99;
 }
-/* line 114, ../sass/components/_toolbar.scss */
-ul.ed_toolbar li.drawer ul, ul.ed_toolbar li.active > span.active {
-  display: none;
-}
-/* line 118, ../sass/components/_toolbar.scss */
-ul.ed_toolbar li.drawer.active ul {
+/* line 54, ../sass/components/_toolbar.scss */
+.eyedraw-toolbar .panel li.active ul {
   display: block;
 }
-/* line 121, ../sass/components/_toolbar.scss */
-ul.ed_toolbar li.drawer.active > a {
+
+/* line 63, ../sass/components/_toolbar.scss */
+.eyedraw-button {
+  background: #eee;
+  border: 1px solid #ccc;
+}
+/* line 66, ../sass/components/_toolbar.scss */
+.eyedraw-button:hover {
+  background: #fff;
+}
+/* line 69, ../sass/components/_toolbar.scss */
+.active .eyedraw-button {
   background: #dae6f1;
+}
+/* line 72, ../sass/components/_toolbar.scss */
+.eyedraw-button, .eyedraw-button img {
+  display: block;
+  height: 32px;
+  margin: 0;
+  padding: 0;
+  width: 32px;
+}
+/* line 79, ../sass/components/_toolbar.scss */
+.eyedraw-button img {
+  border: 0;
+}
+/* line 83, ../sass/components/_toolbar.scss */
+.eyedraw-button .label {
+  -webkit-box-shadow: 1px 3px 8px 1px rgba(0, 0, 0, 0.3);
+  -moz-box-shadow: 1px 3px 8px 1px rgba(0, 0, 0, 0.3);
+  box-shadow: 1px 3px 8px 1px rgba(0, 0, 0, 0.3);
+  background: #fff;
+  border: 1px solid #ccc;
+  display: none;
+  left: -1px;
+  padding: 4px 6px;
+  position: absolute;
+  top: 32px;
+  white-space: nowrap;
+  z-index: 99;
 }
 
 /* line 18, ../sass/components/_tooltip.scss */

@@ -14,113 +14,82 @@
 // * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
 // * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
 
-// Div containing control buttons
-div.ed_toolbar {
-	margin-top: 5px;
-	border: none;
-}
+@charset "UTF-8";
 
-// Control button
-button.ed_img_button {
-	width: 36px;
-	height: 36px;
-	padding: 0px;
-	margin: 0px;
-	background: #eeeeee;
-	border: 1px solid gray;
-	border-radius: 0;
-	box-shadow: none;
-	// Control button - hover
-	&:hover {
-		background-color: #bbbbbb;
-	}
-	// Control button - active
-	&:active {
-		background-color: #888888;
-	}
-	// Control button - disabled
-	&:disabled {
-		background-color: #dddddd;
-	}
-	// Image contained within control button
-	img {
-		padding: 0px;
-		margin: 0px;
-		border: none;
-		width: 32px;
-		height: 32px;
-	}
-	// Image when disabled ***TODO*** use CSS to grey out image?
-	&:disabled img {
-		padding: 0px;
-		margin: 0px;
-	}
-}
+@import "compass/css3";
+@import "compass/css3/user-interface";
 
-ul.ed_toolbar {
-	clear: both;
-	margin: 0;
-	padding: 0;
-	margin: 0 20px 0 0;
-	li {
-		float: left;
-		list-style: none;
-		border: 1px solid #ccc;
-		margin: 0 3px 3px 0;
-		position: relative;
-		a {
-			display: block;
-			height: 32px;
-			width: 32px;
-			position: relative;
-			background: #eee;
-			&:hover {
-				border: none;
-				background: #fff;
-			}
-		}
-		span {
-			display: none;
-			position: absolute;
-			top: 32px;
-			left: -1px;
-			background: #fff;
-			border: 1px solid #ccc;
-			padding: 4px 6px;
-			box-shadow: 1px 3px 8px 1px rgba(0, 0, 0, 0.3);
-			z-index: 99;
-			white-space: nowrap;
-		}
-		img {
-			float: left;
-			width: 32px;
-			height: 32px;
-		}
-		span.active {
-			display: block;
-		}
-		ul {
-			background: #fff;
-			position: absolute;
-			top: 36px;
-			left: 3px;
-			width: 148px;
+// Toolbar container
+.eyedraw-toolbar {
+	// Toolbar panels. A toolbar can have many panels. Panels group buttons
+	// and other controls.
+	.panel {
+		@extend %clearfix;
+		background: none;
+		border: 0;
+		&, ul {
+			list-style-type: none;
 			margin: 0;
-			padding: 3px 0 0 3px;
-			border: 1px solid #ccc;
-			box-shadow: 1px 3px 8px 1px rgba(0, 0, 0, 0.3);
-			z-index: 99;
+			padding: 0;
 		}
-		&.drawer ul, &.active > span.active {
-			display: none;
-		}
-		&.drawer.active {
+		li {
+			float: left;
+			margin: 0 3px 3px 0;
+			position: relative;
+			// Drop-menu
 			ul {
-				display: block;
+				@include box-shadow(1px 3px 8px 1px rgba(0, 0, 0, 0.3));
+				background: #fff;
+				border: 1px solid #ccc;
+				display: none;
+				left: 3px;
+				margin: 0;
+				padding: 3px 0 0 3px;
+				position: absolute;
+				top: 36px;
+				width: 148px;
+				z-index: 99;
 			}
-			> a {
-				background: #dae6f1;
+			&.active {
+				ul {
+					display: block;
+				}
 			}
 		}
+	}
+}
+
+// Toolbar button
+.eyedraw-button {
+	background: #eee;
+	border: 1px solid #ccc;
+	&:hover {
+		background: #fff;
+	}
+	.active & {
+		background: #dae6f1;
+	}
+	&, img {
+		display: block;
+		height: 32px;
+		margin: 0;
+		padding: 0;
+		width: 32px;
+	}
+	img {
+		border: 0;
+	}
+	// Button label
+	.label {
+		@include box-shadow(1px 3px 8px 1px rgba(0, 0, 0, 0.3));
+		background: #fff;
+		border: 1px solid #ccc;
+		display: none;
+		left: -1px;
+		padding: 4px 6px;
+		position: absolute;
+		top: 32px;
+		white-space: nowrap;
+		z-index: 99;
 	}
 }
