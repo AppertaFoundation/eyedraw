@@ -1,0 +1,32 @@
+<!doctype html>
+<html>
+<head>
+	<title>Test eyedraw for Anterior Segment</title>
+	<link rel="stylesheet" type="text/css" href="css/style.css" />
+	<link rel="stylesheet" type="text/css" href="../../assets/css/oe-eyedraw.css" />
+	<script type="text/javascript" src="../../assets/components/jquery/jquery.min.js"></script>
+	<script>
+	(function() {
+
+		// Run once all dependent scripts have been loaded.
+		function onReady() {
+			alert('Ready');
+		}
+
+		// We have to use 'jsonp' here so that we can run this test document on the
+		// file:// protocol (ie, without the use of a webserver)
+		this.scriptsLoadCallback = function(obj) {
+			obj.files.forEach(function(file) {
+				// We use document.write to force the files to be loaded synchronously.
+				document.write('<script src="../../src/' + file + '"><\/script>');
+			});
+			window.onload = onReady;
+		};
+	}());
+	</script>
+	<script type="text/javascript" src="./scripts.jsonp"></script>
+</head>
+<body>
+
+</body>
+</html>
