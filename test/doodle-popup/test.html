@@ -28,7 +28,7 @@
 		};
 	}(this));
 	</script>
-	<script type="text/javascript" src="./scripts.jsonp"></script>
+	<script type="text/javascript" src="./js/scripts.jsonp"></script>
 	<!-- End loading in eyedraw scripts -->
 </head>
 <body>
@@ -60,7 +60,7 @@
 											<div class="eyedraw-toolbar">
 
 												<!-- PANEL START -->
-												<ul class="panel">
+												<ul class="eyedraw-toolbar-panel">
 													<li>
 														<a class="eyedraw-button" href="#" data-function="moveToFront">
 															<img src="../../assets/img/moveToFront.gif" />
@@ -101,7 +101,7 @@
 												<!-- PANEL END -->
 
 												<!-- PANEL START -->
-												<ul class="panel">
+												<ul class="eyedraw-toolbar-panel">
 													<li>
 														<a class="eyedraw-button" href="#" data-function="addDoodle" data-arg="NuclearCataract">
 															<img src="../../assets/img/NuclearCataract.gif" />
@@ -199,6 +199,9 @@
 											</div>
 											<!-- TOOLBAR END -->
 
+											<!-- TOOLTIP -->
+											<span class="eyedraw-canvas-tooltip" id="ed_exampleTooltip"></span>
+
 											<!-- CANVAS START -->
 											<canvas
 											id="ed_example"
@@ -228,9 +231,9 @@
 												<div class="row">
 													<div class="large-8 column">
 														<select name="field" id="eyedraw-field-1">
-															<option>Large</option>
-															<option>Medium</option>
-															<option>Small</option>
+															<option data-value="Large">Large</option>
+															<option data-value="Medium">Medium</option>
+															<option data-value="Small">Small</option>
 														</select>
 													</div>
 												</div>
@@ -260,10 +263,10 @@
 											<!-- FIELD ROW -->
 											<fieldset class="field-row">
 												<label>
-													<input type="checkbox"> Option 1
+													<input type="checkbox" id="field-option-1" /> Option 1
 												</label>
 												<label>
-													<input type="checkbox"> Option 2
+													<input type="checkbox" id="field-option-2" /> Option 2
 												</label>
 											</fieldset>
 											<!-- FIELD ROW -->
@@ -272,6 +275,31 @@
 												<button class="small">Clear</button>
 											</div>
 										</div>
+									</div>
+								</div>
+							</div>
+							<div class="element-eye right-eye column side right" data-side="left">
+								<div class="data-row">
+									<div class="data-value">
+										<p><strong>Notes:</strong></p>
+										<ul>
+											<li>All required markup has to be present on the page.</li>
+											<li>The EyeDraw classes are instantiated via a global 'eyeDrawInit' function, which then instantiates the following:
+												<ul>
+													<li>An eyedraw Drawing</li>
+													<li>An eyedraw controller (the controller handles user and Drawing events)</li>
+													<li>Other event based and collection classes (this can be improved and simplified)</li>
+												</ul>
+											</li>
+											<li>Toolbar actions are routed to the eyedraw instance via inline JS, this can be improved.</li>
+											<li>
+												EyeDraw fields are bound to the drawing via the <code>bindingArray</code> option.
+												<ul>
+													<li><em>Field 1</em> and <em>Option 1</em> are currently bound to the EyeDraw in this example.</li>
+												</ul>
+											</li>
+											<li>There's an obvious coupling between the markup in the page (and thus PHP), the inline JavaScript and the external EyeDraw JavaScript.</li>
+										</ul>
 									</div>
 								</div>
 							</div>
@@ -297,32 +325,24 @@
 			'graphicsPath': '../../assets/img/',
 			'inputId': 'ed_example_data',
 			'onReadyCommandArray': [
-				['addDoodle', ['AntSeg']],
-				['deselectDoodles', []]
+				[
+					'addDoodle', [ 'AntSeg' ]
+				],
+				[
+					'deselectDoodles', []
+				]
 			],
 			'onDoodlesLoadedCommandArray': [],
 			'bindingArray': {
-				// 'AntSeg': {
-				// 	'pupilSize': {
-				// 		'id': 'Element_OphCiExamination_AnteriorSegment_right_pupil_id',
-				// 		'attribute': 'data-value'
-				// 	},
-				// 	'pxe': {
-				// 		'id': 'Element_OphCiExamination_AnteriorSegment_right_pxe'
-				// 	}
-				// },
-				// 'NuclearCataract': {
-				// 	'grade': {
-				// 		'id': 'Element_OphCiExamination_AnteriorSegment_right_nuclear_id',
-				// 		'attribute': 'data-value'
-				// 	}
-				// },
-				// 'CorticalCataract': {
-				// 	'grade': {
-				// 		'id': 'Element_OphCiExamination_AnteriorSegment_right_cortical_id',
-				// 		'attribute': 'data-value'
-				// 	}
-				// }
+				'AntSeg': {
+					'pupilSize': {
+						'id': 'eyedraw-field-1',
+						'attribute': 'data-value'
+					},
+					'pxe': {
+						'id': 'field-option-1'
+					}
+				}
 			},
 			// 'deleteValueArray': {
 			// 	'Element_OphCiExamination_AnteriorSegment_right_nuclear_id': '',
@@ -356,6 +376,10 @@
 				// @todo
 				// 1. Find the eyedraw instance
 				// 2. Execute the function on the eyedraw instance
+				//
+				// if (typeof(ed_drawing_edit_left_45[fn]) == "function") {
+				//		ed_drawing_edit_left_45[fn](arg);
+				// }
 			}
 
 			function onDocumentClick(e) {
