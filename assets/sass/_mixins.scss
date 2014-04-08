@@ -10,17 +10,31 @@
 	}
 }
 
-// Sprite mixin for generating sprite images and associated classes.
-@mixin sprite($icons_path, $class, $width, $height) {
-	$icons: sprite-map($icons_path);
-	[class*="#{$class}"] {
-		background: $icons no-repeat;
+// Custom sprite mixin.
+// @param $path        The path to the images directory.
+// @param $prefixClass The prefix to add to the generated className.
+// @param $width       The width of sprite grid.
+// @param $height      The height of the sprite grid.
+// @param $states      Add states to generated classes, if state images exist on filesystem?
+@mixin sprite($path, $prefixClass, $width, $height, $states: true) {
+	$images: sprite-map($path);
+	[class*="#{$prefixClass}-"] {
+		background: $images no-repeat;
 		width: $width;
 		height: $height;
 	}
-	@each $i in sprite_names($icons) {
-		.#{$class}-#{$i} {
-			background-position: sprite-position($icons, $i);
+	@each $i in sprite_names($images) {
+		.#{$prefixClass}-#{$i} {
+			background-position: sprite-position($images, $i);
+		}
+		@if $states == true {
+			@each $state in hover, active, target {
+				@if sprite_has_selector($images, $i, $state) {
+					.#{$prefixClass}-#{$i}:#{$state} {
+						@extend .#{$prefixClass}-#{$i}_#{$state};
+					}
+				}
+			}
 		}
 	}
 }
