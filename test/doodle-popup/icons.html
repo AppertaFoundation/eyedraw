@@ -13,10 +13,39 @@
 	<link rel="stylesheet" type="text/css" href="../../assets/css/oe-eyedraw.css" id="ed-stylesheet" />
 
 	<style type="text/css">
+		#icons {
+			margin-bottom: 20px;
+		}
 		.icon-example {
 			border: 1px solid #ddd;
 			padding: 2px;
 			margin: 4px;
+			position: relative;
+		}
+		.show-centre .icon-example, .icon-example:hover {
+			border-color: #07f801;
+		}
+		.show-centre .icon-example:before,
+		.icon-example:hover:before {
+			content: "";
+			position: absolute;
+			background: #07f801;
+			width: 100%;
+			height: 1px;
+			top: 50%;
+			left: 0;
+			margin-top: -1px;
+		}
+		.show-centre .icon-example:after,
+		.icon-example:hover:after {
+			content: "";
+			position: absolute;
+			background: #07f801;
+			width: 1px;
+			height: 100%;
+			top: 0;
+			left: 50%;
+			margin-left: -1px;
 		}
 	</style>
 </head>
@@ -27,9 +56,20 @@
 			<div id="icons">
 				<!-- icons to go here -->
 			</div>
+			<p>
+				<button id="show-centres" class="small">Show icon centres</button>
+			</p>
 		</div>
 	</div>
 	<script>
+	(function showIconCentres() {
+		var icons = document.getElementById('icons');
+		var button = document.getElementById('show-centres');
+		button.addEventListener('click', function() {
+			icons.className += ' show-centre';
+		}, false);
+	}());
+
 	(function createIconSpans() {
 
 		function toArray(list) {
@@ -45,7 +85,7 @@
 		var html = toArray(styleSheet.cssRules).filter(function(rule) {
 			return /^\.ed-icon/.test(rule.selectorText);
 		}).map(function(rule) {
-			var className = rule.selectorText.replace(/\./, '');
+			var className = rule.selectorText.replace(/[\.,]/g, '');
 			return '<span class="icon-example ' + className + '" title=".' + className + '"></span>';
 		}).join('');
 
