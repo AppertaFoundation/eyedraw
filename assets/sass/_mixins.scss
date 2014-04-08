@@ -1,3 +1,4 @@
+// Clearfix mixing for clearing floats.
 @mixin clearfix {
 	*zoom: 1;
 	&:before, &:after {
@@ -6,5 +7,20 @@
 	}
 	&:after {
 		clear: both;
+	}
+}
+
+// Sprite mixin for generating sprite images and associated classes.
+@mixin sprite($icons_path, $class, $width, $height) {
+	$icons: sprite-map($icons_path);
+	[class*="#{$class}"] {
+		background: $icons no-repeat;
+		width: $width;
+		height: $height;
+	}
+	@each $i in sprite_names($icons) {
+		.#{$class}-#{$i} {
+			background-position: sprite-position($icons, $i);
+		}
 	}
 }
