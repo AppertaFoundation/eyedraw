@@ -32,13 +32,13 @@ $eyedraw-icon-height: 32px;
 @include sprite("icons/manipulate/*.png", $eyedraw-icon-prefix, $eyedraw-icon-width, $eyedraw-icon-height);
 
 // Gonioscopy icons
-@include sprite("icons/draw/gonioscopy/*.png", "#{$eyedraw-icon-prefix}-gonio", $eyedraw-icon-width, $eyedraw-icon-height);
+@include sprite("icons/draw/gonioscopy/*.png", $eyedraw-icon-prefix, $eyedraw-icon-width, $eyedraw-icon-height);
 
 // Anterior Segment icons
-@include sprite("icons/draw/anterior-segment/*.png", "#{$eyedraw-icon-prefix}-as", $eyedraw-icon-width, $eyedraw-icon-height);
+@include sprite("icons/draw/anterior-segment/*.png", $eyedraw-icon-prefix, $eyedraw-icon-width, $eyedraw-icon-height);
 
 // Optic disc icons
-@include sprite("icons/draw/optic-disc/*.png", "#{$eyedraw-icon-prefix}-od", $eyedraw-icon-width, $eyedraw-icon-height);
+@include sprite("icons/draw/optic-disc/*.png", $eyedraw-icon-prefix, $eyedraw-icon-width, $eyedraw-icon-height);
 
 // Posterior Pole icons
-@include sprite("icons/draw/posterior-pole/*.png", "#{$eyedraw-icon-prefix}-pp", $eyedraw-icon-width, $eyedraw-icon-height);
+@include sprite("icons/draw/posterior-pole/*.png", $eyedraw-icon-prefix, $eyedraw-icon-width, $eyedraw-icon-height);
