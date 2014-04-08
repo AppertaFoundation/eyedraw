@@ -14,46 +14,43 @@
 // * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
 // * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
 
-@charset "UTF-8";
 
-@import "compass/css3";
-@import "compass/css3/user-interface";
 
-// Toolbar container
+// Main toolbar container.
 .eyedraw-toolbar {
-	// Toolbar panels. A toolbar can have many panels. Panels group buttons
-	// and other controls.
-	.panel {
-		@extend %clearfix;
-		background: none;
-		border: 0;
-		&, ul {
-			list-style-type: none;
+
+}
+
+// Toolbar panels. A toolbar can have many panels. Panels group buttons
+// and other controls.
+.eyedraw-toolbar-panel {
+	@extend %clearfix;
+	&, ul {
+		list-style-type: none;
+		margin: 0;
+		padding: 0;
+	}
+	li {
+		float: left;
+		margin: 0 3px 3px 0;
+		position: relative;
+		// Drop-menu
+		ul {
+			@include box-shadow(1px 3px 8px 1px rgba(0, 0, 0, 0.3));
+			background: #fff;
+			border: 1px solid #ccc;
+			display: none;
+			left: 3px;
 			margin: 0;
-			padding: 0;
+			padding: 3px 0 0 3px;
+			position: absolute;
+			top: 36px;
+			width: 148px;
+			z-index: 99;
 		}
-		li {
-			float: left;
-			margin: 0 3px 3px 0;
-			position: relative;
-			// Drop-menu
+		&.active {
 			ul {
-				@include box-shadow(1px 3px 8px 1px rgba(0, 0, 0, 0.3));
-				background: #fff;
-				border: 1px solid #ccc;
-				display: none;
-				left: 3px;
-				margin: 0;
-				padding: 3px 0 0 3px;
-				position: absolute;
-				top: 36px;
-				width: 148px;
-				z-index: 99;
-			}
-			&.active {
-				ul {
-					display: block;
-				}
+				display: block;
 			}
 		}
 	}

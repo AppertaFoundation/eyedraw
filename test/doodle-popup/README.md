@@ -1,19 +1,26 @@
+# Doodle popup
+
+Any files in this location (eyedraw/test/doodle-popup) are not required for
+the main EyeDraw widget. These files are used simply for development and testing
+of the doodle-popup feature.
+
 ## Setup
 
-Before you can view/run the doodle-popup tests, you need to do the following
+Before you can view/run the doodle-popup test document, you need to do the following:
 
 1. Update bower components
 2. Generate test jsonp
 
-### Update bower components
+### 1. Update bower components
 
 1. Ensure bower is installed (sudo npm install bower -g)
 2. Run `bower install` from the module root
 
-### Generate test jsonp
+### 2. Generate test jsonp
 
-This will generate a JSON array of the eyedraw src JavaScript.
+The generate script sits within the './js' directory. and will generate a
+JSON array of the eyedraw src JavaScript.
 
 Run: `node generate-test-jsonp.js`
 
-This is useful for development where we won't want to use the compile/concat'ed files.
+This is useful for development where we don't want to use the compile/concat'ed files.
