@@ -5,4 +5,4 @@
 /node_modules
 .sass-cache
 /assets/components/*
-/test/doodle-popup/scripts.jsonp
+/test/doodle-popup/js/scripts.jsonp
