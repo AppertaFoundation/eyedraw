@@ -24,16 +24,16 @@
  * @version 0.9
  */
 /* line 1, ../sass/_placeholders.scss */
-.eyedraw-toolbar .panel {
+.eyedraw-toolbar-panel {
   *zoom: 1;
 }
 /* line 3, ../sass/_mixins.scss */
-.eyedraw-toolbar .panel:before, .eyedraw-toolbar .panel:after {
+.eyedraw-toolbar-panel:before, .eyedraw-toolbar-panel:after {
   content: " ";
   display: table;
 }
 /* line 7, ../sass/_mixins.scss */
-.eyedraw-toolbar .panel:after {
+.eyedraw-toolbar-panel:after {
   clear: both;
 }
 
@@ -91,25 +91,20 @@ span.squiggle {
   margin-right: 5px !important;
 }
 
-/* line 26, ../sass/components/_toolbar.scss */
-.eyedraw-toolbar .panel {
-  background: none;
-  border: 0;
-}
-/* line 30, ../sass/components/_toolbar.scss */
-.eyedraw-toolbar .panel, .eyedraw-toolbar .panel ul {
+/* line 28, ../sass/components/_toolbar.scss */
+.eyedraw-toolbar-panel, .eyedraw-toolbar-panel ul {
   list-style-type: none;
   margin: 0;
   padding: 0;
 }
-/* line 35, ../sass/components/_toolbar.scss */
-.eyedraw-toolbar .panel li {
+/* line 33, ../sass/components/_toolbar.scss */
+.eyedraw-toolbar-panel li {
   float: left;
   margin: 0 3px 3px 0;
   position: relative;
 }
-/* line 40, ../sass/components/_toolbar.scss */
-.eyedraw-toolbar .panel li ul {
+/* line 38, ../sass/components/_toolbar.scss */
+.eyedraw-toolbar-panel li ul {
   -webkit-box-shadow: 1px 3px 8px 1px rgba(0, 0, 0, 0.3);
   -moz-box-shadow: 1px 3px 8px 1px rgba(0, 0, 0, 0.3);
   box-shadow: 1px 3px 8px 1px rgba(0, 0, 0, 0.3);
@@ -124,25 +119,25 @@ span.squiggle {
   width: 148px;
   z-index: 99;
 }
-/* line 54, ../sass/components/_toolbar.scss */
-.eyedraw-toolbar .panel li.active ul {
+/* line 52, ../sass/components/_toolbar.scss */
+.eyedraw-toolbar-panel li.active ul {
   display: block;
 }
 
-/* line 63, ../sass/components/_toolbar.scss */
+/* line 60, ../sass/components/_toolbar.scss */
 .eyedraw-button {
   background: #eee;
   border: 1px solid #ccc;
 }
-/* line 66, ../sass/components/_toolbar.scss */
+/* line 63, ../sass/components/_toolbar.scss */
 .eyedraw-button:hover {
   background: #fff;
 }
-/* line 69, ../sass/components/_toolbar.scss */
+/* line 66, ../sass/components/_toolbar.scss */
 .active .eyedraw-button {
   background: #dae6f1;
 }
-/* line 72, ../sass/components/_toolbar.scss */
+/* line 69, ../sass/components/_toolbar.scss */
 .eyedraw-button, .eyedraw-button img {
   display: block;
   height: 32px;
@@ -150,11 +145,11 @@ span.squiggle {
   padding: 0;
   width: 32px;
 }
-/* line 79, ../sass/components/_toolbar.scss */
+/* line 76, ../sass/components/_toolbar.scss */
 .eyedraw-button img {
   border: 0;
 }
-/* line 83, ../sass/components/_toolbar.scss */
+/* line 80, ../sass/components/_toolbar.scss */
 .eyedraw-button .label {
   -webkit-box-shadow: 1px 3px 8px 1px rgba(0, 0, 0, 0.3);
   -moz-box-shadow: 1px 3px 8px 1px rgba(0, 0, 0, 0.3);
@@ -171,7 +166,7 @@ span.squiggle {
 }
 
 /* line 18, ../sass/components/_tooltip.scss */
-.canvasTooltip {
+.eyedraw-canvas-tooltip, .canvasTooltip {
   display: none;
   position: absolute;
   width: auto;

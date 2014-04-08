@@ -1,12 +1,14 @@
 var fs = require('fs');
 var path = require('path');
 var glob = require('glob');
-var Handlebars = require('handlebars');
+var util = require('util');
 
 // The order in which the sripts are found is important here.
 var pattern = '{*.js,ED/*.js,ED/Doodles/**/*.js,ED/Misc/*.js}';
-var opt = {
-	cwd: '../../src',
+
+// Glob options.
+var globOpt = {
+	cwd: path.join('..', '..', '..', 'src'),
 	sync: true,
 	nosort: true
 };
@@ -14,15 +16,14 @@ var opt = {
 // Output filename
 var fileName = 'scripts.jsonp';
 
-glob(pattern, opt, function (err, files) {
+glob(pattern, globOpt, function (err, files) {
 	if (err) throw err;
-
-	console.log('Found scripts: ', files.join('\n'), '\n');
+	if (!files.length) throw 'No files found!';
 
 	var json = JSON.stringify({ files: files }, null, 2);
-	var jsonp = 'scriptsLoadCallback(' + json + ');';
+	var jsonp = util.format('scriptsLoadCallback(%s);', json);
 
 	fs.writeFileSync(fileName, jsonp);
 
-	console.log('Created file at location: %s', path.resolve('./' + fileName));
+	console.log('%d Scripts found, created file at location: %s', files.length, path.resolve('./' + fileName));
 });

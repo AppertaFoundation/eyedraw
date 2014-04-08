@@ -14,17 +14,7 @@
 // * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
 // * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
 
-// Canvas tooltip
-.eyedraw-canvas-tooltip {
-	display: none;
-	position: absolute;
-	width: auto;
-	height: auto;
-	padding: 4px 6px;
-	box-shadow: 1px 3px 8px 1px rgba(0, 0, 0, 0.3);
-	font-family: sans-serif;
-	font-size: 12px;
-	background: #fff;
-	border: 1px solid #ccc;
-	z-index: 99;
+// Legacy Tooltip
+.canvasTooltip {
+	@extend .eyedraw-canvas-tooltip;
 }

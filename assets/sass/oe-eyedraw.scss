@@ -24,6 +24,10 @@
  * @version 0.9
  */
 
+@charset "UTF-8";
+
+@import "compass/css3";
+@import "compass/css3/user-interface";
 @import "mixins";
 @import "placeholders";
 
@@ -32,3 +36,6 @@
 @import "components/labels";
 @import "components/toolbar";
 @import "components/tooltip";
+
+// Add support for legacy class names.
+@import "components/legacy";
