@@ -1,3 +1,4 @@
+// Clearfix mixing for clearing floats.
 @mixin clearfix {
 	*zoom: 1;
 	&:before, &:after {
@@ -6,5 +7,38 @@
 	}
 	&:after {
 		clear: both;
+	}
+}
+
+// Custom sprite mixin.
+// @param $path        The path to the images directory.
+// @param $prefixClass The prefix to add to the generated className.
+// @param $width       The width of sprite grid.
+// @param $height      The height of the sprite grid.
+// @param $addStates   Add states to generated classes, if state images exist on filesystem?
+@mixin sprite($path, $prefixClass, $width, $height, $addStates: true) {
+	$ignore: ();
+	$spriteMap: sprite-map($path);
+	[class*="#{$prefixClass}-"] {
+		background: $spriteMap no-repeat;
+		width: $width;
+		height: $height;
+	}
+	@each $i in sprite_names($spriteMap) {
+		@if index($ignore, #{$i}) == false {
+			.#{$prefixClass}-#{$i} {
+				background-position: sprite-position($spriteMap, $i);
+			}
+		}
+		@if $addStates == true {
+			@each $state in hover, active, target {
+				@if sprite_has_selector($spriteMap, $i, $state) {
+					.#{$prefixClass}-#{$i}:#{$state} {
+						background-position: sprite-position($spriteMap, #{$i}_#{$state});
+					}
+					$ignore: append($ignore, unquote("#{$i}_#{$state}"));
+				}
+			}
+		}
 	}
 }

@@ -1,3 +1,18 @@
 %clearfix {
 	@include clearfix;
 }
+
+%hide-text {
+	background-color: transparent;
+	border: 0;
+	color: transparent;
+	font: 0/0 a;
+	text-shadow: none;
+}
+
+%hide-text-absolutely {
+	left: -9999px;
+	overflow: hidden;
+	position: absolute;
+	top: -9999px;
+}
