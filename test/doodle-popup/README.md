@@ -21,6 +21,6 @@ Before you can view/run the doodle-popup test document, you need to do the follo
 The generate script sits within the './js' directory. and will generate a
 JSON array of the eyedraw src JavaScript.
 
-Run: `node generate-test-jsonp.js`
+Run: `node generate-jsonp.js`
 
 This is useful for development where we don't want to use the compile/concat'ed files.
