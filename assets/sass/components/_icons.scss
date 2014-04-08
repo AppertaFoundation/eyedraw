@@ -29,7 +29,7 @@ $eyedraw-icon-height: 32px;
 }
 
 // Manipulate icons
-@include sprite("icons/manipulate/*.png", "#{$eyedraw-icon-prefix}-manip", $eyedraw-icon-width, $eyedraw-icon-height);
+@include sprite("icons/manipulate/*.png", "#{$eyedraw-icon-prefix}-manip", $eyedraw-icon-width, $eyedraw-icon-height, true);
 
 // Drawing icons
-@include sprite("icons/draw/**/*.png", "#{$eyedraw-icon-prefix}-draw", $eyedraw-icon-width, $eyedraw-icon-height);
+@include sprite("icons/draw/**/*.png", "#{$eyedraw-icon-prefix}-draw", $eyedraw-icon-width, $eyedraw-icon-height, true);
