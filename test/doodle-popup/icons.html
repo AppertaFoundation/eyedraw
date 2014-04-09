@@ -13,8 +13,12 @@
 	<link rel="stylesheet" type="text/css" href="../../assets/css/oe-eyedraw.css" id="ed-stylesheet" />
 
 	<style type="text/css">
+		.container {
+			max-width: 1000px;
+			margin-top: 10px;
+		}
 		#icons {
-			margin-bottom: 20px;
+			margin-bottom: 18px;
 		}
 		.icon-example {
 			border: 1px solid #ddd;
@@ -22,11 +26,10 @@
 			margin: 4px;
 			position: relative;
 		}
-		.show-centre .icon-example, .icon-example:hover {
+		.show-centre .icon-example {
 			border-color: #07f801;
 		}
-		.show-centre .icon-example:before,
-		.icon-example:hover:before {
+		.show-centre .icon-example:before {
 			content: "";
 			position: absolute;
 			background: #07f801;
@@ -34,10 +37,8 @@
 			height: 1px;
 			top: 50%;
 			left: 0;
-			margin-top: -1px;
 		}
-		.show-centre .icon-example:after,
-		.icon-example:hover:after {
+		.show-centre .icon-example:after {
 			content: "";
 			position: absolute;
 			background: #07f801;
@@ -45,36 +46,37 @@
 			height: 100%;
 			top: 0;
 			left: 50%;
-			margin-left: -1px;
 		}
 	</style>
 </head>
 <body>
 	<div class="container">
-		<div class="box generic" style="margin-top:20px">
+		<div class="box generic">
 			<h2>EyeDraw Icons</h2>
 			<div id="icons">
 				<!-- icons to go here -->
 			</div>
 			<p>
-				<button id="show-centres" class="small">Show icon centres</button>
+				<button id="show-centres" class="small">Toggle icon centres</button>
 			</p>
 		</div>
 	</div>
 	<script>
-	(function showIconCentres() {
-		var icons = document.getElementById('icons');
+	(function toggleIconCentres() {
+		var container = document.getElementById('icons');
 		var button = document.getElementById('show-centres');
 		button.addEventListener('click', function() {
-			icons.className += ' show-centre';
+			container.className = /show-centre/.test(container.className) ? '' : 'show-centre';
 		}, false);
 	}());
 
-	(function createIconSpans() {
+	(function createIconSpans(container) {
 
 		function toArray(list) {
 			return Array.prototype.slice.call(list);
 		}
+
+		var container = document.getElementById('icons');
 
 		var styleSheet = toArray(document.styleSheets).filter(function(ss) {
 			return ss.ownerNode.id === 'ed-stylesheet';
@@ -83,13 +85,14 @@
 		// Here we simply loop through the stylesheet rules, filter out the icon
 		// selectors, and create <span> elements with classes that match the selectors.
 		var html = toArray(styleSheet.cssRules).filter(function(rule) {
-			return /^\.ed-icon/.test(rule.selectorText);
+			return /^\.ed-icon/.test(rule.selectorText) && !/:/.test(rule.selectorText)
 		}).map(function(rule) {
 			var className = rule.selectorText.replace(/[\.,]/g, '');
 			return '<span class="icon-example ' + className + '" title=".' + className + '"></span>';
 		}).join('');
 
-		document.getElementById('icons').innerHTML = html;
+		container.innerHTML = html;
+
 	}());
 	</script>
 </body>
