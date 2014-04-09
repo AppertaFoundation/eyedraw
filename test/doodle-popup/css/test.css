@@ -44,15 +44,11 @@ body {
 	background-image: url("../img/medium.png?1383822301");
 }
 
-.Element_OphCiExamination_AnteriorSegment .eyedraw-fields {
-	padding-top: 74px;
-}
-
-.row .anterior-segment .column.fixed {
+.anterior-segment .column.fixed {
 	width: 320px;
 }
 
-.row .anterior-segment .column.fluid {
+.anterior-segment .column.fluid {
 	width: -moz-calc(100% - 320px);
 	width: -o-calc(100% - 320px);
 	width: -webkit-calc(100% - 320px);
