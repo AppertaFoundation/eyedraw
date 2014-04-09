@@ -17,9 +17,10 @@
 canvas {
 	// Canvas element in edit mode
 	&.ed_canvas_edit {
-		border: 1px solid #ccc;
+		background: #e4edf5;
+		border: 1px solid #b0bac3;
 		cursor: pointer;
-		margin-top: 5px;
+		margin: 3px 0 3px 3px;
 	}
 	// Canvas element in display mode
 	&.ed_canvas_display {

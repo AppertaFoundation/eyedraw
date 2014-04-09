@@ -31,12 +31,11 @@
 @import "mixins";
 @import "placeholders";
 
+@import "components/widget";
+@import "components/toolbar";
 @import "components/icons";
 @import "components/canvas";
 @import "components/squiggle";
 @import "components/labels";
-@import "components/toolbar";
 @import "components/tooltip";
-
-// Add support for legacy class names.
-@import "components/legacy";
+@import "components/fields";
