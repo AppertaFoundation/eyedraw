@@ -5,19 +5,19 @@
  * @copyright Copyright &copy; 2012 OpenEyes Foundation
  * @license http://www.yiiframework.com/license/
  * Modification date: 17th August 2012
- * 
+ *
  * This file is part of OpenEyes.
- * 
+ *
  * OpenEyes is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * OpenEyes is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with OpenEyes.  If not, see <http://www.gnu.org/licenses/>.
  * @package EyeDraw
@@ -112,10 +112,47 @@ function EyeDrawReadyListener(_drawing) {
 	};
 }
 
+function initToolbar(drawing, container) {
+
+	container = $(container);
+
+	function onDrawerButtonClick(e) {
+		e.preventDefault();
+		e.stopImmediatePropagation();
+		var button = $(e.currentTarget);
+		button.closest('.drawer').toggleClass('active');
+	}
+
+	function onButtonClick(e) {
+		e.preventDefault();
+
+		var button = $(e.currentTarget);
+		var fn = button.data('function');
+		var arg = button.data('arg');
+
+		if (typeof drawing[fn] === 'function') {
+			drawing[fn](arg);
+		} else {
+			console.error([
+				'EyeDraw toolbar error!',
+				'Function "%s" does not exist for this drawing.'
+			].join(''), fn);
+		}
+	}
+
+	function onDocumentClick(e) {
+		container.find('.drawer').removeClass('active');
+	}
+
+	container.on('click', '.eyedraw-toolbar .drawer > a', onDrawerButtonClick);
+	container.on('click', '.eyedraw-toolbar a', onButtonClick);;
+	$(document).on('click', onDocumentClick);
+}
+
 
 /**
  * Function runs on page load to initialise an EyeDraw canvas
- * 
+ *
  * @param {array}
  *          _properties Array of properties passed from widget - drawingName The
  *          EyeDraw drawing object - canvasId The DOM id of the associated
@@ -126,7 +163,7 @@ function EyeDrawReadyListener(_drawing) {
  *          Path to folder containing EyeDraw graphics, - onReadyCommandArray
  *          Array of commands and arguments to be run when images are loaded
  */
-function eyeDrawInit(_properties) {
+function eyeDrawInit(_properties, _containerElement) {
 	// Get reference to the drawing canvas
 	var canvas = document.getElementById(_properties.canvasId);
 
@@ -138,7 +175,9 @@ function eyeDrawInit(_properties) {
 	options['graphicsPath'] = _properties.graphicsPath;
 
 	// Create a drawing linked to the canvas
-	window[_properties.drawingName] = new ED.Drawing(canvas, _properties.eye, _properties.idSuffix, _properties.isEditable, options);
+	var drawingInstance = window[_properties.drawingName] = new ED.Drawing(canvas, _properties.eye, _properties.idSuffix, _properties.isEditable, options);
+
+	initToolbar(drawingInstance, _containerElement);
 
 	// Create a controller object for this drawing with a unique name
 	window['ed_controller_' + _properties.idSuffix] = new eyeDrawController(window[_properties.drawingName]);
