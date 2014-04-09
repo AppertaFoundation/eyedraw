@@ -70,7 +70,7 @@
 		}, false);
 	}());
 
-	(function createIconSpans(container) {
+	(function createIconSpans() {
 
 		function toArray(list) {
 			return Array.prototype.slice.call(list);
@@ -85,7 +85,7 @@
 		// Here we simply loop through the stylesheet rules, filter out the icon
 		// selectors, and create <span> elements with classes that match the selectors.
 		var html = toArray(styleSheet.cssRules).filter(function(rule) {
-			return /^\.ed-icon/.test(rule.selectorText) && !/:/.test(rule.selectorText)
+			return /^\.icon-/.test(rule.selectorText) && !/:/.test(rule.selectorText)
 		}).map(function(rule) {
 			var className = rule.selectorText.replace(/[\.,]/g, '');
 			return '<span class="icon-example ' + className + '" title=".' + className + '"></span>';
