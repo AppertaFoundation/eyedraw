@@ -27,4 +27,4 @@ $eyedraw-icon-height: 32px;
 	}
 }
 
-@include sprite("icons/**/*.png", $eyedraw-icon-prefix, $eyedraw-icon-width, $eyedraw-icon-height, true);
+@include sprite("icons/32x32/**/*.png", $eyedraw-icon-prefix, $eyedraw-icon-width, $eyedraw-icon-height, true);
