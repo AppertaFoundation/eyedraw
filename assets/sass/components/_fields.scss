@@ -14,14 +14,6 @@
 // * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
 // * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
 
-// Main toolbar container.
-.eyedraw-toolbar {
-	@include border-radius(3px);
-	background: #fafafa;
-	border: 1px solid #ddd;
-	padding: 3px 0 0 3px;
-	margin-left: -4px;
+.eyedraw-fields {
+	margin-top: 8px;
 }
-
-@import "components/toolbar/panel";
-@import "components/toolbar/button";

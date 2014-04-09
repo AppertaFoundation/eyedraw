@@ -16,15 +16,15 @@
 
 // Canvas tooltip
 .eyedraw-canvas-tooltip {
-	display: none;
-	position: absolute;
-	width: auto;
-	height: auto;
-	padding: 4px 6px;
-	box-shadow: 1px 3px 8px 1px rgba(0, 0, 0, 0.3);
-	font-family: sans-serif;
-	font-size: 12px;
+	@include box-shadow(1px 3px 8px 1px rgba(0, 0, 0, 0.3));
 	background: #fff;
 	border: 1px solid #ccc;
+	display: none;
+	font-family: sans-serif;
+	font-size: 12px;
+	height: auto;
+	padding: 4px 6px;
+	position: absolute;
+	width: auto;
 	z-index: 99;
 }
