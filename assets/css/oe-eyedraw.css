@@ -46,7 +46,7 @@
   text-shadow: none;
 }
 
-/* line 20, ../sass/components/_widget.scss */
+/* line 20, ../sass/components/_containers.scss */
 .eyedraw-body {
   background: #d2dee8;
   margin: 10px 0;
@@ -163,7 +163,7 @@
 
 /* line 22, ../sass/_mixins.scss */
 [class*="icon-ed-"] {
-  background: url('../img/sprites/icons-sb786627109.png') no-repeat;
+  background: url('../img/sprites/icons/32x32-sa902812c57.png') no-repeat;
   width: 32px;
   height: 32px;
 }
@@ -728,20 +728,20 @@
   background-position: 0 -1760px;
 }
 
-/* line 19, ../sass/components/_canvas.scss */
+/* line 19, ../sass/components/_editor.scss */
 canvas.ed_canvas_edit {
   background: #e4edf5;
   border: 1px solid #b0bac3;
   cursor: pointer;
   margin: 3px 0 3px 3px;
 }
-/* line 26, ../sass/components/_canvas.scss */
+/* line 26, ../sass/components/_editor.scss */
 canvas.ed_canvas_display {
   border: none;
   cursor: auto;
   margin: 0px;
 }
-/* line 32, ../sass/components/_canvas.scss */
+/* line 32, ../sass/components/_editor.scss */
 canvas:focus {
   outline: none;
 }
@@ -772,17 +772,6 @@ span.squiggle {
   display: inline-block;
 }
 
-/* line 19, ../sass/components/_labels.scss */
-.displayParameterLabel {
-  font-weight: normal !important;
-}
-
-/* line 23, ../sass/components/_labels.scss */
-.displayParameterElement {
-  margin-bottom: 0px !important;
-  margin-right: 5px !important;
-}
-
 /* line 18, ../sass/components/_tooltip.scss */
 .eyedraw-canvas-tooltip {
   -webkit-box-shadow: 1px 3px 8px 1px rgba(0, 0, 0, 0.3);
@@ -803,4 +792,33 @@ span.squiggle {
 /* line 17, ../sass/components/_fields.scss */
 .eyedraw-fields {
   margin-top: 8px;
+}
+
+/* line 1, ../sass/components/_selected-doodle.scss */
+.eyedraw-selected-doodle {
+  bottom: 0;
+  position: absolute;
+  right: -190px;
+  width: 190px;
+}
+/* line 6, ../sass/components/_selected-doodle.scss */
+.eyedraw-selected-doodle label {
+  color: #5b5b5b;
+  font-size: .7rem;
+  font-weight: bold;
+  padding-left: 10px;
+}
+/* line 12, ../sass/components/_selected-doodle.scss */
+.eyedraw-selected-doodle .selected {
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  -ms-border-radius: 4px;
+  -o-border-radius: 4px;
+  border-radius: 4px;
+  background-color: #e4edf5;
+  background-image: url('../img/icons/16x16/selected-doodle.png?1397054065');
+  background-repeat: no-repeat;
+  background-position: 1px 3px;
+  border: 2px solid #68c8f8;
+  padding: 2px 2px 2px 20px;
 }

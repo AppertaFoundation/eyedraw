@@ -52,7 +52,46 @@
 							<div class="element-eye right-eye column side left" data-side="right">
 
 									<!-- EYEDRAW WIDGET START -->
-									<div class="eyedraw-widget anterior-segment" id="eyedrawwidget_example">
+									<div class="eyedraw-widget anterior-segment" id="eyedrawwidget_example" data-options='{
+										"drawingName": "ed_example",
+										"canvasId": "ed_example",
+										"eye": 0,
+										"scale": 1,
+										"idSuffix": "",
+										"isEditable": true,
+										"focus": false,
+										"graphicsPath": "../../assets/img/",
+										"inputId": "ed_example_data",
+										"onReadyCommandArray": [
+											[
+												"addDoodle",
+												[
+													"AntSeg"
+												]
+											],
+											[
+												"deselectDoodles",
+												[]
+											]
+										],
+										"onDoodlesLoadedCommandArray": [],
+										"bindingArray": {
+											"AntSeg": {
+												"pupilSize": {
+													"id": "eyedraw-field-1",
+													"attribute": "data-value"
+												},
+												"pxe": {
+													"id": "field-option-1"
+												}
+											}
+										},
+										"syncArray": [],
+										"listenerArray": [],
+										"offsetX": 0,
+										"offsetY": 0,
+										"toImage": false
+									}'>
 
 										<!-- TOOLBAR START -->
 										<div class="eyedraw-toolbar">
@@ -60,79 +99,79 @@
 											<!-- PANEL START -->
 											<ul class="eyedraw-toolbar-panel">
 												<li>
-													<a class="eyedraw-button" href="#" data-function="NuclearCataract">
+													<a class="eyedraw-button" href="#" data-function="addDoodle" data-arg="NuclearCataract">
 														<span class="icon-ed-NuclearCataract"></span>
 														<span class="label">Nuclear cataract</span>
 													</a>
 												</li>
 												<li>
-													<a class="eyedraw-button" href="#" data-function="CorticalCataract">
+													<a class="eyedraw-button" href="#" data-function="addDoodle" data-arg="CorticalCataract">
 														<span class="icon-ed-CorticalCataract"></span>
 														<span class="label">Cortical cataract</span>
 													</a>
 												</li>
 												<li>
-													<a class="eyedraw-button" href="#" data-function="PostSubcapCataract">
+													<a class="eyedraw-button" href="#" data-function="addDoodle" data-arg="PostSubcapCataract">
 														<span class="icon-ed-PostSubcapCataract"></span>
 														<span class="label">Posterior subcapsular cataract</span>
 													</a>
 												</li>
 												<li>
-													<a class="eyedraw-button" href="#" data-function="PCIOL">
+													<a class="eyedraw-button" href="#" data-function="addDoodle" data-arg="PCIOL">
 														<span class="icon-ed-PCIOL"></span>
 														<span class="label">Posterior chamber IOL</span>
 													</a>
 												</li>
 												<li>
-													<a class="eyedraw-button" href="#" data-function="ACIOL">
+													<a class="eyedraw-button" href="#" data-function="addDoodle" data-arg="ACIOL">
 														<span class="icon-ed-ACIOL"></span>
 														<span class="label">Anterior chamber IOL</span>
 													</a>
 												</li>
 												<li>
-													<a class="eyedraw-button" href="#" data-function="Bleb">
+													<a class="eyedraw-button" href="#" data-function="addDoodle" data-arg="Bleb">
 														<span class="icon-ed-Bleb"></span>
 														<span class="label">Trabeculectomy bleb</span>
 													</a>
 												</li>
 												<li>
-													<a class="eyedraw-button" href="#" data-function="PI">
+													<a class="eyedraw-button" href="#" data-function="addDoodle" data-arg="PI">
 														<span class="icon-ed-PI"></span>
 														<span class="label">Peripheral iridectomy</span>
 													</a>
 												</li>
 												<li>
-													<a class="eyedraw-button" href="#" data-function="Fuchs">
+													<a class="eyedraw-button" href="#" data-function="addDoodle" data-arg="Fuchs">
 														<span class="icon-ed-Fuchs"></span>
 														<span class="label">Fuchs endothelial dystrophy</span>
 													</a>
 												</li>
 												<li>
-													<a class="eyedraw-button" href="#" data-function="RK">
+													<a class="eyedraw-button" href="#" data-function="addDoodle" data-arg="RK">
 														<span class="icon-ed-RK"></span>
 														<span class="label">Radial keratotomy</span>
 													</a>
 												</li>
 												<li>
-													<a class="eyedraw-button" href="#" data-function="LasikFlap">
+													<a class="eyedraw-button" href="#" data-function="addDoodle" data-arg="LasikFlap">
 														<span class="icon-ed-LasikFlap"></span>
 														<span class="label">LASIK flap</span>
 													</a>
 												</li>
 												<li>
-													<a class="eyedraw-button" href="#" data-function="CornealScar">
+													<a class="eyedraw-button" href="#" data-function="addDoodle" data-arg="CornealScar">
 														<span class="icon-ed-CornealScar"></span>
 														<span class="label">Corneal scar</span>
 													</a>
 												</li>
 												<li>
-													<a class="eyedraw-button" href="#" data-function="SectorIridectomy">
+													<a class="eyedraw-button" href="#" data-function="addDoodle" data-arg="SectorIridectomy">
 														<span class="icon-ed-SectorIridectomy"></span>
 														<span class="label">Sector iridectomy</span>
 													</a>
 												</li>
 												<li>
-													<a class="eyedraw-button" href="#" data-function="PosteriorSynechia">
+													<a class="eyedraw-button" href="#" data-function="addDoodle" data-arg="PosteriorSynechia">
 														<span class="icon-ed-PosteriorSynechia"></span>
 														<span class="label">Posterior synechia</span>
 													</a>
@@ -246,24 +285,35 @@
 
 												<div class="fixed column eyedraw-editor">
 
-													<!-- TOOLTIP -->
-													<span class="eyedraw-canvas-tooltip" id="ed_exampleTooltip"></span>
-
-													<!-- CANVAS START -->
+													<!-- CANVAS -->
 													<canvas
 													id="ed_example"
 													class="ed_canvas_edit"
 													width="300"
 													height="300"
-													tabindex="1"
-													>
+													tabindex="1">
 													</canvas>
+
+													<!-- TOOLTIP -->
+													<span class="eyedraw-canvas-tooltip" id="ed_exampleTooltip"></span>
+
+													<!-- SELECTED DOODLE -->
+													<div class="eyedraw-selected-doodle">
+														<label for="ed_example_selected_doodle">
+															Currently Selected
+														</label>
+														<div class="selected">
+															<select id="ed_example_selected_doodle">>
+																<option>None</option>
+															</select>
+														</div>
+													</div>
+
+													<!-- DATA FIELD -->
 													<input
 														type="hidden"
 														id="ed_example_data"
 														value='' />
-													<!-- CANVAS END -->
-
 												</div>
 
 												<div class="fluid column eyedraw-fields">
@@ -324,7 +374,7 @@
 										</div>
 									</div>
 								</div>
-								<div class="element-eye right-eye column side right" data-side="left">
+								<div class="element-eye left-eye column side right" data-side="left">
 									<div class="data-row">
 										<div class="data-value">
 											<p><strong>Notes:</strong></p>
@@ -359,85 +409,12 @@
 
 	<!-- EYEDRAW INIT -->
 	<script>
-
-		// Here we init the eyedraw.
-		eyeDrawInit({
-			'drawingName': 'ed_example',
-			'canvasId': 'ed_example',
-			'eye': 0,
-			'scale': 1,
-			'idSuffix': '',
-			'isEditable': true,
-			'focus': false,
-			'graphicsPath': '../../assets/img/',
-			'inputId': 'ed_example_data',
-			'onReadyCommandArray': [
-				[
-					'addDoodle', [ 'AntSeg' ]
-				],
-				[
-					'deselectDoodles', []
-				]
-			],
-			'onDoodlesLoadedCommandArray': [],
-			'bindingArray': {
-				'AntSeg': {
-					'pupilSize': {
-						'id': 'eyedraw-field-1',
-						'attribute': 'data-value'
-					},
-					'pxe': {
-						'id': 'field-option-1'
-					}
-				}
-			},
-			// 'deleteValueArray': {
-			// 	'Element_OphCiExamination_AnteriorSegment_right_nuclear_id': '',
-			// 	'Element_OphCiExamination_AnteriorSegment_right_cortical_id': ''
-			// },
-			'syncArray': [],
-			'listenerArray': [],
-			'offsetX': 0,
-			'offsetY': 0,
-			'toImage': false
+	(function() {
+		$('.eyedraw-widget').each(function(i, elem) {
+			elem = $(elem);
+			eyeDrawInit(elem.data('options'), elem);
 		});
-
-		// Here we init the eyedraw toolbar. Ideally, this should be managed by
-		// eyedraw itself.
-		(function initToolbars(widgets) {
-
-			function onDrawerButtonClick(e) {
-				e.preventDefault();
-				e.stopImmediatePropagation();
-				var button = $(e.currentTarget);
-				button.closest('.drawer').toggleClass('active');
-			}
-
-			function onButtonClick(e) {
-				e.preventDefault();
-
-				var button = $(e.currentTarget);
-				var fn = button.data('function');
-				var arg = button.data('arg');
-
-				// @todo
-				// 1. Find the eyedraw instance
-				// 2. Execute the function on the eyedraw instance
-				//
-				// if (typeof(ed_drawing_edit_left_45[fn]) == "function") {
-				//		ed_drawing_edit_left_45[fn](arg);
-				// }
-			}
-
-			function onDocumentClick(e) {
-				widgets.find('.drawer').removeClass('active');
-			}
-
-			widgets.on('click', '.eyedraw-toolbar .drawer > a', onDrawerButtonClick);
-			widgets.on('click', '.eyedraw-toolbar a', onButtonClick);;
-			$(document).on('click', onDocumentClick);
-
-		}($('.eyedraw-widget')));
+	}());
 	</script>
 	<!-- END EYEDRAW INIT -->
 </body>
