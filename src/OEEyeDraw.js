@@ -112,7 +112,9 @@ function EyeDrawReadyListener(_drawing) {
 	};
 }
 
-function initToolbar(drawing, container) {
+
+
+function initToolBar(drawing, container) {
 
 	container = $(container);
 
@@ -145,10 +147,91 @@ function initToolbar(drawing, container) {
 	}
 
 	container.on('click', '.eyedraw-toolbar .drawer > a', onDrawerButtonClick);
-	container.on('click', '.eyedraw-toolbar a', onButtonClick);;
+	container.on('click', '.eyedraw-button', onButtonClick);
 	$(document).on('click', onDocumentClick);
 }
 
+var DoodlePopup = (function() {
+
+	function ucFirst(str) {
+		return str.charAt(0).toUpperCase() + str.slice(1);
+	}
+
+	function DoodlePopup(drawing, widgetContainer) {
+
+		this.container = widgetContainer.find('.eyedraw-doodle-popup');
+		this.heading = this.container.find('.eyedraw-doodle-popup-heading');
+		this.title = this.heading.find('.title');
+		this.icon = this.heading.find('.icon');
+
+		this.drawing = drawing;
+		this.drawing.registerForNotifications(this, 'notificationHandler', [
+			'ready',
+			'doodleAdded',
+			'doodleDeleted',
+			'doodleSelected',
+			'doodleDeselected'
+		]);
+
+		this.container.on('click', '.eyedraw-doodle-popup-toggle', this.onToggleClick.bind(this));
+	}
+
+	DoodlePopup.prototype.update = function(show, doodle) {
+		if (show) {
+			this.show();
+			this.title.text(doodle.className);
+			if (doodle.isDeletable) {
+				this.icon[0].className = 'icon icon-ed-' + doodle.className;
+			}
+		} else {
+			this.hide();
+		}
+	};
+
+	DoodlePopup.prototype.hide = function() {
+		this.container.addClass('closed');
+	};
+
+	DoodlePopup.prototype.show = function() {
+		this.container.removeClass('closed');
+	};
+
+	DoodlePopup.prototype.onToggleClick = function(e) {
+		e.preventDefault();
+		this.container.toggleClass('closed');
+	}
+
+	DoodlePopup.prototype.notificationHandler = function(notification) {
+		var handlerName = 'on' + ucFirst(notification['eventName']);
+		this[handlerName](notification);
+	};
+
+	DoodlePopup.prototype.onReady = function(notification) {
+		setTimeout(this.hide.bind(this));
+	};
+
+	DoodlePopup.prototype.onDoodleAdded = function(notification) {
+		console.log('doodle added', notification);
+		this.update(true, notification.selectedDoodle);
+	};
+
+	DoodlePopup.prototype.onDoodleDeleted = function(notification) {
+		console.log('doodle deleted', notification);
+		this.update(false, notification.selectedDoodle);
+	};
+
+	DoodlePopup.prototype.onDoodleSelected = function(notification) {
+		console.log('doodle selected', notification);
+		setTimeout(this.update.bind(this, true, notification.selectedDoodle));
+	};
+
+	DoodlePopup.prototype.onDoodleDeselected = function(notification) {
+		console.log('doodle deselected', notification);
+		this.update(false, notification.selectedDoodle);
+	};
+
+	return DoodlePopup;
+}());
 
 /**
  * Function runs on page load to initialise an EyeDraw canvas
@@ -177,7 +260,11 @@ function eyeDrawInit(_properties, _containerElement) {
 	// Create a drawing linked to the canvas
 	var drawingInstance = window[_properties.drawingName] = new ED.Drawing(canvas, _properties.eye, _properties.idSuffix, _properties.isEditable, options);
 
-	initToolbar(drawingInstance, _containerElement);
+	initToolBar(drawingInstance, _containerElement);
+
+	var doodlePopup = new DoodlePopup(drawingInstance, _containerElement);
+
+	// initDoodlePopup(drawingInstance, _containerElement);
 
 	// Create a controller object for this drawing with a unique name
 	window['ed_controller_' + _properties.idSuffix] = new eyeDrawController(window[_properties.drawingName]);
@@ -200,7 +287,7 @@ function eyeDrawInit(_properties, _containerElement) {
 		this.drawing = _drawing;
 
 		// Register controller for notifications
-		this.drawing.registerForNotifications(this, 'notificationHandler', ['ready', 'doodlesLoaded', 'doodleAdded', 'doodleDeleted', 'doodleSelected', 'mousedragged', 'parameterChanged']);
+		this.drawing.registerForNotifications(this, 'notificationHandler', ['ready', 'doodlesLoaded', 'doodleAdded', 'doodleDeleted', 'doodleSelected', 'doodleDeselected', 'mousedragged', 'parameterChanged']);
 
 		// Method called for notification
 		this.notificationHandler = function(_messageArray) {
@@ -284,6 +371,7 @@ function eyeDrawInit(_properties, _containerElement) {
 							canvas.focus();
 						}
 					}
+
 					break;
 
 				case 'doodleDeleted':
@@ -291,6 +379,10 @@ function eyeDrawInit(_properties, _containerElement) {
 					if (input != null && input.value.length > 0) {
 						input.value = this.drawing.save();
 					}
+					break;
+
+				case 'doodleDeselected':
+
 					break;
 
 				case 'doodleSelected':

@@ -46,7 +46,7 @@
 					<h2 class="event-title">Event title</h2>
 
 					<!-- Introduction -->
-					<section class="element">
+					<section class="element hide">
 						<header class="element-header">
 							<h3 class="element-title">Introduction</h3>
 						</header>
@@ -301,7 +301,7 @@
 												<!-- CANVAS -->
 												<canvas
 												id="ed_example"
-												class="ed_canvas_edit"
+												class="eyedraw-canvas-edit"
 												width="300"
 												height="300"
 												tabindex="1">
@@ -320,6 +320,45 @@
 															<option>None</option>
 														</select>
 													</div>
+												</div>
+
+												<!-- DOODLE POPUP -->
+												<div class="eyedraw-doodle-popup">
+													<h4 class="eyedraw-doodle-popup-heading">
+														<span class="eyedraw-button">
+															<span class="icon icon-ed-NuclearCataract"></span>
+														</span>
+														<span class="title">Nuclear cataract</span>
+													</h4>
+													<div class="help-msg">Adjust and move to position and size correctly.</div>
+													<ul class="eyedraw-toolbar-panel">
+														<li>
+															<a class="eyedraw-button" href="#" data-function="lock">
+																<span class="icon-ed-lock"></span>
+																<span class="label">Lock</span>
+															</a>
+														</li>
+														<li>
+															<a class="eyedraw-button" href="#" data-function="moveToBack">
+																<span class="icon-ed-move-to-back"></span>
+																<span class="label">Move to back</span>
+															</a>
+														</li>
+														<li>
+															<a class="eyedraw-button" href="#" data-function="moveToFront">
+																<span class="icon-ed-move-to-front"></span>
+																<span class="label">Move to front</span>
+															</a>
+														</li>
+														<li>
+															<a class="eyedraw-button" href="#" data-function="deleteSelectedDoodle">
+																<span class="icon-ed-delete"></span>
+																<span class="label">Delete</span>
+															</a>
+														</li>
+													</ul>
+													<a href="#" class="eyedraw-doodle-popup-toggle">
+													</a>
 												</div>
 
 												<!-- DATA FIELD -->
@@ -403,7 +442,7 @@
 					<!-- END Anterior segment -->
 
 					<!-- Toolbar example -->
-					<section class="element">
+					<section class="element hide">
 						<header class="element-header">
 							<h3 class="element-title">Toolbar &amp; icons</h3>
 						</header>
@@ -843,7 +882,7 @@
 					</section>
 
 					<!-- Developer notes -->
-					<section class="element">
+					<section class="element hide">
 						<header class="element-header">
 							<h3 class="element-title">Developer notes:</h3>
 						</header>
