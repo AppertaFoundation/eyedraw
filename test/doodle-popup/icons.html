@@ -62,6 +62,7 @@
 		</div>
 	</div>
 	<script>
+
 	(function toggleIconCentres() {
 		var container = document.getElementById('icons');
 		var button = document.getElementById('show-centres');
@@ -72,27 +73,35 @@
 
 	(function createIconSpans() {
 
+		if (/file/.test(window.location.protocol)) {
+			return alert([
+				'Unable to parse the stylesheet because this file is being served using the file:// prototcol.',
+				'You need to serve this page through a web-server (http) in order to view the icons.'
+			].join('\n\n'));
+		}
+
+		// Converts a NodeList/HTMLCollection to an array
 		function toArray(list) {
 			return Array.prototype.slice.call(list);
 		}
 
-		var container = document.getElementById('icons');
-
+		// Get the oe-eyedraw stylesheet.
 		var styleSheet = toArray(document.styleSheets).filter(function(ss) {
 			return ss.ownerNode.id === 'ed-stylesheet';
 		})[0];
 
-		// Here we simply loop through the stylesheet rules, filter out the icon
-		// selectors, and create <span> elements with classes that match the selectors.
-		var html = toArray(styleSheet.cssRules).filter(function(rule) {
+		// Loop through the stylesheet rules, filter out the icon clasess...
+		var iconClasses = toArray(styleSheet.cssRules).filter(function(rule) {
 			return /^\.icon-/.test(rule.selectorText) && !/:/.test(rule.selectorText)
-		}).map(function(rule) {
+		});
+
+		// ..and create <span> elements for the classes
+		var html = iconClasses.map(function(rule) {
 			var className = rule.selectorText.replace(/[\.,]/g, '');
 			return '<span class="icon-example ' + className + '" title=".' + className + '"></span>';
 		}).join('');
 
-		container.innerHTML = html;
-
+		document.getElementById('icons').innerHTML = html;
 	}());
 	</script>
 </body>
