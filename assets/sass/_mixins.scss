@@ -1,4 +1,20 @@
-// Clearfix mixing for clearing floats.
+// * OpenEyes
+// *
+// * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
+// * (C) OpenEyes Foundation, 2011-2013
+// * This file is part of OpenEyes.
+// * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+// * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+// * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+// *
+// * @package OpenEyes
+// * @link http://www.openeyes.org.uk
+// * @author OpenEyes <info@openeyes.org.uk>
+// * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
+// * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
+// * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+
+// Clearfix mixin for clearing floats.
 @mixin clearfix {
 	*zoom: 1;
 	&:before, &:after {
@@ -17,26 +33,51 @@
 // @param $height      The height of the sprite grid.
 // @param $addStates   Add states to generated classes, if state images exist on filesystem?
 @mixin sprite($path, $prefixClass, $width, $height, $addStates: true) {
+	// A list of interaction states.
+	$states: (hover, active, target);
+	// A list to store ignored images.
 	$ignore: ();
+	// Generate the sprite image map.
 	$spriteMap: sprite-map($path);
+	// Rules for all generated classes.
 	[class*="#{$prefixClass}-"] {
-		background: $spriteMap no-repeat;
+		background: {
+			image: $spriteMap;
+			repeat: no-repeat;
+			// Hide the background for classes that don't have any rules.
+			position: -9999px -9999px;
+		};
 		width: $width;
 		height: $height;
 	}
-	@each $i in sprite_names($spriteMap) {
+	// Loop through all images in this sprite map.
+	@each $i in sprite-names($spriteMap) {
+		// A list of found image states.
+		$imageStates: ();
+		// First, find corresponding state images and add them to the list.
+		// We do this first to /reliably/ ensure the state classes do not also get
+		// output with the pseudo versions.
+		@if $addStates == true {
+			@each $state in $states {
+				// Found state image!
+				@if sprite-has-selector($spriteMap, $i, $state) {
+					// Build up list of states.
+					$imageStates: append($imageStates, $state);
+					// Add to ignore list to prevent the non-pseudo class from being generated.
+					$ignore: append($ignore, unquote("#{$i}_#{$state}"));
+				}
+			}
+		}
+		// Output the classes for this image.
 		@if index($ignore, #{$i}) == false {
+			// Default.
 			.#{$prefixClass}-#{$i} {
 				background-position: sprite-position($spriteMap, $i);
 			}
-		}
-		@if $addStates == true {
-			@each $state in hover, active, target {
-				@if sprite_has_selector($spriteMap, $i, $state) {
-					.#{$prefixClass}-#{$i}:#{$state} {
-						background-position: sprite-position($spriteMap, #{$i}_#{$state});
-					}
-					$ignore: append($ignore, unquote("#{$i}_#{$state}"));
+			// State classes (pseudo).
+			@each $state in $imageStates {
+				.#{$prefixClass}-#{$i}:#{$state} {
+					background-position: sprite-position($spriteMap, #{$i}_#{$state});
 				}
 			}
 		}
