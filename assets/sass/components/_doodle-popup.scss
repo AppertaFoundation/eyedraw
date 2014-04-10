@@ -1,0 +1,104 @@
+// * OpenEyes
+// *
+// * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
+// * (C) OpenEyes Foundation, 2011-2013
+// * This file is part of OpenEyes.
+// * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+// * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+// * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+// *
+// * @package OpenEyes
+// * @link http://www.openeyes.org.uk
+// * @author OpenEyes <info@openeyes.org.uk>
+// * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
+// * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
+// * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+
+.eyedraw-doodle-popup {
+	@include border-radius(4px);
+	@include box-shadow(2px 2px 6px rgba(0, 0, 0, 0.4));
+	@include transition(all 0.6s ease);
+	background: #e5edf4;
+	border: 3px solid #68c8f8;
+	padding: 5px;
+	position: absolute;
+	right: -168px;
+	top: 3px;
+	width: 168px;
+	height: 242px;
+	z-index: 100;
+	-webkit-transform: translate3d(0, 0, 0);
+	-webkit-backface-visibility: hidden;
+	-webkit-perspective: 1000;
+	&.closed {
+		right: 0;
+	}
+	.eyedraw-toolbar-panel {
+		position: absolute;
+		left: 5px;
+		bottom: 5px;
+		li {
+			margin-bottom: 0;
+			margin-right: 8px;
+			&:last-child {
+				margin-right: 0;
+			}
+		}
+	}
+	.help-msg {
+		font-size: 12px;
+		color: #666;
+		font-style: italic;
+	}
+}
+
+.eyedraw-doodle-popup-heading {
+	@extend %clearfix;
+	color: #000;
+	font-size: 14px;
+	margin-top: 0;
+	.eyedraw-button {
+		float: left;
+		margin-right: 5px;
+	}
+}
+
+%eyedraw-doodle-popup-toggle-background-open {
+	background: {
+		color: #68c8f8;
+		image: url(../img/icons/16x16/close-drawer.png);
+		repeat: no-repeat;
+		position: 1px 4px;
+	};
+}
+
+%eyedraw-doodle-popup-toggle-background-closed {
+	background: {
+		color: #68c8f8;
+		image: url(../img/icons/16x16/open-drawer.png);
+		repeat: no-repeat;
+		position: 1px 4px;
+	};
+}
+
+.eyedraw-doodle-popup-toggle {
+	@extend %eyedraw-doodle-popup-toggle-background-open;
+	@include border-radius(0 6px 6px 0);
+	@include box-shadow(2px 2px 4px rgba(0, 0, 0, 0.4));
+	display: block;
+	height: 25px;
+	margin-top: -12px;
+	position: absolute;
+	right: -23px;
+	top: 50%;
+	width: 20px;
+	&:hover {
+		@extend %eyedraw-doodle-popup-toggle-background-open;
+	}
+	.closed & {
+		@extend %eyedraw-doodle-popup-toggle-background-closed;
+		&:hover {
+			@extend %eyedraw-doodle-popup-toggle-background-closed;
+		}
+	}
+}

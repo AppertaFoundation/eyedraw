@@ -16,14 +16,16 @@
 
 canvas {
 	// Canvas element in edit mode
-	&.ed_canvas_edit {
+	&.eyedraw-canvas-edit {
 		background: #e4edf5;
 		border: 1px solid #b0bac3;
 		cursor: pointer;
 		margin: 3px 0 3px 3px;
+		position: relative;
+		z-index: 101;
 	}
 	// Canvas element in display mode
-	&.ed_canvas_display {
+	&.eyedraw-canvas-display {
 		border: none;
 		cursor: auto;
 		margin: 0px;
