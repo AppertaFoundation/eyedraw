@@ -24,16 +24,16 @@
  * @version 0.9
  */
 /* line 17, ../sass/_placeholders.scss */
-.eyedraw-widget, .eyedraw-toolbar-panel {
+.eyedraw-widget, .eyedraw-toolbar-panel, .eyedraw-doodle-popup-heading {
   *zoom: 1;
 }
 /* line 20, ../sass/_mixins.scss */
-.eyedraw-widget:before, .eyedraw-toolbar-panel:before, .eyedraw-widget:after, .eyedraw-toolbar-panel:after {
+.eyedraw-widget:before, .eyedraw-toolbar-panel:before, .eyedraw-doodle-popup-heading:before, .eyedraw-widget:after, .eyedraw-toolbar-panel:after, .eyedraw-doodle-popup-heading:after {
   content: " ";
   display: table;
 }
 /* line 24, ../sass/_mixins.scss */
-.eyedraw-widget:after, .eyedraw-toolbar-panel:after {
+.eyedraw-widget:after, .eyedraw-toolbar-panel:after, .eyedraw-doodle-popup-heading:after {
   clear: both;
 }
 
@@ -137,7 +137,7 @@
   position: absolute;
   top: 32px;
   white-space: nowrap;
-  z-index: 99;
+  z-index: 102;
 }
 /* line 47, ../sass/components/toolbar/_button.scss */
 .eyedraw-button:hover .label {
@@ -729,20 +729,46 @@
   background-position: 0 -1760px;
 }
 
+/* line 43, ../sass/_mixins.scss */
+[class*="icon-ed-small-"] {
+  background-image: url('../img/sprites/icons/16x16-s112e9b0ce0.png');
+  background-repeat: no-repeat;
+  background-position: -9999px -9999px;
+  width: 16px;
+  height: 16px;
+}
+
+/* line 74, ../sass/_mixins.scss */
+.icon-ed-small-close-drawer {
+  background-position: 0 -32px;
+}
+
+/* line 74, ../sass/_mixins.scss */
+.icon-ed-small-open-drawer {
+  background-position: 0 -16px;
+}
+
+/* line 74, ../sass/_mixins.scss */
+.icon-ed-small-selected-doodle {
+  background-position: 0 0;
+}
+
 /* line 19, ../sass/components/_editor.scss */
-canvas.ed_canvas_edit {
+canvas.eyedraw-canvas-edit {
   background: #e4edf5;
   border: 1px solid #b0bac3;
   cursor: pointer;
   margin: 3px 0 3px 3px;
+  position: relative;
+  z-index: 101;
 }
-/* line 26, ../sass/components/_editor.scss */
-canvas.ed_canvas_display {
+/* line 28, ../sass/components/_editor.scss */
+canvas.eyedraw-canvas-display {
   border: none;
   cursor: auto;
   margin: 0px;
 }
-/* line 32, ../sass/components/_editor.scss */
+/* line 34, ../sass/components/_editor.scss */
 canvas:focus {
   outline: none;
 }
@@ -822,4 +848,104 @@ span.squiggle {
   background-position: 1px 3px;
   border: 2px solid #68c8f8;
   padding: 2px 2px 2px 20px;
+}
+
+/* line 17, ../sass/components/_doodle-popup.scss */
+.eyedraw-doodle-popup {
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  -ms-border-radius: 4px;
+  -o-border-radius: 4px;
+  border-radius: 4px;
+  -webkit-box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.4);
+  -moz-box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.4);
+  box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.4);
+  -webkit-transition: all 0.6s ease;
+  -moz-transition: all 0.6s ease;
+  -o-transition: all 0.6s ease;
+  transition: all 0.6s ease;
+  background: #e5edf4;
+  border: 3px solid #68c8f8;
+  padding: 5px;
+  position: absolute;
+  right: -168px;
+  top: 3px;
+  width: 168px;
+  height: 242px;
+  z-index: 100;
+  -webkit-transform: translate3d(0, 0, 0);
+  -webkit-backface-visibility: hidden;
+  -webkit-perspective: 1000;
+}
+/* line 33, ../sass/components/_doodle-popup.scss */
+.eyedraw-doodle-popup.closed {
+  right: 0;
+}
+/* line 36, ../sass/components/_doodle-popup.scss */
+.eyedraw-doodle-popup .eyedraw-toolbar-panel {
+  position: absolute;
+  left: 5px;
+  bottom: 5px;
+}
+/* line 40, ../sass/components/_doodle-popup.scss */
+.eyedraw-doodle-popup .eyedraw-toolbar-panel li {
+  margin-bottom: 0;
+  margin-right: 8px;
+}
+/* line 43, ../sass/components/_doodle-popup.scss */
+.eyedraw-doodle-popup .eyedraw-toolbar-panel li:last-child {
+  margin-right: 0;
+}
+/* line 48, ../sass/components/_doodle-popup.scss */
+.eyedraw-doodle-popup .help-msg {
+  font-size: 12px;
+  color: #666;
+  font-style: italic;
+}
+
+/* line 55, ../sass/components/_doodle-popup.scss */
+.eyedraw-doodle-popup-heading {
+  color: #000;
+  font-size: 14px;
+  margin-top: 0;
+}
+/* line 60, ../sass/components/_doodle-popup.scss */
+.eyedraw-doodle-popup-heading .eyedraw-button {
+  float: left;
+  margin-right: 5px;
+}
+
+/* line 66, ../sass/components/_doodle-popup.scss */
+.eyedraw-doodle-popup-toggle, .eyedraw-doodle-popup-toggle:hover {
+  background-color: #68c8f8;
+  background-image: url(../img/icons/16x16/close-drawer.png);
+  background-repeat: no-repeat;
+  background-position: 1px 4px;
+}
+
+/* line 75, ../sass/components/_doodle-popup.scss */
+.closed .eyedraw-doodle-popup-toggle, .closed .eyedraw-doodle-popup-toggle:hover {
+  background-color: #68c8f8;
+  background-image: url(../img/icons/16x16/open-drawer.png);
+  background-repeat: no-repeat;
+  background-position: 1px 4px;
+}
+
+/* line 84, ../sass/components/_doodle-popup.scss */
+.eyedraw-doodle-popup-toggle {
+  -webkit-border-radius: 0 6px 6px 0;
+  -moz-border-radius: 0 6px 6px 0;
+  -ms-border-radius: 0 6px 6px 0;
+  -o-border-radius: 0 6px 6px 0;
+  border-radius: 0 6px 6px 0;
+  -webkit-box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
+  -moz-box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
+  display: block;
+  height: 25px;
+  margin-top: -12px;
+  position: absolute;
+  right: -23px;
+  top: 50%;
+  width: 20px;
 }
