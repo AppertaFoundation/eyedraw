@@ -817,7 +817,7 @@ span.squiggle {
   padding: 4px 6px;
   position: absolute;
   width: auto;
-  z-index: 99;
+  z-index: 102;
 }
 
 /* line 17, ../sass/components/_fields.scss */

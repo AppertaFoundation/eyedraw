@@ -158,6 +158,7 @@ ED.Toolbar = (function() {
 
 	Toolbar.prototype.onButtonClick = function(e) {
 		e.preventDefault();
+		e.stopImmediatePropagation();
 
 		var button = $(e.currentTarget);
 		var fn = button.data('function');
@@ -165,8 +166,12 @@ ED.Toolbar = (function() {
 
 		if (typeof this.drawing[fn] === 'function') {
 			this.drawing[fn](arg);
+			this.emit('doodle.action', {
+				fn: fn,
+				arg: arg
+			});
 		} else {
-			this.emit('error.doodle', 'Invalid doodle function: ' + fn);
+			this.emit('doodle.error', 'Invalid doodle function: ' + fn);
 		}
 	};
 
@@ -180,9 +185,14 @@ ED.Toolbar = (function() {
 
 ED.DoodlePopup = (function() {
 
+	/** Helpers */
 	function ucFirst(str) {
 		return str.charAt(0).toUpperCase() + str.slice(1);
 	}
+
+	/** Constants */
+	var OPEN = 'open';
+	var CLOSED = 'closed';
 
 	/**
 	 * DoodlePopup constructor
@@ -194,10 +204,28 @@ ED.DoodlePopup = (function() {
 
 		EventEmitter2.call(this);
 
-		this.container = widgetContainer.find('.eyedraw-doodle-popup');
-		this.template = $('#eyedraw-doodle-popup-template').html();
-
 		this.drawing = drawing;
+		this.container = widgetContainer.find('.eyedraw-doodle-popup');
+		this.currentDoodle = null;
+		this.state = CLOSED;
+
+		this.createToolbar();
+		this.createTemplate();
+		this.registerForNotifications();
+	}
+
+	DoodlePopup.prototype = Object.create(EventEmitter2.prototype);
+
+	DoodlePopup.prototype.createToolbar = function() {
+		this.toolbar = new ED.Toolbar(this.drawing, this.container);
+		this.toolbar.on('doodle.action', this.compileTemplate.bind(this, null));
+	};
+
+	DoodlePopup.prototype.createTemplate = function() {
+		this.template = $('#eyedraw-doodle-popup-template').html();
+	};
+
+	DoodlePopup.prototype.registerForNotifications = function() {
 		this.drawing.registerForNotifications(this, 'notificationHandler', [
 			'ready',
 			'doodleAdded',
@@ -205,9 +233,7 @@ ED.DoodlePopup = (function() {
 			'doodleSelected',
 			'doodleDeselected'
 		]);
-	}
-
-	DoodlePopup.prototype = Object.create(EventEmitter2.prototype);
+	};
 
 	DoodlePopup.prototype.notificationHandler = function(notification) {
 		var handlerName = 'on' + ucFirst(notification['eventName']);
@@ -218,12 +244,14 @@ ED.DoodlePopup = (function() {
 	 * Run only when the drawing is ready.
 	 */
 	DoodlePopup.prototype.init = function() {
-		setTimeout(this.hide.bind(this));
 		this.container.on('click', '.eyedraw-doodle-popup-toggle', this.onToggleClick.bind(this));
 	};
 
 	DoodlePopup.prototype.compileTemplate = function(data) {
-		var html = Mustache.render(this.template, data);
+		if (data) {
+			this.templateData = data;
+		}
+		var html = Mustache.render(this.template, this.templateData);
 		this.container.html(html);
 	};
 
@@ -237,16 +265,33 @@ ED.DoodlePopup = (function() {
 	};
 
 	DoodlePopup.prototype.hide = function() {
+		this.state = CLOSED;
 		this.container.addClass('closed');
 	};
 
 	DoodlePopup.prototype.show = function() {
+		if (this.currentDoodle.isLocked){
+			return;
+		}
+		this.state = OPEN;
+		this.selectDoodle();
 		this.container.removeClass('closed');
 	};
 
+	DoodlePopup.prototype.selectDoodle = function() {
+		if (!this.currentDoodle.isSelected && !this.currentDoodle.isLocked) {
+			this.currentDoodle.isSelected = true;
+			this.currentDoodle.onSelection();
+			this.drawing.repaint();
+		}
+	};
+
+	/** EVENT HANDLERS */
+
 	DoodlePopup.prototype.onToggleClick = function(e) {
 		e.preventDefault();
-		this.container.toggleClass('closed');
+		var func = (this.state === CLOSED ? 'show' : 'hide');
+		this[func]();
 	}
 
 	DoodlePopup.prototype.onReady = function(notification) {
@@ -254,6 +299,7 @@ ED.DoodlePopup = (function() {
 	};
 
 	DoodlePopup.prototype.onDoodleAdded = function(notification) {
+		this.currentDoodle = notification.selectedDoodle;
 		this.update(true, notification.selectedDoodle);
 	};
 
@@ -262,6 +308,7 @@ ED.DoodlePopup = (function() {
 	};
 
 	DoodlePopup.prototype.onDoodleSelected = function(notification) {
+		this.currentDoodle = notification.selectedDoodle;
 		setTimeout(this.update.bind(this, true, notification.selectedDoodle));
 	};
 
@@ -492,7 +539,7 @@ ED.init = function(_properties) {
 	var drawing = new ED.Drawing(canvas, _properties.eye, _properties.idSuffix, _properties.isEditable, drawingOptions);
 
 	// Views
-	var toolbar = new ED.Toolbar(drawing, container);
+	var toolbar = new ED.Toolbar(drawing, container.find('.eyedraw-toolbar-panel'));
 	var doodlePopup = new ED.DoodlePopup(drawing, container);
 
 	// Controller
