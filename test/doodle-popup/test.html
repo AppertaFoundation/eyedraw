@@ -357,10 +357,18 @@
 							<div class="element-eye left-eye column side right" data-side="left">
 								<div class="data-row">
 									<div class="data-value">
-										<p><strong>Notes:</strong></p>
+										<p><strong>UX Notes/issues:</strong></p>
 										<ul>
-											<li>This demonstrates the anterior segment eyedraw in edit mode.</li>
+											<li>This is just a prototype!</li>
+											<li>The drawer handle overlays fields.</li>
+											<li>Doodle's cannot be selected after they are locked.</li>
 											<li><em>Field 1</em> and <em>Option 1</em> are currently bound to the EyeDraw in this example.</li>
+											<li>"Currently selected" has not been implemented yet.
+										</ul>
+										<p><strong>Dev issues:</strong></p>
+										<ul>
+											<li>Doodle controls have not been implemented</li>
+											<li>Button management is not working as previously (eg, disabling of adding new doodles etc)</li>
 										</ul>
 									</div>
 								</div>
@@ -852,22 +860,22 @@
 			<div class="help-msg">{{helpmsg}}</div>
 		{{/helpmsg}}
 		<ul class="eyedraw-toolbar-panel">
-			{{#locked}}
+			{{#doodle.isLocked}}
 				<li>
 					<a class="eyedraw-button" href="#" data-function="unlock">
 						<span class="icon-ed-unlock"></span>
 						<span class="label">Unlock</span>
 					</a>
 				</li>
-			{{/locked}}
-			{{^locked}}
+			{{/doodle.isLocked}}
+			{{^doodle.isLocked}}
 				<li>
 					<a class="eyedraw-button" href="#" data-function="lock">
 						<span class="icon-ed-lock"></span>
 						<span class="label">Lock</span>
 					</a>
 				</li>
-			{{/locked}}
+			{{/doodle.isLocked}}
 			<li>
 				<a class="eyedraw-button" href="#" data-function="moveToBack">
 					<span class="icon-ed-move-to-back"></span>

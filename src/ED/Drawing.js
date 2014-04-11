@@ -1900,9 +1900,12 @@ ED.Drawing.prototype.lock = function() {
 			if (this.doodleArray[i].isSelected) {
 				this.doodleArray[i].isLocked = true;
 				this.doodleArray[i].isSelected = false;
+				this.doodleArray[i].onDeselection();
 				this.selectedDoodle = null;
 			}
 		}
+
+		// this.notify("doodleDeselected");
 
 		// Refresh canvas
 		this.repaint();
