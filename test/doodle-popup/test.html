@@ -14,6 +14,8 @@
 
 	<!-- Other dependent scripts -->
 	<script type="text/javascript" src="../../assets/components/jquery/jquery.min.js"></script>
+	<script type="text/javascript" src="../../assets/components/mustache/mustache.js"></script>
+	<script type="text/javascript" src="../../assets/components/eventemitter2/lib/eventemitter2.js"></script>
 
 	<!-- Load in the eyedraw scripts -->
 	<script>
@@ -65,46 +67,7 @@
 							<div class="element-eye right-eye column side left" data-side="right">
 
 								<!-- EYEDRAW WIDGET START -->
-								<div class="eyedraw-widget anterior-segment" id="eyedrawwidget_example" data-options='{
-									"drawingName": "ed_example",
-									"canvasId": "ed_example",
-									"eye": 0,
-									"scale": 1,
-									"idSuffix": "",
-									"isEditable": true,
-									"focus": false,
-									"graphicsPath": "../../assets/img/",
-									"inputId": "ed_example_data",
-									"onReadyCommandArray": [
-										[
-											"addDoodle",
-											[
-												"AntSeg"
-											]
-										],
-										[
-											"deselectDoodles",
-											[]
-										]
-									],
-									"onDoodlesLoadedCommandArray": [],
-									"bindingArray": {
-										"AntSeg": {
-											"pupilSize": {
-												"id": "eyedraw-field-1",
-												"attribute": "data-value"
-											},
-											"pxe": {
-												"id": "field-option-1"
-											}
-										}
-									},
-									"syncArray": [],
-									"listenerArray": [],
-									"offsetX": 0,
-									"offsetY": 0,
-									"toImage": false
-								}'>
+								<div class="eyedraw-widget anterior-segment" id="eyedrawwidget_example">
 
 									<!-- TOOLBAR START -->
 									<div class="eyedraw-toolbar">
@@ -323,42 +286,7 @@
 												</div>
 
 												<!-- DOODLE POPUP -->
-												<div class="eyedraw-doodle-popup">
-													<h4 class="eyedraw-doodle-popup-heading">
-														<span class="eyedraw-button">
-															<span class="icon icon-ed-NuclearCataract"></span>
-														</span>
-														<span class="title">Nuclear cataract</span>
-													</h4>
-													<div class="help-msg">Adjust and move to position and size correctly.</div>
-													<ul class="eyedraw-toolbar-panel">
-														<li>
-															<a class="eyedraw-button" href="#" data-function="lock">
-																<span class="icon-ed-lock"></span>
-																<span class="label">Lock</span>
-															</a>
-														</li>
-														<li>
-															<a class="eyedraw-button" href="#" data-function="moveToBack">
-																<span class="icon-ed-move-to-back"></span>
-																<span class="label">Move to back</span>
-															</a>
-														</li>
-														<li>
-															<a class="eyedraw-button" href="#" data-function="moveToFront">
-																<span class="icon-ed-move-to-front"></span>
-																<span class="label">Move to front</span>
-															</a>
-														</li>
-														<li>
-															<a class="eyedraw-button" href="#" data-function="deleteSelectedDoodle">
-																<span class="icon-ed-delete"></span>
-																<span class="label">Delete</span>
-															</a>
-														</li>
-													</ul>
-													<a href="#" class="eyedraw-doodle-popup-toggle">
-													</a>
+												<div class="eyedraw-doodle-popup closed">
 												</div>
 
 												<!-- DATA FIELD -->
@@ -912,15 +840,100 @@
 		</div>
 	</div>
 
-	<!-- EYEDRAW INIT -->
+	<!-- Doodle Popup template -->
+	<script type="text/html" id="eyedraw-doodle-popup-template">
+		<h4 class="eyedraw-doodle-popup-heading">
+			<span class="eyedraw-button">
+				<span class="icon icon-ed-{{doodle.className}}"></span>
+			</span>
+			<span class="title">{{doodle.className}}</span>
+		</h4>
+		{{#helpmsg}}
+			<div class="help-msg">{{helpmsg}}</div>
+		{{/helpmsg}}
+		<ul class="eyedraw-toolbar-panel">
+			{{#locked}}
+				<li>
+					<a class="eyedraw-button" href="#" data-function="unlock">
+						<span class="icon-ed-unlock"></span>
+						<span class="label">Unlock</span>
+					</a>
+				</li>
+			{{/locked}}
+			{{^locked}}
+				<li>
+					<a class="eyedraw-button" href="#" data-function="lock">
+						<span class="icon-ed-lock"></span>
+						<span class="label">Lock</span>
+					</a>
+				</li>
+			{{/locked}}
+			<li>
+				<a class="eyedraw-button" href="#" data-function="moveToBack">
+					<span class="icon-ed-move-to-back"></span>
+					<span class="label">Move to back</span>
+				</a>
+			</li>
+			<li>
+				<a class="eyedraw-button" href="#" data-function="moveToFront">
+					<span class="icon-ed-move-to-front"></span>
+					<span class="label">Move to front</span>
+				</a>
+			</li>
+			{{#doodle.isDeletable}}
+				<li>
+					<a class="eyedraw-button" href="#" data-function="deleteSelectedDoodle">
+						<span class="icon-ed-delete"></span>
+						<span class="label">Delete</span>
+					</a>
+				</li>
+			{{/doodle.isDeletable}}
+		</ul>
+		<a href="#" class="eyedraw-doodle-popup-toggle">
+		</a>
+	</script>
+
 	<script>
 	(function() {
-		$('.eyedraw-widget').each(function(i, elem) {
-			elem = $(elem);
-			var opts = elem.data('options');
-			if (opts) {
-				eyeDrawInit(opts, elem);
-			}
+		ED.init({
+			drawingName: "ed_example",
+			canvasId: "ed_example",
+			eye: 0,
+			scale: 1,
+			idSuffix: "",
+			isEditable: true,
+			focus: false,
+			graphicsPath: "../../assets/img/",
+			inputId: "ed_example_data",
+			onReadyCommandArray: [
+				[
+					"addDoodle",
+					[
+						"AntSeg"
+					]
+				],
+				[
+					"deselectDoodles",
+					[]
+				]
+			],
+			onDoodlesLoadedCommandArray: [],
+			bindingArray: {
+				AntSeg: {
+					pupilSize: {
+						id: "eyedraw-field-1",
+						attribute: "data-value"
+					},
+					pxe: {
+						id: "field-option-1"
+					}
+				}
+			},
+			syncArray: [],
+			listenerArray: [],
+			offsetX: 0,
+			offsetY: 0,
+			toImage: false
 		});
 	}());
 	</script>
