@@ -114,55 +114,88 @@ function EyeDrawReadyListener(_drawing) {
 
 
 
-function initToolBar(drawing, container) {
+ED.Toolbar = (function() {
 
-	container = $(container);
+	/**
+	 * Toolbar constructor
+	 * @param {ED.Drawing} drawing   A doodle drawing instance.
+	 * @param {HTMLElement} container The widget container element
+	 * @extends {EventEmitter2}
+	 */
+	function Toolbar(drawing, container) {
+		EventEmitter2.call(this);
 
-	function onDrawerButtonClick(e) {
-		e.preventDefault();
-		e.stopImmediatePropagation();
-		var button = $(e.currentTarget);
-		button.closest('.drawer').toggleClass('active');
+		this.drawing = drawing;
+		this.container = $(container);
+		this.drawing.registerForNotifications(this, 'notificationHandler', [
+			'ready'
+		]);
 	}
 
-	function onButtonClick(e) {
+	Toolbar.prototype = Object.create(EventEmitter2.prototype);
+
+	Toolbar.prototype.notificationHandler = function(notification) {
+		if (notification.eventName === 'ready') {
+			this.init();
+		}
+	};
+
+	Toolbar.prototype.init = function() {
+
+		this.container
+			.on('click', '.eyedraw-toolbar .drawer > a', this.onDrawerButtonClick.bind(this))
+			.on('click', '.eyedraw-button', this.onButtonClick.bind(this));
+
+		$(document)
+			.on('click', this.onDocumentClick.bind(this));
+	};
+
+	Toolbar.prototype.onDrawerButtonClick = function(e) {
+		e.preventDefault();
+		e.stopImmediatePropagation();
+		$(e.currentTarget).closest('.drawer').toggleClass('active');
+	};
+
+	Toolbar.prototype.onButtonClick = function(e) {
 		e.preventDefault();
 
 		var button = $(e.currentTarget);
 		var fn = button.data('function');
 		var arg = button.data('arg');
 
-		if (typeof drawing[fn] === 'function') {
-			drawing[fn](arg);
+		if (typeof this.drawing[fn] === 'function') {
+			this.drawing[fn](arg);
 		} else {
-			console.error([
-				'EyeDraw toolbar error!',
-				'Function "%s" does not exist for this drawing.'
-			].join(''), fn);
+			this.emit('error.doodle', 'Invalid doodle function: ' + fn);
 		}
-	}
+	};
 
-	function onDocumentClick(e) {
-		container.find('.drawer').removeClass('active');
-	}
+	Toolbar.prototype.onDocumentClick = function(e) {
+		// Close any open drawers.
+		this.container.find('.drawer').removeClass('active');
+	};
 
-	container.on('click', '.eyedraw-toolbar .drawer > a', onDrawerButtonClick);
-	container.on('click', '.eyedraw-button', onButtonClick);
-	$(document).on('click', onDocumentClick);
-}
+	return Toolbar;
+}());
 
-var DoodlePopup = (function() {
+ED.DoodlePopup = (function() {
 
 	function ucFirst(str) {
 		return str.charAt(0).toUpperCase() + str.slice(1);
 	}
 
+	/**
+	 * DoodlePopup constructor
+	 * @param {ED.Drawing} drawing   A doodle drawing instance.
+	 * @param {HTMLElement} widgetContainer The widget container element
+	 * @extends {EventEmitter2}
+	 */
 	function DoodlePopup(drawing, widgetContainer) {
 
+		EventEmitter2.call(this);
+
 		this.container = widgetContainer.find('.eyedraw-doodle-popup');
-		this.heading = this.container.find('.eyedraw-doodle-popup-heading');
-		this.title = this.heading.find('.title');
-		this.icon = this.heading.find('.icon');
+		this.template = $('#eyedraw-doodle-popup-template').html();
 
 		this.drawing = drawing;
 		this.drawing.registerForNotifications(this, 'notificationHandler', [
@@ -172,17 +205,32 @@ var DoodlePopup = (function() {
 			'doodleSelected',
 			'doodleDeselected'
 		]);
-
-		this.container.on('click', '.eyedraw-doodle-popup-toggle', this.onToggleClick.bind(this));
 	}
+
+	DoodlePopup.prototype = Object.create(EventEmitter2.prototype);
+
+	DoodlePopup.prototype.notificationHandler = function(notification) {
+		var handlerName = 'on' + ucFirst(notification['eventName']);
+		this[handlerName](notification);
+	};
+
+	/**
+	 * Run only when the drawing is ready.
+	 */
+	DoodlePopup.prototype.init = function() {
+		setTimeout(this.hide.bind(this));
+		this.container.on('click', '.eyedraw-doodle-popup-toggle', this.onToggleClick.bind(this));
+	};
+
+	DoodlePopup.prototype.compileTemplate = function(data) {
+		var html = Mustache.render(this.template, data);
+		this.container.html(html);
+	};
 
 	DoodlePopup.prototype.update = function(show, doodle) {
 		if (show) {
+			this.compileTemplate({ doodle: doodle });
 			this.show();
-			this.title.text(doodle.className);
-			if (doodle.isDeletable) {
-				this.icon[0].className = 'icon icon-ed-' + doodle.className;
-			}
 		} else {
 			this.hide();
 		}
@@ -201,260 +249,263 @@ var DoodlePopup = (function() {
 		this.container.toggleClass('closed');
 	}
 
-	DoodlePopup.prototype.notificationHandler = function(notification) {
-		var handlerName = 'on' + ucFirst(notification['eventName']);
-		this[handlerName](notification);
-	};
-
 	DoodlePopup.prototype.onReady = function(notification) {
-		setTimeout(this.hide.bind(this));
+		this.init();
 	};
 
 	DoodlePopup.prototype.onDoodleAdded = function(notification) {
-		console.log('doodle added', notification);
 		this.update(true, notification.selectedDoodle);
 	};
 
 	DoodlePopup.prototype.onDoodleDeleted = function(notification) {
-		console.log('doodle deleted', notification);
 		this.update(false, notification.selectedDoodle);
 	};
 
 	DoodlePopup.prototype.onDoodleSelected = function(notification) {
-		console.log('doodle selected', notification);
 		setTimeout(this.update.bind(this, true, notification.selectedDoodle));
 	};
 
 	DoodlePopup.prototype.onDoodleDeselected = function(notification) {
-		console.log('doodle deselected', notification);
 		this.update(false, notification.selectedDoodle);
 	};
 
 	return DoodlePopup;
 }());
 
-/**
- * Function runs on page load to initialise an EyeDraw canvas
- *
- * @param {array}
- *          _properties Array of properties passed from widget - drawingName The
- *          EyeDraw drawing object - canvasId The DOM id of the associated
- *          canvas element - eye The eye (right = 0, left = 1) ***TODO*** handle
- *          this better - idSuffix A suffix for DOM elements to distinguish
- *          those associated with this drawing object - isEditable Flag
- *          indicating whether drawing object is editable or not - graphicsPath
- *          Path to folder containing EyeDraw graphics, - onReadyCommandArray
- *          Array of commands and arguments to be run when images are loaded
- */
-function eyeDrawInit(_properties, _containerElement) {
-	// Get reference to the drawing canvas
-	var canvas = document.getElementById(_properties.canvasId);
+ED.Controller = function(_drawing, _toolbar, _doodlePopup, _container, _properties) {
 
-	// Options array for drawing object
-	var options = new Array();
-	options['offsetX'] = _properties.offsetX;
-	options['offsetY'] = _properties.offsetY;
-	options['toImage'] = _properties.toImage;
-	options['graphicsPath'] = _properties.graphicsPath;
+	// Assign controller properties
+	this.drawing = _drawing;
 
-	// Create a drawing linked to the canvas
-	var drawingInstance = window[_properties.drawingName] = new ED.Drawing(canvas, _properties.eye, _properties.idSuffix, _properties.isEditable, options);
+	// Register controller for notifications
+	this.drawing.registerForNotifications(this, 'notificationHandler', ['ready', 'doodlesLoaded', 'doodleAdded', 'doodleDeleted', 'doodleSelected', 'doodleDeselected', 'mousedragged', 'parameterChanged']);
 
-	initToolBar(drawingInstance, _containerElement);
+	// Handle view errors.
+	_toolbar.on('error.doodle', function(msg) {
+		alert('There was a doodle error: ' + msg);
+	});
 
-	var doodlePopup = new DoodlePopup(drawingInstance, _containerElement);
+	$(document).on('click', function(e) {
+		if($(e.target).parents().index(_container) === -1){
+			_drawing.deselectDoodles();
+		}
+	});
 
-	// initDoodlePopup(drawingInstance, _containerElement);
+	// Method called for notification
+	this.notificationHandler = function(_messageArray) {
+		// Get reference to hidden input element
+		var input = document.getElementById(_properties.inputId);
 
-	// Create a controller object for this drawing with a unique name
-	window['ed_controller_' + _properties.idSuffix] = new eyeDrawController(window[_properties.drawingName]);
+		// Handle events by name
+		switch (_messageArray['eventName']) {
+			// Drawing object ready
+			case 'ready':
 
-	// Array of additional controllers
-	var listenerList = new Array();
-	for (var i = 0; i < _properties.listenerArray.length; i++) {
-		listenerList[i] = new _properties.listenerArray[i](window[_properties.drawingName]);
-	}
-	// always capture the eyedraw being ready:
-	listenerList.push(new EyeDrawReadyListener(window[_properties.drawingName]));
+				// Set scale of drawing
+				this.drawing.globalScaleFactor = _properties.scale;
 
-	// Initialise drawing
-	window[_properties.drawingName].init();
+				// If input exists and contains data, load it into the drawing
+				if (input != null && input.value.length > 0) {
+					// Load drawing data from input element
+					this.drawing.loadDoodles(_properties.inputId);
 
-	// Controller class
-
-	function eyeDrawController(_drawing) {
-		// Assign controller properties
-		this.drawing = _drawing;
-
-		// Register controller for notifications
-		this.drawing.registerForNotifications(this, 'notificationHandler', ['ready', 'doodlesLoaded', 'doodleAdded', 'doodleDeleted', 'doodleSelected', 'doodleDeselected', 'mousedragged', 'parameterChanged']);
-
-		// Method called for notification
-		this.notificationHandler = function(_messageArray) {
-			// Get reference to hidden input element
-			var input = document.getElementById(_properties.inputId);
-
-			// Handle events by name
-			switch (_messageArray['eventName']) {
-				// Drawing object ready
-				case 'ready':
-
-					// Set scale of drawing
-					this.drawing.globalScaleFactor = _properties.scale;
-
-					// If input exists and contains data, load it into the drawing
-					if (input != null && input.value.length > 0) {
-						// Load drawing data from input element
-						this.drawing.loadDoodles(_properties.inputId);
-
-						// Refresh drawing
-						this.drawing.repaint();
-					}
-					// Otherwise run commands in onReadyCommand array
-					else {
-						for (var i = 0; i < _properties.onReadyCommandArray.length; i++) {
-							// Get method name
-							var method = _properties.onReadyCommandArray[i][0];
-							var argumentArray = _properties.onReadyCommandArray[i][1];
-
-							// Run method with arguments
-							this.drawing[method].apply(this.drawing, argumentArray);
-						}
-					}
-
-					// Apply bindings
-					if (!ED.objectIsEmpty(_properties.bindingArray)) {
-						this.drawing.addBindings(_properties.bindingArray);
-					}
-
-					// Apply delete values
-					if (!ED.objectIsEmpty(_properties.deleteValueArray)) {
-						this.drawing.addDeleteValues(_properties.deleteValueArray);
-					}
-
-					// Initialise hidden input
-					if (input != null) {
-						input.value = window[_properties.drawingName].save();
-					}
-
-					// Optionally make canvas element focussed
-					if (_properties.focus) {
-						canvas.focus();
-					}
-
-					// Mark drawing object as ready
-					this.drawing.isReady = true;
-					break;
-
-				case 'doodlesLoaded':
-					// Run commands after doodles have successfully loaded
-					for (var i = 0; i < _properties.onDoodlesLoadedCommandArray.length; i++) {
+					// Refresh drawing
+					this.drawing.repaint();
+				}
+				// Otherwise run commands in onReadyCommand array
+				else {
+					for (var i = 0; i < _properties.onReadyCommandArray.length; i++) {
 						// Get method name
-						var method = _properties.onDoodlesLoadedCommandArray[i][0];
-						var argumentArray = _properties.onDoodlesLoadedCommandArray[i][1];
+						var method = _properties.onReadyCommandArray[i][0];
+						var argumentArray = _properties.onReadyCommandArray[i][1];
 
 						// Run method with arguments
 						this.drawing[method].apply(this.drawing, argumentArray);
 					}
-					break;
+				}
 
-				case 'doodleAdded':
-					// Save drawing to hidden input
-					if (input != null && input.value.length > 0) {
-						input.value = this.drawing.save();
+				// Apply bindings
+				if (!ED.objectIsEmpty(_properties.bindingArray)) {
+					this.drawing.addBindings(_properties.bindingArray);
+				}
+
+				// Apply delete values
+				if (!ED.objectIsEmpty(_properties.deleteValueArray)) {
+					this.drawing.addDeleteValues(_properties.deleteValueArray);
+				}
+
+				// Initialise hidden input
+				if (input != null) {
+					input.value = _drawing.save();
+				}
+
+				// Optionally make canvas element focussed
+				if (_properties.focus) {
+					canvas.focus();
+				}
+
+				// Mark drawing object as ready
+				this.drawing.isReady = true;
+				break;
+
+			case 'doodlesLoaded':
+				// Run commands after doodles have successfully loaded
+				for (var i = 0; i < _properties.onDoodlesLoadedCommandArray.length; i++) {
+					// Get method name
+					var method = _properties.onDoodlesLoadedCommandArray[i][0];
+					var argumentArray = _properties.onDoodlesLoadedCommandArray[i][1];
+
+					// Run method with arguments
+					this.drawing[method].apply(this.drawing, argumentArray);
+				}
+				break;
+
+			case 'doodleAdded':
+				// Save drawing to hidden input
+				if (input != null && input.value.length > 0) {
+					input.value = this.drawing.save();
+				}
+
+				// Label doodle needs immediate keyboard input, so give canvas focus
+				var doodle = _messageArray['object'];
+				if (typeof(doodle) != 'undefined') {
+					if (doodle.className == 'Label') {
+						canvas.focus();
 					}
+				}
 
-					// Label doodle needs immediate keyboard input, so give canvas focus
-					var doodle = _messageArray['object'];
-					if (typeof(doodle) != 'undefined') {
-						if (doodle.className == 'Label') {
-							canvas.focus();
-						}
-					}
+				break;
 
-					break;
+			case 'doodleDeleted':
+				// Save drawing to hidden input
+				if (input != null && input.value.length > 0) {
+					input.value = this.drawing.save();
+				}
+				break;
 
-				case 'doodleDeleted':
-					// Save drawing to hidden input
-					if (input != null && input.value.length > 0) {
-						input.value = this.drawing.save();
-					}
-					break;
+			case 'doodleDeselected':
 
-				case 'doodleDeselected':
+				break;
 
-					break;
+			case 'doodleSelected':
+				// Ensure that selecting a doodle in one drawing de-deselects the others
+				for (var idSuffix in _properties.syncArray) {
+					var drawing = window['ed_drawing_edit_' + idSuffix];
+					drawing.deselectDoodles();
+				}
+				break;
 
-				case 'doodleSelected':
-					// Ensure that selecting a doodle in one drawing de-deselects the others
-					for (var idSuffix in _properties.syncArray) {
-						var drawing = window['ed_drawing_edit_' + idSuffix];
-						drawing.deselectDoodles();
-					}
-					break;
+			case 'mousedragged':
+				// Save drawing to hidden input
+				if (input != null && input.value.length > 0) {
+					input.value = this.drawing.save();
+				}
+				break;
 
-				case 'mousedragged':
-					// Save drawing to hidden input
-					if (input != null && input.value.length > 0) {
-						input.value = this.drawing.save();
-					}
-					break;
+			case 'parameterChanged':
+				// Get master doodle
+				var masterDoodle = _messageArray['object'].doodle;
 
-				case 'parameterChanged':
-					// Get master doodle
-					var masterDoodle = _messageArray['object'].doodle;
+				// Iterate through sync array
+				for (var idSuffix in _properties.syncArray) {
+					// Get reference to slave drawing
+					var slaveDrawing = window['ed_drawing_edit_' + idSuffix];
 
-					// Iterate through sync array
-					for (var idSuffix in _properties.syncArray) {
-						// Get reference to slave drawing
-						var slaveDrawing = window['ed_drawing_edit_' + idSuffix];
+					// Iterate through each specified className
+					for (var className in _properties.syncArray[idSuffix]) {
+						// Iterate through slave class names
+						for (var slaveClassName in _properties.syncArray[idSuffix][className]) {
+							// Slave doodle (uses first doodle in the drawing matching the className)
+							var slaveDoodle = slaveDrawing.firstDoodleOfClass(slaveClassName);
 
-						// Iterate through each specified className
-						for (var className in _properties.syncArray[idSuffix]) {
-							// Iterate through slave class names
-							for (var slaveClassName in _properties.syncArray[idSuffix][className]) {
-								// Slave doodle (uses first doodle in the drawing matching the className)
-								var slaveDoodle = slaveDrawing.firstDoodleOfClass(slaveClassName);
+							// Check that doodles exist, className matches, and sync is allowed
+							if (masterDoodle && masterDoodle.className == className && slaveDoodle && slaveDoodle.willSync) {
+								// Get array of parameters to sync
+								var parameterArray = _properties.syncArray[idSuffix][className][slaveClassName]['parameters'];
 
-								// Check that doodles exist, className matches, and sync is allowed
-								if (masterDoodle && masterDoodle.className == className && slaveDoodle && slaveDoodle.willSync) {
-									// Get array of parameters to sync
-									var parameterArray = _properties.syncArray[idSuffix][className][slaveClassName]['parameters'];
+								if (typeof(parameterArray) != 'undefined') {
+									// Iterate through parameters to sync
+									for (var i = 0; i < parameterArray.length; i++) {
+										// Check that parameter array member matches changed parameter
+										if (parameterArray[i] == _messageArray.object.parameter) {
+											// Avoid infinite loop by checking values are not equal before setting
+											if (masterDoodle[_messageArray.object.parameter] != slaveDoodle[_messageArray.object.parameter]) {
+												var increment = _messageArray.object.value - _messageArray.object.oldValue;
+												var newValue = slaveDoodle[_messageArray.object.parameter] + increment;
 
-									if (typeof(parameterArray) != 'undefined') {
-										// Iterate through parameters to sync
-										for (var i = 0; i < parameterArray.length; i++) {
-											// Check that parameter array member matches changed parameter
-											if (parameterArray[i] == _messageArray.object.parameter) {
-												// Avoid infinite loop by checking values are not equal before setting
-												if (masterDoodle[_messageArray.object.parameter] != slaveDoodle[_messageArray.object.parameter]) {
-													var increment = _messageArray.object.value - _messageArray.object.oldValue;
-													var newValue = slaveDoodle[_messageArray.object.parameter] + increment;
+												// Sync slave parameter to value of master
+												slaveDoodle.setSimpleParameter(_messageArray.object.parameter, newValue);
+												slaveDoodle.updateDependentParameters(_messageArray.object.parameter);
 
-													// Sync slave parameter to value of master
-													slaveDoodle.setSimpleParameter(_messageArray.object.parameter, newValue);
-													slaveDoodle.updateDependentParameters(_messageArray.object.parameter);
-
-													// Update any bindings associated with the slave doodle
-													slaveDrawing.updateBindings(slaveDoodle);
-												}
+												// Update any bindings associated with the slave doodle
+												slaveDrawing.updateBindings(slaveDoodle);
 											}
 										}
 									}
 								}
 							}
 						}
-
-						// Refresh slave drawing
-						slaveDrawing.repaint();
 					}
 
-					// Save drawing to hidden input
-					if (input != null && input.value.length > 0) {
-						input.value = this.drawing.save();
-					}
-					break;
-			}
+					// Refresh slave drawing
+					slaveDrawing.repaint();
+				}
+
+				// Save drawing to hidden input
+				if (input != null && input.value.length > 0) {
+					input.value = this.drawing.save();
+				}
+				break;
 		}
 	}
-}
+};
+
+/**
+ * Function runs on page load to initialise an EyeDraw widget.
+ *
+ * @param {object} _properties Object of properties passed from widget
+ *     @property drawingName The EyeDraw drawing object
+ *     @property canvasId The DOM id of the associated canvas element
+ *     @property eye The eye (right = 0, left = 1) ***TODO*** handle this better
+ *     @property idSuffix A suffix for DOM elements to distinguish those associated with this drawing object
+ *     @property isEditable Flag indicating whether drawing object is editable or not
+ *     @property graphicsPath Path to folder containing EyeDraw graphics
+ *     @property onReadyCommandArray Array of commands and arguments to be run when images are loaded
+ */
+ED.init = function(_properties) {
+
+	// Get reference to the drawing canvas
+	var canvas = document.getElementById(_properties.canvasId);
+
+	// Get reference to the widgget container
+	var container = $(canvas).closest('.eyedraw-widget');
+
+	// Options array for drawing object
+	var drawingOptions = {
+		offsetX: _properties.offsetX,
+		offsetY: _properties.offsetY,
+		toImage: _properties.toImage,
+		graphicsPath: _properties.graphicsPath
+	};
+
+	// Drawing
+	var drawing = new ED.Drawing(canvas, _properties.eye, _properties.idSuffix, _properties.isEditable, drawingOptions);
+
+	// Views
+	var toolbar = new ED.Toolbar(drawing, container);
+	var doodlePopup = new ED.DoodlePopup(drawing, container);
+
+	// Controller
+	var controller = new ED.Controller(drawing, toolbar, doodlePopup, container, _properties);
+
+	// Array of additional controllers
+	var listenerList = new Array();
+	for (var i = 0; i < _properties.listenerArray.length; i++) {
+		listenerList[i] = new _properties.listenerArray[i](drawing);
+	}
+	//always capture the eyedraw being ready:
+	listenerList.push(new EyeDrawReadyListener(drawing));
+
+	// Initialize drawing
+	drawing.init();
+};

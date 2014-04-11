@@ -339,21 +339,21 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 
 	// Array of images to be preloaded
 	this.imageArray = new Array();
-	this.imageArray['patterns/LatticePattern'] = new Image();
-	this.imageArray['patterns/CribriformPattern'] = new Image();
-	this.imageArray['patterns/CribriformPatternSmall'] = new Image();
-	this.imageArray['patterns/CryoPattern'] = new Image();
-	this.imageArray['patterns/AntPVRPattern'] = new Image();
-	this.imageArray['patterns/LaserPattern'] = new Image();
-	this.imageArray['patterns/FuchsPattern'] = new Image();
-	this.imageArray['patterns/PSCPattern'] = new Image();
-	this.imageArray['patterns/MeshworkPatternLight'] = new Image();
-	this.imageArray['patterns/MeshworkPatternMedium'] = new Image();
-	this.imageArray['patterns/MeshworkPatternHeavy'] = new Image();
-	this.imageArray['patterns/NewVesselPattern'] = new Image();
-	this.imageArray['patterns/OedemaPattern'] = new Image();
-	this.imageArray['patterns/OedemaPatternBullous'] = new Image();
-	this.imageArray['patterns/BrownSpotPattern'] = new Image();
+	this.imageArray['LatticePattern'] = new Image();
+	this.imageArray['CribriformPattern'] = new Image();
+	this.imageArray['CribriformPatternSmall'] = new Image();
+	this.imageArray['CryoPattern'] = new Image();
+	this.imageArray['AntPVRPattern'] = new Image();
+	this.imageArray['LaserPattern'] = new Image();
+	this.imageArray['FuchsPattern'] = new Image();
+	this.imageArray['PSCPattern'] = new Image();
+	this.imageArray['MeshworkPatternLight'] = new Image();
+	this.imageArray['MeshworkPatternMedium'] = new Image();
+	this.imageArray['MeshworkPatternHeavy'] = new Image();
+	this.imageArray['NewVesselPattern'] = new Image();
+	this.imageArray['OedemaPattern'] = new Image();
+	this.imageArray['OedemaPatternBullous'] = new Image();
+	this.imageArray['BrownSpotPattern'] = new Image();
 
 	// Set transform to map from doodle to canvas plane
 	this.transform.translate(this.canvas.width / 2, this.canvas.height / 2);
@@ -483,7 +483,8 @@ ED.Drawing.prototype.getPositionOfElement = function(element) {
  */
 ED.Drawing.prototype.init = function() {
 	// Start loading of texture images (will send ready notification when ready)
-	this.preLoadImagesFrom(this.graphicsPath);
+	/* FIXME */
+	this.preLoadImagesFrom(this.graphicsPath + '/' + 'patterns/');
 }
 
 /**
@@ -1925,13 +1926,18 @@ ED.Drawing.prototype.unlock = function() {
  * Deselect any selected doodles
  */
 ED.Drawing.prototype.deselectDoodles = function() {
+
 	// Deselect all doodles
 	for (var i = 0; i < this.doodleArray.length; i++) {
 		this.doodleArray[i].isSelected = false;
 	}
 
-	if (this.selectedDoodle) this.selectedDoodle.onDeselection();
-	this.selectedDoodle = null;
+	if (this.selectedDoodle) {
+		this.selectedDoodle.onDeselection();
+		this.selectedDoodle = null;
+	}
+
+	this.notify("doodleDeselected");
 
 	// Refresh drawing
 	this.repaint();
