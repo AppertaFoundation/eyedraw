@@ -14,5 +14,9 @@
   ],
   "devDependencies": {
     "jquery": "~1.8.3"
+  },
+  "dependencies": {
+    "mustache": "~0.8.1",
+    "eventemitter2": "~0.4.13"
   }
 }

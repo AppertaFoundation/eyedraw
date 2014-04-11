@@ -6,3 +6,4 @@
 .sass-cache
 /assets/components/*
 /test/doodle-popup/js/scripts.jsonp
+.sublime-grunt.cache

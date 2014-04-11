@@ -140,6 +140,10 @@
   z-index: 102;
 }
 /* line 47, ../sass/components/toolbar/_button.scss */
+.eyedraw-button:active .label {
+  left: -9999px;
+}
+/* line 52, ../sass/components/toolbar/_button.scss */
 .eyedraw-button:hover .label {
   -webkit-transition-delay: 0.25s;
   -moz-transition-delay: 0.25s;

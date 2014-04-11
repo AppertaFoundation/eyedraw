@@ -43,6 +43,11 @@
 		white-space: nowrap;
 		z-index: 102;
 	}
+	&:active {
+		.label {
+			left: -9999px;
+		}
+	}
 	&:hover {
 		.label {
 			@include transition-delay(.25s);
