@@ -359,11 +359,10 @@
 									<div class="data-value">
 										<p><strong>UX Notes/issues:</strong></p>
 										<ul>
-											<li>This is just a prototype!</li>
 											<li>The drawer handle overlays fields.</li>
 											<li>Doodle's cannot be selected after they are locked.</li>
-											<li><em>Field 1</em> and <em>Option 1</em> are currently bound to the EyeDraw in this example.</li>
-											<li>"Currently selected" has not been implemented yet.
+											<li>"Currently selected" has not been implemented yet.</li>
+											<li>If a drawer is closed, and the user opens the drawer, the last selected doodle will be selected.</li>
 										</ul>
 										<p><strong>Dev issues:</strong></p>
 										<ul>
@@ -902,6 +901,35 @@
 	</script>
 
 	<script>
+
+	(function() {
+		function TestListener(drawing) {
+			this.drawing = drawing;
+			console.log('ListeNer!');
+			this.init();
+		}
+
+		TestListener.prototype.init = function() {
+			// this.setDefaultDistance();
+			this.drawing.registerForNotifications(this, 'callback', ['doodleAdded', 'doodleDeleted', 'parameterChanged']);
+		};
+		TestListener.prototype.setDefaultDistance = function() {
+			// update
+			// var validityArray = doodle.validateParameter('distance', distance.toString());
+			// if (validityArray.valid) {
+			// 	doodle.setParameterWithAnimation('distance', validityArray.value);
+			// }
+		};
+		TestListener.prototype.callback = function(_messageArray) {
+			// if (_messageArray.eventName == "doodleAdded" && _messageArray.object.className == 'InjectionSite') {
+			// 	this._injectionDoodles[_messageArray.object.id] = _messageArray.object;
+			// 	this.updateDoodleDistance(_messageArray.object, this._default_distance);
+			// }
+		};
+
+		window.TestListener = TestListener;
+	}());
+
 	(function() {
 		ED.init({
 			drawingName: "ed_example",
@@ -938,7 +966,9 @@
 				}
 			},
 			syncArray: [],
-			listenerArray: [],
+			listenerArray: [
+				TestListener
+			],
 			offsetX: 0,
 			offsetY: 0,
 			toImage: false

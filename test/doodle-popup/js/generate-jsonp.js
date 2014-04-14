@@ -4,7 +4,7 @@ var glob = require('glob');
 var util = require('util');
 
 // The order in which the sripts are found is important here.
-var pattern = '{ED/*.js,ED/Doodles/**/*.js,ED/Misc/*.js,*.js}';
+var pattern = '{ED/*.js,ED/Doodles/**/*.js,ED/Misc/*.js,ED/Views/*.js,*.js}';
 
 // Glob options.
 var globOpt = {
