@@ -26,7 +26,7 @@
  * Defines the EyeDraw namespace
  * @namespace Namespace for all EyeDraw classes
  */
-var ED = new Object();
+var ED = ED || {};
 
 /**
  * Radius of inner handle displayed with selected doodle
@@ -646,6 +646,8 @@ ED.Drawing.prototype.notify = function(_eventName, _object) {
 ED.Drawing.prototype.loadDoodles = function(_id) {
 	// Get element containing JSON string
 	var sourceElement = document.getElementById(_id);
+
+	alert('load diidles');
 
 	// If it exists and contains something, load it
 	if (sourceElement && sourceElement.value.length > 0) {
