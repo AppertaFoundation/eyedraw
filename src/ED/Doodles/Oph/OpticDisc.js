@@ -81,7 +81,7 @@ ED.OpticDisc.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'string',
 		list: ['Basic', 'Expert'],
-		animate: true
+		animate: false
 	};
 	this.parameterValidationArray['cdRatio'] = {
 		kind: 'derived',

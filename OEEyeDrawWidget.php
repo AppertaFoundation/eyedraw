@@ -262,14 +262,14 @@ class OEEyeDrawWidget extends CWidget
         // Create matching name and id in 'Yii' format for loading and saving using POST
         if (isset($this->model) && isset($this->attribute)) {
           if ($this->mode == 'edit') {
-						$this->inputName = get_class($this->model).'['. $this->attribute.']';
-          	$this->inputId = get_class($this->model).'_'. $this->attribute;
+						$this->inputName = CHtml::modelName($this->model).'['. $this->attribute.']';
+          	$this->inputId = CHtml::modelName($this->model).'_'. $this->attribute;
           } else {
 						$this->inputId = 'ed_input_'.$this->mode.'_'.$this->idSuffix;
           }
 
-            if (isset($_POST[get_class($this->model)][$this->attribute])) {
-                $this->model->{$this->attribute} = $_POST[get_class($this->model)][$this->attribute];
+            if (isset($_POST[CHtml::modelName($this->model)][$this->attribute])) {
+                $this->model->{$this->attribute} = $_POST[CHtml::modelName($this->model)][$this->attribute];
             }
         }
 
