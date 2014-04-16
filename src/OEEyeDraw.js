@@ -27,6 +27,8 @@
 
 /* global ED: false */
 
+var ED = ED || {};
+
 /**
  * Initialise an EyeDraw widget.
  *

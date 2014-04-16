@@ -6,6 +6,7 @@ module.exports = function(grunt) {
 		qunit: require('./qunit')(grunt),
 		uglify: require('./uglify')(grunt),
 		watch: require('./watch')(grunt),
-		compass: require('./compass')(grunt)
+		compass: require('./compass')(grunt),
+		connect: require('./connect')(grunt)
 	};
 };
