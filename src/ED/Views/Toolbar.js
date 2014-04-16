@@ -49,6 +49,7 @@ ED.Views.Toolbar = (function() {
 	}
 
 	Toolbar.prototype = Object.create(EventEmitter2.prototype);
+	Toolbar.prototype.constructor = Toolbar;
 
 	/**
 	 * Register a ED.Drawing notification handler.
@@ -103,6 +104,8 @@ ED.Views.Toolbar = (function() {
 	 * @param  {Object} e Event object.
 	 */
 	Toolbar.prototype.onButtonClick = function(e) {
+
+		console.log('on button click called');
 
 		e.preventDefault();
 		e.stopImmediatePropagation();

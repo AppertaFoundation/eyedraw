@@ -43,5 +43,5 @@ var ED = ED || {};
  */
 ED.init = function(properties) {
 	'use strict';
-	new ED.Controller(properties);
+	return new ED.Controller(properties);
 };
