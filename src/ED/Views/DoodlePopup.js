@@ -1,15 +1,41 @@
+/**
+ * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
+ * (C) OpenEyes Foundation, 2011-2014
+ * This file is part of OpenEyes.
+ *
+ * OpenEyes is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * OpenEyes is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with OpenEyes.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/* global EventEmitter2: false, $: false, Mustache: false */
+
+var ED = ED || {};
 ED.Views = ED.Views || {};
 
+/**
+ * The DoodlePopup view manages the doodle popup menu.
+ */
 ED.Views.DoodlePopup = (function() {
 
+	'use strict';
+
 	/** Helpers */
-	function ucFirst(str) {
-		return str.charAt(0).toUpperCase() + str.slice(1);
-	}
+	var ucFirst = ED.firstLetterToUpperCase;
 
 	/** Constants */
 	var OPEN = 'open';
 	var CLOSED = 'closed';
+	var EVENT_NAMESPACE = 'eyedraw.doodlepopup';
 
 	/**
 	 * DoodlePopup constructor
@@ -54,7 +80,7 @@ ED.Views.DoodlePopup = (function() {
 	};
 
 	DoodlePopup.prototype.notificationHandler = function(notification) {
-		var eventName = notification['eventName'];
+		var eventName = notification.eventName;
 		var handlerName = 'on' + ucFirst(eventName);
 		this[handlerName](notification);
 	};
@@ -63,7 +89,11 @@ ED.Views.DoodlePopup = (function() {
 	 * Run only when the drawing is ready.
 	 */
 	DoodlePopup.prototype.init = function() {
-		this.container.on('click', '.eyedraw-doodle-popup-toggle', this.onToggleClick.bind(this));
+		this.container.on(
+			'click.' + EVENT_NAMESPACE,
+			'.eyedraw-doodle-popup-toggle',
+			this.onToggleClick.bind(this)
+		);
 	};
 
 	DoodlePopup.prototype.compileTemplate = function(data) {
@@ -74,23 +104,23 @@ ED.Views.DoodlePopup = (function() {
 		this.container.html(html);
 	};
 
-	DoodlePopup.prototype.update = function(show, doodle) {
+	DoodlePopup.prototype.update = function(show, doodle, delay) {
 		if (show) {
 			this.compileTemplate({ doodle: doodle });
-			this.show();
+			this.show(delay);
 		} else {
-			this.hide();
+			this.hide(delay);
 		}
 	};
 
-	DoodlePopup.prototype.hide = function() {
+	DoodlePopup.prototype.hide = function(delay) {
 		this.state = CLOSED;
 		this.delay(function() {
 			this.container.addClass('closed');
-		}.bind(this));
+		}.bind(this), delay);
 	};
 
-	DoodlePopup.prototype.show = function() {
+	DoodlePopup.prototype.show = function(delay) {
 		if (this.currentDoodle.isLocked){
 			return;
 		}
@@ -98,15 +128,18 @@ ED.Views.DoodlePopup = (function() {
 		this.selectDoodle();
 		this.delay(function() {
 			this.container.removeClass('closed');
-		}.bind(this));
+		}.bind(this), delay);
 	};
 
-	DoodlePopup.prototype.delay = function(fn) {
+	DoodlePopup.prototype.delay = function(fn, delay) {
+		delay = typeof delay === 'number' ? delay : 50;
 		clearTimeout(this.delayTimer);
-		this.delayTimer = setTimeout(fn, 50);
+		this.delayTimer = setTimeout(fn, delay);
 	};
 
 	DoodlePopup.prototype.selectDoodle = function() {
+		// @todo This should be one method call on the drawing.
+		// move this stuff into the ED.Drawing class.
 		if (!this.currentDoodle.isSelected && !this.currentDoodle.isLocked) {
 			this.currentDoodle.isSelected = true;
 			this.currentDoodle.onSelection();
@@ -114,23 +147,17 @@ ED.Views.DoodlePopup = (function() {
 		}
 	};
 
-	/** EVENT HANDLERS */
-
-	/**
-	 * Order of events emitted from the eyedraw:
-	 * 1. doodleSelected
-	 * 2. doodleDeselected
-	 * Thus we delay the selected action into the next event loop if we want the
-	 * popup to remain visible when selecting a new doodle.
-	 */
+	/*********************
+	 * EVENT HANDLERS
+	 *********************/
 
 	DoodlePopup.prototype.onToggleClick = function(e) {
 		e.preventDefault();
 		var func = (this.state === CLOSED ? 'show' : 'hide');
 		this[func]();
-	}
+	};
 
-	DoodlePopup.prototype.onReady = function(notification) {
+	DoodlePopup.prototype.onReady = function() {
 		this.init();
 	};
 
@@ -144,8 +171,15 @@ ED.Views.DoodlePopup = (function() {
 	};
 
 	DoodlePopup.prototype.onDoodleSelected = function(notification) {
+		/**
+		 * Order of events emitted from the eyedraw:
+		 * 1. doodleSelected
+		 * 2. doodleDeselected
+		 * Thus we delay the selected action into the next event loop if we want the
+		 * popup to remain visible when selecting a new doodle.
+		 */
 		this.currentDoodle = notification.selectedDoodle;
-		setTimeout(this.update.bind(this, true, notification.selectedDoodle));
+		setTimeout(this.update.bind(this, true, notification.selectedDoodle, 150));
 	};
 
 	DoodlePopup.prototype.onDoodleDeselected = function(notification) {

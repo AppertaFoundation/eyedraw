@@ -3,8 +3,15 @@ var path = require('path');
 var glob = require('glob');
 var util = require('util');
 
-// The order in which the sripts are found is important here.
-var pattern = '{ED/*.js,ED/Doodles/**/*.js,ED/Misc/*.js,ED/Views/*.js,*.js}';
+// The order in which the scripts are found is important here.
+var pattern = '{' + [
+	'ED/Drawing.js',
+	'ED/*.js',
+	'ED/Doodles/**/*.js',
+	'ED/Misc/*.js',
+	'ED/Views/*.js',
+	'*.js'
+].join(',') + '}';
 
 // Glob options.
 var globOpt = {

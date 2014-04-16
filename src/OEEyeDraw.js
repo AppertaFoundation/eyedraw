@@ -25,6 +25,8 @@
  * @version 0.95
  */
 
+/* global ED: false */
+
 /**
  * Initialise an EyeDraw widget.
  *
@@ -38,53 +40,6 @@
  *     @property onReadyCommandArray Array of commands and arguments to be run when images are loaded
  */
 ED.init = function(properties) {
-
-	// Get reference to the drawing canvas
-	var canvas = document.getElementById(properties.canvasId);
-
-	// Get reference to the widgget container
-	var container = $(canvas).closest('.eyedraw-widget');
-
-	// Options array for drawing object
-	var drawingOptions = {
-		offsetX: properties.offsetX,
-		offsetY: properties.offsetY,
-		toImage: properties.toImage,
-		graphicsPath: properties.graphicsPath
-	};
-
-	// Drawing
-	var drawing = new ED.Drawing(canvas, properties.eye, properties.idSuffix, properties.isEditable, drawingOptions);
-
-	// Views
-	var toolbar = new ED.Views.Toolbar(drawing, container.find('.eyedraw-toolbar-panel'));
-	var doodlePopup = new ED.Views.DoodlePopup(drawing, container);
-
-	// Controller
-	var controller = new ED.Controller(drawing, toolbar, doodlePopup, container, properties);
-
-
-	// Initialize drawing
-	drawing.init();
-
-	return {
-		drawing: drawing,
-		toolbar: toolbar,
-		doodlePopup: doodlePopup,
-		controller: controller
-	};
+	'use strict';
+	new ED.Controller(properties);
 };
-
-/** EyeDraw Checker */
-
-/**
- * Let's say there are two eyedraws on the page:
- * For each eyedraw:
- *    Only 1 instance of the EyeChecker is created
- *    An EyeDrawReadyListener instance is created
- *          EyeDrawReadyListener registers it'self with the EyeChecker instance
- *    If all eyedraws are ready (via the reader notifier event) then execchte the registerForReady method,
- *    which will execute the callback.
- */
-
-

@@ -166,7 +166,7 @@
 
 /* line 43, ../sass/_mixins.scss */
 [class*="icon-ed-"] {
-  background-image: url('../img/sprites/icons/32x32-sa902812c57.png');
+  background-image: url('../img/sprites/icons/32x32-s8fb58fdcfc.png');
   background-repeat: no-repeat;
   background-position: -9999px -9999px;
   width: 32px;
@@ -321,6 +321,11 @@
 /* line 79, ../sass/_mixins.scss */
 .icon-ed-AntSynech:hover {
   background-position: 0 -576px;
+}
+
+/* line 74, ../sass/_mixins.scss */
+.icon-ed-PhakoIncision {
+  background-position: 0 -3552px;
 }
 
 /* line 74, ../sass/_mixins.scss */
@@ -680,7 +685,7 @@
 
 /* line 74, ../sass/_mixins.scss */
 .icon-ed-help {
-  background-position: 0 -3552px;
+  background-position: 0 -3584px;
 }
 
 /* line 74, ../sass/_mixins.scss */

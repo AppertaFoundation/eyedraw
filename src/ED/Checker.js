@@ -1,71 +1,88 @@
+/**
+ * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
+ * (C) OpenEyes Foundation, 2011-2014
+ * This file is part of OpenEyes.
+ *
+ * OpenEyes is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * OpenEyes is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with OpenEyes.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 var ED = ED || {};
 
 /**
- * Object to track multiple eyedraw canvases on the page
+ * ED.Checker is used to track when eyedraws are "ready" and execute callbacks
+ * when ready. An eyedraw is ready when all doodles have been loaded, thus this
+ * checker is *only useful for eyedraws in "view" mode*.
  */
-function EyeDrawChecker() {
-	// register of all the eyedraws on the page
-	this._eyedraws = new Array();
-	// register of eyedraws that have been declared ready
-	this._eyedrawsReady = new Array();
-	this._allReadyListeners = new Array();
+ED.Checker = ED.Checker || (function() {
 
-	var self = this;
+	'use strict';
 
-	// quickly establish all the canvases that are eyedraw
-	$('canvas').each(function() {
-		// either a display or edit canvas
-		if ($(this).hasClass('ed_canvas_display') || $(this).hasClass('ed_canvas_edit')) {
-			self._eyedraws.push($(this).attr('id'));
+	var callbacks = [];
+	var instances = [];
+	var ready = 0;
+
+	/**
+	 * Loop through all the registered callbacks and execute them.
+	 */
+	function executeCallbacks(){
+		callbacks.forEach(function(callback) {
+			callback();
+		});
+	}
+
+	/**
+	 * Register a Drawing instance.
+	 * @param  {ED.Drawing}   instance A ED.Drawing instance.
+	 */
+	function register(instance) {
+
+		if (instances.indexOf(instance) !== -1) {
+			return;
 		}
-	});
 
-	// call to mark an eyedraw as ready
-	this.eyedrawReady = function(edId) {
-		// only register eyedraws this checker is aware of
-		if ($.inArray(edId, this._eyedraws) > -1) {
-			// only register it once
-			if ($.inArray(edId, this._eyedrawsReady) == -1) {
-				this._eyedrawsReady.push(edId);
-
-				if (this.allEyedrawsReady()) {
-					// call any registered callback functions
-					for (var i = 0; i < this._allReadyListeners.length; i++) {
-						this._allReadyListeners[i]();
-					}
+		instance.registerForNotifications({
+			callback: function callback() {
+				ready++;
+				if (isAllReady()) {
+					executeCallbacks();
 				}
 			}
-		}
-	};
+		}, 'callback', ['doodlesLoaded']);
+	}
 
-	// function to determine if all the eyedraws on the page are ready
-	this.allEyedrawsReady = function() {
-		if (this._eyedraws.length == this._eyedrawsReady.length) {
-			return true;
-		}
-		return false;
-	};
+	/**
+	 * Check if all registered EyeDraws are ready.
+	 * @return {Boolean}
+	 */
+	function isAllReady() {
+		return (instances.length === ready);
+	}
 
-	// function to register a callback function to call when all eyedraws are ready
-	// if all the eyedraws are ready, then it calls the callback function
-	this.registerForReady = function(callback) {
-		if (this.allEyedrawsReady()) {
+	/**
+	 * Register a callback to be executed once all EyeDraws are ready.
+	 * @param  {Function} callback The callback to be executed.
+	 */
+	function allReady(callback) {
+		if (isAllReady()) {
 			callback();
 		} else {
-			this._allReadyListeners.push(callback);
+			callbacks.push(callback);
 		}
 	}
-}
 
-// global variable to store the EyeDrawChecker in
-var OEEyeDrawChecker;
-
-// global function to initialise and retrieve the global eyedrawchecker object
-
-function getOEEyeDrawChecker() {
-	if (!OEEyeDrawChecker) {
-		OEEyeDrawChecker = new EyeDrawChecker();
-	}
-	return OEEyeDrawChecker;
-}
-
+	return {
+		register: register,
+		onAllReady: allReady
+	};
+}());
