@@ -105,8 +105,6 @@ ED.Views.Toolbar = (function() {
 	 */
 	Toolbar.prototype.onButtonClick = function(e) {
 
-		console.log('on button click called');
-
 		e.preventDefault();
 		e.stopImmediatePropagation();
 

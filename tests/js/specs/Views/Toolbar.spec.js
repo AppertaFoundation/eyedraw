@@ -5,21 +5,24 @@ describe('Toolbar', function() {
 			notificationArray: [],
 			registerForNotifications: function() {
 				ED.Drawing.prototype.registerForNotifications.apply(this, arguments);
-			}
+			},
+			randomFunction: $.noop
 		};
 	};
 
-	var createContainer = function() {
+	var createContainer = function(func, arg) {
 		var container = document.createElement('div');
 		var child = document.createElement('div');
 		child.className = 'eyedraw-button';
+		child.setAttribute('data-function', func || 'randomFunction');
+		child.setAttribute('data-arg', arg || 'catsrule');
 		container.appendChild(child);
 		return container;
 	};
 
-	function createToolbar() {
-		var drawing = createDrawing();
-		var container = createContainer();
+	function createToolbar(drawing, container) {
+		drawing = drawing || createDrawing();
+		container = container || createContainer();
 		var toolbar = new ED.Views.Toolbar(drawing, container);
 		return {
 			drawing: drawing,
@@ -77,6 +80,11 @@ describe('Toolbar', function() {
 			});
 
 			it('should bind events', function() {
+				/*
+				NOTE: we not testing if the drawer button event is bound because we're
+				probably going to remove it at some point
+				*/
+
 				var spy = sinon.spy(ED.Views.Toolbar.prototype, 'onButtonClick');
 
 				var o = createToolbar();
@@ -85,7 +93,55 @@ describe('Toolbar', function() {
 				var button = $(o.container).find('.eyedraw-button');
 				button.trigger('click');
 				expect(spy.calledOnce).to.be.true;
+				spy.restore();
 			});
 		});
+	});
+
+	describe('Handling DOM events', function() {
+		describe('Button click', function() {
+
+			it('should execute a function on the drawing instance', function() {
+				var o = createToolbar();
+				initToolbar(o.toolbar);
+
+				var spy = sinon.spy(o.drawing, 'randomFunction');
+				var button = $(o.container).find('.eyedraw-button');
+				button.trigger('click');
+
+				expect(spy.withArgs('catsrule').called).to.be.true;
+				spy.restore();
+			});
+
+			it('should emit a doodle action event for a known drawing function', function() {
+
+				var o = createToolbar();
+				initToolbar(o.toolbar);
+
+				var spy = sinon.spy(o.toolbar, 'emit');
+				var button = $(o.container).find('.eyedraw-button');
+				button.trigger('click');
+
+				expect(spy.withArgs('doodle.action', {
+					fn: 'randomFunction',
+					arg: 'catsrule'
+				}).called).to.be.true;
+				spy.restore();
+			});
+
+			it('should emit a doodle error event for an unknown drawing function', function() {
+
+				var container = createContainer('funcDoesNotExist');
+				var o = createToolbar(null, container);
+				initToolbar(o.toolbar);
+
+				var spy = sinon.spy(o.toolbar, 'emit');
+				var button = $(o.container).find('.eyedraw-button');
+				button.trigger('click');
+
+				expect(spy.withArgs('doodle.error').called).to.be.true;
+				spy.restore();
+			});
+		})
 	});
 });
