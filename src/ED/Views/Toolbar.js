@@ -45,23 +45,33 @@ ED.Views.Toolbar = (function() {
 		this.drawing = drawing;
 		this.container = $(container);
 
-		this.bindEvents();
+		this.registerForNotifications();
 	}
 
 	Toolbar.prototype = Object.create(EventEmitter2.prototype);
 
-	Toolbar.prototype.bindEvents = function() {
+	/**
+	 * Register a ED.Drawing notification handler.
+	 */
+	Toolbar.prototype.registerForNotifications = function() {
 		this.drawing.registerForNotifications(this, 'notificationHandler', [
 			'ready'
 		]);
 	};
 
+	/**
+	 * The Ed.Drawing notification handler.
+	 * @param  {Object} notification The notification object.
+	 */
 	Toolbar.prototype.notificationHandler = function(notification) {
 		if (notification.eventName === 'ready') {
 			this.init();
 		}
 	};
 
+	/**
+	 * Run when the drawing ready. Bind interaction events.
+	 */
 	Toolbar.prototype.init = function() {
 
 		// Toolbar button click events.
@@ -74,12 +84,24 @@ ED.Views.Toolbar = (function() {
 			.on('click.' + EVENT_NAMESPACE, this.onDocumentClick.bind(this));
 	};
 
+	/*********************
+	 * EVENT HANDLERS
+	 *********************/
+
+	 /**
+	  * Open or close the drawer when clicking on a drawer button.
+	  * @param  {Object} e Event object.
+	  */
 	Toolbar.prototype.onDrawerButtonClick = function(e) {
 		e.preventDefault();
 		e.stopImmediatePropagation();
 		$(e.currentTarget).closest('.drawer').toggleClass('active');
 	};
 
+	/**
+	 * Run an action when clicking on a toolbar button.
+	 * @param  {Object} e Event object.
+	 */
 	Toolbar.prototype.onButtonClick = function(e) {
 
 		e.preventDefault();
@@ -100,6 +122,9 @@ ED.Views.Toolbar = (function() {
 		}
 	};
 
+	/**
+	 * Hide any open drawers when clicking outside of the toolbar.
+	 */
 	Toolbar.prototype.onDocumentClick = function() {
 		// Close any open drawers.
 		this.container.find('.drawer').removeClass('active');

@@ -31,6 +31,11 @@ ED.Controller = (function() {
 	/** Helpers */
 	var ucFirst = ED.firstLetterToUpperCase;
 
+	/**
+	 * Controller constructor. The controller will init the various eyedraw components
+	 * and manage post-init actions.
+	 * @param {Object} properties The EyeDraw widget properties.
+	 */
 	function Controller(properties) {
 
 		this.properties = properties;
@@ -41,19 +46,18 @@ ED.Controller = (function() {
 		this.createDrawing();
 		this.createViews();
 
-		this.bindEvents();
+		this.registerEvents();
 		this.initListeners();
-
-		// Register with the checker.
-		ED.Checker.register(this.drawing);
 
 		// Initialize drawing.
 		this.drawing.init();
 	}
 
+	/**
+	 * Create the canvas drawing instance.
+	 */
 	Controller.prototype.createDrawing = function() {
 
-		// Options array for drawing object
 		var options = {
 			offsetX: this.properties.offsetX,
 			offsetY: this.properties.offsetY,
@@ -61,7 +65,6 @@ ED.Controller = (function() {
 			graphicsPath: this.properties.graphicsPath
 		};
 
-		// Drawing
 		this.drawing = new ED.Drawing(
 			this.canvas,
 			this.properties.eye,
@@ -70,10 +73,16 @@ ED.Controller = (function() {
 			options
 		);
 
+		// Register with the checker.
+		ED.Checker.register(this.drawing);
+
 		// Store this drawing instance
 		ED.setInstance(this.drawing);
 	};
 
+	/**
+	 * Create the various view classes.
+	 */
 	Controller.prototype.createViews = function() {
 
 		// Toolbar
@@ -89,7 +98,10 @@ ED.Controller = (function() {
 		);
 	};
 
-	Controller.prototype.bindEvents = function() {
+	/**
+	 * Register events.
+	 */
+	Controller.prototype.registerEvents = function() {
 
 		// Register controller for notifications
 		this.drawing.registerForNotifications(this, 'notificationHandler', [
@@ -107,6 +119,9 @@ ED.Controller = (function() {
 		$(document).on('click.' + EVENT_NAMESPACE, this.onDocumentClick.bind(this));
 	};
 
+	/**
+	 * Create instances of any listener objects.
+	 */
 	Controller.prototype.initListeners = function() {
 		if (!(this.properties.listenerArray instanceof Array)) {
 			return;
@@ -129,35 +144,54 @@ ED.Controller = (function() {
 		}
 	};
 
+	/**
+	 * Check if the associated input field has any data.
+	 * @return {Boolean}
+	 */
 	Controller.prototype.hasInputFieldData = function() {
 		return (this.input !== null && this.input.value.length > 0);
 	};
 
+	/**
+	 * Save drawing data to the associated input field.
+	 */
 	Controller.prototype.saveDrawingToInputField = function() {
 		if (this.hasInputFieldData()) {
 			this.input.value = this.drawing.save();
 		}
 	};
 
+	/**
+	 * Load data from the input field into the drawing.
+	 */
 	Controller.prototype.loadInputFieldData = function() {
 		// Load drawing data from input element
 		this.drawing.loadDoodles(this.properties.inputId);
 	};
 
+	/**
+	 * Add field bindings to the drawing.
+	 */
 	Controller.prototype.addBindings = function() {
-		// Apply bindings
 		if (!ED.objectIsEmpty(this.properties.bindingArray)) {
 			this.drawing.addBindings(this.properties.bindingArray);
 		}
 	};
 
+	/**
+	 * Add deleted values.
+	 * @TODO
+	 */
 	Controller.prototype.addDeletedValues = function() {
-		// Apply delete values
 		if (!ED.objectIsEmpty(this.properties.deleteValueArray)) {
 			this.drawing.addDeleteValues(this.properties.deleteValueArray);
 		}
 	};
 
+	/**
+	 * Run commands on the drawing once it's ready. (This is useful for
+	 * adding doodles on page load, for example.)
+	 */
 	Controller.prototype.runOnReadyCommands = function() {
 		for (var i = 0; i < this.properties.onReadyCommandArray.length; i++) {
 			// Get method name
@@ -169,6 +203,9 @@ ED.Controller = (function() {
 		}
 	};
 
+	/**
+	 * Run commands once all doodles have been loaded.
+	 */
 	Controller.prototype.runOnDoodlesLoadedCommands = function() {
 		// Run commands after doodles have successfully loaded
 		for (var i = 0; i < this.properties.onDoodlesLoadedCommandArray.length; i++) {
@@ -185,6 +222,10 @@ ED.Controller = (function() {
 	 * EVENT HANDLERS
 	 *********************/
 
+	/**
+	 * Delesect all doodles if clicking outside of the canvas element.
+	 * @param  {Object} e Event object.
+	 */
 	Controller.prototype.onDocumentClick = function(e) {
 		if($(e.target).parents().index(this.container) === -1){
 			this.drawing.deselectDoodles();
@@ -193,7 +234,6 @@ ED.Controller = (function() {
 
 	/**
 	 * On drawing ready.
-	 * @param  {object} notification The notification object.
 	 */
 	Controller.prototype.onReady = function() {
 
@@ -223,11 +263,17 @@ ED.Controller = (function() {
 		this.drawing.isReady = true;
 	};
 
+	/**
+	 * On doodles loaded.
+	 */
 	Controller.prototype.onDoodlesLoaded = function() {
-		// Run the onDoodlesLoadedCommands (if any).
 		this.runOnDoodlesLoadedCommands();
 	};
 
+	/**
+	 * On doodle added.
+	 * @param  {Object} notification The notification object.
+	 */
 	Controller.prototype.onDoodleAdded = function(notification) {
 
 		this.saveDrawingToInputField();
@@ -242,10 +288,16 @@ ED.Controller = (function() {
 		}
 	};
 
+	/**
+	 * On doodle deleted.
+	 */
 	Controller.prototype.onDoodleDeleted = function() {
 		this.saveDrawingToInputField();
 	};
 
+	/**
+	 * On doodle selected.
+	 */
 	Controller.prototype.onDoodleSelected = function() {
 		for (var idSuffix in this.properties.syncArray) {
 			var drawing = this.getEyeDrawInstance(idSuffix);
@@ -253,10 +305,18 @@ ED.Controller = (function() {
 		}
 	};
 
+	/**
+	 * On doodle mouse dragged.
+	 */
 	Controller.prototype.onMousedragged = function() {
 		this.saveDrawingToInputField();
 	};
 
+	/**
+	 * On parameter changed. This event is fired whenever anything is changed
+	 * within the canvas drawing (or via a bound field element).
+	 * @param  {Object} notification The notification object.
+	 */
 	Controller.prototype.onParameterChanged = function(notification) {
 		// Sync with other doodles on the page.
 		this.syncEyedraws(notification.object);
@@ -264,10 +324,20 @@ ED.Controller = (function() {
 		this.saveDrawingToInputField();
 	};
 
+	/**
+	 * Find an eyedraw instance by its' idSuffix.
+	 * @param  {String} idSuffix The eyedraw instance idSuffix
+	 * @return {ED.Drawing}
+	 */
 	Controller.prototype.getEyeDrawInstance = function(idSuffix) {
 		return ED.getInstance(idSuffix);
 	};
 
+	/**
+	 * Sync multiple eyedraws. Essentially this will sync parameters for doodles across
+	 * different eyedraw instances.
+	 * @param  {Object} changedParam The paramater that was changed in the master doodle.
+	 */
 	Controller.prototype.syncEyedraws = function(changedParam) {
 
 		var masterDoodle = changedParam.doodle;
@@ -309,6 +379,14 @@ ED.Controller = (function() {
 		}
 	};
 
+	/**
+	 * Sync doodle parameters across two eyedraws.
+	 * @param  {Array} parameterArray The full list of parameters to sync.
+	 * @param  {Object} changedParam   The parameter that was changed in the master doodle.
+	 * @param  {ED.Doodle} masterDoodle   The master doodle instance.
+	 * @param  {ED.Doodle} slaveDoodle    The slave doodle that will be synced.
+	 * @param  {ED.Drawing} slaveDrawing  The slave drawing instance.
+	 */
 	Controller.prototype.syncDoodleParameters = function(parameterArray, changedParam, masterDoodle, slaveDoodle, slaveDrawing) {
 
 		// Iterate through parameters to sync

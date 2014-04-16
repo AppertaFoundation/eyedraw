@@ -60,16 +60,26 @@ ED.Views.DoodlePopup = (function() {
 
 	DoodlePopup.prototype = Object.create(EventEmitter2.prototype);
 
+	/**
+	 * Create the manipulation toolbar.
+	 */
 	DoodlePopup.prototype.createToolbar = function() {
 		this.toolbar = new ED.Views.Toolbar(this.drawing, this.container);
 		this.toolbar.on('doodle.action', this.compileTemplate.bind(this, null));
 	};
 
+	/**
+	 * Create the template for the popup.
+	 */
 	DoodlePopup.prototype.createTemplate = function() {
 		this.template = $('#eyedraw-doodle-popup-template').html();
 	};
 
+	/**
+	 * Register for drawing notifications and bind interaction events.
+	 */
 	DoodlePopup.prototype.registerForNotifications = function() {
+
 		this.drawing.registerForNotifications(this, 'notificationHandler', [
 			'ready',
 			'doodleAdded',
@@ -79,6 +89,10 @@ ED.Views.DoodlePopup = (function() {
 		]);
 	};
 
+	/**
+	 * This notification handler will simply route events to handlers.
+	 * @param  {Object} notification The notification object.
+	 */
 	DoodlePopup.prototype.notificationHandler = function(notification) {
 		var eventName = notification.eventName;
 		var handlerName = 'on' + ucFirst(eventName);
@@ -86,16 +100,9 @@ ED.Views.DoodlePopup = (function() {
 	};
 
 	/**
-	 * Run only when the drawing is ready.
+	 * Compile the mustache template.
+	 * @param  {Object} data Template data.
 	 */
-	DoodlePopup.prototype.init = function() {
-		this.container.on(
-			'click.' + EVENT_NAMESPACE,
-			'.eyedraw-doodle-popup-toggle',
-			this.onToggleClick.bind(this)
-		);
-	};
-
 	DoodlePopup.prototype.compileTemplate = function(data) {
 		if (data) {
 			this.templateData = data;
@@ -104,6 +111,12 @@ ED.Views.DoodlePopup = (function() {
 		this.container.html(html);
 	};
 
+	/**
+	 * Update the menu content with the specific doodle and either show or hide it.
+	 * @param  {Boolean} show   Show or hide the menu.
+	 * @param  {ED.Doodle} doodle The currently selected doodle.
+	 * @param  {Number} delay  The amount of time to delay (in ms) prior to showing to hiding.
+	 */
 	DoodlePopup.prototype.update = function(show, doodle, delay) {
 		if (show) {
 			this.compileTemplate({ doodle: doodle });
@@ -113,6 +126,10 @@ ED.Views.DoodlePopup = (function() {
 		}
 	};
 
+	/**
+	 * Hide the menu.
+	 * @param  {Number} delay The amount of time (ms) to delay hiding the menu.
+	 */
 	DoodlePopup.prototype.hide = function(delay) {
 		this.state = CLOSED;
 		this.delay(function() {
@@ -120,6 +137,10 @@ ED.Views.DoodlePopup = (function() {
 		}.bind(this), delay);
 	};
 
+	/**
+	 * Show the menu.
+	 * @param  {Number} delay The amount of time (in ms) to delay showing the menu.
+	 */
 	DoodlePopup.prototype.show = function(delay) {
 		if (this.currentDoodle.isLocked){
 			return;
@@ -131,12 +152,20 @@ ED.Views.DoodlePopup = (function() {
 		}.bind(this), delay);
 	};
 
+	/**
+	 * Delay executing a callback.
+	 * @param  {Function} fn    The callback function to execute.
+	 * @param  {Number}   delay The amount of time (in ms) to delay.
+	 */
 	DoodlePopup.prototype.delay = function(fn, delay) {
 		delay = typeof delay === 'number' ? delay : 50;
 		clearTimeout(this.delayTimer);
 		this.delayTimer = setTimeout(fn, delay);
 	};
 
+	/**
+	 * Select the current doodle.
+	 */
 	DoodlePopup.prototype.selectDoodle = function() {
 		// @todo This should be one method call on the drawing.
 		// move this stuff into the ED.Drawing class.
@@ -158,7 +187,11 @@ ED.Views.DoodlePopup = (function() {
 	};
 
 	DoodlePopup.prototype.onReady = function() {
-		this.init();
+		this.container.on(
+			'click.' + EVENT_NAMESPACE,
+			'.eyedraw-doodle-popup-toggle',
+			this.onToggleClick.bind(this)
+		);
 	};
 
 	DoodlePopup.prototype.onDoodleAdded = function(notification) {
