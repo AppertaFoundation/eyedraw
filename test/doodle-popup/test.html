@@ -58,7 +58,7 @@
 					</section>
 					<!-- END Introduction -->
 
-					<!-- Anterior segment -->
+					<!-- Anterior segment EDIT -->
 					<section class="element Element_OphCiExamination_AnteriorSegment">
 						<header class="element-header">
 							<h3 class="element-title">Anterior Segment (edit mode)</h3>
@@ -374,7 +374,170 @@
 							</div>
 						</div>
 					</section>
-					<!-- END Anterior segment -->
+					<!-- END Anterior segment EDIT -->
+
+					<!-- Anterior segment VIEW -->
+					<section class="element Element_OphCiExamination_AnteriorSegment">
+						<header class="element-header">
+							<h3 class="element-title">Anterior Segment (view mode)</h3>
+						</header>
+						<div class="element-fields element-eyes row">
+							<div class="element-eye right-eye column side left" data-side="right">
+
+								<!-- EYEDRAW WIDGET START -->
+								<div class="eyedraw-widget anterior-segment" id="eyedrawwidget_example">
+
+
+
+									<div class="eyedraw-body">
+										<div class="row">
+
+											<div class="fixed column eyedraw-editor">
+
+												<!-- CANVAS -->
+												<canvas
+												id="ed_example_display"
+												class="eyedraw-canvas-display"
+												width="200"
+												height="200"
+												tabindex="1">
+												</canvas>
+
+												<span class="eyedraw-canvas-tooltip" id="ed_exampleTooltip2"></span>
+
+												<!-- DATA FIELD -->
+												<input
+													type="hidden"
+													id="ed_example_display_input_data"
+													name=""
+													value='[{"version":1.1,"subclass":"NuclearCataract","originX":0,"originY":0,"apexY":-120,"order":0},{"version":1.1,"subclass":"AntSeg","apexY":-260,"pxe":false,"coloboma":false,"colour":"Blue","ectropion":false,"order":1},{"version":1.1,"subclass":"ACIOL","originX":-177,"originY":37,"rotation":0,"order":2}]'
+												/>
+											</div>
+
+											<div class="fluid column eyedraw-data">
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="element-eye left-eye column side right" data-side="left">
+								<div class="data-row">
+									<div class="data-value">
+										<p><strong>UX Notes/issues:</strong></p>
+									</div>
+								</div>
+							</div>
+						</div>
+					</section>
+					<!-- END Anterior segment VIEW -->
+
+
+
+
+
+
+
+
+
+
+					<!-- CATARACT EDIT -->
+					<section class="element">
+						<header class="element-header">
+							<h3 class="element-title">Cataract synced with surgeon</h3>
+						</header>
+						<div class="element-fields element-eyes row">
+							<div class="element-eye right-eye column side left" data-side="right">
+
+								<!-- CATARACT EYEDRAW WIDGET START -->
+								<div class="eyedraw-widget anterior-segment" id="eyedrawwidget_example">
+
+									<!-- TOOLBAR START -->
+									<div class="eyedraw-toolbar">
+
+										<!-- PANEL START -->
+										<ul class="eyedraw-toolbar-panel">
+											<li>
+												<a class="eyedraw-button" href="#" data-function="addDoodle" data-arg="PhakoIncision">
+													<span class="icon-ed-PhakoIncision"></span>
+													<span class="label">Phako incision</span>
+												</a>
+											</li>
+										</ul>
+									</div>
+									<!-- TOOLBAR END -->
+
+									<div class="eyedraw-body">
+										<div class="row">
+
+											<div class="fixed column eyedraw-editor">
+
+												<!-- CANVAS -->
+												<canvas
+												id="ed_example_cataract"
+												class="eyedraw-canvas-edit"
+												width="300"
+												height="300"
+												tabindex="1">
+												</canvas>
+
+												<!-- TOOLTIP -->
+												<span class="eyedraw-canvas-tooltip" id="ed_exampleTooltip"></span>
+
+												<!-- DATA FIELD -->
+												<input
+													type="hidden"
+													id="ed_example_cataract_input_data"
+													value='' />
+											</div>
+
+											<div class="fluid column eyedraw-fields">
+
+											</div>
+										</div>
+									</div>
+								</div>
+								<!-- END CATARACT EYEDRAW WIDGET -->
+
+								<!-- SURGEON EYEDRAW WIDGET START -->
+								<div class="eyedraw-widget anterior-segment" id="eyedrawwidget_example">
+
+									<div class="eyedraw-body">
+										<div class="eyedraw-editor">
+
+											<!-- CANVAS -->
+											<canvas
+											id="ed_example_surgeon"
+											class="eyedraw-canvas-edit"
+											width="300"
+											height="300"
+											tabindex="1">
+											</canvas>
+
+											<!-- TOOLTIP -->
+											<span class="eyedraw-canvas-tooltip" id="ed_exampleTooltip"></span>
+
+											<!-- DATA FIELD -->
+											<input
+												type="hidden"
+												id="ed_example_surgeon_input_data"
+												value='' />
+										</div>
+									</div>
+								</div>
+								<!-- START SURGEON EYEDRAW WIDGET -->
+
+							</div>
+							<div class="element-eye left-eye column side right" data-side="left">
+								<p>This example show how an EyeDraw widget can be synced with another EyeDraw widget.</p>
+								<p>In the second EyeDraw widget, the 'Surgeon' doodle is synced with the first widget with the PhakoIncision doodle.</p>
+							</div>
+						</div>
+					</section>
+					<!-- END CATARACT EDIT -->
+
+
+
+
 
 					<!-- Toolbar example -->
 					<section class="element hide">
@@ -901,7 +1064,6 @@
 	</script>
 
 	<script>
-
 	(function() {
 		function TestListener(drawing) {
 			this.drawing = drawing;
@@ -929,14 +1091,16 @@
 
 		window.TestListener = TestListener;
 	}());
+	</script>
 
+	<script>
 	(function() {
+		// Anterior segment edit
 		ED.init({
-			drawingName: "ed_example",
 			canvasId: "ed_example",
 			eye: 0,
 			scale: 1,
-			idSuffix: "",
+			idSuffix: "AntSeg",
 			isEditable: true,
 			focus: false,
 			graphicsPath: "../../assets/img/",
@@ -971,6 +1135,95 @@
 			],
 			offsetX: 0,
 			offsetY: 0,
+			toImage: false
+		});
+	}());
+	</script>
+
+	<script>
+	(function() {
+		// Anterior segment view
+		ED.init({
+			canvasId: 'ed_example_display',
+			inputId: 'ed_example_display_input_data',
+			eye: 0,
+			scale: 1,
+			idSuffix: 'AntSegView',
+			isEditable: false,
+			focus: false,
+			graphicsPath: "../../assets/img/",
+			onReadyCommandArray: [],
+			onDoodlesLoadedCommandArray: [],
+			bindingArray: [],
+			deleteValueArray: [],
+			syncArray: [],
+			listenerArray: [],
+			offsetX: 0,
+			offsetY: 0,
+			toImage: false
+		});
+	}());
+	</script>
+
+	<script>
+	(function() {
+
+		// Cataract edit
+		ED.init({
+			canvasId: 'ed_example_cataract',
+			inputId: 'ed_example_cataract_input_data',
+			eye: 0,
+			scale: 1,
+			idSuffix: 'Cataract',
+			isEditable: true,
+			focus: false,
+			graphicsPath: "../../assets/img/",
+			onReadyCommandArray: [
+				// ['addDoodle', ['AntSeg']],
+				['addDoodle', ['PhakoIncision']],
+				// ['addDoodle', ['PCIOL']],
+				['deselectDoodles', []]
+			],
+			onDoodlesLoadedCommandArray: [],
+			bindingArray: {},
+			deleteValueArray: [],
+			syncArray: [],
+			listenerArray: [],
+			offsetX: 10,
+			offsetY: 10,
+			toImage: false
+		});
+
+		// Surgeon synced with cataract
+		ED.init({
+			canvasId: 'ed_example_surgeon',
+			inputId: 'ed_example_surgeon_input_data',
+			eye: 0,
+			scale: 1,
+			idSuffix: 'Position',
+			isEditable: true,
+			focus: false,
+			graphicsPath: "../../assets/img/",
+			onReadyCommandArray: [
+				['addDoodle', ['OperatingTable']],
+				['addDoodle', ['Surgeon']],
+				['deselectDoodles', []]
+			],
+			onDoodlesLoadedCommandArray: [],
+			bindingArray: [],
+			deleteValueArray: [],
+			syncArray: {
+				Cataract: {
+					Surgeon: {
+						PhakoIncision: {
+							parameters: ['rotation']
+						}
+					}
+				}
+			},
+			listenerArray: [],
+			offsetX: 10,
+			offsetY: 10,
 			toImage: false
 		});
 	}());
