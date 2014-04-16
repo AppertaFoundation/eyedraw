@@ -13,7 +13,10 @@
     "assets/components"
   ],
   "devDependencies": {
-    "jquery": "~1.8.3"
+    "jquery": "~1.8.3",
+    "mocha": "~1.18.2",
+    "chai": "~1.9.1",
+    "sinonjs": "~1.9.1"
   },
   "dependencies": {
     "mustache": "~0.8.1",
