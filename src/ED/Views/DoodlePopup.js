@@ -59,6 +59,7 @@ ED.Views.DoodlePopup = (function() {
 	}
 
 	DoodlePopup.prototype = Object.create(EventEmitter2.prototype);
+	DoodlePopup.prototype.constructor = DoodlePopup;
 
 	/**
 	 * Create the manipulation toolbar.

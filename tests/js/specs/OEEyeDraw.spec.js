@@ -1,4 +1,4 @@
-describe('OEEyeDraw.js', function() {
+describe('OEEyeDraw - EyeDraw Widget init', function() {
 
 	describe('EyeDraw init', function() {
 
@@ -13,6 +13,7 @@ describe('OEEyeDraw.js', function() {
 			ED.init(properties);
 
 			expect(stub.calledOnce).to.be.true;
+			expect(stub.calledWithNew()).to.be.true;
 			expect(stub.calledWith(properties)).to.be.true;
 
 			stub.restore();

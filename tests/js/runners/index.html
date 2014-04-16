@@ -5,10 +5,10 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-		<!-- Add spec CSS here -->
+		<!-- Add spec CSS dependencies here -->
 		<!-- <link rel="stylesheet" type="text/css" href="style.css" /> -->
 
-		<!-- Framework CSS -->
+		<!-- Test framework CSS -->
 		<link rel="stylesheet" href="../../../assets/components/mocha/mocha.css" />
 		<style type="text/css">
 		html, body { background: #fff; }
@@ -18,7 +18,7 @@
 
 		<div id="mocha"></div>
 
-		<!-- Framework dependencies -->
+		<!-- Test framework dependencies -->
 		<script src="../../../assets/components/mocha/mocha.js"></script>
 		<script src="../../../assets/components/chai/chai.js"></script>
 		<script src="../../../assets/components/sinonjs/sinon.js"></script>
@@ -29,13 +29,17 @@
 			mocha.setup('bdd');
 		</script>
 
-		<!-- Add spec dependencies here -->
+		<!-- Add spec JS dependencies here -->
 		<script src="../../../assets/components/jquery/jquery.min.js"></script>
+		<script src="../../../assets/components/eventemitter2/lib/eventemitter2.js"></script>
 		<script src="../../../src/OEEyeDraw.js"></script>
+		<script src="../../../src/ED/Drawing.js"></script>
 		<script src="../../../src/ED/Controller.js"></script>
+		<script src="../../../src/ED/Views/Toolbar.js"></script>
 
 		<!-- Add spec files here -->
-		<script src="../OEEyeDraw.spec.js"></script>
+		<script src="../specs/OEEyeDraw.spec.js"></script>
+		<script src="../specs/Views/Toolbar.spec.js"></script>
 
 		<!-- Run the tests -->
 		<script>
