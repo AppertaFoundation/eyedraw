@@ -27,7 +27,7 @@ describe('Toolbar', function() {
 	};
 
 	/**
-	 * Creates a toolbar instance.
+	 * Creates a toolbar instance
 	 */
 	function createToolbar(drawing, container) {
 		drawing = drawing || createDrawing();
@@ -52,7 +52,7 @@ describe('Toolbar', function() {
 		handler.call(notification.object, fakeNotification);
 	}
 
-	it('should exist within the ED.Views namespace', function() {
+	it('should exist on the ED.Views namespace', function() {
 		expect(typeof ED.Views).to.equal('object');
 		expect(typeof ED.Views.Toolbar).to.equal('function');
 	});
