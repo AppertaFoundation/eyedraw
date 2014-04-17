@@ -132,10 +132,6 @@ ED.Controller = (function() {
 			'mousedragged',
 			'parameterChanged'
 		]);
-
-		// De-select all doodles when clicking anywhere in the document.
-		// @todo: this should move into the drawing
-		// $(document).on('click.' + EVENT_NAMESPACE, this.onDocumentClick.bind(this));
 	};
 
 	/**
@@ -250,20 +246,98 @@ ED.Controller = (function() {
 		}
 	};
 
+	/**
+	 * Find an eyedraw instance by its' idSuffix.
+	 * @param  {String} idSuffix The eyedraw instance idSuffix
+	 * @return {ED.Drawing}
+	 */
+	Controller.prototype.getEyeDrawInstance = function(idSuffix) {
+		return ED.getInstance(idSuffix);
+	};
+
+	/**
+	 * Sync multiple eyedraws. Essentially this will sync parameters for doodles across
+	 * different eyedraw instances.
+	 * @param  {Object} changedParam The paramater that was changed in the master doodle.
+	 */
+	Controller.prototype.syncEyedraws = function(changedParam) {
+
+		var masterDoodle = changedParam.doodle;
+		var syncArray = this.properties.syncArray;
+
+		// Iterate through sync array
+		for (var idSuffix in syncArray) {
+
+			// Get reference to slave drawing
+			var slaveDrawing = this.getEyeDrawInstance(idSuffix);
+
+			if (!slaveDrawing) {
+				ED.errorHandler('ED.Controller', 'syncEyedraws', 'Cannot sync with ' + idSuffix + ': instance not found');
+				break;
+			}
+
+			// Iterate through master doodles to sync.
+			for (var masterDoodleName in syncArray[idSuffix]) {
+
+				// Iterate through slave doodles to sync with master doodle.
+				for (var slaveDoodleName in syncArray[idSuffix][masterDoodleName]) {
+
+					// Get the slave doodle instance (uses first doodle in the drawing matching the className)
+					var slaveDoodle = slaveDrawing.firstDoodleOfClass(slaveDoodleName);
+
+					// Check that doodles exist, className matches, and sync is allowed
+					if (!masterDoodle || masterDoodle.className !== masterDoodleName || !slaveDoodle && !slaveDoodle.willSync) {
+						continue;
+					}
+
+					// Sync the doodle parameters.
+					var parameterArray = syncArray[idSuffix][masterDoodleName][slaveDoodleName].parameters;
+					this.syncDoodleParameters(parameterArray, changedParam, masterDoodle, slaveDoodle, slaveDrawing);
+				}
+			}
+
+			// Refresh the slave drawing, now that the doodle parameters are synced.
+			slaveDrawing.repaint();
+		}
+	};
+
+	/**
+	 * Sync doodle parameters across two eyedraws.
+	 * @param  {Array} parameterArray The full list of parameters to sync.
+	 * @param  {Object} changedParam   The parameter that was changed in the master doodle.
+	 * @param  {ED.Doodle} masterDoodle   The master doodle instance.
+	 * @param  {ED.Doodle} slaveDoodle    The slave doodle that will be synced.
+	 * @param  {ED.Drawing} slaveDrawing  The slave drawing instance.
+	 */
+	Controller.prototype.syncDoodleParameters = function(parameterArray, changedParam, masterDoodle, slaveDoodle, slaveDrawing) {
+
+		// Iterate through parameters to sync
+		for (var i = 0; i < (parameterArray || []).length; i++) {
+
+			// Check that parameter array member matches changed parameter
+			if (parameterArray[i] !== changedParam.parameter) {
+				continue;
+			}
+			// Avoid infinite loop by checking values are not equal before setting
+			if (masterDoodle[changedParam.parameter] === slaveDoodle[changedParam.parameter]) {
+				continue;
+			}
+
+			var increment = changedParam.value - changedParam.oldValue;
+			var newValue = slaveDoodle[changedParam.parameter] + increment;
+
+			// Sync slave parameter to value of master
+			slaveDoodle.setSimpleParameter(changedParam.parameter, newValue);
+			slaveDoodle.updateDependentParameters(changedParam.parameter);
+
+			// Update any bindings associated with the slave doodle
+			slaveDrawing.updateBindings(slaveDoodle);
+		}
+	};
+
 	/*********************
 	 * EVENT HANDLERS
 	 *********************/
-
-	/**
-	 * Delesect all doodles if clicking outside of the canvas element.
-	 * @param  {Object} e Event object.
-	 * @todo This should move into the drawing object.
-	 */
-	// Controller.prototype.onDocumentClick = function(e) {
-		// if($(e.target).parents().index(this.container) === -1){
-			// this.drawing.deselectDoodles();
-		// }
-	// };
 
 	/**
 	 * On drawing ready.
@@ -352,95 +426,6 @@ ED.Controller = (function() {
 		this.syncEyedraws(notification.object);
 		// Save drawing to hidden input.
 		this.saveDrawingToInputField();
-	};
-
-	/**
-	 * Find an eyedraw instance by its' idSuffix.
-	 * @param  {String} idSuffix The eyedraw instance idSuffix
-	 * @return {ED.Drawing}
-	 */
-	Controller.prototype.getEyeDrawInstance = function(idSuffix) {
-		return ED.getInstance(idSuffix);
-	};
-
-	/**
-	 * Sync multiple eyedraws. Essentially this will sync parameters for doodles across
-	 * different eyedraw instances.
-	 * @param  {Object} changedParam The paramater that was changed in the master doodle.
-	 */
-	Controller.prototype.syncEyedraws = function(changedParam) {
-
-		var masterDoodle = changedParam.doodle;
-		var syncArray = this.properties.syncArray;
-
-		// Iterate through sync array
-		for (var idSuffix in syncArray) {
-
-			// Get reference to slave drawing
-			var slaveDrawing = this.getEyeDrawInstance(idSuffix);
-
-			if (!slaveDrawing) {
-				ED.errorHandler('ED.Controller', 'syncEyedraws', 'Cannot sync with ' + idSuffix + ': instance not found');
-				break;
-			}
-
-			// Iterate through master doodles to sync.
-			for (var masterDoodleName in syncArray[idSuffix]) {
-
-				// Iterate through slave doodles to sync with master doodle.
-				for (var slaveDoodleName in syncArray[idSuffix][masterDoodleName]) {
-
-					// Get the slave doodle instance (uses first doodle in the drawing matching the className)
-					var slaveDoodle = slaveDrawing.firstDoodleOfClass(slaveDoodleName);
-
-					// Check that doodles exist, className matches, and sync is allowed
-					if (!masterDoodle || masterDoodle.className !== masterDoodleName || !slaveDoodle && !slaveDoodle.willSync) {
-						continue;
-					}
-
-					// Sync the doodle parameters.
-					var parameterArray = syncArray[idSuffix][masterDoodleName][slaveDoodleName].parameters;
-					this.syncDoodleParameters(parameterArray, changedParam, masterDoodle, slaveDoodle, slaveDrawing);
-				}
-			}
-
-			// Refresh the slave drawing, now that the doodle parameters are synced.
-			slaveDrawing.repaint();
-		}
-	};
-
-	/**
-	 * Sync doodle parameters across two eyedraws.
-	 * @param  {Array} parameterArray The full list of parameters to sync.
-	 * @param  {Object} changedParam   The parameter that was changed in the master doodle.
-	 * @param  {ED.Doodle} masterDoodle   The master doodle instance.
-	 * @param  {ED.Doodle} slaveDoodle    The slave doodle that will be synced.
-	 * @param  {ED.Drawing} slaveDrawing  The slave drawing instance.
-	 */
-	Controller.prototype.syncDoodleParameters = function(parameterArray, changedParam, masterDoodle, slaveDoodle, slaveDrawing) {
-
-		// Iterate through parameters to sync
-		for (var i = 0; i < (parameterArray || []).length; i++) {
-
-			// Check that parameter array member matches changed parameter
-			if (parameterArray[i] !== changedParam.parameter) {
-				continue;
-			}
-			// Avoid infinite loop by checking values are not equal before setting
-			if (masterDoodle[changedParam.parameter] === slaveDoodle[changedParam.parameter]) {
-				continue;
-			}
-
-			var increment = changedParam.value - changedParam.oldValue;
-			var newValue = slaveDoodle[changedParam.parameter] + increment;
-
-			// Sync slave parameter to value of master
-			slaveDoodle.setSimpleParameter(changedParam.parameter, newValue);
-			slaveDoodle.updateDependentParameters(changedParam.parameter);
-
-			// Update any bindings associated with the slave doodle
-			slaveDrawing.updateBindings(slaveDoodle);
-		}
 	};
 
 	return Controller;
