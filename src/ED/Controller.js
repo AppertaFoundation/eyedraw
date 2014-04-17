@@ -19,6 +19,11 @@
 
 /* global $:false */
 
+/**
+ * @todo This controller is getting quite big. Consider sticking all the
+ * drawing event related stuff into a new object.
+ */
+
 var ED = ED || {};
 
 ED.Controller = (function() {
@@ -35,7 +40,10 @@ ED.Controller = (function() {
 	 * Controller constructor. The controller will init the various eyedraw components
 	 * and manage post-init actions.
 	 * @param {Object} properties The EyeDraw widget properties.
-	 * @param {ED.Checker} Checker The EyeDraw checker.
+	 * @param {ED.Checker} [Checker] The EyeDraw checker.
+	 * @param {ED.Drawing} [drawing] An ED.Drawing instance.
+	 * @param {ED.Views.Toolbar} [toolbar] An ED.Views.Toolbar instance.
+	 * @param {ED.Views.DoodlePopup} [doodlePopup] An ED.Views.DoodlePopup instance.
 	 */
 	function Controller(properties, Checker, drawing, toolbar, doodlePopup) {
 
@@ -100,6 +108,9 @@ ED.Controller = (function() {
 		);
 	};
 
+	/**
+	 * Register the drawing instance with the Checker, and store the instance.
+	 */
 	Controller.prototype.registerDrawing = function() {
 		// Register drawing with the checker.
 		this.Checker.register(this.drawing);
@@ -108,10 +119,9 @@ ED.Controller = (function() {
 	};
 
 	/**
-	 * Register events.
+	 * Register drawing and DOM events.
 	 */
 	Controller.prototype.registerEvents = function() {
-
 		// Register controller for notifications
 		this.drawing.registerForNotifications(this, 'notificationHandler', [
 			'ready',
@@ -119,13 +129,13 @@ ED.Controller = (function() {
 			'doodleAdded',
 			'doodleDeleted',
 			'doodleSelected',
-			'doodleDeselected',
 			'mousedragged',
 			'parameterChanged'
 		]);
 
 		// De-select all doodles when clicking anywhere in the document.
-		$(document).on('click.' + EVENT_NAMESPACE, this.onDocumentClick.bind(this));
+		// @todo: this should move into the drawing
+		// $(document).on('click.' + EVENT_NAMESPACE, this.onDocumentClick.bind(this));
 	};
 
 	/**
@@ -197,6 +207,13 @@ ED.Controller = (function() {
 		}
 	};
 
+	Controller.prototype.deselectSyncedDoodles = function() {
+		for (var idSuffix in this.properties.syncArray) {
+			var drawing = this.getEyeDrawInstance(idSuffix);
+			drawing.deselectDoodles();
+		}
+	};
+
 	/**
 	 * Run commands on the drawing once it's ready. (This is useful for
 	 * adding doodles on page load, for example.)
@@ -240,12 +257,13 @@ ED.Controller = (function() {
 	/**
 	 * Delesect all doodles if clicking outside of the canvas element.
 	 * @param  {Object} e Event object.
+	 * @todo This should move into the drawing object.
 	 */
-	Controller.prototype.onDocumentClick = function(e) {
-		if($(e.target).parents().index(this.container) === -1){
-			this.drawing.deselectDoodles();
-		}
-	};
+	// Controller.prototype.onDocumentClick = function(e) {
+		// if($(e.target).parents().index(this.container) === -1){
+			// this.drawing.deselectDoodles();
+		// }
+	// };
 
 	/**
 	 * On drawing ready.
@@ -295,12 +313,12 @@ ED.Controller = (function() {
 
 		// Label doodle needs immediate keyboard input, so give canvas focus.
 		// NOTE: labels are deactivated from 1.6.
-		var doodle = notification.object;
-		if (typeof(doodle) != 'undefined') {
-			if (doodle.className == 'Label') {
-				this.canvas.focus();
-			}
-		}
+		// var doodle = notification.object;
+		// if (typeof(doodle) != 'undefined') {
+		// 	if (doodle.className == 'Label') {
+		// 		this.canvas.focus();
+		// 	}
+		// }
 	};
 
 	/**
@@ -314,10 +332,7 @@ ED.Controller = (function() {
 	 * On doodle selected.
 	 */
 	Controller.prototype.onDoodleSelected = function() {
-		for (var idSuffix in this.properties.syncArray) {
-			var drawing = this.getEyeDrawInstance(idSuffix);
-			drawing.deselectDoodles();
-		}
+		this.deselectSyncedDoodles();
 	};
 
 	/**
