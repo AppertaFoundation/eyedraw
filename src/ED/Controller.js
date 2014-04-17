@@ -35,17 +35,21 @@ ED.Controller = (function() {
 	 * Controller constructor. The controller will init the various eyedraw components
 	 * and manage post-init actions.
 	 * @param {Object} properties The EyeDraw widget properties.
+	 * @param {ED.Checker} Checker The EyeDraw checker.
 	 */
-	function Controller(properties) {
+	function Controller(properties, Checker, drawing, toolbar, doodlePopup) {
 
 		this.properties = properties;
 		this.canvas = document.getElementById(properties.canvasId);
 		this.input = document.getElementById(properties.inputId);
 		this.container = $(this.canvas).closest('.eyedraw-widget');
 
-		this.createDrawing();
-		this.createViews();
+		this.Checker = Checker || ED.Checker;
+		this.drawing = drawing || this.createDrawing();
+		this.toolbar = toolbar || this.createToolbar();
+		this.doodlePopup = doodlePopup || this.createDoodlePopup();
 
+		this.registerDrawing();
 		this.registerEvents();
 		this.initListeners();
 
@@ -65,7 +69,7 @@ ED.Controller = (function() {
 			graphicsPath: this.properties.graphicsPath
 		};
 
-		this.drawing = new ED.Drawing(
+		var drawing = new ED.Drawing(
 			this.canvas,
 			this.properties.eye,
 			this.properties.idSuffix,
@@ -73,29 +77,34 @@ ED.Controller = (function() {
 			options
 		);
 
-		// Register with the checker.
-		ED.Checker.register(this.drawing);
-
-		// Store this drawing instance
-		ED.setInstance(this.drawing);
+		return drawing;
 	};
 
 	/**
-	 * Create the various view classes.
+	 * Create the toolbar view instance.
 	 */
-	Controller.prototype.createViews = function() {
-
-		// Toolbar
-		this.toolbar = new ED.Views.Toolbar(
+	Controller.prototype.createToolbar = function() {
+		return new ED.Views.Toolbar(
 			this.drawing,
 			this.container.find('.eyedraw-toolbar-panel')
 		);
+	};
 
-		// Doodle Popup menu
-		this.doodlePopup = new ED.Views.DoodlePopup(
+	/**
+	 * Create the doodle popup view instance.
+	 */
+	Controller.prototype.createDoodlePopup = function() {
+		return new ED.Views.DoodlePopup(
 			this.drawing,
 			this.container
 		);
+	};
+
+	Controller.prototype.registerDrawing = function() {
+		// Register drawing with the checker.
+		this.Checker.register(this.drawing);
+		// Store the drawing instance.
+		ED.setInstance(this.drawing);
 	};
 
 	/**
@@ -193,10 +202,13 @@ ED.Controller = (function() {
 	 * adding doodles on page load, for example.)
 	 */
 	Controller.prototype.runOnReadyCommands = function() {
-		for (var i = 0; i < this.properties.onReadyCommandArray.length; i++) {
+
+		var arr = (this.properties.onReadyCommandArray || []);
+
+		for (var i = 0; i < arr.length; i++) {
 			// Get method name
-			var method = this.properties.onReadyCommandArray[i][0];
-			var argumentArray = this.properties.onReadyCommandArray[i][1];
+			var method = arr[i][0];
+			var argumentArray = arr[i][1];
 
 			// Run method with arguments
 			this.drawing[method].apply(this.drawing, argumentArray);
@@ -207,11 +219,14 @@ ED.Controller = (function() {
 	 * Run commands once all doodles have been loaded.
 	 */
 	Controller.prototype.runOnDoodlesLoadedCommands = function() {
+
+		var arr = (this.properties.onDoodlesLoadedCommandArray || []);
+
 		// Run commands after doodles have successfully loaded
-		for (var i = 0; i < this.properties.onDoodlesLoadedCommandArray.length; i++) {
+		for (var i = 0; i < arr.length; i++) {
 			// Get method name
-			var method = this.properties.onDoodlesLoadedCommandArray[i][0];
-			var argumentArray = this.properties.onDoodlesLoadedCommandArray[i][1];
+			var method = arr[i][0];
+			var argumentArray = arr[i][1];
 
 			// Run method with arguments
 			this.drawing[method].apply(this.drawing, argumentArray);
