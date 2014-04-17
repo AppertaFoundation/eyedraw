@@ -1,6 +1,9 @@
 describe('Toolbar', function() {
 
-	var createDrawing = function() {
+	/**
+	 * Creates a mock ED.Drawing object
+	 */
+	function createDrawing() {
 		return {
 			notificationArray: [],
 			registerForNotifications: function() {
@@ -10,7 +13,10 @@ describe('Toolbar', function() {
 		};
 	};
 
-	var createContainer = function(func, arg) {
+	/**
+	 * Creates a mock DOM tree
+	 */
+	function createContainer(func, arg) {
 		var container = document.createElement('div');
 		var child = document.createElement('div');
 		child.className = 'eyedraw-button';
@@ -20,6 +26,9 @@ describe('Toolbar', function() {
 		return container;
 	};
 
+	/**
+	 * Creates a toolbar instance.
+	 */
 	function createToolbar(drawing, container) {
 		drawing = drawing || createDrawing();
 		container = container || createContainer();
@@ -31,6 +40,9 @@ describe('Toolbar', function() {
 		};
 	}
 
+	/**
+	 * Initiates the toolbar by firing the ready event on the mock drawing object.
+	 */
 	function initToolbar(toolbar) {
 		var notification = toolbar.drawing.notificationArray[0];
 		var handler = notification.object[notification.methodName];
