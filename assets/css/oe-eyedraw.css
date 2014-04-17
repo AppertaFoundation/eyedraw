@@ -923,38 +923,3 @@ span.squiggle {
   float: left;
   margin-right: 5px;
 }
-
-/* line 66, ../sass/components/_doodle-popup.scss */
-.eyedraw-doodle-popup-toggle, .eyedraw-doodle-popup-toggle:hover {
-  background-color: #68c8f8;
-  background-image: url(../img/icons/16x16/close-drawer.png);
-  background-repeat: no-repeat;
-  background-position: 1px 4px;
-}
-
-/* line 75, ../sass/components/_doodle-popup.scss */
-.closed .eyedraw-doodle-popup-toggle, .closed .eyedraw-doodle-popup-toggle:hover {
-  background-color: #68c8f8;
-  background-image: url(../img/icons/16x16/open-drawer.png);
-  background-repeat: no-repeat;
-  background-position: 1px 4px;
-}
-
-/* line 84, ../sass/components/_doodle-popup.scss */
-.eyedraw-doodle-popup-toggle {
-  -webkit-border-radius: 0 6px 6px 0;
-  -moz-border-radius: 0 6px 6px 0;
-  -ms-border-radius: 0 6px 6px 0;
-  -o-border-radius: 0 6px 6px 0;
-  border-radius: 0 6px 6px 0;
-  -webkit-box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
-  -moz-box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
-  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
-  display: block;
-  height: 25px;
-  margin-top: -12px;
-  position: absolute;
-  right: -23px;
-  top: 50%;
-  width: 20px;
-}
