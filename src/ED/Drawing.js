@@ -206,7 +206,7 @@ ED.positiveAngle = function(_angle) {
  * @param {String} _message Error message
  */
 ED.errorHandler = function(_class, _method, _message) {
-	console.error('EYEDRAW ERROR! class: [' + _class + '] method: [' + _method + '] message: [' + _message + ']');
+	throw new Error('EYEDRAW ERROR! class: [' + _class + '] method: [' + _method + '] message: [' + _message + ']');
 }
 
 /**
@@ -273,6 +273,7 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 	// Check we're working with an actual canvas HTML element.
 	if (!_canvas || !(_canvas instanceof HTMLCanvasElement)) {
 		ED.errorHandler('ED.Drawing', 'constructor', 'Invalid canvas element');
+		return;
 	}
 
 	// Defaults for optional parameters
