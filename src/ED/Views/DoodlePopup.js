@@ -196,8 +196,8 @@ ED.Views.DoodlePopup = (function() {
 	};
 
 	DoodlePopup.prototype.onDoodleAdded = function(notification) {
-		this.currentDoodle = notification.selectedDoodle;
-		this.update(true, notification.selectedDoodle);
+		this.currentDoodle = notification.object;
+		this.update(true, notification.object);
 	};
 
 	DoodlePopup.prototype.onDoodleDeleted = function(notification) {
@@ -212,8 +212,8 @@ ED.Views.DoodlePopup = (function() {
 		 * Thus we delay the selected action into the next event loop if we want the
 		 * popup to remain visible when selecting a new doodle.
 		 */
-		this.currentDoodle = notification.selectedDoodle;
-		setTimeout(this.update.bind(this, true, notification.selectedDoodle, 150));
+		this.currentDoodle = notification.object;
+		setTimeout(this.update.bind(this, true, notification.object, 150));
 	};
 
 	DoodlePopup.prototype.onDoodleDeselected = function(notification) {
