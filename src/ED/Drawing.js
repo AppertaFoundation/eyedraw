@@ -436,6 +436,27 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 			drawing.mouseout(point);
 		}, false);
 
+		document.body.addEventListener('mousedown', function onBodyMouseDown(e) {
+
+			// Deselect all doodles if the user clicks any on the page that is
+			// not the canvas itself, nor the doodle popup, nor any toolbar buttons.
+			var elem = e.target;
+			var isEyeDrawElement = false;
+
+			do {
+				if (/(eyedraw-doodle-popup)|(eyedraw-button)|(eyedraw-canvas)/.test(elem.className)) {
+					isEyeDrawElement = true;
+					break;
+				}
+			} while (
+				(elem = elem.parentNode) && (elem !== document.body)
+			);
+
+			if (!isEyeDrawElement) {
+				drawing.deselectDoodles();
+			}
+		}, false);
+
 		//        this.canvas.addEventListener('mousewheel', function(e) {
 		//                                     e.preventDefault();
 		//                                     drawing.selectNextDoodle(e.wheelDelta);
@@ -589,6 +610,7 @@ ED.Drawing.prototype.checkAllLoaded = function() {
  * @param {Array} _notificationList Array of strings listing the notifications the object is interested in. If empty, receives all.
  */
 ED.Drawing.prototype.registerForNotifications = function(_object, _methodName, _notificationList) {
+
 	// Put in default values for optional parameters
 	if (typeof(_methodName) == 'undefined') {
 		_methodName = 'notificationHandler';
@@ -598,11 +620,11 @@ ED.Drawing.prototype.registerForNotifications = function(_object, _methodName, _
 	}
 
 	// Add object and details to notification array
-	this.notificationArray[this.notificationArray.length] = {
+	this.notificationArray.push({
 		object: _object,
 		methodName: _methodName,
 		notificationList: _notificationList
-	};
+	});
 }
 
 /**
