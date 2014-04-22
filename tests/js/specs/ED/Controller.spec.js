@@ -53,7 +53,12 @@
 			},
 			loadDoodles: $.noop,
 			repaint: $.noop,
-			save: $.noop
+			addBindings: $.noop,
+			addDeleteValues: $.noop,
+			save: function() {
+				var data = JSON.stringify({ test: 'data' });
+				return data;
+			}
 		};
 	};
 
@@ -70,7 +75,6 @@
 	 * @type {Object}
 	 */
 	var FakeDoodle = {
-		hello: 'world',
 		onSelection: $.noop
 	};
 
@@ -88,7 +92,9 @@
 		eye: 0,
 		idSuffix: 'idSuffix',
 		isEditable: true,
-		scale: 1
+		scale: 1,
+		deleteValueArray: {},
+		bindingArray: {}
 	};
 
 	describe('Controller', function() {
@@ -362,6 +368,137 @@
 					expect(spy.calledOnce).to.be.true;
 				});
 			});
+		});
+
+		describe('Loading and saving data', function() {
+			it('should save drawing data to the input field', function() {
+
+				var dom = createDOM();
+				var drawing = createDrawing();
+				var properties = $.extend({}, defaultProperties);
+				var controller = new ED.Controller(properties, FakeChecker, drawing);
+
+				var spy1 = sinon.spy(controller, 'hasInputFieldData');
+				var spy2 = sinon.spy(drawing, 'save');
+
+				// First, lets clear the input field value to test if saving
+				// the data is prevented if the input value is null.
+
+				dom.input.val('');
+				controller.saveDrawingToInputField();
+
+				expect(spy1.calledOnce).to.be.true;
+				expect(spy2.called).to.be.false;
+
+				// Now let's test that the input field value is updated, only if
+				// the input field already has data.
+
+				var data1 = JSON.stringify({ cats: 'rule' });
+				dom.input.val(data1);
+
+				controller.saveDrawingToInputField();
+
+				expect(spy1.calledTwice).to.be.true;
+				expect(spy2.called).to.be.true;
+				expect(dom.input.val()).to.equal(JSON.stringify({ test: 'data' }));
+
+				spy1.reset();
+				spy2.reset();
+				dom.destroy();
+			});
+			it('should load data from the input field', function() {
+
+				var dom = createDOM();
+				var drawing = createDrawing();
+				var properties = $.extend({}, defaultProperties);
+				var controller = new ED.Controller(properties, FakeChecker, drawing);
+				var spy = sinon.spy(drawing, 'loadDoodles');
+
+				controller.loadInputFieldData();
+
+				expect(spy.withArgs(dom.input[0].id).called).to.be.true;
+				dom.destroy();
+			});
+		});
+
+		describe('Drawing setup', function() {
+			it('should add drawing bindings', function() {
+
+				var dom;
+
+				function test(props) {
+					dom = createDOM();
+					var drawing = createDrawing();
+					var properties = $.extend({}, defaultProperties, props);
+					var controller = new ED.Controller(properties, FakeChecker, drawing);
+					var spy = sinon.spy(drawing, 'addBindings');
+					drawing.notify('ready');
+					return spy;
+				}
+
+				// Test not calling the 'addBindings' method if expected object is not an object.
+				var spy1 = test({
+					bindingArray: false
+				});
+
+				expect(spy1.called).to.be.false;
+				spy1.reset();
+				dom.destroy();
+
+				// Test calling the 'addBindings' method if expected object is an actual object.
+				var bindingArray = {
+					AntSeg: {
+						pupilSize: {
+							id: "eyedraw-field-1",
+							attribute: "data-value"
+						},
+						pxe: {
+							id: "field-option-1"
+						}
+					}
+				};
+				var spy2 = test({
+					bindingArray: bindingArray
+				});
+				expect(spy2.withArgs(bindingArray).calledOnce).to.be.true;
+				spy2.reset();
+				dom.destroy();
+			});
+
+			it('should add deleted values', function() {
+
+				var dom;
+
+				function test(props) {
+					dom = createDOM();
+					var drawing = createDrawing();
+					var properties = $.extend({}, defaultProperties, props);
+					var controller = new ED.Controller(properties, FakeChecker, drawing);
+					var spy = sinon.spy(drawing, 'addDeleteValues');
+					drawing.notify('ready');
+					return spy;
+				}
+
+				// Test not calling the 'addBindings' method if expected object is not an object.
+				var spy1 = test({
+					deleteValueArray: false
+				});
+				expect(spy1.called).to.be.false;
+				spy1.reset();
+				dom.destroy();
+
+				// Test calling the 'addBindings' method if expected object is an actual object.
+				var deleteValueArray = {
+					Element_OphCiExamination_AnteriorSegment_right_nuclear_id: '',
+					Element_OphCiExamination_AnteriorSegment_right_cortical_id: ''
+				};
+				var spy2 = test({
+					deleteValueArray: deleteValueArray
+				});
+				expect(spy2.withArgs(deleteValueArray).calledOnce).to.be.true;
+				spy2.reset();
+				dom.destroy();
+			})
 		});
 	});
 }());
