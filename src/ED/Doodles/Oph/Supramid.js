@@ -27,10 +27,10 @@
 ED.Supramid = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "Supramid";
-	
+
 	// Saved parameters
 	this.savedParameterArray = ['apexY', 'originX', 'originY'];
-	
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
@@ -46,7 +46,7 @@ ED.Supramid.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.Supramid.prototype.setHandles = function() {
-	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+	this.handleArray[4] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
 }
 
 /**
@@ -56,7 +56,7 @@ ED.Supramid.prototype.setPropertyDefaults = function() {
 	this.isOrientated = true;
 	this.isRotatable = false;
 	this.snapToQuadrant = true;
-	this.quadrantPoint = new ED.Point(10, 10);
+	this.quadrantPoint = new ED.Drawing.Point(10, 10);
 
 	// Update component of validation array for simple parameters
 	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
@@ -94,17 +94,17 @@ ED.Supramid.prototype.draw = function(_point) {
 	ED.Supramid.superclass.draw.call(this, _point);
 
 	// Calculate key points for supramid bezier
-	var startPoint = new ED.Point(0, this.apexY);
-	var tubePoint = new ED.Point(0, -450);
-	var controlPoint1 = new ED.Point(0, -600);
+	var startPoint = new ED.Drawing.Point(0, this.apexY);
+	var tubePoint = new ED.Drawing.Point(0, -450);
+	var controlPoint1 = new ED.Drawing.Point(0, -600);
 
 	// Calculate mid point x coordinate
 	var midPointX = -450;
-	var controlPoint2 = new ED.Point(midPointX, -300);
-	var midPoint = new ED.Point(midPointX, 0);
-	var controlPoint3 = new ED.Point(midPointX, 300);
-	var controlPoint4 = new ED.Point(midPointX * 0.5, 450);
-	var endPoint = new ED.Point(midPointX * 0.2, 450);
+	var controlPoint2 = new ED.Drawing.Point(midPointX, -300);
+	var midPoint = new ED.Drawing.Point(midPointX, 0);
+	var controlPoint3 = new ED.Drawing.Point(midPointX, 300);
+	var controlPoint4 = new ED.Drawing.Point(midPointX * 0.5, 450);
+	var endPoint = new ED.Drawing.Point(midPointX * 0.2, 450);
 
 	// Boundary path
 	ctx.beginPath();
@@ -141,7 +141,7 @@ ED.Supramid.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(0, this.apexY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(0, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -158,22 +158,22 @@ ED.Supramid.prototype.draw = function(_point) {
 // ED.Supramid.prototype.getParameter = function(_parameter)
 // {
 //     var returnValue;
-//     
+//
 //     switch (_parameter)
 //     {
 //         // Position of end of suture
 //         case 'endPosition':
 //             var r = Math.sqrt(this.apexX * this.apexX + this.apexY * this.apexY);
-//             
+//
 //             if (r < 280 ) returnValue = 'in the AC';
 //             else returnValue = ((r - 280)/14).toFixed(0) + 'mm from limbus';
 //             break;
-// 
+//
 //         default:
 //             returnValue = "";
 //             break;
 //     }
-//     
+//
 //     return returnValue;
 // }
 

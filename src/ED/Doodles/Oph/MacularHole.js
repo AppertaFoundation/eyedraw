@@ -30,7 +30,7 @@ ED.MacularHole = function(_drawing, _parameterJSON) {
 
 	// Saved parameters
 	this.savedParameterArray = ['originX', 'scaleX', 'scaleY'];
-	
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
@@ -46,7 +46,7 @@ ED.MacularHole.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.MacularHole.prototype.setHandles = function() {
-	this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, false);
+	this.handleArray[2] = new ED.Doodle.Handle(null, true, ED.Mode.Scale, false);
 }
 
 /**
@@ -116,7 +116,7 @@ ED.MacularHole.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	point = new ED.Point(0, 0);
+	point = new ED.Drawing.Point(0, 0);
 	point.setWithPolars(r, Math.PI / 4);
 	this.handleArray[2].location = this.transform.transformPoint(point);
 

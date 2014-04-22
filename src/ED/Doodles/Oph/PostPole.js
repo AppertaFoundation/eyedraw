@@ -33,10 +33,10 @@ ED.PostPole = function(_drawing, _parameterJSON) {
 
 	// Derived parameters
 	this.cdRatio = '0';
-	
+
 	// Saved parameters
 	this.savedParameterArray = ['apexX', 'apexY'];
-	
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
@@ -52,7 +52,7 @@ ED.PostPole.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.PostPole.prototype.setHandles = function() {
-	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+	this.handleArray[4] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
 }
 
 /**
@@ -74,7 +74,7 @@ ED.PostPole.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['cdRatio'] = {
 		kind: 'derived',
 		type: 'float',
-		range: new ED.Range(0, 1),
+		range: new ED.Drawing.Range(0, 1),
 		precision: 1,
 		animate: false
 	};
@@ -203,7 +203,7 @@ ED.PostPole.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);

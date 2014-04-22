@@ -30,7 +30,7 @@ ED.EpiretinalMembrane = function(_drawing, _parameterJSON) {
 
 	// Saved parameters
 	this.savedParameterArray = ['originX', 'originY', 'scaleX', 'scaleY', 'rotation'];
-	
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
@@ -46,7 +46,7 @@ ED.EpiretinalMembrane.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.EpiretinalMembrane.prototype.setHandles = function() {
-	this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, true);
+	this.handleArray[2] = new ED.Doodle.Handle(null, true, ED.Mode.Scale, true);
 }
 
 /**
@@ -67,7 +67,7 @@ ED.EpiretinalMembrane.prototype.setPropertyDefaults = function() {
  * Use the setParameter function for derived parameters, as this will also update dependent variables
  */
 ED.EpiretinalMembrane.prototype.setParameterDefaults = function() {
-	
+
 	// Set size according to template
 	if (this.drawing.hasDoodleOfClass('Fundus')) {
 		this.scaleX = 0.5;
@@ -142,7 +142,7 @@ ED.EpiretinalMembrane.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[2].location = this.transform.transformPoint(new ED.Point(r * 0.7, -r * 0.7));
+	this.handleArray[2].location = this.transform.transformPoint(new ED.Drawing.Point(r * 0.7, -r * 0.7));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);

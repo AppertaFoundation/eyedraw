@@ -30,10 +30,10 @@ ED.PCIOL = function(_drawing, _parameterJSON) {
 
 	// Saved parameters
 	this.savedParameterArray = ['originX', 'originY', 'rotation'];
-	
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
-	
+
 	// Invariate parameters
 	this.scaleX = 0.75;
 	this.scaleY = 0.75;
@@ -50,7 +50,7 @@ ED.PCIOL.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.PCIOL.prototype.setHandles = function() {
-	this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Rotate, false);
+	this.handleArray[2] = new ED.Doodle.Handle(null, true, ED.Mode.Rotate, false);
 }
 
 /**
@@ -112,7 +112,7 @@ ED.PCIOL.prototype.draw = function(_point) {
 	this.drawBoundary(_point);
 
 	// Coordinates of handles (in canvas plane)
-	var point = new ED.Point(0, 0)
+	var point = new ED.Drawing.Point(0, 0)
 	point.setWithPolars(r, Math.PI / 4);
 	this.handleArray[2].location = this.transform.transformPoint(point);
 

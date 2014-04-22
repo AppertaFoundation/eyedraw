@@ -27,10 +27,10 @@
 ED.Circinate = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "Circinate";
-	
+
 	// Saved parameters
 	this.savedParameterArray = ['originX', 'originY', 'scaleX', 'scaleY'];
-	
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
@@ -46,7 +46,7 @@ ED.Circinate.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.Circinate.prototype.setHandles = function() {
-	this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, false);
+	this.handleArray[2] = new ED.Doodle.Handle(null, true, ED.Mode.Scale, false);
 }
 
 /**
@@ -103,8 +103,8 @@ ED.Circinate.prototype.draw = function(_point) {
 		var el = 30;
 
 		// Point objects
-		var cp = new ED.Point(0, 0);
-		var ep = new ED.Point(0, 0);
+		var cp = new ED.Drawing.Point(0, 0);
+		var ep = new ED.Drawing.Point(0, 0);
 
 		// Red centre
 		ctx.beginPath();
@@ -130,7 +130,7 @@ ED.Circinate.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	var point = new ED.Point(0, 0);
+	var point = new ED.Drawing.Point(0, 0);
 	point.setWithPolars(rc, Math.PI / 4);
 	this.handleArray[2].location = this.transform.transformPoint(point);
 

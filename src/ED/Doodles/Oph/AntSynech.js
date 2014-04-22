@@ -31,7 +31,7 @@ ED.AntSynech = function(_drawing, _parameterJSON) {
 	// Private parameters
 	this.rtmi = 304;
 	this.riri = 176;
-	
+
 	// Saved parameters
 	this.savedParameterArray = ['arc', 'rotation', 'apexY'];
 
@@ -50,9 +50,9 @@ ED.AntSynech.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.AntSynech.prototype.setHandles = function() {
-	this.handleArray[0] = new ED.Handle(null, true, ED.Mode.Arc, false);
-	this.handleArray[3] = new ED.Handle(null, true, ED.Mode.Arc, false);
-	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+	this.handleArray[0] = new ED.Doodle.Handle(null, true, ED.Mode.Arc, false);
+	this.handleArray[3] = new ED.Doodle.Handle(null, true, ED.Mode.Arc, false);
+	this.handleArray[4] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
 }
 
 /**
@@ -129,9 +129,9 @@ ED.AntSynech.prototype.draw = function(_point) { console.log(this.apexY);
 	this.drawBoundary(_point);
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[0].location = this.transform.transformPoint(new ED.Point(topLeftX, topLeftY));
-	this.handleArray[3].location = this.transform.transformPoint(new ED.Point(topRightX, topRightY));
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(0, this.apexY));
+	this.handleArray[0].location = this.transform.transformPoint(new ED.Drawing.Point(topLeftX, topLeftY));
+	this.handleArray[3].location = this.transform.transformPoint(new ED.Drawing.Point(topRightX, topRightY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(0, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);

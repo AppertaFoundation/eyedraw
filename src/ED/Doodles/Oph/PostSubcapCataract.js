@@ -30,7 +30,7 @@ ED.PostSubcapCataract = function(_drawing, _parameterJSON) {
 
 	// Saved parameters
 	this.savedParameterArray = ['apexX', 'apexY'];
-	
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
@@ -46,7 +46,7 @@ ED.PostSubcapCataract.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.PostSubcapCataract.prototype.setHandles = function() {
-	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+	this.handleArray[4] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
 }
 
 /**
@@ -136,7 +136,7 @@ ED.PostSubcapCataract.prototype.draw = function(_point) {
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {}
 
 	// Coordinates of handles (in canvas plane)
-	var point = new ED.Point(0, 0)
+	var point = new ED.Drawing.Point(0, 0)
 	point.setWithPolars(this.radius, Math.PI / 4);
 	this.handleArray[4].location = this.transform.transformPoint(point);
 

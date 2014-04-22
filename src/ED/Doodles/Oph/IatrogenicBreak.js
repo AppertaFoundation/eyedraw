@@ -30,7 +30,7 @@ ED.IatrogenicBreak = function(_drawing, _parameterJSON) {
 
 	// Saved parameters
 	this.savedParameterArray = ['originX', 'originY', 'scaleX', 'scaleY', 'rotation'];
-	
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
@@ -46,7 +46,7 @@ ED.IatrogenicBreak.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.IatrogenicBreak.prototype.setHandles = function() {
-	this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, true);
+	this.handleArray[2] = new ED.Doodle.Handle(null, true, ED.Mode.Scale, true);
 }
 
 /**
@@ -84,8 +84,8 @@ ED.IatrogenicBreak.prototype.draw = function(_point) {
 	// Oval break
 	var d = 40;
 	var p = 0.8;
-	var sp = new ED.Point(-d, d);
-	var ep = new ED.Point(d, -d);
+	var sp = new ED.Drawing.Point(-d, d);
+	var ep = new ED.Drawing.Point(d, -d);
 
 	// Oval shape
 	ctx.moveTo(sp.x, sp.y);

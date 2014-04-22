@@ -69,7 +69,7 @@ ED.AxialLengthGraph.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'float',
 		precision: 2,
-		range: new ED.Range(14, 38),
+		range: new ED.Drawing.Range(14, 38),
 		animate: true
 	};
 }

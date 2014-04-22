@@ -60,7 +60,7 @@ ED.Freehand.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.Freehand.prototype.setHandles = function() {
-	this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, true);
+	this.handleArray[2] = new ED.Doodle.Handle(null, true, ED.Mode.Scale, true);
 }
 
 /**
@@ -125,7 +125,7 @@ ED.Freehand.prototype.draw = function(_point) {
 	ctx.closePath();
 
 	// Create colour object for squiggle
-	var colourObject = new ED.Colour(0, 0, 0, 1);
+	var colourObject = new ED.Drawing.Colour(0, 0, 0, 1);
 	colourObject.setWithHexString(this.colourString);
 
 	// Set attributes for border (colour changes to indicate drawing mode)
@@ -175,7 +175,7 @@ ED.Freehand.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[2].location = this.transform.transformPoint(new ED.Point(halfWidth, -halfWidth));
+	this.handleArray[2].location = this.transform.transformPoint(new ED.Drawing.Point(halfWidth, -halfWidth));
 
 	// Draw handles if selected but not if for drawing
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);

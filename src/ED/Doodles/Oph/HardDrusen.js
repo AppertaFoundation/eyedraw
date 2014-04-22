@@ -30,7 +30,7 @@ ED.HardDrusen = function(_drawing, _parameterJSON) {
 
 	// Saved parameters
 	this.savedParameterArray = ['apexY', 'scaleX', 'scaleY'];
-	
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
@@ -46,8 +46,8 @@ ED.HardDrusen.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.HardDrusen.prototype.setHandles = function() {
-	this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, false);
-	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+	this.handleArray[2] = new ED.Doodle.Handle(null, true, ED.Mode.Scale, false);
+	this.handleArray[4] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
 }
 
 /**
@@ -115,7 +115,7 @@ ED.HardDrusen.prototype.draw = function(_point) {
 
 		var dr = 10 / this.scaleX;
 
-		var p = new ED.Point(0, 0);
+		var p = new ED.Drawing.Point(0, 0);
 		var n = 20 + Math.abs(Math.floor(this.apexY / 2));
 		for (var i = 0; i < n; i++) {
 			p.setWithPolars(r * ED.randomArray[i], 2 * Math.PI * ED.randomArray[i + 100]);
@@ -124,8 +124,8 @@ ED.HardDrusen.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[2].location = this.transform.transformPoint(new ED.Point(r * 0.7, -r * 0.7));
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
+	this.handleArray[2].location = this.transform.transformPoint(new ED.Drawing.Point(r * 0.7, -r * 0.7));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);

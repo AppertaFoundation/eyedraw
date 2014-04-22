@@ -55,11 +55,11 @@ ED.OpticDisc.superclass = ED.Doodle.prototype;
 ED.OpticDisc.prototype.setHandles = function() {
 	// Array of handles for expert mode
 	for (var i = 0; i < this.numberOfHandles; i++) {
-		this.handleArray[i] = new ED.Handle(null, true, ED.Mode.Handles, false);
+		this.handleArray[i] = new ED.Doodle.Handle(null, true, ED.Mode.Handles, false);
 	}
 
 	// Apex handle for basic mode
-	this.handleArray[this.numberOfHandles] = new ED.Handle(null, true, ED.Mode.Apex, false);
+	this.handleArray[this.numberOfHandles] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
 }
 
 /**
@@ -98,8 +98,8 @@ ED.OpticDisc.prototype.setPropertyDefaults = function() {
 
 		// Create a range object for each handle
 		var range = new Object;
-		range.length = new ED.Range(+50, +290);
-		range.angle = new ED.Range(((15 * cir / 16) + i * cir / 8) % cir, ((1 * cir / 16) + i * cir / 8) % cir);
+		range.length = new ED.Drawing.Range(+50, +290);
+		range.angle = new ED.Drawing.Range(((15 * cir / 16) + i * cir / 8) % cir, ((1 * cir / 16) + i * cir / 8) % cir);
 		this.handleVectorRangeArray[i] = range;
 	}
 }
@@ -113,14 +113,14 @@ ED.OpticDisc.prototype.setParameterDefaults = function() {
 	this.setParameterFromString('cdRatio', '0.3');
 
 	// Create a squiggle to store the handles points
-	var squiggle = new ED.Squiggle(this, new ED.Colour(100, 100, 100, 1), 4, true);
+	var squiggle = new ED.Squiggle(this, new ED.Drawing.Colour(100, 100, 100, 1), 4, true);
 
 	// Add it to squiggle array
 	this.squiggleArray.push(squiggle);
 
 	// Populate with handles at equidistant points around circumference
 	for (var i = 0; i < this.numberOfHandles; i++) {
-		var point = new ED.Point(0, 0);
+		var point = new ED.Drawing.Point(0, 0);
 		point.setWithPolars(-this.apexY, i * 2 * Math.PI / this.numberOfHandles);
 		this.addPointToSquiggle(point);
 	}
@@ -268,7 +268,7 @@ ED.OpticDisc.prototype.draw = function(_point) {
 		ctx.closePath();
 
 		// Set margin attributes
-		var colour = new ED.Colour(0, 0, 0, 1);
+		var colour = new ED.Drawing.Colour(0, 0, 0, 1);
 		colour.setWithHexString('FFA83C'); // Taken from disc margin of a fundus photo
 		ctx.fillStyle = colour.rgba();
 
@@ -287,60 +287,60 @@ ED.OpticDisc.prototype.draw = function(_point) {
 		}
 
 		// Superotemporal vessel
-		var startPoint = new ED.Point(0, 0);
+		var startPoint = new ED.Drawing.Point(0, 0);
 		startPoint.setWithPolars(150, -sign * Math.PI / 2);
 
-		var controlPoint1 = new ED.Point(0, 0);
+		var controlPoint1 = new ED.Drawing.Point(0, 0);
 		controlPoint1.setWithPolars(400, -sign * Math.PI / 8);
-		var controlPoint2 = new ED.Point(0, 0);
+		var controlPoint2 = new ED.Drawing.Point(0, 0);
 		controlPoint2.setWithPolars(450, sign * Math.PI / 8);
 
-		var endPoint = new ED.Point(0, 0);
+		var endPoint = new ED.Drawing.Point(0, 0);
 		endPoint.setWithPolars(500, sign * Math.PI / 4);
 
 		ctx.moveTo(startPoint.x, startPoint.y);
 		ctx.bezierCurveTo(controlPoint1.x, controlPoint1.y, controlPoint2.x, controlPoint2.y, endPoint.x, endPoint.y);
 
 		// Inferotemporal vessel
-		var startPoint = new ED.Point(0, 0);
+		var startPoint = new ED.Drawing.Point(0, 0);
 		startPoint.setWithPolars(150, -sign * Math.PI / 2);
 
-		var controlPoint1 = new ED.Point(0, 0);
+		var controlPoint1 = new ED.Drawing.Point(0, 0);
 		controlPoint1.setWithPolars(400, -sign * 7 * Math.PI / 8);
-		var controlPoint2 = new ED.Point(0, 0);
+		var controlPoint2 = new ED.Drawing.Point(0, 0);
 		controlPoint2.setWithPolars(450, sign * 7 * Math.PI / 8);
 
-		var endPoint = new ED.Point(0, 0);
+		var endPoint = new ED.Drawing.Point(0, 0);
 		endPoint.setWithPolars(500, sign * 3 * Math.PI / 4);
 
 		ctx.moveTo(startPoint.x, startPoint.y);
 		ctx.bezierCurveTo(controlPoint1.x, controlPoint1.y, controlPoint2.x, controlPoint2.y, endPoint.x, endPoint.y);
 
 		// Superonasal vessel
-		var startPoint = new ED.Point(0, 0);
+		var startPoint = new ED.Drawing.Point(0, 0);
 		startPoint.setWithPolars(150, -sign * Math.PI / 2);
 
-		var controlPoint1 = new ED.Point(0, 0);
+		var controlPoint1 = new ED.Drawing.Point(0, 0);
 		controlPoint1.setWithPolars(300, -sign * 2 * Math.PI / 8);
-		var controlPoint2 = new ED.Point(0, 0);
+		var controlPoint2 = new ED.Drawing.Point(0, 0);
 		controlPoint2.setWithPolars(350, -sign * 5 * Math.PI / 16);
 
-		var endPoint = new ED.Point(0, 0);
+		var endPoint = new ED.Drawing.Point(0, 0);
 		endPoint.setWithPolars(450, -sign * 3 * Math.PI / 8);
 
 		ctx.moveTo(startPoint.x, startPoint.y);
 		ctx.bezierCurveTo(controlPoint1.x, controlPoint1.y, controlPoint2.x, controlPoint2.y, endPoint.x, endPoint.y);
 
 		// Inferonasal vessel
-		var startPoint = new ED.Point(0, 0);
+		var startPoint = new ED.Drawing.Point(0, 0);
 		startPoint.setWithPolars(150, -sign * Math.PI / 2);
 
-		var controlPoint1 = new ED.Point(0, 0);
+		var controlPoint1 = new ED.Drawing.Point(0, 0);
 		controlPoint1.setWithPolars(300, -sign * 6 * Math.PI / 8);
-		var controlPoint2 = new ED.Point(0, 0);
+		var controlPoint2 = new ED.Drawing.Point(0, 0);
 		controlPoint2.setWithPolars(350, -sign * 11 * Math.PI / 16);
 
-		var endPoint = new ED.Point(0, 0);
+		var endPoint = new ED.Drawing.Point(0, 0);
 		endPoint.setWithPolars(450, -sign * 5 * Math.PI / 8);
 
 		ctx.moveTo(startPoint.x, startPoint.y);
@@ -373,7 +373,7 @@ ED.OpticDisc.prototype.draw = function(_point) {
 	}
 
 	// Location of apex handle
-	this.handleArray[this.numberOfHandles].location = this.transform.transformPoint(new ED.Point(0, this.apexY));
+	this.handleArray[this.numberOfHandles].location = this.transform.transformPoint(new ED.Drawing.Point(0, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);

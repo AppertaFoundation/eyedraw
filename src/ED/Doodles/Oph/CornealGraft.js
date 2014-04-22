@@ -58,7 +58,7 @@ ED.CornealGraft.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.CornealGraft.prototype.setHandles = function() {
-	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+	this.handleArray[4] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
 }
 
 /**
@@ -145,9 +145,9 @@ ED.CornealGraft.prototype.draw = function(_point) {
 		for (var i = 0; i < this.numberOfSutures; i++) {
 			// Suture points
 			var phi = i * 2 * Math.PI/this.numberOfSutures;
-			var p1 = new ED.Point(0,0);
+			var p1 = new ED.Drawing.Point(0,0);
 			p1.setWithPolars(ri, phi);
-			var p2 = new ED.Point(0,0);
+			var p2 = new ED.Drawing.Point(0,0);
 			p2.setWithPolars(ro, phi);
 
 			// No sutures
@@ -186,7 +186,7 @@ ED.CornealGraft.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);

@@ -58,7 +58,7 @@ ED.RecordReading.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['value'] = {
 		kind: 'derived',
 		type: 'int',
-		range: new ED.Range(0, 240),
+		range: new ED.Drawing.Range(0, 240),
 		animate: true
 	};
 	this.parameterValidationArray['type'] = {

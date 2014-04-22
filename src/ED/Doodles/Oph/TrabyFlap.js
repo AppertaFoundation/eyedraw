@@ -36,8 +36,8 @@ ED.TrabyFlap = function(_drawing, _parameterJSON) {
 
 	// Doodle specific parameters
 	this.r = 380;
-	this.right = new ED.Point(0, 0);
-	this.left = new ED.Point(0, 0);
+	this.right = new ED.Drawing.Point(0, 0);
+	this.left = new ED.Drawing.Point(0, 0);
 
 	// Saved parameters
 	this.savedParameterArray = ['apexX', 'apexY', 'arc', 'rotation'];
@@ -57,9 +57,9 @@ ED.TrabyFlap.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.TrabyFlap.prototype.setHandles = function() {
-	this.handleArray[0] = new ED.Handle(null, true, ED.Mode.Arc, false);
-	this.handleArray[3] = new ED.Handle(null, true, ED.Mode.Arc, false);
-	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+	this.handleArray[0] = new ED.Doodle.Handle(null, true, ED.Mode.Arc, false);
+	this.handleArray[3] = new ED.Doodle.Handle(null, true, ED.Mode.Arc, false);
+	this.handleArray[4] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
 }
 
 /**
@@ -211,7 +211,7 @@ ED.TrabyFlap.prototype.draw = function(_point) {
 	var phi = this.arc / 6;
 
 	// Apex point
-	var apex = new ED.Point(0, this.height);
+	var apex = new ED.Drawing.Point(0, this.height);
 
 	this.right.x = this.r * Math.sin(theta);
 	this.right.y = -this.r * Math.cos(theta);
@@ -252,7 +252,7 @@ ED.TrabyFlap.prototype.draw = function(_point) {
 			var angle = theta / 2;
 			arcStart = -Math.PI / 2 + angle;
 			arcEnd = -Math.PI / 2 - angle;
-			var top = new ED.Point(0, -this.r + (this.height + this.r) / 2);
+			var top = new ED.Drawing.Point(0, -this.r + (this.height + this.r) / 2);
 
 			ctx.arc(0, 0, this.r, arcStart, arcEnd, true);
 			ctx.lineTo(-this.r * Math.sin(angle), top.y);
@@ -268,7 +268,7 @@ ED.TrabyFlap.prototype.draw = function(_point) {
 	// Coordinates of handles (in canvas plane)
 	this.handleArray[0].location = this.transform.transformPoint(this.left);
 	this.handleArray[3].location = this.transform.transformPoint(this.right);
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -283,5 +283,5 @@ ED.TrabyFlap.prototype.draw = function(_point) {
  * @returns {String} Description of doodle
  */
 ED.TrabyFlap.prototype.description = function() {
-	return "Trabeculectomy flap at " + this.clockHour() + " o'clock with " + this.sclerostomy.firstLetterToLowerCase() + " sclerostomy";
+	return "Trabeculectomy flap at " + this.clockHour() + " o'clock with " + ED.firstLetterToLowerCase(this.sclerostomy) + " sclerostomy";
 }

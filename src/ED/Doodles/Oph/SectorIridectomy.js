@@ -27,10 +27,10 @@
 ED.SectorIridectomy = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "SectorIridectomy";
-	
+
 	// Saved parameters
 	this.savedParameterArray = ['apexY', 'arc', 'rotation'];
-	
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
@@ -46,8 +46,8 @@ ED.SectorIridectomy.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.SectorIridectomy.prototype.setHandles = function() {
-	this.handleArray[0] = new ED.Handle(null, true, ED.Mode.Arc, false);
-	this.handleArray[3] = new ED.Handle(null, true, ED.Mode.Arc, false);
+	this.handleArray[0] = new ED.Doodle.Handle(null, true, ED.Mode.Arc, false);
+	this.handleArray[3] = new ED.Doodle.Handle(null, true, ED.Mode.Arc, false);
 }
 
 /**
@@ -141,8 +141,8 @@ ED.SectorIridectomy.prototype.draw = function(_point) {
 	this.drawBoundary(_point);
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[0].location = this.transform.transformPoint(new ED.Point(topLeftX, topLeftY));
-	this.handleArray[3].location = this.transform.transformPoint(new ED.Point(topRightX, topRightY));
+	this.handleArray[0].location = this.transform.transformPoint(new ED.Drawing.Point(topLeftX, topLeftY));
+	this.handleArray[3].location = this.transform.transformPoint(new ED.Drawing.Point(topRightX, topRightY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);

@@ -52,9 +52,9 @@ ED.SubretinalFluid.superclass = ED.Doodle.prototype;
 ED.SubretinalFluid.prototype.setHandles = function() {
 	// Array of handles
 	for (var i = 0; i < this.numberOfHandles; i++) {
-		this.handleArray[i] = new ED.Handle(null, true, ED.Mode.Handles, false);
+		this.handleArray[i] = new ED.Doodle.Handle(null, true, ED.Mode.Handles, false);
 	}
-	
+
 	// Allow top handle to rotate doodle
 	this.handleArray[0].isRotatable = true;
 }
@@ -72,8 +72,8 @@ ED.SubretinalFluid.prototype.setPropertyDefaults = function() {
 		// Create a range object for each handle
 		var n = this.numberOfHandles;
 		var range = new Object;
-		range.length = new ED.Range(+50, +290);
-		range.angle = new ED.Range((((2 * n - 1) * cir / (2 * n)) + i * cir / n) % cir, ((1 * cir / (2 * n)) + i * cir / n) % cir);
+		range.length = new ED.Drawing.Range(+50, +290);
+		range.angle = new ED.Drawing.Range((((2 * n - 1) * cir / (2 * n)) + i * cir / n) % cir, ((1 * cir / (2 * n)) + i * cir / n) % cir);
 		this.handleVectorRangeArray[i] = range;
 	}
 }
@@ -84,21 +84,21 @@ ED.SubretinalFluid.prototype.setPropertyDefaults = function() {
 ED.SubretinalFluid.prototype.setParameterDefaults = function() {
 	var doodle = this.drawing.lastDoodleOfClass(this.className);
 	if (doodle) {
-		var np = new ED.Point(doodle.originX + 100, 0);
+		var np = new ED.Drawing.Point(doodle.originX + 100, 0);
 		this.move(np.x, np.y);
 	} else {
 		this.move((this.drawing.eye == ED.eye.Right ? -1 : 1) * 100, 0);
 	}
-	
+
 	// Create a squiggle to store the handles points
-	var squiggle = new ED.Squiggle(this, new ED.Colour(100, 100, 100, 1), 4, true);
+	var squiggle = new ED.Squiggle(this, new ED.Drawing.Colour(100, 100, 100, 1), 4, true);
 
 	// Add it to squiggle array
 	this.squiggleArray.push(squiggle);
 
 	// Populate with handles at equidistant points around circumference
 	for (var i = 0; i < this.numberOfHandles; i++) {
-		var point = new ED.Point(0, 0);
+		var point = new ED.Drawing.Point(0, 0);
 		point.setWithPolars(this.initialRadius, i * 2 * Math.PI / this.numberOfHandles);
 		this.addPointToSquiggle(point);
 	}
@@ -164,7 +164,7 @@ ED.SubretinalFluid.prototype.draw = function(_point) {
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
-	
+
 	// Return value indicating successful hittest
 	return this.isClicked;
 }

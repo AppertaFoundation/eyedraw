@@ -49,9 +49,9 @@ ED.Rubeosis.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.Rubeosis.prototype.setHandles = function() {
-	this.handleArray[0] = new ED.Handle(null, true, ED.Mode.Arc, false);
-	this.handleArray[3] = new ED.Handle(null, true, ED.Mode.Arc, false);
-	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+	this.handleArray[0] = new ED.Doodle.Handle(null, true, ED.Mode.Arc, false);
+	this.handleArray[3] = new ED.Doodle.Handle(null, true, ED.Mode.Arc, false);
+	this.handleArray[4] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
 }
 
 /**
@@ -68,7 +68,7 @@ ED.Rubeosis.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['severity'] = {
 		kind: 'derived',
 		type: 'float',
-		range: new ED.Range(20, 100),
+		range: new ED.Drawing.Range(20, 100),
 		precision: 1,
 		animate: true
 	};
@@ -159,8 +159,8 @@ ED.Rubeosis.prototype.draw = function(_point) {
 	var arcEnd = -Math.PI / 2 - theta;
 
 	// Coordinates of 'corners' of SectorPRPPostPole
-	var startHandle = new ED.Point(-r * Math.sin(theta), -r * Math.cos(theta));
-	var endHandle = new ED.Point(r * Math.sin(theta), -r * Math.cos(theta));
+	var startHandle = new ED.Drawing.Point(-r * Math.sin(theta), -r * Math.cos(theta));
+	var endHandle = new ED.Drawing.Point(r * Math.sin(theta), -r * Math.cos(theta));
 
 	// Boundary path
 	ctx.beginPath();
@@ -228,7 +228,7 @@ ED.Rubeosis.prototype.draw = function(_point) {
 	// Coordinates of handles (in canvas plane)
 	this.handleArray[0].location = this.transform.transformPoint(startHandle);
 	this.handleArray[3].location = this.transform.transformPoint(endHandle);
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);

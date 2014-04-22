@@ -52,14 +52,14 @@ ED.ChoroidalNaevus.superclass = ED.Doodle.prototype;
 ED.ChoroidalNaevus.prototype.setHandles = function() {
 	// Array of handles
 	for (var i = 0; i < this.numberOfHandles; i++) {
-		this.handleArray[i] = new ED.Handle(null, true, ED.Mode.Handles, false);
+		this.handleArray[i] = new ED.Doodle.Handle(null, true, ED.Mode.Handles, false);
 	}
-	
+
 	// Allow top handle to rotate doodle
 	this.handleArray[0].isRotatable = true;
-	
+
 	// Handle for apex
-	this.handleArray[this.numberOfHandles] = new ED.Handle(null, true, ED.Mode.Apex, false);
+	this.handleArray[this.numberOfHandles] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
 }
 
 /**
@@ -75,11 +75,11 @@ ED.ChoroidalNaevus.prototype.setPropertyDefaults = function() {
 		// Create a range object for each handle
 		var n = this.numberOfHandles;
 		var range = new Object;
-		range.length = new ED.Range(+50, +290);
-		range.angle = new ED.Range((((2 * n - 1) * cir / (2 * n)) + i * cir / n) % cir, ((1 * cir / (2 * n)) + i * cir / n) % cir);
+		range.length = new ED.Drawing.Range(+50, +290);
+		range.angle = new ED.Drawing.Range((((2 * n - 1) * cir / (2 * n)) + i * cir / n) % cir, ((1 * cir / (2 * n)) + i * cir / n) % cir);
 		this.handleVectorRangeArray[i] = range;
 	}
-	
+
 	// Update component of validation array for simple parameters
 	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
 	this.parameterValidationArray['apexY']['range'].setMinAndMax(-50, +50);
@@ -95,14 +95,14 @@ ED.ChoroidalNaevus.prototype.setParameterDefaults = function() {
 	this.setOriginWithDisplacements(200, 150);
 
 	// Create a squiggle to store the handles points
-	var squiggle = new ED.Squiggle(this, new ED.Colour(100, 100, 100, 1), 4, true);
+	var squiggle = new ED.Squiggle(this, new ED.Drawing.Colour(100, 100, 100, 1), 4, true);
 
 	// Add it to squiggle array
 	this.squiggleArray.push(squiggle);
 
 	// Populate with handles at equidistant points around circumference
 	for (var i = 0; i < this.numberOfHandles; i++) {
-		var point = new ED.Point(0, 0);
+		var point = new ED.Drawing.Point(0, 0);
 		point.setWithPolars(this.initialRadius, i * 2 * Math.PI / this.numberOfHandles);
 		this.addPointToSquiggle(point);
 	}
@@ -160,11 +160,11 @@ ED.ChoroidalNaevus.prototype.draw = function(_point) {
 
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
-	
+
 	// Non boundary paths
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
 		// Drusen
-		p = new ED.Point(0,0);
+		p = new ED.Drawing.Point(0,0);
 		fill = "yellow";
 		var dr = 4;
 		n = Math.abs(Math.floor((-this.apexY + 50) / 5));
@@ -173,16 +173,16 @@ ED.ChoroidalNaevus.prototype.draw = function(_point) {
 			this.drawSpot(ctx, p.x, p.y, dr * 2, fill);
 		}
 	}
-	
+
 	// Coordinates of handles (in canvas plane)
 	for (var i = 0; i < this.numberOfHandles; i++) {
 		this.handleArray[i].location = this.transform.transformPoint(this.squiggleArray[0].pointsArray[i]);
 	}
-	this.handleArray[this.numberOfHandles].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
-		
+	this.handleArray[this.numberOfHandles].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
-	
+
 	// Return value indicating successful hittest
 	return this.isClicked;
 }

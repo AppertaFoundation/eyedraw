@@ -30,7 +30,7 @@ ED.LaserDemarcation = function(_drawing, _parameterJSON) {
 
 	// Saved parameters
 	this.savedParameterArray = ['apexY', 'arc', 'rotation'];
-	
+
 	// Call super-class constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
@@ -46,9 +46,9 @@ ED.LaserDemarcation.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.LaserDemarcation.prototype.setHandles = function() {
-	this.handleArray[0] = new ED.Handle(null, true, ED.Mode.Arc, false);
-	this.handleArray[3] = new ED.Handle(null, true, ED.Mode.Arc, false);
-	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+	this.handleArray[0] = new ED.Doodle.Handle(null, true, ED.Mode.Arc, false);
+	this.handleArray[3] = new ED.Doodle.Handle(null, true, ED.Mode.Arc, false);
+	this.handleArray[4] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
 }
 
 /**
@@ -145,7 +145,7 @@ ED.LaserDemarcation.prototype.draw = function(_point) {
 		var ss = 25;
 
 		// Location of laser spot
-		var p = new ED.Point(0, 0);
+		var p = new ED.Drawing.Point(0, 0);
 
 		// Unless 360, go out to the ora with an elegant semicircle
 		if (this.arc < 1.9 * Math.PI) {
@@ -159,7 +159,7 @@ ED.LaserDemarcation.prototype.draw = function(_point) {
 			var n = (Math.round(quad / (ss / rc)));
 
 			// Centre of first quarter circle
-			var c1 = new ED.Point(-ro * Math.sin(theta - rc / ro), -ro * Math.cos(theta - rc / ro));
+			var c1 = new ED.Drawing.Point(-ro * Math.sin(theta - rc / ro), -ro * Math.cos(theta - rc / ro));
 
 			// Draw first quarter circle, including adjustment for improved junction
 			for (var i = 0; i < n; i++) {
@@ -181,7 +181,7 @@ ED.LaserDemarcation.prototype.draw = function(_point) {
 			}
 
 			// Centre of second quarter circle
-			var c2 = new ED.Point(-ro * Math.sin(-theta + rc / ro), -ro * Math.cos(-theta + rc / ro));
+			var c2 = new ED.Drawing.Point(-ro * Math.sin(-theta + rc / ro), -ro * Math.cos(-theta + rc / ro));
 
 			// Draw second quarter circle, including adjustment for improved junction
 			for (var i = 0; i < n; i++) {
@@ -201,9 +201,9 @@ ED.LaserDemarcation.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[0].location = this.transform.transformPoint(new ED.Point(topLeftX, topLeftY));
-	this.handleArray[3].location = this.transform.transformPoint(new ED.Point(topRightX, topRightY));
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
+	this.handleArray[0].location = this.transform.transformPoint(new ED.Drawing.Point(topLeftX, topLeftY));
+	this.handleArray[3].location = this.transform.transformPoint(new ED.Drawing.Point(topRightX, topRightY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);

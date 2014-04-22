@@ -33,7 +33,7 @@ ED.SteepAxis = function(_drawing, _parameterJSON) {
 
 	// Saved parameters
 	this.savedParameterArray = ['rotation'];
-	
+
 	// Call super-class constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
@@ -59,7 +59,7 @@ ED.SteepAxis.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['axis'] = {
 		kind: 'derived',
 		type: 'mod',
-		range: new ED.Range(0, 180),
+		range: new ED.Drawing.Range(0, 180),
 		clock: 'bottom',
 		animate: true
 	};
@@ -136,18 +136,18 @@ ED.SteepAxis.prototype.draw = function(_point) {
 		ctx.lineWidth = 8;
 		ctx.strokeStyle = "gray";
 		ctx.stroke();
-		
+
 		var h = 200;
 		var r = 540;
 		ctx.beginPath();
 		ctx.moveTo(-ro, 0);
 		ctx.arcTo(0, h, ro, 0, r);
 		ctx.closePath();
-		
+
 		ctx.strokeStyle = "gray";
 		ctx.fillStyle = "lightgray";
 		ctx.fill();
-		ctx.stroke();		
+		ctx.stroke();
 	}
 
 	// Return value indicating successful hit test

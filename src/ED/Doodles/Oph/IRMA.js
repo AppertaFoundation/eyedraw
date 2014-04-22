@@ -30,7 +30,7 @@ ED.IRMA = function(_drawing, _parameterJSON) {
 
 	// Saved parameters
 	this.savedParameterArray = ['originX', 'originY', 'scaleX', 'scaleY', 'rotation'];
-	
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
@@ -46,7 +46,7 @@ ED.IRMA.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.IRMA.prototype.setHandles = function() {
-	this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, true);
+	this.handleArray[2] = new ED.Doodle.Handle(null, true, ED.Mode.Scale, true);
 }
 
 /**
@@ -100,7 +100,7 @@ ED.IRMA.prototype.draw = function(_point) {
 	this.drawBoundary(_point);
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[2].location = this.transform.transformPoint(new ED.Point(50, -40));
+	this.handleArray[2].location = this.transform.transformPoint(new ED.Drawing.Point(50, -40));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);

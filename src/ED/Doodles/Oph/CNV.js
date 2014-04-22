@@ -27,10 +27,10 @@
 ED.CNV = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "CNV";
-	
+
 	// Saved parameters
 	this.savedParameterArray = ['originX', 'originY', 'scaleX', 'scaleY'];
-	
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
@@ -46,7 +46,7 @@ ED.CNV.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.CNV.prototype.setHandles = function() {
-	this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, false);
+	this.handleArray[2] = new ED.Doodle.Handle(null, true, ED.Mode.Scale, false);
 }
 
 /**
@@ -90,10 +90,10 @@ ED.CNV.prototype.draw = function(_point) {
 	var phi = 2 * Math.PI / n;
 	var th = 0.5 * Math.PI / n;
 	var b = 4;
-	var point = new ED.Point(0, 0);
+	var point = new ED.Drawing.Point(0, 0);
 
 	// First point
-	var fp = new ED.Point(0, 0);
+	var fp = new ED.Drawing.Point(0, 0);
 	fp.setWithPolars(r, 0);
 	ctx.moveTo(fp.x, fp.y);
 	var rl = r;
@@ -104,15 +104,15 @@ ED.CNV.prototype.draw = function(_point) {
 		var rn = r * (b + ED.randomArray[i]) / b;
 
 		// Control point 1
-		var cp1 = new ED.Point(0, 0);
+		var cp1 = new ED.Drawing.Point(0, 0);
 		cp1.setWithPolars(rl, i * phi + th);
 
 		// Control point 2
-		var cp2 = new ED.Point(0, 0);
+		var cp2 = new ED.Drawing.Point(0, 0);
 		cp2.setWithPolars(rn, (i + 1) * phi - th);
 
 		// Next point
-		var pn = new ED.Point(0, 0);
+		var pn = new ED.Drawing.Point(0, 0);
 		pn.setWithPolars(rn, (i + 1) * phi);
 
 		// Assign next point

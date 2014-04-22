@@ -28,8 +28,8 @@ ED.StarFold.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.StarFold.prototype.setHandles = function() {
-	this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, false);
-	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+	this.handleArray[2] = new ED.Doodle.Handle(null, true, ED.Mode.Scale, false);
+	this.handleArray[4] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
 }
 
 /**
@@ -61,9 +61,9 @@ ED.StarFold.prototype.setParameterDefaults = function() {
 	// Place at 6 o'clock
 	var doodle = this.drawing.lastDoodleOfClass(this.className);
 	if (doodle) {
-		var p = new ED.Point(doodle.originX, doodle.originY);
+		var p = new ED.Drawing.Point(doodle.originX, doodle.originY);
 
-		var np = new ED.Point(0, 0);
+		var np = new ED.Drawing.Point(0, 0);
 		np.setWithPolars(p.length(), p.direction() + Math.PI / 6);
 
 		this.move(np.x, np.y);
@@ -112,8 +112,8 @@ ED.StarFold.prototype.draw = function(_point) {
 	this.arc = Math.atan2(600 * this.scaleX, Math.abs(this.originY));
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[2].location = this.transform.transformPoint(new ED.Point(-300, 200));
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
+	this.handleArray[2].location = this.transform.transformPoint(new ED.Drawing.Point(-300, 200));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);

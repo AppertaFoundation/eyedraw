@@ -30,7 +30,7 @@ ED.IrisNaevus = function(_drawing, _parameterJSON) {
 
 	// Saved parameters
 	this.savedParameterArray = ['originX', 'originY', 'scaleX', 'scaleY'];
-	
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
@@ -46,7 +46,7 @@ ED.IrisNaevus.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.IrisNaevus.prototype.setHandles = function() {
-	this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, false);
+	this.handleArray[2] = new ED.Doodle.Handle(null, true, ED.Mode.Scale, false);
 }
 
 /**
@@ -97,10 +97,10 @@ ED.IrisNaevus.prototype.draw = function(_point) {
 	this.drawBoundary(_point);
 
 	// Coordinates of handles (in canvas plane)
-	var point = new ED.Point(0, 0);
+	var point = new ED.Drawing.Point(0, 0);
 	point.setWithPolars(r, Math.PI / 4);
 	this.handleArray[2].location = this.transform.transformPoint(point);
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);

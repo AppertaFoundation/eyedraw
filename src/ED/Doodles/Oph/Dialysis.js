@@ -28,9 +28,9 @@ ED.Dialysis.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.Dialysis.prototype.setHandles = function() {
-	this.handleArray[1] = new ED.Handle(null, true, ED.Mode.Arc, false);
-	this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Arc, false);
-	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+	this.handleArray[1] = new ED.Doodle.Handle(null, true, ED.Mode.Arc, false);
+	this.handleArray[2] = new ED.Doodle.Handle(null, true, ED.Mode.Arc, false);
+	this.handleArray[4] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
 }
 
 /**
@@ -104,9 +104,9 @@ ED.Dialysis.prototype.draw = function(_point) {
 	this.drawBoundary(_point);
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[1].location = this.transform.transformPoint(new ED.Point(topLeftX, topLeftY));
-	this.handleArray[2].location = this.transform.transformPoint(new ED.Point(topRightX, topRightY));
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
+	this.handleArray[1].location = this.transform.transformPoint(new ED.Drawing.Point(topLeftX, topLeftY));
+	this.handleArray[2].location = this.transform.transformPoint(new ED.Drawing.Point(topRightX, topRightY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);

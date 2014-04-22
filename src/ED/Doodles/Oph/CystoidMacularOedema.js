@@ -27,10 +27,10 @@
 ED.CystoidMacularOedema = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "CystoidMacularOedema";
-	
+
 	// Saved parameters
 	this.savedParameterArray = ['scaleX', 'scaleY'];
-	
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
@@ -46,7 +46,7 @@ ED.CystoidMacularOedema.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.CystoidMacularOedema.prototype.setHandles = function() {
-	this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, false);
+	this.handleArray[2] = new ED.Doodle.Handle(null, true, ED.Mode.Scale, false);
 }
 
 /**
@@ -67,7 +67,7 @@ ED.CystoidMacularOedema.prototype.setPropertyDefaults = function() {
  * Use the setParameter function for derived parameters, as this will also update dependent variables
  */
 ED.CystoidMacularOedema.prototype.setParameterDefaults = function() {
-	
+
 	// Set size according to template
 	if (this.drawing.hasDoodleOfClass('Fundus')) {
 		this.scaleX = 0.5;
@@ -112,7 +112,7 @@ ED.CystoidMacularOedema.prototype.draw = function(_point) {
 		var stroke = "rgba(255, 82, 0, 0.7)";
 
 		// Peripheral cysts
-		var point = new ED.Point(0, 0);
+		var point = new ED.Drawing.Point(0, 0);
 		var n = 8;
 		for (var i = 0; i < n; i++) {
 			var angle = i * 2 * Math.PI / n;
@@ -125,7 +125,7 @@ ED.CystoidMacularOedema.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[2].location = this.transform.transformPoint(new ED.Point(84, -84));
+	this.handleArray[2].location = this.transform.transformPoint(new ED.Drawing.Point(84, -84));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);

@@ -30,7 +30,7 @@ ED.Geographic = function(_drawing, _parameterJSON) {
 
 	// Saved parameters
 	this.savedParameterArray = ['apexX', 'apexY', 'scaleX', 'scaleY'];
-	
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
@@ -46,8 +46,8 @@ ED.Geographic.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.Geographic.prototype.setHandles = function() {
-	this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, false);
-	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+	this.handleArray[2] = new ED.Doodle.Handle(null, true, ED.Mode.Scale, false);
+	this.handleArray[4] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
 }
 
 /**
@@ -94,7 +94,7 @@ ED.Geographic.prototype.draw = function(_point) {
 	// Boundary path
 	ctx.beginPath();
 
-	var point = new ED.Point(0, 0);
+	var point = new ED.Drawing.Point(0, 0);
 
 	// Outer arc
 	if (this.drawing.eye == ED.eye.Right) {
@@ -124,10 +124,10 @@ ED.Geographic.prototype.draw = function(_point) {
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {}
 
 	// Coordinates of handles (in canvas plane)
-	point = new ED.Point(0, 0);
+	point = new ED.Drawing.Point(0, 0);
 	point.setWithPolars(ro, Math.PI / 4);
 	this.handleArray[2].location = this.transform.transformPoint(point);
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);

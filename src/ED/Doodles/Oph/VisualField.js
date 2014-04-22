@@ -36,7 +36,7 @@ ED.VisualField = function(_drawing, _parameterJSON) {
 
 	// Saved parameters
 	this.savedParameterArray = ['apexY'];
-	
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
@@ -54,11 +54,11 @@ ED.VisualField.superclass = ED.Doodle.prototype;
 ED.VisualField.prototype.setHandles = function() {
 	// Array of handles for expert mode
 	for (var i = 0; i < this.numberOfHandles; i++) {
-		this.handleArray[i] = new ED.Handle(null, true, ED.Mode.Handles, false);
+		this.handleArray[i] = new ED.Doodle.Handle(null, true, ED.Mode.Handles, false);
 	}
 
 	// Apex handle for basic mode
-	this.handleArray[this.numberOfHandles] = new ED.Handle(null, true, ED.Mode.Apex, false);
+	this.handleArray[this.numberOfHandles] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
 }
 
 /**
@@ -82,8 +82,8 @@ ED.VisualField.prototype.setPropertyDefaults = function() {
 
 		// Create a range object for each handle
 		var range = new Object;
-		range.length = new ED.Range(+0, +400);
-		range.angle = new ED.Range(((15 * cir / 16) + i * cir / 8) % cir, ((1 * cir / 16) + i * cir / 8) % cir);
+		range.length = new ED.Drawing.Range(+0, +400);
+		range.angle = new ED.Drawing.Range(((15 * cir / 16) + i * cir / 8) % cir, ((1 * cir / 16) + i * cir / 8) % cir);
 		this.handleVectorRangeArray[i] = range;
 	}
 }
@@ -95,7 +95,7 @@ ED.VisualField.prototype.setParameterDefaults = function() {
 	this.apexY = -40;
 
 	// Create a squiggle to store the handles points
-	var squiggle = new ED.Squiggle(this, new ED.Colour(100, 100, 100, 1), 4, true);
+	var squiggle = new ED.Squiggle(this, new ED.Drawing.Colour(100, 100, 100, 1), 4, true);
 
 	// Add it to squiggle array
 	this.squiggleArray.push(squiggle);
@@ -113,7 +113,7 @@ ED.VisualField.prototype.setParameterDefaults = function() {
 	];
 	for (var i = 0; i < this.numberOfHandles; i++) {
 		var coordArray = defaultPointsArray[i];
-		var point = new ED.Point(coordArray[0], coordArray[1]);
+		var point = new ED.Drawing.Point(coordArray[0], coordArray[1]);
 		this.addPointToSquiggle(point);
 	}
 
@@ -210,7 +210,7 @@ ED.VisualField.prototype.draw = function(_point) {
 	}
 
 	// Location of apex handle
-	this.handleArray[this.numberOfHandles].location = this.transform.transformPoint(new ED.Point(this.blindSpotX, this.apexY));
+	this.handleArray[this.numberOfHandles].location = this.transform.transformPoint(new ED.Drawing.Point(this.blindSpotX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);

@@ -59,8 +59,8 @@ ED.ConjunctivalSuture.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.ConjunctivalSuture.prototype.setHandles = function() {
-	this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Rotate, false);
-	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+	this.handleArray[2] = new ED.Doodle.Handle(null, true, ED.Mode.Rotate, false);
+	this.handleArray[4] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
 }
 
 /**
@@ -110,14 +110,14 @@ ED.ConjunctivalSuture.prototype.setParameterDefaults = function() {
 
 	var doodle = this.drawing.lastDoodleOfClass(this.className);
 	if (doodle) {
-		var p = new ED.Point(doodle.originX, doodle.originY);
+		var p = new ED.Drawing.Point(doodle.originX, doodle.originY);
 
-		var np = new ED.Point(0, 0);
+		var np = new ED.Drawing.Point(0, 0);
 		np.setWithPolars(p.length(), p.direction() + Math.PI / 6);
 
 		this.move(np.x, np.y);
 	} else {
-		var np = new ED.Point(0, 0);
+		var np = new ED.Drawing.Point(0, 0);
 		var m = (this.drawing.eye == ED.eye.Right ? 11 : 1);
 		np.setWithPolars(380, m * Math.PI / 6);
 		this.move(np.x, np.y);
@@ -266,8 +266,8 @@ ED.ConjunctivalSuture.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[2].location = this.transform.transformPoint(new ED.Point(-this.boundaryWidth/2, -this.boundaryHeight/2));
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
+	this.handleArray[2].location = this.transform.transformPoint(new ED.Drawing.Point(-this.boundaryWidth/2, -this.boundaryHeight/2));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);

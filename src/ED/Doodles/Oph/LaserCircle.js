@@ -30,7 +30,7 @@ ED.LaserCircle = function(_drawing, _parameterJSON) {
 
 	// Saved parameters
 	this.savedParameterArray = ['originX', 'originY', 'apexX', 'apexY', 'rotation'];
-	
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
@@ -46,7 +46,7 @@ ED.LaserCircle.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.LaserCircle.prototype.setHandles = function() {
-	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, true);
+	this.handleArray[4] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, true);
 }
 
 /**
@@ -68,9 +68,9 @@ ED.LaserCircle.prototype.setParameterDefaults = function() {
 
 	var doodle = this.drawing.lastDoodleOfClass(this.className);
 	if (doodle) {
-		var p = new ED.Point(doodle.originX, doodle.originY);
+		var p = new ED.Drawing.Point(doodle.originX, doodle.originY);
 
-		var np = new ED.Point(0, 0);
+		var np = new ED.Drawing.Point(0, 0);
 		np.setWithPolars(p.length(), p.direction() + Math.PI / 6);
 
 		this.move(np.x, np.y);
@@ -114,7 +114,7 @@ ED.LaserCircle.prototype.draw = function(_point) {
 		var ss = 25;
 
 		// Point for spot
-		var p = new ED.Point(0, 0);
+		var p = new ED.Drawing.Point(0, 0);
 
 		// Difference indicating aspect ratio
 		var d = this.apexX + this.apexY;
@@ -171,7 +171,7 @@ ED.LaserCircle.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);

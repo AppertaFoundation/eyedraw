@@ -30,7 +30,7 @@ ED.CapsularTensionRing = function(_drawing, _parameterJSON) {
 
 	// Saved parameters
 	this.savedParameterArray = ['rotation'];
-	
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
@@ -86,22 +86,22 @@ ED.CapsularTensionRing.prototype.draw = function(_point) {
 	// Outer ring
 	ctx.arc(0, 0, ro, -theta, theta, true);
 
-	var p1c1 = new ED.Point(0, 0)
+	var p1c1 = new ED.Drawing.Point(0, 0)
 	p1c1.setWithPolars(ro, Math.PI / 2 + 0.8 * theta);
 
-	var p1c2 = new ED.Point(0, 0)
+	var p1c2 = new ED.Drawing.Point(0, 0)
 	p1c2.setWithPolars(ri, Math.PI / 2 + 0.8 * theta);
 
-	var p1 = new ED.Point(0, 0)
+	var p1 = new ED.Drawing.Point(0, 0)
 	p1.setWithPolars(ri, Math.PI / 2 + theta);
 
-	var p2c1 = new ED.Point(0, 0)
+	var p2c1 = new ED.Drawing.Point(0, 0)
 	p2c1.setWithPolars(ri, Math.PI / 2 + 1.1 * theta);
 
-	var p2c2 = new ED.Point(0, 0)
+	var p2c2 = new ED.Drawing.Point(0, 0)
 	p2c2.setWithPolars(rm, Math.PI / 2 + 1.1 * theta);
 
-	var p2 = new ED.Point(0, 0)
+	var p2 = new ED.Drawing.Point(0, 0)
 	p2.setWithPolars(rm, Math.PI / 2 + 1.2 * theta);
 
 	ctx.bezierCurveTo(p1c1.x, p1c1.y, p1c2.x, p1c2.y, p1.x, p1.y);
@@ -110,39 +110,39 @@ ED.CapsularTensionRing.prototype.draw = function(_point) {
 	// Inner ring
 	ctx.arc(0, 0, rm, 1.2 * theta, -1.2 * theta, false);
 
-	var p3c1 = new ED.Point(0, 0)
+	var p3c1 = new ED.Drawing.Point(0, 0)
 	p3c1.setWithPolars(rm, Math.PI / 2 - 1.1 * theta);
 
-	var p3c2 = new ED.Point(0, 0)
+	var p3c2 = new ED.Drawing.Point(0, 0)
 	p3c2.setWithPolars(ri, Math.PI / 2 - 1.1 * theta);
 
-	var p3 = new ED.Point(0, 0)
+	var p3 = new ED.Drawing.Point(0, 0)
 	p3.setWithPolars(ri, Math.PI / 2 - theta);
 
-	var p4c1 = new ED.Point(0, 0)
+	var p4c1 = new ED.Drawing.Point(0, 0)
 	p4c1.setWithPolars(ri, Math.PI / 2 - 0.8 * theta);
 
-	var p4c2 = new ED.Point(0, 0)
+	var p4c2 = new ED.Drawing.Point(0, 0)
 	p4c2.setWithPolars(ro, Math.PI / 2 - 0.8 * theta);
 
-	var p4 = new ED.Point(0, 0)
+	var p4 = new ED.Drawing.Point(0, 0)
 	p4.setWithPolars(ro, Math.PI / 2 - theta);
 
 	ctx.bezierCurveTo(p3c1.x, p3c1.y, p3c2.x, p3c2.y, p3.x, p3.y);
 	ctx.bezierCurveTo(p4c1.x, p4c1.y, p4c2.x, p4c2.y, p4.x, p4.y);
 
 	// Hole in end 1
-	var cp1 = new ED.Point(0, 0)
+	var cp1 = new ED.Drawing.Point(0, 0)
 	cp1.setWithPolars(rm - 8, Math.PI / 2 - theta);
-	var ep1 = new ED.Point(0, 0)
+	var ep1 = new ED.Drawing.Point(0, 0)
 	ep1.setWithPolars(rm - 8 + rh, Math.PI / 2 - theta);
 	ctx.moveTo(ep1.x, ep1.y);
 	ctx.arc(cp1.x, cp1.y, 15, 0, 2 * Math.PI, false);
 
 	// Hole in end 2
-	var cp2 = new ED.Point(0, 0)
+	var cp2 = new ED.Drawing.Point(0, 0)
 	cp2.setWithPolars(rm - 8, Math.PI / 2 + theta);
-	var ep2 = new ED.Point(0, 0)
+	var ep2 = new ED.Drawing.Point(0, 0)
 	ep2.setWithPolars(rm - 8 + rh, Math.PI / 2 + theta);
 	ctx.moveTo(ep2.x, ep2.y);
 	ctx.arc(cp2.x, cp2.y, 15, 0, 2 * Math.PI, false);

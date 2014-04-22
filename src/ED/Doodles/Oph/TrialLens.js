@@ -59,7 +59,7 @@ ED.TrialLens.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['axis'] = {
 		kind: 'derived',
 		type: 'mod',
-		range: new ED.Range(0, 180),
+		range: new ED.Drawing.Range(0, 180),
 		clock: 'bottom',
 		animate: true
 	};
