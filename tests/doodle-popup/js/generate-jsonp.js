@@ -5,7 +5,9 @@ var util = require('util');
 
 // The order in which the scripts are found is important here.
 var pattern = '{' + [
+	'ED.js',
 	'ED/Drawing.js',
+	'ED/Drawing/*.js',
 	'ED/*.js',
 	'ED/Doodles/**/*.js',
 	'ED/Misc/*.js',
