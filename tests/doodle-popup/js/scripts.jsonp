@@ -1,8 +1,16 @@
 scriptsLoadCallback({
   "files": [
+    "ED.js",
     "ED/Drawing.js",
+    "ED/Drawing/AffineTransform.js",
+    "ED/Drawing/Colour.js",
+    "ED/Drawing/Point.js",
+    "ED/Drawing/Range.js",
+    "ED/Drawing/Squiggle.js",
     "ED/Checker.js",
     "ED/Controller.js",
+    "ED/Doodle.js",
+    "ED/Report.js",
     "ED/Doodles/An/AgentDose.js",
     "ED/Doodles/An/AgentDuration.js",
     "ED/Doodles/An/RecordGrid.js",

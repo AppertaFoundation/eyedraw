@@ -2,60 +2,60 @@
 <html>
     <head>
         <title>EyeDraw</title>
-        
+
         <!-- EyeDraw CSS style sheet -->
         <link rel="stylesheet" href="../css/oe-eyedraw.css" type="text/css" media="screen" />
-        
+
         <!-- Mandatory file containing key drawing classes -->
         <script src="../dist/eyedraw.js" type="text/javascript"></script>
-        
+
         <!--   This script handles the drawings for the page   -->
         <script type="text/javascript">
-        
+
             //var doodleSet = [{"version": 1.0, "subclass": "Patch", "originX": -130, "originY": -183, "apexX": -50, "rotation": 325, "order": 0, }];
-            
-        
+
+
         	var doodleSet = [{"subclass": "OpticDisc", "originX": 0, "originY": 0, "radius": 200, "apexX": -13, "apexY": -167, "scaleX": 1.00, "scaleY": 1.00, "arc": 180, "rotation": 0, "order": 0, "squiggleArray": [{"colour": {"red":100,"green":100,"blue":100,"alpha":1}, "thickness": 4, "filled": "true", "pointsArray": []}], "mode" : "Basic"}];
-            
-            
+
+
             // This set can be written by PHP and contains doodle data for this drawing from a database
             //var doodleSet = [{"subclass": "PhakoIncision", "originX": 0, "originY": 0, "radius": 250, "apexX": 0, "apexY": -250, "scaleX": 1.00, "scaleY": 1.00, "arc": 90, "rotation": 319, "order": 0, "squiggleArray": []}];
-            
-            
+
+
             // Unique variable assigned to the drawing
             var drawingEdit;
             var drawingDisplay;
             var doodle;
             var controller;
-            
+
             var grid;
-            
+
             // Runs on page load
             function init()
             {
             	var d = new Date();
             	//debugger;
-            	
+
             	//console.log(d.toLocaleTimeString());
                 // Get reference to the drawingEdit canvas
                 var canvasEdit = document.getElementById('canvasEdit');
-                
+
                 // Create a drawingEdit , {scaleOn:'width'}
                 drawingEdit = new ED.Drawing(canvasEdit, ED.eye.Right, 'RPS', true, {graphicsPath:'../img/'});
-                
+
                 // Instantiate a controller object
                 controller = new eyeDrawController(drawingEdit);
-                
+
                 // Initialise drawing
                 drawingEdit.init();
-                
+
                 // Set focus to canvasEdit element
                 canvasEdit.focus();
-                
+
 //                for (var propertyName in ED)
 //                {
 //                    var doodle = ED[propertyName];
-//                    
+//
 //                    if (doodle.superclass == ED.Doodle.prototype)
 //                    {
 //                        var dood = new ED[propertyName];
@@ -73,13 +73,13 @@
                 
                 // Specify call back function
                 this.callBack = callBack;
-                
+
                 // Register for notifications with drawing object
                 this.drawing.registerForNotifications(this, 'callBack', []);
-                
+
                 // Show doodle controls
                 this.drawing.showDoodleControls = true;
-                
+
                 // Method called for notification
                 function callBack(_messageArray)
                 {
@@ -90,7 +90,7 @@
 
 							//Scale down for glaucoma drawings
 							this.drawing.globalScaleFactor = this.gsf;
-							
+
 							//this.drawing.addDoodle('AxialLengthGraph', {'axialLength':'25'});
 							//this.drawing.addDoodle('Baerveldt');
 							//this.drawing.addDoodle('AntSynech');
@@ -99,45 +99,56 @@
 							//this.drawing.addDoodle('UTear');
 							//this.drawing.addDoodle('EarDrum');
 							//this.drawing.addDoodle('Perforation');
+<<<<<<< HEAD
 							this.drawing.addDoodle('Fundus');
 							this.drawing.addDoodle('PostSubcapCataract');
 							//this.drawing.addDoodle('Freehand', {}, {colour:{id:'colourSelect'}});				
+=======
+							//this.drawing.addDoodle('PostPole');
+							//this.drawing.addDoodle('CystoidMacularOedema');
+							//this.drawing.addDoodle('Freehand', {}, {colour:{id:'colourSelect'}});
+>>>>>>> Fixed tests after splitting out ED drawing ojects into individual files
 
 							// Grid , {type:{id:'piTypeSelect'}}  , {type:'Laser'}, {suture:{id:'Eyedraw_boolField'}}
 					    	//this.drawing.addDoodle('Lungs');
-					    	
+
 							// Right eye
 // 					    	rightEye = this.drawing.addDoodle(
-// 					    		'HVT', 
+// 					    		'HVT',
 // 					    		{},
 // 					        	{
-// 					        		hor:{id:'horSelect', attribute:'value'}, ver:{id:'verSelect', attribute:'value'}, tor:{id:'torSelect', attribute:'value'},  
+// 					        		hor:{id:'horSelect', attribute:'value'}, ver:{id:'verSelect', attribute:'value'}, tor:{id:'torSelect', attribute:'value'},
 // 					        		horValue:{id:'horValueSelect', attribute:'value'},
 // 					        		verValue:{id:'verValueSelect', attribute:'value'},
 // 					        		torValue:{id:'torValueSelect', attribute:'value'},
 // 								}
 // 					        );
-// 					    
+//
 // 					        // Constrain x movement
-// 					        //rightEye.parameterValidationArray['originX']['range'] = new ED.Range(-350, -150);
-// 					        
+// 					        //rightEye.parameterValidationArray['originX']['range'] = new ED.Drawing.Range(-350, -150);
+//
 // 					        // Left eye
 // 					        leftEye = this.drawing.addDoodle('HVT', {rotation:Math.PI/4});
-// 					        leftEye.parameterValidationArray['originX']['range'] = new ED.Range(+150, +350);
+// 					        leftEye.parameterValidationArray['originX']['range'] = new ED.Drawing.Range(+150, +350);
 // 					        leftEye.originX = +250;
+<<<<<<< HEAD
 					    
 					        //this.drawing.deselectDoodles();
+=======
+
+					        this.drawing.deselectDoodles();
+>>>>>>> Fixed tests after splitting out ED drawing ojects into individual files
 
 
 
 
-							
+
 							// Scale on width for RecordGrid
 
  							//this.drawing.addDoodle('OpticDisc');
 // 							this.drawing.addDoodle('TransilluminationDefect');
 
-														
+
 							//this.drawing.addDoodle('PostPole');
 							//this.drawing.addDoodle('BranchRetinalVeinOcclusionPostPole');
 							//this.drawing.addDoodle('SectorPRP');
@@ -145,20 +156,20 @@
 							//grid = this.drawing.addDoodle('RecordGrid');
 							//this.drawing.addDoodle('RecordReading', {'type':'sys'});
 							//this.drawing.addDoodle('BPReading', {'stolic':'dia'});
-							
+
 							//this.drawing.addDoodle('AgentDuration');
 
-							
+
 							//var drawing = this.drawing;
-							
+
 // Animation to update timeline every second
 // 							setInterval(function() {
 // 								console.log('Hello');
 // 								grid.nowDate.setMinutes(grid.nowDate.getMinutes() + 1);
 // 								drawing.repaint();
 // 							}, 5000);
-							
-// 
+
+//
 // 							this.drawing.addDoodle('PostPole');
 // 							this.drawing.addDoodle('FibrousProliferation');
 
@@ -178,7 +189,7 @@
 							this.drawing.addDoodle('FieldCircle', {originX:-350, originY:-50, colour:"FF0000"});
 							this.drawing.addDoodle('FieldCircle', {originX:-350, originY:+50, colour:"FF0000"});
 							this.drawing.addDoodle('FieldCircle', {originX:-350, originY:+150, colour:"FF0000"});
-							this.drawing.addDoodle('FieldCircle', {originX:-350, originY:+250, colour:"FF0000"});                   
+							this.drawing.addDoodle('FieldCircle', {originX:-350, originY:+250, colour:"FF0000"});
 
 							// Column 3
 							this.drawing.addDoodle('FieldCircle', {originX:-250, originY:-350, colour:"008000"});
@@ -186,7 +197,7 @@
 							this.drawing.addDoodle('FieldCircle', {originX:-250, originY:-150, colour:"FF0000"});
 
 							this.drawing.addDoodle('FieldCircle', {originX:-250, originY:+150, colour:"FF0000"});
-							this.drawing.addDoodle('FieldCircle', {originX:-250, originY:+250, colour:"FF0000"}); 
+							this.drawing.addDoodle('FieldCircle', {originX:-250, originY:+250, colour:"FF0000"});
 							this.drawing.addDoodle('FieldCircle', {originX:-250, originY:+350, colour:"008000"});
 
 							// Column 4
@@ -195,7 +206,7 @@
 							this.drawing.addDoodle('FieldCircle', {originX:-150, originY:-150, colour:"008000"});
 
 							this.drawing.addDoodle('FieldCircle', {originX:-150, originY:+150, colour:"008000"});
-							this.drawing.addDoodle('FieldCircle', {originX:-150, originY:+250, colour:"008000"}); 
+							this.drawing.addDoodle('FieldCircle', {originX:-150, originY:+250, colour:"008000"});
 							this.drawing.addDoodle('FieldCircle', {originX:-150, originY:+350, colour:"FF0000"});
 
 							// Column 5
@@ -205,7 +216,7 @@
 							this.drawing.addDoodle('FieldCircle', {originX:-50, originY:-50, colour:"008000"});
 							this.drawing.addDoodle('FieldCircle', {originX:-50, originY:+50, colour:"008000"});
 							this.drawing.addDoodle('FieldCircle', {originX:-50, originY:+150, colour:"008000"});
-							this.drawing.addDoodle('FieldCircle', {originX:-50, originY:+250, colour:"008000"}); 
+							this.drawing.addDoodle('FieldCircle', {originX:-50, originY:+250, colour:"008000"});
 							this.drawing.addDoodle('FieldCircle', {originX:-50, originY:+350, colour:"008000"});
 
 							// Column 6
@@ -215,7 +226,7 @@
 							this.drawing.addDoodle('FieldCircle', {originX:+50, originY:-50, colour:"008000"});
 							this.drawing.addDoodle('FieldCircle', {originX:+50, originY:+50, colour:"008000"});
 							this.drawing.addDoodle('FieldCircle', {originX:+50, originY:+150, colour:"008000"});
-							this.drawing.addDoodle('FieldCircle', {originX:+50, originY:+250, colour:"008000"}); 
+							this.drawing.addDoodle('FieldCircle', {originX:+50, originY:+250, colour:"008000"});
 							this.drawing.addDoodle('FieldCircle', {originX:+50, originY:+350, colour:"FFA400"});
 
 							// Column 7
@@ -225,7 +236,7 @@
 							this.drawing.addDoodle('FieldCircle', {originX:+150, originY:+50, colour:"008000"});
 							this.drawing.addDoodle('FieldCircle', {originX:+150, originY:+150, colour:"008000"});
 							this.drawing.addDoodle('FieldCircle', {originX:+150, originY:+250, colour:"008000"});
-							
+
 							// Column 8
 							this.drawing.addDoodle('FieldCircle', {originX:+150, originY:-150, colour:"008000"});
 							this.drawing.addDoodle('FieldCircle', {originX:+150, originY:-50, colour:"008000"});
@@ -237,20 +248,25 @@
 							this.drawing.addDoodle('FieldCircle', {originX:+250, originY:-50, colour:"008000"});
 							this.drawing.addDoodle('FieldCircle', {originX:+250, originY:+50, colour:"008000"});
 							this.drawing.addDoodle('FieldCircle', {originX:+250, originY:+150, colour:"008000"});
-							
+
 							// Column 10
 							this.drawing.addDoodle('FieldCircle', {originX:+350, originY:-50, colour:"008000"});
 							this.drawing.addDoodle('FieldCircle', {originX:+350, originY:+50, colour:"008000"});
+<<<<<<< HEAD
 */																												
 							//this.drawing.deselectDoodles();
+=======
+*/
+							this.drawing.deselectDoodles();
+>>>>>>> Fixed tests after splitting out ED drawing ojects into individual files
                             break;
-                            
+
                         case 'parameterChanged':
                             var doodle = _messageArray['object'].doodle;
-                            
+
 
                             break;
-                        
+
                         case 'doodleAdded':
 							var dood = _messageArray['object'];
 							if (typeof(dood) != 'undefined')
@@ -263,50 +279,50 @@
 //                             			if (sutureArray[i] == null)
 //                             			{
 //                             				sutureArray[i] = dood;
-//                             				
+//
 // 											var trab = this.drawing.lastDoodleOfClass("TrabyFlap");
 // 											if (trab)
 // 											{
 // 												// Get original position
 // 												var p = suturePointsArray[i];
-// 								
+//
 // 												// Calculate radius to this point
 // 												var r = Math.sqrt(p.x * p.x + p.y * p.y);
-// 								
+//
 // 												// Calculate new position
 // 												var np = p.pointAtRadiusAndClockwiseAngle(r, trab.rotation);
-// 								
+//
 // 												// Apply it to suture
 // 												sutureArray[i].originX = np.x;
 // 												sutureArray[i].originY = np.y;
-// 								
+//
 // 												// Apply rotation
 // 												sutureArray[i].rotation = ED.Mod(p.angle + trab.rotation, 2 * Math.PI);
-// 												
+//
 // 												// Apply type
 // 												sutureArray[i].setParameterFromString('type', p.type);
-// 												
+//
 // 												// Apply firstOrginX
 // 												sutureArray[i].firstOriginX = p.ex;
-// 												
+//
 // 												this.drawing.repaint();
 // 											}
-// 											                      				
+//
 //                             				break;
 //                             			}
-//                             		}									
+//                             		}
 // 								}
 							}
 							break;
-                        
+
                         case 'doodleDeleted':
 							var className = _messageArray['object'];
 							if (typeof(className) != 'undefined')
 							{
-								if (className == 'TrabySuture') 
+								if (className == 'TrabySuture')
 								{
 									console.log('Traby suture deleted');
-									
+
 									// Go through array identifying which one has been removed
 									for (var i = 0; i < sutureArray.length; i++)
                             		{
@@ -323,12 +339,12 @@
                     }
                 }
             }
-            
+
             </script>
     </head>
-    
+
     <body onload="init();">
-    
+
         <!-- Doodle controls toolbar -->
         <div class="ed_toolbar">
             <button class="imgbutton" class="imgbutton" disabled="disabled" id="moveToFrontRPS" title="Move to front" onclick="drawingEdit.moveToFront(); return false;" ><img src="../img/moveToFront.gif"/></button>
@@ -338,9 +354,9 @@
             <button class="imgbutton" disabled="disabled" id="deleteSelectedDoodleRPS" title="Delete" onclick="drawingEdit.deleteSelectedDoodle(); return false;" ><img src="../img/deleteSelectedDoodle.gif" /></button>
             <button class="imgbutton" disabled="disabled" id="lockRPS" title="Lock" onclick="drawingEdit.lock(); return false;" ><img src="../img/lock.gif" /></button>
             <button class="imgbutton" disabled="disabled" id="unlockRPS" title="Unlock" onclick="drawingEdit.unlock(); return false;" ><img src="../img/unlock.gif" /></button>
-            
+
             <label style="display:none;" ><input class="checkbox" type="checkbox" id="isSuturedSclerostomyRPS" onchange="drawingEdit.setSelectedDoodle(this, 'isSutured');return false;" />Sutured</label>
-            
+
             <!-- Squiggle options -->
             <span class= "squiggle" id="squiggleSpanRPS" style="display:none;">
                 <img class="colourWell" border="0" src="../img/ColourWell.gif" usemap="#colormapRPS" alt='colormap' />
@@ -366,10 +382,10 @@
 
             <br />
         </div>
-            
+
         <!-- Doodle selection toolbar -->
         <div class="ed_toolbar" id="canvasEdit1doodleToolbar">
-<!-- 
+<!--
             <button id="LensRPS" class="imgbutton" title="Lens" onclick="
 				var vals = grid.getNextValues('sys');
 				if (vals) var sys = drawingEdit.addDoodle('RecordReading', {'type':'sys', 'value':vals['value'], 'originX':vals['originX']});
@@ -379,10 +395,10 @@
 				if (vals) var pul = drawingEdit.addDoodle('RecordReading', {'type':'pul', 'value':vals['value'], 'originX':vals['originX']});
 				var vals = grid.getNextValues('res');
 				if (vals) var res = drawingEdit.addDoodle('RecordReading', {'type':'res', 'value':vals['value'], 'originX':vals['originX']});
-				drawingEdit.deselectDoodles();           
+				drawingEdit.deselectDoodles();
 				return false;
             " ><img src="../img/RecordReading.gif" /></button>
-            
+
             <button id="LensRPS" class="imgbutton" title="Lens" onclick="drawingEdit.addDoodle('PI'); return false;" ><img src="../img/PI.gif" /></button>
  -->
             <button id="LensRPS" class="imgbutton" title="Freehand" onclick="drawingEdit.addDoodle('Freehand'); return false;" ><img src="../img/Freehand.gif" /></button>
@@ -390,32 +406,32 @@
             <button id="LensRPS" class="imgbutton" title="PosteriorPoleObscured" onclick="drawingEdit.addDoodle('ViewObscured'); return false;" ><img src="../img/ViewObscured.gif" /></button>
             <br />
         </div>
-        
+
         <!-- <input class="checkbox" type="checkbox" id="chk_phd"> -->
-            
+
         <!-- Canvas tooltip -->
         <span class="canvasTooltip" id="canvasEditTooltip"></span>
-        
+
         <!-- Canvas element style="border: none;" style="background-color: #DAE6F1;"-->
         <canvas id="canvasEdit" class="ed_canvas_edit" width="300" height="300" tabindex="1" style="border: 1px solid gray; float:left;"></canvas>
-        
+
         <!-- Doodle control panel -->
         <div id="canvasEdit_controls" style="background-color: #DAE6F1; float:left;">
         </div>
-        
+
         <button class="actbutton" onclick="console.log(drawingEdit.report()); return false;">Report</button>
-        
-<!-- 
+
+<!--
         <select id="colourSelect">
 			<option value='FF0000FF'>Red</option>
 			<option value='00FF00FF'>Green</option>
 		</select>
  -->
-		
+
         <!-- <input id="Eyedraw_boolField" type="checkbox"> -->
 
 
-<!-- 
+<!--
         <br/>
 
 		<select id="horSelect">
@@ -429,13 +445,13 @@
 			<option value="None" selected="true" >None</option>
 			<option value="L/R">L/R</option>
 		</select>
-			
+
 		<select id="torSelect">
 			<option value="Excyclotorsion">Excyclotorsion</option>
 			<option value="None" selected="true" >None</option>
 			<option value="Incyclotorsion">Incyclotorsion</option>
 		</select>
-		
+
 		</br>
 		<select id="horValueSelect">
 			<option value=0>0</option>
@@ -490,7 +506,7 @@
 			<option value=49>49</option>
 			<option value=50>50</option>
 		</select>
-		
+
 		<select id="verValueSelect">
 			<option value=0>0</option>
 			<option value=1>1</option>
@@ -569,45 +585,45 @@
 			<option value=20>20</option>
 		</select>
  -->
-		
-<!-- 
+
+<!--
 		<select id="piTypeSelect">
 			<option>Surgical</option>
 			<option>Laser</option>
 		</select>
  -->
-				
+
 		</br>
-<!-- 
+<!--
 		<select id="methodSelect">
 			<option value="Fornix-based">Fornix-based</option>
 			<option value="Limbus-based">Limbus-based</option>
 		</select>
-		
+
 		<select id="siteSelect">
 			<option value="Superior">Superior</option>
 			<option value="Superonasal">Superonasal</option>
 			<option value="Superotemporal">Superotemporal</option>
 		</select>
-							        
+
         <select id="sizeSelect">
             <option value="4x3">4x3</option>
             <option value="5x2">5x2</option>
         </select>
-        
+
         <select id="sclerostomySelect">
             <option value="Punch">Punch</option>
             <option value="Block">Block</option>
         </select>
  -->
-            
+
         <!-- Input element -->
-        <!-- 
+        <!--
         <input type="text" id="stenosisInput" value="0" />
         <input type="text" id="typeInput" value="Calcified" />
-         --> 
-         
-<!-- 
+         -->
+
+<!--
         <button onclick="console.log(drawingEdit.report()); return false;">Report</button>
         <button onclick="var startDate = new Date(); grid.setDate(startDate); console.log(grid.date); return false;">Start</button>
         <button onclick="console.log(grid.getGridX()); return false;">Grid</button>
@@ -615,7 +631,7 @@
  -->
 
 
-        
+
     </body>
 </html>
- 
+

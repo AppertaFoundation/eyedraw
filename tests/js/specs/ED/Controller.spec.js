@@ -1,5 +1,8 @@
 (function ControllerTest() {
 
+	/** TODO: some of the spies should be replaced with mocks so that
+	the original methods are not executed. */
+
 	'use strict';
 
 	/**
@@ -94,7 +97,8 @@
 		isEditable: true,
 		scale: 1,
 		deleteValueArray: {},
-		bindingArray: {}
+		bindingArray: {},
+		syncArray: {}
 	};
 
 	describe('Controller', function() {
@@ -498,7 +502,19 @@
 				expect(spy2.withArgs(deleteValueArray).calledOnce).to.be.true;
 				spy2.reset();
 				dom.destroy();
-			})
+			});
+
+			it('should de-select synced doodles', function() {
+				var syncArray = {
+					Cataract: {
+						Surgeon: {
+							PhakoIncision: {
+								parameters: ['rotation']
+							}
+						}
+					}
+				};
+			});
 		});
 	});
 }());
