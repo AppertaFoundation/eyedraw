@@ -69,6 +69,7 @@
             {
                 this.drawing = _drawing;
                 this.gsf = 1;
+                //this.gsf = 0.72;
                 
                 // Specify call back function
                 this.callBack = callBack;
@@ -91,10 +92,11 @@
 							this.drawing.globalScaleFactor = this.gsf;
 							
 							//this.drawing.addDoodle('AxialLengthGraph', {'axialLength':'25'});
-							this.drawing.addDoodle('Gonioscopy');
-							this.drawing.addDoodle('AntSynech');
+							//this.drawing.addDoodle('Baerveldt');
+							//this.drawing.addDoodle('AntSynech');
 							//this.drawing.addDoodle('ConjunctivalSuture');
-							//this.drawing.addDoodle('TrabySuture');
+							this.drawing.addDoodle('TrabySuture');
+							//this.drawing.addDoodle('UTear');
 							//this.drawing.addDoodle('EarDrum');
 							//this.drawing.addDoodle('Perforation');
 							//this.drawing.addDoodle('PostPole');
@@ -124,7 +126,7 @@
 // 					        leftEye.parameterValidationArray['originX']['range'] = new ED.Range(+150, +350);
 // 					        leftEye.originX = +250;
 					    
-					        this.drawing.deselectDoodles();
+					        //this.drawing.deselectDoodles();
 
 
 
@@ -240,7 +242,7 @@
 							this.drawing.addDoodle('FieldCircle', {originX:+350, originY:-50, colour:"008000"});
 							this.drawing.addDoodle('FieldCircle', {originX:+350, originY:+50, colour:"008000"});
 */																												
-							this.drawing.deselectDoodles();
+							//this.drawing.deselectDoodles();
                             break;
                             
                         case 'parameterChanged':

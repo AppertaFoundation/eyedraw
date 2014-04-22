@@ -61,7 +61,7 @@ ED.Baerveldt.prototype.setPropertyDefaults = function() {
 	this.snapToAngles = true;
 
 	// Update component of validation array for simple parameters
-	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
+	this.parameterValidationArray['apexX']['range'].setMinAndMax(-300, +300);
 	this.parameterValidationArray['apexY']['range'].setMinAndMax(-600, -100);
 
 	// Add complete validation arrays for derived parameters
@@ -213,9 +213,19 @@ ED.Baerveldt.prototype.draw = function(_point) {
 
 		// Tube
 		ctx.moveTo(-20 * s, 290 * s + d);
-		ctx.lineTo(-20 * s, this.apexY);
-		ctx.lineTo(20 * s, this.apexY);
-		ctx.lineTo(20 * s, 290 * s + d);
+// 		ctx.lineTo(-20 * s, this.apexY);
+// 		ctx.lineTo(20 * s, this.apexY);
+// 		ctx.lineTo(20 * s, 290 * s + d);
+
+		var cp1 = new ED.Point(0, (290 * s + d) + (this.apexY - (290 * s + d)) * 1);
+		var cp2 = new ED.Point(this.apexX * 0.3, this.apexY);
+		var yd = this.apexX > 0?1:-1;
+		
+		ctx.bezierCurveTo(cp1.x - 20 * s, cp1.y, cp2.x - 20 * s, cp2.y, this.apexX - 20 * s, this.apexY + 20 * s * yd);
+		ctx.lineTo(this.apexX + 20 * s, this.apexY - 20 * s * yd);
+		ctx.bezierCurveTo(cp2.x + 20 * s, cp2.y, cp1.x + 20 * s, cp1.y, 20 * s, 290 * s + d);
+		
+		//ctx.lineTo(cp1.x, cp1.y);
 
 		ctx.strokeStyle = "rgba(150,150,150,0.5)";
 		ctx.stroke();

@@ -34,7 +34,7 @@ ED.TrabySuture = function(_drawing, _parameterJSON) {
 	this.size = '10/0';
 	
 	// Number of handles for releasable suture
-	this.numberOfHandles = 2;
+	this.numberOfHandles = 5;
 
 	// Saved parameters
 	this.savedParameterArray = ['originX', 'originY', 'apexX', 'apexY', 'arc', 'rotation', 'shape', 'type', 'size'];
@@ -62,14 +62,13 @@ ED.TrabySuture.prototype.setHandles = function() {
 		this.handleArray[i] = new ED.Handle(null, true, ED.Mode.Handles, false);
 	}
 
-	this.handleArray[this.numberOfHandles] = new ED.Handle(null, true, ED.Mode.Rotate, false);
+	//this.handleArray[this.numberOfHandles] = new ED.Handle(null, true, ED.Mode.Rotate, false);
 }
 
 /**
  * Sets default dragging attributes
  */
 ED.TrabySuture.prototype.setPropertyDefaults = function() {
-
 	// Update component of validation array for simple parameters
 	this.parameterValidationArray['apexX']['range'].setMinAndMax(-50, +50);
 	this.parameterValidationArray['apexY']['range'].setMinAndMax(+70, +70);
@@ -111,11 +110,18 @@ ED.TrabySuture.prototype.setParameterDefaults = function() {
 	// Add it to squiggle array
 	this.squiggleArray.push(squiggle);
 
-	// Populate with handles
-	var point = new ED.Point(100, 100);
-	this.addPointToSquiggle(point);
-	point = new ED.Point(-100, 100);
-	this.addPointToSquiggle(point);
+	// Populate handle array
+	var positionSet = [
+		{x: 100, y: -100},
+		{x: -100, y: 100},
+		{x: -100, y: 200},
+		{x: 0, y: 250},
+		{x: 100, y: 200},
+	];
+	for (var i = 0; i < positionSet.length; i++) {
+		var point = new ED.Point(positionSet[i].x, positionSet[i].y);
+		this.addPointToSquiggle(point);
+	}
 }
 
 /**
@@ -193,18 +199,18 @@ ED.TrabySuture.prototype.draw = function(_point) {
 		// Type of suture
 		switch (this.shape) {
 			case 'Releasable':
-				ctx.moveTo(-2, 64);
-				ctx.bezierCurveTo(20, 36, -15, 16, -16, -7);
-				ctx.bezierCurveTo(-18, -30, -12, -43, -4, -43);
-				ctx.bezierCurveTo(6, -43, 12, -28, 12, -9);
-				ctx.bezierCurveTo(12, 11, 0, 23, -2, 30);
-				ctx.bezierCurveTo(-3, 36, 3, 37, 2, 30);
-				ctx.bezierCurveTo(2, 20, -4, 24, -3, 29);
-				ctx.bezierCurveTo(-3, 36, 14, 37, 23, 56);
-				ctx.bezierCurveTo(32, 74, 34, 100, 34, 100);
+// 				ctx.moveTo(-2, 64);
+// 				ctx.bezierCurveTo(20, 36, -15, 16, -16, -7);
+// 				ctx.bezierCurveTo(-18, -30, -12, -43, -4, -43);
+// 				ctx.bezierCurveTo(6, -43, 12, -28, 12, -9);
+// 				ctx.bezierCurveTo(12, 11, 0, 23, -2, 30);
+// 				ctx.bezierCurveTo(-3, 36, 3, 37, 2, 30);
+// 				ctx.bezierCurveTo(2, 20, -4, 24, -3, 29);
+// 				ctx.bezierCurveTo(-3, 36, 14, 37, 23, 56);
+// 				ctx.bezierCurveTo(32, 74, 34, 100, 34, 100);
 				
 				// From point
-				var fp = new ED.Point(34, 100);
+				//var fp = new ED.Point(34, 100);
 
 				// Suture exit through cornea
 				// 				var ep = new ED.Point(this.firstOriginX, -60);
@@ -255,26 +261,29 @@ ED.TrabySuture.prototype.draw = function(_point) {
 				*/
 
 				// Releasable
-				var fp;
-				var tp;
-				var cp1;
-				var cp2;
+// 				var fp;
+// 				var tp;
+// 				var cp1;
+// 				var cp2;
 
 				// Angle of control point from radius line to point (this value makes path a circle Math.PI/12 for 8 points
-				var phi = 2 * Math.PI / (10 * this.numberOfHandles);
+				//var phi = 2 * Math.PI / (10 * this.numberOfHandles);
 				
-				for (var i = 0; i < this.numberOfHandles; i++) {
+				tp = this.squiggleArray[0].pointsArray[0];
+				ctx.moveTo(tp.x, tp.y);
+				
+				for (var i = 1; i < this.numberOfHandles; i++) {
 
 					// To point
 					tp = this.squiggleArray[0].pointsArray[i];
 
 					// Control points
-					cp1 = new ED.Point(fp.x + (tp.x - fp.x)/3, fp.y);
-					cp2 = new ED.Point(fp.x + 2 * (tp.x - fp.x)/3, tp.y);
+// 					cp1 = new ED.Point(fp.x + (tp.x - fp.x)/3, fp.y);
+// 					cp2 = new ED.Point(fp.x + 2 * (tp.x - fp.x)/3, tp.y);
 
 					// Draw Bezier curve
-					ctx.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, tp.x, tp.y);
-					
+					//ctx.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, tp.x, tp.y);
+					ctx.lineTo(tp.x, tp.y);
 					fp = tp;
 				}
 			
@@ -311,15 +320,10 @@ ED.TrabySuture.prototype.draw = function(_point) {
 		ctx.stroke();
 	}
 
-	// Coordinates of expert handles (in canvas plane)
-	if (this.shape == "Releasable") {
-		for (var i = 0; i < this.numberOfHandles; i++) {
-			this.handleArray[i].location = this.transform.transformPoint(this.squiggleArray[0].pointsArray[i]);
-		}
-	}
-
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[this.numberOfHandles].location = this.transform.transformPoint(new ED.Point(+40, -70));
+	for (var i = 0; i < this.numberOfHandles; i++) {
+		this.handleArray[i].location = this.transform.transformPoint(this.squiggleArray[0].pointsArray[i]);
+	}
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
