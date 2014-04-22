@@ -85,7 +85,7 @@
 	var defaultProperties = {
 		canvasId: 'canvasID',
 		inputId: 'inputID',
-		graphicsPath: '../../../assets/img',
+		graphicsPath: '../../../../../assets/img',
 		offsetX: 100,
 		offsetY: 100,
 		toImage: false,
@@ -117,7 +117,7 @@
 			it('should set the expected properties', function() {
 
 				var properties = $.extend({}, defaultProperties);
-				var controller = new ED.Controller(properties, FakeChecker);
+				var controller = new ED.Controller(properties, FakeChecker, null, null, FakeDoodle);
 
 				expect(controller.properties).to.equal(properties);
 				expect(controller.canvas).to.equal(dom.canvas[0]);
@@ -133,7 +133,7 @@
 				var spy2 = sinon.spy(ED, 'setInstance');
 
 				var properties = $.extend({}, defaultProperties);
-				var controller = new ED.Controller(properties, FakeChecker);
+				var controller = new ED.Controller(properties, FakeChecker, null, null, FakeDoodle);
 
 				expect(controller.drawing instanceof ED.Drawing).to.be.true;
 				expect(spy1.withArgs(controller.drawing).called).to.be.true;
@@ -146,7 +146,7 @@
 			it('should create new Toolbar and DoodlePopup instances', function() {
 
 				var properties = $.extend({}, defaultProperties);
-				var controller = new ED.Controller(properties, FakeChecker);
+				var controller = new ED.Controller(properties, FakeChecker, null, null, null);
 
 				expect(controller.toolbar instanceof ED.Views.Toolbar).to.be.true;
 				expect(controller.doodlePopup instanceof ED.Views.DoodlePopup).to.be.true;
@@ -157,7 +157,7 @@
 
 				var drawing = createDrawing();
 				var properties = $.extend({}, defaultProperties);
-				var controller = new ED.Controller(properties, FakeChecker, drawing);
+				var controller = new ED.Controller(properties, FakeChecker, drawing, null, FakeDoodle);
 
 				var notification = drawing.notificationArray[drawing.notificationArray.length - 1]
 
@@ -182,7 +182,7 @@
 					listenerArray: [ listener ]
 				}, defaultProperties);
 
-				var controller = new ED.Controller(properties, FakeChecker);
+				var controller = new ED.Controller(properties, FakeChecker, null, null, FakeDoodle);
 
 				expect(listener.withArgs(controller.drawing).called).to.be.true;
 				expect(listener.calledWithNew()).to.be.true;
@@ -192,7 +192,7 @@
 				var drawing = createDrawing();
 				var spy = sinon.spy(drawing, 'init');
 				var properties = $.extend({}, defaultProperties);
-				var controller = new ED.Controller(properties, FakeChecker, drawing);
+				var controller = new ED.Controller(properties, FakeChecker, drawing, null, FakeDoodle);
 				expect(spy.called).to.be.true;
 			});
 		});
@@ -210,7 +210,7 @@
 				properties = $.extend({
 					focus: true
 				}, defaultProperties);
-				controller = new ED.Controller(properties, FakeChecker, drawing);
+				controller = new ED.Controller(properties, FakeChecker, drawing, null, FakeDoodle);
 			});
 			afterEach(function() {
 				dom.destroy();
@@ -376,7 +376,7 @@
 				var dom = createDOM();
 				var drawing = createDrawing();
 				var properties = $.extend({}, defaultProperties);
-				var controller = new ED.Controller(properties, FakeChecker, drawing);
+				var controller = new ED.Controller(properties, FakeChecker, drawing, null, FakeDoodle);
 
 				var spy1 = sinon.spy(controller, 'hasInputFieldData');
 				var spy2 = sinon.spy(drawing, 'save');
@@ -411,7 +411,7 @@
 				var dom = createDOM();
 				var drawing = createDrawing();
 				var properties = $.extend({}, defaultProperties);
-				var controller = new ED.Controller(properties, FakeChecker, drawing);
+				var controller = new ED.Controller(properties, FakeChecker, drawing, null, FakeDoodle);
 				var spy = sinon.spy(drawing, 'loadDoodles');
 
 				controller.loadInputFieldData();
@@ -430,7 +430,7 @@
 					dom = createDOM();
 					var drawing = createDrawing();
 					var properties = $.extend({}, defaultProperties, props);
-					var controller = new ED.Controller(properties, FakeChecker, drawing);
+					var controller = new ED.Controller(properties, FakeChecker, drawing, null, FakeDoodle);
 					var spy = sinon.spy(drawing, 'addBindings');
 					drawing.notify('ready');
 					return spy;
@@ -473,7 +473,7 @@
 					dom = createDOM();
 					var drawing = createDrawing();
 					var properties = $.extend({}, defaultProperties, props);
-					var controller = new ED.Controller(properties, FakeChecker, drawing);
+					var controller = new ED.Controller(properties, FakeChecker, drawing, null, FakeDoodle);
 					var spy = sinon.spy(drawing, 'addDeleteValues');
 					drawing.notify('ready');
 					return spy;
