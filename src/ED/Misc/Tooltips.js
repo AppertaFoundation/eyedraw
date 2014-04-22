@@ -167,6 +167,7 @@ ED.trans['TrabySuture'] = 'Trabeculectomy suture<br/><br/>Drag to position<br/>D
 ED.trans['TractionRetinalDetachment'] = 'Traction retinal detachment<br/><br/>Drag to position<br/>Drag inner handle to change shape and size<br/>Drag outer handle to rotate';
 ED.trans['TransilluminationDefect'] = 'Transillumination defects of the iris<br/><br/>Drag to rotate around centre<br/>Drag each end handle to alter extent';
 ED.trans['UTear'] = '';
+ED.trans['ViewObscured'] = 'View obscured<br/><br/>Drag handle to change opacity';
 ED.trans['VitreousOpacity'] = 'Vitreous Opacity<br/><br/>Drag to move<br/>Drag the inner handle up and down to alter opacity<br/>Drag the outer handle to scale';
 
 // ENT

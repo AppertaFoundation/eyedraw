@@ -549,6 +549,7 @@ class DoodleInfo
         "UpShoot" => "Up shoot",
         "UTear" => "Traction ‘U’ tear",
         "Vicryl" => "Vicryl suture",
+        "ViewObscured" => "View obscured",
         "VitreousOpacity" => "Vitreous opacity",
         "VPattern" => "V pattern",
 
