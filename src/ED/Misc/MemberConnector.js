@@ -63,7 +63,7 @@ ED.MemberConnector.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['length'] = {
 		kind: 'derived',
 		type: 'int',
-		range: new ED.Range(0, 1000),
+		range: new ED.Drawing.Range(0, 1000),
 		animate: true
 	};
 	this.parameterValidationArray['type'] = {

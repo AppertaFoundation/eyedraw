@@ -30,7 +30,7 @@ ED.PeripapillaryAtrophy = function(_drawing, _parameterJSON) {
 
 	// Private parameters
 	this.outerRadius = 340;
-	
+
 	// Saved parameters
 	this.savedParameterArray = ['rotation'];
 
@@ -49,10 +49,10 @@ ED.PeripapillaryAtrophy.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.PeripapillaryAtrophy.prototype.setHandles = function() {
-	this.handleArray[0] = new ED.Handle(null, true, ED.Mode.Handles, false);
-	this.handleArray[1] = new ED.Handle(null, true, ED.Mode.Handles, false);
-	this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Handles, false);
-	this.handleArray[3] = new ED.Handle(null, true, ED.Mode.Handles, false);
+	this.handleArray[0] = new ED.Doodle.Handle(null, true, ED.Mode.Handles, false);
+	this.handleArray[1] = new ED.Doodle.Handle(null, true, ED.Mode.Handles, false);
+	this.handleArray[2] = new ED.Doodle.Handle(null, true, ED.Mode.Handles, false);
+	this.handleArray[3] = new ED.Doodle.Handle(null, true, ED.Mode.Handles, false);
 }
 
 /**
@@ -73,20 +73,20 @@ ED.PeripapillaryAtrophy.prototype.setPropertyDefaults = function() {
 	var max = this.outerRadius * 1.4;
 	var min = this.outerRadius;
 	this.handleCoordinateRangeArray[0] = {
-		x: new ED.Range(-max, -min),
-		y: new ED.Range(-0, +0)
+		x: new ED.Drawing.Range(-max, -min),
+		y: new ED.Drawing.Range(-0, +0)
 	};
 	this.handleCoordinateRangeArray[1] = {
-		x: new ED.Range(-0, +0),
-		y: new ED.Range(-max, -min)
+		x: new ED.Drawing.Range(-0, +0),
+		y: new ED.Drawing.Range(-max, -min)
 	};
 	this.handleCoordinateRangeArray[2] = {
-		x: new ED.Range(min, max),
-		y: new ED.Range(-0, +0)
+		x: new ED.Drawing.Range(min, max),
+		y: new ED.Drawing.Range(-0, +0)
 	};
 	this.handleCoordinateRangeArray[3] = {
-		x: new ED.Range(-0, +0),
-		y: new ED.Range(min, max)
+		x: new ED.Drawing.Range(-0, +0),
+		y: new ED.Drawing.Range(min, max)
 	};
 }
 
@@ -95,16 +95,16 @@ ED.PeripapillaryAtrophy.prototype.setPropertyDefaults = function() {
  */
 ED.PeripapillaryAtrophy.prototype.setParameterDefaults = function() {
 	// Create a squiggle to store the handles points
-	var squiggle = new ED.Squiggle(this, new ED.Colour(100, 100, 100, 1), 4, true);
+	var squiggle = new ED.Squiggle(this, new ED.Drawing.Colour(100, 100, 100, 1), 4, true);
 
 	// Add it to squiggle array
 	this.squiggleArray.push(squiggle);
 
 	// Add four points to the squiggle
-	this.addPointToSquiggle(new ED.Point(-this.outerRadius - (this.drawing.eye == ED.eye.Right ? 100 : 0), 0));
-	this.addPointToSquiggle(new ED.Point(0, -this.outerRadius));
-	this.addPointToSquiggle(new ED.Point(this.outerRadius + (this.drawing.eye == ED.eye.Right ? 0 : 100), 0));
-	this.addPointToSquiggle(new ED.Point(0, this.outerRadius));
+	this.addPointToSquiggle(new ED.Drawing.Point(-this.outerRadius - (this.drawing.eye == ED.eye.Right ? 100 : 0), 0));
+	this.addPointToSquiggle(new ED.Drawing.Point(0, -this.outerRadius));
+	this.addPointToSquiggle(new ED.Drawing.Point(this.outerRadius + (this.drawing.eye == ED.eye.Right ? 0 : 100), 0));
+	this.addPointToSquiggle(new ED.Drawing.Point(0, this.outerRadius));
 }
 
 /**
@@ -167,7 +167,7 @@ ED.PeripapillaryAtrophy.prototype.draw = function(_point) {
 
 	// Set attributes
 	ctx.lineWidth = 2;
-	var colour = new ED.Colour(0, 0, 0, 1);
+	var colour = new ED.Drawing.Colour(0, 0, 0, 1);
 	colour.setWithHexString('DFD989');
 	ctx.fillStyle = colour.rgba();
 	ctx.strokeStyle = "gray";

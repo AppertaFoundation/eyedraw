@@ -30,7 +30,7 @@ ED.FocalLaser = function(_drawing, _parameterJSON) {
 
 	// Saved parameters
 	this.savedParameterArray = ['originX', 'originY', 'apexY'];
-	
+
 	// Call super-class constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
@@ -46,7 +46,7 @@ ED.FocalLaser.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.FocalLaser.prototype.setHandles = function() {
-	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+	this.handleArray[4] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
 }
 
 /**
@@ -129,7 +129,7 @@ ED.FocalLaser.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	var point = new ED.Point(0, 0);
+	var point = new ED.Drawing.Point(0, 0);
 	point.setWithPolars(ro, Math.PI / 4);
 	this.handleArray[4].location = this.transform.transformPoint(point);
 

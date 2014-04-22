@@ -50,9 +50,9 @@ ED.ConjunctivalFlap.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.ConjunctivalFlap.prototype.setHandles = function() {
-	this.handleArray[0] = new ED.Handle(null, true, ED.Mode.Arc, false);
-	this.handleArray[3] = new ED.Handle(null, true, ED.Mode.Arc, false);
-	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+	this.handleArray[0] = new ED.Doodle.Handle(null, true, ED.Mode.Arc, false);
+	this.handleArray[3] = new ED.Doodle.Handle(null, true, ED.Mode.Arc, false);
+	this.handleArray[4] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
 }
 
 /**
@@ -142,11 +142,11 @@ ED.ConjunctivalFlap.prototype.draw = function(_point) {
 	var phi = this.arc / 6;
 
 	// Apex point
-	var apex = new ED.Point(this.apexX, this.apexY);
+	var apex = new ED.Drawing.Point(this.apexX, this.apexY);
 
 	// Coordinates of corners of flap
-	var right = new ED.Point(r * Math.sin(theta), -r * Math.cos(theta));
-	var left = new ED.Point(-r * Math.sin(theta), -r * Math.cos(theta));
+	var right = new ED.Drawing.Point(r * Math.sin(theta), -r * Math.cos(theta));
+	var left = new ED.Drawing.Point(-r * Math.sin(theta), -r * Math.cos(theta));
 
 	// Boundary path
 	ctx.beginPath();

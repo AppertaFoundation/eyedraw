@@ -206,6 +206,9 @@ ED.Controller = (function() {
 	Controller.prototype.deselectSyncedDoodles = function() {
 		for (var idSuffix in this.properties.syncArray) {
 			var drawing = this.getEyeDrawInstance(idSuffix);
+			if (!drawing) {
+				throw new Error('Unable to get eyedraw instance!');
+			}
 			drawing.deselectDoodles();
 		}
 	};

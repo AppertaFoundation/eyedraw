@@ -30,7 +30,7 @@ ED.PosteriorRetinectomy = function(_drawing, _parameterJSON) {
 
 	// Saved parameters
 	this.savedParameterArray = ['originX', 'originY', 'apexY'];
-	
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
@@ -46,7 +46,7 @@ ED.PosteriorRetinectomy.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.PosteriorRetinectomy.prototype.setHandles = function() {
-	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+	this.handleArray[4] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
 }
 
 /**
@@ -73,10 +73,10 @@ ED.PosteriorRetinectomy.prototype.setParameterDefaults = function() {
 
 	var doodle = this.drawing.lastDoodleOfClass(this.className);
 	if (doodle) {
-		var point = new ED.Point(doodle.originX, doodle.originY);
+		var point = new ED.Drawing.Point(doodle.originX, doodle.originY);
 		var direction = point.direction() + Math.PI / 8;
 		var distance = point.length();
-		var np = new ED.Point(0, 0);
+		var np = new ED.Drawing.Point(0, 0);
 		np.setWithPolars(distance, direction);
 
 		this.originX = np.x;
@@ -128,7 +128,7 @@ ED.PosteriorRetinectomy.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);

@@ -30,7 +30,7 @@ ED.RRD = function(_drawing, _parameterJSON) {
 
 	// Saved parameters
 	this.savedParameterArray = ['apexY', 'arc', 'rotation'];
-	
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
@@ -46,9 +46,9 @@ ED.RRD.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.RRD.prototype.setHandles = function() {
-	this.handleArray[1] = new ED.Handle(null, true, ED.Mode.Arc, false);
-	this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Arc, false);
-	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+	this.handleArray[1] = new ED.Doodle.Handle(null, true, ED.Mode.Arc, false);
+	this.handleArray[2] = new ED.Doodle.Handle(null, true, ED.Mode.Arc, false);
+	this.handleArray[4] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
 }
 
 /**
@@ -144,9 +144,9 @@ ED.RRD.prototype.draw = function(_point) {
 	this.drawBoundary(_point);
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[1].location = this.transform.transformPoint(new ED.Point(topLeftX, topLeftY));
-	this.handleArray[2].location = this.transform.transformPoint(new ED.Point(topRightX, topRightY));
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
+	this.handleArray[1].location = this.transform.transformPoint(new ED.Drawing.Point(topLeftX, topLeftY));
+	this.handleArray[2].location = this.transform.transformPoint(new ED.Drawing.Point(topRightX, topRightY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -200,9 +200,9 @@ ED.RRD.prototype.diagnosticHierarchy = function() {
 ED.RRD.prototype.isMacOff = function() {
 	// Get coordinates of macula in doodle plane
 	if (this.drawing.eye == ED.eye.Right) {
-		var macula = new ED.Point(-100, 0);
+		var macula = new ED.Drawing.Point(-100, 0);
 	} else {
-		var macula = new ED.Point(100, 0);
+		var macula = new ED.Drawing.Point(100, 0);
 	}
 
 	// Convert to canvas plane

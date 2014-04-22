@@ -27,10 +27,10 @@
 ED.RetinalVeinOcclusionPostPole = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "RetinalVeinOcclusionPostPole";
-	
+
 	// Saved parameters
 	this.savedParameterArray = ['apexX', 'apexY', 'arc', 'rotation'];
-	
+
 	// Call super-class constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
@@ -46,9 +46,9 @@ ED.RetinalVeinOcclusionPostPole.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.RetinalVeinOcclusionPostPole.prototype.setHandles = function() {
-	this.handleArray[0] = new ED.Handle(null, true, ED.Mode.Arc, false);
-	this.handleArray[3] = new ED.Handle(null, true, ED.Mode.Arc, false);
-	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+	this.handleArray[0] = new ED.Doodle.Handle(null, true, ED.Mode.Arc, false);
+	this.handleArray[3] = new ED.Doodle.Handle(null, true, ED.Mode.Arc, false);
+	this.handleArray[4] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
 }
 
 /**
@@ -85,7 +85,7 @@ ED.RetinalVeinOcclusionPostPole.prototype.draw = function(_point) {
 
 	// Call draw method in superclass
 	ED.RetinalVeinOcclusionPostPole.superclass.draw.call(this, _point);
-	
+
 	// Radii
 	var ro = 420;
 	var ri = -this.apexY;
@@ -124,7 +124,7 @@ ED.RetinalVeinOcclusionPostPole.prototype.draw = function(_point) {
 
 	// Non boundary drawing
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
-	
+
 		// Distribution data
 		var si = 30;
 		var sd = (30 + si);
@@ -140,7 +140,7 @@ ED.RetinalVeinOcclusionPostPole.prototype.draw = function(_point) {
 			for (var a = -Math.PI / 2 - arcStart; a < this.arc - Math.PI / 2 - arcStart; a += sd / r) {
 				a = -Math.PI / 2 - arcStart + j * 2 * Math.PI / count[i];
 
-				var p = new ED.Point(0, 0);
+				var p = new ED.Drawing.Point(0, 0);
 				p.setWithPolars(r, a);
 				this.drawNFLHaem(ctx, p.x, p.y);
 
@@ -152,9 +152,9 @@ ED.RetinalVeinOcclusionPostPole.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[0].location = this.transform.transformPoint(new ED.Point(topLeftX, topLeftY));
-	this.handleArray[3].location = this.transform.transformPoint(new ED.Point(topRightX, topRightY));
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
+	this.handleArray[0].location = this.transform.transformPoint(new ED.Drawing.Point(topLeftX, topLeftY));
+	this.handleArray[3].location = this.transform.transformPoint(new ED.Drawing.Point(topRightX, topRightY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -170,7 +170,7 @@ ED.RetinalVeinOcclusionPostPole.prototype.draw = function(_point) {
  */
 ED.RetinalVeinOcclusionPostPole.prototype.description = function() {
 	var returnString = "";
-	
+
 	// Type
 	var type = this.type();
 	switch (type){
@@ -183,7 +183,7 @@ ED.RetinalVeinOcclusionPostPole.prototype.description = function() {
 			}
 			returnString += 'branch ';
 			break;
-		
+
 		case 'hemispheric':
 			if (this.rotation > Math.PI / 2 && this.rotation < 3 * Math.PI / 2) {
 				returnString = 'Inferior ';
@@ -193,13 +193,13 @@ ED.RetinalVeinOcclusionPostPole.prototype.description = function() {
 			}
 			returnString += 'hemispheric ';
 			break;
-			
+
 		case 'central':
 			returnString += 'Central ';
 			break;
 	}
 	returnString += "retinal vein occlusion ";
-	
+
 	// Macula
 	if (this.apexY < -150) {
 		returnString += 'sparing ';
@@ -207,9 +207,9 @@ ED.RetinalVeinOcclusionPostPole.prototype.description = function() {
 	else {
 		returnString += 'involving ';
 	}
-	
+
 	returnString += 'the macula ';
-	
+
 	return returnString;
 }
 
@@ -231,7 +231,7 @@ ED.RetinalVeinOcclusionPostPole.prototype.snomedCode = function() {
 		case 'central':
 			return 68478007;
 			break;
-	}	
+	}
 }
 
 /**

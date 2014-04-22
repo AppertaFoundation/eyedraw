@@ -30,7 +30,7 @@ ED.Telangiectasis = function(_drawing, _parameterJSON) {
 
 	// Saved parameters
 	this.savedParameterArray = ['originX', 'apexX', 'apexY'];
-	
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
@@ -46,7 +46,7 @@ ED.Telangiectasis.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.Telangiectasis.prototype.setHandles = function() {
-	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+	this.handleArray[4] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
 }
 
 /**
@@ -107,13 +107,13 @@ ED.Telangiectasis.prototype.draw = function(_point) {
 
 		var dr = 10 / this.scaleX;
 
-		var p = new ED.Point(0, 0);
+		var p = new ED.Drawing.Point(0, 0);
 		var n = 10;
 		for (var i = 0; i < n; i++) {
 			p.setWithPolars(r * 0.8 * ED.randomArray[i], 2 * Math.PI * ED.randomArray[i + 100]);
 			this.drawSpot(ctx, p.x, p.y, dr, fill);
 		}
-		
+
 		// Ring of Exudate
 		if (this.apexY < - 50) {
 			fill = "yellow";
@@ -123,7 +123,7 @@ ED.Telangiectasis.prototype.draw = function(_point) {
 				this.drawSpot(ctx, p.x, p.y, dr, fill);
 			}
 		}
-		
+
 		// Pigmentation
 		fill = "brown";
 		n = Math.abs(Math.floor(this.apexX / 10));
@@ -134,7 +134,7 @@ ED.Telangiectasis.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);

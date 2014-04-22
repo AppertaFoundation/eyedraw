@@ -49,9 +49,9 @@ ED.PosteriorSynechia.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.PosteriorSynechia.prototype.setHandles = function() {
-	this.handleArray[0] = new ED.Handle(null, true, ED.Mode.Arc, false);
-	this.handleArray[3] = new ED.Handle(null, true, ED.Mode.Arc, false);
-	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+	this.handleArray[0] = new ED.Doodle.Handle(null, true, ED.Mode.Arc, false);
+	this.handleArray[3] = new ED.Doodle.Handle(null, true, ED.Mode.Arc, false);
+	this.handleArray[4] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
 }
 
 /**
@@ -69,7 +69,7 @@ ED.PosteriorSynechia.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['size'] = {
 		kind: 'derived',
 		type: 'float',
-		range: new ED.Range(20, 100),
+		range: new ED.Drawing.Range(20, 100),
 		precision: 1,
 		animate: true
 	};
@@ -153,8 +153,8 @@ ED.PosteriorSynechia.prototype.draw = function(_point) {
 	var arcEnd = -Math.PI / 2 - theta;
 
 	// Coordinates of 'corners' of SectorPRPPostPole
-	var startHandle = new ED.Point(-ro * Math.sin(theta), -ro * Math.cos(theta));
-	var endHandle = new ED.Point(ro * Math.sin(theta), -ro * Math.cos(theta));
+	var startHandle = new ED.Drawing.Point(-ro * Math.sin(theta), -ro * Math.cos(theta));
+	var endHandle = new ED.Drawing.Point(ro * Math.sin(theta), -ro * Math.cos(theta));
 
 	// Boundary path
 	ctx.beginPath();
@@ -163,7 +163,7 @@ ED.PosteriorSynechia.prototype.draw = function(_point) {
 	ctx.arc(0, 0, ro, arcEnd, arcStart, false);
 
 	//var cp = bp.pointAtRadiusAndClockwiseAngle(pr/2, Math.PI/16);
-	var apex = new ED.Point(this.apexX, this.apexY);
+	var apex = new ED.Drawing.Point(this.apexX, this.apexY);
 
 	// Curve from endpoint to apex
 	var cp1 = endHandle.pointAtAngleToLineToPointAtProportion(Math.PI / 12, apex, 0.33);
@@ -227,7 +227,7 @@ ED.PosteriorSynechia.prototype.draw = function(_point) {
 	// Coordinates of handles (in canvas plane)
 	this.handleArray[0].location = this.transform.transformPoint(startHandle);
 	this.handleArray[3].location = this.transform.transformPoint(endHandle);
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);

@@ -27,22 +27,22 @@
 ED.Perforation = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "Perforation";
-	
+
 	// Constants
 	this.margin = 30000;
 
 	// Derived parameters
 	this.isMarginal = false;
-	
+
 	// Other parameters
 	this.safe = true;
-	
+
 	// Saved parameters
 	this.savedParameterArray = ['originX', 'originY', 'scaleX', 'scaleY', 'safe'];
-	
+
 	// Parameters in doodle control bar (parameter name: parameter label)
 	this.controlParameterArray = {'safe':'Safe'};
-	
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
@@ -58,7 +58,7 @@ ED.Perforation.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.Perforation.prototype.setHandles = function() {
-	this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, false);
+	this.handleArray[2] = new ED.Doodle.Handle(null, true, ED.Mode.Scale, false);
 }
 
 /**
@@ -161,7 +161,7 @@ ED.Perforation.prototype.draw = function(_point) {
 	this.drawBoundary(_point);
 
 	// Coordinates of handles (in canvas plane)
-	var point = new ED.Point(0, 0);
+	var point = new ED.Drawing.Point(0, 0);
 	point.setWithPolars(r, Math.PI / 4);
 	this.handleArray[2].location = this.transform.transformPoint(point);
 
@@ -182,16 +182,16 @@ ED.Perforation.prototype.draw = function(_point) {
 // 	returnValue += " perforation of eardrum";
 
 	var returnValue = "";
-	
+
 	if (this.originX <= 0) returnValue = "Antero";
 	else returnValue = "Postero";
-	
+
 	if (this.originY <= 0) returnValue += "superior";
 	else returnValue += "inferior";
-	
+
 	returnValue += " perforation of eardrum";
-	
-	
+
+
 	return returnValue;
 }
 

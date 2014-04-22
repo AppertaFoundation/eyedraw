@@ -30,7 +30,7 @@ ED.RetinalTouch = function(_drawing, _parameterJSON) {
 
 	// Saved parameters
 	this.savedParameterArray = ['originX', 'originY'];
-	
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
@@ -94,8 +94,8 @@ ED.RetinalTouch.prototype.draw = function(_point) {
 		var theta = 0;
 		for (var i = 0; i < n; i++) {
 			theta += 2 * Math.PI / n;
-			var sp = new ED.Point(0, 0);
-			var ep = new ED.Point(0, 0);
+			var sp = new ED.Drawing.Point(0, 0);
+			var ep = new ED.Drawing.Point(0, 0);
 			sp.setWithPolars(ri, theta);
 			ep.setWithPolars(ro, theta);
 

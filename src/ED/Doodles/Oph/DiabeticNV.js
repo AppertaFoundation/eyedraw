@@ -27,10 +27,10 @@
 ED.DiabeticNV = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "DiabeticNV";
-	
+
 	// Saved parameters
 	this.savedParameterArray = ['originX', 'originY', 'scaleX', 'scaleY'];
-	
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
@@ -46,7 +46,7 @@ ED.DiabeticNV.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.DiabeticNV.prototype.setHandles = function() {
-	this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, false);
+	this.handleArray[2] = new ED.Doodle.Handle(null, true, ED.Mode.Scale, false);
 }
 
 /**
@@ -103,11 +103,11 @@ ED.DiabeticNV.prototype.draw = function(_point) {
 	var n = 8;
 
 	// Do a vessel
-	var cp1 = new ED.Point(0, 0);
-	var cp2 = new ED.Point(0, 0);
-	var tip = new ED.Point(0, 0);
-	var cp3 = new ED.Point(0, 0);
-	var cp4 = new ED.Point(0, 0);
+	var cp1 = new ED.Drawing.Point(0, 0);
+	var cp2 = new ED.Drawing.Point(0, 0);
+	var tip = new ED.Drawing.Point(0, 0);
+	var cp3 = new ED.Drawing.Point(0, 0);
+	var cp4 = new ED.Drawing.Point(0, 0);
 
 	// Move to centre
 	ctx.moveTo(0, 0);
@@ -139,7 +139,7 @@ ED.DiabeticNV.prototype.draw = function(_point) {
 	this.drawBoundary(_point);
 
 	// Coordinates of handles (in canvas plane)
-	point = new ED.Point(0, 0);
+	point = new ED.Drawing.Point(0, 0);
 	point.setWithPolars(r, Math.PI / 4);
 	this.handleArray[2].location = this.transform.transformPoint(point);
 

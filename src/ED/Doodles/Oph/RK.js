@@ -30,7 +30,7 @@ ED.RK = function(_drawing, _parameterJSON) {
 
 	// Saved parameters
 	this.savedParameterArray = ['apexY', 'scaleX', 'scaleY', 'rotation'];
-	
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
@@ -46,8 +46,8 @@ ED.RK.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.RK.prototype.setHandles = function() {
-	this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, false);
-	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+	this.handleArray[2] = new ED.Doodle.Handle(null, true, ED.Mode.Scale, false);
+	this.handleArray[4] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
 }
 
 /**
@@ -127,9 +127,9 @@ ED.RK.prototype.draw = function(_point) {
 		var i;
 		for (i = 0; i < n; i++) {
 			var angle = i * theta;
-			var pi = new ED.Point(0, 0);
+			var pi = new ED.Drawing.Point(0, 0);
 			pi.setWithPolars(ri, angle);
-			var po = new ED.Point(0, 0);
+			var po = new ED.Drawing.Point(0, 0);
 			po.setWithPolars(ro, angle);
 			ctx.moveTo(pi.x, pi.y);
 			ctx.lineTo(po.x, po.y);
@@ -139,10 +139,10 @@ ED.RK.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	var point = new ED.Point(0, 0)
+	var point = new ED.Drawing.Point(0, 0)
 	point.setWithPolars(ro, Math.PI / 4);
 	this.handleArray[2].location = this.transform.transformPoint(point);
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);

@@ -30,7 +30,7 @@ ED.LasikFlap = function(_drawing, _parameterJSON) {
 
 	// Saved parameters
 	this.savedParameterArray = ['scaleX', 'scaleY', 'rotation'];
-	
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
@@ -46,7 +46,7 @@ ED.LasikFlap.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.LasikFlap.prototype.setHandles = function() {
-	this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, false);
+	this.handleArray[2] = new ED.Doodle.Handle(null, true, ED.Mode.Scale, false);
 }
 
 /**
@@ -108,7 +108,7 @@ ED.LasikFlap.prototype.draw = function(_point) {
 	this.drawBoundary(_point);
 
 	// Coordinates of handles (in canvas plane)
-	var point = new ED.Point(0, 0)
+	var point = new ED.Drawing.Point(0, 0)
 	point.setWithPolars(r, angle);
 	this.handleArray[2].location = this.transform.transformPoint(point);
 

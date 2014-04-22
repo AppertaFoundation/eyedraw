@@ -46,8 +46,8 @@ ED.CiliaryInjection.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.CiliaryInjection.prototype.setHandles = function() {
-	this.handleArray[0] = new ED.Handle(null, true, ED.Mode.Arc, false);
-	this.handleArray[3] = new ED.Handle(null, true, ED.Mode.Arc, false);
+	this.handleArray[0] = new ED.Doodle.Handle(null, true, ED.Mode.Arc, false);
+	this.handleArray[3] = new ED.Doodle.Handle(null, true, ED.Mode.Arc, false);
 }
 
 /**
@@ -139,12 +139,12 @@ ED.CiliaryInjection.prototype.draw = function(_point) {
 		var n = Math.floor(this.arc / phi);
 
 		// Start and end points of vessel
-		var sp = new ED.Point(0, 0);
-		var ep = new ED.Point(0, 0);
+		var sp = new ED.Drawing.Point(0, 0);
+		var ep = new ED.Drawing.Point(0, 0);
 
 		ctx.beginPath();
 
-		// Radial lines		
+		// Radial lines
 		for (var i = 0; i < n; i++) {
 			var theta = Math.PI / 2 + arcEnd + i * phi;
 			sp.setWithPolars(ro, theta);
@@ -160,8 +160,8 @@ ED.CiliaryInjection.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[0].location = this.transform.transformPoint(new ED.Point(topLeftX, topLeftY));
-	this.handleArray[3].location = this.transform.transformPoint(new ED.Point(topRightX, topRightY));
+	this.handleArray[0].location = this.transform.transformPoint(new ED.Drawing.Point(topLeftX, topLeftY));
+	this.handleArray[3].location = this.transform.transformPoint(new ED.Drawing.Point(topRightX, topRightY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);

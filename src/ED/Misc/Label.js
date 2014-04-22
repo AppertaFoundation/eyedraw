@@ -70,7 +70,7 @@ ED.Label.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.Label.prototype.setHandles = function() {
-	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+	this.handleArray[4] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
 }
 
 /**
@@ -166,7 +166,7 @@ ED.Label.prototype.draw = function(_point) {
 		ctx.fillText(this.labelText, -this.labelWidth / 2 + this.padding, this.labelHeight / 6);
 
 		// Coordinate of start of arrow
-		var arrowStart = new ED.Point(0, 0);
+		var arrowStart = new ED.Drawing.Point(0, 0);
 
 		// Calculation of which quadrant arrowEnd is in
 		var q;
@@ -192,7 +192,7 @@ ED.Label.prototype.draw = function(_point) {
 		}
 
 		// Coordinates of end of arrow
-		var arrowEnd = new ED.Point(this.apexX, this.apexY);
+		var arrowEnd = new ED.Drawing.Point(this.apexX, this.apexY);
 
 		// Draw arrow
 		ctx.beginPath();
@@ -204,7 +204,7 @@ ED.Label.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
