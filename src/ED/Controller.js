@@ -45,16 +45,18 @@ ED.Controller = (function() {
 	 * @param {ED.Views.Toolbar} [toolbar] An ED.Views.Toolbar instance.
 	 * @param {ED.Views.DoodlePopup} [doodlePopup] An ED.Views.DoodlePopup instance.
 	 */
-	function Controller(properties, Checker, drawing, toolbar, doodlePopup) {
+	function Controller(properties, Checker, drawing, toolbar, doodlePopup, selectedDoodle) {
 
 		this.properties = properties;
 		this.canvas = document.getElementById(properties.canvasId);
 		this.input = document.getElementById(properties.inputId);
 		this.container = $(this.canvas).closest('.eyedraw-widget');
+
 		this.Checker = Checker || ED.Checker;
 		this.drawing = drawing || this.createDrawing();
 		this.toolbar = toolbar || this.createToolbar();
 		this.doodlePopup = doodlePopup || this.createDoodlePopup();
+		this.selectedDoodle = selectedDoodle || this.createSelectedDoodle();
 
 		this.registerDrawing();
 		this.registerEvents();
@@ -103,7 +105,14 @@ ED.Controller = (function() {
 	Controller.prototype.createDoodlePopup = function() {
 		return new ED.Views.DoodlePopup(
 			this.drawing,
-			this.container
+			this.container.find('.eyedraw-doodle-popup')
+		);
+	};
+
+	Controller.prototype.createSelectedDoodle = function() {
+		return new ED.Views.SelectedDoodle(
+			this.drawing,
+			this.container.find('.eyedraw-selected-doodle')
 		);
 	};
 
