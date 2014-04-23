@@ -84,7 +84,7 @@ ED.Views.SelectedDoodle = (function() {
 	 */
 	SelectedDoodle.prototype.createOption = function(doodle) {
 		return $('<option />', {
-			text: doodle.className,
+			text: ED.titles[doodle.className] || doodle.className,
 			selected: (doodle === this.drawing.selectedDoodle)
 		}).data('doodle', doodle);
 	};

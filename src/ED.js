@@ -257,6 +257,12 @@ ED.resetInstances = function() {
 	ED.instances = {};
 };
 
+ED.titles = {};
+
+ED.setTitles = function(titles) {
+	this.titles = titles;
+};
+
 /**
  * Array of 200 random numbers
  */
