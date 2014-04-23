@@ -93,10 +93,10 @@ ED.AntSeg.prototype.setPropertyDefaults = function() {
 		display: true
 	};
 	this.parameterValidationArray['colour'] = {
-		kind: 'derived',
+		kind: 'other',
 		type: 'string',
 		list: ['Blue', 'Brown', 'Gray', 'Green'],
-		animate: true
+		animate: false
 	};
 	this.parameterValidationArray['ectropion'] = {
 		kind: 'derived',

@@ -4320,7 +4320,6 @@ ED.Doodle.prototype.parameterElement = function(_parameter) {
  * @param {Boolean} _updateBindings Update the doodle form control bindings?
  */
 ED.Doodle.prototype.setParameterWithAnimation = function(_parameter, _value, _updateBindings) {
-
 	// Can doodle animate this parameter?
 	if (this.parameterValidationArray[_parameter]['animate']) {
 		var valueArray = this.dependentParameterValues(_parameter, _value);
@@ -7885,6 +7884,7 @@ ED.trans['NuclearCataract'] = 'Nuclear cataract<br/><br/>Drag to move<br/>Drag h
 ED.trans['OperatingTable'] = 'Operating table';
 ED.trans['OpticDisc'] = 'Optic disc<br/><br/>Basic mode: Drag handle to adjust cup/disc ratio<br/>Expert mode: Drag handles to re-shape disc';
 ED.trans['OpticDiscPit'] = 'Optic disc pit<br/><br/>Drag to position<br/>Drag handle to change shape';
+ED.trans['Patch'] = 'Patch<br/><br/>Drag to position<br/>Drag handle to change size';
 ED.trans['Papilloedema'] = 'Papilloedema';
 ED.trans['PCIOL'] = 'Posterior chamber IOL<br/><br/>Drag to move<br/>Drag the handle to rotate';
 ED.trans['PeripapillaryAtrophy'] = 'Peripapillary atrophy<br/><br/>Drag to rotate<br/>Drag handles to change extent';
@@ -7918,6 +7918,7 @@ ED.trans['Sclerostomy'] = 'A sclerostomy for vitrectomy<br/><br/>Drag to rotate 
 ED.trans['SidePort'] = 'Side port<br/><br/>Drag to move';
 ED.trans['SubretinalFluid'] = 'Subretinal fluid<br/><br/>Drag to position<br/>Drag handles to change shape<br/>Drag to position<br/>Drag outer ring of top handles to rotate';
 ED.trans['SubretinalPFCL'] = 'Subretinal PFCL<br/><br/>Drag to position<br/>Drag handle to change size';
+ED.trans['Supramid'] = 'Supramid suture<br/><br/>Drag handle to move conjunctival end of suture';
 ED.trans['Surgeon'] = 'Surgeon';
 ED.trans['SwollenDisc'] = 'Swollen disc';
 ED.trans['Telangiectasis'] = 'Parafoveal Telangiectasia<br/><br/>Drag middle handle to add pigment and exudate';
@@ -7927,6 +7928,7 @@ ED.trans['TrabyFlap'] = 'Trabeculectomy flap<br/><br/>Drag to position<br/>Drag 
 ED.trans['TrabySuture'] = 'Trabeculectomy suture<br/><br/>Drag to position<br/>Drag corner handle to adjust orientation</br>Drag lower handle to change suture type';
 ED.trans['TractionRetinalDetachment'] = 'Traction retinal detachment<br/><br/>Drag to position<br/>Drag inner handle to change shape and size<br/>Drag outer handle to rotate';
 ED.trans['TransilluminationDefect'] = 'Transillumination defects of the iris<br/><br/>Drag to rotate around centre<br/>Drag each end handle to alter extent';
+ED.trans['Tube'] = 'Drainage tube<br/><br/>Drag to change quadrant<br/>Drag handle to move end of tube';
 ED.trans['UTear'] = '';
 ED.trans['ViewObscured'] = 'View obscured<br/><br/>Drag handle to change opacity';
 ED.trans['VitreousOpacity'] = 'Vitreous Opacity<br/><br/>Drag to move<br/>Drag the inner handle up and down to alter opacity<br/>Drag the outer handle to scale';
@@ -12254,273 +12256,6 @@ ED.ACIOL.prototype.description = function() {
  */
 
 /**
- * Ahmed tube
- *
- * @class Ahmed
- * @property {String} className Name of doodle subclass
- * @param {Drawing} _drawing
- * @param {Object} _parameterJSON
- */
-ED.Ahmed = function(_drawing, _parameterJSON) {
-	// Set classname
-	this.className = "Ahmed";
-
-	// Derived parameters
-	this.platePosition = 'STQ';
-
-	// Saved parameters
-	this.savedParameterArray = ['rotation', 'apexY'];
-
-	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _parameterJSON);
-}
-
-/**
- * Sets superclass and constructor
- */
-ED.Ahmed.prototype = new ED.Doodle;
-ED.Ahmed.prototype.constructor = ED.Ahmed;
-ED.Ahmed.superclass = ED.Doodle.prototype;
-
-/**
- * Sets handle attributes
- */
-ED.Ahmed.prototype.setHandles = function() {
-	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
-}
-
-/**
- * Sets default dragging attributes
- */
-ED.Ahmed.prototype.setPropertyDefaults = function() {
-	this.isMoveable = false;
-	this.isRotatable = true;
-	this.snapToAngles = true;
-
-	// Update component of validation array for simple parameters
-	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
-	this.parameterValidationArray['apexY']['range'].setMinAndMax(-600, -100);
-
-	// Add complete validation arrays for derived parameters
-	this.parameterValidationArray['platePosition'] = {
-		kind: 'derived',
-		type: 'string',
-		list: ['STQ', 'SNQ', 'INQ', 'ITQ'],
-		animate: true
-	};
-
-	// Array of angles to snap to
-	var phi = Math.PI / 4;
-	this.anglesArray = [phi, 3 * phi, 5 * phi, 7 * phi];
-}
-
-/**
- * Sets default parameters
- */
-ED.Ahmed.prototype.setParameterDefaults = function() {
-	this.apexY = -300;
-	this.setParameterFromString('platePosition', 'STQ');
-}
-
-/**
- * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
- * The returned parameters are animated if the 'animate' property in the parameterValidationArray is set to true
- *
- * @param {String} _parameter Name of parameter that has changed
- * @value {Undefined} _value Value of parameter to calculate
- * @returns {Array} Associative array of values of dependent parameters
- */
-ED.Ahmed.prototype.dependentParameterValues = function(_parameter, _value) {
-	var returnArray = new Array();
-
-	var isRE = (this.drawing.eye == ED.eye.Right);
-	var phi = Math.PI / 4;
-
-	switch (_parameter) {
-		case 'rotation':
-			if (this.rotation > 0 && this.rotation <= 2 * phi) {
-				returnArray['platePosition'] = isRE ? 'SNQ' : 'STQ';
-			} else if (this.rotation > 2 * phi && this.rotation <= 4 * phi) {
-				returnArray['platePosition'] = isRE ? 'INQ' : 'ITQ';
-			} else if (this.rotation > 4 * phi && this.rotation <= 6 * phi) {
-				returnArray['platePosition'] = isRE ? 'ITQ' : 'INQ';
-			} else {
-				returnArray['platePosition'] = isRE ? 'STQ' : 'SNQ';
-			}
-			break;
-
-		case 'platePosition':
-			switch (_value) {
-				case 'STQ':
-					if (isRE) {
-						returnArray['rotation'] = 7 * phi;
-					} else {
-						returnArray['rotation'] = phi;
-					}
-					break;
-				case 'SNQ':
-					if (isRE) {
-						returnArray['rotation'] = phi;
-					} else {
-						returnArray['rotation'] = 7 * phi;
-					}
-					break;
-				case 'INQ':
-					if (isRE) {
-						returnArray['rotation'] = 3 * phi;
-					} else {
-						returnArray['rotation'] = 5 * phi;
-					}
-					break;
-				case 'ITQ':
-					if (isRE) {
-						returnArray['rotation'] = 5 * phi;
-					} else {
-						returnArray['rotation'] = 3 * phi;
-					}
-					break;
-			}
-			break;
-	}
-
-	return returnArray;
-}
-
-/**
- * Draws doodle or performs a hit test if a Point parameter is passed
- *
- * @param {Point} _point Optional point in canvas plane, passed if performing hit test
- */
-ED.Ahmed.prototype.draw = function(_point) {
-	// Get context
-	var ctx = this.drawing.context;
-
-	// Call draw method in superclass
-	ED.Ahmed.superclass.draw.call(this, _point);
-
-	// Boundary path
-	ctx.beginPath();
-
-	// Scaling factor
-	var s = 0.41666667;
-
-	// Vertical shift
-	var d = -740;
-
-	// Plate
-	ctx.moveTo(-300 * s, 0 * s + d);
-	ctx.bezierCurveTo(-300 * s, -100 * s + d, -200 * s, -400 * s + d, 0 * s, -400 * s + d);
-	ctx.bezierCurveTo(200 * s, -400 * s + d, 300 * s, -100 * s + d, 300 * s, 0 * s + d);
-	ctx.bezierCurveTo(300 * s, 140 * s + d, 200 * s, 250 * s + d, 0 * s, 250 * s + d);
-	ctx.bezierCurveTo(-200 * s, 250 * s + d, -300 * s, 140 * s + d, -300 * s, 0 * s + d);
-
-	// Connection flange
-	ctx.moveTo(-160 * s, 230 * s + d);
-	ctx.lineTo(-120 * s, 290 * s + d);
-	ctx.lineTo(120 * s, 290 * s + d);
-	ctx.lineTo(160 * s, 230 * s + d);
-	ctx.bezierCurveTo(120 * s, 250 * s + d, -120 * s, 250 * s + d, -160 * s, 230 * s + d);
-
-	// Set Attributes
-	ctx.lineWidth = 4;
-	ctx.strokeStyle = "rgba(120,120,120,0.75)";
-	ctx.fillStyle = "rgba(220,220,220,0.5)";
-
-	// Draw boundary path (also hit testing)
-	this.drawBoundary(_point);
-
-	// Non boundary paths
-	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
-		// Spots
-		this.drawSpot(ctx, 0 * s, -230 * s + d, 20 * s, "white");
-		this.drawSpot(ctx, -180 * s, -180 * s + d, 20 * s, "white");
-		this.drawSpot(ctx, 180 * s, -180 * s + d, 20 * s, "white");
-
-		// Trapezoid mechanism
-		ctx.beginPath()
-		ctx.moveTo(-100 * s, 230 * s + d);
-		ctx.lineTo(100 * s, 230 * s + d);
-		ctx.lineTo(200 * s, 0 * s + d);
-		ctx.lineTo(40 * s, 0 * s + d);
-		ctx.arcTo(0, -540 * s + d, -40 * s, 0 * s + d, 15);
-		ctx.lineTo(-40 * s, 0 * s + d);
-		ctx.lineTo(-200 * s, 0 * s + d);
-		ctx.closePath();
-
-		ctx.fillStyle = "rgba(250,250,250,0.7)";
-		ctx.fill();
-
-		// Lines
-		ctx.moveTo(-80 * s, -40 * s + d);
-		ctx.lineTo(-160 * s, -280 * s + d);
-		ctx.moveTo(80 * s, -40 * s + d);
-		ctx.lineTo(160 * s, -280 * s + d);
-		ctx.lineWidth = 8;
-		ctx.strokeStyle = "rgba(250,250,250,0.7)";
-		ctx.stroke();
-
-		// Ridge on flange
-		ctx.beginPath()
-		ctx.moveTo(-30 * s, 250 * s + d);
-		ctx.lineTo(-30 * s, 290 * s + d);
-		ctx.moveTo(30 * s, 250 * s + d);
-		ctx.lineTo(30 * s, 290 * s + d);
-
-		// Tube
-		ctx.moveTo(-20 * s, 290 * s + d);
-		ctx.lineTo(-20 * s, this.apexY);
-		ctx.lineTo(20 * s, this.apexY);
-		ctx.lineTo(20 * s, 290 * s + d);
-
-		ctx.strokeStyle = "rgba(150,150,150,0.5)";
-		ctx.stroke();
-	}
-
-	// Coordinates of handles (in canvas plane)
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
-
-	// Draw handles if selected
-	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
-
-	// Return value indicating successful hittest
-	return this.isClicked;
-}
-
-/**
- * Returns a string containing a text description of the doodle
- *
- * @returns {String} Description of doodle
- */
-ED.Ahmed.prototype.description = function() {
-	var descArray = {
-		STQ: 'superotemporal',
-		SNQ: 'superonasal',
-		INQ: 'inferonasal',
-		ITQ: 'inferotemporal'
-	};
-
-	return "Ahmed tube in the " + descArray[this.platePosition] + " quadrant";
-}
-
-/**
- * OpenEyes
- *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
- * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
- *
- * @package OpenEyes
- * @link http://www.openeyes.org.uk
- * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
- */
-
-/**
  * AngleGradeEast
  *
  * @class AngleGradeEast
@@ -13912,10 +13647,10 @@ ED.AntSeg.prototype.setPropertyDefaults = function() {
 		display: true
 	};
 	this.parameterValidationArray['colour'] = {
-		kind: 'derived',
+		kind: 'other',
 		type: 'string',
 		list: ['Blue', 'Brown', 'Gray', 'Green'],
-		animate: true
+		animate: false
 	};
 	this.parameterValidationArray['ectropion'] = {
 		kind: 'derived',
@@ -14932,265 +14667,6 @@ ED.AxialLengthGraph.prototype.draw = function(_point) {
 
 	// Return value indicating successful hit test
 	return this.isClicked;
-}
-
-/**
- * OpenEyes
- *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
- * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
- *
- * @package OpenEyes
- * @link http://www.openeyes.org.uk
- * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
- */
-
-/**
- * Baerveldt tube
- *
- * @class Baerveldt
- * @property {String} className Name of doodle subclass
- * @param {Drawing} _drawing
- * @param {Object} _parameterJSON
- */
-ED.Baerveldt = function(_drawing, _parameterJSON) {
-	// Set classname
-	this.className = "Baerveldt";
-
-	// Derived parameters
-	this.platePosition = 'STQ';
-
-	// Saved parameters
-	this.savedParameterArray = ['rotation', 'apexY'];
-
-	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _parameterJSON);
-}
-
-/**
- * Sets superclass and constructor
- */
-ED.Baerveldt.prototype = new ED.Doodle;
-ED.Baerveldt.prototype.constructor = ED.Baerveldt;
-ED.Baerveldt.superclass = ED.Doodle.prototype;
-
-/**
- * Sets handle attributes
- */
-ED.Baerveldt.prototype.setHandles = function() {
-	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
-}
-
-/**
- * Sets default dragging attributes
- */
-ED.Baerveldt.prototype.setPropertyDefaults = function() {
-	this.isMoveable = false;
-	this.isRotatable = true;
-	this.snapToAngles = true;
-
-	// Update component of validation array for simple parameters
-	this.parameterValidationArray['apexX']['range'].setMinAndMax(-300, +300);
-	this.parameterValidationArray['apexY']['range'].setMinAndMax(-600, -100);
-
-	// Add complete validation arrays for derived parameters
-	this.parameterValidationArray['platePosition'] = {
-		kind: 'derived',
-		type: 'string',
-		list: ['STQ', 'SNQ', 'INQ', 'ITQ'],
-		animate: true
-	};
-
-	// Array of angles to snap to
-	var phi = Math.PI / 4;
-	this.anglesArray = [phi, 3 * phi, 5 * phi, 7 * phi];
-}
-
-/**
- * Sets default parameters
- */
-ED.Baerveldt.prototype.setParameterDefaults = function() {
-	this.apexY = -300;
-	this.setParameterFromString('platePosition', 'STQ');
-}
-
-/**
- * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
- * The returned parameters are animated if the 'animate' property in the parameterValidationArray is set to true
- *
- * @param {String} _parameter Name of parameter that has changed
- * @value {Undefined} _value Value of parameter to calculate
- * @returns {Array} Associative array of values of dependent parameters
- */
-ED.Baerveldt.prototype.dependentParameterValues = function(_parameter, _value) {
-	var returnArray = new Array();
-
-	var isRE = (this.drawing.eye == ED.eye.Right);
-	var phi = Math.PI / 4;
-
-	switch (_parameter) {
-		case 'rotation':
-			if (this.rotation > 0 && this.rotation <= 2 * phi) {
-				returnArray['platePosition'] = isRE ? 'SNQ' : 'STQ';
-			} else if (this.rotation > 2 * phi && this.rotation <= 4 * phi) {
-				returnArray['platePosition'] = isRE ? 'INQ' : 'ITQ';
-			} else if (this.rotation > 4 * phi && this.rotation <= 6 * phi) {
-				returnArray['platePosition'] = isRE ? 'ITQ' : 'INQ';
-			} else {
-				returnArray['platePosition'] = isRE ? 'STQ' : 'SNQ';
-			}
-			break;
-
-		case 'platePosition':
-			switch (_value) {
-				case 'STQ':
-					if (isRE) {
-						returnArray['rotation'] = 7 * phi;
-					} else {
-						returnArray['rotation'] = phi;
-					}
-					break;
-				case 'SNQ':
-					if (isRE) {
-						returnArray['rotation'] = phi;
-					} else {
-						returnArray['rotation'] = 7 * phi;
-					}
-					break;
-				case 'INQ':
-					if (isRE) {
-						returnArray['rotation'] = 3 * phi;
-					} else {
-						returnArray['rotation'] = 5 * phi;
-					}
-					break;
-				case 'ITQ':
-					if (isRE) {
-						returnArray['rotation'] = 5 * phi;
-					} else {
-						returnArray['rotation'] = 3 * phi;
-					}
-					break;
-			}
-			break;
-	}
-
-	return returnArray;
-}
-
-/**
- * Draws doodle or performs a hit test if a Point parameter is passed
- *
- * @param {Point} _point Optional point in canvas plane, passed if performing hit test
- */
-ED.Baerveldt.prototype.draw = function(_point) {
-	// Get context
-	var ctx = this.drawing.context;
-
-	// Call draw method in superclass
-	ED.Baerveldt.superclass.draw.call(this, _point);
-
-	// Boundary path
-	ctx.beginPath();
-
-	// Scaling factor
-	var s = 0.41666667;
-
-	// Vertical shift
-	var d = -740;
-
-	// Plate
-	ctx.moveTo(-400 * s, 0 * s + d);
-	ctx.bezierCurveTo(-400 * s, -100 * s + d, -300 * s, -200 * s + d, -200 * s, -200 * s + d);
-	ctx.bezierCurveTo(-100 * s, -200 * s + d, -58 * s, -136 * s + d, 0 * s, -135 * s + d);
-	ctx.bezierCurveTo(54 * s, -136 * s + d, 100 * s, -200 * s + d, 200 * s, -200 * s + d);
-	ctx.bezierCurveTo(300 * s, -200 * s + d, 400 * s, -100 * s + d, 400 * s, 0 * s + d);
-	ctx.bezierCurveTo(400 * s, 140 * s + d, 200 * s, 250 * s + d, 0 * s, 250 * s + d);
-	ctx.bezierCurveTo(-200 * s, 250 * s + d, -400 * s, 140 * s + d, -400 * s, 0 * s + d);
-
-	// Connection flange
-	ctx.moveTo(-160 * s, 230 * s + d);
-	ctx.lineTo(-120 * s, 290 * s + d);
-	ctx.lineTo(120 * s, 290 * s + d);
-	ctx.lineTo(160 * s, 230 * s + d);
-	ctx.bezierCurveTo(120 * s, 250 * s + d, -120 * s, 250 * s + d, -160 * s, 230 * s + d);
-
-	// Set Attributes
-	ctx.lineWidth = 4;
-	ctx.strokeStyle = "rgba(120,120,120,0.75)";
-	ctx.fillStyle = "rgba(220,220,220,0.5)";
-
-	// Draw boundary path (also hit testing)
-	this.drawBoundary(_point);
-
-	// Non boundary paths
-	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
-		// Spots
-		this.drawSpot(ctx, -240 * s, -40 * s + d, 10, "rgba(150,150,150,0.5)");
-		this.drawSpot(ctx, -120 * s, 40 * s + d, 10, "rgba(150,150,150,0.5)");
-		this.drawSpot(ctx, 120 * s, 40 * s + d, 10, "rgba(150,150,150,0.5)");
-		this.drawSpot(ctx, 240 * s, -40 * s + d, 10, "rgba(150,150,150,0.5)");
-		this.drawSpot(ctx, -100 * s, 260 * s + d, 5, "rgba(150,150,150,0.5)");
-		this.drawSpot(ctx, 100 * s, 260 * s + d, 5, "rgba(150,150,150,0.5)");
-
-		// Ridge on flange
-		ctx.beginPath()
-		ctx.moveTo(-30 * s, 250 * s + d);
-		ctx.lineTo(-30 * s, 290 * s + d);
-		ctx.moveTo(30 * s, 250 * s + d);
-		ctx.lineTo(30 * s, 290 * s + d);
-
-		// Tube
-		ctx.moveTo(-20 * s, 290 * s + d);
-// 		ctx.lineTo(-20 * s, this.apexY);
-// 		ctx.lineTo(20 * s, this.apexY);
-// 		ctx.lineTo(20 * s, 290 * s + d);
-
-		var cp1 = new ED.Point(0, (290 * s + d) + (this.apexY - (290 * s + d)) * 1);
-		var cp2 = new ED.Point(this.apexX * 0.3, this.apexY);
-		var yd = this.apexX > 0?1:-1;
-		
-		ctx.bezierCurveTo(cp1.x - 20 * s, cp1.y, cp2.x - 20 * s, cp2.y, this.apexX - 20 * s, this.apexY + 20 * s * yd);
-		ctx.lineTo(this.apexX + 20 * s, this.apexY - 20 * s * yd);
-		ctx.bezierCurveTo(cp2.x + 20 * s, cp2.y, cp1.x + 20 * s, cp1.y, 20 * s, 290 * s + d);
-		
-		//ctx.lineTo(cp1.x, cp1.y);
-
-		ctx.strokeStyle = "rgba(150,150,150,0.5)";
-		ctx.stroke();
-	}
-
-	// Coordinates of handles (in canvas plane)
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
-
-	// Draw handles if selected
-	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
-
-	// Return value indicating successful hittest
-	return this.isClicked;
-}
-
-/**
- * Returns a string containing a text description of the doodle
- *
- * @returns {String} Description of doodle
- */
-ED.Baerveldt.prototype.description = function() {
-	var descArray = {
-		STQ: 'superotemporal',
-		SNQ: 'superonasal',
-		INQ: 'inferonasal',
-		ITQ: 'inferotemporal'
-	};
-
-	return "Baerveldt tube in the " + descArray[this.platePosition] + " quadrant";
 }
 
 /**
@@ -18489,7 +17965,7 @@ ED.CornealGraft.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'string',
 		list: ['Interrupted', 'Continuous', 'None'],
-		animate: true
+		animate: false
 	};
 	this.parameterValidationArray['opaque'] = {
 		kind: 'derived',
@@ -27607,238 +27083,6 @@ ED.Microaneurysm.prototype.groupDescription = function() {
  */
 
 /**
- * Molteno tube
- *
- * @class Molteno
- * @property {String} className Name of doodle subclass
- * @param {Drawing} _drawing
- * @param {Object} _parameterJSON
- */
-ED.Molteno = function(_drawing, _parameterJSON) {
-	// Set classname
-	this.className = "Molteno";
-
-	// Derived parameters
-	this.platePosition = 'STQ';
-
-	// Saved parameters
-	this.savedParameterArray = ['rotation', 'apexY'];
-
-	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _parameterJSON);
-}
-
-/**
- * Sets superclass and constructor
- */
-ED.Molteno.prototype = new ED.Doodle;
-ED.Molteno.prototype.constructor = ED.Molteno;
-ED.Molteno.superclass = ED.Doodle.prototype;
-
-/**
- * Sets handle attributes
- */
-ED.Molteno.prototype.setHandles = function() {
-	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
-}
-
-/**
- * Sets default dragging attributes
- */
-ED.Molteno.prototype.setPropertyDefaults = function() {
-	this.isMoveable = false;
-	this.isRotatable = true;
-	this.snapToAngles = true;
-
-	// Update component of validation array for simple parameters
-	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
-	this.parameterValidationArray['apexY']['range'].setMinAndMax(-600, -100);
-
-	// Add complete validation arrays for derived parameters
-	this.parameterValidationArray['platePosition'] = {
-		kind: 'derived',
-		type: 'string',
-		list: ['STQ', 'SNQ', 'INQ', 'ITQ'],
-		animate: true
-	};
-
-	// Array of angles to snap to
-	var phi = Math.PI / 4;
-	this.anglesArray = [phi, 3 * phi, 5 * phi, 7 * phi];
-}
-
-/**
- * Sets default parameters
- */
-ED.Molteno.prototype.setParameterDefaults = function() {
-	this.apexY = -300;
-	this.setParameterFromString('platePosition', 'STQ');
-}
-
-/**
- * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
- * The returned parameters are animated if the 'animate' property in the parameterValidationArray is set to true
- *
- * @param {String} _parameter Name of parameter that has changed
- * @value {Undefined} _value Value of parameter to calculate
- * @returns {Array} Associative array of values of dependent parameters
- */
-ED.Molteno.prototype.dependentParameterValues = function(_parameter, _value) {
-	var returnArray = new Array();
-
-	var isRE = (this.drawing.eye == ED.eye.Right);
-	var phi = Math.PI / 4;
-
-	switch (_parameter) {
-		case 'rotation':
-			if (this.rotation > 0 && this.rotation <= 2 * phi) {
-				returnArray['platePosition'] = isRE ? 'SNQ' : 'STQ';
-			} else if (this.rotation > 2 * phi && this.rotation <= 4 * phi) {
-				returnArray['platePosition'] = isRE ? 'INQ' : 'ITQ';
-			} else if (this.rotation > 4 * phi && this.rotation <= 6 * phi) {
-				returnArray['platePosition'] = isRE ? 'ITQ' : 'INQ';
-			} else {
-				returnArray['platePosition'] = isRE ? 'STQ' : 'SNQ';
-			}
-			break;
-
-		case 'platePosition':
-			switch (_value) {
-				case 'STQ':
-					if (isRE) {
-						returnArray['rotation'] = 7 * phi;
-					} else {
-						returnArray['rotation'] = phi;
-					}
-					break;
-				case 'SNQ':
-					if (isRE) {
-						returnArray['rotation'] = phi;
-					} else {
-						returnArray['rotation'] = 7 * phi;
-					}
-					break;
-				case 'INQ':
-					if (isRE) {
-						returnArray['rotation'] = 3 * phi;
-					} else {
-						returnArray['rotation'] = 5 * phi;
-					}
-					break;
-				case 'ITQ':
-					if (isRE) {
-						returnArray['rotation'] = 5 * phi;
-					} else {
-						returnArray['rotation'] = 3 * phi;
-					}
-					break;
-			}
-			break;
-	}
-
-	return returnArray;
-}
-
-/**
- * Draws doodle or performs a hit test if a Point parameter is passed
- *
- * @param {Point} _point Optional point in canvas plane, passed if performing hit test
- */
-ED.Molteno.prototype.draw = function(_point) {
-	// Get context
-	var ctx = this.drawing.context;
-
-	// Call draw method in superclass
-	ED.Molteno.superclass.draw.call(this, _point);
-
-	// Boundary path
-	ctx.beginPath();
-
-	// Scaling factor
-	var s = 0.41666667;
-
-	// Vertical shift
-	var d = -740;
-
-	// Plate
-	ctx.arc(0, d, 310 * s, 0, Math.PI * 2, true);
-
-	// Set Attributes
-	ctx.lineWidth = 4;
-	ctx.strokeStyle = "rgba(120,120,120,0.75)";
-	ctx.fillStyle = "rgba(220,220,220,0.5)";
-
-	// Draw boundary path (also hit testing)
-	this.drawBoundary(_point);
-
-	// Non boundary paths
-	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
-		// Inner ring
-		ctx.beginPath();
-		ctx.arc(0, d, 250 * s, 0, Math.PI * 2, true);
-		ctx.stroke();
-
-		// Suture holes
-		this.drawSpot(ctx, -200 * s, 200 * s + d, 5, "rgba(255,255,255,1)");
-		this.drawSpot(ctx, -200 * s, -200 * s + d, 5, "rgba(255,255,255,1)");
-		this.drawSpot(ctx, 200 * s, -200 * s + d, 5, "rgba(255,255,255,1)");
-		this.drawSpot(ctx, 200 * s, 200 * s + d, 5, "rgba(255,255,255,1)");
-
-		// Tube
-		ctx.moveTo(-20 * s, 290 * s + d);
-		ctx.lineTo(-20 * s, this.apexY);
-		ctx.lineTo(20 * s, this.apexY);
-		ctx.lineTo(20 * s, 290 * s + d);
-
-		ctx.strokeStyle = "rgba(150,150,150,0.5)";
-		ctx.stroke();
-	}
-
-	// Coordinates of handles (in canvas plane)
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
-
-	// Draw handles if selected
-	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
-
-	// Return value indicating successful hittest
-	return this.isClicked;
-}
-
-/**
- * Returns a string containing a text description of the doodle
- *
- * @returns {String} Description of doodle
- */
-ED.Molteno.prototype.description = function() {
-	var descArray = {
-		STQ: 'superotemporal',
-		SNQ: 'superonasal',
-		INQ: 'inferonasal',
-		ITQ: 'inferotemporal'
-	};
-
-	return "Molteno tube in the " + descArray[this.platePosition] + " quadrant";
-}
-
-/**
- * OpenEyes
- *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
- * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
- *
- * @package OpenEyes
- * @link http://www.openeyes.org.uk
- * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
- */
-
-/**
  * Multifocal Choroiditis
  *
  * @class MultifocalChoroiditis
@@ -29767,11 +29011,14 @@ ED.Patch = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "Patch";
 
-	// Derived parameters
+	// Other parameters
 	this.material = 'Sclera';
 
 	// Saved parameters
 	this.savedParameterArray = ['originX', 'originY', 'width', 'height', 'apexX'];
+
+	// Parameters in doodle control bar (parameter name: parameter label)
+	this.controlParameterArray = {'material':'Material'};
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -29789,7 +29036,6 @@ ED.Patch.superclass = ED.Doodle.prototype;
  */
 ED.Patch.prototype.setHandles = function() {
 	this.handleArray[3] = new ED.Handle(null, true, ED.Mode.Size, false);
-	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
 }
 
 /**
@@ -29798,16 +29044,12 @@ ED.Patch.prototype.setHandles = function() {
 ED.Patch.prototype.setPropertyDefaults = function() {
 	this.isOrientated = true;
 
-	// Update component of validation array for simple parameters
-	this.parameterValidationArray['apexX']['range'].setMinAndMax(-50, +50);
-	this.parameterValidationArray['apexY']['range'].setMinAndMax(-0, +0);
-
 	// Add complete validation arrays for derived parameters
 	this.parameterValidationArray['material'] = {
-		kind: 'derived',
+		kind: 'other',
 		type: 'string',
 		list: ['Sclera', 'Tenons', 'Tutoplast'],
-		animate: true
+		animate: false
 	};
 }
 
@@ -29815,51 +29057,37 @@ ED.Patch.prototype.setPropertyDefaults = function() {
  * Sets default parameters
  */
 ED.Patch.prototype.setParameterDefaults = function() {
-	this.width = 120;
+	this.width = 200;
 	this.height = 200;
-	this.originY = -260;
 
 	this.setParameterFromString('material', 'Sclera');
-
-	// Patches are usually temporal
-// 	if(this.drawing.eye == ED.eye.Right)
-// 	{
-// 	   this.originX = -260;
-// 	   this.rotation = -Math.PI/4;
-// 	}
-// 	else
-// 	{
-// 	   this.originX = 260;
-// 	   this.rotation = Math.PI/4;
-// 	}
-}
-
-/**
- * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
- * The returned parameters are animated if their 'animate' property is set to true
- *
- * @param {String} _parameter Name of parameter that has changed
- * @value {Undefined} _value Value of parameter to calculate
- * @returns {Array} Associative array of values of dependent parameters
- */
-ED.Patch.prototype.dependentParameterValues = function(_parameter, _value) {
-	var returnArray = new Array();
-
-	switch (_parameter) {
-		case 'apexX':
-			if (_value < -16) returnArray['material'] = 'Sclera';
-			else if (_value < 16) returnArray['material'] = 'Tenons';
-			else returnArray['material'] = 'Tutoplast';
-			break;
-
-		case 'material':
-			if (_value == 'Sclera') returnArray['apexX'] = -50;
-			else if (_value == 'Tenons') returnArray['apexX'] = 50;
-			else returnArray['apexX'] = 0;
-			break;
+	
+	// Position over tube if present
+	var doodle = this.drawing.lastDoodleOfClass("Tube");
+	if (doodle) {
+		switch (doodle.platePosition) {
+			case 'STQ':
+				this.originX = -250;
+				this.originY = -250;
+				this.rotation = 7 * Math.PI/4;
+				break;
+			case 'SNQ':
+				this.originX = +250;
+				this.originY = -250;
+				this.rotation = 1 * Math.PI/4;
+				break;
+			case 'INQ':
+				this.originX = +250;
+				this.originY = +250;
+				this.rotation = 3 * Math.PI/4;
+				break;
+			case 'ITQ':
+				this.originX = -250;
+				this.originY = +250;
+				this.rotation = 5 * Math.PI/4;
+				break;	
+		}
 	}
-
-	return returnArray;
 }
 
 /**
@@ -29876,10 +29104,7 @@ ED.Patch.prototype.draw = function(_point) {
 
 	// Boundary path
 	ctx.beginPath();
-
 	ctx.rect(-this.width / 2, -this.height / 2, this.width, this.height);
-
-	// Close path
 	ctx.closePath();
 
 	// Colour of fill
@@ -29901,7 +29126,6 @@ ED.Patch.prototype.draw = function(_point) {
 
 	// Non boundary paths
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
-
 		var xd = this.width/2;
 		var yd = this.height/2 - 10;
 
@@ -29910,21 +29134,10 @@ ED.Patch.prototype.draw = function(_point) {
 		this.drawSpot(ctx, -xd, yd, 5, "blue");
 		this.drawSpot(ctx, xd, -yd, 5, "blue");
 		this.drawSpot(ctx, xd, yd, 5, "blue");
-
-		// Suture thread ends
-// 		this.drawLine(ctx, -60, -60, -50, -50, 2, "blue");
-// 		this.drawLine(ctx, -50, -50, -60, -40, 2, "blue");
-// 		this.drawLine(ctx, -60, 60, -50, 50, 2, "blue");
-// 		this.drawLine(ctx, -50, 50, -60, 40, 2, "blue");
-// 		this.drawLine(ctx, 60, -60, 50, -50, 2, "blue");
-// 		this.drawLine(ctx, 50, -50, 60, -40, 2, "blue");
-// 		this.drawLine(ctx, 60, 60, 50, 50, 2, "blue");
-// 		this.drawLine(ctx, 50, 50, 60, 40, 2, "blue");
 	}
 
 	// Coordinates of handles (in canvas plane)
 	this.handleArray[3].location = this.transform.transformPoint(new ED.Point(this.width / 2, -this.height / 2));
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -29934,26 +29147,12 @@ ED.Patch.prototype.draw = function(_point) {
 }
 
 /**
- * Draws extra items if the doodle is highlighted
- */
-ED.Patch.prototype.drawHighlightExtras = function() {
-	// Get context
-	var ctx = this.drawing.context;
-
-	// Draw text description of material
-	ctx.lineWidth = 1;
-	ctx.fillStyle = "gray";
-	ctx.font = "48px sans-serif";
-	ctx.fillText(this.material, 80, 20);
-}
-
-/**
  * Returns a string containing a text description of the doodle
  *
  * @returns {String} Description of doodle
  */
 ED.Patch.prototype.description = function() {
-	return "Scleral patch";
+	return this.material + " patch";
 }
 
 /**
@@ -34702,120 +33901,6 @@ ED.ScleralIncision.prototype.groupDescriptionEnd = function() {
 }
 
 /**
- * Scleral Patch
- *
- * @class ScleralPatch
- * @property {String} className Name of doodle subclass
- * @param {Drawing} _drawing
- * @param {Object} _parameterJSON
- */
-ED.ScleralPatch = function(_drawing, _parameterJSON) {
-	// Set classname
-	this.className = "Patch";
-
-	// Call superclass constructor
-	ED.Doodle.call(this, _drawing, _parameterJSON);
-}
-
-/**
- * Sets superclass and constructor
- */
-ED.ScleralPatch.prototype = new ED.Doodle;
-ED.ScleralPatch.prototype.constructor = ED.ScleralPatch;
-ED.ScleralPatch.superclass = ED.Doodle.prototype;
-
-/**
- * Sets handle attributes
- */
-ED.ScleralPatch.prototype.setHandles = function() {
-	this.handleArray[3] = new ED.Handle(null, true, ED.Mode.Scale, true);
-}
-
-/**
- * Sets default dragging attributes
- */
-ED.ScleralPatch.prototype.setPropertyDefaults = function() {
-	//this.isOrientated = true;
-	this.isSqueezable = true;
-    
-    // Update component of validation array for simple parameters
-    this.parameterValidationArray['apexX']['range'].setMinAndMax(-20, +200);
-    this.parameterValidationArray['apexY']['range'].setMinAndMax(-200, -20);
-}
-
-/**
- * Sets default parameters
- */
-ED.ScleralPatch.prototype.setParameterDefaults = function() {
-    this.apexX = 50;
-    this.apexY = -70;
-    this.originY = -260;
-    
-    
-    // Patchs are usually temporal
-//    if(this.drawing.eye == ED.eye.Right)
-//    {
-//        this.originX = -260;
-//        this.rotation = -Math.PI/4;
-//    }
-//    else
-//    {
-//        this.originX = 260;
-//        this.rotation = Math.PI/4;
-//    }
-}
-
-/**
- * Draws doodle or performs a hit test if a Point parameter is passed
- *
- * @param {Point} _point Optional point in canvas plane, passed if performing hit test
- */
-ED.ScleralPatch.prototype.draw = function(_point) {
-	// Get context
-	var ctx = this.drawing.context;
-	
-	// Call draw method in superclass
-	ED.ScleralPatch.superclass.draw.call(this, _point);
-    
-    // Boundary path
-	ctx.beginPath();
-    
-    ctx.rect(-50, -50, 100, 100);
-    
-	// Close path
-	ctx.closePath();
-    
-    // Colour of fill
-    ctx.fillStyle = "rgba(200,200,50,0.5)";
-    ctx.strokeStyle = "rgba(120,120,120,0.5)";
-    
-	// Draw boundary path (also hit testing)
-	this.drawBoundary(_point);
-	
-	// Other stuff here
-	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
-
-	}
-    
-    // Coordinates of handles (in canvas plane)
-    this.handleArray[3].location = this.transform.transformPoint(new ED.Point(50, -50));
-    
-	// Draw handles if selected
-	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
-	
-	// Return value indicating successful hittest
-	return this.isClicked;
-}
-
-/**
- * Returns a string containing a text description of the doodle
- *
- * @returns {String} Description of doodle
- */
-ED.ScleralPatch.prototype.description = function() {
-    return "Scleral patch";
-}
-/**
  * OpenEyes
  *
  * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
@@ -36539,7 +35624,7 @@ ED.Supramid = function(_drawing, _parameterJSON) {
 	this.className = "Supramid";
 	
 	// Saved parameters
-	this.savedParameterArray = ['apexY', 'originX', 'originY'];
+	this.savedParameterArray = ['apexY', 'rotation'];
 	
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -36563,31 +35648,25 @@ ED.Supramid.prototype.setHandles = function() {
  * Sets default dragging attributes
  */
 ED.Supramid.prototype.setPropertyDefaults = function() {
-	this.isOrientated = true;
+	this.isMoveable = false;
 	this.isRotatable = false;
-	this.snapToQuadrant = true;
-	this.quadrantPoint = new ED.Point(10, 10);
 
 	// Update component of validation array for simple parameters
-	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
-	this.parameterValidationArray['apexY']['range'].setMinAndMax(-420, -200);
+	this.parameterValidationArray['apexX']['range'].setMinAndMax(-800, +800);
+	this.parameterValidationArray['apexY']['range'].setMinAndMax(-800, +800);
 }
 
 /**
  * Sets default parameters
  */
 ED.Supramid.prototype.setParameterDefaults = function() {
-	this.apexX = 0;
-	this.apexY = -350;
-	this.originY = -10;
+	this.apexX = -660;
+	this.apexY = 30;
 
-	// Tubes are usually STQ
-	if (this.drawing.eye == ED.eye.Right) {
-		this.originX = -10;
-		this.rotation = -Math.PI / 4;
-	} else {
-		this.originX = 10;
-		this.rotation = Math.PI / 4;
+	// Make rotation same as tube
+	var doodle = this.drawing.lastDoodleOfClass("Tube");
+	if (doodle) {
+		this.rotation = doodle.rotation;
 	}
 }
 
@@ -36602,28 +35681,22 @@ ED.Supramid.prototype.draw = function(_point) {
 
 	// Call draw method in superclass
 	ED.Supramid.superclass.draw.call(this, _point);
+	
+	// Get tube doodle
+	var doodle = this.drawing.lastDoodleOfClass("Tube");
+	if (doodle) {
+		this.rotation = doodle.rotation;
+	}
 
 	// Calculate key points for supramid bezier
-	var startPoint = new ED.Point(0, this.apexY);
-	var tubePoint = new ED.Point(0, -450);
-	var controlPoint1 = new ED.Point(0, -600);
-
-	// Calculate mid point x coordinate
-	var midPointX = -450;
-	var controlPoint2 = new ED.Point(midPointX, -300);
-	var midPoint = new ED.Point(midPointX, 0);
-	var controlPoint3 = new ED.Point(midPointX, 300);
-	var controlPoint4 = new ED.Point(midPointX * 0.5, 450);
-	var endPoint = new ED.Point(midPointX * 0.2, 450);
+	var startPoint = new ED.Point(this.apexX, this.apexY);
+	var tubePoint = new ED.Point(0, -700);
 
 	// Boundary path
 	ctx.beginPath();
 
-	// Rectangle around suture
-	ctx.moveTo(this.apexX, tubePoint.y);
-	ctx.lineTo(midPointX, tubePoint.y);
-	ctx.lineTo(midPointX, endPoint.y);
-	ctx.lineTo(this.apexX, endPoint.y);
+	// Rectangle around end of suture
+	ctx.rect(this.apexX - 100, this.apexY - 100, 200, 200);
 
 	// Close path
 	ctx.closePath();
@@ -36631,27 +35704,30 @@ ED.Supramid.prototype.draw = function(_point) {
 	// Set line attributes
 	ctx.lineWidth = 1;
 	ctx.fillStyle = "rgba(0, 0, 0, 0)";
-	ctx.strokeStyle = "rgba(0, 0, 0, 0)";
+	if (this.isSelected) ctx.strokeStyle = "rgba(0, 0, 0, 0.8)";
+	else ctx.strokeStyle = "rgba(0, 0, 0, 0)";
 
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 
 	// Non boundary paths
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
-		// Suture
-		ctx.beginPath()
-		ctx.moveTo(startPoint.x, startPoint.y);
-		ctx.lineTo(tubePoint.x, tubePoint.y);
-		ctx.bezierCurveTo(controlPoint1.x, controlPoint1.y, controlPoint2.x, controlPoint2.y, midPoint.x, midPoint.y);
-		ctx.bezierCurveTo(controlPoint3.x, controlPoint3.y, controlPoint4.x, controlPoint4.y, endPoint.x, endPoint.y);
+		if (doodle) {
+			// Suture
+			var xDev = startPoint.x/Math.abs(startPoint.x) * 100;
+			ctx.beginPath()
+			ctx.moveTo(startPoint.x, startPoint.y);
+			ctx.bezierCurveTo(startPoint.x + xDev, startPoint.y - 100, tubePoint.x + xDev, tubePoint.y, doodle.bezierArray['sp'].x, doodle.bezierArray['sp'].y);
+			ctx.bezierCurveTo(doodle.bezierArray['cp1'].x, doodle.bezierArray['cp1'].y, doodle.bezierArray['cp2'].x, doodle.bezierArray['cp2'].y, doodle.bezierArray['ep'].x, doodle.bezierArray['ep'].y);
 
-		ctx.lineWidth = 4;
-		ctx.strokeStyle = "purple";
-		ctx.stroke();
+			ctx.lineWidth = 4;
+			ctx.strokeStyle = "purple";
+			ctx.stroke();
+		}
 	}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(0, this.apexY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -36693,11 +35769,7 @@ ED.Supramid.prototype.draw = function(_point) {
  * @returns {String} Description of doodle
  */
 ED.Supramid.prototype.description = function() {
-	var returnString = "Supramid suture ";
-
-	returnString += this.getParameter('endPosition');
-
-	return returnString;
+	return "Supramid suture";
 }
 
 /**
@@ -38613,6 +37685,473 @@ ED.TrialLens.prototype.draw = function(_point) {
 
 	// Return value indicating successful hit test
 	return this.isClicked;
+}
+
+/**
+ * OpenEyes
+ *
+ * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
+ * (C) OpenEyes Foundation, 2011-2013
+ * This file is part of OpenEyes.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package OpenEyes
+ * @link http://www.openeyes.org.uk
+ * @author OpenEyes <info@openeyes.org.uk>
+ * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
+ * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ */
+
+/**
+ * Tube tube
+ *
+ * @class Tube
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Object} _parameterJSON
+ */
+ED.Tube = function(_drawing, _parameterJSON) {
+	// Set classname
+	this.className = "Tube";
+
+	// Derived parameters
+	this.type = 'Baerveldt 250';
+	this.platePosition = 'STQ';
+	
+	// Other Parameters
+	this.bezierArray = new Array();
+
+	// Saved parameters
+	this.savedParameterArray = ['rotation', 'apexY', 'type'];
+	
+	// Parameters in doodle control bar (parameter name: parameter label)
+	this.controlParameterArray = {'type':'Type'};
+
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _parameterJSON);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.Tube.prototype = new ED.Doodle;
+ED.Tube.prototype.constructor = ED.Tube;
+ED.Tube.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.Tube.prototype.setHandles = function() {
+	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+}
+
+/**
+ * Sets default dragging attributes
+ */
+ED.Tube.prototype.setPropertyDefaults = function() {
+	this.isMoveable = false;
+	this.isRotatable = true;
+	this.snapToAngles = true;
+
+	// Update component of validation array for simple parameters
+	this.parameterValidationArray['apexX']['range'].setMinAndMax(-300, +300);
+	this.parameterValidationArray['apexY']['range'].setMinAndMax(-600, -100);
+
+	// Add complete validation arrays for derived parameters
+	this.parameterValidationArray['type'] = {
+		kind: 'other',
+		type: 'string',
+		list: ['Ahmed FP7', 'Ahmed S2', 'Ahmed S3', 'Baerveldt 250', 'Baerveldt 350', 'Molteno Single', 'Molteno 8mm'],
+		animate: false
+	};
+	this.parameterValidationArray['platePosition'] = {
+		kind: 'derived',
+		type: 'string',
+		list: ['STQ', 'SNQ', 'INQ', 'ITQ'],
+		animate: true
+	};
+
+	// Array of angles to snap to
+	var phi = Math.PI / 4;
+	this.anglesArray = [phi, 3 * phi, 5 * phi, 7 * phi];
+}
+
+/**
+ * Sets default parameters
+ */
+ED.Tube.prototype.setParameterDefaults = function() {
+	this.apexY = -300;
+	//this.setParameterFromString('type', 'Baerveldt');
+	this.setParameterFromString('platePosition', 'STQ');
+}
+
+/**
+ * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
+ * The returned parameters are animated if the 'animate' property in the parameterValidationArray is set to true
+ *
+ * @param {String} _parameter Name of parameter that has changed
+ * @value {Undefined} _value Value of parameter to calculate
+ * @returns {Array} Associative array of values of dependent parameters
+ */
+ED.Tube.prototype.dependentParameterValues = function(_parameter, _value) {
+	var returnArray = new Array();
+
+	var isRE = (this.drawing.eye == ED.eye.Right);
+	var phi = Math.PI / 4;
+
+	switch (_parameter) {
+		case 'rotation':
+			if (this.rotation > 0 && this.rotation <= 2 * phi) {
+				returnArray['platePosition'] = isRE ? 'SNQ' : 'STQ';
+			} else if (this.rotation > 2 * phi && this.rotation <= 4 * phi) {
+				returnArray['platePosition'] = isRE ? 'INQ' : 'ITQ';
+			} else if (this.rotation > 4 * phi && this.rotation <= 6 * phi) {
+				returnArray['platePosition'] = isRE ? 'ITQ' : 'INQ';
+			} else {
+				returnArray['platePosition'] = isRE ? 'STQ' : 'SNQ';
+			}
+			break;
+
+		case 'platePosition':
+			switch (_value) {
+				case 'STQ':
+					if (isRE) {
+						returnArray['rotation'] = 7 * phi;
+					} else {
+						returnArray['rotation'] = phi;
+					}
+					break;
+				case 'SNQ':
+					if (isRE) {
+						returnArray['rotation'] = phi;
+					} else {
+						returnArray['rotation'] = 7 * phi;
+					}
+					break;
+				case 'INQ':
+					if (isRE) {
+						returnArray['rotation'] = 3 * phi;
+					} else {
+						returnArray['rotation'] = 5 * phi;
+					}
+					break;
+				case 'ITQ':
+					if (isRE) {
+						returnArray['rotation'] = 5 * phi;
+					} else {
+						returnArray['rotation'] = 3 * phi;
+					}
+					break;
+			}
+			break;
+	}
+
+	return returnArray;
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.Tube.prototype.draw = function(_point) {
+	// Get context
+	var ctx = this.drawing.context;
+
+	// Call draw method in superclass
+	ED.Tube.superclass.draw.call(this, _point);
+
+	// Boundary path
+	ctx.beginPath();
+
+	// Scaling factor
+	var s = 0.41666667;
+
+	// Vertical shift
+	var d = -740;
+	
+	switch (this.type) {
+		case 'Ahmed FP7':
+			// Plate
+			ctx.moveTo(-300 * s, 0 * s + d);
+			ctx.bezierCurveTo(-300 * s, -100 * s + d, -200 * s, -400 * s + d, 0 * s, -400 * s + d);
+			ctx.bezierCurveTo(200 * s, -400 * s + d, 300 * s, -100 * s + d, 300 * s, 0 * s + d);
+			ctx.bezierCurveTo(300 * s, 140 * s + d, 200 * s, 250 * s + d, 0 * s, 250 * s + d);
+			ctx.bezierCurveTo(-200 * s, 250 * s + d, -300 * s, 140 * s + d, -300 * s, 0 * s + d);
+
+			// Connection flange
+			ctx.moveTo(-160 * s, 230 * s + d);
+			ctx.lineTo(-120 * s, 290 * s + d);
+			ctx.lineTo(120 * s, 290 * s + d);
+			ctx.lineTo(160 * s, 230 * s + d);
+			ctx.bezierCurveTo(120 * s, 250 * s + d, -120 * s, 250 * s + d, -160 * s, 230 * s + d);
+			break;
+
+		case 'Ahmed S2':
+			// Plate
+			ctx.moveTo(-300 * s, 0 * s + d);
+			ctx.bezierCurveTo(-300 * s, -100 * s + d, -200 * s, -400 * s + d, 0 * s, -400 * s + d);
+			ctx.bezierCurveTo(200 * s, -400 * s + d, 300 * s, -100 * s + d, 300 * s, 0 * s + d);
+			ctx.bezierCurveTo(300 * s, 140 * s + d, 200 * s, 250 * s + d, 0 * s, 250 * s + d);
+			ctx.bezierCurveTo(-200 * s, 250 * s + d, -300 * s, 140 * s + d, -300 * s, 0 * s + d);
+
+			// Connection flange
+			ctx.moveTo(-160 * s, 230 * s + d);
+			ctx.lineTo(-120 * s, 290 * s + d);
+			ctx.lineTo(120 * s, 290 * s + d);
+			ctx.lineTo(160 * s, 230 * s + d);
+			ctx.bezierCurveTo(120 * s, 250 * s + d, -120 * s, 250 * s + d, -160 * s, 230 * s + d);
+			break;
+			
+		case 'Ahmed S3':
+			// Plate
+			ctx.moveTo(-100 * s, 230 * s + d);
+			ctx.lineTo(100 * s, 230 * s + d);
+			ctx.lineTo(200 * s, 0 * s + d);
+			ctx.lineTo(100 * s, -230 * s + d);
+			ctx.lineTo(-100 * s, -230 * s + d);
+			ctx.lineTo(-200 * s, 0 * s + d);
+			ctx.lineTo(-100 * s, 230 * s + d);
+				
+			// Connection flange
+			ctx.moveTo(-100 * s, 230 * s + d);
+			ctx.lineTo(-100 * s, 290 * s + d);
+			ctx.lineTo(100 * s, 290 * s + d);
+			ctx.lineTo(100 * s, 230 * s + d);
+			ctx.bezierCurveTo(100 * s, 250 * s + d, -100 * s, 250 * s + d, -100 * s, 230 * s + d);
+			break;
+
+		case 'Baerveldt 250':
+			// Plate
+			ctx.moveTo(0, 230 * s + d);
+			ctx.lineTo(-100 * s, 230 * s + d);
+			ctx.bezierCurveTo(-500 * s, 180 * s + d, -300 * s, -240 * s + d, 0, -200 * s + d);
+			ctx.bezierCurveTo(300 * s, -240 * s + d, 500 * s, 180 * s + d, 100 * s, 230 * s + d);
+			ctx.lineTo(0, 230 * s + d);
+
+			// Connection flange
+			ctx.moveTo(-160 * s, 230 * s + d);
+			ctx.lineTo(-120 * s, 290 * s + d);
+			ctx.lineTo(120 * s, 290 * s + d);
+			ctx.lineTo(160 * s, 230 * s + d);
+			ctx.bezierCurveTo(120 * s, 250 * s + d, -120 * s, 250 * s + d, -160 * s, 230 * s + d);
+			break;
+			
+		case 'Baerveldt 350':
+			// Plate
+			ctx.moveTo(0, 230 * s + d);
+			ctx.lineTo(-100 * s, 230 * s + d);
+			ctx.bezierCurveTo(-150 * s, 230 * s + d, -600 * s, 0 * s + d, -300 * s, -200 * s + d);
+			ctx.bezierCurveTo(-200 * s, -240 * s + d, 200 * s, -240 * s + d, 300 * s, -200 * s + d);
+			ctx.bezierCurveTo(600 * s, 0 * s + d, 150 * s, 230 * s + d, 100 * s, 230 * s + d);
+			ctx.lineTo(0, 230 * s + d);
+
+			// Connection flange
+			ctx.moveTo(-160 * s, 230 * s + d);
+			ctx.lineTo(-120 * s, 290 * s + d);
+			ctx.lineTo(120 * s, 290 * s + d);
+			ctx.lineTo(160 * s, 230 * s + d);
+			ctx.bezierCurveTo(120 * s, 250 * s + d, -120 * s, 250 * s + d, -160 * s, 230 * s + d);
+			break;
+			
+		case 'Molteno Single':
+			// Plate
+			ctx.arc(0, d, 310 * s, 0, Math.PI * 2, true);
+			break;
+			
+		case 'Molteno 8mm':
+			// Plate
+			ctx.arc(0, d + 30, 250 * s, 0, Math.PI * 2, true);
+			break;
+	}
+
+	// Set Attributes
+	ctx.lineWidth = 4;
+	ctx.strokeStyle = "rgba(120,120,120,0.75)";
+	ctx.fillStyle = "rgba(220,220,220,0.5)";
+
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+
+	// Non boundary paths
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+		// Extras
+		switch (this.type) {
+			case 'Ahmed FP7':
+				// Spots
+				this.drawSpot(ctx, 0 * s, -230 * s + d, 20 * s, "white");
+				this.drawSpot(ctx, -180 * s, -180 * s + d, 20 * s, "white");
+				this.drawSpot(ctx, 180 * s, -180 * s + d, 20 * s, "white");
+
+				// Trapezoid mechanism
+				ctx.beginPath()
+				ctx.moveTo(-100 * s, 230 * s + d);
+				ctx.lineTo(100 * s, 230 * s + d);
+				ctx.lineTo(200 * s, 0 * s + d);
+				ctx.lineTo(40 * s, 0 * s + d);
+				ctx.arcTo(0, -540 * s + d, -40 * s, 0 * s + d, 15);
+				ctx.lineTo(-40 * s, 0 * s + d);
+				ctx.lineTo(-200 * s, 0 * s + d);
+				ctx.closePath();
+
+				ctx.fillStyle = "rgba(250,250,250,0.7)";
+				ctx.fill();
+
+				// Lines
+				ctx.moveTo(-80 * s, -40 * s + d);
+				ctx.lineTo(-160 * s, -280 * s + d);
+				ctx.moveTo(80 * s, -40 * s + d);
+				ctx.lineTo(160 * s, -280 * s + d);
+				ctx.lineWidth = 8;
+				ctx.strokeStyle = "rgba(250,250,250,0.7)";
+				ctx.stroke();
+
+				// Ridge on flange
+				ctx.beginPath()
+				ctx.moveTo(-30 * s, 250 * s + d);
+				ctx.lineTo(-30 * s, 290 * s + d);
+				ctx.moveTo(30 * s, 250 * s + d);
+				ctx.lineTo(30 * s, 290 * s + d);			
+				break;
+				
+			case 'Ahmed S2':
+				// Trapezoid mechanism
+				ctx.beginPath()
+				ctx.moveTo(-100 * s, 230 * s + d);
+				ctx.lineTo(100 * s, 230 * s + d);
+				ctx.lineTo(200 * s, 0 * s + d);
+				ctx.lineTo(-40 * s, 0 * s + d);
+				ctx.lineTo(-200 * s, 0 * s + d);
+				ctx.closePath();
+				ctx.fillStyle = "rgba(250,250,250,0.7)";
+				ctx.fill();
+
+				// Line
+				ctx.beginPath();
+				ctx.moveTo(-280 * s, 0 * s + d);
+				ctx.lineTo(+280 * s, 0 * s + d);
+				ctx.lineWidth = 8;
+				ctx.strokeStyle = "rgba(250,250,250,0.7)";
+				ctx.stroke();		
+				break;
+				
+			case 'Ahmed S3':
+				// Trapezoid mechanism
+				ctx.beginPath()
+				ctx.moveTo(-100 * s, 230 * s + d);
+				ctx.lineTo(100 * s, 230 * s + d);
+				ctx.lineTo(200 * s, 0 * s + d);
+				ctx.lineTo(-40 * s, 0 * s + d);
+				ctx.lineTo(-200 * s, 0 * s + d);
+				ctx.closePath();
+				ctx.fillStyle = "rgba(250,250,250,0.7)";
+				ctx.fill();	
+				break;
+											
+			case 'Baerveldt 250':
+				// Spots
+ 				this.drawSpot(ctx, -120 * s, 20 * s + d, 10, "rgba(150,150,150,0.5)");
+				this.drawSpot(ctx, 120 * s, 20 * s + d, 10, "rgba(150,150,150,0.5)");
+
+				// Ridge on flange
+				ctx.beginPath();
+				ctx.moveTo(-30 * s, 250 * s + d);
+				ctx.lineTo(-30 * s, 290 * s + d);
+				ctx.moveTo(30 * s, 250 * s + d);
+				ctx.lineTo(30 * s, 290 * s + d);
+				ctx.strokeStyle = "rgba(150,150,150,0.5)";
+				ctx.stroke();
+				break;
+											
+			case 'Baerveldt 350':
+				// Spots
+ 				this.drawSpot(ctx, -120 * s, 20 * s + d, 10, "rgba(150,150,150,0.5)");
+				this.drawSpot(ctx, 120 * s, 20 * s + d, 10, "rgba(150,150,150,0.5)");
+
+				// Ridge on flange
+				ctx.beginPath();
+				ctx.moveTo(-30 * s, 250 * s + d);
+				ctx.lineTo(-30 * s, 290 * s + d);
+				ctx.moveTo(30 * s, 250 * s + d);
+				ctx.lineTo(30 * s, 290 * s + d);
+				ctx.strokeStyle = "rgba(150,150,150,0.5)";
+				ctx.stroke();
+				break;
+						
+		case 'Molteno Single':				
+				// Inner ring
+				ctx.beginPath();
+				ctx.arc(0, d, 250 * s, 0, Math.PI * 2, true);
+				ctx.stroke();
+
+				// Suture holes
+				this.drawSpot(ctx, -200 * s, 200 * s + d, 5, "rgba(255,255,255,1)");
+				this.drawSpot(ctx, -200 * s, -200 * s + d, 5, "rgba(255,255,255,1)");
+				this.drawSpot(ctx, 200 * s, -200 * s + d, 5, "rgba(255,255,255,1)");
+				this.drawSpot(ctx, 200 * s, 200 * s + d, 5, "rgba(255,255,255,1)");
+				break;
+				
+		case 'Molteno 8mm':				
+				// Inner ring
+				ctx.beginPath();
+				ctx.arc(0, d + 30, 200 * s, 0, Math.PI * 2, true);
+				ctx.stroke();
+
+				// Suture holes
+				this.drawSpot(ctx, -160 * s, 160 * s + d + 30, 5, "rgba(255,255,255,1)");
+				this.drawSpot(ctx, -160 * s, -160 * s + d + 30, 5, "rgba(255,255,255,1)");
+				this.drawSpot(ctx, 160 * s, -160 * s + d + 30, 5, "rgba(255,255,255,1)");
+				this.drawSpot(ctx, 160 * s, 160 * s + d + 30, 5, "rgba(255,255,255,1)");
+				break;
+		}
+
+		// Bezier points for curve of tube in array to export to Supramid
+		this.bezierArray['sp'] = new ED.Point(0, 380 * s + d);
+		this.bezierArray['cp1'] = new ED.Point(0, 420 * s + d);
+		this.bezierArray['cp2'] = new ED.Point(this.apexX * 1.5, this.apexY + ((290 * s + d) - this.apexY) * 0.5);
+		this.bezierArray['ep'] = new ED.Point(this.apexX, this.apexY);
+		
+		ctx.beginPath();
+		ctx.moveTo(0, 290 * s + d);
+		ctx.lineTo(this.bezierArray['sp'].x, this.bezierArray['sp'].y);		
+ 		ctx.bezierCurveTo(this.bezierArray['cp1'].x, this.bezierArray['cp1'].y, this.bezierArray['cp2'].x, this.bezierArray['cp2'].y, this.bezierArray['ep'].x, this.bezierArray['ep'].y);
+		
+		// Simulate tube with gray line and white narrower line
+		ctx.strokeStyle = "rgba(150,150,150,0.5)";
+		ctx.lineWidth = 20;
+		ctx.stroke();
+		ctx.strokeStyle = "white";
+		ctx.lineWidth = 8;
+		ctx.stroke();
+	}
+
+	// Coordinates of handles (in canvas plane)
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
+
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+	
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.Tube.prototype.description = function() {
+	var descArray = {
+		STQ: 'superotemporal',
+		SNQ: 'superonasal',
+		INQ: 'inferonasal',
+		ITQ: 'inferotemporal'
+	};
+
+	return this.type + " tube in the " + descArray[this.platePosition] + " quadrant";
 }
 
 /**

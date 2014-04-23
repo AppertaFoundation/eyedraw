@@ -76,7 +76,7 @@ ED.CornealGraft.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'string',
 		list: ['Interrupted', 'Continuous', 'None'],
-		animate: true
+		animate: false
 	};
 	this.parameterValidationArray['opaque'] = {
 		kind: 'derived',

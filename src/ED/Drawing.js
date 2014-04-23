@@ -4320,7 +4320,6 @@ ED.Doodle.prototype.parameterElement = function(_parameter) {
  * @param {Boolean} _updateBindings Update the doodle form control bindings?
  */
 ED.Doodle.prototype.setParameterWithAnimation = function(_parameter, _value, _updateBindings) {
-
 	// Can doodle animate this parameter?
 	if (this.parameterValidationArray[_parameter]['animate']) {
 		var valueArray = this.dependentParameterValues(_parameter, _value);

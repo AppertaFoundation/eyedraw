@@ -28,11 +28,14 @@ ED.Patch = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "Patch";
 
-	// Derived parameters
+	// Other parameters
 	this.material = 'Sclera';
 
 	// Saved parameters
 	this.savedParameterArray = ['originX', 'originY', 'width', 'height', 'apexX'];
+
+	// Parameters in doodle control bar (parameter name: parameter label)
+	this.controlParameterArray = {'material':'Material'};
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -50,7 +53,6 @@ ED.Patch.superclass = ED.Doodle.prototype;
  */
 ED.Patch.prototype.setHandles = function() {
 	this.handleArray[3] = new ED.Handle(null, true, ED.Mode.Size, false);
-	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
 }
 
 /**
@@ -59,16 +61,12 @@ ED.Patch.prototype.setHandles = function() {
 ED.Patch.prototype.setPropertyDefaults = function() {
 	this.isOrientated = true;
 
-	// Update component of validation array for simple parameters
-	this.parameterValidationArray['apexX']['range'].setMinAndMax(-50, +50);
-	this.parameterValidationArray['apexY']['range'].setMinAndMax(-0, +0);
-
 	// Add complete validation arrays for derived parameters
 	this.parameterValidationArray['material'] = {
-		kind: 'derived',
+		kind: 'other',
 		type: 'string',
 		list: ['Sclera', 'Tenons', 'Tutoplast'],
-		animate: true
+		animate: false
 	};
 }
 
@@ -76,51 +74,37 @@ ED.Patch.prototype.setPropertyDefaults = function() {
  * Sets default parameters
  */
 ED.Patch.prototype.setParameterDefaults = function() {
-	this.width = 120;
+	this.width = 200;
 	this.height = 200;
-	this.originY = -260;
 
 	this.setParameterFromString('material', 'Sclera');
-
-	// Patches are usually temporal
-// 	if(this.drawing.eye == ED.eye.Right)
-// 	{
-// 	   this.originX = -260;
-// 	   this.rotation = -Math.PI/4;
-// 	}
-// 	else
-// 	{
-// 	   this.originX = 260;
-// 	   this.rotation = Math.PI/4;
-// 	}
-}
-
-/**
- * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
- * The returned parameters are animated if their 'animate' property is set to true
- *
- * @param {String} _parameter Name of parameter that has changed
- * @value {Undefined} _value Value of parameter to calculate
- * @returns {Array} Associative array of values of dependent parameters
- */
-ED.Patch.prototype.dependentParameterValues = function(_parameter, _value) {
-	var returnArray = new Array();
-
-	switch (_parameter) {
-		case 'apexX':
-			if (_value < -16) returnArray['material'] = 'Sclera';
-			else if (_value < 16) returnArray['material'] = 'Tenons';
-			else returnArray['material'] = 'Tutoplast';
-			break;
-
-		case 'material':
-			if (_value == 'Sclera') returnArray['apexX'] = -50;
-			else if (_value == 'Tenons') returnArray['apexX'] = 50;
-			else returnArray['apexX'] = 0;
-			break;
+	
+	// Position over tube if present
+	var doodle = this.drawing.lastDoodleOfClass("Tube");
+	if (doodle) {
+		switch (doodle.platePosition) {
+			case 'STQ':
+				this.originX = -250;
+				this.originY = -250;
+				this.rotation = 7 * Math.PI/4;
+				break;
+			case 'SNQ':
+				this.originX = +250;
+				this.originY = -250;
+				this.rotation = 1 * Math.PI/4;
+				break;
+			case 'INQ':
+				this.originX = +250;
+				this.originY = +250;
+				this.rotation = 3 * Math.PI/4;
+				break;
+			case 'ITQ':
+				this.originX = -250;
+				this.originY = +250;
+				this.rotation = 5 * Math.PI/4;
+				break;	
+		}
 	}
-
-	return returnArray;
 }
 
 /**
@@ -137,10 +121,7 @@ ED.Patch.prototype.draw = function(_point) {
 
 	// Boundary path
 	ctx.beginPath();
-
 	ctx.rect(-this.width / 2, -this.height / 2, this.width, this.height);
-
-	// Close path
 	ctx.closePath();
 
 	// Colour of fill
@@ -162,7 +143,6 @@ ED.Patch.prototype.draw = function(_point) {
 
 	// Non boundary paths
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
-
 		var xd = this.width/2;
 		var yd = this.height/2 - 10;
 
@@ -171,21 +151,10 @@ ED.Patch.prototype.draw = function(_point) {
 		this.drawSpot(ctx, -xd, yd, 5, "blue");
 		this.drawSpot(ctx, xd, -yd, 5, "blue");
 		this.drawSpot(ctx, xd, yd, 5, "blue");
-
-		// Suture thread ends
-// 		this.drawLine(ctx, -60, -60, -50, -50, 2, "blue");
-// 		this.drawLine(ctx, -50, -50, -60, -40, 2, "blue");
-// 		this.drawLine(ctx, -60, 60, -50, 50, 2, "blue");
-// 		this.drawLine(ctx, -50, 50, -60, 40, 2, "blue");
-// 		this.drawLine(ctx, 60, -60, 50, -50, 2, "blue");
-// 		this.drawLine(ctx, 50, -50, 60, -40, 2, "blue");
-// 		this.drawLine(ctx, 60, 60, 50, 50, 2, "blue");
-// 		this.drawLine(ctx, 50, 50, 60, 40, 2, "blue");
 	}
 
 	// Coordinates of handles (in canvas plane)
 	this.handleArray[3].location = this.transform.transformPoint(new ED.Point(this.width / 2, -this.height / 2));
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -195,24 +164,10 @@ ED.Patch.prototype.draw = function(_point) {
 }
 
 /**
- * Draws extra items if the doodle is highlighted
- */
-ED.Patch.prototype.drawHighlightExtras = function() {
-	// Get context
-	var ctx = this.drawing.context;
-
-	// Draw text description of material
-	ctx.lineWidth = 1;
-	ctx.fillStyle = "gray";
-	ctx.font = "48px sans-serif";
-	ctx.fillText(this.material, 80, 20);
-}
-
-/**
  * Returns a string containing a text description of the doodle
  *
  * @returns {String} Description of doodle
  */
 ED.Patch.prototype.description = function() {
-	return "Scleral patch";
+	return this.material + " patch";
 }

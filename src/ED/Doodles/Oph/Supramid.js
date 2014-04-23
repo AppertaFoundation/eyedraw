@@ -29,7 +29,7 @@ ED.Supramid = function(_drawing, _parameterJSON) {
 	this.className = "Supramid";
 	
 	// Saved parameters
-	this.savedParameterArray = ['apexY', 'originX', 'originY'];
+	this.savedParameterArray = ['apexY', 'rotation'];
 	
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -53,31 +53,25 @@ ED.Supramid.prototype.setHandles = function() {
  * Sets default dragging attributes
  */
 ED.Supramid.prototype.setPropertyDefaults = function() {
-	this.isOrientated = true;
+	this.isMoveable = false;
 	this.isRotatable = false;
-	this.snapToQuadrant = true;
-	this.quadrantPoint = new ED.Point(10, 10);
 
 	// Update component of validation array for simple parameters
-	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
-	this.parameterValidationArray['apexY']['range'].setMinAndMax(-420, -200);
+	this.parameterValidationArray['apexX']['range'].setMinAndMax(-800, +800);
+	this.parameterValidationArray['apexY']['range'].setMinAndMax(-800, +800);
 }
 
 /**
  * Sets default parameters
  */
 ED.Supramid.prototype.setParameterDefaults = function() {
-	this.apexX = 0;
-	this.apexY = -350;
-	this.originY = -10;
+	this.apexX = -660;
+	this.apexY = 30;
 
-	// Tubes are usually STQ
-	if (this.drawing.eye == ED.eye.Right) {
-		this.originX = -10;
-		this.rotation = -Math.PI / 4;
-	} else {
-		this.originX = 10;
-		this.rotation = Math.PI / 4;
+	// Make rotation same as tube
+	var doodle = this.drawing.lastDoodleOfClass("Tube");
+	if (doodle) {
+		this.rotation = doodle.rotation;
 	}
 }
 
@@ -92,28 +86,22 @@ ED.Supramid.prototype.draw = function(_point) {
 
 	// Call draw method in superclass
 	ED.Supramid.superclass.draw.call(this, _point);
+	
+	// Get tube doodle
+	var doodle = this.drawing.lastDoodleOfClass("Tube");
+	if (doodle) {
+		this.rotation = doodle.rotation;
+	}
 
 	// Calculate key points for supramid bezier
-	var startPoint = new ED.Point(0, this.apexY);
-	var tubePoint = new ED.Point(0, -450);
-	var controlPoint1 = new ED.Point(0, -600);
-
-	// Calculate mid point x coordinate
-	var midPointX = -450;
-	var controlPoint2 = new ED.Point(midPointX, -300);
-	var midPoint = new ED.Point(midPointX, 0);
-	var controlPoint3 = new ED.Point(midPointX, 300);
-	var controlPoint4 = new ED.Point(midPointX * 0.5, 450);
-	var endPoint = new ED.Point(midPointX * 0.2, 450);
+	var startPoint = new ED.Point(this.apexX, this.apexY);
+	var tubePoint = new ED.Point(0, -700);
 
 	// Boundary path
 	ctx.beginPath();
 
-	// Rectangle around suture
-	ctx.moveTo(this.apexX, tubePoint.y);
-	ctx.lineTo(midPointX, tubePoint.y);
-	ctx.lineTo(midPointX, endPoint.y);
-	ctx.lineTo(this.apexX, endPoint.y);
+	// Rectangle around end of suture
+	ctx.rect(this.apexX - 100, this.apexY - 100, 200, 200);
 
 	// Close path
 	ctx.closePath();
@@ -121,27 +109,30 @@ ED.Supramid.prototype.draw = function(_point) {
 	// Set line attributes
 	ctx.lineWidth = 1;
 	ctx.fillStyle = "rgba(0, 0, 0, 0)";
-	ctx.strokeStyle = "rgba(0, 0, 0, 0)";
+	if (this.isSelected) ctx.strokeStyle = "rgba(0, 0, 0, 0.8)";
+	else ctx.strokeStyle = "rgba(0, 0, 0, 0)";
 
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 
 	// Non boundary paths
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
-		// Suture
-		ctx.beginPath()
-		ctx.moveTo(startPoint.x, startPoint.y);
-		ctx.lineTo(tubePoint.x, tubePoint.y);
-		ctx.bezierCurveTo(controlPoint1.x, controlPoint1.y, controlPoint2.x, controlPoint2.y, midPoint.x, midPoint.y);
-		ctx.bezierCurveTo(controlPoint3.x, controlPoint3.y, controlPoint4.x, controlPoint4.y, endPoint.x, endPoint.y);
+		if (doodle) {
+			// Suture
+			var xDev = startPoint.x/Math.abs(startPoint.x) * 100;
+			ctx.beginPath()
+			ctx.moveTo(startPoint.x, startPoint.y);
+			ctx.bezierCurveTo(startPoint.x + xDev, startPoint.y - 100, tubePoint.x + xDev, tubePoint.y, doodle.bezierArray['sp'].x, doodle.bezierArray['sp'].y);
+			ctx.bezierCurveTo(doodle.bezierArray['cp1'].x, doodle.bezierArray['cp1'].y, doodle.bezierArray['cp2'].x, doodle.bezierArray['cp2'].y, doodle.bezierArray['ep'].x, doodle.bezierArray['ep'].y);
 
-		ctx.lineWidth = 4;
-		ctx.strokeStyle = "purple";
-		ctx.stroke();
+			ctx.lineWidth = 4;
+			ctx.strokeStyle = "purple";
+			ctx.stroke();
+		}
 	}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(0, this.apexY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -183,9 +174,5 @@ ED.Supramid.prototype.draw = function(_point) {
  * @returns {String} Description of doodle
  */
 ED.Supramid.prototype.description = function() {
-	var returnString = "Supramid suture ";
-
-	returnString += this.getParameter('endPosition');
-
-	return returnString;
+	return "Supramid suture";
 }
