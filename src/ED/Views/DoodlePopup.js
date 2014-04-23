@@ -29,10 +29,6 @@ ED.Views.DoodlePopup = (function() {
 
 	'use strict';
 
-	/** Constants */
-	var OPEN = 'open';
-	var CLOSED = 'closed';
-
 	/**
 	 * DoodlePopup constructor
 	 * @param {ED.Drawing} drawing   A doodle drawing instance.
@@ -43,7 +39,6 @@ ED.Views.DoodlePopup = (function() {
 
 		ED.View.apply(this, arguments);
 
-		this.state = CLOSED;
 		this.delayTimer = 0;
 
 		this.createToolbar();
@@ -113,7 +108,6 @@ ED.Views.DoodlePopup = (function() {
 	 * @param  {Number} delay The amount of time (ms) to delay hiding the menu.
 	 */
 	DoodlePopup.prototype.hide = function() {
-		this.state = CLOSED;
 		this.delay(function() {
 			this.container.addClass('closed');
 		}.bind(this));
@@ -127,7 +121,6 @@ ED.Views.DoodlePopup = (function() {
 		if (this.drawing.selectDoodle.isLocked) {
 			return;
 		}
-		this.state = OPEN;
 		this.delay(function() {
 			this.container.removeClass('closed');
 		}.bind(this));
