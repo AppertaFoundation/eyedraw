@@ -174,19 +174,6 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 	// Initialise canvas context transform by calling clear() method
 	this.clear();
 
-	// Get reference to button elements
-	this.moveToFrontButton = document.getElementById('moveToFront' + this.idSuffix);
-	this.moveToBackButton = document.getElementById('moveToBack' + this.idSuffix);
-	this.flipVerButton = document.getElementById('flipVer' + this.idSuffix);
-	this.flipHorButton = document.getElementById('flipHor' + this.idSuffix);
-	this.deleteSelectedDoodleButton = document.getElementById('deleteSelectedDoodle' + this.idSuffix);
-	this.lockButton = document.getElementById('lock' + this.idSuffix);
-	this.unlockButton = document.getElementById('unlock' + this.idSuffix);
-	//this.squiggleSpan = document.getElementById('squiggleSpan' + this.idSuffix);
-	//this.colourPreview = document.getElementById('colourPreview' + this.idSuffix);
-	//this.fillRadio = document.getElementById('fillRadio' + this.idSuffix);
-	//this.thickness = document.getElementById('thicknessSelect' + this.idSuffix);
-
 	// Selection rectangle
 	this.selectionRectangleIsBeingDragged = false;
 	this.selectionRectangleStart = new ED.Drawing.Point(0, 0);
@@ -2700,55 +2687,6 @@ ED.Drawing.prototype.repaint = function() {
 	}
 	if (this.selectedDoodle != null) {
 		this.selectedDoodle.setDisplayOfParameterControls(true);
-	}
-
-	// Enable or disable buttons which work on selected doodle
-	if (this.selectedDoodle != null) {
-		if (this.moveToFrontButton !== null) this.moveToFrontButton.disabled = false;
-		if (this.moveToBackButton !== null) this.moveToBackButton.disabled = false;
-		if (this.flipVerButton !== null) this.flipVerButton.disabled = false;
-		if (this.flipHorButton !== null) this.flipHorButton.disabled = false;
-		if (this.deleteSelectedDoodleButton !== null && this.selectedDoodle.isDeletable) this.deleteSelectedDoodleButton.disabled = false;
-		if (this.lockButton !== null) this.lockButton.disabled = false;
-		//if (this.squiggleSpan !== null && this.selectedDoodle.isDrawable) this.squiggleSpan.style.display = "inline-block";
-	} else {
-		if (this.moveToFrontButton !== null) this.moveToFrontButton.disabled = true;
-		if (this.moveToBackButton !== null) this.moveToBackButton.disabled = true;
-		if (this.flipVerButton !== null) this.flipVerButton.disabled = true;
-		if (this.flipHorButton !== null) this.flipHorButton.disabled = true;
-		if (this.deleteSelectedDoodleButton !== null) this.deleteSelectedDoodleButton.disabled = true;
-		if (this.lockButton !== null) this.lockButton.disabled = true;
-		//if (this.squiggleSpan !== null) this.squiggleSpan.style.display = "none";
-	}
-
-	// Go through doodles looking for any that are locked and enable/disable unlock button
-	if (this.unlockButton != null) {
-		this.unlockButton.disabled = true;
-		for (var i = 0; i < this.doodleArray.length; i++) {
-			if (this.doodleArray[i].isLocked) {
-				this.unlockButton.disabled = false;
-				break;
-			}
-		}
-	}
-
-	// Get reference to doodle toolbar
-	var doodleToolbar = document.getElementById(this.canvas.id + 'doodleToolbar');
-	if (doodleToolbar) {
-		// Iterate through all buttons activating them
-		var buttonArray = doodleToolbar.getElementsByTagName('button');
-		for (var i = 0; i < buttonArray.length; i++) {
-			buttonArray[i].disabled = false;
-		}
-
-		// Go through doodles looking for any that unique, and disable the corresponding add button
-		for (var i = 0; i < this.doodleArray.length; i++) {
-			// Button ID is concatenation of class name and id suffix
-			var addButton = document.getElementById(this.doodleArray[i].className + this.idSuffix);
-			if (addButton) {
-				addButton.disabled = this.doodleArray[i].isUnique;
-			}
-		}
 	}
 
 	// ***TODO*** ask Mark what this code is for

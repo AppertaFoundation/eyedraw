@@ -78,6 +78,9 @@
 			@each $state in $imageStates {
 				.#{$prefixClass}-#{$i}:#{$state} {
 					background-position: sprite-position($spriteMap, #{$i}_#{$state});
+					.disabled & {
+						background-position: sprite-position($spriteMap, $i);
+					}
 				}
 			}
 		}

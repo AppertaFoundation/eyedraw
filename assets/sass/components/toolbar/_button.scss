@@ -25,7 +25,7 @@
 	padding: 0;
 	width: 32px;
 	&:hover {
-		background: #118afb
+		background: #118afb;
 	}
 	.active & {
 		background: #dae6f1;
@@ -50,8 +50,18 @@
 	}
 	&:hover {
 		.label {
-			@include transition-delay(.25s);
+			@include transition-delay(0.25s);
 			left: -1px;
+		}
+	}
+	&.disabled {
+		cursor: default;
+		background: #ddd;
+		&:hover {
+			.label {
+				@include transition-delay(0s);
+				left: -9999px;
+			}
 		}
 	}
 }

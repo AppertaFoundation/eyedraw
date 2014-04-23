@@ -39,16 +39,12 @@ ED.Views.Toolbar = (function() {
 	 * @extends {EventEmitter2}
 	 */
 	function Toolbar(drawing, container) {
-
-		EventEmitter2.call(this);
-
-		this.drawing = drawing;
-		this.container = $(container);
-
-		this.registerForNotifications();
+		ED.View.apply(this, arguments);
+		this.buttons = this.container.find('.eyedraw-button');
+		this.bindEvents();
 	}
 
-	Toolbar.prototype = Object.create(EventEmitter2.prototype);
+	Toolbar.prototype = Object.create(ED.View.prototype);
 	Toolbar.prototype.constructor = Toolbar;
 
 	/**
@@ -56,24 +52,15 @@ ED.Views.Toolbar = (function() {
 	 */
 	Toolbar.prototype.registerForNotifications = function() {
 		this.drawing.registerForNotifications(this, 'notificationHandler', [
-			'ready'
+			'ready',
+			'drawingRepainted'
 		]);
-	};
-
-	/**
-	 * The Ed.Drawing notification handler.
-	 * @param  {Object} notification The notification object.
-	 */
-	Toolbar.prototype.notificationHandler = function(notification) {
-		if (notification.eventName === 'ready') {
-			this.init();
-		}
 	};
 
 	/**
 	 * Run when the drawing ready. Bind interaction events.
 	 */
-	Toolbar.prototype.init = function() {
+	Toolbar.prototype.bindEvents = function() {
 
 		// Toolbar button click events.
 		this.container
@@ -109,6 +96,11 @@ ED.Views.Toolbar = (function() {
 		e.stopImmediatePropagation();
 
 		var button = $(e.currentTarget);
+
+		if (button.hasClass('disabled')) {
+			return;
+		}
+
 		var fn = button.data('function');
 		var arg = button.data('arg');
 
@@ -121,6 +113,39 @@ ED.Views.Toolbar = (function() {
 		} else {
 			this.emit('doodle.error', 'Invalid doodle function: ' + fn);
 		}
+	};
+
+	Toolbar.prototype.enableButton = function(button) {
+		button.attr('disabled', false).removeClass('disabled');
+	};
+
+	Toolbar.prototype.disableButton = function(button) {
+		button.attr('disabled', true).addClass('disabled');
+	};
+
+	Toolbar.prototype.updateButtonState = function(button) {
+
+		this.enableButton(button);
+
+		var func = button.data('function');
+		var arg = button.data('arg');
+
+		if (func === 'addDoodle') {
+
+			var doodle = this.drawing.doodleArray.filter(function(doodle) {
+				return doodle.className === arg
+			})[0];
+
+			if (doodle && doodle.isUnique) {
+				this.disableButton(button);
+			}
+		}
+	};
+
+	Toolbar.prototype.onDrawingRepainted  = function() {
+		this.buttons.each(function(i, button) {
+			this.updateButtonState($(button));
+		}.bind(this))
 	};
 
 	/**
