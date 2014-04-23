@@ -17,7 +17,7 @@
  * along with OpenEyes.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* global $: false */
+/* global $: false, ED: true */
 
 var ED = ED || {};
 ED.Views = ED.Views || {};
@@ -38,7 +38,7 @@ ED.Views.SelectedDoodle = (function() {
 	 * @param {HTMLElement} container The widget container element
 	 * @extends {EventEmitter2}
 	 */
-	function SelectedDoodle(drawing, container) {
+	function SelectedDoodle() {
 		ED.View.apply(this, arguments);
 		this.select = this.container.find('select');
 		this.doodles = this.drawing.doodleArray;
@@ -74,7 +74,7 @@ ED.Views.SelectedDoodle = (function() {
 	 */
 	SelectedDoodle.prototype.render = function() {
 		var noneOption = '<option ' + (this.drawing.selectedDoodle === null ? ' selected' : '') + '>None</option>';
-		this.select.html(noneOption)
+		this.select.html(noneOption);
 		this.select.append(this.doodles.map(this.createOption.bind(this)));
 	};
 
@@ -97,7 +97,7 @@ ED.Views.SelectedDoodle = (function() {
 		this.render();
 	};
 
-	SelectedDoodle.prototype.onDoodleAdded = function(notification) {
+	SelectedDoodle.prototype.onDoodleAdded = function() {
 		this.render();
 	};
 
@@ -105,7 +105,7 @@ ED.Views.SelectedDoodle = (function() {
 		this.render();
 	};
 
-	SelectedDoodle.prototype.onDoodleSelected = function(notification) {
+	SelectedDoodle.prototype.onDoodleSelected = function() {
 		this.render();
 	};
 

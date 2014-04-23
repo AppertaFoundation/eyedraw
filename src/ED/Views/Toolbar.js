@@ -17,7 +17,7 @@
  * along with OpenEyes.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* global EventEmitter2: false, $: false */
+/* global $: false */
 
 var ED = ED || {};
 ED.Views = ED.Views || {};
@@ -38,7 +38,7 @@ ED.Views.Toolbar = (function() {
 	 * @param {HTMLElement} container The widget container element
 	 * @extends {EventEmitter2}
 	 */
-	function Toolbar(drawing, container) {
+	function Toolbar() {
 		ED.View.apply(this, arguments);
 		this.buttons = this.container.find('.eyedraw-button');
 		this.bindEvents();
@@ -52,7 +52,6 @@ ED.Views.Toolbar = (function() {
 	 */
 	Toolbar.prototype.registerForNotifications = function() {
 		this.drawing.registerForNotifications(this, 'notificationHandler', [
-			'ready',
 			'drawingRepainted'
 		]);
 	};
@@ -133,7 +132,7 @@ ED.Views.Toolbar = (function() {
 		if (func === 'addDoodle') {
 
 			var doodle = this.drawing.doodleArray.filter(function(doodle) {
-				return doodle.className === arg
+				return (doodle.className === arg);
 			})[0];
 
 			if (doodle && doodle.isUnique) {
@@ -145,7 +144,7 @@ ED.Views.Toolbar = (function() {
 	Toolbar.prototype.onDrawingRepainted  = function() {
 		this.buttons.each(function(i, button) {
 			this.updateButtonState($(button));
-		}.bind(this))
+		}.bind(this));
 	};
 
 	/**

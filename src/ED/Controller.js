@@ -30,9 +30,6 @@ ED.Controller = (function() {
 
 	'use strict';
 
-	/** Constants */
-	var EVENT_NAMESPACE = 'eyedraw.controller';
-
 	/** Helpers */
 	var ucFirst = ED.firstLetterToUpperCase;
 
@@ -215,12 +212,9 @@ ED.Controller = (function() {
 	 * Deselect all synced doodles.
 	 */
 	Controller.prototype.deselectSyncedDoodles = function() {
-		for (var idSuffix in this.properties.syncArray) {
-			var drawing = this.getEyeDrawInstance(idSuffix);
-			if (!drawing) {
-				throw new Error('Unable to get eyedraw instance!');
-			}
-			drawing.deselectDoodles();
+		var arr = this.properties.syncArray;
+		for (var idSuffix in arr) {
+			this.getEyeDrawInstance(idSuffix).deselectDoodles();
 		}
 	};
 
@@ -393,7 +387,7 @@ ED.Controller = (function() {
 	 * On doodle added.
 	 * @param  {Object} notification The notification object.
 	 */
-	Controller.prototype.onDoodleAdded = function(notification) {
+	Controller.prototype.onDoodleAdded = function() {
 
 		this.saveDrawingToInputField();
 
