@@ -17,7 +17,7 @@
  * along with OpenEyes.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* global EventEmitter2: false, $: false, Mustache: false */
+/* global $: false, Mustache: false */
 
 var ED = ED || {};
 ED.Views = ED.Views || {};
@@ -43,12 +43,10 @@ ED.Views.DoodlePopup = (function() {
 	 * @param {HTMLElement} widgetContainer The widget container element
 	 * @extends {EventEmitter2}
 	 */
-	function DoodlePopup(drawing, widgetContainer) {
+	function DoodlePopup(drawing, container) {
 
-		EventEmitter2.call(this);
+		ED.View.apply(this, arguments);
 
-		this.drawing = drawing;
-		this.container = widgetContainer.find('.eyedraw-doodle-popup');
 		this.currentDoodle = null;
 		this.state = CLOSED;
 		this.delayTimer = 0;
@@ -58,7 +56,7 @@ ED.Views.DoodlePopup = (function() {
 		this.registerForNotifications();
 	}
 
-	DoodlePopup.prototype = Object.create(EventEmitter2.prototype);
+	DoodlePopup.prototype = Object.create(ED.View.prototype);
 	DoodlePopup.prototype.constructor = DoodlePopup;
 
 	/**
@@ -66,7 +64,7 @@ ED.Views.DoodlePopup = (function() {
 	 */
 	DoodlePopup.prototype.createToolbar = function() {
 		this.toolbar = new ED.Views.Toolbar(this.drawing, this.container);
-		this.toolbar.on('doodle.action', this.compileTemplate.bind(this, null));
+		this.toolbar.on('doodle.action', this.render.bind(this, null));
 	};
 
 	/**
@@ -80,7 +78,6 @@ ED.Views.DoodlePopup = (function() {
 	 * Register for drawing notifications and bind interaction events.
 	 */
 	DoodlePopup.prototype.registerForNotifications = function() {
-
 		this.drawing.registerForNotifications(this, 'notificationHandler', [
 			'ready',
 			'doodleAdded',
@@ -91,20 +88,10 @@ ED.Views.DoodlePopup = (function() {
 	};
 
 	/**
-	 * This notification handler will simply route events to handlers.
-	 * @param  {Object} notification The notification object.
-	 */
-	DoodlePopup.prototype.notificationHandler = function(notification) {
-		var eventName = notification.eventName;
-		var handlerName = 'on' + ucFirst(eventName);
-		this[handlerName](notification);
-	};
-
-	/**
 	 * Compile the mustache template.
 	 * @param  {Object} data Template data.
 	 */
-	DoodlePopup.prototype.compileTemplate = function(data) {
+	DoodlePopup.prototype.render = function(data) {
 		if (data) {
 			this.templateData = data;
 		}
@@ -120,7 +107,7 @@ ED.Views.DoodlePopup = (function() {
 	 */
 	DoodlePopup.prototype.update = function(show, doodle, delay) {
 		if (show) {
-			this.compileTemplate({ doodle: doodle });
+			this.render({ doodle: doodle });
 			this.show(delay);
 		} else {
 			this.hide(delay);
@@ -181,18 +168,7 @@ ED.Views.DoodlePopup = (function() {
 	 * EVENT HANDLERS
 	 *********************/
 
-	DoodlePopup.prototype.onToggleClick = function(e) {
-		e.preventDefault();
-		var func = (this.state === CLOSED ? 'show' : 'hide');
-		this[func]();
-	};
-
 	DoodlePopup.prototype.onReady = function() {
-		this.container.on(
-			'click.' + EVENT_NAMESPACE,
-			'.eyedraw-doodle-popup-toggle',
-			this.onToggleClick.bind(this)
-		);
 	};
 
 	DoodlePopup.prototype.onDoodleAdded = function(notification) {
@@ -214,7 +190,7 @@ ED.Views.DoodlePopup = (function() {
 		 * popup to remain visible when selecting a new doodle.
 		 */
 		this.currentDoodle = notification.object || notification.selectedDoodle;
-		setTimeout(this.update.bind(this, true, this.currentDoodle, 150));
+		setTimeout(this.update.bind(this, true, this.currentDoodle, 60));
 	};
 
 	DoodlePopup.prototype.onDoodleDeselected = function(notification) {

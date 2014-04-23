@@ -233,9 +233,15 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 			// not the canvas itself, nor the doodle popup, nor any toolbar buttons.
 			var elem = e.target;
 			var isEyeDrawElement = false;
+			var ignore = '(' + [
+				'eyedraw-doodle-popup',
+				'eyedraw-button',
+				'eyedraw-canvas',
+				'eyedraw-selected-doodle-select'
+			].join(')|(') + ')';
 
 			do {
-				if (/(eyedraw-doodle-popup)|(eyedraw-button)|(eyedraw-canvas)/.test(elem.className)) {
+				if (new RegExp(ignore).test(elem.className)) {
 					isEyeDrawElement = true;
 					break;
 				}
@@ -449,8 +455,11 @@ ED.Drawing.prototype.notify = function(_eventName, _object) {
 		object: _object
 	};
 
+	// console.log(this.notificationArray);
+
 	// Call method on each registered object
 	for (var i = 0; i < this.notificationArray.length; i++) {
+
 		// Assign to variables to make code easier to read
 		var list = this.notificationArray[i]['notificationList'];
 		var object = this.notificationArray[i]['object'];
@@ -600,7 +609,6 @@ ED.Drawing.prototype.drawAllDoodles = function() {
 	}
 }
 
-
 /**
  * Responds to mouse down event in canvas, cycles through doodles from front to back.
  * Selected doodle is first selectable doodle to have click within boundary path.
@@ -637,21 +645,8 @@ ED.Drawing.prototype.mousedown = function(_point) {
 						this.doodleArray[i].isForDrawing = true;
 					}
 
-					this.doodleArray[i].isSelected = true;
-					this.selectedDoodle = this.doodleArray[i];
 					found = true;
-
-					// Check if newly selected
-					if (this.lastSelectedDoodle != this.selectedDoodle) {
-						// Run onDeselection code for last doodle
-						if (this.lastSelectedDoodle) this.lastSelectedDoodle.onDeselection();
-
-						// Run onSelection code
-						this.selectedDoodle.onSelection();
-
-						// Notify
-						this.notify("doodleSelected");
-					}
+					this.selectDoodle(this.doodleArray[i]);
 
 					// If for drawing, mouse down starts a new squiggle
 					if (!this.doubleClick && this.doodleArray[i].isForDrawing) {
@@ -1842,9 +1837,6 @@ ED.Drawing.prototype.selectNextDoodle = function(_value) {
 ED.Drawing.prototype.setDoodleAsSelected = function(_doodleId) {
 	var selectedIndex = -1;
 
-	// Deselect doodles
-	this.deselectDoodles();
-
 	// Iterate through doodles
 	for (var i = 0; i < this.doodleArray.length; i++) {
 		if (this.doodleArray[i].id == _doodleId) {
@@ -1853,14 +1845,31 @@ ED.Drawing.prototype.setDoodleAsSelected = function(_doodleId) {
 	}
 
 	if (selectedIndex >= 0) {
-		this.doodleArray[selectedIndex].isSelected = true;
-		this.selectedDoodle = this.doodleArray[selectedIndex];
-		this.selectedDoodle.onSelection();
-
-		// Refresh drawing
-		this.repaint();
+		var doodle = this.doodleArray[selectedIndex];
+		this.selectDoodle(doodle);
 	}
 }
+
+/**
+ * Mark a doodle as selected
+ * @param  {ED.Doodle} doodle
+ */
+ED.Drawing.prototype.selectDoodle = function(doodle) {
+
+	this.deselectDoodles();
+
+	doodle.isSelected = true;
+	this.selectedDoodle = doodle;
+
+	// Run onDeselection code for last doodle
+	if (this.lastSelectedDoodle) this.lastSelectedDoodle.onDeselection();
+	// Run onSelection code
+	this.selectedDoodle.onSelection();
+	// Notify
+	this.notify("doodleSelected");
+
+	this.repaint();
+};
 
 /**
  * Marks the doodle as 'unmodified' so we can catch an event when it gets modified by the user
