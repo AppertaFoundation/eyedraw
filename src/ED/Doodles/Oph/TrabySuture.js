@@ -59,7 +59,7 @@ ED.TrabySuture.superclass = ED.Doodle.prototype;
 ED.TrabySuture.prototype.setHandles = function() {
 	// Array of handles for releasable suture
 	for (var i = 0; i < this.numberOfHandles; i++) {
-		this.handleArray[i] = new ED.Doodle.Handle(null, true, ED.Mode.Handles, false);
+		this.handleArray[i] = new ED.Handle(null, true, ED.Mode.Handles, false);
 	}
 
 	//this.handleArray[this.numberOfHandles] = new ED.Handle(null, true, ED.Mode.Rotate, false);
@@ -105,12 +105,11 @@ ED.TrabySuture.prototype.setParameterDefaults = function() {
 	this.size = '10/0';
 
 	// Create a squiggle to store the handles points
-	var squiggle = new ED.Squiggle(this, new ED.Drawing.Colour(100, 100, 100, 1), 4, true);
+	var squiggle = new ED.Squiggle(this, new ED.Colour(100, 100, 100, 1), 4, true);
 
 	// Add it to squiggle array
 	this.squiggleArray.push(squiggle);
 
-<<<<<<< HEAD
 	// Populate handle array
 	var positionSet = [
 		{x: 100, y: -100},
@@ -123,13 +122,6 @@ ED.TrabySuture.prototype.setParameterDefaults = function() {
 		var point = new ED.Point(positionSet[i].x, positionSet[i].y);
 		this.addPointToSquiggle(point);
 	}
-=======
-	// Populate with handles
-	var point = new ED.Drawing.Point(100, 100);
-	this.addPointToSquiggle(point);
-	point = new ED.Drawing.Point(-100, 100);
-	this.addPointToSquiggle(point);
->>>>>>> Moved objects into namespaces and saved objects in individual files.
 }
 
 /**
@@ -207,7 +199,6 @@ ED.TrabySuture.prototype.draw = function(_point) {
 		// Type of suture
 		switch (this.shape) {
 			case 'Releasable':
-<<<<<<< HEAD
 // 				ctx.moveTo(-2, 64);
 // 				ctx.bezierCurveTo(20, 36, -15, 16, -16, -7);
 // 				ctx.bezierCurveTo(-18, -30, -12, -43, -4, -43);
@@ -217,26 +208,12 @@ ED.TrabySuture.prototype.draw = function(_point) {
 // 				ctx.bezierCurveTo(2, 20, -4, 24, -3, 29);
 // 				ctx.bezierCurveTo(-3, 36, 14, 37, 23, 56);
 // 				ctx.bezierCurveTo(32, 74, 34, 100, 34, 100);
-				
+
 				// From point
 				//var fp = new ED.Point(34, 100);
-=======
-				ctx.moveTo(-2, 64);
-				ctx.bezierCurveTo(20, 36, -15, 16, -16, -7);
-				ctx.bezierCurveTo(-18, -30, -12, -43, -4, -43);
-				ctx.bezierCurveTo(6, -43, 12, -28, 12, -9);
-				ctx.bezierCurveTo(12, 11, 0, 23, -2, 30);
-				ctx.bezierCurveTo(-3, 36, 3, 37, 2, 30);
-				ctx.bezierCurveTo(2, 20, -4, 24, -3, 29);
-				ctx.bezierCurveTo(-3, 36, 14, 37, 23, 56);
-				ctx.bezierCurveTo(32, 74, 34, 100, 34, 100);
-
-				// From point
-				var fp = new ED.Drawing.Point(34, 100);
->>>>>>> Moved objects into namespaces and saved objects in individual files.
 
 				// Suture exit through cornea
-				// 				var ep = new ED.Drawing.Point(this.firstOriginX, -60);
+				// 				var ep = new ED.Point(this.firstOriginX, -60);
 				//
 				// 				// Set up a new transform and centre in canvas
 				// 				var at = new ED.AffineTransform();
@@ -253,7 +230,7 @@ ED.TrabySuture.prototype.draw = function(_point) {
 
 				/*
 				// Suture exit through cornea
-				var ep = new ED.Drawing.Point(this.firstOriginX, -60);
+				var ep = new ED.Point(this.firstOriginX, -60);
 
 				// Set up a new transform and centre in canvas
 				var at = new ED.AffineTransform();
@@ -274,7 +251,7 @@ ED.TrabySuture.prototype.draw = function(_point) {
 				else if (this.id == 6) d = d * +1;
 				else d = d * -1;
 
-				var mp = new ED.Drawing.Point(this.firstOriginX - d, -90);
+				var mp = new ED.Point(this.firstOriginX - d, -90);
 				var tmp = at.transformPoint(mp);
 				var fmp = this.inverseTransform.transformPoint(tmp);
 
@@ -290,38 +267,23 @@ ED.TrabySuture.prototype.draw = function(_point) {
 // 				var cp2;
 
 				// Angle of control point from radius line to point (this value makes path a circle Math.PI/12 for 8 points
-<<<<<<< HEAD
 				//var phi = 2 * Math.PI / (10 * this.numberOfHandles);
-				
+
 				tp = this.squiggleArray[0].pointsArray[0];
 				ctx.moveTo(tp.x, tp.y);
-				
-				for (var i = 1; i < this.numberOfHandles; i++) {
-=======
-				var phi = 2 * Math.PI / (10 * this.numberOfHandles);
 
-				for (var i = 0; i < this.numberOfHandles; i++) {
->>>>>>> Moved objects into namespaces and saved objects in individual files.
+				for (var i = 1; i < this.numberOfHandles; i++) {
 
 					// To point
 					tp = this.squiggleArray[0].pointsArray[i];
 
 					// Control points
-<<<<<<< HEAD
 // 					cp1 = new ED.Point(fp.x + (tp.x - fp.x)/3, fp.y);
 // 					cp2 = new ED.Point(fp.x + 2 * (tp.x - fp.x)/3, tp.y);
 
 					// Draw Bezier curve
 					//ctx.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, tp.x, tp.y);
 					ctx.lineTo(tp.x, tp.y);
-=======
-					cp1 = new ED.Drawing.Point(fp.x + (tp.x - fp.x)/3, fp.y);
-					cp2 = new ED.Drawing.Point(fp.x + 2 * (tp.x - fp.x)/3, tp.y);
-
-					// Draw Bezier curve
-					ctx.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, tp.x, tp.y);
-
->>>>>>> Moved objects into namespaces and saved objects in individual files.
 					fp = tp;
 				}
 
@@ -359,13 +321,9 @@ ED.TrabySuture.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-<<<<<<< HEAD
 	for (var i = 0; i < this.numberOfHandles; i++) {
 		this.handleArray[i].location = this.transform.transformPoint(this.squiggleArray[0].pointsArray[i]);
 	}
-=======
-	this.handleArray[this.numberOfHandles].location = this.transform.transformPoint(new ED.Drawing.Point(+40, -70));
->>>>>>> Moved objects into namespaces and saved objects in individual files.
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -403,4 +361,3 @@ ED.TrabySuture.prototype.description = function() {
 
 	return returnValue;
 }
-
