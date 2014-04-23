@@ -17,7 +17,7 @@
  * along with OpenEyes.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* global $: false, Mustache: false */
+/* global $: false, Mustache: false, ED: true */
 
 var ED = ED || {};
 ED.Views = ED.Views || {};
@@ -29,13 +29,9 @@ ED.Views.DoodlePopup = (function() {
 
 	'use strict';
 
-	/** Helpers */
-	var ucFirst = ED.firstLetterToUpperCase;
-
 	/** Constants */
 	var OPEN = 'open';
 	var CLOSED = 'closed';
-	var EVENT_NAMESPACE = 'eyedraw.doodlepopup';
 
 	/**
 	 * DoodlePopup constructor
@@ -43,17 +39,15 @@ ED.Views.DoodlePopup = (function() {
 	 * @param {HTMLElement} widgetContainer The widget container element
 	 * @extends {EventEmitter2}
 	 */
-	function DoodlePopup(drawing, container) {
+	function DoodlePopup() {
 
 		ED.View.apply(this, arguments);
 
-		this.currentDoodle = null;
 		this.state = CLOSED;
 		this.delayTimer = 0;
 
 		this.createToolbar();
 		this.createTemplate();
-		this.registerForNotifications();
 	}
 
 	DoodlePopup.prototype = Object.create(ED.View.prototype);
@@ -64,7 +58,7 @@ ED.Views.DoodlePopup = (function() {
 	 */
 	DoodlePopup.prototype.createToolbar = function() {
 		this.toolbar = new ED.Views.Toolbar(this.drawing, this.container);
-		this.toolbar.on('doodle.action', this.render.bind(this, null));
+		this.toolbar.on('doodle.action', this.render.bind(this));
 	};
 
 	/**
@@ -79,7 +73,6 @@ ED.Views.DoodlePopup = (function() {
 	 */
 	DoodlePopup.prototype.registerForNotifications = function() {
 		this.drawing.registerForNotifications(this, 'notificationHandler', [
-			'ready',
 			'doodleAdded',
 			'doodleDeleted',
 			'doodleSelected',
@@ -91,26 +84,24 @@ ED.Views.DoodlePopup = (function() {
 	 * Compile the mustache template.
 	 * @param  {Object} data Template data.
 	 */
-	DoodlePopup.prototype.render = function(data) {
-		if (data) {
-			this.templateData = data;
-		}
-		var html = Mustache.render(this.template, this.templateData);
+	DoodlePopup.prototype.render = function() {
+		var data = {
+			doodle: this.drawing.selectedDoodle
+		};
+		var html = Mustache.render(this.template, data);
 		this.container.html(html);
 	};
 
 	/**
 	 * Update the menu content with the specific doodle and either show or hide it.
 	 * @param  {Boolean} show   Show or hide the menu.
-	 * @param  {ED.Doodle} doodle The currently selected doodle.
-	 * @param  {Number} delay  The amount of time to delay (in ms) prior to showing to hiding.
 	 */
-	DoodlePopup.prototype.update = function(show, doodle, delay) {
+	DoodlePopup.prototype.update = function(show) {
 		if (show) {
-			this.render({ doodle: doodle });
-			this.show(delay);
+			this.render();
+			this.show();
 		} else {
-			this.hide(delay);
+			this.hide();
 		}
 	};
 
@@ -118,26 +109,25 @@ ED.Views.DoodlePopup = (function() {
 	 * Hide the menu.
 	 * @param  {Number} delay The amount of time (ms) to delay hiding the menu.
 	 */
-	DoodlePopup.prototype.hide = function(delay) {
+	DoodlePopup.prototype.hide = function() {
 		this.state = CLOSED;
 		this.delay(function() {
 			this.container.addClass('closed');
-		}.bind(this), delay);
+		}.bind(this));
 	};
 
 	/**
 	 * Show the menu.
 	 * @param  {Number} delay The amount of time (in ms) to delay showing the menu.
 	 */
-	DoodlePopup.prototype.show = function(delay) {
-		if (this.currentDoodle.isLocked){
+	DoodlePopup.prototype.show = function() {
+		if (this.drawing.selectDoodle.isLocked) {
 			return;
 		}
 		this.state = OPEN;
-		this.selectDoodle();
 		this.delay(function() {
 			this.container.removeClass('closed');
-		}.bind(this), delay);
+		}.bind(this));
 	};
 
 	/**
@@ -145,56 +135,29 @@ ED.Views.DoodlePopup = (function() {
 	 * @param  {Function} fn    The callback function to execute.
 	 * @param  {Number}   delay The amount of time (in ms) to delay.
 	 */
-	DoodlePopup.prototype.delay = function(fn, delay) {
-		delay = typeof delay === 'number' ? delay : 50;
+	DoodlePopup.prototype.delay = function(fn) {
 		clearTimeout(this.delayTimer);
-		this.delayTimer = setTimeout(fn, delay);
-	};
-
-	/**
-	 * Select the current doodle.
-	 */
-	DoodlePopup.prototype.selectDoodle = function() {
-		// @todo This should be one method call on the drawing.
-		// move this stuff into the ED.Drawing class.
-		if (!this.currentDoodle.isSelected && !this.currentDoodle.isLocked) {
-			this.currentDoodle.isSelected = true;
-			this.currentDoodle.onSelection();
-			this.drawing.repaint();
-		}
+		this.delayTimer = setTimeout(fn, 50);
 	};
 
 	/*********************
 	 * EVENT HANDLERS
 	 *********************/
 
-	DoodlePopup.prototype.onReady = function() {
+	DoodlePopup.prototype.onDoodleAdded = function() {
+		this.update(true);
 	};
 
-	DoodlePopup.prototype.onDoodleAdded = function(notification) {
-		// FIXME
-		this.currentDoodle = notification.object || notification.selectedDoodle;
-		this.update(true, this.currentDoodle);
+	DoodlePopup.prototype.onDoodleDeleted = function() {
+		this.update(false);
 	};
 
-	DoodlePopup.prototype.onDoodleDeleted = function(notification) {
-		this.update(false, notification.object || notification.selectedDoodle);
+	DoodlePopup.prototype.onDoodleSelected = function() {
+		setTimeout(this.update.bind(this, true));
 	};
 
-	DoodlePopup.prototype.onDoodleSelected = function(notification) {
-		/**
-		 * Order of events emitted from the eyedraw:
-		 * 1. doodleSelected
-		 * 2. doodleDeselected
-		 * Thus we delay the selected action into the next event loop if we want the
-		 * popup to remain visible when selecting a new doodle.
-		 */
-		this.currentDoodle = notification.object || notification.selectedDoodle;
-		setTimeout(this.update.bind(this, true, this.currentDoodle, 60));
-	};
-
-	DoodlePopup.prototype.onDoodleDeselected = function(notification) {
-		this.update(false, notification.selectedDoodle);
+	DoodlePopup.prototype.onDoodleDeselected = function() {
+		this.update(false);
 	};
 
 	return DoodlePopup;
