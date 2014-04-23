@@ -51,7 +51,6 @@ ED.Controller = (function() {
 		this.canvas = document.getElementById(properties.canvasId);
 		this.input = document.getElementById(properties.inputId);
 		this.container = $(this.canvas).closest('.eyedraw-widget');
-
 		this.Checker = Checker || ED.Checker;
 		this.drawing = drawing || this.createDrawing();
 		this.toolbar = toolbar || this.createToolbar();
@@ -122,7 +121,7 @@ ED.Controller = (function() {
 	 * Register drawing and DOM events.
 	 */
 	Controller.prototype.registerEvents = function() {
-		// Register controller for notifications
+		// Register controller for drawing notifications
 		this.drawing.registerForNotifications(this, 'notificationHandler', [
 			'ready',
 			'doodlesLoaded',
@@ -203,6 +202,9 @@ ED.Controller = (function() {
 		}
 	};
 
+	/**
+	 * Deselect all synced doodles.
+	 */
 	Controller.prototype.deselectSyncedDoodles = function() {
 		for (var idSuffix in this.properties.syncArray) {
 			var drawing = this.getEyeDrawInstance(idSuffix);
@@ -218,29 +220,26 @@ ED.Controller = (function() {
 	 * adding doodles on page load, for example.)
 	 */
 	Controller.prototype.runOnReadyCommands = function() {
-
 		var arr = (this.properties.onReadyCommandArray || []);
-
-		for (var i = 0; i < arr.length; i++) {
-			// Get method name
-			var method = arr[i][0];
-			var argumentArray = arr[i][1];
-
-			// Run method with arguments
-			this.drawing[method].apply(this.drawing, argumentArray);
-		}
+		this.runCommands(arr);
 	};
 
 	/**
 	 * Run commands once all doodles have been loaded.
 	 */
 	Controller.prototype.runOnDoodlesLoadedCommands = function() {
-
 		var arr = (this.properties.onDoodlesLoadedCommandArray || []);
+		this.runCommands(arr);
+	};
 
-		// Run commands after doodles have successfully loaded
+	/**
+	 * Run commands (with arguments) on the drawing instance.
+	 * @param  {Array} arr The array of commands.
+	 */
+	Controller.prototype.runCommands = function(arr) {
+
 		for (var i = 0; i < arr.length; i++) {
-			// Get method name
+
 			var method = arr[i][0];
 			var argumentArray = arr[i][1];
 
@@ -295,6 +294,7 @@ ED.Controller = (function() {
 
 					// Sync the doodle parameters.
 					var parameterArray = syncArray[idSuffix][masterDoodleName][slaveDoodleName].parameters;
+
 					this.syncDoodleParameters(parameterArray, changedParam, masterDoodle, slaveDoodle, slaveDrawing);
 				}
 			}
