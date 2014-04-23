@@ -443,6 +443,8 @@ ED.Drawing.prototype.notify = function(_eventName, _object) {
 	};
 
 	// console.log(this.notificationArray);
+	//
+
 
 	// Call method on each registered object
 	for (var i = 0; i < this.notificationArray.length; i++) {
@@ -451,6 +453,8 @@ ED.Drawing.prototype.notify = function(_eventName, _object) {
 		var list = this.notificationArray[i]['notificationList'];
 		var object = this.notificationArray[i]['object'];
 		var methodName = this.notificationArray[i]['methodName'];
+
+		// console.log(_eventName);
 
 		// Check that event is in notification list for this object, or array is empty implying all notifications
 		if (list.length == 0 || list.indexOf(_eventName) >= 0) {
@@ -1852,6 +1856,7 @@ ED.Drawing.prototype.selectDoodle = function(doodle) {
 	if (this.lastSelectedDoodle) this.lastSelectedDoodle.onDeselection();
 	// Run onSelection code
 	this.selectedDoodle.onSelection();
+
 	// Notify
 	this.notify("doodleSelected");
 

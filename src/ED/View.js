@@ -38,7 +38,6 @@ ED.View = (function() {
 	 * @extends {EventEmitter2}
 	 */
 	function View(drawing, container) {
-
 		EventEmitter2.call(this);
 
 		this.drawing = drawing;
@@ -49,15 +48,6 @@ ED.View = (function() {
 
 	View.prototype = Object.create(EventEmitter2.prototype);
 	View.prototype.constructor = View;
-
-	/**
-	 * Register for drawing notifications and bind interaction events.
-	 */
-	View.prototype.registerForNotifications = function() {
-		// this.drawing.registerForNotifications(this, 'notificationHandler', [
-		// 	'ready',
-		// ]);
-	};
 
 	/**
 	 * This notification handler will simply route events to handlers.
@@ -71,12 +61,6 @@ ED.View = (function() {
 		}
 		this[handlerName](notification);
 	};
-
-	/*********************
-	 * EVENT HANDLERS
-	 *********************/
-
-	View.prototype.onReady = $.noop;
 
 	return View;
 }());
