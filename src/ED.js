@@ -187,6 +187,7 @@ ED.positiveAngle = function(_angle) {
  * @param {String} _message Error message
  */
 ED.errorHandler = function(_class, _method, _message) {
+	console.error(_message);
 	throw new Error('EYEDRAW ERROR! class: [' + _class + '] method: [' + _method + '] message: [' + _message + ']');
 }
 
@@ -238,13 +239,22 @@ ED.instances = {};
 
 ED.setInstance = function(instance) {
 	var id = instance.idSuffix;
-	if (!(id in ED.instances)) {
-		ED.instances[id] = instance;
+	if (!id) {
+		console.log(instance);
+		throw new Error('Instance does not contain idSuffix');
 	}
+	if (id in ED.instances) {
+		throw new Error('Instance with id ' + id + ' has already been set');
+	}
+	ED.instances[id] = instance;
 };
 
 ED.getInstance = function(idSuffix) {
 	return ED.instances[idSuffix];
+};
+
+ED.resetInstances = function() {
+	ED.instances = {};
 };
 
 /**
