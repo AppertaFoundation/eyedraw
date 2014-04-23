@@ -85,8 +85,11 @@ ED.Views.DoodlePopup = (function() {
 	 * @param  {Object} data Template data.
 	 */
 	DoodlePopup.prototype.render = function() {
+		var doodle = this.drawing.selectedDoodle;
 		var data = {
-			doodle: this.drawing.selectedDoodle
+			doodle: doodle,
+			title: doodle ? ED.titles[doodle.className] : '',
+			desc: doodle ? ED.trans[doodle.className] : ''
 		};
 		var html = Mustache.render(this.template, data);
 		this.container.html(html);

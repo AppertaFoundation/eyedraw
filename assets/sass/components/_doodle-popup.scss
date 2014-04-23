@@ -17,7 +17,7 @@
 .eyedraw-doodle-popup {
 	@include border-radius(4px);
 	@include box-shadow(2px 2px 6px rgba(0, 0, 0, 0.4));
-	@include transition(all 0.5s ease);
+	@include transition(right 0.5s ease, opacity 0.5s ease);
 	background: #e5edf4;
 	border: 3px solid #68c8f8;
 	bottom: 8px;
@@ -27,11 +27,18 @@
 	width: 168px;
 	height: 242px;
 	z-index: 100;
+	opacity: 1;
 	-webkit-transform: translate3d(0, 0, 0);
 	-webkit-backface-visibility: hidden;
 	-webkit-perspective: 1000;
 	&.closed {
-		right: 0;
+		right: 8px;
+		opacity: 0.85;
+		.eyedraw-button {
+			.label {
+				display: none;
+			}
+		}
 	}
 	.eyedraw-toolbar-panel {
 		position: absolute;
@@ -50,12 +57,19 @@
 		color: #666;
 		font-style: italic;
 	}
+	.description {
+		font-size: 12px;
+		line-height: 13px;
+		font-style: italic;
+		padding-top: 6px;
+	}
 }
 
 .eyedraw-doodle-popup-heading {
 	@extend %clearfix;
 	color: #000;
 	font-size: 14px;
+	line-height: 14px;
 	margin-top: 0;
 	.eyedraw-button {
 		float: left;
