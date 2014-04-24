@@ -120,6 +120,7 @@ ED.Controller = (function() {
 		// Register drawing with the checker.
 		this.Checker.register(this.drawing);
 		// Store the drawing instance.
+		/** @todo This should be moved into the Checker */
 		ED.setInstance(this.drawing);
 	};
 
@@ -257,6 +258,7 @@ ED.Controller = (function() {
 	 * @return {ED.Drawing}
 	 */
 	Controller.prototype.getEyeDrawInstance = function(idSuffix) {
+		/** @todo This should be moved into the Checker */
 		return ED.getInstance(idSuffix);
 	};
 

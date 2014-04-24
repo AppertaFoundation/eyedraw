@@ -41,7 +41,6 @@ ED.Views.SelectedDoodle = (function() {
 	function SelectedDoodle() {
 		ED.View.apply(this, arguments);
 		this.select = this.container.find('select');
-		this.doodles = this.drawing.doodleArray;
 		this.bindEvents();
 	}
 
@@ -49,15 +48,17 @@ ED.Views.SelectedDoodle = (function() {
 	SelectedDoodle.prototype.constructor = SelectedDoodle;
 
 	/**
-	 * Register a ED.Drawing notification handler.
+	 * Register a ED.Drawing notification handler. For each event, re-render the view.
 	 */
 	SelectedDoodle.prototype.registerForNotifications = function() {
-		this.drawing.registerForNotifications(this, 'notificationHandler', [
+		this.drawing.registerForNotifications(this, 'render', [
 			'ready',
 			'doodleAdded',
 			'doodleDeleted',
 			'doodleSelected',
-			'doodleDeselected'
+			'doodleDeselected',
+			'moveToFront',
+			'moveToBack'
 		]);
 	};
 
@@ -72,47 +73,74 @@ ED.Views.SelectedDoodle = (function() {
 	/**
 	 * Render the select element.
 	 */
-	SelectedDoodle.prototype.render = function() {
-		var noneOption = '<option ' + (this.drawing.selectedDoodle === null ? ' selected' : '') + '>None</option>';
-		this.select.html(noneOption);
-		this.select.append(this.doodles.map(this.createOption.bind(this)));
+	SelectedDoodle.prototype.render = function(notification) {
+
+		var optgroup = $('<optgroup label="Selected doodle" />');
+
+		// "None" option
+		var noneText = 'None';
+		var noneSelected = (this.drawing.selectedDoodle === null);
+		optgroup.append(this.createOption(noneText, noneSelected));
+
+		// Doodle options
+		var doodleOptions = this.drawing.doodleArray.map(this.createDoodleOption.bind(this));
+		optgroup.append(doodleOptions);
+
+		this.select.html(optgroup);
 	};
 
 	/**
-	 * Create an <option> element.
-	 * @param  {ED.Doodle} doodle
+	 * Create a jQuery instance for an <option> element.
+	 * @param  {String} text     The <option> text.
+	 * @param  {Boolean} selected Is the option selected?
+	 * @return {jQuery}          The jQuery instance.
 	 */
-	SelectedDoodle.prototype.createOption = function(doodle) {
+	SelectedDoodle.prototype.createOption = function(text, selected) {
 		return $('<option />', {
-			text: ED.titles[doodle.className] || doodle.className,
-			selected: (doodle === this.drawing.selectedDoodle)
-		}).data('doodle', doodle);
+			text: text,
+			selected: selected
+		});
+	};
+
+	/**
+	 * Create an doodle jQuery option element.
+	 * @param  {ED.Doodle} doodle
+	 * @return {jQuery} The jQuery instance.
+	 */
+	SelectedDoodle.prototype.createDoodleOption = function(doodle) {
+
+		var text = ED.titles[doodle.className] || doodle.className
+		var selected = (doodle === this.drawing.selectedDoodle);
+
+		// Find matching doodles, in order of created time.
+		var doodles = this.drawing.doodleArray.filter(function(d) {
+			return (d.className === doodle.className);
+		}).sort(function(a, b) {
+			return (a.createdTime - b.createdTime);
+		});
+
+		if (doodles.length > 1) {
+			// Find the index of this doodle within the set of matching doodles.
+			var index = doodles.indexOf(doodle);
+			text += ' (' + (index + 1) + ')';
+		}
+
+		var option = this.createOption(text, selected);
+
+		// Store the doodle reference
+		option.data('doodle', doodle);
+
+		return option;
 	};
 
 	/*********************
 	 * EVENT HANDLERS
 	 *********************/
 
-	SelectedDoodle.prototype.onReady = function() {
-		this.render();
-	};
-
-	SelectedDoodle.prototype.onDoodleAdded = function() {
-		this.render();
-	};
-
-	SelectedDoodle.prototype.onDoodleDeleted = function() {
-		this.render();
-	};
-
-	SelectedDoodle.prototype.onDoodleSelected = function() {
-		this.render();
-	};
-
-	SelectedDoodle.prototype.onDoodleDeselected = function() {
-		this.render();
-	};
-
+	/**
+	 * Select a doodle or de-select all doodles (when selecting "none")
+	 * @param  {Object} e DOM event object.
+	 */
 	SelectedDoodle.prototype.onSelectChange = function(e) {
 		var doodle = $(e.target).find(':selected').data('doodle');
 		if (!doodle) {

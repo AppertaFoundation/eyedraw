@@ -43,6 +43,12 @@
 		white-space: nowrap;
 		z-index: 102;
 	}
+	// Button icon
+	[class*="icon-ed-"] {
+		// Account for the borders
+		margin-left: -1px;
+		margin-top: -1px;
+	}
 	&:active {
 		.label {
 			left: -9999px;
