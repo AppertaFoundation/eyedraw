@@ -79,6 +79,9 @@ ED.Doodle = function(_drawing, _parameterJSON) {
 		this.transform = new ED.Drawing.AffineTransform();
 		this.inverseTransform = new ED.Drawing.AffineTransform();
 
+		// Store created time
+		this.createdTime = (new Date()).getTime();
+
 		// Dragging defaults - set individual values in subclasses
 		this.isLocked = false;
 		this.isSelectable = true;

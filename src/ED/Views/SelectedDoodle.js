@@ -41,7 +41,6 @@ ED.Views.SelectedDoodle = (function() {
 	function SelectedDoodle() {
 		ED.View.apply(this, arguments);
 		this.select = this.container.find('select');
-		this.doodles = this.drawing.doodleArray;
 		this.bindEvents();
 	}
 
@@ -57,7 +56,9 @@ ED.Views.SelectedDoodle = (function() {
 			'doodleAdded',
 			'doodleDeleted',
 			'doodleSelected',
-			'doodleDeselected'
+			'doodleDeselected',
+			'moveToFront',
+			'moveToBack'
 		]);
 	};
 
@@ -73,45 +74,63 @@ ED.Views.SelectedDoodle = (function() {
 	 * Render the select element.
 	 */
 	SelectedDoodle.prototype.render = function() {
-		var noneOption = '<option ' + (this.drawing.selectedDoodle === null ? ' selected' : '') + '>None</option>';
-		this.select.html(noneOption);
-		this.select.append(this.doodles.map(this.createOption.bind(this)));
+
+		// "None" option
+		var noneText = 'None';
+		var noneSelected = (this.drawing.selectedDoodle === null ? ' selected' : '');
+		this.select.html(this.createOption(noneText, noneSelected));
+
+		// Doodle options
+		var doodleOptions = this.drawing.doodleArray.map(this.createDoodleOption.bind(this));
+		this.select.append(doodleOptions);
+	};
+
+	/**
+	 * Render the view for each notification.
+	 */
+	SelectedDoodle.prototype.notificationHandler = SelectedDoodle.prototype.render;
+
+	/**
+	 * Create a jQuery instance for an <option> element.
+	 * @param  {String} text     The <option> text.
+	 * @param  {Boolean} selected Is the option selected?
+	 * @return {jQuery}          The jQuery instance.
+	 */
+	SelectedDoodle.prototype.createOption = function(text, selected) {
+		return $('<option />', {
+			text: text,
+			selected: selected
+		});
 	};
 
 	/**
 	 * Create an <option> element.
 	 * @param  {ED.Doodle} doodle
 	 */
-	SelectedDoodle.prototype.createOption = function(doodle) {
-		return $('<option />', {
-			text: ED.titles[doodle.className] || doodle.className,
-			selected: (doodle === this.drawing.selectedDoodle)
-		}).data('doodle', doodle);
+	SelectedDoodle.prototype.createDoodleOption = function(doodle) {
+
+		var text = ED.titles[doodle.className] || doodle.className
+		var selected = (doodle === this.drawing.selectedDoodle);
+
+		// Find matching doodles, in order of created time.
+		var doodles = this.drawing.doodleArray.filter(function(d) {
+			return (d.className === doodle.className);
+		}).sort(function(a, b) {
+			return (a.createdTime - b.createdTime);
+		});
+
+		if (doodles.length > 1) {
+			// Find the index of this doodle within the set of matching doodles.
+			var index = doodles.indexOf(doodle) + 1;
+			text += ' (' + index + ')';
+		}
+
+		return this.createOption(text, selected).data('doodle', doodle);
 	};
 
 	/*********************
 	 * EVENT HANDLERS
 	 *********************/
-
-	SelectedDoodle.prototype.onReady = function() {
-		this.render();
-	};
-
-	SelectedDoodle.prototype.onDoodleAdded = function() {
-		this.render();
-	};
-
-	SelectedDoodle.prototype.onDoodleDeleted = function() {
-		this.render();
-	};
-
-	SelectedDoodle.prototype.onDoodleSelected = function() {
-		this.render();
-	};
-
-	SelectedDoodle.prototype.onDoodleDeselected = function() {
-		this.render();
-	};
 
 	SelectedDoodle.prototype.onSelectChange = function(e) {
 		var doodle = $(e.target).find(':selected').data('doodle');
