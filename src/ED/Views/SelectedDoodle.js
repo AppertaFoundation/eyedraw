@@ -73,16 +73,20 @@ ED.Views.SelectedDoodle = (function() {
 	/**
 	 * Render the select element.
 	 */
-	SelectedDoodle.prototype.render = function() {
+	SelectedDoodle.prototype.render = function(notification) {
+
+		var optgroup = $('<optgroup label="Selected doodle" />');
 
 		// "None" option
 		var noneText = 'None';
-		var noneSelected = (this.drawing.selectedDoodle === null ? ' selected' : '');
-		this.select.html(this.createOption(noneText, noneSelected));
+		var noneSelected = (this.drawing.selectedDoodle === null);
+		optgroup.append(this.createOption(noneText, noneSelected));
 
 		// Doodle options
 		var doodleOptions = this.drawing.doodleArray.map(this.createDoodleOption.bind(this));
-		this.select.append(doodleOptions);
+		optgroup.append(doodleOptions);
+
+		this.select.html(optgroup);
 	};
 
 	/**

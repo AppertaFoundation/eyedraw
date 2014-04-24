@@ -1060,34 +1060,31 @@ span.squiggle {
 
 /* line 17, ../sass/components/_fields.scss */
 .eyedraw-fields {
-  margin-top: 58px;
+  margin-top: 52px;
 }
 
 /* line 17, ../sass/components/_selected-doodle.scss */
 .eyedraw-selected-doodle {
-  top: 6px;
+  top: 3px;
   position: absolute;
-  right: -190px;
+  right: -186px;
   width: 190px;
+  z-index: 101;
 }
-/* line 22, ../sass/components/_selected-doodle.scss */
+/* line 23, ../sass/components/_selected-doodle.scss */
 .eyedraw-selected-doodle label {
   color: #5b5b5b;
   font-size: .7rem;
   font-weight: bold;
   padding-left: 10px;
 }
-/* line 28, ../sass/components/_selected-doodle.scss */
+/* line 29, ../sass/components/_selected-doodle.scss */
 .eyedraw-selected-doodle .selected-box {
-  -webkit-border-radius: 4px;
-  -moz-border-radius: 4px;
-  -ms-border-radius: 4px;
-  -o-border-radius: 4px;
-  border-radius: 4px;
   background-color: #e4edf5;
   background-repeat: no-repeat;
-  border: 2px solid #68c8f8;
-  padding: 2px;
+  border: 1px solid #b0bac3;
+  border-left: 0;
+  padding: 8px 4px;
 }
 
 /* line 17, ../sass/components/_doodle-popup.scss */
@@ -1106,7 +1103,6 @@ span.squiggle {
   transition: right 0.5s ease, opacity 0.5s ease;
   background: #e5edf4;
   border: 3px solid #68c8f8;
-  bottom: 8px;
   padding: 5px;
   position: absolute;
   right: -168px;
@@ -1114,6 +1110,7 @@ span.squiggle {
   height: 242px;
   z-index: 100;
   opacity: 1;
+  top: 44px;
   -webkit-transform: translate3d(0, 0, 0);
   -webkit-backface-visibility: hidden;
   -webkit-perspective: 1000;

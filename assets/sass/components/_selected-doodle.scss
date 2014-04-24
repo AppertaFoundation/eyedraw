@@ -15,10 +15,11 @@
 // * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
 
 .eyedraw-selected-doodle {
-	top: 6px;
+	top: 3px;
 	position: absolute;
-	right: -190px;
+	right: -186px;
 	width: 190px;
+	z-index: 101;
 	label {
 		color: #5b5b5b;
 		font-size: .7rem;
@@ -26,12 +27,12 @@
 		padding-left: 10px;
 	}
 	.selected-box {
-		@include border-radius(4px);
 		background: {
 			color: #e4edf5;
 			repeat: no-repeat;
 		};
-		border: 2px solid #68c8f8;
-		padding: 2px;
+		border: 1px solid #b0bac3;
+		border-left: 0;
+		padding: 8px 4px;
 	}
 }

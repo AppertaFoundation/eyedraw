@@ -20,7 +20,6 @@
 	@include transition(right 0.5s ease, opacity 0.5s ease);
 	background: #e5edf4;
 	border: 3px solid #68c8f8;
-	bottom: 8px;
 	padding: 5px;
 	position: absolute;
 	right: -168px;
@@ -28,6 +27,7 @@
 	height: 242px;
 	z-index: 100;
 	opacity: 1;
+	top: 44px;
 	-webkit-transform: translate3d(0, 0, 0);
 	-webkit-backface-visibility: hidden;
 	-webkit-perspective: 1000;
