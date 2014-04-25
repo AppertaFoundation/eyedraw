@@ -216,10 +216,12 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 
 		document.body.addEventListener('mousedown', function onBodyMouseDown(e) {
 
-			// Deselect all doodles if the user clicks any on the page that is
+			// Deselect all doodles if the user clicks anywhere on the page that is
 			// not the canvas itself, nor the doodle popup, nor any toolbar buttons.
+
 			var elem = e.target;
 			var isEyeDrawElement = false;
+
 			var ignore = '(' + [
 				'eyedraw-doodle-popup',
 				'eyedraw-button',
@@ -630,7 +632,7 @@ ED.Drawing.prototype.mousedown = function(_point) {
 
 			// Successful hit test?
 			if (this.doodleArray[i].draw(_point)) {
-				if (this.doodleArray[i].isSelectable && !this.doodleArray[i].isLocked) {
+				if (this.doodleArray[i].isSelectable) {
 					// If double clicked, go into drawing mode
 					if (this.doubleClick && this.doodleArray[i].isSelected && this.doodleArray[i].isDrawable) {
 						this.doodleArray[i].isForDrawing = true;
@@ -717,6 +719,13 @@ ED.Drawing.prototype.mousemove = function(_point) {
 		point: _point
 	});
 
+	// Get selected doodle
+	var doodle = this.selectedDoodle;
+
+	if (doodle && this.selectedDoodle.isLocked) {
+		return;
+	}
+
 	// Draw selection rectangle
 	/*
     if (this.mode == ED.Mode.Select)
@@ -736,9 +745,6 @@ ED.Drawing.prototype.mousemove = function(_point) {
 
 	// Start the hover timer (also resets it)
 	this.startHoverTimer(_point);
-
-	// Get selected doodle
-	var doodle = this.selectedDoodle;
 
 	// Only drag if mouse already down and a doodle selected
 	if (this.mouseDown && doodle != null) {
@@ -1327,6 +1333,11 @@ ED.Drawing.prototype.hover = function(_point) {
  * @param {Point} _point coordinates of mouse in canvas plane
  */
 ED.Drawing.prototype.showTooltip = function(_point) {
+
+
+	// DISABLED TOOLTIPS AS PART OF #OED-4
+	return;
+
 	// Get coordinates of mouse
 	var xAbs = _point.x;
 	var yAbs = _point.y;
@@ -1401,8 +1412,14 @@ ED.Drawing.prototype.hideTooltip = function() {
  * Moves selected doodle to front
  */
 ED.Drawing.prototype.moveToFront = function() {
+
 	// Should only be called if a doodle is selected, but check anyway
 	if (this.selectedDoodle != null) {
+
+		if (this.selectedDoodle.isLocked) {
+			return;
+		}
+
 		// Assign large number to selected doodle
 		this.selectedDoodle.order = 1000;
 
@@ -1428,8 +1445,14 @@ ED.Drawing.prototype.moveToFront = function() {
  * Moves selected doodle to back
  */
 ED.Drawing.prototype.moveToBack = function() {
+
 	// Should only be called if a doodle is selected, but check anyway
-	if (this.selectedDoodle != null) {
+	if (this.selectedDoodle !== null) {
+
+		if (this.selectedDoodle.isLocked) {
+			return;
+		}
+
 		// Assign negative order to selected doodle
 		this.selectedDoodle.order = -1;
 
@@ -1711,20 +1734,9 @@ ED.Drawing.prototype.deleteDoodleOfId = function(_id) {
  */
 ED.Drawing.prototype.lock = function() {
 	// Should only be called if a doodle is selected, but check anyway
-	if (this.selectedDoodle != null) {
-		// Go through doodles locking any that are selected
-		for (var i = 0; i < this.doodleArray.length; i++) {
-			if (this.doodleArray[i].isSelected) {
-				this.doodleArray[i].isLocked = true;
-				this.doodleArray[i].isSelected = false;
-				this.doodleArray[i].onDeselection();
-				this.selectedDoodle = null;
-			}
-		}
-
-		// this.notify("doodleDeselected");
-
-		// Refresh canvas
+	if (this.selectedDoodle !== null) {
+		this.selectedDoodle.isLocked = true;
+		this.notify("doodleLocked");
 		this.repaint();
 	}
 }
@@ -1737,7 +1749,7 @@ ED.Drawing.prototype.unlock = function() {
 	for (var i = 0; i < this.doodleArray.length; i++) {
 		this.doodleArray[i].isLocked = false;
 	}
-
+	this.notify("doodleUnlocked");
 	// Refresh canvas
 	this.repaint();
 }

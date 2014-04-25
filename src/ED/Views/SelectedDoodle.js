@@ -58,7 +58,9 @@ ED.Views.SelectedDoodle = (function() {
 			'doodleSelected',
 			'doodleDeselected',
 			'moveToFront',
-			'moveToBack'
+			'moveToBack',
+			'doodleLocked',
+			'doodleUnlocked'
 		]);
 	};
 
@@ -123,6 +125,10 @@ ED.Views.SelectedDoodle = (function() {
 			// Find the index of this doodle within the set of matching doodles.
 			var index = doodles.indexOf(doodle);
 			text += ' (' + (index + 1) + ')';
+		}
+
+		if (doodle.isLocked) {
+			text += ' (Locked)';
 		}
 
 		var option = this.createOption(text, selected);
