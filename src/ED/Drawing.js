@@ -22,6 +22,8 @@
  * along with OpenEyes.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+var ED = ED || {};
+
 /**
  * A Drawing consists of one canvas element displaying one or more doodles;
  * Doodles are drawn in the 'doodle plane' consisting of a (nominal) 1001 pixel square grid -500 to 500) with central origin, and negative Y upwards
@@ -59,6 +61,7 @@
  * @param {Bool} _isEditable Flag indicating whether canvas is editable or not
  * @param {Array} _options Associative array of optional parameters
  */
+
 ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 
 	// Check we're working with an actual canvas HTML element.

@@ -297,7 +297,7 @@ ED.Doodle = function(_drawing, _parameterJSON) {
 						var colour = new ED.Drawing.Colour(c.red, c.green, c.blue, c.alpha);
 						var thickness = squiggleArray[j].thickness;
 						var filled = squiggleArray[j].filled;
-						var squiggle = new ED.Squiggle(this, colour, thickness, filled);
+						var squiggle = new ED.Drawing.Squiggle(this, colour, thickness, filled);
 
 						// Add points to squiggle and complete it
 						var pointsArray = squiggleArray[j].pointsArray;
@@ -1765,7 +1765,7 @@ ED.Doodle.prototype.addSquiggle = function() {
 	}
 
 	// Create new squiggle
-	var squiggle = new ED.Squiggle(this, colourObject, lineThickness, this.filled);
+	var squiggle = new ED.Drawing.Squiggle(this, colourObject, lineThickness, this.filled);
 
 	// Add it to squiggle array
 	this.squiggleArray.push(squiggle);

@@ -59,10 +59,10 @@ ED.TrabySuture.superclass = ED.Doodle.prototype;
 ED.TrabySuture.prototype.setHandles = function() {
 	// Array of handles for releasable suture
 	for (var i = 0; i < this.numberOfHandles; i++) {
-		this.handleArray[i] = new ED.Handle(null, true, ED.Mode.Handles, false);
+		this.handleArray[i] = new ED.Doodle.Handle(null, true, ED.Mode.Handles, false);
 	}
 
-	//this.handleArray[this.numberOfHandles] = new ED.Handle(null, true, ED.Mode.Rotate, false);
+	//this.handleArray[this.numberOfHandles] = new ED.Doodle.Handle(null, true, ED.Mode.Rotate, false);
 }
 
 /**
@@ -105,7 +105,7 @@ ED.TrabySuture.prototype.setParameterDefaults = function() {
 	this.size = '10/0';
 
 	// Create a squiggle to store the handles points
-	var squiggle = new ED.Squiggle(this, new ED.Colour(100, 100, 100, 1), 4, true);
+	var squiggle = new ED.Drawing.Squiggle(this, new ED.Colour(100, 100, 100, 1), 4, true);
 
 	// Add it to squiggle array
 	this.squiggleArray.push(squiggle);

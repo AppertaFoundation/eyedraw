@@ -4,7 +4,11 @@
         <title>EyeDraw</title>
 
         <!-- EyeDraw CSS style sheet -->
-        <link rel="stylesheet" href="../css/oe-eyedraw.css" type="text/css" media="screen" />
+        <link rel="stylesheet" href="../assets/css/oe-eyedraw.css" type="text/css" media="screen" />
+
+        <!-- Depedendant 3rd-party libraries -->
+
+        <script src="../assets/components/eventemitter2/lib/eventemitter2.js" type="text/javascript"></script>
 
         <!-- Mandatory file containing key drawing classes -->
         <script src="../dist/eyedraw.js" type="text/javascript"></script>
@@ -41,7 +45,7 @@
                 var canvasEdit = document.getElementById('canvasEdit');
 
                 // Create a drawingEdit , {scaleOn:'width'}
-                drawingEdit = new ED.Drawing(canvasEdit, ED.eye.Right, 'RPS', true, {graphicsPath:'../img/'});
+                drawingEdit = new ED.Drawing(canvasEdit, ED.eye.Right, 'RPS', true, {graphicsPath:'../assets/img/'});
 
                 // Instantiate a controller object
                 controller = new eyeDrawController(drawingEdit);
@@ -70,7 +74,7 @@
                 this.drawing = _drawing;
                 this.gsf = 1;
                 //this.gsf = 0.72;
-                
+
                 // Specify call back function
                 this.callBack = callBack;
 
@@ -99,15 +103,9 @@
 							//this.drawing.addDoodle('UTear');
 							//this.drawing.addDoodle('EarDrum');
 							//this.drawing.addDoodle('Perforation');
-<<<<<<< HEAD
 							this.drawing.addDoodle('Fundus');
 							this.drawing.addDoodle('PostSubcapCataract');
-							//this.drawing.addDoodle('Freehand', {}, {colour:{id:'colourSelect'}});				
-=======
-							//this.drawing.addDoodle('PostPole');
-							//this.drawing.addDoodle('CystoidMacularOedema');
 							//this.drawing.addDoodle('Freehand', {}, {colour:{id:'colourSelect'}});
->>>>>>> Fixed tests after splitting out ED drawing ojects into individual files
 
 							// Grid , {type:{id:'piTypeSelect'}}  , {type:'Laser'}, {suture:{id:'Eyedraw_boolField'}}
 					    	//this.drawing.addDoodle('Lungs');
@@ -125,19 +123,14 @@
 // 					        );
 //
 // 					        // Constrain x movement
-// 					        //rightEye.parameterValidationArray['originX']['range'] = new ED.Drawing.Range(-350, -150);
+// 					        //rightEye.parameterValidationArray['originX']['range'] = new ED.Range(-350, -150);
 //
 // 					        // Left eye
 // 					        leftEye = this.drawing.addDoodle('HVT', {rotation:Math.PI/4});
-// 					        leftEye.parameterValidationArray['originX']['range'] = new ED.Drawing.Range(+150, +350);
+// 					        leftEye.parameterValidationArray['originX']['range'] = new ED.Range(+150, +350);
 // 					        leftEye.originX = +250;
-<<<<<<< HEAD
-					    
-					        //this.drawing.deselectDoodles();
-=======
 
-					        this.drawing.deselectDoodles();
->>>>>>> Fixed tests after splitting out ED drawing ojects into individual files
+					        //this.drawing.deselectDoodles();
 
 
 
@@ -252,13 +245,8 @@
 							// Column 10
 							this.drawing.addDoodle('FieldCircle', {originX:+350, originY:-50, colour:"008000"});
 							this.drawing.addDoodle('FieldCircle', {originX:+350, originY:+50, colour:"008000"});
-<<<<<<< HEAD
-*/																												
-							//this.drawing.deselectDoodles();
-=======
 */
-							this.drawing.deselectDoodles();
->>>>>>> Fixed tests after splitting out ED drawing ojects into individual files
+							//this.drawing.deselectDoodles();
                             break;
 
                         case 'parameterChanged':
@@ -634,4 +622,3 @@
 
     </body>
 </html>
-
