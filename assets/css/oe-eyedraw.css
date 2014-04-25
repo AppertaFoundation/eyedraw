@@ -140,10 +140,15 @@
   z-index: 102;
 }
 /* line 47, ../sass/components/toolbar/_button.scss */
+.eyedraw-button [class*="icon-ed-"] {
+  margin-left: -1px;
+  margin-top: -1px;
+}
+/* line 53, ../sass/components/toolbar/_button.scss */
 .eyedraw-button:active .label {
   left: -9999px;
 }
-/* line 52, ../sass/components/toolbar/_button.scss */
+/* line 58, ../sass/components/toolbar/_button.scss */
 .eyedraw-button:hover .label {
   -webkit-transition-delay: 0.25s;
   -moz-transition-delay: 0.25s;
@@ -151,12 +156,12 @@
   transition-delay: 0.25s;
   left: -1px;
 }
-/* line 57, ../sass/components/toolbar/_button.scss */
+/* line 63, ../sass/components/toolbar/_button.scss */
 .eyedraw-button.disabled {
   cursor: default;
   background: #ddd;
 }
-/* line 61, ../sass/components/toolbar/_button.scss */
+/* line 67, ../sass/components/toolbar/_button.scss */
 .eyedraw-button.disabled:hover .label {
   -webkit-transition-delay: 0s;
   -moz-transition-delay: 0s;
@@ -179,7 +184,7 @@
 
 /* line 43, ../sass/_mixins.scss */
 [class*="icon-ed-"] {
-  background-image: url('../img/sprites/icons/32x32-sa97cb69c30.png');
+  background-image: url('../img/sprites/icons/32x32-sb14f8d1809.png');
   background-repeat: no-repeat;
   background-position: -9999px -9999px;
   width: 32px;
@@ -394,11 +399,6 @@
 /* line 81, ../sass/_mixins.scss */
 .disabled .icon-ed-AntSynech:hover {
   background-position: 0 -864px;
-}
-
-/* line 74, ../sass/_mixins.scss */
-.icon-ed-PhakoIncision {
-  background-position: 0 -3936px;
 }
 
 /* line 74, ../sass/_mixins.scss */
@@ -982,7 +982,7 @@
 
 /* line 74, ../sass/_mixins.scss */
 .icon-ed-help {
-  background-position: 0 -3968px;
+  background-position: 0 -3936px;
 }
 
 /* line 74, ../sass/_mixins.scss */
