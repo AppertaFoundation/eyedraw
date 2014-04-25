@@ -81,7 +81,8 @@ ED.Views.DoodlePopup = (function() {
 		var data = {
 			doodle: doodle,
 			title: doodle ? ED.titles[doodle.className] : '',
-			desc: doodle ? ED.trans[doodle.className] : ''
+			desc: doodle ? ED.trans[doodle.className] : '',
+			lockedButtonClass: (doodle && doodle.isLocked) ? ' disabled' : ''
 		};
 		var html = Mustache.render(this.template, data);
 		this.container.html(html);
@@ -102,7 +103,6 @@ ED.Views.DoodlePopup = (function() {
 
 	/**
 	 * Hide the menu.
-	 * @param  {Number} delay The amount of time (ms) to delay hiding the menu.
 	 */
 	DoodlePopup.prototype.hide = function() {
 		this.delay(function() {
@@ -112,12 +112,8 @@ ED.Views.DoodlePopup = (function() {
 
 	/**
 	 * Show the menu.
-	 * @param  {Number} delay The amount of time (in ms) to delay showing the menu.
 	 */
 	DoodlePopup.prototype.show = function() {
-		if (this.drawing.selectDoodle.isLocked) {
-			return;
-		}
 		this.delay(function() {
 			this.container.removeClass('closed');
 		}.bind(this));
@@ -126,7 +122,6 @@ ED.Views.DoodlePopup = (function() {
 	/**
 	 * Delay executing a callback.
 	 * @param  {Function} fn    The callback function to execute.
-	 * @param  {Number}   delay The amount of time (in ms) to delay.
 	 */
 	DoodlePopup.prototype.delay = function(fn) {
 		clearTimeout(this.delayTimer);

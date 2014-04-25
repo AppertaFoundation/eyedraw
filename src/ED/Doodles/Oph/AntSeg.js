@@ -163,6 +163,7 @@ ED.AntSeg.prototype.dependentParameterValues = function(_parameter, _value) {
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
 ED.AntSeg.prototype.draw = function(_point) {
+
 	// Get context
 	var ctx = this.drawing.context;
 

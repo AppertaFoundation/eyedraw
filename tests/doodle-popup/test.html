@@ -355,10 +355,9 @@
 									<div class="data-value">
 										<p><strong>UX Notes/issues:</strong></p>
 										<ul>
-											<li>Doodle's cannot be selected after they are locked.</li>
 											<li>Need button disabled state designed</li>
-											<li>Do we still need toolbar drop menus?</li>
 											<li>Do we still need the canvas tooltips?</li>
+											<li>What about <code>doodle.isForDrawing</code> and <code>doodle.addSquiggle()</code>, is this functionality still required?</li>
 										</ul>
 										<p><strong>Dev issues:</strong></p>
 										<ul>
@@ -1017,9 +1016,16 @@
 			{{#helpmsg}}
 				<div class="help-msg">{{helpmsg}}</div>
 			{{/helpmsg}}
-			{{#desc}}
-				<div class="description">{{{desc}}}</div>
-			{{/desc}}
+			{{#doodle.isLocked}}
+				<div class="description">
+					<strong>This doodle is locked and cannot be edited.</strong><br/><br/>
+				</div>
+			{{/doodle.isLocked}}
+			{{^doodle.isLocked}}
+				{{#desc}}
+					<div class="description">{{{desc}}}</div>
+				{{/desc}}
+			{{/doodle.isLocked}}
 			<ul class="eyedraw-toolbar-panel">
 				{{#doodle.isLocked}}
 					<li>
@@ -1038,20 +1044,20 @@
 					</li>
 				{{/doodle.isLocked}}
 				<li>
-					<a class="eyedraw-button" href="#" data-function="moveToBack">
+					<a class="eyedraw-button{{lockedButtonClass}}" href="#" data-function="moveToBack">
 						<span class="icon-ed-move-to-back"></span>
 						<span class="label">Move to back</span>
 					</a>
 				</li>
 				<li>
-					<a class="eyedraw-button" href="#" data-function="moveToFront">
+					<a class="eyedraw-button{{lockedButtonClass}}" href="#" data-function="moveToFront">
 						<span class="icon-ed-move-to-front"></span>
 						<span class="label">Move to front</span>
 					</a>
 				</li>
 				{{#doodle.isDeletable}}
 					<li>
-						<a class="eyedraw-button" href="#" data-function="deleteSelectedDoodle">
+						<a class="eyedraw-button{{lockedButtonClass}}" href="#" data-function="deleteSelectedDoodle">
 							<span class="icon-ed-delete"></span>
 							<span class="label">Delete</span>
 						</a>
