@@ -48,42 +48,68 @@ ED.Views.Toolbar = (function() {
 	Toolbar.prototype.constructor = Toolbar;
 
 	/**
-	 * Register a ED.Drawing notification handler.
+	 * Register a ED.Drawing notification handler. For each event, update
+	 * the toolbar state.
 	 */
 	Toolbar.prototype.registerForNotifications = function() {
-		this.drawing.registerForNotifications(this, 'notificationHandler', [
-			'drawingRepainted'
+		this.drawing.registerForNotifications(this, 'updateState', [
+			'doodleAdded',
+			'doodleDeleted',
 		]);
 	};
 
 	/**
-	 * Run when the drawing ready. Bind interaction events.
+	 * Bind UI events.
 	 */
 	Toolbar.prototype.bindEvents = function() {
+		this.container.on('click.' + EVENT_NAMESPACE, '.eyedraw-button', this.onButtonClick.bind(this));
+	};
 
-		// Toolbar button click events.
-		this.container
-			.on('click.' + EVENT_NAMESPACE, '.eyedraw-toolbar .drawer > a', this.onDrawerButtonClick.bind(this))
-			.on('click.' + EVENT_NAMESPACE, '.eyedraw-button', this.onButtonClick.bind(this));
+	Toolbar.prototype.enableButton = function(button) {
+		button.attr('disabled', false).removeClass('disabled');
+	};
 
-		// Document click event, hide drawers on document click.
-		$(document)
-			.on('click.' + EVENT_NAMESPACE, this.onDocumentClick.bind(this));
+	Toolbar.prototype.disableButton = function(button) {
+		button.attr('disabled', true).addClass('disabled');
+	};
+
+	/**
+	 * Update the state of a toolbar button. Find the associated doodle
+	 * and detrmine if the button should be enabled or disabled.
+	 * @param  {jQuery} button A jQuery button instance
+	 */
+	Toolbar.prototype.updateButtonState = function(button) {
+
+		this.enableButton(button);
+
+		var func = button.data('function');
+		var arg = button.data('arg');
+
+		if (func !== 'addDoodle') {
+			return;
+		}
+
+		var doodle = this.drawing.doodleArray.filter(function(doodle) {
+			return (doodle.className === arg);
+		})[0];
+
+		if (doodle && doodle.isUnique) {
+			this.disableButton(button);
+		}
+	};
+
+	/**
+	 * Update the state of all toolbar buttons.
+	 */
+	Toolbar.prototype.updateState  = function() {
+		this.buttons.each(function(i, button) {
+			this.updateButtonState($(button));
+		}.bind(this));
 	};
 
 	/*********************
 	 * EVENT HANDLERS
 	 *********************/
-
-	 /**
-	  * Open or close the drawer when clicking on a drawer button.
-	  * @param  {Object} e Event object.
-	  */
-	Toolbar.prototype.onDrawerButtonClick = function(e) {
-		e.preventDefault();
-		e.stopImmediatePropagation();
-		$(e.currentTarget).closest('.drawer').toggleClass('active');
-	};
 
 	/**
 	 * Run an action when clicking on a toolbar button.
@@ -112,47 +138,6 @@ ED.Views.Toolbar = (function() {
 		} else {
 			this.emit('doodle.error', 'Invalid doodle function: ' + fn);
 		}
-	};
-
-	Toolbar.prototype.enableButton = function(button) {
-		button.attr('disabled', false).removeClass('disabled');
-	};
-
-	Toolbar.prototype.disableButton = function(button) {
-		button.attr('disabled', true).addClass('disabled');
-	};
-
-	Toolbar.prototype.updateButtonState = function(button) {
-
-		this.enableButton(button);
-
-		var func = button.data('function');
-		var arg = button.data('arg');
-
-		if (func === 'addDoodle') {
-
-			var doodle = this.drawing.doodleArray.filter(function(doodle) {
-				return (doodle.className === arg);
-			})[0];
-
-			if (doodle && doodle.isUnique) {
-				this.disableButton(button);
-			}
-		}
-	};
-
-	Toolbar.prototype.onDrawingRepainted  = function() {
-		this.buttons.each(function(i, button) {
-			this.updateButtonState($(button));
-		}.bind(this));
-	};
-
-	/**
-	 * Hide any open drawers when clicking outside of the toolbar.
-	 */
-	Toolbar.prototype.onDocumentClick = function() {
-		// Close any open drawers.
-		this.container.find('.drawer').removeClass('active');
 	};
 
 	return Toolbar;

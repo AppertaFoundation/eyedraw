@@ -36,11 +36,8 @@ ED.Views.DoodlePopup = (function() {
 	 * @extends {EventEmitter2}
 	 */
 	function DoodlePopup() {
-
 		ED.View.apply(this, arguments);
-
 		this.delayTimer = 0;
-
 		this.createToolbar();
 		this.createTemplate();
 	}
