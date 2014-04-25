@@ -1,4 +1,274 @@
 /**
+ * Defines the EyeDraw namespace
+ * @namespace Namespace for all EyeDraw classes
+ */
+var ED = ED || {};
+
+/**
+ * Radius of inner handle displayed with selected doodle
+ * @constant
+ */
+ED.handleRadius = 15;
+
+/**
+ * Distance in doodle plane moved by pressing an arrow key
+ * @constant
+ */
+ED.arrowDelta = 4;
+
+/**
+ * SquiggleWidth
+ */
+ED.squiggleWidth = {
+	Thin: 4,
+	Medium: 12,
+	Thick: 20
+}
+
+/**
+ * SquiggleStyle
+ */
+ED.squiggleStyle = {
+	Outline: 0,
+	Solid: 1
+}
+
+/**
+ * Flag to detect double clicks
+ */
+ED.recentClick = false;
+
+/**
+ * Eye (Some doodles behave differently according to side)
+ */
+ED.eye = {
+	Right: 0,
+	Left: 1
+}
+
+/**
+ * Draw function mode (Canvas pointInPath function requires a path)
+ */
+ED.drawFunctionMode = {
+	Draw: 0,
+	HitTest: 1
+}
+
+/**
+ * Mouse dragging mode
+ */
+ED.Mode = {
+	None: 0,
+	Move: 1,
+	Scale: 2,
+	Arc: 3,
+	Rotate: 4,
+	Apex: 5,
+	Handles: 6,
+	Draw: 7,
+	Select: 8,
+	Size: 9
+}
+
+/**
+ * Handle ring
+ */
+ED.handleRing = {
+	Inner: 0,
+	Outer: 1
+}
+
+/**
+ * Flag to indicate when the drawing has been modified
+ */
+ED.modified = false;
+
+/*
+ * Chris Raettig's function for getting accurate mouse position in all browsers
+ *
+ * @param {Object} obj Object to get offset for, usually canvas object
+ * @returns {Object} x and y values of offset
+ */
+ED.findOffset = function(obj, curleft, curtop) {
+	if (obj.offsetParent) {
+		do {
+			curleft += obj.offsetLeft;
+			curtop += obj.offsetTop;
+		} while (obj = obj.offsetParent);
+		return {
+			left: curleft,
+			top: curtop
+		};
+	}
+}
+
+ED.findPosition = function(obj, event) {
+	if (typeof jQuery != 'undefined') {
+		var offset = jQuery(obj).offset();
+	} else {
+		var offset = ED.findOffset(obj, 0, 0);
+	}
+	return {
+		x: event.pageX - offset.left,
+		y: event.pageY - offset.top
+	};
+}
+
+/*
+ * Function to test whether a Javascript object is empty
+ *
+ * @param {Object} _object Object to apply test to
+ * @returns {Bool} Indicates whether object is empty or not
+ */
+ED.objectIsEmpty = function(_object) {
+	for (var property in _object) {
+		if (_object.hasOwnProperty(property)) return false;
+	}
+
+	return true;
+}
+
+/*
+ * Returns true if browser is firefox
+ *
+ * @returns {Bool} True is browser is firefox
+ */
+ED.isFirefox = function() {
+	var index = 0;
+	var ua = window.navigator.userAgent;
+	index = ua.indexOf("Firefox");
+
+	if (index > 0) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+// Checks that the value is numeric http://stackoverflow.com/questions/18082/validate-numbers-in-javascript-isnumeric
+ED.isNumeric = function(_value) {
+	return (_value - 0) == _value && _value.length > 0;
+}
+
+/**
+ * Returns 'true' remainder of a number divided by a modulus (i.e. always positive, unlike x%y)
+ *
+ * @param {Float} _x number
+ * @param {Float} _y modulus
+ * @returns {Float} True modulus of _x/_y
+ */
+ED.Mod = function Mod(_x, _y) {
+	return _x - Math.floor(_x / _y) * _y;
+}
+
+/**
+ * Converts an angle (positive or negative) into a positive angle (ie a bearing)
+ *
+ * @param {Float} _angle Angle in radians
+ * @returns {Float} Positive angle between 0 and 2 * Pi
+ */
+ED.positiveAngle = function(_angle) {
+	var circle = 2 * Math.PI;
+
+	// First make it positive
+	while (_angle < 0) {
+		_angle += circle;
+	}
+
+	// Return remainder
+	return _angle % circle;
+}
+
+/**
+ * Error handler
+ *
+ * @param {String} _class Class
+ * @param {String} _method Method
+ * @param {String} _message Error message
+ */
+ED.errorHandler = function(_class, _method, _message) {
+	console.error(_message);
+	throw new Error('EYEDRAW ERROR! class: [' + _class + '] method: [' + _method + '] message: [' + _message + ']');
+}
+
+ED.firstLetterToUpperCase = function(str) {
+	return str.charAt(0).toUpperCase() + str.slice(1);
+};
+
+
+/**
+ * Additional function for String object
+ *
+ * @returns {String} String with first letter made lower case, unless part of an abbreviation
+ */
+ED.firstLetterToLowerCase = function(str) {
+	var secondChar = str.charAt(1);
+
+	if (secondChar == secondChar.toUpperCase()) {
+		return str;
+	} else {
+		return str.charAt(0).toLowerCase() + str.slice(1);
+	}
+};
+
+/**
+ * Additional function for String object
+ *
+ * @returns {String} String with last ', ' replaced with ', and '
+ */
+ED.addAndAfterLastComma = function(str) {
+	// Search backwards from end of string for comma
+	var found = false;
+	for (var pos = str.length - 1; pos >= 0; pos--) {
+		if (str.charAt(pos) == ',') {
+			found = true;
+			break;
+		}
+	}
+
+	if (found) return str.substring(0, pos) + ", and" + str.substring(pos + 1, str.length);
+	else return str;
+};
+
+
+/**
+ * FIXME
+ */
+
+ED.instances = {};
+
+ED.setInstance = function(instance) {
+	var id = instance.idSuffix;
+	if (!id) {
+		console.log(instance);
+		throw new Error('Instance does not contain idSuffix');
+	}
+	if (id in ED.instances) {
+		throw new Error('Instance with id ' + id + ' has already been set');
+	}
+	ED.instances[id] = instance;
+};
+
+ED.getInstance = function(idSuffix) {
+	return ED.instances[idSuffix];
+};
+
+ED.resetInstances = function() {
+	ED.instances = {};
+};
+
+ED.titles = {};
+
+ED.setTitles = function(titles) {
+	this.titles = titles;
+};
+
+/**
+ * Array of 200 random numbers
+ */
+ED.randomArray = [0.6570, 0.2886, 0.7388, 0.1621, 0.9896, 0.0434, 0.1695, 0.9099, 0.1948, 0.4433, 0.1580, 0.7392, 0.8730, 0.2165, 0.7138, 0.6316, 0.3425, 0.2838, 0.4551, 0.4153, 0.7421, 0.3364, 0.6087, 0.1986, 0.5764, 0.1952, 0.6179, 0.6699, 0.0903, 0.2968, 0.2684, 0.9383, 0.2488, 0.4579, 0.2921, 0.9085, 0.7951, 0.4500, 0.2255, 0.3366, 0.6670, 0.7300, 0.5511, 0.5623, 0.1376, 0.5553, 0.9898, 0.4317, 0.5922, 0.6452, 0.5008, 0.7077, 0.0704, 0.2293, 0.5697, 0.7415, 0.1557, 0.2944, 0.4566, 0.4129, 0.2449, 0.5620, 0.4105, 0.5486, 0.8917, 0.9346, 0.0921, 0.7998, 0.7717, 0.0357, 0.1179, 0.0168, 0.1520, 0.5187, 0.3466, 0.1663, 0.5935, 0.7524, 0.8410, 0.1859, 0.6012, 0.8171, 0.9272, 0.3367, 0.8133, 0.4868, 0.3665, 0.9625, 0.7839, 0.3052, 0.1651, 0.6414, 0.7361, 0.0065, 0.3267, 0.0554, 0.3389, 0.8967, 0.8777, 0.0557, 0.9201, 0.6015, 0.2676, 0.3365, 0.2606, 0.0989, 0.2085, 0.3526, 0.8476, 0.0146, 0.0190, 0.6896, 0.5198, 0.9871, 0.0288, 0.8037, 0.6741, 0.2148, 0.2584, 0.8447, 0.8480, 0.5557, 0.2480, 0.4736, 0.8869, 0.1867, 0.3869, 0.6871, 0.1011, 0.7561, 0.7340, 0.1525, 0.9968, 0.8179, 0.7103, 0.5462, 0.4150, 0.4187, 0.0478, 0.6511, 0.0386, 0.5243, 0.7271, 0.9093, 0.4461, 0.1264, 0.0756, 0.9405, 0.7287, 0.0684, 0.2820, 0.4059, 0.3694, 0.7641, 0.4188, 0.0498, 0.7841, 0.9136, 0.6210, 0.2249, 0.9935, 0.9709, 0.0741, 0.6218, 0.3166, 0.2237, 0.7754, 0.4191, 0.2195, 0.2935, 0.4529, 0.9112, 0.9183, 0.3275, 0.1856, 0.8345, 0.0442, 0.6297, 0.9030, 0.4689, 0.9512, 0.2219, 0.9993, 0.8981, 0.1018, 0.9362, 0.6426, 0.4563, 0.1267, 0.7889, 0.5057, 0.8588, 0.4669, 0.0687, 0.6623, 0.3681, 0.8152, 0.9004, 0.0822, 0.3652];
+
+/**
  * @fileOverview Contains the core classes for EyeDraw
  * @author <a href="mailto:bill.aylward@mac.com">Bill Aylward</a>
  * @version 1.2
@@ -21,6 +291,8 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenEyes.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+var ED = ED || {};
 
 /**
  * A Drawing consists of one canvas element displaying one or more doodles;
@@ -59,6 +331,7 @@
  * @param {Bool} _isEditable Flag indicating whether canvas is editable or not
  * @param {Array} _options Associative array of optional parameters
  */
+
 ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 
 	// Check we're working with an actual canvas HTML element.
@@ -174,19 +447,6 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 	// Initialise canvas context transform by calling clear() method
 	this.clear();
 
-	// Get reference to button elements
-	this.moveToFrontButton = document.getElementById('moveToFront' + this.idSuffix);
-	this.moveToBackButton = document.getElementById('moveToBack' + this.idSuffix);
-	this.flipVerButton = document.getElementById('flipVer' + this.idSuffix);
-	this.flipHorButton = document.getElementById('flipHor' + this.idSuffix);
-	this.deleteSelectedDoodleButton = document.getElementById('deleteSelectedDoodle' + this.idSuffix);
-	this.lockButton = document.getElementById('lock' + this.idSuffix);
-	this.unlockButton = document.getElementById('unlock' + this.idSuffix);
-	//this.squiggleSpan = document.getElementById('squiggleSpan' + this.idSuffix);
-	//this.colourPreview = document.getElementById('colourPreview' + this.idSuffix);
-	//this.fillRadio = document.getElementById('fillRadio' + this.idSuffix);
-	//this.thickness = document.getElementById('thicknessSelect' + this.idSuffix);
-
 	// Selection rectangle
 	this.selectionRectangleIsBeingDragged = false;
 	this.selectionRectangleStart = new ED.Drawing.Point(0, 0);
@@ -229,13 +489,21 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 
 		document.body.addEventListener('mousedown', function onBodyMouseDown(e) {
 
-			// Deselect all doodles if the user clicks any on the page that is
+			// Deselect all doodles if the user clicks anywhere on the page that is
 			// not the canvas itself, nor the doodle popup, nor any toolbar buttons.
+
 			var elem = e.target;
 			var isEyeDrawElement = false;
 
+			var ignore = '(' + [
+				'eyedraw-doodle-popup',
+				'eyedraw-button',
+				'eyedraw-canvas',
+				'eyedraw-selected-doodle-select'
+			].join(')|(') + ')';
+
 			do {
-				if (/(eyedraw-doodle-popup)|(eyedraw-button)|(eyedraw-canvas)/.test(elem.className)) {
+				if (new RegExp(ignore).test(elem.className)) {
 					isEyeDrawElement = true;
 					break;
 				}
@@ -449,12 +717,19 @@ ED.Drawing.prototype.notify = function(_eventName, _object) {
 		object: _object
 	};
 
+	// console.log(this.notificationArray);
+	//
+
+
 	// Call method on each registered object
 	for (var i = 0; i < this.notificationArray.length; i++) {
+
 		// Assign to variables to make code easier to read
 		var list = this.notificationArray[i]['notificationList'];
 		var object = this.notificationArray[i]['object'];
 		var methodName = this.notificationArray[i]['methodName'];
+
+		// console.log(_eventName);
 
 		// Check that event is in notification list for this object, or array is empty implying all notifications
 		if (list.length == 0 || list.indexOf(_eventName) >= 0) {
@@ -600,7 +875,6 @@ ED.Drawing.prototype.drawAllDoodles = function() {
 	}
 }
 
-
 /**
  * Responds to mouse down event in canvas, cycles through doodles from front to back.
  * Selected doodle is first selectable doodle to have click within boundary path.
@@ -631,27 +905,14 @@ ED.Drawing.prototype.mousedown = function(_point) {
 
 			// Successful hit test?
 			if (this.doodleArray[i].draw(_point)) {
-				if (this.doodleArray[i].isSelectable && !this.doodleArray[i].isLocked) {
+				if (this.doodleArray[i].isSelectable) {
 					// If double clicked, go into drawing mode
 					if (this.doubleClick && this.doodleArray[i].isSelected && this.doodleArray[i].isDrawable) {
 						this.doodleArray[i].isForDrawing = true;
 					}
 
-					this.doodleArray[i].isSelected = true;
-					this.selectedDoodle = this.doodleArray[i];
 					found = true;
-
-					// Check if newly selected
-					if (this.lastSelectedDoodle != this.selectedDoodle) {
-						// Run onDeselection code for last doodle
-						if (this.lastSelectedDoodle) this.lastSelectedDoodle.onDeselection();
-
-						// Run onSelection code
-						this.selectedDoodle.onSelection();
-
-						// Notify
-						this.notify("doodleSelected");
-					}
+					this.selectDoodle(this.doodleArray[i]);
 
 					// If for drawing, mouse down starts a new squiggle
 					if (!this.doubleClick && this.doodleArray[i].isForDrawing) {
@@ -731,6 +992,13 @@ ED.Drawing.prototype.mousemove = function(_point) {
 		point: _point
 	});
 
+	// Get selected doodle
+	var doodle = this.selectedDoodle;
+
+	if (doodle && this.selectedDoodle.isLocked) {
+		return;
+	}
+
 	// Draw selection rectangle
 	/*
     if (this.mode == ED.Mode.Select)
@@ -750,9 +1018,6 @@ ED.Drawing.prototype.mousemove = function(_point) {
 
 	// Start the hover timer (also resets it)
 	this.startHoverTimer(_point);
-
-	// Get selected doodle
-	var doodle = this.selectedDoodle;
 
 	// Only drag if mouse already down and a doodle selected
 	if (this.mouseDown && doodle != null) {
@@ -1341,6 +1606,11 @@ ED.Drawing.prototype.hover = function(_point) {
  * @param {Point} _point coordinates of mouse in canvas plane
  */
 ED.Drawing.prototype.showTooltip = function(_point) {
+
+
+	// DISABLED TOOLTIPS AS PART OF #OED-4
+	return;
+
 	// Get coordinates of mouse
 	var xAbs = _point.x;
 	var yAbs = _point.y;
@@ -1415,8 +1685,14 @@ ED.Drawing.prototype.hideTooltip = function() {
  * Moves selected doodle to front
  */
 ED.Drawing.prototype.moveToFront = function() {
+
 	// Should only be called if a doodle is selected, but check anyway
 	if (this.selectedDoodle != null) {
+
+		if (this.selectedDoodle.isLocked) {
+			return;
+		}
+
 		// Assign large number to selected doodle
 		this.selectedDoodle.order = 1000;
 
@@ -1442,8 +1718,14 @@ ED.Drawing.prototype.moveToFront = function() {
  * Moves selected doodle to back
  */
 ED.Drawing.prototype.moveToBack = function() {
+
 	// Should only be called if a doodle is selected, but check anyway
-	if (this.selectedDoodle != null) {
+	if (this.selectedDoodle !== null) {
+
+		if (this.selectedDoodle.isLocked) {
+			return;
+		}
+
 		// Assign negative order to selected doodle
 		this.selectedDoodle.order = -1;
 
@@ -1725,20 +2007,9 @@ ED.Drawing.prototype.deleteDoodleOfId = function(_id) {
  */
 ED.Drawing.prototype.lock = function() {
 	// Should only be called if a doodle is selected, but check anyway
-	if (this.selectedDoodle != null) {
-		// Go through doodles locking any that are selected
-		for (var i = 0; i < this.doodleArray.length; i++) {
-			if (this.doodleArray[i].isSelected) {
-				this.doodleArray[i].isLocked = true;
-				this.doodleArray[i].isSelected = false;
-				this.doodleArray[i].onDeselection();
-				this.selectedDoodle = null;
-			}
-		}
-
-		// this.notify("doodleDeselected");
-
-		// Refresh canvas
+	if (this.selectedDoodle !== null) {
+		this.selectedDoodle.isLocked = true;
+		this.notify("doodleLocked");
 		this.repaint();
 	}
 }
@@ -1751,7 +2022,7 @@ ED.Drawing.prototype.unlock = function() {
 	for (var i = 0; i < this.doodleArray.length; i++) {
 		this.doodleArray[i].isLocked = false;
 	}
-
+	this.notify("doodleUnlocked");
 	// Refresh canvas
 	this.repaint();
 }
@@ -1842,9 +2113,6 @@ ED.Drawing.prototype.selectNextDoodle = function(_value) {
 ED.Drawing.prototype.setDoodleAsSelected = function(_doodleId) {
 	var selectedIndex = -1;
 
-	// Deselect doodles
-	this.deselectDoodles();
-
 	// Iterate through doodles
 	for (var i = 0; i < this.doodleArray.length; i++) {
 		if (this.doodleArray[i].id == _doodleId) {
@@ -1853,14 +2121,32 @@ ED.Drawing.prototype.setDoodleAsSelected = function(_doodleId) {
 	}
 
 	if (selectedIndex >= 0) {
-		this.doodleArray[selectedIndex].isSelected = true;
-		this.selectedDoodle = this.doodleArray[selectedIndex];
-		this.selectedDoodle.onSelection();
-
-		// Refresh drawing
-		this.repaint();
+		var doodle = this.doodleArray[selectedIndex];
+		this.selectDoodle(doodle);
 	}
 }
+
+/**
+ * Mark a doodle as selected
+ * @param  {ED.Doodle} doodle
+ */
+ED.Drawing.prototype.selectDoodle = function(doodle) {
+
+	this.deselectDoodles();
+
+	doodle.isSelected = true;
+	this.selectedDoodle = doodle;
+
+	// Run onDeselection code for last doodle
+	if (this.lastSelectedDoodle) this.lastSelectedDoodle.onDeselection();
+	// Run onSelection code
+	this.selectedDoodle.onSelection();
+
+	// Notify
+	this.notify("doodleSelected");
+
+	this.repaint();
+};
 
 /**
  * Marks the doodle as 'unmodified' so we can catch an event when it gets modified by the user
@@ -2693,55 +2979,6 @@ ED.Drawing.prototype.repaint = function() {
 		this.selectedDoodle.setDisplayOfParameterControls(true);
 	}
 
-	// Enable or disable buttons which work on selected doodle
-	if (this.selectedDoodle != null) {
-		if (this.moveToFrontButton !== null) this.moveToFrontButton.disabled = false;
-		if (this.moveToBackButton !== null) this.moveToBackButton.disabled = false;
-		if (this.flipVerButton !== null) this.flipVerButton.disabled = false;
-		if (this.flipHorButton !== null) this.flipHorButton.disabled = false;
-		if (this.deleteSelectedDoodleButton !== null && this.selectedDoodle.isDeletable) this.deleteSelectedDoodleButton.disabled = false;
-		if (this.lockButton !== null) this.lockButton.disabled = false;
-		//if (this.squiggleSpan !== null && this.selectedDoodle.isDrawable) this.squiggleSpan.style.display = "inline-block";
-	} else {
-		if (this.moveToFrontButton !== null) this.moveToFrontButton.disabled = true;
-		if (this.moveToBackButton !== null) this.moveToBackButton.disabled = true;
-		if (this.flipVerButton !== null) this.flipVerButton.disabled = true;
-		if (this.flipHorButton !== null) this.flipHorButton.disabled = true;
-		if (this.deleteSelectedDoodleButton !== null) this.deleteSelectedDoodleButton.disabled = true;
-		if (this.lockButton !== null) this.lockButton.disabled = true;
-		//if (this.squiggleSpan !== null) this.squiggleSpan.style.display = "none";
-	}
-
-	// Go through doodles looking for any that are locked and enable/disable unlock button
-	if (this.unlockButton != null) {
-		this.unlockButton.disabled = true;
-		for (var i = 0; i < this.doodleArray.length; i++) {
-			if (this.doodleArray[i].isLocked) {
-				this.unlockButton.disabled = false;
-				break;
-			}
-		}
-	}
-
-	// Get reference to doodle toolbar
-	var doodleToolbar = document.getElementById(this.canvas.id + 'doodleToolbar');
-	if (doodleToolbar) {
-		// Iterate through all buttons activating them
-		var buttonArray = doodleToolbar.getElementsByTagName('button');
-		for (var i = 0; i < buttonArray.length; i++) {
-			buttonArray[i].disabled = false;
-		}
-
-		// Go through doodles looking for any that unique, and disable the corresponding add button
-		for (var i = 0; i < this.doodleArray.length; i++) {
-			// Button ID is concatenation of class name and id suffix
-			var addButton = document.getElementById(this.doodleArray[i].className + this.idSuffix);
-			if (addButton) {
-				addButton.disabled = this.doodleArray[i].isUnique;
-			}
-		}
-	}
-
 	// ***TODO*** ask Mark what this code is for
 	if (!this.modified) {
 		this.modified = true;
@@ -2908,6 +3145,4191 @@ ED.Drawing.prototype.nextDoodleId = function() {
 //
 //ED.DoodleGroups.foo = 4;
 
+/**
+ * Doodles are components of drawings which have built in knowledge of what they represent, and how to behave when manipulated;
+ * Doodles are drawn in the 'doodle plane' consisting of 1001 pixel square grid with central origin (ie -500 to 500) and
+ * are rendered in a canvas element using a combination of the affine transform of the host drawing, and the doodle's own transform.
+ *
+ * @class Doodle
+ * @property {Drawing} drawing Drawing to which this doodle belongs
+ * @property {Int} originX X coordinate of origin in doodle plane
+ * @property {Int} originY Y coordinate of origin in doodle plane
+ * @property {Float} radius of doodle from origin (used for some rotatable doodles that are fixed at origin)
+ * @property {Int} apexX X coordinate of apex in doodle plane
+ * @property {Int} apexY Y coordinate of apex in doodle plane
+ * @property {Float} scaleX Scale of doodle along X axis
+ * @property {Float} scaleY Scale of doodle along Y axis
+ * @property {Float} arc Angle of arc for doodles that extend in a circular fashion
+ * @property {Float} rotation Angle of rotation from 12 o'clock
+ * @property {Int} order Order in which doodle is drawn (0 first ie backmost layer)
+ * @property {Array} squiggleArray Array containing squiggles (freehand drawings)
+ * @property {AffineTransform} transform Affine transform which handles the doodle's position, scale and rotation
+ * @property {AffineTransform} inverseTransform The inverse of transform
+ * @property {Bool} isLocked True if doodle is locked (temporarily unselectable)
+ * @property {Bool} isSelectable True if doodle is non-selectable
+ * @property {Bool} isShowHighlight True if doodle shows a highlight when selected
+ * @property {Bool} willStaySelected True if selection persists on mouseup
+ * @property {Bool} isDeletable True if doodle can be deleted
+ * @property {Bool} isSaveable Flag indicating whether doodle will be included in saved JSON string
+ * @property {Bool} isOrientated True if doodle should always point to the centre (default = false)
+ * @property {Bool} isScaleable True if doodle can be scaled. If false, doodle increases its arc angle
+ * @property {Bool} isSqueezable True if scaleX and scaleY can be independently modifed (ie no fixed aspect ratio)
+ * @property {Bool} isMoveable True if doodle can be moved. When combined with isOrientated allows automatic rotation.
+ * @property {Bool} isRotatable True if doodle can be rotated
+ * @property {Bool} isDrawable True if doodle accepts freehand drawings
+ * @property {Bool} isUnique True if only one doodle of this class allowed in a drawing
+ * @property {Bool} isArcSymmetrical True if changing arc does not change rotation
+ * @property {Bool} addAtBack True if new doodles are added to the back of the drawing (ie first in array)
+ * @property {Bool} isPointInLine True if centre of all doodles with this property should be connected by a line segment
+ * @property {Bool} snapToGrid True if doodle should snap to a grid in doodle plane
+ * @property {Bool} snapToQuadrant True if doodle should snap to a specific position in quadrant (defined in subclass)
+ * @property {Bool} snapToPoints True if doodle should snap to one of a set of specific points
+ * @property {Bool} snapToAngles True if doodle should snap to one of a set of specific rotation values
+ * @property {Array} pointsArray Array of points to snap to
+ * @property {Array} anglesArray Array of angles to snap to
+ * @property {Bool} willReport True if doodle responds to a report request (can be used to suppress reports when not needed)
+ * @property {Bool} willSync Flag used to indicate whether doodle will synchronise with another doodle
+ * @property {Float} radius Distance from centre of doodle space, calculated for doodles with isRotable true
+ * @property {Bool} isSelected True if doodle is currently selected
+ * @property {Bool} isBeingDragged Flag indicating doodle is being dragged
+ * @property {Int} draggingHandleIndex index of handle being dragged
+ * @property {Range} draggingHandleRing Inner or outer ring of dragging handle
+ * @property {Bool} isClicked Hit test flag
+ * @property {Enum} drawFunctionMode Mode for boundary path
+ * @property {Bool} isFilled True if boundary path is filled as well as stroked
+ * @property {Bool} showsToolTip Shows a tooltip if true
+ * @property {Int} frameCounter Keeps track of how many animation frames have been drawn
+ * @property {Array} handleArray Array containing handles to be rendered
+ * @property {Point} leftExtremity Point at left most extremity of doodle (used to calculate arc)
+ * @property {Point} rightExtremity Point at right most extremity of doodle (used to calculate arc)
+ * @property {Int} gridSpacing Separation of grid elements
+ * @property {Int} gridDisplacementX Displacement of grid matrix from origin along x axis
+ * @property {Int} gridDisplacementY Displacement of grid matrix from origin along y axis
+ * @property {Float} version Version of doodle
+ * @param {Drawing} _drawing
+ * @param {Object} _parameterJSON
+ * @param {Int} _order
+ */
+ED.Doodle = function(_drawing, _parameterJSON) {
+	// Function called as part of prototype assignment has no parameters passed
+	if (typeof(_drawing) != 'undefined') {
+		// Drawing containing this doodle
+		this.drawing = _drawing;
+
+		// Unique ID of doodle within this drawing
+		this.id = this.drawing.nextDoodleId();
+
+		// Optional rray of squiggles
+		this.squiggleArray = new Array();
+
+		// Transform used to draw doodle (includes additional transforms specific to the doodle)
+		this.transform = new ED.Drawing.AffineTransform();
+		this.inverseTransform = new ED.Drawing.AffineTransform();
+
+		// Store created time
+		this.createdTime = (new Date()).getTime();
+
+		// Dragging defaults - set individual values in subclasses
+		this.isLocked = false;
+		this.isSelectable = true;
+		this.isShowHighlight = true;
+		this.willStaySelected = true;
+		this.isDeletable = true;
+		this.isSaveable = true;
+		this.isOrientated = false;
+		this.isScaleable = true;
+		this.isSqueezable = false;
+		this.isMoveable = true;
+		this.isRotatable = true;
+		this.isDrawable = false;
+		this.isUnique = false;
+		this.isArcSymmetrical = false;
+		this.addAtBack = false;
+		this.isPointInLine = false;
+		this.snapToGrid = false;
+		this.snapToQuadrant = false;
+		this.snapToPoints = false;
+		this.snapToAngles = false;
+		this.snapToArc = false;
+		this.willReport = true;
+		this.willSync = true;
+
+		// Calculate maximum range of origin:
+		var halfWidth = Math.round(this.drawing.doodlePlaneWidth / 2);
+		var halfHeight = Math.round(this.drawing.doodlePlaneHeight / 2);
+
+		// Parameter validation array
+		this.parameterValidationArray = {
+			originX: {
+				kind: 'simple',
+				type: 'int',
+				range: new ED.Drawing.Range(-halfWidth, +halfWidth),
+				defaultValue: +0,
+				delta: 15
+			},
+			originY: {
+				kind: 'simple',
+				type: 'int',
+				range: new ED.Drawing.Range(-halfHeight, +halfHeight),
+				defaultValue: +0,
+				delta: 15
+			},
+			width: {
+				kind: 'simple',
+				type: 'int',
+				range: new ED.Drawing.Range(+100, +halfHeight),
+				defaultValue: +50,
+				delta: 15
+			},
+			height: {
+				kind: 'simple',
+				type: 'int',
+				range: new ED.Drawing.Range(+100, +halfWidth),
+				defaultValue: +50,
+				delta: 15
+			},
+			radius: {
+				kind: 'simple',
+				type: 'float',
+				range: new ED.Drawing.Range(+100, +450),
+				precision: 6,
+				defaultValue: +100,
+				delta: 15
+			},
+			apexX: {
+				kind: 'simple',
+				type: 'int',
+				defaultValue: +0,
+				range: new ED.Drawing.Range(-500, +500),
+				delta: 15
+			},
+			apexY: {
+				kind: 'simple',
+				type: 'int',
+				range: new ED.Drawing.Range(-500, +500),
+				defaultValue: +0,
+				delta: 15
+			},
+			scaleX: {
+				kind: 'simple',
+				type: 'float',
+				range: new ED.Drawing.Range(+0.5, +4.0),
+				precision: 6,
+				defaultValue: +1,
+				delta: 0.1
+			},
+			scaleY: {
+				kind: 'simple',
+				type: 'float',
+				range: new ED.Drawing.Range(+0.5, +4.0),
+				precision: 6,
+				defaultValue: +1,
+				delta: 0.1
+			},
+			arc: {
+				kind: 'simple',
+				type: 'float',
+				range: new ED.Drawing.Range(Math.PI / 12, Math.PI * 2),
+				precision: 6,
+				defaultValue: Math.PI,
+				delta: 0.1
+			},
+			rotation: {
+				kind: 'simple',
+				type: 'float',
+				range: new ED.Drawing.Range(0, 2 * Math.PI),
+				precision: 6,
+				defaultValue: +0,
+				delta: 0.2
+			},
+		};
+
+		// Optional array for saving non-bound parameters
+		if (!this.savedParameterArray) {
+			this.savedParameterArray = [];
+		}
+
+		// Optional array for parameters linked to elements in doodle control panel
+		if (!this.controlParameterArray) {
+			this.controlParameterArray = [];
+		}
+
+		// Optional array for saving details of object parameters for reconstitution from string
+		if (!this.parameterObjectTypeArray) {
+			this.parameterObjectTypeArray = [];
+		}
+
+		// Grid properties
+		this.gridSpacing = 200;
+		this.gridDisplacementX = 0;
+		this.gridDisplacementY = 0;
+
+		// Flags and other properties
+		this.isBeingDragged = false;
+		this.draggingHandleIndex = null;
+		this.draggingHandleRing = null;
+		this.isClicked = false;
+		this.drawFunctionMode = ED.drawFunctionMode.Draw;
+		this.isFilled = true;
+		this.showsToolTip = true;
+		this.derivedParametersArray = new Array(); // Array relating special parameters to corresponding common parameter
+		this.animationFrameRate = 30; // Frames per second
+		this.animationDataArray = new Array(); // Associative array, key = parameter name, value = array with animation info
+		this.parentClass = ""; // Class of parent that a doodle is dependent on (parent auto-created)
+		this.inFrontOfClassArray = new Array(); // Array of classes to put this doodle in front of (in order)
+
+		// Array of points to snap to
+		this.pointsArray = new Array();
+		this.anglesArray = new Array();
+		this.arcArray = new Array();
+		this.quadrantPoint = new ED.Drawing.Point(200, 200);
+
+		// Bindings to HTML element values. Associative array with parameter name as key
+		this.bindingArray = new Array();
+		this.drawing.listenerArray[this.id] = new Array();
+
+		// Array of 5 handles
+		this.handleArray = new Array();
+		this.handleArray[0] = new ED.Doodle.Handle(new ED.Drawing.Point(-50, 50), false, ED.Mode.Scale, false);
+		this.handleArray[1] = new ED.Doodle.Handle(new ED.Drawing.Point(-50, -50), false, ED.Mode.Scale, false);
+		this.handleArray[2] = new ED.Doodle.Handle(new ED.Drawing.Point(50, -50), false, ED.Mode.Scale, false);
+		this.handleArray[3] = new ED.Doodle.Handle(new ED.Drawing.Point(50, 50), false, ED.Mode.Scale, false);
+		this.handleArray[4] = new ED.Doodle.Handle(new ED.Drawing.Point(this.apexX, this.apexY), false, ED.Mode.Apex, false);
+		this.setHandles();
+
+		// Extremities
+		this.leftExtremity = new ED.Drawing.Point(-100, -100);
+		this.rightExtremity = new ED.Drawing.Point(0, -100);
+
+		// Version
+		this.version = +1.1;
+
+		// Set dragging default settings
+		this.setPropertyDefaults();
+
+		// Assign default values to simple parameters
+		for (var parameter in this.parameterValidationArray) {
+			var validation = this.parameterValidationArray[parameter];
+			if (validation.kind == 'simple') {
+				this[parameter] = validation.defaultValue;
+			}
+		}
+
+		// New doodle (constructor called with _drawing parameter only)
+		if (typeof(_parameterJSON) == 'undefined') {
+
+			// Default is to put new doodle in front
+			this.order = this.drawing.doodleArray.length;
+
+			// Other initialisation
+			this.setParameterDefaults();
+
+			// Newly added doodles are selected
+			this.isSelected = true;
+		}
+		// Doodle with passed parameters
+		else {
+			// Iterate array assigning values from passed array (arc and rotation are stored in degrees for legacy reasons)
+			for (var p in _parameterJSON) {
+				// Parameters arc and rotation are stored in degrees
+				if (p == 'arc' || p == 'rotation') {
+					this[p] = _parameterJSON[p] * Math.PI / 180;
+				}
+				// Squiggles
+				else if (p == 'squiggleArray') {
+					var squiggleArray = _parameterJSON[p];
+					for (var j = 0; j < squiggleArray.length; j++) {
+						// Get parameters and create squiggle
+						var c = squiggleArray[j].colour;
+						var colour = new ED.Drawing.Colour(c.red, c.green, c.blue, c.alpha);
+						var thickness = squiggleArray[j].thickness;
+						var filled = squiggleArray[j].filled;
+						var squiggle = new ED.Drawing.Squiggle(this, colour, thickness, filled);
+
+						// Add points to squiggle and complete it
+						var pointsArray = squiggleArray[j].pointsArray;
+						for (var k = 0; k < pointsArray.length; k++) {
+							var point = new ED.Drawing.Point(pointsArray[k].x, pointsArray[k].y);
+							squiggle.addPoint(point);
+						}
+						squiggle.complete = true;
+
+						// Add squiggle to doodle's squiggle array
+						this.squiggleArray.push(squiggle);
+					}
+				}
+				// Saved parameters (V1.3 method - keep for legacy data)
+				else if (p == 'params') {
+					for (var j = 0; j < _parameterJSON[p].length; j++) {
+						var param_name = _parameterJSON[p][j].name;
+						var param_value = _parameterJSON[p][j].value;
+						this.setParameterFromString(param_name, param_value);
+					}
+				}
+				// Other parameters
+				else {
+					// Complex objects (e.g. date)
+					if (p in this.parameterObjectTypeArray) {
+						this[p] = this.parseObjectString(_parameterJSON[p], this.parameterObjectTypeArray[p]);
+					}
+					// Other parameters are simple assignments
+					else {
+						this[p] = _parameterJSON[p];
+					}
+				}
+			}
+
+			// Set orientation if appropriate
+			if (this.isOrientated) {
+				this.rotation = this.orientation();
+			}
+
+			// Order
+			this.order = +_parameterJSON['order'];
+
+			// Update values of any derived parameters
+			// 			for (var parameter in this.parameterValidationArray) {
+			// 				var validation = this.parameterValidationArray[parameter];
+			// 				if (validation.kind == 'simple') {
+			// 					this.updateDependentParameters(parameter);
+			// 				}
+			// 			}
+			for (var p in this.savedParameterArray) {
+				this.updateDependentParameters(this.savedParameterArray[p]);
+			}
+
+			// Loaded doodles are not selected
+			this.isSelected = false;
+			this.isForDrawing = false;
+		}
+	}
+}
+
+/**
+ * Parses JSON string to reconstitute parameters which are entries in this.parameterObjectTypeArray
+ *
+ * @param {String} _string String containing object from JSON string
+ * @param {String} _type Type of object
+ */
+ED.Doodle.prototype.parseObjectString = function(_string, _type) {
+	var returnObject = false;
+	switch (_type) {
+		case 'date':
+			var a = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2}(?:\.\d*)?)Z$/.exec(_string);
+			returnObject = new Date(Date.UTC(+a[1], +a[2] - 1, +a[3], +a[4], +a[5], +a[6]));
+			break;
+
+		default:
+			ED.errorHandler('ED.Doodle', 'parseObjectString', 'Object type: ' + _type + ' currently not supported');
+			break;
+	}
+
+	return returnObject;
+}
+
+/**
+ * Sets default handle attributes (overridden by subclasses)
+ */
+ED.Doodle.prototype.setHandles = function() {}
+
+/**
+ * Sets default properties (overridden by subclasses)
+ */
+ED.Doodle.prototype.setPropertyDefaults = function() {}
+
+/**
+ * Sets default parameters (overridden by subclasses)
+ */
+ED.Doodle.prototype.setParameterDefaults = function() {}
+
+/**
+ * Sets position in array relative to other relevant doodles (overridden by subclasses)
+ */
+ED.Doodle.prototype.position = function() {}
+
+/**
+ * Called on attempt to delete doodle, and returns permission (overridden by subclasses)
+ *
+ * @returns {Bool} True if OK to delete
+ */
+ED.Doodle.prototype.willDelete = function() {
+	return true;
+}
+
+/**
+ * Moves doodle and adjusts rotation as appropriate
+ *
+ * @param {Float} _x Distance to move along x axis in doodle plane
+ * @param {Float} _y Distance to move along y axis in doodle plane
+ */
+ED.Doodle.prototype.move = function(_x, _y) {
+	// Ensure parameters are integers
+	var x = Math.round(+_x);
+	var y = Math.round(+_y);
+
+	if (this.isMoveable) {
+		// Enforce bounds
+		var newOriginX = this.parameterValidationArray['originX']['range'].constrain(this.originX + x);
+		var newOriginY = this.parameterValidationArray['originY']['range'].constrain(this.originY + y);
+
+		// Move doodle to new position
+		if (x != 0) this.setSimpleParameter('originX', newOriginX);
+		if (y != 0) this.setSimpleParameter('originY', newOriginY);
+
+		// Update dependencies
+		this.updateDependentParameters('originX');
+		this.updateDependentParameters('originY');
+
+		// Only need to change rotation if doodle has moved
+		if (x != 0 || y != 0) {
+			// If doodle isOriented is true, rotate doodle around centre of canvas (eg makes 'U' tears point to centre)
+			if (this.isOrientated) {
+
+				// Alter orientation of doodle
+				this.setSimpleParameter('rotation', this.orientation());
+
+				// Update dependencies
+				this.updateDependentParameters('rotation');
+			}
+		}
+
+		// Notify (NB pass doodle in message array, since this is not necessarily selected)
+		this.drawing.notify("doodleMoved", {
+			doodle: this
+		});
+	}
+}
+
+/**
+ * Calculates orientation based on x and y coordinates of doodle
+ *
+ * @returns {Float} Orientation in radians
+ */
+ED.Doodle.prototype.orientation = function() {
+	// Get position of centre of display (canvas plane relative to centre) and of an arbitrary point vertically above
+	var canvasCentre = new ED.Drawing.Point(0, 0);
+	var canvasTop = new ED.Drawing.Point(0, -100);
+
+	// New position of doodle
+	var newDoodleOrigin = new ED.Drawing.Point(this.originX, this.originY);
+
+	// Calculate angle to current position from centre relative to north
+	return this.drawing.innerAngle(canvasTop, canvasCentre, newDoodleOrigin);
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.Doodle.prototype.draw = function(_point) {
+	// Determine function mode
+	if (typeof(_point) != 'undefined') {
+		this.drawFunctionMode = ED.drawFunctionMode.HitTest;
+	} else {
+		this.drawFunctionMode = ED.drawFunctionMode.Draw;
+	}
+
+	// Get context
+	var ctx = this.drawing.context;
+
+	// Augment transform with properties of this doodle
+	ctx.translate(this.originX, this.originY);
+	ctx.rotate(this.rotation);
+	ctx.scale(this.scaleX, this.scaleY);
+
+	// Mirror with internal transform
+	this.transform.setToTransform(this.drawing.transform);
+	this.transform.translate(this.originX, this.originY);
+	this.transform.rotate(this.rotation);
+	this.transform.scale(this.scaleX, this.scaleY);
+
+	// Update inverse transform
+	this.inverseTransform = this.transform.createInverse();
+
+	// Reset hit test flag
+	this.isClicked = false;
+}
+
+/**
+ * Draws selection handles and sets dragging mode which is determined by which handle and part of handle is selected
+ * Function either performs a hit test or draws the handles depending on whether a valid Point object is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.Doodle.prototype.drawHandles = function(_point) {
+	// Reset handle index and selected ring
+	if (this.drawFunctionMode == ED.drawFunctionMode.HitTest) {
+		this.draggingHandleIndex = null;
+		this.draggingHandleRing = null;
+	}
+
+	// Get context
+	var ctx = this.drawing.context;
+
+	// Save context to stack
+	ctx.save();
+
+	// Reset context transform to identity matrix
+	ctx.setTransform(1, 0, 0, 1, 0, 0);
+
+	// Dimensions and colour of handles
+	ctx.lineWidth = 1;
+	ctx.strokeStyle = "red";
+	ctx.fillStyle = "yellow";
+
+	// Draw corner handles
+	var arc = Math.PI * 2;
+
+	for (var i = 0; i < this.handleArray.length; i++) {
+		var handle = this.handleArray[i];
+
+		if (handle.isVisible) {
+			// Path for inner ring
+			ctx.beginPath();
+			ctx.arc(handle.location.x, handle.location.y, ED.handleRadius / 2, 0, arc, true);
+
+			// Hit testing for inner ring
+			if (this.drawFunctionMode == ED.drawFunctionMode.HitTest) {
+				if (ctx.isPointInPath(_point.x, _point.y)) {
+					this.draggingHandleIndex = i;
+					this.draggingHandleRing = ED.handleRing.Inner;
+					this.drawing.mode = handle.mode;
+					this.isClicked = true;
+				}
+			}
+
+			// Path for optional outer ring
+			if (this.isRotatable && handle.isRotatable) {
+				ctx.moveTo(handle.location.x + ED.handleRadius, handle.location.y);
+				ctx.arc(handle.location.x, handle.location.y, ED.handleRadius, 0, arc, true);
+
+				// Hit testing for outer ring
+				if (this.drawFunctionMode == ED.drawFunctionMode.HitTest) {
+					if (ctx.isPointInPath(_point.x, _point.y)) {
+						this.draggingHandleIndex = i;
+						if (this.draggingHandleRing == null) {
+							this.draggingHandleRing = ED.handleRing.Outer;
+							this.drawing.mode = ED.Mode.Rotate;
+						}
+						this.isClicked = true;
+					}
+				}
+			}
+
+			// Draw handles
+			if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+				ctx.fill();
+				ctx.stroke();
+			}
+		}
+	}
+
+	// Restore context
+	ctx.restore();
+}
+
+/**
+ * Draws the boundary path or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.Doodle.prototype.drawBoundary = function(_point) {
+	// Get context
+	var ctx = this.drawing.context;
+
+	// HitTest
+	if (this.drawFunctionMode == ED.drawFunctionMode.HitTest) {
+		// Workaround for Mozilla bug 405300 https://bugzilla.mozilla.org/show_bug.cgi?id=405300
+		if (ED.isFirefox()) {
+			ctx.save();
+			ctx.setTransform(1, 0, 0, 1, 0, 0);
+			var hitTest = ctx.isPointInPath(_point.x, _point.y);
+			ctx.restore();
+		} else {
+			var hitTest = ctx.isPointInPath(_point.x, _point.y);
+		}
+
+		if (hitTest) {
+			// Set dragging mode
+			if (this.isDrawable && this.isForDrawing) {
+				this.drawing.mode = ED.Mode.Draw;
+			} else {
+				this.drawing.mode = ED.Mode.Move;
+			}
+
+			// Set flag indicating positive hit test
+			this.isClicked = true;
+		}
+	}
+	// Drawing
+	else {
+		// Specify highlight attributes
+		if (this.isSelected && this.isShowHighlight) {
+			ctx.shadowColor = "gray";
+			ctx.shadowOffsetX = 0;
+			ctx.shadowOffsetY = 0;
+			ctx.shadowBlur = 20;
+		}
+
+		// Specify highlight attributes
+		if (this.isForDrawing) {
+			ctx.shadowColor = "blue";
+			ctx.shadowOffsetX = 0;
+			ctx.shadowOffsetY = 0;
+			ctx.shadowBlur = 20;
+		}
+
+		// Fill path and draw it
+		if (this.isFilled) {
+			ctx.fill();
+		}
+		ctx.stroke();
+
+		// Reset so shadow only on boundary
+		ctx.shadowBlur = 0;
+
+		// Draw any additional highlight items
+		if (this.isSelected && this.isShowHighlight) {
+			this.drawHighlightExtras();
+		}
+	}
+}
+
+/**
+ * Draws extra items if the doodle is highlighted
+ */
+ED.Doodle.prototype.drawHighlightExtras = function() {
+}
+
+/**
+ * Shows doodle parameter controls. Doodle must set display:true in parameterValidationArray
+ *
+ * @param {Bool} _flag Flag determining whether display is shown or not shown
+ */
+ED.Doodle.prototype.setDisplayOfParameterControls = function(_flag) {
+	for (var parameter in this.parameterValidationArray) {
+		var validation = this.parameterValidationArray[parameter];
+		if (validation.display) {
+			// Construct id of element
+			var id = parameter + this.className + this.drawing.idSuffix;
+
+			// Look for corresponding element and toggle display
+			var element = document.getElementById(id);
+			if (element) {
+				// Get parent label
+				var label = element.parentNode;
+				if (_flag) {
+					label.style.display = 'inline';
+				} else {
+					label.style.display = 'none';
+				}
+
+				// Ensure value of checkbox matches value of property
+				element.checked = this[parameter];
+			}
+		}
+	}
+}
+
+/**
+ * Returns a String which, if not empty, determines the root descriptions of multiple instances of the doodle
+ *
+ * @returns {String} Group description
+ */
+ED.Doodle.prototype.groupDescription = function() {
+	return "";
+}
+
+/**
+ * Runs when doodle is selected by the user
+ */
+// ED.Doodle.prototype.onSelection = function() {
+// }
+
+/**
+ * Runs when doodle is deselected by the user
+ */
+// ED.Doodle.prototype.onDeselection = function() {
+// }
+
+/**
+ * Returns a string containing a text description of the doodle (overridden by subclasses)
+ *
+ * @returns {String} Description of doodle
+ */
+ED.Doodle.prototype.description = function() {
+	return "";
+}
+
+/**
+ * Returns a String which, if not empty, determines the suffix following a group description
+ *
+ * @returns {String} Group description end
+ */
+ED.Doodle.prototype.groupDescriptionEnd = function() {
+	return "";
+}
+
+/**
+ * Returns a string containing a text description of the doodle. String taken from language specific ED_Tooltips.js
+ *
+ * @returns {String} Tool tip text
+ */
+ED.Doodle.prototype.tooltip = function() {
+	var tip = ED.trans[this.className];
+	if (typeof(tip) != 'undefined') {
+		return tip;
+	} else {
+		return "";
+	}
+}
+
+/**
+ * Returns the SnoMed code of the doodle (overridden by subclasses)
+ *
+ * @returns {Int} SnoMed code of entity representated by doodle
+ */
+ED.Doodle.prototype.snomedCode = function() {
+	return 0;
+}
+
+/**
+ * Returns a number indicating position in a hierarchy of diagnoses from 0 to 9 (highest) (overridden by subclasses)
+ *
+ * @returns {Int} Position in diagnostic hierarchy
+ */
+ED.Doodle.prototype.diagnosticHierarchy = function() {
+	return 0;
+}
+
+/**
+ * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
+ * The returned parameters are animated if their 'animate' property is set to true
+ *
+ * @param {String} _parameter Name of parameter that has changed
+ * @value {Undefined} _value Value of parameter to calculate
+ * @returns {Array} Associative array of values of dependent parameters
+ */
+ED.Doodle.prototype.dependentParameterValues = function(_parameter, _value) {
+	return new Array();
+}
+
+/**
+ * Updates dependent parameters
+ *
+ * @param {String} _parameter Name of parameter for which dependent parameters will be updated
+ * @param {Boolean} _updateBindings Update the doodle form control bindings?
+ */
+ED.Doodle.prototype.updateDependentParameters = function(_parameter, _updateBindings) {
+	// Retrieve list of dependent parameters and set them
+	var valueArray = this.dependentParameterValues(_parameter, this[_parameter]);
+	for (var parameter in valueArray) {
+		this.setSimpleParameter(parameter, valueArray[parameter]);
+	}
+
+	// Update bindings
+	if (_updateBindings || _updateBindings === undefined) {
+		this.drawing.updateBindings(this);
+	}
+}
+
+/**
+ * Validates the value of a parameter, and returns it in appropriate format
+ * If value is invalid, returns a constrained value or the original value
+ * Called by event handlers of HTML elements
+ *
+ * @param {String} _parameter Name of the parameter
+ * @param {Undefined} _value Value of the parameter to validate
+ * @returns {Array} Array containing a bool indicating validity, and the correctly formatted value of the parameter
+ */
+ED.Doodle.prototype.validateParameter = function(_parameter, _value) {
+	// Retrieve validation object for this doodle
+	var validation = this.parameterValidationArray[_parameter];
+
+	// Set return value;
+	var value = "";
+
+	if (validation) {
+		// Validity flag
+		var valid = false;
+
+		// Enforce string type and trim it
+		value = _value.toString().trim();
+
+		switch (validation.type) {
+			case 'string':
+
+				// Check that its in list of valid values
+				if (validation.list.indexOf(value) >= 0) {
+					valid = true;
+				}
+				break;
+
+			case 'float':
+
+				// Test that value is a number
+				if (ED.isNumeric(value)) {
+					// Convert string to float value
+					value = parseFloat(value);
+
+					// Constrain value to allowable range
+					value = validation.range.constrain(value);
+
+					// Convert back to string, applying any formatting
+					value = value.toFixed(validation.precision);
+
+					valid = true;
+				}
+				break;
+
+			case 'int':
+
+				// Test that value is a number, and if not reset to current value of doodle
+				if (ED.isNumeric(value)) {
+					// Convert string to float value
+					value = parseInt(value);
+
+					// Constrain value to allowable range
+					value = validation.range.constrain(value);
+
+					// Convert back to string, applying any formatting
+					value = value.toFixed(0);
+
+					valid = true;
+				}
+				break;
+
+			case 'mod':
+
+				// Test that value is a number, and if not reset to current value of doodle
+				if (ED.isNumeric(value)) {
+					// Convert string to float value
+					value = parseInt(value);
+
+					// Constrain value to allowable range
+					value = validation.range.constrain(value);
+
+					// Deal with crossover
+					if (validation.clock == 'top') {
+						if (value == validation.range.min) value = validation.range.max;
+					} else if (validation.clock == 'bottom') {
+						if (value == validation.range.max) value = validation.range.min;
+					}
+
+					// Convert back to string, applying any formatting
+					value = value.toFixed(0);
+
+					valid = true;
+				}
+				break;
+
+			case 'bool':
+
+				// Event handler detects check box type and returns checked attribute
+				if (_value == 'true' || _value == 'false') {
+					// Convert to string for compatibility with setParameterFromString method
+					value = _value;
+					valid = true;
+				}
+				break;
+
+			case 'colourString':
+				// ***TODO*** Add some actual validation here
+				valid = true;
+				break;
+
+			case 'freeText':
+				// ***TODO*** Add some actual validation here
+				valid = true;
+				break;
+
+			default:
+				ED.errorHandler('ED.Drawing', 'eventHandler', 'Illegal validation type');
+				break;
+		}
+	} else {
+		ED.errorHandler('ED.Doodle', 'validateParameter', 'Unknown parameter name');
+	}
+
+	// If not valid, get current value of parameter
+	if (!valid) {
+		value = this.getParameter(_parameter);
+		ED.errorHandler('ED.Doodle', 'validateParameter', 'Validation failure for parameter: ' + _parameter + ' with value: ' + _value);
+	}
+
+	// Return validity and value
+	var returnArray = new Array();
+	returnArray['valid'] = valid;
+	returnArray['value'] = value;
+	return returnArray;
+}
+
+/**
+ * Generates a unique id for a control element bound to a parameter ***TODO*** improve this
+ *
+ * @param {String} _parameter Name of the parameter
+ * @returns {String} ID for a control element
+ */
+ED.Doodle.prototype.parameterControlElementId = function(_parameter) {
+	return this.drawing.canvas.id + '_' + _parameter + '_control';
+}
+
+/**
+ * Runs when doodle is selected by the user
+ */
+ED.Doodle.prototype.onSelection = function() {
+	// Show control bar
+	if (this.drawing.showDoodleControls) {
+		var controlDiv = document.getElementById(this.drawing.canvas.id + '_' + 'controls');
+
+		for (var parameter in this.controlParameterArray) {
+			// Create element and add to control bar
+			var element = this.parameterElement(parameter);
+			controlDiv.appendChild(element);
+
+			// Add binding
+			this.addBinding(parameter, {id:this.parameterControlElementId(parameter)});
+		}
+	}
+}
+
+/**
+ * Runs when doodle is deselected by the user
+ */
+ED.Doodle.prototype.onDeselection = function() {
+	// Hide control bar
+	if (this.drawing.showDoodleControls) {
+		// Remove all bindings
+		for (var parameter in this.controlParameterArray) {
+			this.removeBinding(parameter);
+		}
+
+		// Remove all child elements in control div
+		var controlDiv = document.getElementById(this.drawing.canvas.id + '_' + 'controls');
+		while(controlDiv.hasChildNodes()){
+			controlDiv.removeChild(controlDiv.lastChild);
+		}
+	}
+}
+
+/**
+ * Creates an element for parameter in the doodle control bar
+ *
+ * @param {String} _parameter Name of the parameter
+ * @returns {String} _id ID for a control element
+ */
+ED.Doodle.prototype.parameterElement = function(_parameter) {
+	var element;
+	switch (this.parameterValidationArray[_parameter].type) {
+		case 'string':
+			// Create a select element
+			element = document.createElement('select');
+			element.setAttribute('id', this.parameterControlElementId(_parameter));
+
+			// Add options from validation array
+			for (var i in this.parameterValidationArray[_parameter].list) {
+				var option = document.createElement('option');
+				option.innerText = this.parameterValidationArray[_parameter].list[i];
+				//if (option.innerText == this[_parameter]) option.selected = true;
+				element.appendChild(option);
+			}
+			break;
+
+		case 'bool':
+			// Create a checkbox element
+			element = document.createElement('input');
+    		element.type = 'checkbox';
+    		element.setAttribute('id', this.parameterControlElementId(_parameter));
+    		break;
+
+		case 'colourString':
+			// Create a colour picker
+			element = document.createElement('select');
+			element.setAttribute('id', this.parameterControlElementId(_parameter));
+
+			// Add options from validation array
+			for (var i in this.parameterValidationArray[_parameter].list) {
+				var option = document.createElement('option');
+				// Hack until colour picker worked out
+				if (this.parameterValidationArray[_parameter].list[i] == "FF0000FF") {
+					option.innerText = "Red";
+				}
+				else if (this.parameterValidationArray[_parameter].list[i] == "00FF00FF") {
+					option.innerText = "Green";
+				}
+				else {
+					option.innerText = "Blue";
+				}
+				option.value = this.parameterValidationArray[_parameter].list[i];
+				element.appendChild(option);
+			}
+    		break;
+
+		case 'freeText':
+			// Create a text input element
+			element = document.createElement('input');
+    		element.type = 'text';
+    		element.setAttribute('id', this.parameterControlElementId(_parameter));
+    		break;
+
+// 		case 'radio':
+// 			// Create a radio button element
+// 			element = document.createElement('input');
+//     		element.type = 'checkbox';
+//     		element.setAttribute('id', this.parameterControlElementId(_parameter));
+//     		break;
+
+		default:
+			ED.errorHandler('ED.Doodle', 'parameterElement', 'Unexpected type: ' + this.parameterValidationArray[_parameter].type + ' for parameter: ' + _parameter);
+			break;
+	}
+	// Create label  ***TODO*** deal with optional label and language
+	var label = document.createElement('label');
+	label.innerText = this.controlParameterArray[_parameter];
+
+	// Wrap in div to allow display in vertical block
+	var div = document.createElement('div');
+	div.appendChild(label);
+	div.appendChild(element);
+
+	return div;
+}
+
+/**
+ * Attempts to animate a change in value of a parameter
+ *
+ * @param {String} _parameter Name of parameter
+ * @param {String} _value New value of parameter
+ * @param {Boolean} _updateBindings Update the doodle form control bindings?
+ */
+ED.Doodle.prototype.setParameterWithAnimation = function(_parameter, _value, _updateBindings) {
+
+	// Can doodle animate this parameter?
+	if (this.parameterValidationArray[_parameter]['animate']) {
+		var valueArray = this.dependentParameterValues(_parameter, _value);
+		for (var parameter in valueArray) {
+			// Read delta in units per frame
+			var delta = this.parameterValidationArray[parameter]['delta'];
+
+			// Calculate 'distance' to go
+			var distance = valueArray[parameter] - this[parameter];
+
+			// Calculate sign and apply to delta
+			if (parameter == 'rotation') {
+				// This formula works out correct distance and direction on a radians 'clock face' (ie the shortest way round)
+				var sign = ((Math.PI - Math.abs(distance)) * distance) < 0 ? -1 : 1;
+				distance = distance * sign;
+
+				// Make distance positive
+				if (distance < 0) distance += 2 * Math.PI;
+
+				// Test for roughly half way
+				if (distance > 3.141) {
+					if (this.rotation < Math.PI) sign = -sign;
+				}
+			} else {
+				var sign = distance < 0 ? -1 : 1;
+			}
+			delta = delta * sign;
+
+			// Calculate number of frames to animate
+			var frames = Math.abs(Math.floor(distance / delta));
+
+			// Put results into an associative array for this parameter
+			var array = {
+				timer: null,
+				delta: delta,
+				frames: frames,
+				frameCounter: 0
+			};
+			this.animationDataArray[parameter] = array;
+
+			// Call animation method
+			if (frames > 0) {
+				this.increment(parameter, valueArray[parameter], _updateBindings);
+			}
+			// Increment may be too small to animate, but still needs setting
+			else {
+				// Set  parameter to exact value
+				this.setSimpleParameter(parameter, valueArray[parameter]);
+
+				// Update dependencies
+				this.updateDependentParameters(parameter, _updateBindings);
+
+				// Refresh drawing
+				this.drawing.repaint();
+			}
+		}
+
+	}
+	// Otherwise just set it directly
+	else {
+		this.setParameterFromString(_parameter, _value.toString());
+	}
+}
+
+/**
+ * Set the value of a doodle's parameter directly, and triggers a notification
+ *
+ * @param {String} _parameter Name of parameter
+ * @param {Undefined} _value New value of parameter
+ */
+ED.Doodle.prototype.setSimpleParameter = function(_parameter, _value) {
+	// Create notification message var messageArray = {eventName:_eventName, selectedDoodle:this.selectedDoodle, object:_object};
+	var object = new Object;
+	object.doodle = this;
+	object.parameter = _parameter;
+	object.value = _value;
+	object.oldValue = this[_parameter];
+
+	// Set parameter
+	this[_parameter] = _value;
+
+	// Trigger notification
+	this.drawing.notify('parameterChanged', object);
+}
+
+/**
+ * Set the value of a doodle's parameter from a string format following validation
+ *
+ * @param {String} _parameter Name of parameter
+ * @param {String} _value New value of parameter
+ */
+ED.Doodle.prototype.setParameterFromString = function(_parameter, _value) {
+	// Check type of passed value variable
+	var type = typeof(_value);
+	if (type != 'string') {
+		ED.errorHandler('ED.Doodle', 'setParameterFromString', '_value parameter should be of type string, not ' + type);
+	}
+
+	// Retrieve validation object for this doodle
+	var validation = this.parameterValidationArray[_parameter];
+
+	if (validation) {
+		// Set value according to type of parameter
+		switch (validation.type) {
+			case 'string':
+				this[_parameter] = _value;
+				break;
+
+			case 'float':
+				this[_parameter] = parseFloat(_value);
+				break;
+
+			case 'int':
+				this[_parameter] = parseInt(_value);
+				break;
+
+			case 'mod':
+				this[_parameter] = parseInt(_value);
+				break;
+
+			case 'bool':
+				this[_parameter] = (_value == 'true');
+				break;
+
+			case 'colourString':
+				this[_parameter] = _value;
+				break;
+
+			case 'freeText':
+				this[_parameter] = _value;
+				break;
+
+			default:
+				ED.errorHandler('ED.Doodle', 'setParameterFromString', 'Illegal validation type: ' + validation.type);
+				break;
+		}
+
+		// Update dependencies
+		this.updateDependentParameters(_parameter);
+
+		// Update child dependencies of any derived parameters
+		if (this.parameterValidationArray[_parameter]['kind'] == 'derived') {
+			var valueArray = this.dependentParameterValues(_parameter, _value);
+			for (var parameter in valueArray) {
+				// Update dependencies
+				this.updateDependentParameters(parameter);
+			}
+		}
+
+		// Create notification message var messageArray = {eventName:_eventName, selectedDoodle:this.selectedDoodle, object:_object};
+		var object = new Object;
+		object.doodle = this;
+		object.parameter = _parameter;
+		object.value = _value;
+		object.oldValue = this[_parameter];
+
+		// Trigger notification
+		this.drawing.notify('parameterChanged', object);
+	} else {
+		ED.errorHandler('ED.Doodle', 'setParameterFromString', 'No item in parameterValidationArray corresponding to parameter: ' + _parameter);
+	}
+
+	// Refresh drawing
+	this.drawing.repaint();
+}
+
+/**
+ * Set the value of a doodle's origin to avoid overlapping other doodles
+ *
+ * @param {String} _first Displacement of first doodle
+ * @param {String} _next Displacement of subsequent doodles
+ */
+ED.Doodle.prototype.setOriginWithDisplacements = function(_first, _next) {
+	this.originX = this.drawing.eye == ED.eye.Right ? -_first : _first;
+	this.originY = -_first;
+
+	// Get last doodle to be added
+	if (this.addAtBack) {
+		var doodle = this.drawing.firstDoodleOfClass(this.className);
+	} else {
+		var doodle = this.drawing.lastDoodleOfClass(this.className);
+	}
+
+	// If there is one, make position relative to it
+	if (doodle) {
+		var newOriginX = doodle.originX - _next;
+		var newOriginY = doodle.originY - _next;
+
+		this.originX = this.parameterValidationArray['originX']['range'].constrain(newOriginX);
+		this.originY = this.parameterValidationArray['originY']['range'].constrain(newOriginY);
+	}
+}
+
+/**
+ * Set the value of a doodle's origin as if rotating
+ *
+ * @param {Int} _radius The radius of rotation
+ * @param {Int} _first Rotation in degrees of first doodle anticlockwise right eye, clockwise left eye
+ * @param {Int} _next Additional rotation of subsequent doodles
+ */
+ED.Doodle.prototype.setOriginWithRotations = function(_radius, _first, _next) {
+	var direction = this.drawing.eye == ED.eye.Right ? -1 : 1;
+
+	var origin = new ED.Drawing.Point(0,0);
+	origin.setWithPolars(_radius, direction * _first * Math.PI / 180);
+
+	// Get last doodle to be added
+	if (this.addAtBack) {
+		var doodle = this.drawing.firstDoodleOfClass(this.className);
+	} else {
+		var doodle = this.drawing.lastDoodleOfClass(this.className);
+	}
+
+	// If there is one, make position relative to it
+	if (doodle) {
+		var doodleOrigin = new ED.Drawing.Point(doodle.originX, doodle.originY);
+		origin.setWithPolars(_radius, doodleOrigin.direction() + direction * _next * Math.PI / 180);
+	}
+
+	this.originX = origin.x;
+	this.originY = origin.y;
+}
+
+/**
+ * Set the value of a doodle's rotation to avoid overlapping other doodles
+ *
+ * @param {Int} _first Rotation in degrees of first doodle anticlockwise right eye, clockwise left eye
+ * @param {Int} _next Additional rotation of subsequent doodles
+ */
+ED.Doodle.prototype.setRotationWithDisplacements = function(_first, _next) {
+	var direction = this.drawing.eye == ED.eye.Right ? -1 : 1;
+	var newRotation;
+
+	// Get last doodle to be added
+	if (this.addAtBack) {
+		var doodle = this.drawing.firstDoodleOfClass(this.className);
+	} else {
+		var doodle = this.drawing.lastDoodleOfClass(this.className);
+	}
+
+	// If there is one, make rotation relative to it
+	if (doodle) {
+		newRotation = ((doodle.rotation * 180 / Math.PI + direction * _next + 360) % 360) * Math.PI / 180;
+	} else {
+		newRotation = ((direction * _first + 360) % 360) * Math.PI / 180;
+	}
+
+	this.rotation = this.parameterValidationArray['rotation']['range'].constrain(newRotation);
+}
+
+/**
+ * Deselects doodle
+ */
+ED.Doodle.prototype.deselect = function() {
+	// Deselect
+	this.isSelected = false;
+	this.drawing.selectedDoodle = null;
+
+	// Refresh drawing
+	this.drawing.repaint();
+}
+
+/**
+ * Returns parameter values in validated string format
+ *
+ * @param {String} _parameter Name of parameter
+ * @returns {String} Value of parameter
+ */
+ED.Doodle.prototype.getParameter = function(_parameter) {
+	// Retrieve validation object for this doodle
+	var validation = this.parameterValidationArray[_parameter];
+
+	// Set return value;
+	var value = "";
+
+	if (validation) {
+		switch (validation.type) {
+			case 'string':
+				value = this[_parameter];
+				break;
+
+			case 'float':
+				// Convert to string, applying any formatting
+				value = this[_parameter].toFixed(validation.precision);
+				break;
+
+			case 'int':
+				// Convert to string, applying any formatting
+				value = this[_parameter].toFixed(0);
+				break;
+
+			case 'mod':
+				// Round to integer applying any formatting
+				value = Math.round(this[_parameter]);
+
+				// Deal with crossover
+				if (validation.clock == 'top') {
+					if (value == validation.range.min) value = validation.range.max;
+				} else if (validation.clock == 'bottom') {
+					if (value == validation.range.max) value = validation.range.min;
+				}
+
+				// Convert to string
+				value = value.toFixed(0);
+				break;
+
+			case 'bool':
+				value = this[_parameter].toString();
+				break;
+
+			case 'colourString':
+				value = this[_parameter];
+				break;
+
+			case 'freeText':
+				value = this[_parameter];
+				break;
+
+			default:
+				ED.errorHandler('ED.Doodle', 'getParameter', 'Illegal validation type');
+				break;
+		}
+	} else {
+		ED.errorHandler('ED.Doodle', 'getParameter', 'No entry in parameterValidationArray corresponding to parameter: ' + _parameter);
+	}
+
+	// Return value
+	return value;
+}
+
+/**
+ * Uses a timeout to call itself and produce the animation
+ *
+ * @param {String} _parameter Name of parameter
+ * @param {String} _value New value of parameter
+ * @param {Boolean} _updateBindings Update the doodle form control bindings?
+ */
+ED.Doodle.prototype.increment = function(_parameter, _value, _updateBindings) {
+	// Increment parameter and framecounter
+	var currentValue = this[_parameter];
+	this.animationDataArray[_parameter]['frameCounter']++;
+
+	// Calculate interval between frames in milliseconds
+	var interval = 1000 / this.animationFrameRate;
+
+	// Complete or continue animation
+	if (this.animationDataArray[_parameter]['frameCounter'] == this.animationDataArray[_parameter]['frames']) {
+		// Set  parameter to exact value
+		this.setSimpleParameter(_parameter, _value);
+
+		// Update dependencies
+		this.updateDependentParameters(_parameter, _updateBindings);
+
+		// Stop timer
+		clearTimeout(this.animationDataArray[_parameter]['timer']);
+	} else {
+		// Set parameter to new value
+		this.setSimpleParameter(_parameter, currentValue + this.animationDataArray[_parameter]['delta']);
+
+		// Update dependencies
+		this.updateDependentParameters(_parameter, _updateBindings);
+
+		// Start timer and set to call this function again after interval
+		var doodle = this;
+		this.animationDataArray[_parameter]['timer'] = setTimeout(function() {
+			doodle.increment(_parameter, _value, _updateBindings);
+		}, interval);
+	}
+
+	// Refresh drawing
+	this.drawing.repaint();
+}
+
+/**
+ * Adds a binding to the doodle. Only derived parameters can be bound
+ *
+ * @param {String} _parameter Name of parameter to be bound
+ * @param {String} _fieldParameters Details of bound HTML element
+ */
+ED.Doodle.prototype.addBinding = function(_parameter, _fieldParameters) {
+	var elementId = _fieldParameters['id'];
+	var attribute = _fieldParameters['attribute'];
+
+	// Check that doodle has a parameter of this name
+	if (typeof(this[_parameter]) != 'undefined') {
+		// Get reference to HTML element
+		var element = document.getElementById(elementId);
+
+		// Check element exists
+		if (element != null) {
+			// Add binding to array
+			this.bindingArray[_parameter] = {
+				'id': elementId,
+				'attribute': attribute
+			};
+
+			// Attach onchange event of element with a function which calls the drawing event handler
+			var drawing = this.drawing;
+			var id = this.id;
+			var className = this.className;
+			var listener;
+
+			// Set the parameter to the value of the element, and attach a listener
+			switch (element.type) {
+				case 'checkbox':
+					if (attribute) {
+						ED.errorHandler('ED.Doodle', 'addBinding', 'Binding to a checkbox with a non-standard attribute not yet supported');
+					} else {
+						// For parameters linked to an element with a saved value, set value to that of bound element
+						if (this.savedParameterArray.indexOf(_parameter) < 0) {
+							this.setParameterFromString(_parameter, element.checked.toString());
+						}
+						// Otherwise set element value to saved doodle parameter
+						else {
+							this.drawing.updateBindings(this);
+						}
+						element.addEventListener('change', listener = function(event) {
+							drawing.eventHandler('onchange', id, className, this.id, this.checked.toString());
+						}, false);
+					}
+					break;
+
+				case 'select-one':
+					if (attribute) {
+						if (element.selectedIndex > -1) {
+							// For parameters linked to a saved value, set value to that of bound element
+							if (this.savedParameterArray.indexOf(_parameter) < 0) {
+								this.setParameterFromString(_parameter, element.options[element.selectedIndex].getAttribute(attribute));
+							}
+						}
+						element.addEventListener('change', listener = function(event) {
+							drawing.eventHandler('onchange', id, className, this.id, this.options[this.selectedIndex].getAttribute(attribute));
+						}, false);
+					} else {
+						// For parameters linked to an element with a saved value, set value to that of bound element
+						if (this.savedParameterArray.indexOf(_parameter) < 0) {
+							this.setParameterFromString(_parameter, element.value);
+						}
+						// Otherwise set element value to saved doodle parameter
+						else {
+							this.drawing.updateBindings(this);
+						}
+						element.addEventListener('change', listener = function(event) {
+							drawing.eventHandler('onchange', id, className, this.id, this.value);
+						}, false);
+					}
+					break;
+
+				case 'text':
+					if (attribute) {
+						ED.errorHandler('ED.Doodle', 'addBinding', 'Binding to a text field with a non-standard attribute not yet supported');
+					} else {
+						// For parameters linked to an element with a saved value, set value to that of bound element
+						if (this.savedParameterArray.indexOf(_parameter) < 0) {
+							this.setParameterFromString(_parameter, element.value);
+						}
+						// Otherwise set element value to saved doodle parameter
+						else {
+							this.drawing.updateBindings(this);
+						}
+						element.addEventListener('change', listener = function(event) {
+							drawing.eventHandler('onchange', id, className, this.id, this.value);
+						}, false);
+					}
+					break;
+
+				default:
+					if (attribute) {
+						this.setParameterFromString(_parameter, element.getAttribute(attribute));
+						element.addEventListener('change', listener = function(event) {
+							drawing.eventHandler('onchange', id, className, this.id, this.getAttribute(attribute));
+						}, false);
+					} else {
+						this.setParameterFromString(_parameter, element.value);
+						element.addEventListener('change', listener = function(event) {
+							drawing.eventHandler('onchange', id, className, this.id, this.value);
+						}, false);
+					}
+					break;
+			}
+
+			// Add listener to array
+			this.drawing.listenerArray[this.id][_parameter] = listener;
+		} else {
+			ED.errorHandler('ED.Doodle', 'addBinding', 'Failed to add binding. DOM has no element with id: ' + elementId);
+		}
+	} else {
+		ED.errorHandler('ED.Doodle', 'addBinding', 'Failed to add binding. Doodle of class: ' + this.className + ' has no parameter of name: ' + _parameter);
+	}
+}
+
+/**
+ * Removes a binding from a doodle
+ *
+ * @param {String} _parameter Name of parameter whosse binding is to be removed
+ */
+ED.Doodle.prototype.removeBinding = function(_parameter) {
+	// Get id of corresponding element
+	var elementId;
+	for (var parameter in this.bindingArray) {
+		if (parameter == _parameter) {
+			elementId = this.bindingArray[_parameter]['id'];
+		}
+	}
+
+	// Remove entry in binding array
+	delete this.bindingArray[_parameter];
+
+	// Remove event listener
+	var element = document.getElementById(elementId);
+	element.removeEventListener('change', this.drawing.listenerArray[this.id][_parameter], false);
+
+	// Remove entry in listener array
+	delete this.drawing.listenerArray[this.id][_parameter];
+}
+
+/**
+ * Returns the roation converted to clock hours
+ *
+ * @param {Int} _Offset Optional integer offset (1 to 11)
+ * @returns {Int} Clock hour from 1 to 12
+ */
+ED.Doodle.prototype.clockHour = function(_offset) {
+	var clockHour;
+	var offset;
+
+	if (typeof(_offset) != 'undefined') offset = _offset
+	else offset = 0;
+
+	if (this.isRotatable && !this.isMoveable) {
+		clockHour = ((this.rotation * 6 / Math.PI) + 12 + offset) % 12;
+	} else {
+		var twelvePoint = new ED.Drawing.Point(0, -100);
+		var thisPoint = new ED.Drawing.Point(this.originX, this.originY);
+		var clockHour = ((twelvePoint.clockwiseAngleTo(thisPoint) * 6 / Math.PI) + 12 + offset) % 12;
+	}
+
+	clockHour = clockHour.toFixed(0);
+	if (clockHour == 0) clockHour = 12;
+	return clockHour
+}
+
+/**
+ * Returns the quadrant of a doodle based on origin coordinates
+ *
+ * @returns {String} Description of quadrant
+ */
+ED.Doodle.prototype.quadrant = function() {
+	var returnString = "";
+
+	// Use trigonometry on rotation field to determine quadrant
+	returnString += this.originY < 0 ? "supero" : "infero";
+	if (this.drawing.eye == ED.eye.Right) {
+		returnString += this.originX < 0 ? "temporal" : "nasal";
+	} else {
+		returnString += this.originX < 0 ? "nasal" : "temporal";
+	}
+
+	returnString += " quadrant";
+
+	return returnString;
+}
+
+/**
+ * Returns the rotation converted to degrees
+ *
+ * @returns {Int} Degrees from 0 to 360
+ */
+ED.Doodle.prototype.degrees = function() {
+	var degrees;
+
+	if (this.isRotatable && !this.isMoveable) {
+		degrees = ((this.rotation * 180 / Math.PI) + 360) % 360;
+	} else {
+		var twelvePoint = new ED.Drawing.Point(0, -100);
+		var thisPoint = new ED.Drawing.Point(this.originX, this.originY);
+		degrees = ((twelvePoint.clockwiseAngleTo(thisPoint) * 180 / Math.PI) + 360) % 360;
+	}
+
+	degrees = degrees.toFixed(0);
+	if (degrees == 0) degrees = 0;
+	return degrees;
+}
+
+/**
+ * Returns the extent converted to clock hours
+ *
+ * @returns {Int} Clock hour from 1 to 12
+ */
+ED.Doodle.prototype.clockHourExtent = function() {
+	var clockHourStart;
+	var clockHourEnd;
+
+	if (this.isRotatable && !this.isMoveable) {
+		clockHourStart = (((this.rotation - this.arc / 2) * 6 / Math.PI) + 12) % 12;
+		clockHourEnd = (((this.rotation + this.arc / 2) * 6 / Math.PI) + 12) % 12;
+	} else {
+		var twelvePoint = new ED.Drawing.Point(0, -100);
+		var thisPoint = new ED.Drawing.Point(this.originX, this.originY);
+		var clockHour = ((twelvePoint.clockwiseAngleTo(thisPoint) * 6 / Math.PI) + 12) % 12;
+	}
+
+	clockHourStart = clockHourStart.toFixed(0);
+	if (clockHourStart == 0) clockHourStart = 12;
+	clockHourEnd = clockHourEnd.toFixed(0);
+	if (clockHourEnd == 0) clockHourEnd = 12;
+	return "from " + clockHourStart + " to " + clockHourEnd;
+}
+
+/**
+ * Returns the extent converted to degrees
+ *
+ * @returns {Int} Extent 0 to 360 degrees
+ */
+ED.Doodle.prototype.degreesExtent = function() {
+	var degrees = this.arc * 180 / Math.PI;
+	var intDegrees = Math.round(degrees);
+	return intDegrees;
+}
+
+/**
+ * Returns the location relative to the disc
+ *
+ * @returns {String} Text description of location
+ */
+ED.Doodle.prototype.locationRelativeToDisc = function() {
+	var locationString = "";
+
+	// Right eye
+	if (this.drawing.eye == ED.eye.Right) {
+		if (this.originX > 180 && this.originX < 420 && this.originY > -120 && this.originY < 120) {
+			locationString = "at the disc";
+		} else {
+			locationString += this.originY <= 0 ? "supero" : "infero";
+			locationString += this.originX <= 300 ? "temporally" : "nasally";
+		}
+	}
+	// Left eye
+	else {
+		if (this.originX < -180 && this.originX > -420 && this.originY > -120 && this.originY < 120) {
+			locationString = "at the disc";
+		} else {
+			locationString += this.originY <= 0 ? "supero" : "infero";
+			locationString += this.originX >= -300 ? "temporally" : "nasally";
+		}
+	}
+
+	return locationString;
+}
+
+/**
+ * Returns the location relative to the fovea
+ *
+ * @returns {String} Text description of location
+ */
+ED.Doodle.prototype.locationRelativeToFovea = function() {
+	var locationString = "";
+
+	// Right eye
+	if (this.drawing.eye == ED.eye.Right) {
+		if (this.originX > -10 && this.originX < 10 && this.originY > -10 && this.originY < 10) {
+			locationString = "at the fovea";
+		} else {
+			locationString += this.originY <= 0 ? "supero" : "infero";
+			locationString += this.originX <= 0 ? "temporal" : "nasal";
+			locationString += " to the fovea";
+		}
+	}
+	// Left eye
+	else {
+		if (this.originX > -10 && this.originX < 10 && this.originY > -10 && this.originY < 10) {
+			locationString = "at the fovea";
+		} else {
+			locationString += this.originY <= 0 ? "supero" : "infero";
+			locationString += this.originX >= 0 ? "temporally" : "nasally";
+			locationString += " to the fovea";
+		}
+	}
+	return locationString;
+}
+
+/**
+ * Adds a new squiggle to the doodle's squiggle array
+ */
+ED.Doodle.prototype.addSquiggle = function() {
+	// Get colour (stored as a HEX string in the doodle) and create colour object
+	var colourObject = new ED.Drawing.Colour(0, 0, 0, 1);
+	colourObject.setWithHexString(this.colourString);
+
+	// Line thickness
+	var lineThickness;
+	switch (this.thickness) {
+		case "Thin":
+			lineThickness = ED.squiggleWidth.Thin;
+			break;
+		case "Medium":
+			lineThickness = ED.squiggleWidth.Medium;
+			break;
+		case "Thick":
+			lineThickness = ED.squiggleWidth.Thick;
+			break;
+		default:
+			lineThickness = ED.squiggleWidth.Thin;
+			break;
+	}
+
+	// Create new squiggle
+	var squiggle = new ED.Drawing.Squiggle(this, colourObject, lineThickness, this.filled);
+
+	// Add it to squiggle array
+	this.squiggleArray.push(squiggle);
+}
+
+
+/**
+ * Adds a point to the active squiggle (the last in the squiggle array)
+ *
+ * @param {Point} _point The point in the doodle plane to be added
+ */
+ED.Doodle.prototype.addPointToSquiggle = function(_point) {
+	if (this.squiggleArray.length > 0) {
+		var index = this.squiggleArray.length - 1;
+		var squiggle = this.squiggleArray[index];
+
+		squiggle.addPoint(_point);
+	}
+}
+
+/**
+ * Complete the active squiggle (last in the array)
+ */
+ED.Doodle.prototype.completeSquiggle = function() {
+	if (this.squiggleArray.length > 0) {
+		var index = this.squiggleArray.length - 1;
+		var squiggle = this.squiggleArray[index];
+
+		squiggle.complete = true;
+	}
+}
+
+/**
+ * Calculates arc for doodles without a natural arc value
+ *
+ * @returns Arc value in radians
+ */
+ED.Doodle.prototype.calculateArc = function() {
+	// Transform extremity points to origin of 0,0
+	var left = new ED.Drawing.Point(this.leftExtremity.x - this.drawing.canvas.width / 2, this.leftExtremity.y - this.drawing.canvas.height / 2);
+	var right = new ED.Drawing.Point(this.rightExtremity.x - this.drawing.canvas.width / 2, this.rightExtremity.y - this.drawing.canvas.height / 2);
+
+	// Return angle between them
+	return left.clockwiseAngleTo(right);
+}
+
+/**
+ * Finds the nearest point in the doodle pointsArray
+ *
+ * @param {ED.Drawing.Point} _point The point to test
+ * @returns {ED.Drawing.Point} The nearest point
+ */
+ED.Doodle.prototype.nearestPointTo = function(_point) {
+	// Check that pointsArray has content
+	if (this.pointsArray.length > 0) {
+		var min = 10000000; // Greater than square of maximum separation in doodle plane
+		var index = 0;
+
+		// Iterate through points array to find nearest point
+		for (var i = 0; i < this.pointsArray.length; i++) {
+			var p = this.pointsArray[i];
+			var d = (_point.x - p.x) * (_point.x - p.x) + (_point.y - p.y) * (_point.y - p.y);
+
+			if (d < min) {
+				min = d;
+				index = i;
+			}
+		}
+
+		return this.pointsArray[index];
+	}
+	// Otherwise generate error and return passed point
+	else {
+		ED.errorHandler('ED.Doodle', 'nearestPointTo', 'Attempt to calculate nearest points with an empty points array');
+		return _point;
+	}
+}
+
+/**
+ * Finds the nearest angle in the doodle anglesArray
+ *
+ * @param {Float} _angle The angle to test
+ * @returns {Float} The nearest angle
+ */
+ED.Doodle.prototype.nearestAngleTo = function(_angle) {
+	// Check that anglesArray has content
+	if (this.anglesArray.length > 0) {
+		var min = 2 * Math.PI; // Greater than one complete rotation
+		var index = 0;
+
+		// Iterate through angles array to find nearest point
+		for (var i = 0; i < this.anglesArray.length; i++) {
+			var p = this.anglesArray[i];
+
+			var d = Math.abs(p - _angle);
+
+			if (d < min) {
+				min = d;
+				index = i;
+			}
+		}
+
+		return this.anglesArray[index];
+	}
+	// Otherwise generate error and return passed angle
+	else {
+		ED.errorHandler('ED.Doodle', 'nearestAngleTo', 'Attempt to calculate nearest angle with an empty angles array');
+		return _angle;
+	}
+}
+
+/**
+ * Finds the nearest arc in the doodle arcArray
+ *
+ * @param {Float} _arc The angle to test
+ * @returns {Float} The nearest angle
+ */
+ED.Doodle.prototype.nearestArcTo = function(_arc) {
+	// Check that arcArray has content
+	if (this.arcArray.length > 0) {
+		var min = 2 * Math.PI; // Greater than one complete rotation
+		var index = 0;
+
+		// Iterate through angles array to find nearest point
+		for (var i = 0; i < this.arcArray.length; i++) {
+			var p = this.arcArray[i];
+
+			var d = Math.abs(p - _arc);
+
+			if (d < min) {
+				min = d;
+				index = i;
+			}
+		}
+
+		return this.arcArray[index];
+	}
+	// Otherwise generate error and return passed arc
+	else {
+		ED.errorHandler('ED.Doodle', 'nearestArcTo', 'Attempt to calculate nearest arc with an empty arc array');
+		return _arc;
+	}
+}
+
+/**
+ * Returns a doodle in JSON format
+ *
+ * @returns {String} A JSON encoded string representing the variable properties of the doodle
+ */
+ED.Doodle.prototype.json = function() {
+	// Start of JSON string
+	var s = '{';
+
+	// Version and doodle subclass
+	s = s + '"version":' + this.version.toFixed(1) + ',';
+	s = s + '"subclass":' + '"' + this.className + '",';
+
+	// Only save values of parameters specified in savedParameterArray
+	if (typeof(this.savedParameterArray) != 'undefined') {
+		if (this.savedParameterArray.length > 0) {
+			for (var i = 0; i < this.savedParameterArray.length; i++) {
+				var p = this.savedParameterArray[i];
+
+				// String to output
+				var o;
+
+				// Special treatment according to parameter
+				if (p == 'scaleX' || p == 'scaleY') {
+					o = this[p].toFixed(2);
+				} else if (p == 'arc' || p == 'rotation') {
+					o = (this[p] * 180 / Math.PI).toFixed(0);
+				} else if (p == 'originX' || p == 'originY' || p == 'radius' || p == 'apexX' || p == 'apexY' || p == 'width' || p == 'height') {
+					o = this[p].toFixed(0);
+				} else if (typeof(this[p]) == 'number') {
+					o = this[p].toFixed(2);
+				} else if (typeof(this[p]) == 'string') {
+					o = '"' + this[p] + '"';
+				} else if (typeof(this[p]) == 'boolean') {
+					o = this[p];
+				} else if (typeof(this[p]) == 'object') {
+					o = JSON.stringify(this[p]);
+				} else {
+					ED.errorHandler('ED.Doodle', 'json', 'Attempt to create json for an unhandled parameter type: ' + typeof(this[p]));
+					o = "ERROR";
+				}
+
+				// Construct json
+				s = s + '"' + p + '":' + o + ',';
+			}
+		}
+	}
+
+	// Optional squiggle array
+	if (this.squiggleArray.length > 0) {
+		s = s + '"squiggleArray":[';
+		for (var j = 0; j < this.squiggleArray.length; j++) {
+			s = s + this.squiggleArray[j].json();
+			if (this.squiggleArray.length - j > 1) {
+				s = s + ',';
+			}
+		}
+		s = s + '],';
+	}
+
+	// Order
+	s = s + '"order":' + this.order.toFixed(0);
+
+	// End of JSON
+	s = s + '}';
+
+	return s;
+}
+
+/**
+ * Draws a circular spot with given parameters
+ *
+ * @param {Object} _ctx Context of canvas
+ * @param {Float} _x X-coordinate of origin
+ * @param {Float} _y Y-coordinate of origin
+ * @param {Float} _r Radius
+ * @param {String} _colour String containing colour
+ */
+ED.Doodle.prototype.drawSpot = function(_ctx, _x, _y, _r, _colour) {
+	_ctx.save();
+	_ctx.beginPath();
+	_ctx.arc(_x, _y, _r, 0, Math.PI * 2, true);
+	_ctx.fillStyle = _colour;
+	_ctx.strokeStyle = _colour;
+	_ctx.lineWidth = 0;
+	_ctx.fill();
+	_ctx.stroke();
+	_ctx.restore();
+}
+
+/**
+ * Draws a circle with given parameters
+ *
+ * @param {Object} _ctx Context of canvas
+ * @param {Float} _x X-coordinate of origin
+ * @param {Float} _y Y-coordinate of origin
+ * @param {Float} _r Radius
+ * @param {String} _fillColour String containing fill colour
+ * @param {Int} _lineWidth Line width in pixels
+ * @param {String} _strokeColour String containing stroke colour
+ */
+ED.Doodle.prototype.drawCircle = function(_ctx, _x, _y, _r, _fillColour, _lineWidth, _strokeColour) {
+	_ctx.save();
+	_ctx.beginPath();
+	_ctx.arc(_x, _y, _r, 0, Math.PI * 2, true);
+	_ctx.fillStyle = _fillColour;
+	_ctx.fill();
+	_ctx.lineWidth = _lineWidth;
+	_ctx.strokeStyle = _strokeColour;
+	_ctx.stroke();
+	_ctx.restore();
+}
+
+/**
+ * Draws a line with given parameters
+ *
+ * @param {Object} _ctx Context of canvas
+ * @param {Float} _x1 X-coordinate of origin
+ * @param {Float} _y1 Y-coordinate of origin
+ * @param {Float} _x2 X-coordinate of origin
+ * @param {Float} _y2 Y-coordinate of origin
+ * @param {Float} _w Width of line
+ * @param {String} _colour String containing colour
+ */
+ED.Doodle.prototype.drawLine = function(_ctx, _x1, _y1, _x2, _y2, _w, _colour) {
+	_ctx.save();
+	_ctx.beginPath();
+	_ctx.moveTo(_x1, _y1);
+	_ctx.lineTo(_x2, _y2);
+	_ctx.lineWidth = _w;
+	_ctx.strokeStyle = _colour;
+	_ctx.stroke();
+	_ctx.restore();
+}
+
+/**
+ * Draws a laser spot
+ *
+ * @param {Object} _ctx Context of canvas
+ * @param {Float} _x X-coordinate of origin
+ * @param {Float} _y Y-coordinate of origin
+ */
+ED.Doodle.prototype.drawLaserSpot = function(_ctx, _x, _y) {
+	this.drawCircle(_ctx, _x, _y, 15, "Yellow", 10, "rgba(255, 128, 0, 1)");
+}
+
+/**
+ * Draws a haemorrhage orientated to be parallel to nerve fibre layer
+ *
+ * @param {Object} _ctx Context of canvas
+ * @param {Float} _x X-coordinate of origin
+ * @param {Float} _y Y-coordinate of origin
+ */
+ED.Doodle.prototype.drawNFLHaem = function(_ctx, _x, _y) {
+	// Parameters
+	var r = 10;
+
+	// Create point from parameters
+	var p = new ED.Drawing.Point(_x, _y);
+
+	// Create two new points 'tangential'
+	var phi1 = p.direction() + Math.PI/2;
+	var phi2 = p.direction() + 3 * Math.PI/2;
+	var p1 = new ED.Drawing.Point(0,0);
+	p1.setWithPolars(r, phi1);
+	var p2 = new ED.Drawing.Point(0,0);
+	p2.setWithPolars(r, phi2);
+
+	// Draw line
+	_ctx.beginPath();
+	_ctx.moveTo(_x + p1.x, _y + p1.y);
+	_ctx.lineTo(_x + p2.x, _y + p2.y);
+
+	_ctx.lineWidth = 16;
+	_ctx.lineCap = 'round';
+	_ctx.strokeStyle = "rgba(255,0,0,0.5)";
+
+	_ctx.stroke();
+}
+
+/**
+ * Adds an ellipse to a path
+ *
+ * @param {Object} _ctx Context of canvas
+ * @param {Float} _x X-coordinate of origin
+ * @param {Float} _y Y-coordinate of origin
+ * @param {Float} _w Width
+ * @param {Float} _h Height
+ */
+ED.Doodle.prototype.addEllipseToPath = function(_ctx, _x, _y, _w, _h) {
+  var kappa = 0.5522848;
+  var ox = (_w / 2) * kappa;
+  var oy = (_h / 2) * kappa;
+
+  _ctx.moveTo(-_w/2, 0);
+  _ctx.bezierCurveTo(_x - _w/2, _y - oy, _x - ox, _y - _h/2, _x, _y - _h/2);
+  _ctx.bezierCurveTo(_x + ox, _y - _h/2, _x + _w/2, _y - oy, _x + _w/2, _y);
+  _ctx.bezierCurveTo(_x + _w/2, _y + oy, _x + ox, _y + _h/2, _x, _y + _h/2);
+  _ctx.bezierCurveTo(_x - ox, _y + _h/2, _x - _w/2, _y + oy, _x - _w/2, _y);
+}
+
+/**
+ * Returns the x coordinate of a point given its y and the radius
+ *
+ * @param {Float} _r Radius to point
+ * @param {Float} _y y coordinate of point
+ * @returns {Float} x coordinate of point
+ */
+ED.Doodle.prototype.xForY = function(_r, _y) {
+	return Math.sqrt(_r * _r - _y * _y);
+}
+
+/**
+ * Outputs doodle information to the console
+ */
+ED.Doodle.prototype.debug = function() {
+	console.log('org: ' + this.originX + " : " + this.originY);
+	console.log('apx: ' + this.apexX + " : " + this.apexY);
+	console.log('rot: ' + this.rotation * 180 / Math.PI);
+	console.log('arc: ' + this.arc * 180 / Math.PI);
+}
+
+/**
+ * Represents a control handle on the doodle
+ *
+ * @class Handle
+ * @property {Point} location Location in doodle plane
+ * @property {Bool} isVisible Flag indicating whether handle should be shown
+ * @property {Enum} mode The drawing mode that selection of the handle triggers
+ * @property {Bool} isRotatable Flag indicating whether the handle shows an outer ring used for rotation
+ * @param {Point} _location
+ * @param {Bool} _isVisible
+ * @param {Enum} _mode
+ * @param {Bool} _isRotatable
+ */
+ED.Doodle.Handle = function(_location, _isVisible, _mode, _isRotatable) {
+	// Properties
+	if (_location == null) {
+		this.location = new ED.Drawing.Point(0, 0);
+	} else {
+		this.location = _location;
+	}
+	this.isVisible = _isVisible;
+	this.mode = _mode;
+	this.isRotatable = _isRotatable;
+}
+/**
+ * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
+ * (C) OpenEyes Foundation, 2011-2014
+ * This file is part of OpenEyes.
+ *
+ * OpenEyes is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * OpenEyes is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with OpenEyes.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/**
+ * An object of the Report class is used to extract data for the Royal College of Ophthalmologists retinal detachment dataset.
+ * The object analyses an EyeDraw drawing, and sets the value of HTML elements on the page accordingly.
+ *
+ * @class Report
+ * @property {Canvas} canvas A canvas element used to edit and display the drawing
+ * @property {Int} breaksInAttached The number of retinal breaks in attached retina
+ * @property {Int} breaksInDetached The number of retinal breaks in detached retina
+ * @property {String} largestBreakType The type of the largest retinal break
+ * @property {Int} largestBreakSize The size in clock hours of the largest retinal break
+ * @property {Int} lowestBreakPosition The lowest position of any break in clock hours
+ * @property {String} pvrType The type of PVR
+ * @property {Int} pvrCClockHours The number of clock hours of posterior PVR type C
+ * @property {Int} antPvrClockHours The number of clock hours of anterior PVR
+ * @param Drawing _drawing The drawing object to be analysed
+ */
+ED.Report = function(_drawing) {
+	// Properties
+	this.drawing = _drawing;
+	this.breaksInAttached = 0;
+	this.breaksInDetached = 0;
+	this.largestBreakType = 'Not found';
+	this.largestBreakSize = 0;
+	this.lowestBreakPosition = 12;
+	this.pvrType = 'None';
+	this.pvrCClockHours = 0;
+	this.antPvrClockHours = 0;
+
+	// Variables
+	var pvrCDegrees = 0;
+	var AntPvrDegrees = 0;
+	var minDegreesFromSix = 180;
+
+	// Create array of doodle classes which are retinal breaks
+	var breakClassArray = new Array();
+	breakClassArray["UTear"] = "U tear";
+	breakClassArray["RoundHole"] = "Round hole";
+	breakClassArray["Dialysis"] = "Dialysis";
+	breakClassArray["GRT"] = "GRT";
+	breakClassArray["MacularHole"] = "Macular hole";
+	breakClassArray["OuterLeafBreak"] = "Outer Leaf Break";
+
+	// Array of RRD doodles
+	this.rrdArray = new Array();
+
+	// First iteration to create array of retinal detachments
+	var i, doodle;
+	for (i = 0; i < this.drawing.doodleArray.length; i++) {
+		doodle = this.drawing.doodleArray[i];
+
+		// If its a RRD, add to RRD array
+		if (doodle.className == "RRD") {
+			this.rrdArray.push(doodle);
+		}
+	}
+
+	// Second iteration for other doodles
+	for (i = 0; i < this.drawing.doodleArray.length; i++) {
+		doodle = this.drawing.doodleArray[i];
+
+		// Star fold - PVR C
+		if (doodle.className == "StarFold") {
+			this.pvrType = 'C';
+			pvrCDegrees += doodle.arc * 180 / Math.PI;
+		}
+		// Anterior PVR
+		else if (doodle.className == "AntPVR") {
+			this.pvrType = 'C';
+			AntPvrDegrees += doodle.arc * 180 / Math.PI;
+		}
+		// Retinal breaks
+		else if (doodle.className in breakClassArray) {
+			// Bearing of break is calculated in two different ways
+			var breakBearing = 0;
+			if (doodle.className == "UTear" || doodle.className == "RoundHole" || doodle.className == "OuterLeafBreak") {
+				breakBearing = (Math.round(Math.atan2(doodle.originX, -doodle.originY) * 180 / Math.PI) + 360) % 360;
+			} else {
+				breakBearing = (Math.round(doodle.rotation * 180 / Math.PI + 360)) % 360;
+			}
+
+			// Bool if break is in detached retina
+			var inDetached = this.inDetachment(breakBearing);
+
+			// Increment totals
+			if (inDetached) {
+				this.breaksInDetached++;
+			} else {
+				this.breaksInAttached++;
+			}
+
+			// Get largest break in radians
+			if (inDetached && doodle.arc > this.largestBreakSize) {
+				this.largestBreakSize = doodle.arc;
+				this.largestBreakType = breakClassArray[doodle.className];
+			}
+
+			// Get lowest break
+			var degreesFromSix = Math.abs(breakBearing - 180);
+
+			if (inDetached && degreesFromSix < minDegreesFromSix) {
+				minDegreesFromSix = degreesFromSix;
+
+				// convert to clock hours
+				var bearing = breakBearing + 15;
+				remainder = bearing % 30;
+				this.lowestBreakPosition = Math.floor((bearing - remainder) / 30);
+				if (this.lowestBreakPosition == 0) this.lowestBreakPosition = 12;
+			}
+		}
+	}
+
+	// Star folds integer result (round up to one clock hour)
+	pvrCDegrees += 25;
+	var remainder = pvrCDegrees % 30;
+	this.pvrCClockHours = Math.floor((pvrCDegrees - remainder) / 30);
+
+	// Anterior PVR clock hours
+	AntPvrDegrees += 25;
+	remainder = AntPvrDegrees % 30;
+	this.antPvrClockHours = Math.floor((AntPvrDegrees - remainder) / 30);
+
+	// Convert largest break size to clockhours
+	var size = this.largestBreakSize * 180 / Math.PI + 25;
+	var remainder = size % 30;
+	this.largestBreakSize = Math.floor((size - remainder) / 30);
+}
+
+/**
+ * Accepts a bearing in degrees (0 is at 12 o'clock) and returns true if it is in an area of detachment
+ *
+ * @param {Float} _angle Bearing in degrees
+ * @returns {Bool} True is the bearing intersects with an area of retinal deatchment
+ */
+ED.Report.prototype.inDetachment = function(_angle) {
+	var returnValue = false;
+
+	// Iterate through retinal detachments
+	for (key in this.rrdArray) {
+		var rrd = this.rrdArray[key];
+
+		// Get start and finish bearings of detachment in degrees
+		var min = (rrd.rotation - rrd.arc / 2) * 180 / Math.PI;
+		var max = (rrd.rotation + rrd.arc / 2) * 180 / Math.PI;
+
+		// Convert to positive numbers
+		var min = (min + 360) % 360;
+		var max = (max + 360) % 360;
+
+		// Handle according to whether RRD straddles 12 o'clock
+		if (max < min) {
+			if ((0 <= _angle && _angle <= max) || (min <= _angle && _angle <= 360)) {
+				returnValue = true;
+			}
+		} else if (max == min) // Case if detachment is total
+		{
+			return true;
+		} else {
+			if (min <= _angle && _angle <= max) {
+				returnValue = true;
+			}
+		}
+	}
+
+	return returnValue;
+}
+
+/**
+ * Extent of RRD in clock hours
+ *
+ * @returns {Array} An array of extents (1 to 3 clock hours) for each quadrant
+ */
+ED.Report.prototype.extent = function() {
+	// Array of extents by quadrant
+	var extentArray = new Array();
+	if (this.drawing.eye == ED.eye.Right) {
+		extentArray["SN"] = 0;
+		extentArray["IN"] = 0;
+		extentArray["IT"] = 0;
+		extentArray["ST"] = 0;
+	} else {
+		extentArray["ST"] = 0;
+		extentArray["IT"] = 0;
+		extentArray["IN"] = 0;
+		extentArray["SN"] = 0;
+	}
+
+	// get middle of first hour in degrees
+	var midHour = 15;
+
+	// Go through each quadrant counting extent of detachment
+	for (quadrant in extentArray) {
+		for (var i = 0; i < 3; i++) {
+			var addition = this.inDetachment(midHour) ? 1 : 0;
+			extentArray[quadrant] = extentArray[quadrant] + addition;
+			midHour = midHour + 30;
+		}
+	}
+
+	return extentArray;
+}
+
+/**
+ * Returns true if the macular is off
+ *
+ * @returns {Bool} True if the macula is off
+ */
+ED.Report.prototype.isMacOff = function() {
+	var result = false;
+
+	// Iterate through each detachment, one macoff is enough
+	for (key in this.rrdArray) {
+		var rrd = this.rrdArray[key];
+		if (rrd.isMacOff()) result = true;
+	}
+
+	return result;
+}
+
+/**
+ * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
+ * (C) OpenEyes Foundation, 2011-2014
+ * This file is part of OpenEyes.
+ *
+ * OpenEyes is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * OpenEyes is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with OpenEyes.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+var ED = ED || {};
+
+/**
+ * ED.Checker is used to track when eyedraws are "ready" and execute callbacks
+ * when ready. An eyedraw is ready when all doodles have been loaded, thus this
+ * checker is *only useful for eyedraws in "view" mode*.
+ */
+ED.Checker = ED.Checker || (function() {
+
+	'use strict';
+
+	var callbacks = [];
+	var instances = [];
+	var ready = 0;
+
+	/**
+	 * Loop through all the registered callbacks and execute them.
+	 */
+	function executeCallbacks(){
+		callbacks.forEach(function(callback) {
+			callback();
+		});
+	}
+
+	/**
+	 * Register a Drawing instance.
+	 * @param  {ED.Drawing}   instance A ED.Drawing instance.
+	 */
+	function register(instance) {
+
+		if (instances.indexOf(instance) !== -1) {
+			return;
+		}
+
+		instance.registerForNotifications({
+			callback: function callback() {
+				ready++;
+				if (isAllReady()) {
+					executeCallbacks();
+				}
+			}
+		}, 'callback', ['doodlesLoaded']);
+	}
+
+	/**
+	 * Check if all registered EyeDraws are ready.
+	 * @return {Boolean}
+	 */
+	function isAllReady() {
+		return (instances.length === ready);
+	}
+
+	/**
+	 * Register a callback to be executed once all EyeDraws are ready.
+	 * @param  {Function} callback The callback to be executed.
+	 */
+	function allReady(callback) {
+		if (isAllReady()) {
+			callback();
+		} else {
+			callbacks.push(callback);
+		}
+	}
+
+	return {
+		register: register,
+		onAllReady: allReady
+	};
+}());
+/**
+ * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
+ * (C) OpenEyes Foundation, 2011-2014
+ * This file is part of OpenEyes.
+ *
+ * OpenEyes is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * OpenEyes is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with OpenEyes.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/* global $:false */
+
+/**
+ * @todo This controller is getting quite big. Consider sticking all the
+ * drawing event related stuff into a new object.
+ */
+
+var ED = ED || {};
+
+ED.Controller = (function() {
+
+	'use strict';
+
+	/** Helpers */
+	var ucFirst = ED.firstLetterToUpperCase;
+
+	/**
+	 * Controller constructor. The controller will init the various eyedraw components
+	 * and manage post-init actions.
+	 * @param {Object} properties The EyeDraw widget properties.
+	 * @param {ED.Checker} [Checker] The EyeDraw checker.
+	 * @param {ED.Drawing} [drawing] An ED.Drawing instance.
+	 * @param {ED.Views.Toolbar} [toolbar] An ED.Views.Toolbar instance.
+	 * @param {ED.Views.DoodlePopup} [doodlePopup] An ED.Views.DoodlePopup instance.
+	 */
+	function Controller(properties, Checker, drawing, toolbar, doodlePopup, selectedDoodle) {
+
+		this.properties = properties;
+		this.canvas = document.getElementById(properties.canvasId);
+		this.input = document.getElementById(properties.inputId);
+		this.container = $(this.canvas).closest('.eyedraw-widget');
+
+		this.Checker = Checker || ED.Checker;
+		this.drawing = drawing || this.createDrawing();
+		this.toolbar = toolbar || this.createToolbar();
+		this.doodlePopup = doodlePopup || this.createDoodlePopup();
+		this.selectedDoodle = selectedDoodle || this.createSelectedDoodle();
+
+		this.registerDrawing();
+		this.registerEvents();
+		this.initListeners();
+
+		// Initialize drawing.
+		this.drawing.init();
+	}
+
+	/**
+	 * Create the canvas drawing instance.
+	 */
+	Controller.prototype.createDrawing = function() {
+
+		var options = {
+			offsetX: this.properties.offsetX,
+			offsetY: this.properties.offsetY,
+			toImage: this.properties.toImage,
+			graphicsPath: this.properties.graphicsPath
+		};
+
+		var drawing = new ED.Drawing(
+			this.canvas,
+			this.properties.eye,
+			this.properties.idSuffix,
+			this.properties.isEditable,
+			options
+		);
+
+		return drawing;
+	};
+
+	/**
+	 * Create the toolbar view instance.
+	 */
+	Controller.prototype.createToolbar = function() {
+		return new ED.Views.Toolbar(
+			this.drawing,
+			this.container.find('.eyedraw-toolbar-panel')
+		);
+	};
+
+	/**
+	 * Create the doodle popup view instance.
+	 */
+	Controller.prototype.createDoodlePopup = function() {
+		return new ED.Views.DoodlePopup(
+			this.drawing,
+			this.container.find('.eyedraw-doodle-popup')
+		);
+	};
+
+	Controller.prototype.createSelectedDoodle = function() {
+		return new ED.Views.SelectedDoodle(
+			this.drawing,
+			this.container.find('.eyedraw-selected-doodle')
+		);
+	};
+
+	/**
+	 * Register the drawing instance with the Checker, and store the instance.
+	 */
+	Controller.prototype.registerDrawing = function() {
+		// Register drawing with the checker.
+		this.Checker.register(this.drawing);
+		// Store the drawing instance.
+		/** @todo This should be moved into the Checker */
+		ED.setInstance(this.drawing);
+	};
+
+	/**
+	 * Register drawing and DOM events.
+	 */
+	Controller.prototype.registerEvents = function() {
+		// Register controller for drawing notifications
+		this.drawing.registerForNotifications(this, 'notificationHandler', [
+			'ready',
+			'doodlesLoaded',
+			'doodleAdded',
+			'doodleDeleted',
+			'doodleSelected',
+			'mousedragged',
+			'parameterChanged'
+		]);
+	};
+
+	/**
+	 * Create instances of any listener objects.
+	 */
+	Controller.prototype.initListeners = function() {
+		if (!(this.properties.listenerArray instanceof Array)) {
+			return;
+		}
+		// Additional listener controllers
+		this.properties.listenerArray.forEach(function(ListenerArray) {
+			new ListenerArray(this.drawing);
+		}.bind(this));
+	};
+
+	/**
+	 * Route a notification to an event handler.
+	 * @param  {object} notification The notification object.
+	 */
+	Controller.prototype.notificationHandler = function(notification) {
+		var eventName = notification.eventName;
+		var handlerName = 'on' + ucFirst(eventName);
+		if (this[handlerName]) {
+			this[handlerName](notification);
+		}
+	};
+
+	/**
+	 * Check if the associated input field has any data.
+	 * @return {Boolean}
+	 */
+	Controller.prototype.hasInputFieldData = function() {
+		return (this.input !== null && this.input.value.length > 0);
+	};
+
+	/**
+	 * Save drawing data to the associated input field.
+	 */
+	Controller.prototype.saveDrawingToInputField = function() {
+		if (this.hasInputFieldData()) {
+			this.input.value = this.drawing.save();
+		}
+	};
+
+	/**
+	 * Load data from the input field into the drawing.
+	 */
+	Controller.prototype.loadInputFieldData = function() {
+		// Load drawing data from input element
+		this.drawing.loadDoodles(this.properties.inputId);
+	};
+
+	/**
+	 * Add field bindings to the drawing.
+	 */
+	Controller.prototype.addBindings = function() {
+		if (!ED.objectIsEmpty(this.properties.bindingArray)) {
+			this.drawing.addBindings(this.properties.bindingArray);
+		}
+	};
+
+	/**
+	 * Add deleted values.
+	 * @TODO
+	 */
+	Controller.prototype.addDeletedValues = function() {
+		if (!ED.objectIsEmpty(this.properties.deleteValueArray)) {
+			this.drawing.addDeleteValues(this.properties.deleteValueArray);
+		}
+	};
+
+	/**
+	 * Deselect all synced doodles.
+	 */
+	Controller.prototype.deselectSyncedDoodles = function() {
+		var arr = this.properties.syncArray;
+		for (var idSuffix in arr) {
+			this.getEyeDrawInstance(idSuffix).deselectDoodles();
+		}
+	};
+
+	/**
+	 * Run commands on the drawing once it's ready. (This is useful for
+	 * adding doodles on page load, for example.)
+	 */
+	Controller.prototype.runOnReadyCommands = function() {
+		var arr = (this.properties.onReadyCommandArray || []);
+		this.runCommands(arr);
+	};
+
+	/**
+	 * Run commands once all doodles have been loaded.
+	 */
+	Controller.prototype.runOnDoodlesLoadedCommands = function() {
+		var arr = (this.properties.onDoodlesLoadedCommandArray || []);
+		this.runCommands(arr);
+	};
+
+	/**
+	 * Run commands (with arguments) on the drawing instance.
+	 * @param  {Array} arr The array of commands.
+	 */
+	Controller.prototype.runCommands = function(arr) {
+
+		for (var i = 0; i < arr.length; i++) {
+
+			var method = arr[i][0];
+			var argumentArray = arr[i][1];
+
+			// Run method with arguments
+			this.drawing[method].apply(this.drawing, argumentArray);
+		}
+	};
+
+	/**
+	 * Find an eyedraw instance by its' idSuffix.
+	 * @param  {String} idSuffix The eyedraw instance idSuffix
+	 * @return {ED.Drawing}
+	 */
+	Controller.prototype.getEyeDrawInstance = function(idSuffix) {
+		/** @todo This should be moved into the Checker */
+		return ED.getInstance(idSuffix);
+	};
+
+	/**
+	 * Sync multiple eyedraws. Essentially this will sync parameters for doodles across
+	 * different eyedraw instances.
+	 * @param  {Object} changedParam The paramater that was changed in the master doodle.
+	 */
+	Controller.prototype.syncEyedraws = function(changedParam) {
+
+		var masterDoodle = changedParam.doodle;
+		var syncArray = this.properties.syncArray;
+
+		// Iterate through sync array
+		for (var idSuffix in syncArray) {
+
+			// Get reference to slave drawing
+			var slaveDrawing = this.getEyeDrawInstance(idSuffix);
+
+			if (!slaveDrawing) {
+				ED.errorHandler('ED.Controller', 'syncEyedraws', 'Cannot sync with ' + idSuffix + ': instance not found');
+				break;
+			}
+
+			// Iterate through master doodles to sync.
+			for (var masterDoodleName in syncArray[idSuffix]) {
+
+				// Iterate through slave doodles to sync with master doodle.
+				for (var slaveDoodleName in syncArray[idSuffix][masterDoodleName]) {
+
+					// Get the slave doodle instance (uses first doodle in the drawing matching the className)
+					var slaveDoodle = slaveDrawing.firstDoodleOfClass(slaveDoodleName);
+
+					// Check that doodles exist, className matches, and sync is allowed
+					if (!masterDoodle || masterDoodle.className !== masterDoodleName || !slaveDoodle && !slaveDoodle.willSync) {
+						continue;
+					}
+
+					// Sync the doodle parameters.
+					var parameterArray = syncArray[idSuffix][masterDoodleName][slaveDoodleName].parameters;
+
+					this.syncDoodleParameters(parameterArray, changedParam, masterDoodle, slaveDoodle, slaveDrawing);
+				}
+			}
+
+			// Refresh the slave drawing, now that the doodle parameters are synced.
+			slaveDrawing.repaint();
+		}
+	};
+
+	/**
+	 * Sync doodle parameters across two eyedraws.
+	 * @param  {Array} parameterArray The full list of parameters to sync.
+	 * @param  {Object} changedParam   The parameter that was changed in the master doodle.
+	 * @param  {ED.Doodle} masterDoodle   The master doodle instance.
+	 * @param  {ED.Doodle} slaveDoodle    The slave doodle that will be synced.
+	 * @param  {ED.Drawing} slaveDrawing  The slave drawing instance.
+	 */
+	Controller.prototype.syncDoodleParameters = function(parameterArray, changedParam, masterDoodle, slaveDoodle, slaveDrawing) {
+
+		// Iterate through parameters to sync
+		for (var i = 0; i < (parameterArray || []).length; i++) {
+
+			// Check that parameter array member matches changed parameter
+			if (parameterArray[i] !== changedParam.parameter) {
+				continue;
+			}
+			// Avoid infinite loop by checking values are not equal before setting
+			if (masterDoodle[changedParam.parameter] === slaveDoodle[changedParam.parameter]) {
+				continue;
+			}
+
+			var increment = changedParam.value - changedParam.oldValue;
+			var newValue = slaveDoodle[changedParam.parameter] + increment;
+
+			// Sync slave parameter to value of master
+			slaveDoodle.setSimpleParameter(changedParam.parameter, newValue);
+			slaveDoodle.updateDependentParameters(changedParam.parameter);
+
+			// Update any bindings associated with the slave doodle
+			slaveDrawing.updateBindings(slaveDoodle);
+		}
+	};
+
+	/*********************
+	 * EVENT HANDLERS
+	 *********************/
+
+	/**
+	 * On drawing ready.
+	 */
+	Controller.prototype.onReady = function() {
+
+		// Set scale of drawing
+		this.drawing.globalScaleFactor = this.properties.scale;
+
+		// If input exists and contains data, load it into the drawing.
+		if (this.hasInputFieldData()) {
+			this.loadInputFieldData();
+			this.drawing.repaint();
+		}
+		// Otherwise run commands in onReadyCommand array.
+		else {
+			this.runOnReadyCommands();
+		}
+
+		this.addBindings();
+		this.addDeletedValues();
+		this.saveDrawingToInputField();
+
+		// Optionally make canvas element focused
+		if (this.properties.focus) {
+			this.canvas.focus();
+		}
+
+		// Mark drawing object as ready
+		this.drawing.isReady = true;
+	};
+
+	/**
+	 * On doodles loaded.
+	 */
+	Controller.prototype.onDoodlesLoaded = function() {
+		this.runOnDoodlesLoadedCommands();
+	};
+
+	/**
+	 * On doodle added.
+	 * @param  {Object} notification The notification object.
+	 */
+	Controller.prototype.onDoodleAdded = function() {
+
+		this.saveDrawingToInputField();
+
+		// Label doodle needs immediate keyboard input, so give canvas focus.
+		// NOTE: labels are deactivated from 1.6.
+		// var doodle = notification.object;
+		// if (typeof(doodle) != 'undefined') {
+		// 	if (doodle.className == 'Label') {
+		// 		this.canvas.focus();
+		// 	}
+		// }
+	};
+
+	/**
+	 * On doodle deleted.
+	 */
+	Controller.prototype.onDoodleDeleted = function() {
+		this.saveDrawingToInputField();
+	};
+
+	/**
+	 * On doodle selected.
+	 */
+	Controller.prototype.onDoodleSelected = function() {
+		this.deselectSyncedDoodles();
+	};
+
+	/**
+	 * On doodle mouse dragged.
+	 */
+	Controller.prototype.onMousedragged = function() {
+		this.saveDrawingToInputField();
+	};
+
+	/**
+	 * On parameter changed. This event is fired whenever anything is changed
+	 * within the canvas drawing (or via a bound field element).
+	 * @param  {Object} notification The notification object.
+	 */
+	Controller.prototype.onParameterChanged = function(notification) {
+		// Sync with other doodles on the page.
+		this.syncEyedraws(notification.object);
+		// Save drawing to hidden input.
+		this.saveDrawingToInputField();
+	};
+
+	return Controller;
+}());
+/**
+ * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
+ * (C) OpenEyes Foundation, 2011-2014
+ * This file is part of OpenEyes.
+ *
+ * OpenEyes is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * OpenEyes is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with OpenEyes.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/* global EventEmitter2: false, $: false, Mustache: false */
+
+var ED = ED || {};
+
+/**
+ * Base view.
+ */
+ED.View = (function() {
+
+	'use strict';
+
+	/** Helpers */
+	var ucFirst = ED.firstLetterToUpperCase;
+
+	/**
+	 * View constructor
+	 * @param {ED.Drawing} drawing   A doodle drawing instance.
+	 * @param {HTMLElement|jQuery} widgetContainer The widget container element
+	 * @extends {EventEmitter2}
+	 */
+	function View(drawing, container) {
+		EventEmitter2.call(this);
+
+		this.drawing = drawing;
+		this.container = $(container);
+
+		this.registerForNotifications();
+	}
+
+	View.prototype = Object.create(EventEmitter2.prototype);
+	View.prototype.constructor = View;
+
+	/**
+	 * This notification handler will simply route events to handlers.
+	 * @param  {Object} notification The notification object.
+	 */
+	View.prototype.notificationHandler = function(notification) {
+		var eventName = notification.eventName;
+		var handlerName = 'on' + ucFirst(eventName);
+		if (!this[handlerName]) {
+			console.error('No handler defined for event:', handlerName);
+		}
+		this[handlerName](notification);
+	};
+
+	return View;
+}());
+
+/**
+ * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
+ * (C) OpenEyes Foundation, 2011-2014
+ * This file is part of OpenEyes.
+ *
+ * OpenEyes is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * OpenEyes is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with OpenEyes.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+
+/**
+ * Creates a new transformation matrix initialised to the identity matrix
+ *
+ * @class AffineTransform
+ * @property {Array} components Array representing 3x3 matrix
+ */
+ED.Drawing.AffineTransform = function() {
+	// Properties - array of arrays of column values one for each row
+	this.components = [
+		[1, 0, 0],
+		[0, 1, 0],
+		[0, 0, 1]
+	];
+}
+
+/**
+ * Sets matrix to identity matrix
+ */
+ED.Drawing.AffineTransform.prototype.setToIdentity = function() {
+	this.components[0][0] = 1;
+	this.components[0][1] = 0;
+	this.components[0][2] = 0;
+	this.components[1][0] = 0;
+	this.components[1][1] = 1;
+	this.components[1][2] = 0;
+	this.components[2][0] = 0;
+	this.components[2][1] = 0;
+	this.components[2][2] = 1;
+}
+
+/**
+ * Sets the transform matrix to another
+ *
+ * @param {AffineTransform} _transform Array An affine transform
+ */
+ED.Drawing.AffineTransform.prototype.setToTransform = function(_transform) {
+	this.components[0][0] = _transform.components[0][0];
+	this.components[0][1] = _transform.components[0][1];
+	this.components[0][2] = _transform.components[0][2];
+	this.components[1][0] = _transform.components[1][0];
+	this.components[1][1] = _transform.components[1][1];
+	this.components[1][2] = _transform.components[1][2];
+	this.components[2][0] = _transform.components[2][0];
+	this.components[2][1] = _transform.components[2][1];
+	this.components[2][2] = _transform.components[2][2];
+}
+
+/**
+ * Adds a translation to the transform matrix
+ *
+ * @param {float} _x value to translate along x-axis
+ * @param {float} _y value to translate along y-axis
+ */
+ED.Drawing.AffineTransform.prototype.translate = function(_x, _y) {
+	this.components[0][2] = this.components[0][0] * _x + this.components[0][1] * _y + this.components[0][2];
+	this.components[1][2] = this.components[1][0] * _x + this.components[1][1] * _y + this.components[1][2];
+	this.components[2][2] = this.components[2][0] * _x + this.components[2][1] * _y + this.components[2][2];
+}
+
+/**
+ * Adds a scale to the transform matrix
+ *
+ * @param {float} _sx value to scale along x-axis
+ * @param {float} _sy value to scale along y-axis
+ */
+ED.Drawing.AffineTransform.prototype.scale = function(_sx, _sy) {
+	this.components[0][0] = this.components[0][0] * _sx;
+	this.components[0][1] = this.components[0][1] * _sy;
+	this.components[1][0] = this.components[1][0] * _sx;
+	this.components[1][1] = this.components[1][1] * _sy;
+	this.components[2][0] = this.components[2][0] * _sx;
+	this.components[2][1] = this.components[2][1] * _sy;
+}
+
+/**
+ * Adds a rotation to the transform matrix
+ *
+ * @param {float} _rad value to rotate by in radians
+ */
+ED.Drawing.AffineTransform.prototype.rotate = function(_rad) {
+	// Calulate trigonometry
+	var c = Math.cos(_rad);
+	var s = Math.sin(_rad);
+
+	// Make new matrix for transform
+	var matrix = [
+		[0, 0, 0],
+		[0, 0, 0],
+		[0, 0, 0]
+	];
+
+	// Apply transform
+	matrix[0][0] = this.components[0][0] * c + this.components[0][1] * s;
+	matrix[0][1] = this.components[0][1] * c - this.components[0][0] * s;
+	matrix[1][0] = this.components[1][0] * c + this.components[1][1] * s;
+	matrix[1][1] = this.components[1][1] * c - this.components[1][0] * s;
+	matrix[2][0] = this.components[2][0] * c + this.components[2][1] * s;
+	matrix[2][1] = this.components[2][1] * c - this.components[2][0] * s;
+
+	// Change old matrix
+	this.components[0][0] = matrix[0][0];
+	this.components[0][1] = matrix[0][1];
+	this.components[1][0] = matrix[1][0];
+	this.components[1][1] = matrix[1][1];
+	this.components[2][0] = matrix[2][0];
+	this.components[2][1] = matrix[2][1];
+}
+
+/**
+ * Applies transform to a point
+ *
+ * @param {Point} _point a point
+ * @returns {Point} a transformed point
+ */
+ED.Drawing.AffineTransform.prototype.transformPoint = function(_point) {
+	var newX = _point.x * this.components[0][0] + _point.y * this.components[0][1] + 1 * this.components[0][2];
+	var newY = _point.x * this.components[1][0] + _point.y * this.components[1][1] + 1 * this.components[1][2];
+
+	return new ED.Drawing.Point(newX, newY);
+}
+
+/**
+ * Calculates determinant of transform matrix
+ *
+ * @returns {Float} determinant
+ */
+ED.Drawing.AffineTransform.prototype.determinant = function() {
+	return this.components[0][0] * (this.components[1][1] * this.components[2][2] - this.components[1][2] * this.components[2][1]) -
+		this.components[0][1] * (this.components[1][0] * this.components[2][2] - this.components[1][2] * this.components[2][0]) +
+		this.components[0][2] * (this.components[1][0] * this.components[2][1] - this.components[1][1] * this.components[2][0]);
+}
+
+/**
+ * Inverts transform matrix
+ *
+ * @returns {Array} inverse matrix
+ */
+ED.Drawing.AffineTransform.prototype.createInverse = function() {
+	// Create new matrix
+	var inv = new ED.Drawing.AffineTransform();
+
+	var det = this.determinant();
+
+	//if (det != 0)
+	var invdet = 1 / det;
+
+	// Calculate components of inverse matrix
+	inv.components[0][0] = invdet * (this.components[1][1] * this.components[2][2] - this.components[1][2] * this.components[2][1]);
+	inv.components[0][1] = invdet * (this.components[0][2] * this.components[2][1] - this.components[0][1] * this.components[2][2]);
+	inv.components[0][2] = invdet * (this.components[0][1] * this.components[1][2] - this.components[0][2] * this.components[1][1]);
+
+	inv.components[1][0] = invdet * (this.components[1][2] * this.components[2][0] - this.components[1][0] * this.components[2][2]);
+	inv.components[1][1] = invdet * (this.components[0][0] * this.components[2][2] - this.components[0][2] * this.components[2][0]);
+	inv.components[1][2] = invdet * (this.components[0][2] * this.components[1][0] - this.components[0][0] * this.components[1][2]);
+
+	inv.components[2][0] = invdet * (this.components[1][0] * this.components[2][1] - this.components[1][1] * this.components[2][0]);
+	inv.components[2][1] = invdet * (this.components[0][1] * this.components[2][0] - this.components[0][0] * this.components[2][1]);
+	inv.components[2][2] = invdet * (this.components[0][0] * this.components[1][1] - this.components[0][1] * this.components[1][0]);
+
+	return inv;
+}
+/**
+ * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
+ * (C) OpenEyes Foundation, 2011-2014
+ * This file is part of OpenEyes.
+ *
+ * OpenEyes is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * OpenEyes is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with OpenEyes.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+
+/**
+ * A colour in the RGB space;
+ * Usage: var c = new ED.Drawing.Colour(0, 0, 255, 0.75); ctx.fillStyle = c.rgba();
+ *
+ * @property {Int} red The red value as an integer from 0 to 255
+ * @property {Int} green The green value as an integer from 0 to 255
+ * @property {Int} blue The blue value as an integer from 0 to 255
+ * @property {Float} alpha The alpha value as a float from 0 to 1
+ * @param {Int} _red
+ * @param {Int} _green
+ * @param {Int} _blue
+ * @param {Float} _alpha
+ */
+ED.Drawing.Colour = function(_red, _green, _blue, _alpha) {
+	this.red = _red;
+	this.green = _green;
+	this.blue = _blue;
+	this.alpha = _alpha;
+}
+
+/**
+ * Sets the colour from a hex encoded string
+ *
+ * @param {String} Colour in hex format (eg 'E0AB4F')
+ */
+ED.Drawing.Colour.prototype.setWithHexString = function(_hexString) {
+	// ***TODO*** add some string reality checks here
+	this.red = parseInt((_hexString.charAt(0) + _hexString.charAt(1)), 16);
+	this.green = parseInt((_hexString.charAt(2) + _hexString.charAt(3)), 16);
+	this.blue = parseInt((_hexString.charAt(4) + _hexString.charAt(5)), 16);
+	if (_hexString.length > 6) {
+		this.alpha = parseInt((_hexString.charAt(6) + _hexString.charAt(7)), 16);
+	}
+}
+
+/**
+ * Outputs the colour as a hex string
+ *
+ * @returns {String} Colour in hex format (eg 'E0AB4F')
+ */
+ED.Drawing.Colour.prototype.hexString = function() {
+	var hexString = "";
+
+	// temporary while awaiting internet! Works for red and green only
+	if (this.red > 0) return "FF0000FF";
+	else return "00FF00FF";
+
+	// ***TODO*** add some string reality checks here
+// 	this.red = parseInt((_hexString.charAt(0) + _hexString.charAt(1)), 16);
+// 	this.green = parseInt((_hexString.charAt(2) + _hexString.charAt(3)), 16);
+// 	this.blue = parseInt((_hexString.charAt(4) + _hexString.charAt(5)), 16);
+// 	if (_hexString.length > 6) {
+// 		this.alpha = parseInt((_hexString.charAt(6) + _hexString.charAt(7)), 16);
+// 	}
+}
+
+/**
+ * Returns a colour in Javascript rgba format
+ *
+ * @returns {String} Colour in rgba format
+ */
+ED.Drawing.Colour.prototype.rgba = function() {
+	return "rgba(" + this.red + ", " + this.green + ", " + this.blue + ", " + this.alpha + ")";
+}
+
+/**
+ * Returns a colour in JSON format
+ *
+ * @returns {String} A JSON encoded string representing the colour
+ */
+ED.Drawing.Colour.prototype.json = function() {
+	return "{\"red\":" + this.red + ",\"green\":" + this.green + ",\"blue\":" + this.blue + ",\"alpha\":" + this.alpha + "}";
+}
+
+/**
+ * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
+ * (C) OpenEyes Foundation, 2011-2014
+ * This file is part of OpenEyes.
+ *
+ * OpenEyes is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * OpenEyes is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with OpenEyes.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/**
+ * Represents a point in two dimensional space
+ * @class Point
+ * @property {Int} x The x-coordinate of the point
+ * @property {Int} y The y-coordinate of the point
+ * @property {Array} components Array representing point in matrix notation
+ * @param {Float} _x
+ * @param {Float} _y
+ */
+ED.Drawing.Point = function(_x, _y) {
+	// Properties
+	this.x = Math.round(+_x);
+	this.y = Math.round(+_y);
+	this.components = [this.x, this.y, 1];
+}
+
+/**
+ * Sets properties of the point using polar coordinates
+ *
+ * @param {Float} _r Distance from the origin
+ * @param {Float} _p Angle in radians from North going clockwise
+ */
+ED.Drawing.Point.prototype.setWithPolars = function(_r, _p) {
+	this.x = Math.round(_r * Math.sin(_p));
+	this.y = Math.round(-_r * Math.cos(_p));
+}
+
+/**
+ * Sets x and y of the point
+ *
+ * @param {Float} _x value of x
+ * @param {Float} _y value of y
+ */
+ED.Drawing.Point.prototype.setCoordinates = function(_x, _y) {
+	this.x = _x;
+	this.y = _y;
+}
+
+/**
+ * Calculates the distance between this point and another
+ *
+ * @param {Point} _point
+ * @returns {Float} Distance from the passed point
+ */
+ED.Drawing.Point.prototype.distanceTo = function(_point) {
+	return Math.sqrt(Math.pow(this.x - _point.x, 2) + Math.pow(this.y - _point.y, 2));
+}
+
+/**
+ * Calculates the dot product of two points (treating points as 2D vectors)
+ *
+ * @param {Point} _point
+ * @returns {Float} The dot product
+ */
+ED.Drawing.Point.prototype.dotProduct = function(_point) {
+	return this.x * _point.x + this.y * _point.y;
+}
+
+/**
+ * Calculates the cross product of two points (treating points as 2D vectors)
+ *
+ * @param {Point} _point
+ * @returns {Float} The cross product
+ */
+ED.Drawing.Point.prototype.crossProduct = function(_point) {
+	return this.x * _point.y - this.y * _point.x;
+}
+
+/**
+ * Calculates the length of the point treated as a vector
+ *
+ * @returns {Float} The length
+ */
+ED.Drawing.Point.prototype.length = function() {
+	return Math.sqrt(this.x * this.x + this.y * this.y);
+}
+
+/**
+ * Calculates the direction of the point treated as a vector
+ *
+ * @returns {Float} The angle from zero (north) going clockwise
+ */
+ED.Drawing.Point.prototype.direction = function() {
+	var north = new ED.Drawing.Point(0, -100);
+
+	return north.clockwiseAngleTo(this);
+}
+
+/**
+ * Inner angle to other vector from same origin going round clockwise from vector a to vector b
+ *
+ * @param {Point} _point
+ * @returns {Float} The angle in radians
+ */
+ED.Drawing.Point.prototype.clockwiseAngleTo = function(_point) {
+	var angle = Math.acos(this.dotProduct(_point) / (this.length() * _point.length()));
+	if (this.crossProduct(_point) < 0) {
+		return 2 * Math.PI - angle;
+	} else {
+		return angle;
+	}
+}
+
+/**
+ * Creates a new point at an angle
+ *
+ * @param {Float} _r Distance from the origin
+ * @param {Float} _phi Angle form the radius to the control point
+ * @returns {Point} The control point
+ */
+ED.Drawing.Point.prototype.pointAtRadiusAndClockwiseAngle = function(_r, _phi) {
+	// Calculate direction (clockwise from north)
+	var angle = this.direction();
+
+	// Create point and set length and direction
+	var point = new ED.Drawing.Point(0, 0);
+	point.setWithPolars(_r, angle + _phi);
+
+	return point;
+}
+
+/**
+ * Creates a new point at an angle to and half way along a straight line between this point and another
+ *
+ * @param {Float} _phi Angle form the radius to the control point
+ * @param {Float} _point Point at other end of straight line
+ * @returns {Point} A point object
+ */
+ED.Drawing.Point.prototype.pointAtAngleToLineToPointAtProportion = function(_phi, _point, _prop) {
+	// Midpoint in coordinates as if current point is origin
+	var bp = new ED.Drawing.Point((_point.x - this.x) * _prop, (_point.y - this.y) * _prop);
+
+	// Calculate radius
+	r = bp.length();
+
+	// Create new point
+	var point = bp.pointAtRadiusAndClockwiseAngle(r, _phi);
+
+	// Shift origin back
+	point.x += this.x;
+	point.y += this.y;
+
+	return point;
+}
+
+
+/**
+ * Clock hour of point on clock face centred on origin
+ *
+ * @returns {Int} The clock hour
+ */
+ED.Drawing.Point.prototype.clockHour = function(_point) {
+	var twelvePoint = new ED.Drawing.Point(0, -100);
+	var clockHour = ((twelvePoint.clockwiseAngleTo(this) * 6 / Math.PI) + 12) % 12;
+
+	clockHour = clockHour.toFixed(0);
+	if (clockHour == 0) clockHour = 12;
+
+	return clockHour;
+}
+
+/**
+ * Creates a control point on a tangent to the radius of the point at an angle of phi from the radius
+ *
+ * @param {Float} _phi Angle form the radius to the control point
+ * @returns {Point} The control point
+ */
+ED.Drawing.Point.prototype.tangentialControlPoint = function(_phi) {
+	// Calculate length of line from origin to point and direction (clockwise from north)
+	var r = this.length();
+	var angle = this.direction();
+
+	// Calculate length of control point
+	var h = r / Math.cos(_phi);
+
+	// Create point and set length and direction
+	var point = new ED.Drawing.Point(0, 0);
+	point.setWithPolars(h, angle + _phi);
+
+	return point;
+}
+
+/**
+ * Returns a point in JSON encoding
+ *
+ * @returns {String} point in JSON format
+ */
+ED.Drawing.Point.prototype.json = function() {
+	return "{\"x\":" + this.x.toFixed(2) + ",\"y\":" + this.y.toFixed(2) + "}";
+}
+/**
+ * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
+ * (C) OpenEyes Foundation, 2011-2014
+ * This file is part of OpenEyes.
+ *
+ * OpenEyes is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * OpenEyes is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with OpenEyes.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/**
+ * Represents a range of numerical values
+ *
+ * @class Range
+ * @property {Float} min Minimum value
+ * @property {Float} max Maximum value
+ * @param {Float} _min
+ * @param {Float} _max
+ */
+ED.Drawing.Range = function(_min, _max) {
+	// Properties
+	this.min = _min;
+	this.max = _max;
+}
+
+/**
+ * Set min and max with one function call
+ *
+ * @param {Float} _min
+ * @param {Float} _max
+ */
+ED.Drawing.Range.prototype.setMinAndMax = function(_min, _max) {
+	// Set properties
+	this.min = _min;
+	this.max = _max;
+}
+
+/**
+ * Returns true if the parameter is less than the minimum of the range
+ *
+ * @param {Float} _num
+ * @returns {Bool} True if the parameter is less than the minimum
+ */
+ED.Drawing.Range.prototype.isBelow = function(_num) {
+	if (_num < this.min) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+/**
+ * Returns true if the parameter is more than the maximum of the range
+ *
+ * @param {Float} _num
+ * @returns {Bool} True if the parameter is more than the maximum
+ */
+ED.Drawing.Range.prototype.isAbove = function(_num) {
+	if (_num > this.max) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+/**
+ * Returns true if the parameter is inclusively within the range
+ *
+ * @param {Float} _num
+ * @returns {Bool} True if the parameter is within the range
+ */
+ED.Drawing.Range.prototype.includes = function(_num) {
+	if (_num < this.min || _num > this.max) {
+		return false;
+	} else {
+		return true;
+	}
+}
+
+/**
+ * Constrains a value to the limits of the range
+ *
+ * @param {Float} _num
+ * @returns {Float} The constrained value
+ */
+ED.Drawing.Range.prototype.constrain = function(_num) {
+	if (_num < this.min) {
+		return this.min;
+	} else if (_num > this.max) {
+		return this.max;
+	} else {
+		return _num;
+	}
+}
+
+/**
+ * Returns true if the parameter is within the 'clockface' range represented by the min and max values
+ *
+ * @param {Float} _angle Angle to test
+ * @param {Bool} _isDegrees Flag indicating range is in degrees rather than radians
+ * @returns {Bool} True if the parameter is within the range
+ */
+ED.Drawing.Range.prototype.includesInAngularRange = function(_angle, _isDegrees) {
+	// Arbitrary radius
+	var r = 100;
+
+	// Points representing vectos of angles within range
+	var min = new ED.Drawing.Point(0, 0);
+	var max = new ED.Drawing.Point(0, 0);
+	var angle = new ED.Drawing.Point(0, 0);
+
+	// Set points using polar coordinates
+	if (!_isDegrees) {
+		min.setWithPolars(r, this.min);
+		max.setWithPolars(r, this.max);
+		angle.setWithPolars(r, _angle);
+	} else {
+		min.setWithPolars(r, this.min * Math.PI / 180);
+		max.setWithPolars(r, this.max * Math.PI / 180);
+		angle.setWithPolars(r, _angle * Math.PI / 180);
+	}
+
+	return (min.clockwiseAngleTo(angle) <= min.clockwiseAngleTo(max));
+}
+
+/**
+ * Constrains a value to the limits of the angular range
+ *
+ * @param {Float} _angle Angle to test
+ * @param {Bool} _isDegrees Flag indicating range is in degrees rather than radians
+ * @returns {Float} The constrained value
+ */
+ED.Drawing.Range.prototype.constrainToAngularRange = function(_angle, _isDegrees) {
+	// No point in constraining unless range is less than 360 degrees!
+	if ((this.max - this.min) < (_isDegrees ? 360 : (2 * Math.PI))) {
+		// Arbitrary radius
+		var r = 100;
+
+		// Points representing vectors of angles within range
+		var min = new ED.Drawing.Point(0, 0);
+		var max = new ED.Drawing.Point(0, 0);
+		var angle = new ED.Drawing.Point(0, 0);
+
+		// Set points using polar coordinates
+		if (!_isDegrees) {
+			min.setWithPolars(r, this.min);
+			max.setWithPolars(r, this.max);
+			angle.setWithPolars(r, _angle);
+		} else {
+			min.setWithPolars(r, this.min * Math.PI / 180);
+			max.setWithPolars(r, this.max * Math.PI / 180);
+			angle.setWithPolars(r, _angle * Math.PI / 180);
+		}
+
+		// Return appropriate value depending on relationship to range
+		if (min.clockwiseAngleTo(angle) <= min.clockwiseAngleTo(max)) {
+			return _angle;
+		} else {
+			if (angle.clockwiseAngleTo(min) < max.clockwiseAngleTo(angle)) {
+				return this.min;
+			} else {
+				return this.max;
+			}
+		}
+	} else {
+		return _angle;
+	}
+}
+/**
+ * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
+ * (C) OpenEyes Foundation, 2011-2014
+ * This file is part of OpenEyes.
+ *
+ * OpenEyes is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * OpenEyes is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with OpenEyes.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/**
+ * Squiggles are free-hand lines drawn by the mouse;
+ * Points are stored in an array and represent points in the doodle plane
+ *
+ * @class Squiggle
+ * @property {Doodle} doodle The doodle to which this squiggle belongs
+ * @property {Colour} colour Colour of the squiggle
+ * @property {Int} thickness Thickness of the squiggle in pixels
+ * @property {Bool} filled True if squiggle is solid (filled)
+ * @property {Array} pointsArray Array of points making up the squiggle
+ * @property {Bool} complete True if the squiggle is complete (allows a filled squiggle to appear as a line while being created)
+ * @param {Doodle} _doodle
+ * @param {Colour} _colour
+ * @param {Int} _thickness
+ * @param {Bool} _filled
+ */
+ED.Drawing.Squiggle = function(_doodle, _colour, _thickness, _filled) {
+	this.doodle = _doodle;
+	this.colour = _colour;
+	this.thickness = _thickness;
+	this.filled = _filled;
+
+	this.pointsArray = new Array();
+	this.complete = false;
+}
+
+/**
+ * Adds a point to the points array
+ *
+ * @param {Point} _point
+ */
+ED.Drawing.Squiggle.prototype.addPoint = function(_point) {
+	this.pointsArray.push(_point);
+}
+
+/**
+ * Returns a squiggle in JSON format
+ *
+ * @returns {String} A JSON encoded string representing the squiggle
+ */
+ED.Drawing.Squiggle.prototype.json = function() {
+	var s = '{';
+	s = s + '"colour":' + this.colour.json() + ',';
+	s = s + '"thickness": ' + this.thickness + ',';
+	s = s + '"filled": "' + this.filled + '",';
+
+	s = s + '"pointsArray":[';
+	for (var i = 0; i < this.pointsArray.length; i++) {
+		s = s + this.pointsArray[i].json();
+		if (this.pointsArray.length - i > 1) {
+			s = s + ',';
+		}
+	}
+	s = s + ']';
+	s = s + '}';
+
+	return s;
+}
+/**
+ * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
+ * (C) OpenEyes Foundation, 2011-2014
+ * This file is part of OpenEyes.
+ *
+ * OpenEyes is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * OpenEyes is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with OpenEyes.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/* global $: false, Mustache: false, ED: true */
+
+var ED = ED || {};
+ED.Views = ED.Views || {};
+
+/**
+ * The DoodlePopup view manages the doodle popup menu.
+ */
+ED.Views.DoodlePopup = (function() {
+
+	'use strict';
+
+	/**
+	 * DoodlePopup constructor
+	 * @param {ED.Drawing} drawing   A doodle drawing instance.
+	 * @param {HTMLElement} widgetContainer The widget container element
+	 * @extends {EventEmitter2}
+	 */
+	function DoodlePopup() {
+		ED.View.apply(this, arguments);
+		this.delayTimer = 0;
+		this.createToolbar();
+		this.createTemplate();
+	}
+
+	DoodlePopup.prototype = Object.create(ED.View.prototype);
+	DoodlePopup.prototype.constructor = DoodlePopup;
+
+	/**
+	 * Create the manipulation toolbar.
+	 */
+	DoodlePopup.prototype.createToolbar = function() {
+		this.toolbar = new ED.Views.Toolbar(this.drawing, this.container);
+		this.toolbar.on('doodle.action', this.render.bind(this));
+	};
+
+	/**
+	 * Create the template for the popup.
+	 */
+	DoodlePopup.prototype.createTemplate = function() {
+		this.template = $('#eyedraw-doodle-popup-template').html();
+	};
+
+	/**
+	 * Register for drawing notifications and bind interaction events.
+	 */
+	DoodlePopup.prototype.registerForNotifications = function() {
+		this.drawing.registerForNotifications(this, 'notificationHandler', [
+			'doodleAdded',
+			'doodleDeleted',
+			'doodleSelected',
+			'doodleDeselected'
+		]);
+	};
+
+	/**
+	 * Compile the mustache template.
+	 * @param  {Object} data Template data.
+	 */
+	DoodlePopup.prototype.render = function() {
+		var doodle = this.drawing.selectedDoodle;
+		var data = {
+			doodle: doodle,
+			title: doodle ? ED.titles[doodle.className] : '',
+			desc: doodle ? ED.trans[doodle.className] : '',
+			lockedButtonClass: (doodle && doodle.isLocked) ? ' disabled' : ''
+		};
+		var html = Mustache.render(this.template, data);
+		this.container.html(html);
+	};
+
+	/**
+	 * Update the menu content with the specific doodle and either show or hide it.
+	 * @param  {Boolean} show   Show or hide the menu.
+	 */
+	DoodlePopup.prototype.update = function(show) {
+		if (show) {
+			this.render();
+			this.show();
+		} else {
+			this.hide();
+		}
+	};
+
+	/**
+	 * Hide the menu.
+	 */
+	DoodlePopup.prototype.hide = function() {
+		this.delay(function() {
+			this.container.addClass('closed');
+		}.bind(this));
+	};
+
+	/**
+	 * Show the menu.
+	 */
+	DoodlePopup.prototype.show = function() {
+		this.delay(function() {
+			this.container.removeClass('closed');
+		}.bind(this));
+	};
+
+	/**
+	 * Delay executing a callback.
+	 * @param  {Function} fn    The callback function to execute.
+	 */
+	DoodlePopup.prototype.delay = function(fn) {
+		clearTimeout(this.delayTimer);
+		this.delayTimer = setTimeout(fn, 50);
+	};
+
+	/*********************
+	 * EVENT HANDLERS
+	 *********************/
+
+	DoodlePopup.prototype.onDoodleAdded = function() {
+		this.update(true);
+	};
+
+	DoodlePopup.prototype.onDoodleDeleted = function() {
+		this.update(false);
+	};
+
+	DoodlePopup.prototype.onDoodleSelected = function() {
+		setTimeout(this.update.bind(this, true));
+	};
+
+	DoodlePopup.prototype.onDoodleDeselected = function() {
+		this.update(false);
+	};
+
+	return DoodlePopup;
+}());
+
+/**
+ * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
+ * (C) OpenEyes Foundation, 2011-2014
+ * This file is part of OpenEyes.
+ *
+ * OpenEyes is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * OpenEyes is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with OpenEyes.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/* global $: false, ED: true */
+
+var ED = ED || {};
+ED.Views = ED.Views || {};
+
+/**
+ * The selected-doodle view manages interactions on the main doodle selected-doodle.
+ */
+ED.Views.SelectedDoodle = (function() {
+
+	'use strict';
+
+	/** Constants **/
+	var EVENT_NAMESPACE = 'eyedraw.selected-doodle';
+
+	/**
+	 * SelectedDoodle constructor
+	 * @param {ED.Drawing} drawing   A doodle drawing instance.
+	 * @param {HTMLElement} container The widget container element
+	 * @extends {EventEmitter2}
+	 */
+	function SelectedDoodle() {
+		ED.View.apply(this, arguments);
+		this.select = this.container.find('select');
+		this.bindEvents();
+	}
+
+	SelectedDoodle.prototype = Object.create(ED.View.prototype);
+	SelectedDoodle.prototype.constructor = SelectedDoodle;
+
+	/**
+	 * Register a ED.Drawing notification handler. For each event, re-render the view.
+	 */
+	SelectedDoodle.prototype.registerForNotifications = function() {
+		this.drawing.registerForNotifications(this, 'render', [
+			'ready',
+			'doodleAdded',
+			'doodleDeleted',
+			'doodleSelected',
+			'doodleDeselected',
+			'moveToFront',
+			'moveToBack',
+			'doodleLocked',
+			'doodleUnlocked'
+		]);
+	};
+
+	/**
+	 * Bind UI events
+	 * @return {[type]}
+	 */
+	SelectedDoodle.prototype.bindEvents = function() {
+		this.select.on('change.' + EVENT_NAMESPACE, this.onSelectChange.bind(this));
+	};
+
+	/**
+	 * Render the select element.
+	 */
+	SelectedDoodle.prototype.render = function(notification) {
+
+		var optgroup = $('<optgroup label="Selected doodle" />');
+
+		// "None" option
+		var noneText = 'None';
+		var noneSelected = (this.drawing.selectedDoodle === null);
+		optgroup.append(this.createOption(noneText, noneSelected));
+
+		// Doodle options
+		var doodleOptions = this.drawing.doodleArray.map(this.createDoodleOption.bind(this));
+		optgroup.append(doodleOptions);
+
+		this.select.html(optgroup);
+	};
+
+	/**
+	 * Create a jQuery instance for an <option> element.
+	 * @param  {String} text     The <option> text.
+	 * @param  {Boolean} selected Is the option selected?
+	 * @return {jQuery}          The jQuery instance.
+	 */
+	SelectedDoodle.prototype.createOption = function(text, selected) {
+		return $('<option />', {
+			text: text,
+			selected: selected
+		});
+	};
+
+	/**
+	 * Create an doodle jQuery option element.
+	 * @param  {ED.Doodle} doodle
+	 * @return {jQuery} The jQuery instance.
+	 */
+	SelectedDoodle.prototype.createDoodleOption = function(doodle) {
+
+		var text = ED.titles[doodle.className] || doodle.className
+		var selected = (doodle === this.drawing.selectedDoodle);
+
+		// Find matching doodles, in order of created time.
+		var doodles = this.drawing.doodleArray.filter(function(d) {
+			return (d.className === doodle.className);
+		}).sort(function(a, b) {
+			return (a.createdTime - b.createdTime);
+		});
+
+		if (doodles.length > 1) {
+			// Find the index of this doodle within the set of matching doodles.
+			var index = doodles.indexOf(doodle);
+			text += ' (' + (index + 1) + ')';
+		}
+
+		if (doodle.isLocked) {
+			text += ' (Locked)';
+		}
+
+		var option = this.createOption(text, selected);
+
+		// Store the doodle reference
+		option.data('doodle', doodle);
+
+		return option;
+	};
+
+	/*********************
+	 * EVENT HANDLERS
+	 *********************/
+
+	/**
+	 * Select a doodle or de-select all doodles (when selecting "none")
+	 * @param  {Object} e DOM event object.
+	 */
+	SelectedDoodle.prototype.onSelectChange = function(e) {
+		var doodle = $(e.target).find(':selected').data('doodle');
+		if (!doodle) {
+			this.drawing.deselectDoodles();
+		} else {
+			this.drawing.selectDoodle(doodle);
+		}
+	};
+
+	return SelectedDoodle;
+}());
+/**
+ * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
+ * (C) OpenEyes Foundation, 2011-2014
+ * This file is part of OpenEyes.
+ *
+ * OpenEyes is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * OpenEyes is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with OpenEyes.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/* global $: false */
+
+var ED = ED || {};
+ED.Views = ED.Views || {};
+
+/**
+ * The toolbar view manages interactions on the main doodle toolbar.
+ */
+ED.Views.Toolbar = (function() {
+
+	'use strict';
+
+	/** Constants **/
+	var EVENT_NAMESPACE = 'eyedraw.toolbar';
+
+	/**
+	 * Toolbar constructor
+	 * @param {ED.Drawing} drawing   A doodle drawing instance.
+	 * @param {HTMLElement} container The widget container element
+	 * @extends {EventEmitter2}
+	 */
+	function Toolbar() {
+		ED.View.apply(this, arguments);
+		this.buttons = this.container.find('.eyedraw-button');
+		this.bindEvents();
+	}
+
+	Toolbar.prototype = Object.create(ED.View.prototype);
+	Toolbar.prototype.constructor = Toolbar;
+
+	/**
+	 * Register a ED.Drawing notification handler. For each event, update
+	 * the toolbar state.
+	 */
+	Toolbar.prototype.registerForNotifications = function() {
+		this.drawing.registerForNotifications(this, 'updateState', [
+			'doodleAdded',
+			'doodleDeleted',
+		]);
+	};
+
+	/**
+	 * Bind UI events.
+	 */
+	Toolbar.prototype.bindEvents = function() {
+		this.container.on('click.' + EVENT_NAMESPACE, '.eyedraw-button', this.onButtonClick.bind(this));
+	};
+
+	Toolbar.prototype.enableButton = function(button) {
+		button.attr('disabled', false).removeClass('disabled');
+	};
+
+	Toolbar.prototype.disableButton = function(button) {
+		button.attr('disabled', true).addClass('disabled');
+	};
+
+	/**
+	 * Update the state of a toolbar button. Find the associated doodle
+	 * and detrmine if the button should be enabled or disabled.
+	 * @param  {jQuery} button A jQuery button instance
+	 */
+	Toolbar.prototype.updateButtonState = function(button) {
+
+		this.enableButton(button);
+
+		var func = button.data('function');
+		var arg = button.data('arg');
+
+		if (func !== 'addDoodle') {
+			return;
+		}
+
+		var doodle = this.drawing.doodleArray.filter(function(doodle) {
+			return (doodle.className === arg);
+		})[0];
+
+		if (doodle && doodle.isUnique) {
+			this.disableButton(button);
+		}
+	};
+
+	/**
+	 * Update the state of all toolbar buttons.
+	 */
+	Toolbar.prototype.updateState  = function() {
+		this.buttons.each(function(i, button) {
+			this.updateButtonState($(button));
+		}.bind(this));
+	};
+
+	/*********************
+	 * EVENT HANDLERS
+	 *********************/
+
+	/**
+	 * Run an action when clicking on a toolbar button.
+	 * @param  {Object} e Event object.
+	 */
+	Toolbar.prototype.onButtonClick = function(e) {
+
+		e.preventDefault();
+		e.stopImmediatePropagation();
+
+		var button = $(e.currentTarget);
+
+		if (button.hasClass('disabled')) {
+			return;
+		}
+
+		var fn = button.data('function');
+		var arg = button.data('arg');
+
+		if (typeof this.drawing[fn] === 'function') {
+			this.drawing[fn](arg);
+			this.emit('doodle.action', {
+				fn: fn,
+				arg: arg
+			});
+		} else {
+			this.emit('doodle.error', 'Invalid doodle function: ' + fn);
+		}
+	};
+
+	return Toolbar;
+}());
 /**
  * @fileOverview Contains doodle subclasses for the anterior segment
  * @author <a href="mailto:bill.aylward@mac.com">Bill Aylward</a>
@@ -4556,19 +8978,19 @@ ED.Surgeon.prototype.draw = function(_point) {
  *
  * Modification date: 15th June 2012
  * Copyright 2012 OpenEyes
- * 
+ *
  * This file is part of OpenEyes.
- * 
+ *
  * OpenEyes is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * OpenEyes is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with OpenEyes.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -4591,154 +9013,154 @@ if (ED == null || typeof(ED) != "object") {
 ED.trans = new Object();
 
 // For UTF.8, this file should be loaded with the 'charset="utf-8"' attribute. This currently cannot be done with the Yii registerScriptFile method
-ED.trans['ACIOL'] = 'Anterior chamber IOL<br/><br/>Drag to move<br/>Drag the handle to rotate';
-ED.trans['AngleGradeEast'] = 'Grade of angle (Iris)<br/><br/>Drag handle to adjust amount of angle obscure by iris';
-ED.trans['AngleGradeNorth'] = 'Grade of angle (Iris)<br/><br/>Drag handle to adjust amount of angle obscure by iris';
-ED.trans['AngleGradeSouth'] = 'Grade of angle (Iris)<br/><br/>Drag handle to adjust amount of angle obscure by iris';
-ED.trans['AngleGradeWest'] = 'Grade of angle (Iris)<br/><br/>Drag handle to adjust amount of angle obscure by iris';
-ED.trans['AngleNV'] = 'Angle new vessels<br/><br/>Drag to move around angle<br/>Drag handles to change extent';
-ED.trans['AngleRecession'] = 'Angle recession<br/><br/>Drag to move around angle<br/>Drag handles to change extent';
-ED.trans['AntSeg'] = 'Anterior segment<br/><br/>Drag the handle to resize the pupil<br/><br/>The iris is semi-transparent so that IOLs, and<br/>other structures can be seen behind it';
+ED.trans['ACIOL'] = 'Drag to move<br/>Drag the handle to rotate';
+ED.trans['AngleGradeEast'] = 'Drag handle to adjust amount of angle obscure by iris';
+ED.trans['AngleGradeNorth'] = 'Drag handle to adjust amount of angle obscure by iris';
+ED.trans['AngleGradeSouth'] = 'Drag handle to adjust amount of angle obscure by iris';
+ED.trans['AngleGradeWest'] = 'Drag handle to adjust amount of angle obscure by iris';
+ED.trans['AngleNV'] = 'Drag to move around angle<br/>Drag handles to change extent';
+ED.trans['AngleRecession'] = 'Drag to move around angle<br/>Drag handles to change extent';
+ED.trans['AntSeg'] = 'Drag the handle to resize the pupil<br/><br/>The iris is semi-transparent so that IOLs, and<br/>other structures can be seen behind it';
 ED.trans['AntSegCrossSection'] = '';
-ED.trans['AntSynech'] = 'Anterior synechiae<br/><br/>Drag to move around angle<br/>Drag handles to change extent';
-ED.trans['ArcuateScotoma'] = 'Arcuate scotoma<br/><br/>Drag handle to change size';
-ED.trans['BiopsySite'] = 'Biopsy site<br/><br/>Drag to position';
-ED.trans['Bleb'] = 'Trabeculectomy bleb<br/><br/>Drag to move around the limbus';
-ED.trans['BlotHaemorrhage'] = 'Blot haemorrhage<br/><br/>Drag to position<br/>Drag the handle to change size';
-ED.trans['BuckleSuture'] = 'Buckle suture<br/><br/>Drag to position';
-ED.trans['BusaccaNodule'] = 'Busacca nodule<br/><br/>Drag to move around the iris';
-ED.trans['CapsularTensionRing'] = 'Capsular Tension Ring<br/><br/>This cannot be selected directly since it is behind the iris<br/>Select the iris first<br/>Then move the scroll wheel until the ring is selected<br/>Click the \'Move to front\' button<br/>Err.. of course if you are seeing this tooltip you have already done it';
-ED.trans['ChandelierSingle'] = 'Chandelier illumination<br/><br/>Drag to rotate around centre<br/>';
-ED.trans['ChandelierDouble'] = 'Double chandelier illumination<br/><br/>Drag to rotate around centre<br/>';
-ED.trans['ChoroidalHaemorrhage'] = 'Choroidal haemorrhage<br/><br/>Drag to move around eye<br/>Drag outer handles to change size</br>Drag middle handle to change posterior extent';
-ED.trans['ChoroidalNaevus'] = 'Choroidal naevus<br/><br/>Drag to position<br/>Drag outer handles to change shape<br/>Drag outer ring of top handles to rotate<br/>Drag middle handle to add drusen';
-ED.trans['CiliaryInjection'] = 'Ciliary injection<br/><br/>Drag to rotate around centre<br/>Drag handles to change extent';
-ED.trans['Circinate'] = 'Circinate (Ring of exudates)<br/><br/>Drag to position<br/>Drag handle to change size';
-ED.trans['CircumferentialBuckle'] = 'Circumferential buckle<br/><br/>Drag to position<br/>Drag outer handles to change extent<br/>Drag middle handle to change width';
-ED.trans['ConjunctivalFlap'] = 'Conjunctival flap<br/><br/>Drag to move around the limbus<br/>Drag handles to change size and depth';
-ED.trans['CornealAbrasion'] = 'Corneal abrasion<br/><br/>Drag to position<br/>Drag handle to change size';
+ED.trans['AntSynech'] = 'Drag to move around angle<br/>Drag handles to change extent';
+ED.trans['ArcuateScotoma'] = 'Drag handle to change size';
+ED.trans['BiopsySite'] = 'Drag to position';
+ED.trans['Bleb'] = 'Drag to move around the limbus';
+ED.trans['BlotHaemorrhage'] = 'Drag to position<br/>Drag the handle to change size';
+ED.trans['BuckleSuture'] = 'Drag to position';
+ED.trans['BusaccaNodule'] = 'Drag to move around the iris';
+ED.trans['CapsularTensionRing'] = 'This cannot be selected directly since it is behind the iris<br/>Select the iris first<br/>Then move the scroll wheel until the ring is selected<br/>Click the \'Move to front\' button<br/>Err.. of course if you are seeing this tooltip you have already done it';
+ED.trans['ChandelierSingle'] = 'Drag to rotate around centre<br/>';
+ED.trans['ChandelierDouble'] = 'Drag to rotate around centre<br/>';
+ED.trans['ChoroidalHaemorrhage'] = 'Drag to move around eye<br/>Drag outer handles to change size</br>Drag middle handle to change posterior extent';
+ED.trans['ChoroidalNaevus'] = 'Drag to position<br/>Drag outer handles to change shape<br/>Drag outer ring of top handles to rotate<br/>Drag middle handle to add drusen';
+ED.trans['CiliaryInjection'] = 'Drag to rotate around centre<br/>Drag handles to change extent';
+ED.trans['Circinate'] = 'Drag to position<br/>Drag handle to change size';
+ED.trans['CircumferentialBuckle'] = 'Drag to position<br/>Drag outer handles to change extent<br/>Drag middle handle to change width';
+ED.trans['ConjunctivalFlap'] = 'Drag to move around the limbus<br/>Drag handles to change size and depth';
+ED.trans['CornealAbrasion'] = 'Drag to position<br/>Drag handle to change size';
 ED.trans['CorneaCrossSection'] = 'Corneal cross section';
-ED.trans['CornealErosion'] = 'Removal of corneal epithelium<br/><br/>Drag to position<br/>Drag handle to change size';
-ED.trans['CornealGraft'] = 'Corneal graft<br/><br/>Drag handle to change size';
-ED.trans['CornealOedema'] = 'Corneal oedema<br/><br/>Drag to position<br/>Drag handle to change size';
+ED.trans['CornealErosion'] = 'Drag to position<br/>Drag handle to change size';
+ED.trans['CornealGraft'] = 'Drag handle to change size';
+ED.trans['CornealOedema'] = 'Drag to position<br/>Drag handle to change size';
 ED.trans['CornealStriae'] = 'Corneal striae';
-ED.trans['CornealScar'] = 'Corneal Scar<br/><br/>Drag outer handle to change shape<br/>Drag inner handle to change density';
-ED.trans['CornealSuture'] = 'Corneal suture<br/><br/>Drag to move';
-ED.trans['CorticalCataract'] = 'Cortical cataract<br/><br/>Drag to move<br/>Drag handle to change density';
-ED.trans['CottonWoolSpot'] = 'Cotton wool spot<br/><br/>Drag to position<br/>Drag handle to change shape and size';
-ED.trans['CNV'] = 'Choroidal neovascular membrane<br/><br/>Drag to move<br/>Drag handle to scale';
-ED.trans['CutterPI'] = 'Cutter iridectomy<br/><br/>Drag to move around the iris';
-ED.trans['CystoidMacularOedema'] = 'Cystoid macular oedema<br/><br/>Drag handle to change size';
-ED.trans['DiabeticNV'] = 'Diabetic new vessels<br/><br/>Drag to position<br/>Drag handle to change size';
-ED.trans['DiscHaemorrhage'] = 'Disc haemorrhage<br/><br/>Drag to position';
-ED.trans['DiscPallor'] = 'Disc Pallor<br/><br/>Drag to position<br/>Drag handles to adjust extent';
-ED.trans['DrainageRetinotomy'] = 'Drainage retinotomy<br/><br/>Drag to position';
-ED.trans['DrainageSite'] = 'Drainage site<br/><br/>Drag to change position';
-ED.trans['EncirclingBand'] = 'Encircling band<br/><br/>Drag to change orientation of Watzke sleeve';
-ED.trans['EntrySiteBreak'] = 'Entry site break<br/><br/>Drag to position<br/>Drag either end handle to increase extent';
-ED.trans['EpiretinalMembrane'] = 'Epiretinal membrane<br/><br/>Drag inner handle to change shape and size<br/>Drag outer handle to rotate';
-ED.trans['FibrousProliferation'] = 'Fibrous Proliferation<br/><br/>Drag to position<br/>Drag inner handle to change shape and size<br/>Drag outer handle to rotate';
-ED.trans['FocalLaser'] = 'Focal laser burns<br/><br/>Drag the handle for a bigger area with more burns';
-ED.trans['Freehand'] = 'Freehand drawing<br/><br/>Double-click to start drawing<br/>Drag inner handle to change size<br/>Drag outer handle to rotate<br/><br/>Adjust colours and settings in tool bar';
+ED.trans['CornealScar'] = 'Drag outer handle to change shape<br/>Drag inner handle to change density';
+ED.trans['CornealSuture'] = 'Drag to move';
+ED.trans['CorticalCataract'] = 'Drag to move<br/>Drag handle to change density';
+ED.trans['CottonWoolSpot'] = 'Drag to position<br/>Drag handle to change shape and size';
+ED.trans['CNV'] = 'Drag to move<br/>Drag handle to scale';
+ED.trans['CutterPI'] = 'Drag to move around the iris';
+ED.trans['CystoidMacularOedema'] = 'Drag handle to change size';
+ED.trans['DiabeticNV'] = 'Drag to position<br/>Drag handle to change size';
+ED.trans['DiscHaemorrhage'] = 'Drag to position';
+ED.trans['DiscPallor'] = 'Drag to position<br/>Drag handles to adjust extent';
+ED.trans['DrainageRetinotomy'] = 'Drag to position';
+ED.trans['DrainageSite'] = 'Drag to change position';
+ED.trans['EncirclingBand'] = 'Drag to change orientation of Watzke sleeve';
+ED.trans['EntrySiteBreak'] = 'Drag to position<br/>Drag either end handle to increase extent';
+ED.trans['EpiretinalMembrane'] = 'Drag inner handle to change shape and size<br/>Drag outer handle to rotate';
+ED.trans['FibrousProliferation'] = 'Drag to position<br/>Drag inner handle to change shape and size<br/>Drag outer handle to rotate';
+ED.trans['FocalLaser'] = 'Drag the handle for a bigger area with more burns';
+ED.trans['Freehand'] = 'Double-click to start drawing<br/>Drag inner handle to change size<br/>Drag outer handle to rotate<br/><br/>Adjust colours and settings in tool bar';
 ED.trans['Fundus'] = '';
-ED.trans['Fuchs'] = 'Fuch\'s Endothelial Dystrophy<br/><br/>Drag handle to change shape';
-ED.trans['Geographic'] = 'Geographic Atrophy<br/><br/>Drag middle handle to alter size of remaining central island of RPE<br/>Drag outside handle to scale';
-ED.trans['Gonioscopy'] = 'Goniogram<br/><br/>Drag top left handle up and down to alter pigment density<br/>Drag top left handle left and right to alter pigment homogeneity';
-ED.trans['HardDrusen'] = 'Hard drusen<br/><br/>Drag middle handle up and down to alter density of drusen<br/>Drag outside handle to scale';
-ED.trans['HardExudate'] = 'Hard exudate<br/><br/>Drag to position';
-ED.trans['Hyphaema'] = 'Hyphaema<br/><br/>Drag handle vertically to change size<br/>Drag handle horizontally to change density';
-ED.trans['Hypopyon'] = 'Hypopyon<br/><br/>Drag handle vertically to change size';
-ED.trans['IatrogenicBreak'] = 'Iatrogenic Break<br/><br/>Drag to position<br/>Drag inner handle to change size<br/>Drag outer handle to rotate';
-ED.trans['ILMPeel'] = 'ILM peel<br/><br/>Drag to position<br/>Drag handle to change size';
-ED.trans['InjectionSite'] = 'Injection site<br/><br/>Drag to position<br/>Drag handle to adjust distance from limbus';
-ED.trans['IrisHook'] = 'Iris hook<br/><br/>Drag to move around the clock<br/><br/>The hook will match the size of the pupil as it changes<br/>Subsequent hooks are added to the next quadrant';
-ED.trans['IrisNaevus'] = 'Iris naevus<br/><br/>Drag to move<br/>Drag handle to change size';
-ED.trans['IRMA'] = 'Intraretinal microvascular abnormalities<br/><br/>Drag to move<br/>Drag inner handle to change size<br/>Drag outer handle to rotate';
-ED.trans['KeraticPrecipitates'] = 'Keratic precipitates<br/><br/>Drag middle handle up and down to alter density<br/>Drag middle handle left and right to alter size<br/>Drag outside handle to scale';
-ED.trans['KoeppeNodule'] = 'Koeppe nodule<br/><br/>Drag to move around the iris';
-ED.trans['KrukenbergSpindle'] = 'Krukenberg\'s spindle<br/><br/>Drag to move</br>Drag outer handle to change shape';
-//ED.trans['Label'] = 'A text label<br/><br/>Drag to move label, type text to edit</br>Drag handle to move pointer';
-ED.trans['LaserCircle'] = 'A circle of laser spots<br/><br/>Drag handle to change shape';
-ED.trans['LaserDemarcation'] = 'A row of laser spots for demarcation<br/><br/>Drag to rotate<br/>Drag each end handle to increase extent<br/>Drag the middle handle to move line more posteriorly';
-ED.trans['LaserSpot'] = 'A single laser spot<br/><br/>Drag to position<br/>Drag the handle to change size';
-ED.trans['LasikFlap'] = 'LASIK flap<br/><br/>Drag to rotate<br/>Drag the handle to scale';
-ED.trans['Lens'] = 'Lens<br/><br/>Drag to move<br/>Edit properties when selected<br/>Delete to remove';
+ED.trans['Fuchs'] = 'Drag handle to change shape';
+ED.trans['Geographic'] = 'Drag middle handle to alter size of remaining central island of RPE<br/>Drag outside handle to scale';
+ED.trans['Gonioscopy'] = 'Drag top left handle up and down to alter pigment density<br/>Drag top left handle left and right to alter pigment homogeneity';
+ED.trans['HardDrusen'] = 'Drag middle handle up and down to alter density of drusen<br/>Drag outside handle to scale';
+ED.trans['HardExudate'] = 'Drag to position';
+ED.trans['Hyphaema'] = 'Drag handle vertically to change size<br/>Drag handle horizontally to change density';
+ED.trans['Hypopyon'] = 'Drag handle vertically to change size';
+ED.trans['IatrogenicBreak'] = 'Drag to position<br/>Drag inner handle to change size<br/>Drag outer handle to rotate';
+ED.trans['ILMPeel'] = 'Drag to position<br/>Drag handle to change size';
+ED.trans['InjectionSite'] = 'Drag to position<br/>Drag handle to adjust distance from limbus';
+ED.trans['IrisHook'] = 'Drag to move around the clock<br/><br/>The hook will match the size of the pupil as it changes<br/>Subsequent hooks are added to the next quadrant';
+ED.trans['IrisNaevus'] = 'Drag to move<br/>Drag handle to change size';
+ED.trans['IRMA'] = 'Drag to move<br/>Drag inner handle to change size<br/>Drag outer handle to rotate';
+ED.trans['KeraticPrecipitates'] = 'Drag middle handle up and down to alter density<br/>Drag middle handle left and right to alter size<br/>Drag outside handle to scale';
+ED.trans['KoeppeNodule'] = 'Drag to move around the iris';
+ED.trans['KrukenbergSpindle'] = 'Drag to move</br>Drag outer handle to change shape';
+//ED.trans['Label'] = 'Drag to move label, type text to edit</br>Drag handle to move pointer';
+ED.trans['LaserCircle'] = 'Drag handle to change shape';
+ED.trans['LaserDemarcation'] = 'Drag to rotate<br/>Drag each end handle to increase extent<br/>Drag the middle handle to move line more posteriorly';
+ED.trans['LaserSpot'] = 'Drag to position<br/>Drag the handle to change size';
+ED.trans['LasikFlap'] = 'Drag to rotate<br/>Drag the handle to scale';
+ED.trans['Lens'] = 'Drag to move<br/>Edit properties when selected<br/>Delete to remove';
 ED.trans['LensCrossSection'] = '';
-ED.trans['LimbalRelaxingIncision'] = 'Limbal relaxing incision<br/><br/>Drag to move';
-ED.trans['Macroaneurysm'] = 'Macroaneurysm<br/><br/>Drag to move';
-ED.trans['MacularDystrophy'] = 'Macular dystrophy<br/><br/>Drag outer handle to change size<br/>Drag middle handle to change type';
-ED.trans['MacularGrid'] = 'Macular grid<br/><br/>Drag the handle to scale';
-ED.trans['MacularHole'] = 'Macular hole<br/><br/>Drag the handle to scale';
-ED.trans['MacularThickening'] = 'Macular thickening<br/><br/>Drag to position<br/>Drag handle to change size';
-ED.trans['MattressSuture'] = 'Mattress suture<br/><br/>Drag to move';
-ED.trans['Microaneurysm'] = 'Microaneurysm<br/><br/>Drag to position';
-ED.trans['NerveFibreDefect'] = 'Nerve fibre layer defect<br/><br/>Drag to position<br/>Drag handles to change size';
-ED.trans['NuclearCataract'] = 'Nuclear cataract<br/><br/>Drag to move<br/>Drag handle to change density';
+ED.trans['LimbalRelaxingIncision'] = 'Drag to move';
+ED.trans['Macroaneurysm'] = 'Drag to move';
+ED.trans['MacularDystrophy'] = 'Drag outer handle to change size<br/>Drag middle handle to change type';
+ED.trans['MacularGrid'] = 'Drag the handle to scale';
+ED.trans['MacularHole'] = 'Drag the handle to scale';
+ED.trans['MacularThickening'] = 'Drag to position<br/>Drag handle to change size';
+ED.trans['MattressSuture'] = 'Drag to move';
+ED.trans['Microaneurysm'] = 'Drag to position';
+ED.trans['NerveFibreDefect'] = 'Drag to position<br/>Drag handles to change size';
+ED.trans['NuclearCataract'] = 'Drag to move<br/>Drag handle to change density';
 ED.trans['OperatingTable'] = 'Operating table';
-ED.trans['OpticDisc'] = 'Optic disc<br/><br/>Basic mode: Drag handle to adjust cup/disc ratio<br/>Expert mode: Drag handles to re-shape disc';
-ED.trans['OpticDiscPit'] = 'Optic disc pit<br/><br/>Drag to position<br/>Drag handle to change shape';
+ED.trans['OpticDisc'] = 'Basic mode: Drag handle to adjust cup/disc ratio<br/>Expert mode: Drag handles to re-shape disc';
+ED.trans['OpticDiscPit'] = 'Drag to position<br/>Drag handle to change shape';
 ED.trans['Papilloedema'] = 'Papilloedema';
-ED.trans['PCIOL'] = 'Posterior chamber IOL<br/><br/>Drag to move<br/>Drag the handle to rotate';
-ED.trans['PeripapillaryAtrophy'] = 'Peripapillary atrophy<br/><br/>Drag to rotate<br/>Drag handles to change extent';
-ED.trans['PeripheralRetinectomy'] = 'Peripheral retinectomy<br/><br/>Drag to rotate<br/>Drag each end handle to increase extent<br/>Drag the middle handle to move posterior limit';
-ED.trans['PeripheralRRD'] = 'Peripheral retinal detachment<br/><br/>Drag to rotate<br/>Drag each end handle to increase extent<br/>Drag the middle handle to move posterior limit';
-ED.trans['PhakoIncision'] = 'Phako incision<br/><br/>Drag end handle to change length<br/>Drag the middle handle to change section type<br/>Drag the incision itself to move';
-ED.trans['PI'] = 'Peripheral iridectomy<br/><br/>Drag to move around the iris';
+ED.trans['PCIOL'] = 'Drag to move<br/>Drag the handle to rotate';
+ED.trans['PeripapillaryAtrophy'] = 'Drag to rotate<br/>Drag handles to change extent';
+ED.trans['PeripheralRetinectomy'] = 'Drag to rotate<br/>Drag each end handle to increase extent<br/>Drag the middle handle to move posterior limit';
+ED.trans['PeripheralRRD'] = 'Drag to rotate<br/>Drag each end handle to increase extent<br/>Drag the middle handle to move posterior limit';
+ED.trans['PhakoIncision'] = 'Drag end handle to change length<br/>Drag the middle handle to change section type<br/>Drag the incision itself to move';
+ED.trans['PI'] = 'Drag to move around the iris';
 ED.trans['PosteriorCapsule'] = 'Posterior capsule';
 ED.trans['PosteriorEmbryotoxon'] = 'Posterior embryotoxon';
-ED.trans['PosteriorRetinectomy'] = 'Posterior retinectomy<br/><br/>Drag to position<br/>Drag the handle to change size';
-ED.trans['PosteriorSynechia'] = 'Posterior synechia<br/><br/>Drag to rotate around centre<br/>Drag handles to increase extent';
-ED.trans['PostPole'] = 'Posterior pole<br/><br/>The disc cup can be edited by clicking on the disc, and dragging the yellow handle<br/>The gray circle marks one disc diameter from the fovea';
-ED.trans['PostSubcapCataract'] = 'Posterior subcapsular cataract<br/><br/>Drag handle to change size';
-ED.trans['PreRetinalHaemorrhage'] = 'Preretinal haemorrhage<br/><br/>Drag to position<br/>Drag handles to change shape and size';
+ED.trans['PosteriorRetinectomy'] = 'Drag to position<br/>Drag the handle to change size';
+ED.trans['PosteriorSynechia'] = 'Drag to rotate around centre<br/>Drag handles to increase extent';
+ED.trans['PostPole'] = 'The disc cup can be edited by clicking on the disc, and dragging the yellow handle<br/>The gray circle marks one disc diameter from the fovea';
+ED.trans['PostSubcapCataract'] = 'Drag handle to change size';
+ED.trans['PreRetinalHaemorrhage'] = 'Drag to position<br/>Drag handles to change shape and size';
 ED.trans['PRPPostPole'] = 'Pan-retinal photocoagulation';
-ED.trans['RadialSponge'] = 'Radial sponge<br/><br/>Drag to change position';
-ED.trans['RetinalArteryOcclusionPostPole'] = 'Retinal artery occlusion<br/><br/>Drag to position<br/>Drag handles to change extent<br/>Drag central handle to alter macular involvement';
-ED.trans['RetinalTouch'] = 'Retinal touch<br/><br/>Drag to change position';
-ED.trans['RetinalVeinOcclusionPostPole'] = 'Retinal vein occlusion<br/><br/>Drag to position<br/>Drag handles to change extent<br/>Drag central handle to alter macular involvement';
-ED.trans['RK'] = 'Radial keratotomy<br/><br/>Drag to rotate<br/>Drag outer handle to resize<br/>Drag inner handle to adjust central extent';
+ED.trans['RadialSponge'] = 'Drag to change position';
+ED.trans['RetinalArteryOcclusionPostPole'] = 'Drag to position<br/>Drag handles to change extent<br/>Drag central handle to alter macular involvement';
+ED.trans['RetinalTouch'] = 'Drag to change position';
+ED.trans['RetinalVeinOcclusionPostPole'] = 'Drag to position<br/>Drag handles to change extent<br/>Drag central handle to alter macular involvement';
+ED.trans['RK'] = 'Drag to rotate<br/>Drag outer handle to resize<br/>Drag inner handle to adjust central extent';
 ED.trans['RoundHole'] = '';
-ED.trans['RPEDetachment'] = 'RPE detachment<br/><br/>Drag to position<br/>Drag handles to change shape<br/>Drag to position<br/>Drag outer ring of top handles to rotate';
-ED.trans['RPERip'] = 'RPE rip<br/><br/>Drag to move<br/>Drag large handle to resize and rotate<br/>Drag other handles to adjust shape';
-ED.trans['RRD'] = 'Rhegmatogenous retinal detachment<br/><br/>Drag to move around eye<br/>Drag outer handles to change size</br>Drag middle handle to change posterior extent';
-ED.trans['Rubeosis'] = 'Rubeosis iridis<br/><br/>Drag to rotate around centre<br/>Drag handles to increase extent';
-ED.trans['SectorPRP'] = 'A sector of panretinal photocoagulation<br/><br/>Drag to rotate around centre<br/>Drag each end handle to increase extent';
-ED.trans['SectorPRPPostPole'] = 'A sector of panretinal photocoagulation<br/><br/>Drag to rotate around centre<br/>Drag each end handle to increase extent';
-ED.trans['ScleralIncision'] = 'Scleral incision<br/><br/>Drag to move around the sclera';
-ED.trans['SectorIridectomy'] = 'Sector Iridectomy<br/><br/>Drag to position<br/>Drag handles to adjust extent';
-ED.trans['Sclerostomy'] = 'A sclerostomy for vitrectomy<br/><br/>Drag to rotate around centre<br/>Drag each handle to alter gauge<br/>Click suture button to toggle suture';
-ED.trans['SidePort'] = 'Side port<br/><br/>Drag to move';
-ED.trans['SubretinalFluid'] = 'Subretinal fluid<br/><br/>Drag to position<br/>Drag handles to change shape<br/>Drag to position<br/>Drag outer ring of top handles to rotate';
-ED.trans['SubretinalPFCL'] = 'Subretinal PFCL<br/><br/>Drag to position<br/>Drag handle to change size';
+ED.trans['RPEDetachment'] = 'Drag to position<br/>Drag handles to change shape<br/>Drag to position<br/>Drag outer ring of top handles to rotate';
+ED.trans['RPERip'] = 'Drag to move<br/>Drag large handle to resize and rotate<br/>Drag other handles to adjust shape';
+ED.trans['RRD'] = 'Drag to move around eye<br/>Drag outer handles to change size</br>Drag middle handle to change posterior extent';
+ED.trans['Rubeosis'] = 'Drag to rotate around centre<br/>Drag handles to increase extent';
+ED.trans['SectorPRP'] = 'Drag to rotate around centre<br/>Drag each end handle to increase extent';
+ED.trans['SectorPRPPostPole'] = 'Drag to rotate around centre<br/>Drag each end handle to increase extent';
+ED.trans['ScleralIncision'] = 'Drag to move around the sclera';
+ED.trans['SectorIridectomy'] = 'Drag to position<br/>Drag handles to adjust extent';
+ED.trans['Sclerostomy'] = 'Drag to rotate around centre<br/>Drag each handle to alter gauge<br/>Click suture button to toggle suture';
+ED.trans['SidePort'] = 'Drag to move';
+ED.trans['SubretinalFluid'] = 'Drag to position<br/>Drag handles to change shape<br/>Drag to position<br/>Drag outer ring of top handles to rotate';
+ED.trans['SubretinalPFCL'] = 'Drag to position<br/>Drag handle to change size';
 ED.trans['Surgeon'] = 'Surgeon';
 ED.trans['SwollenDisc'] = 'Swollen disc';
-ED.trans['Telangiectasis'] = 'Parafoveal Telangiectasia<br/><br/>Drag middle handle to add pigment and exudate';
-ED.trans['ToricPCIOL'] = 'Toric posterior chamber IOL<br/><br/>Drag to move<br/>Drag the handle to rotate';
-ED.trans['Trabectome'] = 'Trabectome<br/><br/>Drag to position<br/>Drag either end handle to adjust extent';
-ED.trans['TrabyFlap'] = 'Trabeculectomy flap<br/><br/>Drag to position<br/>Drag either end handle to adjust size</br>Drag middle handle to change sclerostomy';
-ED.trans['TrabySuture'] = 'Trabeculectomy suture<br/><br/>Drag to position<br/>Drag corner handle to adjust orientation</br>Drag lower handle to change suture type';
-ED.trans['TractionRetinalDetachment'] = 'Traction retinal detachment<br/><br/>Drag to position<br/>Drag inner handle to change shape and size<br/>Drag outer handle to rotate';
-ED.trans['TransilluminationDefect'] = 'Transillumination defects of the iris<br/><br/>Drag to rotate around centre<br/>Drag each end handle to alter extent';
+ED.trans['Telangiectasis'] = 'Drag middle handle to add pigment and exudate';
+ED.trans['ToricPCIOL'] = 'Drag to move<br/>Drag the handle to rotate';
+ED.trans['Trabectome'] = 'Drag to position<br/>Drag either end handle to adjust extent';
+ED.trans['TrabyFlap'] = 'Drag to position<br/>Drag either end handle to adjust size</br>Drag middle handle to change sclerostomy';
+ED.trans['TrabySuture'] = 'Drag to position<br/>Drag corner handle to adjust orientation</br>Drag lower handle to change suture type';
+ED.trans['TractionRetinalDetachment'] = 'Drag to position<br/>Drag inner handle to change shape and size<br/>Drag outer handle to rotate';
+ED.trans['TransilluminationDefect'] = 'Drag to rotate around centre<br/>Drag each end handle to alter extent';
 ED.trans['UTear'] = '';
-ED.trans['ViewObscured'] = 'View obscured<br/><br/>Drag handle to change opacity';
-ED.trans['VitreousOpacity'] = 'Vitreous Opacity<br/><br/>Drag to move<br/>Drag the inner handle up and down to alter opacity<br/>Drag the outer handle to scale';
+ED.trans['ViewObscured'] = 'Drag handle to change opacity';
+ED.trans['VitreousOpacity'] = 'Drag to move<br/>Drag the inner handle up and down to alter opacity<br/>Drag the outer handle to scale';
 
 // ENT
-ED.trans['Grommet'] = 'Grommet<br/><br/>Drag to position';
-ED.trans['Perforation'] = 'Perforation<br/><br/>Drag to move<br/>Drag handle to change size';
+ED.trans['Grommet'] = 'Drag to position';
+ED.trans['Perforation'] = 'Drag to move<br/>Drag handle to change size';
 
 // Cardiology
-ED.trans['Crepitations'] = 'Crepitations<br/><br/>Drag to move<br/>Drag handle to resize';
-ED.trans['Stenosis'] = 'Stenosis<br/><br/>Drag to move<br/>Drag handle up and down to change degree<br/>Drag handle to left and right to change type';
-ED.trans['Wheeze'] = 'Wheeze<br/><br/>Drag to move';
-ED.trans['Effusion'] = 'Pleural effusion<br/><br/>Drag handle to move up';
-ED.trans['LeftCoronaryArtery'] = 'Left coronary artery<br/><br/>Drag handle to move origin and make anomolous';
-ED.trans['DrugStent'] = 'Drug eluting stent<br/><br/>Drag to move';
-ED.trans['MetalStent'] = 'Metal stent<br/><br/>Drag to move';
-ED.trans['Bypass'] = 'Coronary artery bypass<br/><br/>Drag handle to alter destination';
-ED.trans['Bruit'] = 'Bruit<br/><br/>Drag to move';
-ED.trans['Bruising'] = 'Bruising<br/><br/>Drag to move<br/>Drag handle to resize';
-ED.trans['Haematoma'] = 'Haematoma<br/><br/>Drag to move<br/>Drag handle to resize';
+ED.trans['Crepitations'] = 'Drag to move<br/>Drag handle to resize';
+ED.trans['Stenosis'] = 'Drag to move<br/>Drag handle up and down to change degree<br/>Drag handle to left and right to change type';
+ED.trans['Wheeze'] = 'Drag to move';
+ED.trans['Effusion'] = 'Drag handle to move up';
+ED.trans['LeftCoronaryArtery'] = 'Drag handle to move origin and make anomolous';
+ED.trans['DrugStent'] = 'Drag to move';
+ED.trans['MetalStent'] = 'Drag to move';
+ED.trans['Bypass'] = 'Drag handle to alter destination';
+ED.trans['Bruit'] = 'Drag to move';
+ED.trans['Bruising'] = 'Drag to move<br/>Drag handle to resize';
+ED.trans['Haematoma'] = 'Drag to move<br/>Drag handle to resize';
 
 /**
  * OpenEyes
@@ -10774,6 +15196,7 @@ ED.AntSeg.prototype.dependentParameterValues = function(_parameter, _value) {
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
 ED.AntSeg.prototype.draw = function(_point) {
+
 	// Get context
 	var ctx = this.drawing.context;
 
@@ -13688,7 +18111,7 @@ ED.ChoroidalNaevus.prototype.setParameterDefaults = function() {
 	this.setOriginWithDisplacements(200, 150);
 
 	// Create a squiggle to store the handles points
-	var squiggle = new ED.Squiggle(this, new ED.Drawing.Colour(100, 100, 100, 1), 4, true);
+	var squiggle = new ED.Drawing.Squiggle(this, new ED.Drawing.Colour(100, 100, 100, 1), 4, true);
 
 	// Add it to squiggle array
 	this.squiggleArray.push(squiggle);
@@ -15515,7 +19938,7 @@ ED.CornealOedema.prototype.setParameterDefaults = function() {
 
 /*
 	// Create a squiggle to store the handles points
-	var squiggle = new ED.Squiggle(this, new ED.Drawing.Colour(100, 100, 100, 1), 4, true);
+	var squiggle = new ED.Drawing.Squiggle(this, new ED.Drawing.Colour(100, 100, 100, 1), 4, true);
 
 	// Add it to squiggle array
 	this.squiggleArray.push(squiggle);
@@ -18702,7 +23125,7 @@ ED.FocalChoroiditis.prototype.setParameterDefaults = function() {
 	this.setOriginWithDisplacements(200, 150);
 
 	// Create a squiggle to store the handles points
-	var squiggle = new ED.Squiggle(this, new ED.Drawing.Colour(100, 100, 100, 1), 4, true);
+	var squiggle = new ED.Drawing.Squiggle(this, new ED.Drawing.Colour(100, 100, 100, 1), 4, true);
 
 	// Add it to squiggle array
 	this.squiggleArray.push(squiggle);
@@ -25401,7 +29824,7 @@ ED.OpticDisc.prototype.setParameterDefaults = function() {
 	this.setParameterFromString('cdRatio', '0.3');
 
 	// Create a squiggle to store the handles points
-	var squiggle = new ED.Squiggle(this, new ED.Drawing.Colour(100, 100, 100, 1), 4, true);
+	var squiggle = new ED.Drawing.Squiggle(this, new ED.Drawing.Colour(100, 100, 100, 1), 4, true);
 
 	// Add it to squiggle array
 	this.squiggleArray.push(squiggle);
@@ -26845,7 +31268,7 @@ ED.PeripapillaryAtrophy.prototype.setPropertyDefaults = function() {
  */
 ED.PeripapillaryAtrophy.prototype.setParameterDefaults = function() {
 	// Create a squiggle to store the handles points
-	var squiggle = new ED.Squiggle(this, new ED.Drawing.Colour(100, 100, 100, 1), 4, true);
+	var squiggle = new ED.Drawing.Squiggle(this, new ED.Drawing.Colour(100, 100, 100, 1), 4, true);
 
 	// Add it to squiggle array
 	this.squiggleArray.push(squiggle);
@@ -29382,7 +33805,7 @@ ED.RPEDetachment.prototype.setParameterDefaults = function() {
 	}
 
 	// Create a squiggle to store the handles points
-	var squiggle = new ED.Squiggle(this, new ED.Drawing.Colour(100, 100, 100, 1), 4, true);
+	var squiggle = new ED.Drawing.Squiggle(this, new ED.Drawing.Colour(100, 100, 100, 1), 4, true);
 
 	// Add it to squiggle array
 	this.squiggleArray.push(squiggle);
@@ -33073,7 +37496,7 @@ ED.SubretinalFluid.prototype.setParameterDefaults = function() {
 	}
 
 	// Create a squiggle to store the handles points
-	var squiggle = new ED.Squiggle(this, new ED.Drawing.Colour(100, 100, 100, 1), 4, true);
+	var squiggle = new ED.Drawing.Squiggle(this, new ED.Drawing.Colour(100, 100, 100, 1), 4, true);
 
 	// Add it to squiggle array
 	this.squiggleArray.push(squiggle);
@@ -34504,11 +38927,7 @@ ED.TrabySuture.prototype.setHandles = function() {
 		this.handleArray[i] = new ED.Doodle.Handle(null, true, ED.Mode.Handles, false);
 	}
 
-<<<<<<< HEAD
-	//this.handleArray[this.numberOfHandles] = new ED.Handle(null, true, ED.Mode.Rotate, false);
-=======
-	this.handleArray[this.numberOfHandles] = new ED.Doodle.Handle(null, true, ED.Mode.Rotate, false);
->>>>>>> Moved objects into namespaces and saved objects in individual files.
+	//this.handleArray[this.numberOfHandles] = new ED.Doodle.Handle(null, true, ED.Mode.Rotate, false);
 }
 
 /**
@@ -34551,12 +38970,11 @@ ED.TrabySuture.prototype.setParameterDefaults = function() {
 	this.size = '10/0';
 
 	// Create a squiggle to store the handles points
-	var squiggle = new ED.Squiggle(this, new ED.Drawing.Colour(100, 100, 100, 1), 4, true);
+	var squiggle = new ED.Drawing.Squiggle(this, new ED.Colour(100, 100, 100, 1), 4, true);
 
 	// Add it to squiggle array
 	this.squiggleArray.push(squiggle);
 
-<<<<<<< HEAD
 	// Populate handle array
 	var positionSet = [
 		{x: 100, y: -100},
@@ -34569,13 +38987,6 @@ ED.TrabySuture.prototype.setParameterDefaults = function() {
 		var point = new ED.Point(positionSet[i].x, positionSet[i].y);
 		this.addPointToSquiggle(point);
 	}
-=======
-	// Populate with handles
-	var point = new ED.Drawing.Point(100, 100);
-	this.addPointToSquiggle(point);
-	point = new ED.Drawing.Point(-100, 100);
-	this.addPointToSquiggle(point);
->>>>>>> Moved objects into namespaces and saved objects in individual files.
 }
 
 /**
@@ -34653,7 +39064,6 @@ ED.TrabySuture.prototype.draw = function(_point) {
 		// Type of suture
 		switch (this.shape) {
 			case 'Releasable':
-<<<<<<< HEAD
 // 				ctx.moveTo(-2, 64);
 // 				ctx.bezierCurveTo(20, 36, -15, 16, -16, -7);
 // 				ctx.bezierCurveTo(-18, -30, -12, -43, -4, -43);
@@ -34663,26 +39073,12 @@ ED.TrabySuture.prototype.draw = function(_point) {
 // 				ctx.bezierCurveTo(2, 20, -4, 24, -3, 29);
 // 				ctx.bezierCurveTo(-3, 36, 14, 37, 23, 56);
 // 				ctx.bezierCurveTo(32, 74, 34, 100, 34, 100);
-				
+
 				// From point
 				//var fp = new ED.Point(34, 100);
-=======
-				ctx.moveTo(-2, 64);
-				ctx.bezierCurveTo(20, 36, -15, 16, -16, -7);
-				ctx.bezierCurveTo(-18, -30, -12, -43, -4, -43);
-				ctx.bezierCurveTo(6, -43, 12, -28, 12, -9);
-				ctx.bezierCurveTo(12, 11, 0, 23, -2, 30);
-				ctx.bezierCurveTo(-3, 36, 3, 37, 2, 30);
-				ctx.bezierCurveTo(2, 20, -4, 24, -3, 29);
-				ctx.bezierCurveTo(-3, 36, 14, 37, 23, 56);
-				ctx.bezierCurveTo(32, 74, 34, 100, 34, 100);
-
-				// From point
-				var fp = new ED.Drawing.Point(34, 100);
->>>>>>> Moved objects into namespaces and saved objects in individual files.
 
 				// Suture exit through cornea
-				// 				var ep = new ED.Drawing.Point(this.firstOriginX, -60);
+				// 				var ep = new ED.Point(this.firstOriginX, -60);
 				//
 				// 				// Set up a new transform and centre in canvas
 				// 				var at = new ED.AffineTransform();
@@ -34699,7 +39095,7 @@ ED.TrabySuture.prototype.draw = function(_point) {
 
 				/*
 				// Suture exit through cornea
-				var ep = new ED.Drawing.Point(this.firstOriginX, -60);
+				var ep = new ED.Point(this.firstOriginX, -60);
 
 				// Set up a new transform and centre in canvas
 				var at = new ED.AffineTransform();
@@ -34720,7 +39116,7 @@ ED.TrabySuture.prototype.draw = function(_point) {
 				else if (this.id == 6) d = d * +1;
 				else d = d * -1;
 
-				var mp = new ED.Drawing.Point(this.firstOriginX - d, -90);
+				var mp = new ED.Point(this.firstOriginX - d, -90);
 				var tmp = at.transformPoint(mp);
 				var fmp = this.inverseTransform.transformPoint(tmp);
 
@@ -34736,38 +39132,23 @@ ED.TrabySuture.prototype.draw = function(_point) {
 // 				var cp2;
 
 				// Angle of control point from radius line to point (this value makes path a circle Math.PI/12 for 8 points
-<<<<<<< HEAD
 				//var phi = 2 * Math.PI / (10 * this.numberOfHandles);
-				
+
 				tp = this.squiggleArray[0].pointsArray[0];
 				ctx.moveTo(tp.x, tp.y);
-				
-				for (var i = 1; i < this.numberOfHandles; i++) {
-=======
-				var phi = 2 * Math.PI / (10 * this.numberOfHandles);
 
-				for (var i = 0; i < this.numberOfHandles; i++) {
->>>>>>> Moved objects into namespaces and saved objects in individual files.
+				for (var i = 1; i < this.numberOfHandles; i++) {
 
 					// To point
 					tp = this.squiggleArray[0].pointsArray[i];
 
 					// Control points
-<<<<<<< HEAD
 // 					cp1 = new ED.Point(fp.x + (tp.x - fp.x)/3, fp.y);
 // 					cp2 = new ED.Point(fp.x + 2 * (tp.x - fp.x)/3, tp.y);
 
 					// Draw Bezier curve
 					//ctx.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, tp.x, tp.y);
 					ctx.lineTo(tp.x, tp.y);
-=======
-					cp1 = new ED.Drawing.Point(fp.x + (tp.x - fp.x)/3, fp.y);
-					cp2 = new ED.Drawing.Point(fp.x + 2 * (tp.x - fp.x)/3, tp.y);
-
-					// Draw Bezier curve
-					ctx.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, tp.x, tp.y);
-
->>>>>>> Moved objects into namespaces and saved objects in individual files.
 					fp = tp;
 				}
 
@@ -34805,13 +39186,9 @@ ED.TrabySuture.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-<<<<<<< HEAD
 	for (var i = 0; i < this.numberOfHandles; i++) {
 		this.handleArray[i].location = this.transform.transformPoint(this.squiggleArray[0].pointsArray[i]);
 	}
-=======
-	this.handleArray[this.numberOfHandles].location = this.transform.transformPoint(new ED.Drawing.Point(+40, -70));
->>>>>>> Moved objects into namespaces and saved objects in individual files.
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -34849,7 +39226,6 @@ ED.TrabySuture.prototype.description = function() {
 
 	return returnValue;
 }
-
 
 /**
  * OpenEyes
@@ -35788,7 +40164,7 @@ ED.ViewObscured = function(_drawing, _parameterJSON) {
 
 	// Saved parameters
 	this.savedParameterArray = ['apexY'];
-	
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
@@ -35804,7 +40180,7 @@ ED.ViewObscured.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.ViewObscured.prototype.setHandles = function() {
-	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+	this.handleArray[4] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
 }
 
 /**
@@ -35839,7 +40215,7 @@ ED.ViewObscured.prototype.draw = function(_point) {
 
 	// Boundary path
 	ctx.beginPath();
-	
+
 	// Radius of opacity
 	var ro = 200;
 
@@ -35883,7 +40259,7 @@ ED.ViewObscured.prototype.description = function() {
 		returnString =  "";
 		endText = " obscured";
 	}
-	
+
 	if (this.drawing.hasDoodleOfClass('PostPole')) {
 		returnString += "Posterior pole";
 	}
@@ -35893,9 +40269,9 @@ ED.ViewObscured.prototype.description = function() {
 	else if (this.drawing.hasDoodleOfClass('OpticDisc')) {
 		returnString += "Optic disc";
 	}
-	
+
 	returnString += endText;
-	
+
 	return returnString;
 }
 
@@ -35997,7 +40373,7 @@ ED.VisualField.prototype.setParameterDefaults = function() {
 	this.apexY = -40;
 
 	// Create a squiggle to store the handles points
-	var squiggle = new ED.Squiggle(this, new ED.Drawing.Colour(100, 100, 100, 1), 4, true);
+	var squiggle = new ED.Drawing.Squiggle(this, new ED.Drawing.Colour(100, 100, 100, 1), 4, true);
 
 	// Add it to squiggle array
 	this.squiggleArray.push(squiggle);
@@ -36189,7 +40565,7 @@ ED.VisualFieldChart.prototype.setPropertyDefaults = function() {
  */
 ED.VisualFieldChart.prototype.setParameterDefaults = function() {
 	// Create a squiggle to store the handles points
-	var squiggle = new ED.Squiggle(this, new ED.Drawing.Colour(100, 100, 100, 1), 4, true);
+	var squiggle = new ED.Drawing.Squiggle(this, new ED.Drawing.Colour(100, 100, 100, 1), 4, true);
 
 	// Add it to squiggle array
 	this.squiggleArray.push(squiggle);
