@@ -1070,30 +1070,19 @@
 
 	<script>
 	(function() {
+		// Custom listener
 		function TestListener(drawing) {
 			this.drawing = drawing;
-			console.log('ListeNer!');
 			this.init();
 		}
-
 		TestListener.prototype.init = function() {
-			// this.setDefaultDistance();
-			this.drawing.registerForNotifications(this, 'callback', ['doodleAdded', 'doodleDeleted', 'parameterChanged']);
+			this.drawing.registerForNotifications(this, 'callback', [
+				'doodleAdded',
+				'doodleDeleted',
+				'parameterChanged'
+			]);
 		};
-		TestListener.prototype.setDefaultDistance = function() {
-			// update
-			// var validityArray = doodle.validateParameter('distance', distance.toString());
-			// if (validityArray.valid) {
-			// 	doodle.setParameterWithAnimation('distance', validityArray.value);
-			// }
-		};
-		TestListener.prototype.callback = function(_messageArray) {
-			// if (_messageArray.eventName == "doodleAdded" && _messageArray.object.className == 'InjectionSite') {
-			// 	this._injectionDoodles[_messageArray.object.id] = _messageArray.object;
-			// 	this.updateDoodleDistance(_messageArray.object, this._default_distance);
-			// }
-		};
-
+		TestListener.prototype.callback = function(_messageArray) {};
 		window.TestListener = TestListener;
 	}());
 	</script>
