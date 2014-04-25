@@ -77,16 +77,28 @@ ED.Views.DoodlePopup = (function() {
 	 * @param  {Object} data Template data.
 	 */
 	DoodlePopup.prototype.render = function() {
+
 		var doodle = this.drawing.selectedDoodle;
+
+		// Template data
 		var data = {
 			doodle: doodle,
+			drawing: this.drawing,
 			title: doodle ? ED.titles[doodle.className] : '',
 			desc: doodle ? ED.trans[doodle.className] : '',
-			lockedButtonClass: (doodle && doodle.isLocked) ? ' disabled' : ''
+			lockedButtonClass: (doodle && doodle.isLocked) ? ' disabled' : '',
 		};
+
+		// Render the template
 		var html = Mustache.render(this.template, data);
 		this.container.html(html);
+
+		// Add doodle controls
+		if (doodle) {
+			doodle.showDoodleControls();
+		}
 	};
+
 
 	/**
 	 * Update the menu content with the specific doodle and either show or hide it.
