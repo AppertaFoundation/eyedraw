@@ -84,9 +84,9 @@ ED.Views.DoodlePopup = (function() {
 		var data = {
 			doodle: doodle,
 			drawing: this.drawing,
-			title: doodle ? ED.titles[doodle.className] : '',
-			desc: doodle ? ED.trans[doodle.className] : '',
-			lockedButtonClass: (doodle && doodle.isLocked) ? ' disabled' : '',
+			title: ED.titles[doodle.className],
+			desc: ED.trans[doodle.className],
+			lockedButtonClass: doodle.isLocked ? ' disabled' : '',
 		};
 
 		// Render the template
@@ -94,9 +94,7 @@ ED.Views.DoodlePopup = (function() {
 		this.container.html(html);
 
 		// Add doodle controls
-		if (doodle) {
-			doodle.showDoodleControls();
-		}
+		doodle.showDoodleControls();
 	};
 
 
@@ -105,7 +103,7 @@ ED.Views.DoodlePopup = (function() {
 	 * @param  {Boolean} show   Show or hide the menu.
 	 */
 	DoodlePopup.prototype.update = function(show) {
-		if (show) {
+		if (show && this.drawing.selectedDoodle) {
 			this.render();
 			this.show();
 		} else {
@@ -145,7 +143,7 @@ ED.Views.DoodlePopup = (function() {
 	 *********************/
 
 	DoodlePopup.prototype.onDoodleAdded = function() {
-		this.update(true);
+		this.drawing.selectDoodle(this.drawing.selectedDoodle);
 	};
 
 	DoodlePopup.prototype.onDoodleDeleted = function() {
@@ -153,6 +151,8 @@ ED.Views.DoodlePopup = (function() {
 	};
 
 	DoodlePopup.prototype.onDoodleSelected = function() {
+		// We do this in the next event loop as the "doodleDeselect" event
+		// is triggered before the "doodleSelect" event.
 		setTimeout(this.update.bind(this, true));
 	};
 
