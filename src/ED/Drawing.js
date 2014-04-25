@@ -1869,11 +1869,12 @@ ED.Drawing.prototype.selectDoodle = function(doodle) {
 
 	// Run onDeselection code for last doodle
 	if (this.lastSelectedDoodle) this.lastSelectedDoodle.onDeselection();
-	// Run onSelection code
-	this.selectedDoodle.onSelection();
 
 	// Notify
 	this.notify("doodleSelected");
+
+	// Run onSelection code
+	this.selectedDoodle.onSelection();
 
 	this.repaint();
 };

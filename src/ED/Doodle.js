@@ -934,16 +934,7 @@ ED.Doodle.prototype.parameterControlElementId = function(_parameter) {
 ED.Doodle.prototype.onSelection = function() {
 	// Show control bar
 	if (this.drawing.showDoodleControls) {
-		var controlDiv = document.getElementById(this.drawing.canvas.id + '_' + 'controls');
-
-		for (var parameter in this.controlParameterArray) {
-			// Create element and add to control bar
-			var element = this.parameterElement(parameter);
-			controlDiv.appendChild(element);
-
-			// Add binding
-			this.addBinding(parameter, {id:this.parameterControlElementId(parameter)});
-		}
+		this.showDoodleControls();
 	}
 }
 
@@ -953,18 +944,87 @@ ED.Doodle.prototype.onSelection = function() {
 ED.Doodle.prototype.onDeselection = function() {
 	// Hide control bar
 	if (this.drawing.showDoodleControls) {
-		// Remove all bindings
-		for (var parameter in this.controlParameterArray) {
-			this.removeBinding(parameter);
-		}
-
-		// Remove all child elements in control div
-		var controlDiv = document.getElementById(this.drawing.canvas.id + '_' + 'controls');
-		while(controlDiv.hasChildNodes()){
-			controlDiv.removeChild(controlDiv.lastChild);
-		}
+		this.removeDoodleControls();
 	}
 }
+
+/**
+ * Creates an array of control elements
+ * @return {Array}    The array of elements.
+ */
+ED.Doodle.prototype.getControlElements = function() {
+	var elements = [];
+	for (var parameter in this.controlParameterArray) {
+		// Create element
+		elements.push(
+			this.parameterElement(parameter)
+		);
+	}
+	return elements;
+};
+
+/**
+ * Add bindings to the control elements.
+ */
+ED.Doodle.prototype.addControlBindings = function() {
+	for (var parameter in this.controlParameterArray) {
+		this.addBinding(parameter, {
+			id: this.parameterControlElementId(parameter)
+		});
+	}
+};
+
+/**
+ * Generate and append the control elements to the DOM.
+ * @param  {HTMLElement} controlDiv The container element.
+ */
+ED.Doodle.prototype.showDoodleControls = function(controlDiv) {
+
+	// Find the container element
+	if (!controlDiv) {
+
+		var id = this.drawing.canvas.id + '_' + 'controls';
+		var controlDiv = document.getElementById(id);
+
+		if (!controlDiv) {
+			return ED.errorHandler('ED.Doodle', 'showDoodleControls', 'Unable to create doodle controls: element with id ' + id + ' does not exist');
+		}
+	}
+
+	// Append controls to the container
+	this.getControlElements().forEach(function(element) {
+		controlDiv.appendChild(element);
+	});
+	// Add bindings
+	this.addControlBindings();
+};
+
+/**
+ * Remove controls elements.
+ * @param  {HTMLElement} controlDiv The container element.
+ */
+ED.Doodle.prototype.removeDoodleControls = function(controlDiv) {
+
+	// Find the container element
+	if (!controlDiv) {
+		var id = this.drawing.canvas.id + '_' + 'controls';
+		var controlDiv = document.getElementById(id);
+
+		if (!controlDiv) {
+			return ED.errorHandler('ED.Doodle', 'removeDoodleControls', 'Unable to remove doodle controls: element with id ' + id + ' does not exist');
+		}
+	}
+
+	// Remove all bindings
+	for (var parameter in this.controlParameterArray) {
+		this.removeBinding(parameter);
+	}
+
+	// Remove elements
+	while(controlDiv.hasChildNodes()){
+		controlDiv.removeChild(controlDiv.lastChild);
+	}
+};
 
 /**
  * Creates an element for parameter in the doodle control bar
@@ -1037,9 +1097,11 @@ ED.Doodle.prototype.parameterElement = function(_parameter) {
 			ED.errorHandler('ED.Doodle', 'parameterElement', 'Unexpected type: ' + this.parameterValidationArray[_parameter].type + ' for parameter: ' + _parameter);
 			break;
 	}
+
 	// Create label  ***TODO*** deal with optional label and language
 	var label = document.createElement('label');
 	label.innerText = this.controlParameterArray[_parameter];
+	label.setAttribute('for', this.parameterControlElementId(_parameter));
 
 	// Wrap in div to allow display in vertical block
 	var div = document.createElement('div');

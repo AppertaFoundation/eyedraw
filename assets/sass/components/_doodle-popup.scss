@@ -24,8 +24,9 @@
 	position: absolute;
 	right: -183px;
 	width: 181px;
-	height: 242px;
+	min-height: 242px;
 	z-index: 100;
+	padding-bottom: 40px;
 	opacity: 1;
 	top: 44px;
 	-webkit-transform: translate3d(0, 0, 0);
@@ -58,10 +59,31 @@
 		font-style: italic;
 	}
 	.description {
+		color: #444;
 		font-size: 12px;
-		line-height: 13px;
 		font-style: italic;
+		line-height: 12px;
 		padding-top: 6px;
+	}
+	.controls {
+		padding-top: 14px;
+		> div {
+			@extend %clearfix;
+			line-height: 12px;
+			padding-bottom: 8px;
+		}
+		label {
+			color: #477792;
+			float: left;
+			font-size: 12px;
+			margin: 0 6px 0 0;
+			&:after {
+				content: ":";
+			}
+		}
+		select {
+			width: auto;
+		}
 	}
 }
 

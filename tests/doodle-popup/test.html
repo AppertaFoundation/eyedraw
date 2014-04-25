@@ -1025,6 +1025,8 @@
 					<div class="description">{{{desc}}}</div>
 				{{/desc}}
 			{{/doodle.isLocked}}
+			<div class="controls{{#doodle.isLocked}} hide{{/doodle.isLocked}}" id="{{drawing.canvas.id}}_controls">
+			</div>
 			<ul class="eyedraw-toolbar-panel">
 				{{#doodle.isLocked}}
 					<li>

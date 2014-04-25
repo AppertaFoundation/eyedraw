@@ -24,16 +24,16 @@
  * @version 0.9
  */
 /* line 17, ../sass/_placeholders.scss */
-.eyedraw-widget, .eyedraw-toolbar-panel, .eyedraw-doodle-popup-heading {
+.eyedraw-widget, .eyedraw-toolbar-panel, .eyedraw-doodle-popup .controls > div, .eyedraw-doodle-popup-heading {
   *zoom: 1;
 }
 /* line 20, ../sass/_mixins.scss */
-.eyedraw-widget:before, .eyedraw-toolbar-panel:before, .eyedraw-doodle-popup-heading:before, .eyedraw-widget:after, .eyedraw-toolbar-panel:after, .eyedraw-doodle-popup-heading:after {
+.eyedraw-widget:before, .eyedraw-toolbar-panel:before, .eyedraw-doodle-popup .controls > div:before, .eyedraw-doodle-popup-heading:before, .eyedraw-widget:after, .eyedraw-toolbar-panel:after, .eyedraw-doodle-popup .controls > div:after, .eyedraw-doodle-popup-heading:after {
   content: " ";
   display: table;
 }
 /* line 24, ../sass/_mixins.scss */
-.eyedraw-widget:after, .eyedraw-toolbar-panel:after, .eyedraw-doodle-popup-heading:after {
+.eyedraw-widget:after, .eyedraw-toolbar-panel:after, .eyedraw-doodle-popup .controls > div:after, .eyedraw-doodle-popup-heading:after {
   clear: both;
 }
 
@@ -1191,60 +1191,86 @@ span.squiggle {
   position: absolute;
   right: -183px;
   width: 181px;
-  height: 242px;
+  min-height: 242px;
   z-index: 100;
+  padding-bottom: 40px;
   opacity: 1;
   top: 44px;
   -webkit-transform: translate3d(0, 0, 0);
   -webkit-backface-visibility: hidden;
   -webkit-perspective: 1000;
 }
-/* line 34, ../sass/components/_doodle-popup.scss */
+/* line 35, ../sass/components/_doodle-popup.scss */
 .eyedraw-doodle-popup.closed {
   right: 8px;
   opacity: 0.85;
 }
-/* line 38, ../sass/components/_doodle-popup.scss */
+/* line 39, ../sass/components/_doodle-popup.scss */
 .eyedraw-doodle-popup.closed .eyedraw-button .label {
   display: none;
 }
-/* line 43, ../sass/components/_doodle-popup.scss */
+/* line 44, ../sass/components/_doodle-popup.scss */
 .eyedraw-doodle-popup .eyedraw-toolbar-panel {
   position: absolute;
   left: 5px;
   bottom: 5px;
 }
-/* line 47, ../sass/components/_doodle-popup.scss */
+/* line 48, ../sass/components/_doodle-popup.scss */
 .eyedraw-doodle-popup .eyedraw-toolbar-panel li {
   margin-bottom: 0;
   margin-right: 8px;
 }
-/* line 50, ../sass/components/_doodle-popup.scss */
+/* line 51, ../sass/components/_doodle-popup.scss */
 .eyedraw-doodle-popup .eyedraw-toolbar-panel li:last-child {
   margin-right: 0;
 }
-/* line 55, ../sass/components/_doodle-popup.scss */
+/* line 56, ../sass/components/_doodle-popup.scss */
 .eyedraw-doodle-popup .help-msg {
   font-size: 12px;
   color: #666;
   font-style: italic;
 }
-/* line 60, ../sass/components/_doodle-popup.scss */
+/* line 61, ../sass/components/_doodle-popup.scss */
 .eyedraw-doodle-popup .description {
+  color: #444;
   font-size: 12px;
-  line-height: 13px;
   font-style: italic;
+  line-height: 12px;
   padding-top: 6px;
 }
-
 /* line 68, ../sass/components/_doodle-popup.scss */
+.eyedraw-doodle-popup .controls {
+  padding-top: 14px;
+}
+/* line 70, ../sass/components/_doodle-popup.scss */
+.eyedraw-doodle-popup .controls > div {
+  line-height: 12px;
+  padding-bottom: 8px;
+}
+/* line 75, ../sass/components/_doodle-popup.scss */
+.eyedraw-doodle-popup .controls label {
+  color: #477792;
+  float: left;
+  font-size: 12px;
+  margin: 0 6px 0 0;
+}
+/* line 80, ../sass/components/_doodle-popup.scss */
+.eyedraw-doodle-popup .controls label:after {
+  content: ":";
+}
+/* line 84, ../sass/components/_doodle-popup.scss */
+.eyedraw-doodle-popup .controls select {
+  width: auto;
+}
+
+/* line 90, ../sass/components/_doodle-popup.scss */
 .eyedraw-doodle-popup-heading {
   color: #000;
   font-size: 14px;
   line-height: 14px;
   margin-top: 0;
 }
-/* line 74, ../sass/components/_doodle-popup.scss */
+/* line 96, ../sass/components/_doodle-popup.scss */
 .eyedraw-doodle-popup-heading .eyedraw-button {
   float: left;
   margin-right: 5px;
