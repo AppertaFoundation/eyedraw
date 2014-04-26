@@ -4382,6 +4382,7 @@ ED.Doodle.prototype.setParameterWithAnimation = function(_parameter, _value, _up
 	else {
 		this.setParameterFromString(_parameter, _value.toString());
 	}
+	this.drawing.notify("setParameterWithAnimationComplete");
 }
 
 /**

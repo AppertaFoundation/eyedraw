@@ -4382,6 +4382,7 @@ ED.Doodle.prototype.setParameterWithAnimation = function(_parameter, _value, _up
 	else {
 		this.setParameterFromString(_parameter, _value.toString());
 	}
+	this.drawing.notify("setParameterWithAnimationComplete");
 }
 
 /**
@@ -7827,6 +7828,7 @@ ED.trans['CornealAbrasion'] = 'Corneal abrasion<br/><br/>Drag to position<br/>Dr
 ED.trans['CorneaCrossSection'] = 'Corneal cross section';
 ED.trans['CornealErosion'] = 'Removal of corneal epithelium<br/><br/>Drag to position<br/>Drag handle to change size';
 ED.trans['CornealGraft'] = 'Corneal graft<br/><br/>Drag handle to change size';
+ED.trans['CornealInlay'] = 'Corneal inlay';
 ED.trans['CornealOedema'] = 'Corneal oedema<br/><br/>Drag to position<br/>Drag handle to change size';
 ED.trans['CornealStriae'] = 'Corneal striae';
 ED.trans['CornealScar'] = 'Corneal Scar<br/><br/>Drag outer handle to change shape<br/>Drag inner handle to change density';
@@ -13861,6 +13863,21 @@ ED.AntSeg.prototype.description = function() {
 
 	// PXE
 	if (this.pxe) returnValue += "pseudoexfoliation, ";
+	
+	// Empty report so far
+	if (returnValue.length == 0) {
+		// Is lens present and normal?
+		var doodle = this.drawing.lastDoodleOfClass('Lens');
+		if (doodle) {
+			var lensDescription = doodle.description();
+			if (lensDescription.length == 0) {
+				returnValue = "Anterior segment normal, ";
+			}
+		}
+		else {
+			returnValue = "Aphakic, ";
+		}
+	}
 
 	// Remove final comma and space and capitalise first letter
 	returnValue = returnValue.replace(/, +$/, '');
@@ -18091,6 +18108,132 @@ ED.CornealGraft.prototype.draw = function(_point) {
  */
 ED.CornealGraft.prototype.description = function() {
 	return "Corneal Graft";
+}
+
+/**
+ * OpenEyes
+ *
+ * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
+ * (C) OpenEyes Foundation, 2011-2013
+ * This file is part of OpenEyes.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package OpenEyes
+ * @link http://www.openeyes.org.uk
+ * @author OpenEyes <info@openeyes.org.uk>
+ * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
+ * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ */
+
+/**
+ * Lasik Flap
+ *
+ * @class CornealInlay
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Object} _parameterJSON
+ */
+ED.CornealInlay = function(_drawing, _parameterJSON) {
+	// Set classname
+	this.className = "CornealInlay";
+	
+	// Other parameters
+	this.type = 'Type 1';
+	
+	// Saved parameters
+	this.savedParameterArray = ['scaleX', 'scaleY', 'rotation', 'type'];
+
+	// Parameters in doodle control bar (parameter name: parameter label)
+	this.controlParameterArray = {'type':'Type'};
+		
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _parameterJSON);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.CornealInlay.prototype = new ED.Doodle;
+ED.CornealInlay.prototype.constructor = ED.CornealInlay;
+ED.CornealInlay.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets default dragging attributes
+ */
+ED.CornealInlay.prototype.setPropertyDefaults = function() {
+	this.isMoveable = false;
+	this.isUnique = true;
+
+	// Update component of validation array for simple parameters
+	this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.75, +1.00);
+	this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.75, +1.00);
+	
+	this.parameterValidationArray['type'] = {
+		kind: 'other',
+		type: 'string',
+		list: ['Type 1', 'Type 2'],
+		animate: false
+	};
+}
+
+/**
+ * Sets default parameters
+ */
+ED.CornealInlay.prototype.setParameterDefaults = function() {
+	//this.apexY = -100;
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.CornealInlay.prototype.draw = function(_point) {
+	// Get context
+	var ctx = this.drawing.context;
+
+	// Call draw method in superclass
+	ED.CornealInlay.superclass.draw.call(this, _point);
+
+	// CornealInlay raidius
+	var ro = 200;
+	var ri = 100;
+
+	// Calculate parameters for arc
+	var arcStart = 0;
+	var arcEnd = 2 * Math.PI;
+
+	// Boundary path
+	ctx.beginPath();
+
+	// Arcs
+	ctx.arc(0, 0, ro, arcStart, arcEnd, true);
+	ctx.arc(0, 0, ri, arcStart, arcEnd, false);
+
+	// Fill details
+	ctx.lineWidth = 2;
+	ctx.fillStyle = "rgba(155,155,155,0.8)";
+	ctx.strokeStyle = ctx.fillStyle;
+
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.CornealInlay.prototype.description = function() {
+	var	returnString = "Corneal inlay " +  this.type;
+
+	return returnString;
 }
 
 /**
@@ -25284,10 +25427,16 @@ ED.LaserSpot.prototype.groupDescription = function() {
 ED.LasikFlap = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "LasikFlap";
-
-	// Saved parameters
-	this.savedParameterArray = ['scaleX', 'scaleY', 'rotation'];
 	
+	// Other parameters
+	this.gradeDLK = 'None';
+	
+	// Saved parameters
+	this.savedParameterArray = ['scaleX', 'scaleY', 'rotation', 'gradeDLK'];
+
+	// Parameters in doodle control bar (parameter name: parameter label)
+	this.controlParameterArray = {'gradeDLK':'DLK Grade'};
+		
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
@@ -25314,8 +25463,15 @@ ED.LasikFlap.prototype.setPropertyDefaults = function() {
 	this.isUnique = true;
 
 	// Update component of validation array for simple parameters
-	this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.75, +1.15);
-	this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.75, +1.15);
+	this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.75, +1.00);
+	this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.75, +1.00);
+	
+	this.parameterValidationArray['gradeDLK'] = {
+		kind: 'other',
+		type: 'string',
+		list: ['None', 'Grade 1', 'Grade 2', 'Grade 3'],
+		animate: false
+	};
 }
 
 /**
@@ -25364,6 +25520,27 @@ ED.LasikFlap.prototype.draw = function(_point) {
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 
+	// Non boundary drawing
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+		ctx.beginPath();
+		ctx.arc(0, 0, r/2, 0, 2* Math.PI, true);
+		switch (this.gradeDLK) {
+			case 'None':
+				ctx.fillStyle = "rgba(155,255,255,0)";
+				break;
+			case 'Grade 1':
+				ctx.fillStyle = "rgba(155,255,255,0.4)";
+				break;
+			case 'Grade 2':
+				ctx.fillStyle = "rgba(155,255,255,0.6)";
+				break;
+			case 'Grade 3':
+				ctx.fillStyle = "rgba(155,255,255,0.8)";
+				break;
+		}
+		ctx.fill();
+	}
+	
 	// Coordinates of handles (in canvas plane)
 	var point = new ED.Point(0, 0)
 	point.setWithPolars(r, angle);
@@ -25404,6 +25581,8 @@ ED.LasikFlap.prototype.description = function() {
 	if (s < c && as < ac) quadrant = "superior";
 
 	returnString = "LASIK flap with " + quadrant + " hinge";
+	
+	if(this.gradeDLK != 'None') returnString += ", DLK " + this.gradeDLK;
 
 	return returnString;
 }
@@ -25487,39 +25666,39 @@ ED.Lens.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'string',
 		list: ['None', 'Mild', 'Moderate', 'Brunescent'],
-		animate: true
+		animate: false
 	};
 	this.parameterValidationArray['corticalGrade'] = {
 		kind: 'derived',
 		type: 'string',
 		list: ['None', 'Mild', 'Moderate', 'White'],
-		animate: true
+		animate: false
 	};
 	this.parameterValidationArray['posteriorSubcapsularGrade'] = {
 		kind: 'derived',
 		type: 'string',
 		list: ['None', 'Small', 'Medium', 'Large'],
-		animate: true
+		animate: false
 	};
 	this.parameterValidationArray['anteriorPolar'] = {
 		kind: 'derived',
 		type: 'bool',
-		display: true
+		display: false
 	};
 	this.parameterValidationArray['posteriorPolar'] = {
 		kind: 'derived',
 		type: 'bool',
-		display: true
+		display: false
 	};
 	this.parameterValidationArray['coronary'] = {
 		kind: 'derived',
 		type: 'bool',
-		display: true
+		display: false
 	};
 	this.parameterValidationArray['phakodonesis'] = {
 		kind: 'derived',
 		type: 'bool',
-		display: true
+		display: false
 	};
 }
 
@@ -28667,12 +28846,12 @@ ED.PI.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'string',
 		list: ['Surgical', 'Laser'],
-		animate: true
+		animate: false
 	};
 	this.parameterValidationArray['patent'] = {
 		kind: 'derived',
 		type: 'bool',
-		display: true
+		display: false
 	};
 }
 
@@ -31563,9 +31742,15 @@ ED.PreRetinalHaemorrhage.prototype.groupDescription = function() {
 ED.RK = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "RK";
+	
+	// Other parameters
+	this.numberOfCuts = '8';
 
 	// Saved parameters
-	this.savedParameterArray = ['apexY', 'scaleX', 'scaleY', 'rotation'];
+	this.savedParameterArray = ['apexY', 'scaleX', 'scaleY', 'rotation', 'numberOfCuts'];
+
+	// Parameters in doodle control bar (parameter name: parameter label)
+	this.controlParameterArray = {'numberOfCuts':'Number of Cuts'};
 	
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -31598,6 +31783,13 @@ ED.RK.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.5, +1.15);
 	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
 	this.parameterValidationArray['apexY']['range'].setMinAndMax(-200, -60);
+	
+	this.parameterValidationArray['numberOfCuts'] = {
+		kind: 'other',
+		type: 'string',
+		list: ['4', '8', '16'],
+		animate: false
+	};
 }
 
 /**
@@ -31622,7 +31814,7 @@ ED.RK.prototype.draw = function(_point) {
 	// RK number and size
 	var ro = 320;
 	var ri = -this.apexY;
-	var n = 8;
+	var n = parseInt(this.numberOfCuts);
 
 	// Calculate parameters for arcs
 	var arcStart = 0;
@@ -33282,6 +33474,161 @@ ED.RetinalVeinOcclusionPostPole.prototype.type = function() {
 	if (this.arc > 1.5 * Math.PI) return "central";
 	else if (this.arc > 0.8 * Math.PI) return 'hemispheric';
 	else return 'branch';
+}
+
+/**
+ * OpenEyes
+ *
+ * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
+ * (C) OpenEyes Foundation, 2011-2013
+ * This file is part of OpenEyes.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package OpenEyes
+ * @link http://www.openeyes.org.uk
+ * @author OpenEyes <info@openeyes.org.uk>
+ * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
+ * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ */
+
+/**
+ * RingSegment
+ *
+ * @class RingSegment
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Object} _parameterJSON
+ */
+ED.RingSegment = function(_drawing, _parameterJSON) {
+	// Set classname
+	this.className = "RingSegment";
+
+	// Saved parameters
+	this.savedParameterArray = ['arc', 'rotation'];
+	
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _parameterJSON);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.RingSegment.prototype = new ED.Doodle;
+ED.RingSegment.prototype.constructor = ED.RingSegment;
+ED.RingSegment.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.RingSegment.prototype.setHandles = function() {
+	this.handleArray[3] = new ED.Handle(null, true, ED.Mode.Arc, false);
+}
+
+/**
+ * Sets default dragging attributes
+ */
+ED.RingSegment.prototype.setPropertyDefaults = function() {
+	this.isScaleable = false;
+	this.isMoveable = false;
+	this.isRotatable = true;
+	this.isArcSymmetrical = true;
+
+	// Update component of validation array for simple parameters
+	this.parameterValidationArray['arc']['range'].setMinAndMax(20 * Math.PI / 180, Math.PI / 2);
+}
+
+/**
+ * Sets default parameters
+ */
+ED.RingSegment.prototype.setParameterDefaults = function() {
+	// Default arc
+	this.arc = 30 * Math.PI / 180;
+
+	// Make it 180 degrees to last one of same class
+	var doodle = this.drawing.lastDoodleOfClass(this.className);
+	if (doodle) {
+		this.rotation = doodle.rotation + Math.PI;
+		this.arc = doodle.arc;
+	} else {
+		// LRIs are usually temporal
+		if (this.drawing.eye == ED.eye.Right) {
+			this.rotation = -Math.PI / 2;
+		} else {
+			this.rotation = Math.PI / 2;
+		}
+	}
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.RingSegment.prototype.draw = function(_point) {
+	// Get context
+	var ctx = this.drawing.context;
+
+	// Call draw method in superclass
+	ED.RingSegment.superclass.draw.call(this, _point);
+
+	// Radius
+	var r = 300;
+	var d = 20;
+	var ro = r + d;
+	var ri = r - d;
+
+	// Boundary path
+	ctx.beginPath();
+
+	// Half angle of arc
+	var theta = this.arc / 2;
+
+	// Arc across
+	ctx.arc(0, 0, ro, -Math.PI / 2 + theta, -Math.PI / 2 - theta, true);
+
+	// Arc back to mirror image point on the other side
+	ctx.arc(0, 0, ri, -Math.PI / 2 - theta, -Math.PI / 2 + theta, false);
+
+	// Close path
+	ctx.closePath();
+
+	// Colour of fill is white but with transparency
+	ctx.fillStyle = "rgba(255,255,255,0.75)";
+
+	// Set line attributes
+	ctx.lineWidth = 4;
+
+	// Colour of outer line is dark gray
+	ctx.strokeStyle = "darkgray";
+
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+
+	// Coordinates of handles (in canvas plane)
+	var point = new ED.Point(0, 0);
+	point.setWithPolars(r, theta);
+	this.handleArray[3].location = this.transform.transformPoint(point);
+
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.RingSegment.prototype.description = function() {
+	var returnString = "Limbal relaxing incision " + (this.arc * 180 / Math.PI).toFixed(0) + " degrees at ";
+	returnString += this.clockHour() + " o'clock";
+
+	return returnString;
 }
 
 /**

@@ -69,6 +69,7 @@ ED.trans['CornealAbrasion'] = 'Corneal abrasion<br/><br/>Drag to position<br/>Dr
 ED.trans['CorneaCrossSection'] = 'Corneal cross section';
 ED.trans['CornealErosion'] = 'Removal of corneal epithelium<br/><br/>Drag to position<br/>Drag handle to change size';
 ED.trans['CornealGraft'] = 'Corneal graft<br/><br/>Drag handle to change size';
+ED.trans['CornealInlay'] = 'Corneal inlay';
 ED.trans['CornealOedema'] = 'Corneal oedema<br/><br/>Drag to position<br/>Drag handle to change size';
 ED.trans['CornealStriae'] = 'Corneal striae';
 ED.trans['CornealScar'] = 'Corneal Scar<br/><br/>Drag outer handle to change shape<br/>Drag inner handle to change density';

@@ -307,6 +307,21 @@ ED.AntSeg.prototype.description = function() {
 
 	// PXE
 	if (this.pxe) returnValue += "pseudoexfoliation, ";
+	
+	// Empty report so far
+	if (returnValue.length == 0) {
+		// Is lens present and normal?
+		var doodle = this.drawing.lastDoodleOfClass('Lens');
+		if (doodle) {
+			var lensDescription = doodle.description();
+			if (lensDescription.length == 0) {
+				returnValue = "Anterior segment normal, ";
+			}
+		}
+		else {
+			returnValue = "Aphakic, ";
+		}
+	}
 
 	// Remove final comma and space and capitalise first letter
 	returnValue = returnValue.replace(/, +$/, '');

@@ -77,39 +77,39 @@ ED.Lens.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'string',
 		list: ['None', 'Mild', 'Moderate', 'Brunescent'],
-		animate: true
+		animate: false
 	};
 	this.parameterValidationArray['corticalGrade'] = {
 		kind: 'derived',
 		type: 'string',
 		list: ['None', 'Mild', 'Moderate', 'White'],
-		animate: true
+		animate: false
 	};
 	this.parameterValidationArray['posteriorSubcapsularGrade'] = {
 		kind: 'derived',
 		type: 'string',
 		list: ['None', 'Small', 'Medium', 'Large'],
-		animate: true
+		animate: false
 	};
 	this.parameterValidationArray['anteriorPolar'] = {
 		kind: 'derived',
 		type: 'bool',
-		display: true
+		display: false
 	};
 	this.parameterValidationArray['posteriorPolar'] = {
 		kind: 'derived',
 		type: 'bool',
-		display: true
+		display: false
 	};
 	this.parameterValidationArray['coronary'] = {
 		kind: 'derived',
 		type: 'bool',
-		display: true
+		display: false
 	};
 	this.parameterValidationArray['phakodonesis'] = {
 		kind: 'derived',
 		type: 'bool',
-		display: true
+		display: false
 	};
 }
 

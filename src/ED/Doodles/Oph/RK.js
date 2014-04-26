@@ -27,9 +27,15 @@
 ED.RK = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "RK";
+	
+	// Other parameters
+	this.numberOfCuts = '8';
 
 	// Saved parameters
-	this.savedParameterArray = ['apexY', 'scaleX', 'scaleY', 'rotation'];
+	this.savedParameterArray = ['apexY', 'scaleX', 'scaleY', 'rotation', 'numberOfCuts'];
+
+	// Parameters in doodle control bar (parameter name: parameter label)
+	this.controlParameterArray = {'numberOfCuts':'Number of Cuts'};
 	
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -62,6 +68,13 @@ ED.RK.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.5, +1.15);
 	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
 	this.parameterValidationArray['apexY']['range'].setMinAndMax(-200, -60);
+	
+	this.parameterValidationArray['numberOfCuts'] = {
+		kind: 'other',
+		type: 'string',
+		list: ['4', '8', '16'],
+		animate: false
+	};
 }
 
 /**
@@ -86,7 +99,7 @@ ED.RK.prototype.draw = function(_point) {
 	// RK number and size
 	var ro = 320;
 	var ri = -this.apexY;
-	var n = 8;
+	var n = parseInt(this.numberOfCuts);
 
 	// Calculate parameters for arcs
 	var arcStart = 0;

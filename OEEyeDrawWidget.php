@@ -430,6 +430,7 @@ class DoodleInfo
         "CornealAbrasion" => "Corneal abrasion",
         "CornealErosion" => "Removal of corneal epithelium",
         "CornealGraft" => "Corneal graft",
+        "CornealInlay" => "Corneal inlay",
         "CornealOedema" => "Corneal oedema",
         "CornealScar" => "Corneal scar",
         "CornealStriae" => "Corneal striae",

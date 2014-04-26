@@ -27,10 +27,16 @@
 ED.LasikFlap = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "LasikFlap";
-
-	// Saved parameters
-	this.savedParameterArray = ['scaleX', 'scaleY', 'rotation'];
 	
+	// Other parameters
+	this.gradeDLK = 'None';
+	
+	// Saved parameters
+	this.savedParameterArray = ['scaleX', 'scaleY', 'rotation', 'gradeDLK'];
+
+	// Parameters in doodle control bar (parameter name: parameter label)
+	this.controlParameterArray = {'gradeDLK':'DLK Grade'};
+		
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
@@ -57,8 +63,15 @@ ED.LasikFlap.prototype.setPropertyDefaults = function() {
 	this.isUnique = true;
 
 	// Update component of validation array for simple parameters
-	this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.75, +1.15);
-	this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.75, +1.15);
+	this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.75, +1.00);
+	this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.75, +1.00);
+	
+	this.parameterValidationArray['gradeDLK'] = {
+		kind: 'other',
+		type: 'string',
+		list: ['None', 'Grade 1', 'Grade 2', 'Grade 3'],
+		animate: false
+	};
 }
 
 /**
@@ -107,6 +120,27 @@ ED.LasikFlap.prototype.draw = function(_point) {
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 
+	// Non boundary drawing
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+		ctx.beginPath();
+		ctx.arc(0, 0, r/2, 0, 2* Math.PI, true);
+		switch (this.gradeDLK) {
+			case 'None':
+				ctx.fillStyle = "rgba(155,255,255,0)";
+				break;
+			case 'Grade 1':
+				ctx.fillStyle = "rgba(155,255,255,0.4)";
+				break;
+			case 'Grade 2':
+				ctx.fillStyle = "rgba(155,255,255,0.6)";
+				break;
+			case 'Grade 3':
+				ctx.fillStyle = "rgba(155,255,255,0.8)";
+				break;
+		}
+		ctx.fill();
+	}
+	
 	// Coordinates of handles (in canvas plane)
 	var point = new ED.Point(0, 0)
 	point.setWithPolars(r, angle);
@@ -147,6 +181,8 @@ ED.LasikFlap.prototype.description = function() {
 	if (s < c && as < ac) quadrant = "superior";
 
 	returnString = "LASIK flap with " + quadrant + " hinge";
+	
+	if(this.gradeDLK != 'None') returnString += ", DLK " + this.gradeDLK;
 
 	return returnString;
 }

@@ -17,27 +17,26 @@
  */
 
 /**
- * Peripheral iridectomy
+ * Lasik Flap
  *
- * @class PI
+ * @class CornealInlay
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
  * @param {Object} _parameterJSON
  */
-ED.PI = function(_drawing, _parameterJSON) {
+ED.CornealInlay = function(_drawing, _parameterJSON) {
 	// Set classname
-	this.className = "PI";
-
-	// Derived parameters
-	this.type = 'Surgical';
-	this.patent = true;
-
+	this.className = "CornealInlay";
+	
+	// Other parameters
+	this.type = 'Type 1';
+	
 	// Saved parameters
-	this.savedParameterArray = ['rotation', 'type', 'patent'];
+	this.savedParameterArray = ['scaleX', 'scaleY', 'rotation', 'type'];
 
 	// Parameters in doodle control bar (parameter name: parameter label)
-	this.controlParameterArray = {'type':'Type', 'patent':'Patent'};
-
+	this.controlParameterArray = {'type':'Type'};
+		
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
@@ -45,36 +44,34 @@ ED.PI = function(_drawing, _parameterJSON) {
 /**
  * Sets superclass and constructor
  */
-ED.PI.prototype = new ED.Doodle;
-ED.PI.prototype.constructor = ED.PI;
-ED.PI.superclass = ED.Doodle.prototype;
+ED.CornealInlay.prototype = new ED.Doodle;
+ED.CornealInlay.prototype.constructor = ED.CornealInlay;
+ED.CornealInlay.superclass = ED.Doodle.prototype;
 
 /**
- * Sets default properties
+ * Sets default dragging attributes
  */
-ED.PI.prototype.setPropertyDefaults = function() {
-	this.isScaleable = false;
+ED.CornealInlay.prototype.setPropertyDefaults = function() {
 	this.isMoveable = false;
+	this.isUnique = true;
 
-	// Add complete validation arrays for derived parameters
+	// Update component of validation array for simple parameters
+	this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.75, +1.00);
+	this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.75, +1.00);
+	
 	this.parameterValidationArray['type'] = {
-		kind: 'derived',
+		kind: 'other',
 		type: 'string',
-		list: ['Surgical', 'Laser'],
+		list: ['Type 1', 'Type 2'],
 		animate: false
-	};
-	this.parameterValidationArray['patent'] = {
-		kind: 'derived',
-		type: 'bool',
-		display: false
 	};
 }
 
 /**
  * Sets default parameters
  */
-ED.PI.prototype.setParameterDefaults = function() {
-	this.setRotationWithDisplacements(30, 30);
+ED.CornealInlay.prototype.setParameterDefaults = function() {
+	//this.apexY = -100;
 }
 
 /**
@@ -82,39 +79,32 @@ ED.PI.prototype.setParameterDefaults = function() {
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.PI.prototype.draw = function(_point) {
+ED.CornealInlay.prototype.draw = function(_point) {
 	// Get context
 	var ctx = this.drawing.context;
 
 	// Call draw method in superclass
-	ED.PI.superclass.draw.call(this, _point);
+	ED.CornealInlay.superclass.draw.call(this, _point);
 
-	// Outer radius
-	var r = 360;
+	// CornealInlay raidius
+	var ro = 200;
+	var ri = 100;
+
+	// Calculate parameters for arc
+	var arcStart = 0;
+	var arcEnd = 2 * Math.PI;
 
 	// Boundary path
 	ctx.beginPath();
-	switch (this.type) {
-		case 'Surgical':
-			var phi = Math.PI / 24;
-			ctx.arc(0, 0, r, -phi - Math.PI / 2, phi - Math.PI / 2, false);
-			ctx.lineTo(0, -r * 0.8);
-			ctx.closePath();
-			break;
-		case 'Laser':
-			ctx.arc(0, -r * 0.9, 36, 0, Math.PI * 2, true);
-			break;
-	}
 
-	// Set line attributes
-	ctx.lineWidth = 4;
+	// Arcs
+	ctx.arc(0, 0, ro, arcStart, arcEnd, true);
+	ctx.arc(0, 0, ri, arcStart, arcEnd, false);
 
-	// Colour of outer line is dark gray
-	ctx.strokeStyle = "rgba(120,120,120,0.75)";;
-
-	// Colour of fill
-	if (this.patent) ctx.fillStyle = "rgba(255,255,255,1)";
-	else ctx.fillStyle = "rgba(150,150,150,1)";
+	// Fill details
+	ctx.lineWidth = 2;
+	ctx.fillStyle = "rgba(155,155,155,0.8)";
+	ctx.strokeStyle = ctx.fillStyle;
 
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
@@ -128,6 +118,8 @@ ED.PI.prototype.draw = function(_point) {
  *
  * @returns {String} Description of doodle
  */
-ED.PI.prototype.description = function() {
-	return "Peripheral iridectomy at " + this.clockHour() + " o'clock";
+ED.CornealInlay.prototype.description = function() {
+	var	returnString = "Corneal inlay " +  this.type;
+
+	return returnString;
 }
