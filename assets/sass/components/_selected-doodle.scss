@@ -15,24 +15,17 @@
 // * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
 
 .eyedraw-selected-doodle {
-	top: 0;
+	@include border-radius(0 3px 3px 0);
+	background: {
+		color: #e4edf5;
+		repeat: no-repeat;
+	};
+	border: 1px solid #53a0c7;
+	border-left: 0;
+	padding: 8px 4px;
 	position: absolute;
-	right: -198px;
+	right: -186px;
+	top: 0;
 	width: 190px;
 	z-index: 101;
-	label {
-		color: #5b5b5b;
-		font-size: .7rem;
-		font-weight: bold;
-		padding-left: 10px;
-	}
-	.selected-box {
-		background: {
-			color: #e4edf5;
-			repeat: no-repeat;
-		};
-		border: 1px solid #b0bac3;
-		border-left: 0;
-		padding: 8px 4px;
-	}
 }

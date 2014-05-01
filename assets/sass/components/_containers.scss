@@ -17,7 +17,18 @@
 .eyedraw-widget {
 	@extend %clearfix;
 }
+
 .eyedraw-body {
 	background: #d2dee8;
 	margin: 10px 0 10px -3px;
+	.column.fixed {
+		width: 320px;
+		padding-right: 0;
+	}
+	.column.fluid {
+		width: -moz-calc(100% - 320px);
+		width: -o-calc(100% - 320px);
+		width: -webkit-calc(100% - 320px);
+		width: calc(100% - 320px);
+	}
 }
