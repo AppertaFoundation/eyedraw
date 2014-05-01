@@ -44,16 +44,7 @@ body {
 	background-image: url("../img/medium.png?1383822301");
 }
 
-.anterior-segment .column.fixed {
-	width: 320px;
-}
 
-.anterior-segment .column.fluid {
-	width: -moz-calc(100% - 320px);
-	width: -o-calc(100% - 320px);
-	width: -webkit-calc(100% - 320px);
-	width: calc(100% - 320px);
-}
 
 #event-content .EyeDrawWidget .ed_toolbar {
 	margin: 0;
