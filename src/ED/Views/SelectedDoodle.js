@@ -85,9 +85,13 @@ ED.Views.SelectedDoodle = (function() {
 		optgroup.append(this.createOption(noneText, noneSelected));
 
 		// Doodle options
-		var doodleOptions = this.drawing.doodleArray.map(this.createDoodleOption.bind(this));
+		var doodles = this.drawing.doodleArray.slice(); // break reference
+		doodles.reverse();
+
+		var doodleOptions = doodles.map(this.createDoodleOption.bind(this));
 		optgroup.append(doodleOptions);
 
+		// Update the select dropdown.
 		this.select.html(optgroup);
 	};
 
