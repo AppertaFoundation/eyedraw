@@ -15,7 +15,6 @@
 // * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
 
 .eyedraw-selected-doodle {
-	@include border-radius(0 3px 3px 0);
 	background: {
 		color: #e4edf5;
 		repeat: no-repeat;
@@ -23,9 +22,10 @@
 	border: 1px solid #53a0c7;
 	border-left: 0;
 	padding: 8px 4px;
+	height: 36px;
 	position: absolute;
-	right: -186px;
-	top: 0;
-	width: 190px;
+	right: -188px;
+	top: 3px;
+	width: 192px;
 	z-index: 101;
 }
