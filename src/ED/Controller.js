@@ -39,10 +39,11 @@ ED.Controller = (function() {
 	 * @param {Object} properties The EyeDraw widget properties.
 	 * @param {ED.Checker} [Checker] The EyeDraw checker.
 	 * @param {ED.Drawing} [drawing] An ED.Drawing instance.
-	 * @param {ED.Views.Toolbar} [toolbar] An ED.Views.Toolbar instance.
+	 * @param {ED.Views.Toolbar} [mainToolbar] An ED.Views.Toolbar instance.
+	 * @param {ED.Views.Toolbar} [canvasToolbar] An ED.Views.Toolbar instance.
 	 * @param {ED.Views.DoodlePopup} [doodlePopup] An ED.Views.DoodlePopup instance.
 	 */
-	function Controller(properties, Checker, drawing, toolbar, doodlePopup, selectedDoodle) {
+	function Controller(properties, Checker, drawing, mainToolbar, canvasToolbar, doodlePopup, selectedDoodle) {
 
 		this.properties = properties;
 		this.canvas = document.getElementById(properties.canvasId);
@@ -51,7 +52,8 @@ ED.Controller = (function() {
 
 		this.Checker = Checker || ED.Checker;
 		this.drawing = drawing || this.createDrawing();
-		this.toolbar = toolbar || this.createToolbar();
+		this.mainToolbar = mainToolbar || this.createToolbar('.eyedraw-main-toolbar');
+		this.canvasToolbar = canvasToolbar || this.createToolbar('.eyedraw-canvas-toolbar');
 		this.doodlePopup = doodlePopup || this.createDoodlePopup();
 		this.selectedDoodle = selectedDoodle || this.createSelectedDoodle();
 
@@ -87,17 +89,17 @@ ED.Controller = (function() {
 	};
 
 	/**
-	 * Create the toolbar view instance.
+	 * Create a Toolbar view instance.
 	 */
-	Controller.prototype.createToolbar = function() {
+	Controller.prototype.createToolbar = function(container) {
 		return new ED.Views.Toolbar(
 			this.drawing,
-			this.container.find('.eyedraw-toolbar-panel')
+			this.container.find(container)
 		);
 	};
 
 	/**
-	 * Create the doodle popup view instance.
+	 * Create a DoodlePopup view instance.
 	 */
 	Controller.prototype.createDoodlePopup = function() {
 		return new ED.Views.DoodlePopup(
@@ -106,6 +108,10 @@ ED.Controller = (function() {
 		);
 	};
 
+	/**
+	 * Create a SelectedDoodle instance.
+	 * @return {ED.Views.SelectedDoodle} [description]
+	 */
 	Controller.prototype.createSelectedDoodle = function() {
 		return new ED.Views.SelectedDoodle(
 			this.drawing,

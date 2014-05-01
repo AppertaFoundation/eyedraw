@@ -22,13 +22,13 @@
 	border: 3px solid #68c8f8;
 	padding: 5px;
 	position: absolute;
-	right: -183px;
+	right: -194px;
 	width: 181px;
 	min-height: 242px;
 	z-index: 100;
 	padding-bottom: 40px;
 	opacity: 1;
-	top: 44px;
+	top: 40px;
 	-webkit-transform: translate3d(0, 0, 0);
 	-webkit-backface-visibility: hidden;
 	-webkit-perspective: 1000;
@@ -44,7 +44,9 @@
 	.eyedraw-toolbar-panel {
 		position: absolute;
 		left: 5px;
+		/* test */
 		bottom: 5px;
+		// test
 		li {
 			margin-bottom: 0;
 			margin-right: 8px;

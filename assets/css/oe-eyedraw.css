@@ -98,6 +98,27 @@
   display: block;
 }
 
+/* line 53, ../sass/components/toolbar/_panel.scss */
+.eyedraw-toolbar-panel.eyedraw-canvas-toolbar {
+  bottom: 3px;
+  left: 6px;
+  position: absolute;
+  z-index: 102;
+}
+/* line 58, ../sass/components/toolbar/_panel.scss */
+.eyedraw-toolbar-panel.eyedraw-canvas-toolbar li {
+  margin: 0;
+}
+/* line 61, ../sass/components/toolbar/_panel.scss */
+.eyedraw-toolbar-panel.eyedraw-canvas-toolbar .eyedraw-button {
+  background: none;
+  border: 0;
+}
+/* line 64, ../sass/components/toolbar/_panel.scss */
+.eyedraw-toolbar-panel.eyedraw-canvas-toolbar .eyedraw-button .label {
+  top: -32px;
+}
+
 /* line 18, ../sass/components/toolbar/_button.scss */
 .eyedraw-button {
   -webkit-border-radius: 3px;
@@ -1079,7 +1100,12 @@
   background-position: 0 0;
 }
 
-/* line 19, ../sass/components/_editor.scss */
+/* line 17, ../sass/components/_editor.scss */
+.eyedraw-editor {
+  position: relative;
+}
+
+/* line 23, ../sass/components/_editor.scss */
 canvas.eyedraw-canvas-edit {
   background: #e4edf5;
   border: 1px solid #b0bac3;
@@ -1088,13 +1114,13 @@ canvas.eyedraw-canvas-edit {
   position: relative;
   z-index: 101;
 }
-/* line 28, ../sass/components/_editor.scss */
+/* line 32, ../sass/components/_editor.scss */
 canvas.eyedraw-canvas-display {
   border: none;
   cursor: auto;
   margin: 0px;
 }
-/* line 34, ../sass/components/_editor.scss */
+/* line 38, ../sass/components/_editor.scss */
 canvas:focus {
   outline: none;
 }
@@ -1149,9 +1175,9 @@ span.squiggle {
 
 /* line 17, ../sass/components/_selected-doodle.scss */
 .eyedraw-selected-doodle {
-  top: 3px;
+  top: 0;
   position: absolute;
-  right: -186px;
+  right: -198px;
   width: 190px;
   z-index: 101;
 }
@@ -1189,13 +1215,13 @@ span.squiggle {
   border: 3px solid #68c8f8;
   padding: 5px;
   position: absolute;
-  right: -183px;
+  right: -194px;
   width: 181px;
   min-height: 242px;
   z-index: 100;
   padding-bottom: 40px;
   opacity: 1;
-  top: 44px;
+  top: 40px;
   -webkit-transform: translate3d(0, 0, 0);
   -webkit-backface-visibility: hidden;
   -webkit-perspective: 1000;
@@ -1213,24 +1239,25 @@ span.squiggle {
 .eyedraw-doodle-popup .eyedraw-toolbar-panel {
   position: absolute;
   left: 5px;
+  /* test */
   bottom: 5px;
 }
-/* line 48, ../sass/components/_doodle-popup.scss */
+/* line 50, ../sass/components/_doodle-popup.scss */
 .eyedraw-doodle-popup .eyedraw-toolbar-panel li {
   margin-bottom: 0;
   margin-right: 8px;
 }
-/* line 51, ../sass/components/_doodle-popup.scss */
+/* line 53, ../sass/components/_doodle-popup.scss */
 .eyedraw-doodle-popup .eyedraw-toolbar-panel li:last-child {
   margin-right: 0;
 }
-/* line 56, ../sass/components/_doodle-popup.scss */
+/* line 58, ../sass/components/_doodle-popup.scss */
 .eyedraw-doodle-popup .help-msg {
   font-size: 12px;
   color: #666;
   font-style: italic;
 }
-/* line 61, ../sass/components/_doodle-popup.scss */
+/* line 63, ../sass/components/_doodle-popup.scss */
 .eyedraw-doodle-popup .description {
   color: #444;
   font-size: 12px;
@@ -1238,39 +1265,39 @@ span.squiggle {
   line-height: 12px;
   padding-top: 6px;
 }
-/* line 68, ../sass/components/_doodle-popup.scss */
+/* line 70, ../sass/components/_doodle-popup.scss */
 .eyedraw-doodle-popup .controls {
   padding-top: 14px;
 }
-/* line 70, ../sass/components/_doodle-popup.scss */
+/* line 72, ../sass/components/_doodle-popup.scss */
 .eyedraw-doodle-popup .controls > div {
   line-height: 12px;
   padding-bottom: 8px;
 }
-/* line 75, ../sass/components/_doodle-popup.scss */
+/* line 77, ../sass/components/_doodle-popup.scss */
 .eyedraw-doodle-popup .controls label {
   color: #477792;
   float: left;
   font-size: 12px;
   margin: 0 6px 0 0;
 }
-/* line 80, ../sass/components/_doodle-popup.scss */
+/* line 82, ../sass/components/_doodle-popup.scss */
 .eyedraw-doodle-popup .controls label:after {
   content: ":";
 }
-/* line 84, ../sass/components/_doodle-popup.scss */
+/* line 86, ../sass/components/_doodle-popup.scss */
 .eyedraw-doodle-popup .controls select {
   width: auto;
 }
 
-/* line 90, ../sass/components/_doodle-popup.scss */
+/* line 92, ../sass/components/_doodle-popup.scss */
 .eyedraw-doodle-popup-heading {
   color: #000;
   font-size: 14px;
   line-height: 14px;
   margin-top: 0;
 }
-/* line 96, ../sass/components/_doodle-popup.scss */
+/* line 98, ../sass/components/_doodle-popup.scss */
 .eyedraw-doodle-popup-heading .eyedraw-button {
   float: left;
   margin-right: 5px;
