@@ -51,8 +51,12 @@ ED.Checker = ED.Checker || (function() {
 			return;
 		}
 
+		// Store instance
+		instances.push(instance);
+
+		// Register 'doodlesLoaded' event
 		instance.registerForNotifications({
-			callback: function callback() {
+			callback: function onDoodlesLoaded() {
 				ready++;
 				if (isAllReady()) {
 					executeCallbacks();
@@ -81,8 +85,30 @@ ED.Checker = ED.Checker || (function() {
 		}
 	}
 
+	/**
+	 * Returns an eyedraw instance by idSuffix
+	 * @param {String} idSuffix The eyedraw instance idSuffix
+	 * @return {ED.Drawing} An eyedraw instance.
+	 */
+	function getInstance(idSuffix) {
+		return instances.filter(function(instance) {
+			return (instance.idSuffix === idSuffix);
+		})[0];
+	}
+
+	/**
+	 * Resets all eyedraw instances and registered callback functions.
+	 */
+	function reset() {
+		instances = [];
+		callbacks = [];
+		ready = 0;
+	}
+
 	return {
 		register: register,
-		onAllReady: allReady
+		onAllReady: allReady,
+		getInstance: getInstance,
+		reset: reset
 	};
 }());
