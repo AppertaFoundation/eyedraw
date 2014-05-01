@@ -1019,21 +1019,30 @@
 				<span class="eyedraw-button">
 					<span class="icon icon-ed-{{doodle.className}}"></span>
 				</span>
+				<a class="eyedraw-doodle-help" href="#">
+					?
+				</a>
+				<!--
 				<span class="title">{{title}}</span>
+				-->
 			</h4>
+			<!--
 			{{#helpmsg}}
 				<div class="help-msg">{{helpmsg}}</div>
 			{{/helpmsg}}
-			{{#doodle.isLocked}}
-				<div class="description">
-					<strong>This doodle is locked and cannot be edited.</strong>
-				</div>
-			{{/doodle.isLocked}}
-			{{^doodle.isLocked}}
-				{{#desc}}
-					<div class="description">{{{desc}}}</div>
-				{{/desc}}
-			{{/doodle.isLocked}}
+			-->
+			<div class="eyedraw-doodle-info hide">
+				{{#doodle.isLocked}}
+					<div class="description">
+						<strong>This doodle is locked and cannot be edited.</strong>
+					</div>
+				{{/doodle.isLocked}}
+				{{^doodle.isLocked}}
+					{{#desc}}
+						<div class="description">{{{desc}}}</div>
+					{{/desc}}
+				{{/doodle.isLocked}}
+			</div>
 			<div class="controls{{#doodle.isLocked}} hide{{/doodle.isLocked}}" id="{{drawing.canvas.id}}_controls">
 			</div>
 			<ul class="eyedraw-toolbar-panel">

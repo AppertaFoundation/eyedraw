@@ -40,6 +40,16 @@ ED.Views.DoodlePopup = (function() {
 		this.delayTimer = 0;
 		this.createToolbar();
 		this.createTemplate();
+
+		this.container.on('mouseenter', '.eyedraw-doodle-help', function() {
+			this.container.find('.eyedraw-doodle-info').show();
+			this.container.find('.controls').hide();
+		}.bind(this));
+
+		this.container.on('mouseleave', '.eyedraw-doodle-help', function() {
+			this.container.find('.eyedraw-doodle-info').hide();
+			this.container.find('.controls').show();
+		}.bind(this));
 	}
 
 	DoodlePopup.prototype = Object.create(ED.View.prototype);
