@@ -79,38 +79,20 @@
 			it('should register the notification handler with the drawing instance', function() {
 				var notification = o.drawing.notificationArray[0];
 				var handler = notification.object[notification.methodName];
-				expect(handler).to.equal(o.toolbar.notificationHandler);
+				expect(handler).to.equal(o.toolbar.updateState);
 			});
-		});
 
-		describe('Handling drawing events', function() {
+			it('should bind events', function() {
 
-			describe('Ready event', function() {
+				var spy = sinon.spy(ED.Views.Toolbar.prototype, 'onButtonClick');
 
-				it('should call the init method', function() {
-					var o = createToolbar();
-					var spy = sinon.spy(o.toolbar, 'init');
-					initToolbar(o.toolbar);
-					expect(spy.calledOnce).to.be.true;
-					spy.restore();
-				});
+				var o = createToolbar();
+				initToolbar(o.toolbar);
 
-				it('should bind events', function() {
-					/*
-					NOTE: we not testing if the drawer button event is bound because we're
-					probably going to remove it at some point
-					*/
-
-					var spy = sinon.spy(ED.Views.Toolbar.prototype, 'onButtonClick');
-
-					var o = createToolbar();
-					initToolbar(o.toolbar);
-
-					var button = $(o.container).find('.eyedraw-button');
-					button.trigger('click');
-					expect(spy.calledOnce).to.be.true;
-					spy.restore();
-				});
+				var button = $(o.container).find('.eyedraw-button');
+				button.trigger('click');
+				expect(spy.calledOnce).to.be.true;
+				spy.restore();
 			});
 		});
 

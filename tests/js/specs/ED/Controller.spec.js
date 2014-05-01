@@ -25,64 +25,25 @@
 			value: JSON.stringify({ test: 'testing' })
 		}).appendTo(container);
 
-		var toolbar = $('<div />', {
-			'class': 'eyedraw-toolbar-panel'
+		var mainToolbar = $('<div />', {
+			'class': 'eyedraw-toolbar-panel eyedraw-main-toolbar'
+		}).appendTo(container);
+
+		var canvasToolbar = $('<div />', {
+			'class': 'eyedraw-toolbar-panel eyedraw-canvas-toolbar'
 		}).appendTo(container);
 
 		return {
 			container: container,
 			canvas: canvas,
 			input: input,
-			toolbar: toolbar,
+			mainToolbar: mainToolbar,
+			canvasToolbar: canvasToolbar,
 			destroy: function destroy() {
 				container.empty().remove();
 			}
 		};
 	}
-
-	/**
-	 * Creates a mock ED.Drawing object
-	 */
-	function createDrawing(properties) {
-		return $.extend({}, {
-			notificationArray: [],
-			registerForNotifications: function() {
-				ED.Drawing.prototype.registerForNotifications.apply(this, arguments);
-			},
-			init: $.noop,
-			randomFunction: $.noop,
-			notify: function() {
-				ED.Drawing.prototype.notify.apply(this, arguments);
-			},
-			loadDoodles: $.noop,
-			repaint: $.noop,
-			addBindings: $.noop,
-			addDeleteValues: $.noop,
-			addDoodle: $.noop,
-			save: function() {
-				var data = JSON.stringify({ test: 'data' });
-				return data;
-			},
-			deselectDoodles: $.noop,
-			firstDoodleOfClass: $.noop
-		}, properties);
-	}
-
-	/**
-	 * A mock ED.Checker object
-	 * @type {Object}
-	 */
-	var MockChecker = {
-		register: $.noop
-	};
-
-	/**
-	 * A mock doodle.
-	 * @type {Object}
-	 */
-	var MockDoodle = {
-		onSelection: $.noop
-	};
 
 	/**
 	 * Default ED.Drawing properties
@@ -107,7 +68,7 @@
 	describe('Controller', function() {
 
 		afterEach(function() {
-			ED.resetInstances();
+			ED.Checker.reset();
 		});
 
 		it('should exist on the ED namespace', function() {
@@ -128,49 +89,44 @@
 			it('should set the expected properties', function() {
 
 				var properties = $.extend({}, defaultProperties);
-				var controller = new ED.Controller(properties, MockChecker, null, null, MockDoodle);
+				var controller = new ED.Controller(properties);
 
 				expect(controller.properties).to.equal(properties);
 				expect(controller.canvas).to.equal(dom.canvas[0]);
 				expect(controller.input).to.equal(dom.input[0]);
 				expect(controller.container instanceof jQuery).to.be.true;
 				expect(controller.container[0]).to.equal(dom.container[0]);
-				expect(controller.Checker).to.equal(MockChecker);
+				expect(controller.Checker).to.equal(ED.Checker);
 			});
 
-			it('should create a new Drawing instance, register it with the Checker and save the instance', function() {
+			it('should create a new Drawing instance and register it with the Checker', function() {
 
-				var spy1 = sinon.spy(MockChecker, 'register');
-				var spy2 = sinon.spy(ED, 'setInstance');
+				var spy1 = sinon.spy(ED.Checker, 'register');
 
 				var properties = $.extend({}, defaultProperties);
-				var controller = new ED.Controller(properties, MockChecker, null, null, MockDoodle);
+				var controller = new ED.Controller(properties);
 
 				expect(controller.drawing instanceof ED.Drawing).to.be.true;
 				expect(spy1.withArgs(controller.drawing).called).to.be.true;
-				expect(spy2.withArgs(controller.drawing).called).to.be.true;
 
 				spy1.reset();
-				spy2.reset();
 			});
 
 			it('should create new Toolbar and DoodlePopup instances', function() {
 
 				var properties = $.extend({}, defaultProperties);
-				var controller = new ED.Controller(properties, MockChecker, null, null, null);
+				var controller = new ED.Controller(properties);
 
-				expect(controller.toolbar instanceof ED.Views.Toolbar).to.be.true;
+				expect(controller.mainToolbar instanceof ED.Views.Toolbar).to.be.true;
 				expect(controller.doodlePopup instanceof ED.Views.DoodlePopup).to.be.true;
-				expect(controller.toolbar.container[0]).to.equal(dom.toolbar[0]);
+				expect(controller.mainToolbar.container[0]).to.equal(dom.mainToolbar[0]);
 			});
 
 			it('should register the notification handler with the drawing instance', function() {
 
 				var properties = $.extend({}, defaultProperties);
-				var mockDrawing = createDrawing(properties);
-				var controller = new ED.Controller(properties, MockChecker, mockDrawing, null, MockDoodle);
-
-				var notification = mockDrawing.notificationArray[mockDrawing.notificationArray.length - 1]
+				var controller = new ED.Controller(properties);
+				var notification = controller.drawing.notificationArray[controller.drawing.notificationArray.length - 1]
 
 				expect(notification.object).to.equal(controller);
 				expect(notification.methodName).to.equal('notificationHandler');
@@ -193,7 +149,7 @@
 					listenerArray: [ listener ]
 				}, defaultProperties);
 
-				var controller = new ED.Controller(properties, MockChecker, null, null, MockDoodle);
+				var controller = new ED.Controller(properties);
 
 				expect(listener.withArgs(controller.drawing).called).to.be.true;
 				expect(listener.calledWithNew()).to.be.true;
@@ -201,9 +157,8 @@
 
 			it('should init the drawing', function() {
 				var properties = $.extend({}, defaultProperties);
-				var mockDrawing = createDrawing(properties);
-				var spy = sinon.spy(mockDrawing, 'init');
-				var controller = new ED.Controller(properties, MockChecker, mockDrawing, null, MockDoodle);
+				var spy = sinon.spy(ED.Drawing.prototype, 'init');
+				var controller = new ED.Controller(properties);
 				expect(spy.called).to.be.true;
 				spy.reset();
 			});
@@ -213,7 +168,7 @@
 
 			var dom;
 			var properties;
-			var mockDrawing;
+			var drawing;
 			var controller;
 
 			beforeEach(function() {
@@ -221,8 +176,9 @@
 				properties = $.extend({
 					focus: true
 				}, defaultProperties);
-				mockDrawing = createDrawing(properties);
-				controller = new ED.Controller(properties, MockChecker, mockDrawing, null, MockDoodle);
+
+				controller = new ED.Controller(properties, null, null, new Function(), new Function(), new Function(), new Function());
+				drawing = controller.drawing;
 			});
 			afterEach(function() {
 				dom.destroy();
@@ -232,22 +188,22 @@
 
 				it('should call the correct handler', function() {
 					var spy = sinon.spy(controller, 'onReady');
-					mockDrawing.notify('ready');
+					drawing.notify('ready');
 					expect(spy.called).to.be.true;
 					spy.reset();
 				});
 
 				it('should set the globalScaleFactor', function() {
-					mockDrawing.notify('ready');
+					drawing.notify('ready');
 					expect(controller.drawing.globalScaleFactor).to.equal(properties.scale);
 				});
 
 				describe('Loading data from input field', function() {
 					it('should load data from the input field', function() {
 						var spy1 = sinon.spy(controller, 'loadInputFieldData');
-						var spy2 = sinon.spy(mockDrawing, 'loadDoodles');
-						var spy3 = sinon.spy(mockDrawing, 'repaint');
-						mockDrawing.notify('ready');
+						var spy2 = sinon.spy(drawing, 'loadDoodles');
+						var spy3 = sinon.spy(drawing, 'repaint');
+						drawing.notify('ready');
 						expect(spy1.calledOnce).to.be.true;
 						expect(spy2.withArgs('inputID').calledOnce).to.be.true;
 						expect(spy3.calledOnce).to.be.true;
@@ -261,14 +217,14 @@
 					it('should not attempt to load data from the input field', function() {
 						dom.input.val('');
 						var spy = sinon.spy(controller, 'loadInputFieldData');
-						mockDrawing.notify('ready');
+						drawing.notify('ready');
 						expect(spy.called).to.be.false;
 						spy.reset();
 					});
 					it('should run the OnReady commands', function() {
 						dom.input.val('');
 						var spy = sinon.spy(controller, 'runOnReadyCommands');
-						mockDrawing.notify('ready');
+						drawing.notify('ready');
 						expect(spy.calledOnce).to.be.true;
 						spy.reset();
 					});
@@ -276,21 +232,21 @@
 
 				it('should add bindings', function() {
 					var spy = sinon.spy(controller, 'addBindings');
-					mockDrawing.notify('ready');
+					drawing.notify('ready');
 					expect(spy.calledOnce).to.be.true;
 					spy.reset();
 				});
 
 				it('should add deleted values', function() {
 					var spy = sinon.spy(controller, 'addDeletedValues');
-					mockDrawing.notify('ready');
+					drawing.notify('ready');
 					expect(spy.calledOnce).to.be.true;
 					spy.reset();
 				});
 
 				it('should save the drawing data to the input field', function() {
 					var spy = sinon.spy(controller, 'saveDrawingToInputField');
-					mockDrawing.notify('ready');
+					drawing.notify('ready');
 					expect(spy.calledOnce).to.be.true;
 					spy.reset();
 				});
@@ -305,21 +261,21 @@
 				*/
 
 				it('should set the isReady flag to true', function() {
-					mockDrawing.notify('ready');
-					expect(controller.drawing.isReady).to.be.true;
+					drawing.notify('ready');
+					expect(drawing.isReady).to.be.true;
 				});
 			});
 
 			describe('doodlesLoaded event', function() {
 				it('should call the correct handler', function() {
 					var spy = sinon.spy(controller, 'onDoodlesLoaded');
-					mockDrawing.notify('doodlesLoaded', MockDoodle);
+					drawing.notify('doodlesLoaded');
 					expect(spy.called).to.be.true;
 					spy.reset();
 				});
 				it('should run the OnDoodlesLoaded commands', function() {
 					var spy = sinon.spy(controller, 'runOnDoodlesLoadedCommands');
-					mockDrawing.notify('doodlesLoaded', MockDoodle);
+					drawing.notify('doodlesLoaded');
 					expect(spy.calledOnce).to.be.true;
 					spy.reset();
 				});
@@ -328,13 +284,13 @@
 			describe('doodleAdded event', function() {
 				it('should call the correct handler', function() {
 					var spy = sinon.spy(controller, 'onDoodleAdded');
-					mockDrawing.notify('doodleAdded', MockDoodle);
+					drawing.notify('doodleAdded');
 					expect(spy.called).to.be.true;
 					spy.reset();
 				});
 				it('should save the drawing data to the input field', function() {
 					var spy = sinon.spy(controller, 'saveDrawingToInputField');
-					mockDrawing.notify('doodleAdded', MockDoodle);
+					drawing.notify('doodleAdded');
 					expect(spy.calledOnce).to.be.true;
 					spy.reset();
 				});
@@ -343,13 +299,13 @@
 			describe('doodleDeleted event', function() {
 				it('should call the correct handler', function() {
 					var spy = sinon.spy(controller, 'onDoodleDeleted');
-					mockDrawing.notify('doodleDeleted', MockDoodle);
+					drawing.notify('doodleDeleted');
 					expect(spy.called).to.be.true;
 					spy.reset();
 				});
 				it('should save the drawing data to the input field', function() {
 					var spy = sinon.spy(controller, 'saveDrawingToInputField');
-					mockDrawing.notify('doodleDeleted', MockDoodle);
+					drawing.notify('doodleDeleted');
 					expect(spy.calledOnce).to.be.true;
 					spy.reset();
 				});
@@ -358,13 +314,13 @@
 			describe('doodleSelected event', function() {
 				it('should call the correct handler', function() {
 					var spy = sinon.spy(controller, 'onDoodleSelected');
-					mockDrawing.notify('doodleSelected', MockDoodle);
+					drawing.notify('doodleSelected');
 					expect(spy.calledOnce).to.be.true;
 					spy.reset();
 				});
 				it('should deselect synced doodles', function() {
 					var spy = sinon.spy(controller, 'deselectSyncedDoodles');
-					mockDrawing.notify('doodleSelected', MockDoodle);
+					drawing.notify('doodleSelected');
 					expect(spy.calledOnce).to.be.true;
 					spy.reset();
 				})
@@ -373,13 +329,13 @@
 			describe('mousedragged event', function() {
 				it('should call the correct handler', function() {
 					var spy = sinon.spy(controller, 'onMousedragged');
-					mockDrawing.notify('mousedragged', MockDoodle);
+					drawing.notify('mousedragged');
 					expect(spy.calledOnce).to.be.true;
 					spy.reset();
 				});
 				it('should save the drawing data to the input field', function() {
 					var spy = sinon.spy(controller, 'saveDrawingToInputField');
-					mockDrawing.notify('doodleDeleted', MockDoodle);
+					drawing.notify('doodleDeleted');
 					expect(spy.calledOnce).to.be.true;
 					spy.reset();
 				});
@@ -388,19 +344,19 @@
 			describe('parameterChanged event', function() {
 				it('should call the correct handler', function() {
 					var spy = sinon.spy(controller, 'onParameterChanged');
-					mockDrawing.notify('parameterChanged', MockDoodle);
+					drawing.notify('parameterChanged', new Function());
 					expect(spy.calledOnce).to.be.true;
 					spy.reset();
 				});
 				it('should sync the eyedraws', function() {
 					var spy = sinon.spy(controller, 'syncEyedraws');
-					mockDrawing.notify('parameterChanged', MockDoodle);
+					drawing.notify('parameterChanged', new Function());
 					expect(spy.calledOnce).to.be.true;
 					spy.reset();
 				});
 				it('should save the drawing data to the input field', function() {
 					var spy = sinon.spy(controller, 'saveDrawingToInputField');
-					mockDrawing.notify('parameterChanged', MockDoodle);
+					drawing.notify('parameterChanged', new Function());
 					expect(spy.calledOnce).to.be.true;
 					spy.reset();
 				});
@@ -411,12 +367,21 @@
 			it('should save drawing data to the input field', function() {
 
 				var dom = createDOM();
+				var fakeDrawing = {
+					init: $.noop,
+					registerForNotifications: $.noop,
+					save: function() {
+						return JSON.stringify({ test: 'data' })
+					}
+				};
 				var properties = $.extend({}, defaultProperties);
-				var mockDrawing = createDrawing(properties);
-				var controller = new ED.Controller(properties, MockChecker, mockDrawing, null, MockDoodle);
+
+				var controller = new ED.Controller(properties, null, fakeDrawing);
+
+				var drawing = controller.drawing;
 
 				var spy1 = sinon.spy(controller, 'hasInputFieldData');
-				var spy2 = sinon.spy(mockDrawing, 'save');
+				var spy2 = sinon.spy(drawing, 'save');
 
 				// First, lets clear the input field value to test if saving
 				// the data is prevented if the input value is null.
@@ -427,16 +392,17 @@
 				expect(spy1.calledOnce).to.be.true;
 				expect(spy2.called).to.be.false;
 
+
 				// Now let's test that the input field value is updated, only if
 				// the input field already has data.
 
 				var data1 = JSON.stringify({ cats: 'rule' });
 				dom.input.val(data1);
-
 				controller.saveDrawingToInputField();
 
 				expect(spy1.calledTwice).to.be.true;
 				expect(spy2.called).to.be.true;
+
 				expect(dom.input.val()).to.equal(JSON.stringify({ test: 'data' }));
 
 				spy1.reset();
@@ -447,9 +413,9 @@
 
 				var dom = createDOM();
 				var properties = $.extend({}, defaultProperties);
-				var mockDrawing = createDrawing(properties);
-				var controller = new ED.Controller(properties, MockChecker, mockDrawing, null, MockDoodle);
-				var spy = sinon.spy(mockDrawing, 'loadDoodles');
+				var controller = new ED.Controller(properties);
+				var drawing = controller.drawing;
+				var spy = sinon.spy(drawing, 'loadDoodles');
 
 				controller.loadInputFieldData();
 
@@ -468,10 +434,10 @@
 				function test(props) {
 					dom = createDOM();
 					var properties = $.extend({}, defaultProperties, props);
-					var mockDrawing = createDrawing(properties);
-					var controller = new ED.Controller(properties, MockChecker, mockDrawing, null, MockDoodle);
-					var spy = sinon.spy(mockDrawing, 'addBindings');
-					mockDrawing.notify('ready');
+					var controller = new ED.Controller(properties);
+					var drawing = controller.drawing;
+					var spy = sinon.spy(drawing, 'addBindings');
+					drawing.notify('ready');
 					return spy;
 				}
 
@@ -486,8 +452,9 @@
 				dom.destroy();
 
 				// Test calling the 'addBindings' method if expected object is an actual object.
+				// WARNING: this should throw an eyedraw error
 				var bindingArray = {
-					AntSeg: {
+					'EYEDRAW_ID_!': {
 						pupilSize: {
 							id: "eyedraw-field-1",
 							attribute: "data-value"
@@ -513,9 +480,9 @@
 				function test(props) {
 					dom = createDOM();
 					var properties = $.extend({}, defaultProperties, props);
-					var mockDrawing = createDrawing(properties);
-					var controller = new ED.Controller(properties, MockChecker, mockDrawing, null, MockDoodle);
-					var spy = sinon.spy(mockDrawing, 'addDeleteValues');
+					var controller = new ED.Controller(properties);
+					var drawing = controller.drawing;
+					var spy = sinon.spy(drawing, 'addDeleteValues');
 					controller.addDeletedValues();
 					return spy;
 				}
@@ -574,17 +541,17 @@
 				var prop1 = $.extend({}, properties, {
 					idSuffix: 'EYEDRAW_ID_1'
 				});
-				var mockDrawing1 = createDrawing(prop1);
-				var controller1 = new ED.Controller(prop1, null, mockDrawing1, null, MockDoodle);
+				var controller1 = new ED.Controller(prop1);
+				var drawing1 = controller1.drawing;
 
 				var prop2 = $.extend({}, properties, {
 					idSuffix: 'EYEDRAW_ID_2'
 				});
-				var mockDrawing2 = createDrawing(prop2);
-				var controller2 = new ED.Controller(prop2, null, mockDrawing2, null, MockDoodle);
+				var controller2 = new ED.Controller(prop2);
+				var drawing2 = controller2.drawing;
 
-				var spy1 = sinon.spy(mockDrawing1, 'deselectDoodles');
-				var spy2 = sinon.spy(mockDrawing2, 'deselectDoodles');
+				var spy1 = sinon.spy(drawing1, 'deselectDoodles');
+				var spy2 = sinon.spy(drawing2, 'deselectDoodles');
 
 				// Here we test that both drawing instances are called.
 				controller1.deselectSyncedDoodles();
@@ -612,11 +579,13 @@
 					],
 				});
 
-				var mockDrawing = createDrawing(props);
-				var controller = new ED.Controller(props, MockChecker, mockDrawing, null, MockDoodle);
+				var dom = createDOM();
+				var controller = new ED.Controller(props);
 
-				var spy1 = sinon.spy(mockDrawing, 'addDoodle');
-				var spy2 = sinon.spy(mockDrawing, 'deselectDoodles');
+				var drawing = controller.drawing;
+
+				var spy1 = sinon.spy(drawing, 'addDoodle');
+				var spy2 = sinon.spy(drawing, 'deselectDoodles');
 
 				controller.runOnReadyCommands();
 
@@ -624,6 +593,7 @@
 				expect(spy2.calledOnce).to.be.true;
 				spy1.reset();
 				spy2.reset();
+				dom.destroy();
 			});
 
 			it('should run On Doodles Loaded commands', function() {
@@ -643,11 +613,12 @@
 					],
 				});
 
-				var mockDrawing = createDrawing(props);
-				var controller = new ED.Controller(props, MockChecker, mockDrawing, null, MockDoodle);
+				var dom = createDOM();
+				var controller = new ED.Controller(props);
+				var drawing = controller.drawing;
 
-				var spy1 = sinon.spy(mockDrawing, 'addDoodle');
-				var spy2 = sinon.spy(mockDrawing, 'deselectDoodles');
+				var spy1 = sinon.spy(drawing, 'addDoodle');
+				var spy2 = sinon.spy(drawing, 'deselectDoodles');
 
 				controller.runOnDoodlesLoadedCommands();
 
@@ -656,16 +627,20 @@
 
 				spy1.reset();
 				spy2.reset();
+				dom.destroy();
 			});
 
 			it('should return an eyedraw instance', function() {
-				var spy = sinon.spy(ED, 'getInstance');
+
+				var dom = createDOM();
+				var spy = sinon.spy(ED.Checker, 'getInstance');
 				var props = $.extend({}, defaultProperties, {});
-				var mockDrawing = createDrawing(props);
-				var controller = new ED.Controller(props, MockChecker, mockDrawing, null, MockDoodle);
+				var controller = new ED.Controller(props);
+				var drawing = controller.drawing;
 				var instance = controller.getEyeDrawInstance('EYEDRAW_ID');
-				expect(instance).to.equal(mockDrawing);
+				expect(instance).to.equal(drawing);
 				spy.reset();
+				dom.destroy();
 			})
 		});
 
@@ -673,17 +648,21 @@
 			it('should sync eyedraws', function() {
 
 				var options1 = {
-					idSuffix: 'EYEDRAW_ID_1'
+					idSuffix: 'EYEDRAW_ID_1',
+					onReadyCommandArray: [
+						[
+							"addDoodle",
+							[
+								"PhakoIncision"
+							]
+						]
+					]
 				};
+				var dom = createDOM();
 				var properties1 = $.extend({}, defaultProperties, options1);
-				var mockDrawing1 = createDrawing(properties1);
-				var doodle1 = {
-					foo: 'bar'
-				};
-				mockDrawing1.firstDoodleOfClass = function() {
-					return doodle1;
-				};
-				var controller1 = new ED.Controller(properties1, MockChecker, mockDrawing1, null, MockDoodle);
+				var controller1 = new ED.Controller(properties1);
+				var drawing1 = controller1.drawing;
+				controller1.runOnReadyCommands();
 
 				var options2 = {
 					idSuffix: 'EYEDRAW_ID_2',
@@ -699,8 +678,8 @@
 				};
 
 				var properties2 = $.extend({}, defaultProperties, options2);
-				var mockDrawing2 = createDrawing(properties2);
-				var controller2 = new ED.Controller(properties2, MockChecker, mockDrawing2, null, MockDoodle);
+				var controller2 = new ED.Controller(properties2);
+				var drawing2 = controller2.drawing;
 
 				var changedObject = {
 					doodle: {
@@ -711,17 +690,17 @@
 					value: 4.71238898038469
 				};
 
-				var spy1 = sinon.spy(mockDrawing1, 'firstDoodleOfClass');
+				var spy1 = sinon.spy(drawing1, 'firstDoodleOfClass');
 				var spy2 = sinon.spy(controller2, 'syncDoodleParameters');
-				var spy3 = sinon.spy(mockDrawing1, 'repaint');
+				var spy3 = sinon.spy(drawing1, 'repaint');
 
 				controller2.syncEyedraws(changedObject);
 
 				var parameterArray = ['rotation'];
 				var changedParam = changedObject;
 				var masterDoodle = changedObject.doodle;
-				var slaveDoodle = doodle1;
-				var slaveDrawing = mockDrawing1;
+				var slaveDoodle = drawing1.selectedDoodle;
+				var slaveDrawing = drawing1;
 
 				expect(spy1.withArgs('PhakoIncision').calledOnce).to.be.true;
 				expect(spy2.withArgs(parameterArray, changedParam, masterDoodle, slaveDoodle, slaveDrawing).calledOnce).to.be.true;
@@ -730,6 +709,7 @@
 				spy1.reset();
 				spy2.reset();
 				spy3.reset();
+				dom.destroy();
 			});
 
 			it('should sync doodle parameters', function() {
@@ -769,6 +749,6 @@
 				spy2.reset();
 				spy3.reset();
 			});
-		})
+		});
 	});
 }());
