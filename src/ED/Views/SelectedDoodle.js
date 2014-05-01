@@ -23,7 +23,7 @@ var ED = ED || {};
 ED.Views = ED.Views || {};
 
 /**
- * The selected-doodle view manages interactions on the main doodle selected-doodle.
+ * This view class manages the selected doodle dropdown.
  */
 ED.Views.SelectedDoodle = (function() {
 

@@ -73,7 +73,7 @@
 									<div class="eyedraw-toolbar">
 
 										<!-- PANEL START -->
-										<ul class="eyedraw-toolbar-panel">
+										<ul class="eyedraw-toolbar-panel eyedraw-main-toolbar">
 											<li>
 												<a class="eyedraw-button" href="#" data-function="addDoodle" data-arg="NuclearCataract">
 													<span class="icon-ed-NuclearCataract"></span>
@@ -259,37 +259,47 @@
 									<div class="eyedraw-body">
 										<div class="row">
 
-											<div class="fixed column eyedraw-editor">
+											<div class="fixed column">
 
-												<!-- CANVAS -->
-												<canvas
-												id="ed_example"
-												class="eyedraw-canvas-edit"
-												width="300"
-												height="300"
-												tabindex="1">
-												</canvas>
+											 <div class="eyedraw-editor">
 
-												<!-- TOOLTIP -->
-												<span class="eyedraw-canvas-tooltip" id="ed_exampleTooltip"></span>
+													<!-- CANVAS -->
+													<canvas
+													id="ed_example"
+													class="eyedraw-canvas-edit"
+													width="300"
+													height="300"
+													tabindex="1">
+													</canvas>
 
-												<!-- SELECTED DOODLE -->
-												<div class="eyedraw-selected-doodle">
-													<div class="selected-box">
-														<select class="eyedraw-selected-doodle-select" id="ed_example_selected_doodle">>
-														</select>
+													<!-- SELECTED DOODLE -->
+													<div class="eyedraw-selected-doodle">
+														<div class="selected-box">
+															<select class="eyedraw-selected-doodle-select" id="ed_example_selected_doodle">>
+															</select>
+														</div>
 													</div>
-												</div>
 
-												<!-- DOODLE POPUP -->
-												<div class="eyedraw-doodle-popup closed">
-												</div>
+													<!-- CANVAS TOOLBAR -->
+													<ul class="eyedraw-toolbar-panel eyedraw-canvas-toolbar">
+														<li>
+															<a class="eyedraw-button" href="#" data-function="resetEyedraw">
+																<span class="icon-ed-reset"></span>
+																<span class="label">Reset eyedraw</span>
+															</a>
+														</li>
+													</ul>
 
-												<!-- DATA FIELD -->
-												<input
-													type="hidden"
-													id="ed_example_data"
-													value='' />
+													<!-- DOODLE POPUP -->
+													<div class="eyedraw-doodle-popup closed">
+													</div>
+
+													<!-- DATA FIELD -->
+													<input
+														type="hidden"
+														id="ed_example_data"
+														value='' />
+												</div>
 											</div>
 
 											<div class="fluid column eyedraw-fields">
@@ -355,6 +365,7 @@
 									<div class="data-value">
 										<p><strong>UX Notes/issues:</strong></p>
 										<ul>
+											<li>The doodle popup is too high if there is lots of help text & doodle controls</li>
 											<li>Need button disabled state designed</li>
 											<li>What about <code>doodle.isForDrawing</code> and <code>doodle.addSquiggle()</code>, is this functionality still required?</li>
 										</ul>

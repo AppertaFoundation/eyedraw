@@ -23,7 +23,7 @@ var ED = ED || {};
 ED.Views = ED.Views || {};
 
 /**
- * The DoodlePopup view manages the doodle popup menu.
+ * This view class manages the doodle popup.
  */
 ED.Views.DoodlePopup = (function() {
 

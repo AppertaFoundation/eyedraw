@@ -23,7 +23,7 @@ var ED = ED || {};
 ED.Views = ED.Views || {};
 
 /**
- * The toolbar view manages interactions on the main doodle toolbar.
+ * This view class manages the toolbar.
  */
 ED.Views.Toolbar = (function() {
 
@@ -75,7 +75,7 @@ ED.Views.Toolbar = (function() {
 
 	/**
 	 * Update the state of a toolbar button. Find the associated doodle
-	 * and detrmine if the button should be enabled or disabled.
+	 * and determine if the button should be enabled or disabled.
 	 * @param  {jQuery} button A jQuery button instance
 	 */
 	Toolbar.prototype.updateButtonState = function(button) {

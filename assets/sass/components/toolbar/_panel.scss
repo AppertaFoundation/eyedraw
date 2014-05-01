@@ -47,3 +47,23 @@
 		}
 	}
 }
+
+// Canvas toolbar (eg, "reset eyedraw")
+.eyedraw-toolbar-panel {
+	&.eyedraw-canvas-toolbar {
+		bottom: 3px;
+		left: 6px;
+		position: absolute;
+		z-index: 102;
+		li {
+			margin: 0;
+		}
+		.eyedraw-button {
+			background: none;
+			border: 0;
+			.label {
+				top: -32px;
+			}
+		}
+	}
+}
