@@ -429,6 +429,7 @@ class DoodleInfo
         "CircumferentialBuckle" => "Circumferential buckle",
         "CNV" => "Choroidal new vessels",
         "ConjunctivalFlap" => "Conjunctival flap",
+        "ConjunctivalSuture" => "Conjunctival suture",
         "CornealAbrasion" => "Corneal abrasion",
         "CornealErosion" => "Removal of corneal epithelium",
         "CornealGraft" => "Corneal graft",
