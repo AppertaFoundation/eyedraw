@@ -21,12 +21,13 @@
 canvas {
 	// Canvas element in edit mode
 	&.eyedraw-canvas-edit {
-		background: #e4edf5;
-		border: 1px solid #53a0c7;
 		cursor: pointer;
-		margin: 3px 0 3px 3px;
 		position: relative;
-		z-index: 101;
+		z-index: 103;
+		border: 0;
+		background: #e4edf5;
+		top: 4px;
+		left: 4px;
 	}
 	// Canvas element in display mode
 	&.eyedraw-canvas-display {
@@ -38,4 +39,20 @@ canvas {
 	&:focus {
 		outline: none;
 	}
+}
+
+.canvas-container {
+	position: absolute;
+	z-index: 101;
+	border: 1px solid #53a0c7;
+	background: #e4edf5;
+	width: 302px;
+	height: 302px;
+	left: 3px;
+	top: 3px;
+}
+
+.eyedraw-doodle-info {
+	padding-top: 10px;
+	padding-bottom: 10px;
 }

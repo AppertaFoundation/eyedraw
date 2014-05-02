@@ -15,21 +15,17 @@
 // * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
 
 .eyedraw-doodle-popup {
-	@include border-radius(0 4px 4px 0);
-	@include box-shadow(2px 2px 6px rgba(0, 0, 0, 0.4));
 	@include transition(right 0.5s ease, opacity 0.5s ease);
 	background: #e5edf4;
-	border: 3px solid #68c8f8;
-	border-left: 0;
-	padding: 5px 5px 5px 10px;
+	border: 1px solid #53a0c7;
+	border-width: 0 1px 1px 0;
+	opacity: 1;
+	padding: 5px;
 	position: absolute;
 	right: -188px;
-	width: 196px;
-	min-height: 242px;
-	z-index: 100;
-	padding-bottom: 40px;
-	opacity: 1;
-	top: 40px;
+	top: 35px;
+	width: 192px;
+	z-index: 102;
 	-webkit-transform: translate3d(0, 0, 0);
 	-webkit-backface-visibility: hidden;
 	-webkit-perspective: 1000;
@@ -43,12 +39,9 @@
 		}
 	}
 	.eyedraw-toolbar-panel {
-		position: absolute;
-		left: 10px;
-		bottom: 5px;
 		li {
 			margin-bottom: 0;
-			margin-right: 8px;
+			margin-right: 5px;
 			&:last-child {
 				margin-right: 0;
 			}
@@ -98,17 +91,4 @@
 		float: left;
 		margin-right: 5px;
 	}
-}
-
-.eyedraw-doodle-help {
-	float: right;
-	background: #5dcbff;
-	width: 18px;
-	height: 18px;
-	border-radius: 18px;
-	color: #000;
-	font-size: 14px;
-	line-height: 18px;
-	display: block;
-	text-align: center;
 }

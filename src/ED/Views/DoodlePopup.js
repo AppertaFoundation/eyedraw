@@ -105,6 +105,12 @@ ED.Views.DoodlePopup = (function() {
 
 		// Add doodle controls
 		doodle.showDoodleControls();
+
+		var controls = this.container.find('.controls');
+
+		if (!controls.children().length) {
+			controls.addClass('hide');
+		}
 	};
 
 

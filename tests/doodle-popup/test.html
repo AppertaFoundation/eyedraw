@@ -264,6 +264,7 @@
 											 <div class="eyedraw-editor">
 
 													<!-- CANVAS -->
+													<div class="canvas-container"></div>
 													<canvas
 													id="ed_example"
 													class="eyedraw-canvas-edit"
@@ -1015,37 +1016,12 @@
 	<!-- Doodle Popup template -->
 	<script type="text/html" id="eyedraw-doodle-popup-template">
 		{{#doodle}}
-			<h4 class="eyedraw-doodle-popup-heading">
-				<span class="eyedraw-button">
-					<span class="icon icon-ed-{{doodle.className}}"></span>
-				</span>
-				<a class="eyedraw-doodle-help" href="#">
-					?
-				</a>
-				<!--
-				<span class="title">{{title}}</span>
-				-->
-			</h4>
-			<!--
-			{{#helpmsg}}
-				<div class="help-msg">{{helpmsg}}</div>
-			{{/helpmsg}}
-			-->
-			<div class="eyedraw-doodle-info hide">
-				{{#doodle.isLocked}}
-					<div class="description">
-						<strong>This doodle is locked and cannot be edited.</strong>
-					</div>
-				{{/doodle.isLocked}}
-				{{^doodle.isLocked}}
-					{{#desc}}
-						<div class="description">{{{desc}}}</div>
-					{{/desc}}
-				{{/doodle.isLocked}}
-			</div>
-			<div class="controls{{#doodle.isLocked}} hide{{/doodle.isLocked}}" id="{{drawing.canvas.id}}_controls">
-			</div>
 			<ul class="eyedraw-toolbar-panel">
+				<li>
+					<a class="eyedraw-button eyedraw-doodle-help" href="#" data-function="unlock">
+						<span class="icon-ed-help"></span>
+					</a>
+				</li>
 				{{#doodle.isLocked}}
 					<li>
 						<a class="eyedraw-button" href="#" data-function="unlock">
@@ -1083,6 +1059,20 @@
 					</li>
 				{{/doodle.isDeletable}}
 			</ul>
+			<div class="eyedraw-doodle-info hide">
+				{{#doodle.isLocked}}
+					<div class="description">
+						<strong>This doodle is locked and cannot be edited.</strong>
+					</div>
+				{{/doodle.isLocked}}
+				{{^doodle.isLocked}}
+					{{#desc}}
+						<div class="description">{{{desc}}}</div>
+					{{/desc}}
+				{{/doodle.isLocked}}
+			</div>
+			<div class="controls{{#doodle.isLocked}} hide{{/doodle.isLocked}}" id="{{drawing.canvas.id}}_controls">
+			</div>
 		{{/doodle}}
 	</script>
 
