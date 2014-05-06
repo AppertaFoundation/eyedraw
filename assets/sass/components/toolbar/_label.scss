@@ -14,35 +14,35 @@
 // * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
 // * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
 
-// Panels group buttons and other controls.
-.eyedraw-toolbar-panel {
-	@extend %clearfix;
-	&, ul {
-		list-style-type: none;
-		margin: 0;
-		padding: 0;
+.eyedraw-button {
+	.label {
+		@include box-shadow(1px 3px 8px 1px rgba(0, 0, 0, 0.3));
+		@include transition(all 0s ease);
+		background: #fff;
+		border: 1px solid #ccc;
+		left: -9999px;
+		padding: 4px 6px;
+		position: absolute;
+		top: 32px;
+		white-space: nowrap;
+		z-index: 104;
 	}
-	li {
-		float: left;
-		margin: 0 3px 3px 0;
-		position: relative;
-		// Drop-menu
-		ul {
-			@include box-shadow(1px 3px 8px 1px rgba(0, 0, 0, 0.3));
-			background: #fff;
-			border: 1px solid #ccc;
-			display: none;
-			left: 3px;
-			margin: 0;
-			padding: 3px 0 0 3px;
-			position: absolute;
-			top: 36px;
-			width: 148px;
-			z-index: 99;
+	&:active {
+		.label {
+			left: -9999px;
 		}
-		&.active {
-			ul {
-				display: block;
+	}
+	&:hover {
+		.label {
+			@include transition-delay(0.25s);
+			left: -1px;
+		}
+	}
+	&.disabled {
+		&:hover {
+			.label {
+				@include transition-delay(0s);
+				left: -9999px;
 			}
 		}
 	}

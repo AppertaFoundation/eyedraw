@@ -16,6 +16,7 @@
 
 .eyedraw-doodle-popup {
 	@include transition(right 0.5s ease, opacity 0.5s ease);
+	@include box-shadow(0 6px 14px -5px rgba(0,0,0,0.7));
 	background: #e5edf4;
 	border: 1px solid #53a0c7;
 	border-width: 0 1px 1px 0;
@@ -23,7 +24,7 @@
 	padding: 5px;
 	position: absolute;
 	right: -188px;
-	top: 35px;
+	top: 38px;
 	width: 192px;
 	z-index: 102;
 	-webkit-transform: translate3d(0, 0, 0);
@@ -61,6 +62,8 @@
 	}
 	.controls {
 		padding-top: 14px;
+		max-height: 224px;
+		overflow: auto;
 		> div {
 			@extend %clearfix;
 			line-height: 12px;

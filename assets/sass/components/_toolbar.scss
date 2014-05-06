@@ -25,3 +25,24 @@
 
 @import "components/toolbar/panel";
 @import "components/toolbar/button";
+@import "components/toolbar/label";
+
+// Canvas toolbar (eg, "reset eyedraw")
+.eyedraw-toolbar-panel {
+	&.eyedraw-canvas-toolbar {
+		bottom: 3px;
+		left: 6px;
+		position: absolute;
+		z-index: 102;
+		li {
+			margin: 0;
+		}
+		.eyedraw-button {
+			background: none;
+			border: 0;
+			.label {
+				top: -32px;
+			}
+		}
+	}
+}

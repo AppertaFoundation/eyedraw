@@ -42,13 +42,13 @@ ED.Views.DoodlePopup = (function() {
 		this.createTemplate();
 
 		this.container.on('mouseenter', '.eyedraw-doodle-help', function() {
-			this.container.find('.eyedraw-doodle-info').show();
+			this.container.find('.eyedraw-doodle-info').hide().fadeIn(100);
 			this.container.find('.controls').hide();
 		}.bind(this));
 
 		this.container.on('mouseleave', '.eyedraw-doodle-help', function() {
 			this.container.find('.eyedraw-doodle-info').hide();
-			this.container.find('.controls').show();
+			this.container.find('.controls').hide().fadeIn(100);
 		}.bind(this));
 	}
 

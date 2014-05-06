@@ -30,44 +30,14 @@
 	.active & {
 		background: #dae6f1;
 	}
-	// Button label.
-	.label {
-		@include box-shadow(1px 3px 8px 1px rgba(0, 0, 0, 0.3));
-		@include transition(all 0s ease);
-		background: #fff;
-		border: 1px solid #ccc;
-		left: -9999px;
-		padding: 4px 6px;
-		position: absolute;
-		top: 32px;
-		white-space: nowrap;
-		z-index: 102;
-	}
 	// Button icon
 	[class*="icon-ed-"] {
 		// Account for the borders
 		margin-left: -1px;
 		margin-top: -1px;
 	}
-	&:active {
-		.label {
-			left: -9999px;
-		}
-	}
-	&:hover {
-		.label {
-			@include transition-delay(0.25s);
-			left: -1px;
-		}
-	}
 	&.disabled {
 		cursor: default;
 		background: #ddd;
-		&:hover {
-			.label {
-				@include transition-delay(0s);
-				left: -9999px;
-			}
-		}
 	}
 }
