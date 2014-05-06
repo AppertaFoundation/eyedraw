@@ -1128,22 +1128,18 @@ canvas.eyedraw-canvas-edit {
   top: 4px;
   left: 4px;
 }
-/* line 31, ../sass/components/_editor.scss */
-.doodle-selected canvas.eyedraw-canvas-edit {
-  border-right: 1px solid #8dd5ed;
-}
-/* line 36, ../sass/components/_editor.scss */
+/* line 33, ../sass/components/_editor.scss */
 canvas.eyedraw-canvas-display {
   border: none;
   cursor: auto;
   margin: 0px;
 }
-/* line 42, ../sass/components/_editor.scss */
+/* line 39, ../sass/components/_editor.scss */
 canvas:focus {
   outline: none;
 }
 
-/* line 47, ../sass/components/_editor.scss */
+/* line 44, ../sass/components/_editor.scss */
 .canvas-container {
   position: absolute;
   z-index: 101;
@@ -1155,7 +1151,7 @@ canvas:focus {
   top: 3px;
 }
 
-/* line 58, ../sass/components/_editor.scss */
+/* line 55, ../sass/components/_editor.scss */
 .eyedraw-doodle-info {
   padding-top: 10px;
   padding-bottom: 10px;
