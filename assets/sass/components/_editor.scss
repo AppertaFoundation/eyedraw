@@ -28,6 +28,9 @@ canvas {
 		background: #e4edf5;
 		top: 4px;
 		left: 4px;
+		.doodle-selected & {
+			border-right: 1px solid #8dd5ed;
+		}
 	}
 	// Canvas element in display mode
 	&.eyedraw-canvas-display {

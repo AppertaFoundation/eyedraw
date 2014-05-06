@@ -16,8 +16,7 @@
 
 .eyedraw-doodle-popup {
 	@include transition(right 0.5s ease, opacity 0.5s ease);
-	@include box-shadow(0 6px 14px -5px rgba(0,0,0,0.7));
-	background: #e5edf4;
+	background: #c3def5;
 	border: 1px solid #53a0c7;
 	border-width: 0 1px 1px 0;
 	opacity: 1;
@@ -27,6 +26,7 @@
 	top: 38px;
 	width: 192px;
 	z-index: 102;
+	height: 267px;
 	-webkit-transform: translate3d(0, 0, 0);
 	-webkit-backface-visibility: hidden;
 	-webkit-perspective: 1000;

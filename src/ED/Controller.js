@@ -141,6 +141,14 @@ ED.Controller = (function() {
 			'mousedragged',
 			'parameterChanged'
 		]);
+
+		// Other events.
+		this.doodlePopup.on('show', function() {
+			this.container.addClass('doodle-selected');
+		}.bind(this));
+		this.doodlePopup.on('hide', function() {
+			this.container.removeClass('doodle-selected');
+		}.bind(this));
 	};
 
 	/**

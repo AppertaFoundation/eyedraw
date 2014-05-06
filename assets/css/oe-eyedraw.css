@@ -1128,18 +1128,22 @@ canvas.eyedraw-canvas-edit {
   top: 4px;
   left: 4px;
 }
-/* line 33, ../sass/components/_editor.scss */
+/* line 31, ../sass/components/_editor.scss */
+.doodle-selected canvas.eyedraw-canvas-edit {
+  border-right: 1px solid #8dd5ed;
+}
+/* line 36, ../sass/components/_editor.scss */
 canvas.eyedraw-canvas-display {
   border: none;
   cursor: auto;
   margin: 0px;
 }
-/* line 39, ../sass/components/_editor.scss */
+/* line 42, ../sass/components/_editor.scss */
 canvas:focus {
   outline: none;
 }
 
-/* line 44, ../sass/components/_editor.scss */
+/* line 47, ../sass/components/_editor.scss */
 .canvas-container {
   position: absolute;
   z-index: 101;
@@ -1151,7 +1155,7 @@ canvas:focus {
   top: 3px;
 }
 
-/* line 55, ../sass/components/_editor.scss */
+/* line 58, ../sass/components/_editor.scss */
 .eyedraw-doodle-info {
   padding-top: 10px;
   padding-bottom: 10px;
@@ -1207,7 +1211,7 @@ span.squiggle {
 
 /* line 17, ../sass/components/_selected-doodle.scss */
 .eyedraw-selected-doodle {
-  background-color: #e4edf5;
+  background-color: #c3def5;
   background-repeat: no-repeat;
   border: 1px solid #53a0c7;
   border-left: 0;
@@ -1226,10 +1230,7 @@ span.squiggle {
   -moz-transition: right 0.5s ease, opacity 0.5s ease;
   -o-transition: right 0.5s ease, opacity 0.5s ease;
   transition: right 0.5s ease, opacity 0.5s ease;
-  -webkit-box-shadow: 0 6px 14px -5px rgba(0, 0, 0, 0.7);
-  -moz-box-shadow: 0 6px 14px -5px rgba(0, 0, 0, 0.7);
-  box-shadow: 0 6px 14px -5px rgba(0, 0, 0, 0.7);
-  background: #e5edf4;
+  background: #c3def5;
   border: 1px solid #53a0c7;
   border-width: 0 1px 1px 0;
   opacity: 1;
@@ -1239,6 +1240,7 @@ span.squiggle {
   top: 38px;
   width: 192px;
   z-index: 102;
+  height: 267px;
   -webkit-transform: translate3d(0, 0, 0);
   -webkit-backface-visibility: hidden;
   -webkit-perspective: 1000;

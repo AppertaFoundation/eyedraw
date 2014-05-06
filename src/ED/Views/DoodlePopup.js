@@ -132,6 +132,7 @@ ED.Views.DoodlePopup = (function() {
 	 */
 	DoodlePopup.prototype.hide = function() {
 		this.delay(function() {
+			this.emit('hide');
 			this.container.addClass('closed');
 		}.bind(this));
 	};
@@ -141,6 +142,7 @@ ED.Views.DoodlePopup = (function() {
 	 */
 	DoodlePopup.prototype.show = function() {
 		this.delay(function() {
+			this.emit('show');
 			this.container.removeClass('closed');
 		}.bind(this));
 	};
