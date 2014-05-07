@@ -62,7 +62,10 @@ ED.Views.Toolbar = (function() {
 	 * Bind UI events.
 	 */
 	Toolbar.prototype.bindEvents = function() {
-		this.container.on('click.' + EVENT_NAMESPACE, '.ed-button', this.onButtonClick.bind(this));
+		this.container
+			.on('click.' + EVENT_NAMESPACE, '.ed-button', this.onButtonClick.bind(this))
+			.on('mouseenter.' + EVENT_NAMESPACE, '.ed-button', this.onButtonMouseEnter.bind(this))
+			.on('mouseleave.' + EVENT_NAMESPACE, '.ed-button', this.onButtonMouseLeave.bind(this));
 	};
 
 	Toolbar.prototype.enableButton = function(button) {
@@ -129,15 +132,40 @@ ED.Views.Toolbar = (function() {
 		var fn = button.data('function');
 		var arg = button.data('arg');
 
-		if (typeof this.drawing[fn] === 'function') {
+		if (fn && typeof this.drawing[fn] === 'function') {
 			this.drawing[fn](arg);
-			this.emit('doodle.action', {
-				fn: fn,
-				arg: arg
-			});
 		} else {
-			this.emit('doodle.error', 'Invalid doodle function: ' + fn);
+			this.emit('button.error', 'Invalid doodle function: ' + fn);
 		}
+
+		this.emit('button.action', {
+			fn: fn,
+			arg: arg,
+			button: button,
+			e: e
+		});
+	};
+
+	/**
+	 * Emit mouseenter event on button mouse enter
+	 * @param  {Object} e Event object.
+	 */
+	Toolbar.prototype.onButtonMouseEnter = function(e) {
+		this.emit('button.mouseenter', {
+			button: $(e.currentTarget),
+			e: e
+		});
+	};
+
+	/**
+	 * Emit mouseleave event on button mouse leave.
+	 * @param  {Object} e Event object.
+	 */
+	Toolbar.prototype.onButtonMouseLeave = function(e) {
+		this.emit('button.mouseleave', {
+			button: $(e.currentTarget),
+			e: e
+		});
 	};
 
 	return Toolbar;

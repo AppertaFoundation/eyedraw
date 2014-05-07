@@ -50,6 +50,7 @@ ED.Controller = (function() {
 		this.input = document.getElementById(properties.inputId);
 		this.container = $(this.canvas).closest('.ed-widget');
 
+		// FIXME: we shouldn't be instantiating this stuff if not in edit mode.
 		this.Checker = Checker || ED.Checker;
 		this.drawing = drawing || this.createDrawing();
 		this.mainToolbar = mainToolbar || this.createToolbar('.ed-main-toolbar');

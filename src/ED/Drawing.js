@@ -1758,6 +1758,13 @@ ED.Drawing.prototype.unlock = function() {
 }
 
 /**
+ * Toggle doodle help text
+ */
+ED.Drawing.prototype.toggleHelp = function() {
+	this.notify('toggleDoodleHelp');
+};
+
+/**
  * Deselect any selected doodles
  */
 ED.Drawing.prototype.deselectDoodles = function() {

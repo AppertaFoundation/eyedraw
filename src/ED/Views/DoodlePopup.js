@@ -39,17 +39,8 @@ ED.Views.DoodlePopup = (function() {
 		ED.View.apply(this, arguments);
 		this.delayTimer = 0;
 		this.createToolbar();
+		this.createHelpButton();
 		this.createTemplate();
-
-		this.container.on('mouseenter', '.ed-doodle-help', function() {
-			this.container.find('.ed-doodle-info').hide().fadeIn(100);
-			this.container.find('.ed-doodle-controls').hide();
-		}.bind(this));
-
-		this.container.on('mouseleave', '.ed-doodle-help', function() {
-			this.container.find('.ed-doodle-info').hide();
-			this.container.find('.ed-doodle-controls').hide().fadeIn(100);
-		}.bind(this));
 	}
 
 	DoodlePopup.prototype = Object.create(ED.View.prototype);
@@ -60,8 +51,12 @@ ED.Views.DoodlePopup = (function() {
 	 */
 	DoodlePopup.prototype.createToolbar = function() {
 		this.toolbar = new ED.Views.Toolbar(this.drawing, this.container);
-		this.toolbar.on('doodle.action', this.render.bind(this));
+		this.toolbar.on('button.action', this.render.bind(this));
 	};
+
+	DoodlePopup.prototype.createHelpButton = function() {
+		this.helpButton = new ED.Views.DoodlePopup.Help(this);
+	}
 
 	/**
 	 * Create the template for the popup.
@@ -106,13 +101,16 @@ ED.Views.DoodlePopup = (function() {
 		// Add doodle controls
 		doodle.showDoodleControls();
 
+		// TODO: this should be moved into the showDoodleControls method
 		var controls = this.container.find('.controls');
-
 		if (!controls.children().length) {
 			controls.addClass('hide');
 		}
-	};
 
+		console.log('re-rendered');
+
+		this.emit('render');
+	};
 
 	/**
 	 * Update the menu content with the specific doodle and either show or hide it.
@@ -150,10 +148,12 @@ ED.Views.DoodlePopup = (function() {
 	/**
 	 * Delay executing a callback.
 	 * @param  {Function} fn    The callback function to execute.
+	 * @param {Integer} amount The delay time (in ms)
 	 */
-	DoodlePopup.prototype.delay = function(fn) {
+	DoodlePopup.prototype.delay = function(fn, amount) {
 		clearTimeout(this.delayTimer);
-		this.delayTimer = setTimeout(fn, 50);
+		amount = typeof amount === 'number' ? amount : 50;
+		this.delayTimer = setTimeout(fn, amount);
 	};
 
 	/*********************
