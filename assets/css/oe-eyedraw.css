@@ -146,11 +146,11 @@
   width: 32px;
 }
 /* line 27, ../sass/components/toolbar/_button.scss */
-.ed-button:hover {
+.ed-button:hover, .ed-button.hover {
   background: #118afb;
 }
 /* line 30, ../sass/components/toolbar/_button.scss */
-.active .ed-button {
+.active .ed-button, .ed-button.active {
   background: #dae6f1;
 }
 /* line 34, ../sass/components/toolbar/_button.scss */
