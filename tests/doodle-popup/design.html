@@ -1,0 +1,653 @@
+<!doctype html>
+<html>
+<head>
+	<title>Eyedraw doodle popup menu prototype</title>
+
+	<!-- This is the main OpenEyes stlesheet -->
+	<link rel="stylesheet" type="text/css" href="css/style.css" />
+
+	<!-- This is purely used for test/demo purposes -->
+	<link rel="stylesheet" type="text/css" href="css/test.css" />
+
+	<!-- The eyedraw widget stylesheet -->
+	<link rel="stylesheet" type="text/css" href="../../assets/css/oe-eyedraw.css" />
+
+	<!-- Other dependent scripts -->
+	<script type="text/javascript" src="../../assets/components/jquery/jquery.min.js"></script>
+	<script type="text/javascript" src="../../assets/components/mustache/mustache.js"></script>
+	<script type="text/javascript" src="../../assets/components/eventemitter2/lib/eventemitter2.js"></script>
+</head>
+<body>
+	<div class="container main" role="main">
+		<div class="container content">
+			<div class="large-12 column event edit">
+				<header class="event-header">
+					<ul class="inline-list tabs event-actions">
+						<li class="selected">
+							<a href="#">Create</a>
+						</li>
+					</ul>
+				</header>
+				<div class="event-content" id="event-content">
+					<h2 class="event-title">Event title</h2>
+
+					<!-- Edit mode -->
+					<section class="element Element_OphCiExamination_AnteriorSegment">
+						<header class="element-header">
+							<h3 class="element-title">Edit mode (no doodle selected)</h3>
+						</header>
+						<div class="element-fields element-eyes row">
+							<div class="element-eye right-eye column side left">
+								<div class="ed-widget anterior-segment" id="eyedrawwidget_example">
+									<div class="ed-toolbar">
+										<ul class="ed-toolbar-panel ed-main-toolbar">
+										</ul>
+									</div>
+									<div class="ed-body">
+										<div class="row">
+											<div class="fixed column">
+												<div class="ed-editor">
+
+													<div class="ed-canvas-container"></div>
+													<canvas
+													id="ed-design-example"
+													class="ed-canvas-edit"
+													width="300"
+													height="300"
+													tabindex="1">
+													</canvas>
+
+													<div class="ed-selected-doodle">
+														<select class="ed-selected-doodle-select" id="ed_example_selected_doodle">
+															<optgroup label="Selected doodle">
+																<option>None</option>
+																<option selected>Selected doodle</option>
+															</optgroup>
+														</select>
+													</div>
+
+													<ul class="ed-toolbar-panel ed-canvas-toolbar">
+														<li>
+															<a class="ed-button" href="#" data-function="resetEyedraw">
+																<span class="icon-ed-reset"></span>
+																<span class="label">Reset eyedraw</span>
+															</a>
+														</li>
+													</ul>
+
+													<div class="ed-doodle-popup closed">
+													</div>
+												</div>
+											</div>
+
+											<div class="fluid column ed-fields">
+
+												<!-- FIELD ROW -->
+												<div class="field-row">
+													<label for="ed-field-1">
+														Field 1:
+													</label>
+													<div class="row">
+														<div class="large-8 column">
+															<select name="field" id="ed-field-1">
+																<option data-value="Large">Large</option>
+																<option data-value="Medium">Medium</option>
+																<option data-value="Small">Small</option>
+															</select>
+														</div>
+													</div>
+												</div>
+
+												<!-- FIELD ROW -->
+												<div class="field-row">
+													<label for="ed-field-2">
+														Field 2:
+													</label>
+													<div class="row">
+														<div class="large-8 column">
+															<select name="field" id="ed-field-2">
+																<option data-value="Large">Large</option>
+																<option data-value="Medium">Medium</option>
+																<option data-value="Small">Small</option>
+															</select>
+														</div>
+													</div>
+												</div>
+
+												<!-- FIELD ROW -->
+												<div class="field-row">
+													<button class="small">Report</button>
+													<button class="small">Clear</button>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="element-eye left-eye column side right" data-side="left">
+								<div class="data-row">
+									<div class="data-value">
+										<p>This example demonstrates the default edit state of the EyeDraw and
+										shows the following components:</p>
+										<ul>
+											<li>The eyedraw toolbar</li>
+											<li>The eydraw editing area (canvas)</li>
+											<li>The selected doodle</li>
+											<li>Bound eyedraw fields</li>
+											<li>Canvas toolbar (reset button)</li>
+										</ul>
+									</div>
+								</div>
+							</div>
+						</div>
+					</section>
+
+					<!-- Edit mode with doodle popup -->
+					<section class="element Element_OphCiExamination_AnteriorSegment">
+						<header class="element-header">
+							<h3 class="element-title">Edit mode with doodle selected</h3>
+						</header>
+						<div class="element-fields element-eyes row">
+							<div class="element-eye right-eye column side left">
+								<div class="ed-widget anterior-segment" id="eyedrawwidget_example">
+									<div class="ed-toolbar">
+										<ul class="ed-toolbar-panel ed-main-toolbar">
+										</ul>
+									</div>
+									<div class="ed-body">
+										<div class="row">
+											<div class="fixed column">
+												<div class="ed-editor">
+
+													<div class="ed-canvas-container"></div>
+													<canvas
+													id="ed-design-example"
+													class="ed-canvas-edit"
+													width="300"
+													height="300"
+													tabindex="1">
+													</canvas>
+
+													<div class="ed-selected-doodle">
+														<select class="ed-selected-doodle-select" id="ed_example_selected_doodle">
+															<optgroup label="Selected doodle">
+																<option>None</option>
+																<option selected>Selected doodle</option>
+															</optgroup>
+														</select>
+													</div>
+
+													<ul class="ed-toolbar-panel ed-canvas-toolbar">
+														<li>
+															<a class="ed-button" href="#" data-function="resetEyedraw">
+																<span class="icon-ed-reset"></span>
+																<span class="label">Reset eyedraw</span>
+															</a>
+														</li>
+													</ul>
+
+													<div class="ed-doodle-popup">
+														<ul class="ed-toolbar-panel ed-doodle-popup-toolbar">
+															<li>
+																<a class="ed-button ed-doodle-help" href="#" data-function="unlock">
+																	<span class="icon-ed-help"></span>
+																</a>
+															</li>
+																<li>
+																	<a class="ed-button" href="#" data-function="lock">
+																		<span class="icon-ed-lock"></span>
+																		<span class="label">Lock</span>
+																	</a>
+																</li>
+															<li>
+																<a class="ed-button" href="#" data-function="moveToBack">
+																	<span class="icon-ed-move-to-back"></span>
+																	<span class="label">Move to back</span>
+																</a>
+															</li>
+															<li>
+																<a class="ed-button" href="#" data-function="moveToFront">
+																	<span class="icon-ed-move-to-front"></span>
+																	<span class="label">Move to front</span>
+																</a>
+															</li>
+														</ul>
+														<div class="ed-doodle-info hide">
+																	<div class="ed-doodle-description">Drag the handle to resize the pupil<br><br>The iris is semi-transparent so that IOLs, and other structures can be seen behind it</div>
+														</div>
+														<div class="ed-doodle-controls" id="ed_example_controls">
+														<div><label for="ed_example_pupilSize_control">Pupil size</label><select id="ed_example_pupilSize_control"><option>Large</option><option>Medium</option><option>Small</option></select></div><div><label for="ed_example_pxe_control">PXE</label><input type="checkbox" id="ed_example_pxe_control"></div><div><label for="ed_example_coloboma_control">Coloboma</label><input type="checkbox" id="ed_example_coloboma_control"></div><div><label for="ed_example_colour_control">Colour</label><select id="ed_example_colour_control"><option>Blue</option><option>Brown</option><option>Gray</option><option>Green</option></select></div><div><label for="ed_example_ectropion_control">Ectropion uveae</label><input type="checkbox" id="ed_example_ectropion_control"></div></div>
+													</div>
+												</div>
+											</div>
+
+											<div class="fluid column ed-fields">
+
+												<!-- FIELD ROW -->
+												<div class="field-row">
+													<label for="ed-field-1">
+														Field 1:
+													</label>
+													<div class="row">
+														<div class="large-8 column">
+															<select name="field" id="ed-field-1">
+																<option data-value="Large">Large</option>
+																<option data-value="Medium">Medium</option>
+																<option data-value="Small">Small</option>
+															</select>
+														</div>
+													</div>
+												</div>
+
+												<!-- FIELD ROW -->
+												<div class="field-row">
+													<label for="ed-field-2">
+														Field 2:
+													</label>
+													<div class="row">
+														<div class="large-8 column">
+															<select name="field" id="ed-field-2">
+																<option data-value="Large">Large</option>
+																<option data-value="Medium">Medium</option>
+																<option data-value="Small">Small</option>
+															</select>
+														</div>
+													</div>
+												</div>
+
+												<!-- FIELD ROW -->
+												<div class="field-row">
+													<button class="small">Report</button>
+													<button class="small">Clear</button>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="element-eye left-eye column side right" data-side="left">
+								<div class="data-row">
+									<div class="data-value">
+										<p>This example demonstrates the EyeDraw when a doodle is selected, and shows the following components:</p>
+										<ul>
+											<li>Doodle popup</li>
+											<li>Doodle manipulation toolbar</li>
+											<li>Doodle control fields</li>
+										</ul>
+									</div>
+								</div>
+							</div>
+						</div>
+					</section>
+
+
+					<!-- Edit mode with doodle popup and doodle description -->
+					<section class="element Element_OphCiExamination_AnteriorSegment">
+						<header class="element-header">
+							<h3 class="element-title">Edit mode with doodle selected</h3>
+						</header>
+						<div class="element-fields element-eyes row">
+							<div class="element-eye right-eye column side left">
+								<div class="ed-widget anterior-segment" id="eyedrawwidget_example">
+									<div class="ed-toolbar">
+										<ul class="ed-toolbar-panel ed-main-toolbar">
+										</ul>
+									</div>
+									<div class="ed-body">
+										<div class="row">
+											<div class="fixed column">
+												<div class="ed-editor">
+
+													<div class="ed-canvas-container"></div>
+													<canvas
+													id="ed-design-example"
+													class="ed-canvas-edit"
+													width="300"
+													height="300"
+													tabindex="1">
+													</canvas>
+
+													<div class="ed-selected-doodle">
+														<select class="ed-selected-doodle-select" id="ed_example_selected_doodle">
+															<optgroup label="Selected doodle">
+																<option>None</option>
+																<option selected>Selected doodle</option>
+															</optgroup>
+														</select>
+													</div>
+
+													<ul class="ed-toolbar-panel ed-canvas-toolbar">
+														<li>
+															<a class="ed-button" href="#" data-function="resetEyedraw">
+																<span class="icon-ed-reset"></span>
+																<span class="label">Reset eyedraw</span>
+															</a>
+														</li>
+													</ul>
+
+													<div class="ed-doodle-popup">
+														<ul class="ed-toolbar-panel ed-doodle-popup-toolbar">
+															<li>
+																<a class="ed-button ed-doodle-help" href="#" data-function="unlock">
+																	<span class="icon-ed-help"></span>
+																</a>
+															</li>
+																<li>
+																	<a class="ed-button" href="#" data-function="lock">
+																		<span class="icon-ed-lock"></span>
+																		<span class="label">Lock</span>
+																	</a>
+																</li>
+															<li>
+																<a class="ed-button" href="#" data-function="moveToBack">
+																	<span class="icon-ed-move-to-back"></span>
+																	<span class="label">Move to back</span>
+																</a>
+															</li>
+															<li>
+																<a class="ed-button" href="#" data-function="moveToFront">
+																	<span class="icon-ed-move-to-front"></span>
+																	<span class="label">Move to front</span>
+																</a>
+															</li>
+														</ul>
+														<div class="ed-doodle-info">
+															<div class="ed-doodle-description">Drag the handle to resize the pupil<br><br>The iris is semi-transparent so that IOLs, and other structures can be seen behind it</div>
+														</div>
+														<div class="ed-doodle-controls hide" id="ed_example_controls">
+															<div><label for="ed_example_pupilSize_control">Pupil size</label><select id="ed_example_pupilSize_control"><option>Large</option><option>Medium</option><option>Small</option></select></div><div><label for="ed_example_pxe_control">PXE</label><input type="checkbox" id="ed_example_pxe_control"></div><div><label for="ed_example_coloboma_control">Coloboma</label><input type="checkbox" id="ed_example_coloboma_control"></div><div><label for="ed_example_colour_control">Colour</label><select id="ed_example_colour_control"><option>Blue</option><option>Brown</option><option>Gray</option><option>Green</option></select></div><div><label for="ed_example_ectropion_control">Ectropion uveae</label><input type="checkbox" id="ed_example_ectropion_control"></div>
+														</div>
+													</div>
+												</div>
+											</div>
+
+											<div class="fluid column ed-fields">
+
+												<!-- FIELD ROW -->
+												<div class="field-row">
+													<label for="ed-field-1">
+														Field 1:
+													</label>
+													<div class="row">
+														<div class="large-8 column">
+															<select name="field" id="ed-field-1">
+																<option data-value="Large">Large</option>
+																<option data-value="Medium">Medium</option>
+																<option data-value="Small">Small</option>
+															</select>
+														</div>
+													</div>
+												</div>
+
+												<!-- FIELD ROW -->
+												<div class="field-row">
+													<label for="ed-field-2">
+														Field 2:
+													</label>
+													<div class="row">
+														<div class="large-8 column">
+															<select name="field" id="ed-field-2">
+																<option data-value="Large">Large</option>
+																<option data-value="Medium">Medium</option>
+																<option data-value="Small">Small</option>
+															</select>
+														</div>
+													</div>
+												</div>
+
+												<!-- FIELD ROW -->
+												<div class="field-row">
+													<button class="small">Report</button>
+													<button class="small">Clear</button>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="element-eye left-eye column side right" data-side="left">
+								<div class="data-row">
+									<div class="data-value">
+										<p>This example show the state of the doodle popup when the doodle information is displayed (when the help icon is selected).</p>
+									</div>
+								</div>
+							</div>
+						</div>
+					</section>
+
+
+					<!-- Edit mode with doodle popup -->
+					<section class="element Element_OphCiExamination_AnteriorSegment">
+						<header class="element-header">
+							<h3 class="element-title">Edit mode with doodle selected</h3>
+						</header>
+						<div class="element-fields element-eyes row">
+							<div class="element-eye right-eye column side left">
+								<div class="ed-widget anterior-segment" id="eyedrawwidget_example">
+									<div class="ed-toolbar">
+										<ul class="ed-toolbar-panel ed-main-toolbar">
+										</ul>
+									</div>
+									<div class="ed-body">
+										<div class="row">
+											<div class="fixed column">
+												<div class="ed-editor">
+
+													<div class="ed-canvas-container"></div>
+													<canvas
+													id="ed-design-example"
+													class="ed-canvas-edit"
+													width="300"
+													height="300"
+													tabindex="1">
+													</canvas>
+
+													<div class="ed-selected-doodle">
+														<select class="ed-selected-doodle-select" id="ed_example_selected_doodle">
+															<optgroup label="Selected doodle">
+																<option>None</option>
+																<option selected>Selected doodle</option>
+															</optgroup>
+														</select>
+													</div>
+
+													<ul class="ed-toolbar-panel ed-canvas-toolbar">
+														<li>
+															<a class="ed-button" href="#" data-function="resetEyedraw">
+																<span class="icon-ed-reset"></span>
+																<span class="label">Reset eyedraw</span>
+															</a>
+														</li>
+													</ul>
+
+													<div class="ed-doodle-popup">
+														<ul class="ed-toolbar-panel ed-doodle-popup-toolbar">
+															<li>
+																<a class="ed-button ed-doodle-help" href="#" data-function="unlock">
+																	<span class="icon-ed-help"></span>
+																</a>
+															</li>
+																<li>
+																	<a class="ed-button" href="#" data-function="lock">
+																		<span class="icon-ed-lock"></span>
+																		<span class="label">Lock</span>
+																	</a>
+																</li>
+															<li>
+																<a class="ed-button" href="#" data-function="moveToBack">
+																	<span class="icon-ed-move-to-back"></span>
+																	<span class="label">Move to back</span>
+																</a>
+															</li>
+															<li>
+																<a class="ed-button" href="#" data-function="moveToFront">
+																	<span class="icon-ed-move-to-front"></span>
+																	<span class="label">Move to front</span>
+																</a>
+															</li>
+														</ul>
+														<div class="ed-doodle-info hide">
+															<div class="ed-doodle-description">Drag the handle to resize the pupil<br><br>The iris is semi-transparent so that IOLs, and other structures can be seen behind it</div>
+														</div>
+														<div class="ed-doodle-controls" id="ed_example_controls">
+															<div><label for="ed_example_pupilSize_control">Pupil size</label><select id="ed_example_pupilSize_control"><option>Large</option><option>Medium</option><option>Small</option></select></div><div><label for="ed_example_pxe_control">PXE</label><input type="checkbox" id="ed_example_pxe_control"></div><div><label for="ed_example_coloboma_control">Coloboma</label><input type="checkbox" id="ed_example_coloboma_control"></div><div><label for="ed_example_colour_control">Colour</label><select id="ed_example_colour_control"><option>Blue</option><option>Brown</option><option>Gray</option><option>Green</option></select></div><div><label for="ed_example_ectropion_control">Ectropion uveae</label><input type="checkbox" id="ed_example_ectropion_control"></div>
+															<div><label>Additional field</label><input type="checkbox" /></div>
+															<div><label>Additional field</label><input type="checkbox" /></div>
+															<div><label>Additional field</label><input type="checkbox" /></div>
+															<div><label>Additional field</label><input type="checkbox" /></div>
+															<div><label>Additional field</label><input type="checkbox" /></div>
+															<div><label>Additional field</label><input type="checkbox" /></div>
+															<div><label>Additional field</label><input type="checkbox" /></div>
+															<div><label>Additional field</label><input type="checkbox" /></div>
+															<div><label>Additional field</label><input type="checkbox" /></div>
+														</div>
+													</div>
+												</div>
+											</div>
+
+											<div class="fluid column ed-fields">
+
+												<!-- FIELD ROW -->
+												<div class="field-row">
+													<label for="ed-field-1">
+														Field 1:
+													</label>
+													<div class="row">
+														<div class="large-8 column">
+															<select name="field" id="ed-field-1">
+																<option data-value="Large">Large</option>
+																<option data-value="Medium">Medium</option>
+																<option data-value="Small">Small</option>
+															</select>
+														</div>
+													</div>
+												</div>
+
+												<!-- FIELD ROW -->
+												<div class="field-row">
+													<label for="ed-field-2">
+														Field 2:
+													</label>
+													<div class="row">
+														<div class="large-8 column">
+															<select name="field" id="ed-field-2">
+																<option data-value="Large">Large</option>
+																<option data-value="Medium">Medium</option>
+																<option data-value="Small">Small</option>
+															</select>
+														</div>
+													</div>
+												</div>
+
+												<!-- FIELD ROW -->
+												<div class="field-row">
+													<button class="small">Report</button>
+													<button class="small">Clear</button>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="element-eye left-eye column side right" data-side="left">
+								<div class="data-row">
+									<div class="data-value">
+										<p>This example demonstrates how the doodle popup handles doodles with
+										many associated field controls.</p>
+									</div>
+								</div>
+							</div>
+						</div>
+					</section>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script type="text/html" id="toolbar-template">
+		<li>
+			<a class="ed-button" href="#" data-function="addDoodle" data-arg="NuclearCataract">
+				<span class="icon-ed-NuclearCataract"></span>
+				<span class="label">Nuclear cataract</span>
+			</a>
+		</li>
+		<li>
+			<a class="ed-button" href="#" data-function="addDoodle" data-arg="CorticalCataract">
+				<span class="icon-ed-CorticalCataract"></span>
+				<span class="label">Cortical cataract</span>
+			</a>
+		</li>
+		<li>
+			<a class="ed-button" href="#" data-function="addDoodle" data-arg="PostSubcapCataract">
+				<span class="icon-ed-PostSubcapCataract"></span>
+				<span class="label">Posterior subcapsular cataract</span>
+			</a>
+		</li>
+		<li>
+			<a class="ed-button" href="#" data-function="addDoodle" data-arg="PCIOL">
+				<span class="icon-ed-PCIOL"></span>
+				<span class="label">Posterior chamber IOL</span>
+			</a>
+		</li>
+		<li>
+			<a class="ed-button" href="#" data-function="addDoodle" data-arg="ACIOL">
+				<span class="icon-ed-ACIOL"></span>
+				<span class="label">Anterior chamber IOL</span>
+			</a>
+		</li>
+		<li>
+			<a class="ed-button" href="#" data-function="addDoodle" data-arg="Bleb">
+				<span class="icon-ed-Bleb"></span>
+				<span class="label">Trabeculectomy bleb</span>
+			</a>
+		</li>
+		<li>
+			<a class="ed-button" href="#" data-function="addDoodle" data-arg="PI">
+				<span class="icon-ed-PI"></span>
+				<span class="label">Peripheral iridectomy</span>
+			</a>
+		</li>
+		<li>
+			<a class="ed-button" href="#" data-function="addDoodle" data-arg="Fuchs">
+				<span class="icon-ed-Fuchs"></span>
+				<span class="label">Fuchs endothelial dystrophy</span>
+			</a>
+		</li>
+		<li>
+			<a class="ed-button" href="#" data-function="addDoodle" data-arg="RK">
+				<span class="icon-ed-RK"></span>
+				<span class="label">Radial keratotomy</span>
+			</a>
+		</li>
+		<li>
+			<a class="ed-button" href="#" data-function="addDoodle" data-arg="LasikFlap">
+				<span class="icon-ed-LasikFlap"></span>
+				<span class="label">LASIK flap</span>
+			</a>
+		</li>
+		<li>
+			<a class="ed-button" href="#" data-function="addDoodle" data-arg="CornealScar">
+				<span class="icon-ed-CornealScar"></span>
+				<span class="label">Corneal scar</span>
+			</a>
+		</li>
+		<li>
+			<a class="ed-button" href="#" data-function="addDoodle" data-arg="SectorIridectomy">
+				<span class="icon-ed-SectorIridectomy"></span>
+				<span class="label">Sector iridectomy</span>
+			</a>
+		</li>
+		<li>
+			<a class="ed-button" href="#" data-function="addDoodle" data-arg="PosteriorSynechia">
+				<span class="icon-ed-PosteriorSynechia"></span>
+				<span class="label">Posterior synechia</span>
+			</a>
+		</li>
+	</script>
+	<script>
+	(function() {
+		var toolbar = $('#toolbar-template').html();
+		$('.ed-main-toolbar').html(toolbar);
+	}());
+	</script>
+</body>
+</html>
