@@ -12,6 +12,7 @@ var pattern = '{' + [
 	'ED/Doodles/**/*.js',
 	'ED/Misc/*.js',
 	'ED/Views/*.js',
+	'ED/Views/**/*.js',
 	'*.js'
 ].join(',') + '}';
 
