@@ -38,7 +38,7 @@ ED.AntSeg = function(_drawing, _parameterJSON) {
 	this.ectropion = false;
 
 	// Saved parameters
-	this.savedParameterArray = ['apexY', 'rotation', 'pxe', 'coloboma', 'colour', 'ectropion'];
+	this.savedParameterArray = ['pupilSize', 'apexY', 'rotation', 'pxe', 'coloboma', 'colour', 'ectropion'];
 
 	// Parameters in doodle control bar (parameter name: parameter label)
 	this.controlParameterArray = {'pupilSize':'Pupil size', 'pxe':'PXE', 'coloboma':'Coloboma', 'colour':'Colour', 'ectropion':'Ectropion uveae'};
