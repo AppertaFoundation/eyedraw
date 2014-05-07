@@ -15,7 +15,7 @@
 // * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
 
 // Main toolbar container.
-.eyedraw-toolbar {
+.ed-toolbar {
 	@include border-radius(3px);
 	background: #fafafa;
 	border: 1px solid #ddd;
@@ -23,26 +23,6 @@
 	margin-left: -4px;
 }
 
-@import "components/toolbar/panel";
+@import "components/toolbar/panels";
 @import "components/toolbar/button";
 @import "components/toolbar/label";
-
-// Canvas toolbar (eg, "reset eyedraw")
-.eyedraw-toolbar-panel {
-	&.eyedraw-canvas-toolbar {
-		bottom: 3px;
-		left: 6px;
-		position: absolute;
-		z-index: 102;
-		li {
-			margin: 0;
-		}
-		.eyedraw-button {
-			background: none;
-			border: 0;
-			.label {
-				top: -32px;
-			}
-		}
-	}
-}

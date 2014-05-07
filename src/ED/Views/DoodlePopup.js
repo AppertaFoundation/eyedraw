@@ -41,14 +41,14 @@ ED.Views.DoodlePopup = (function() {
 		this.createToolbar();
 		this.createTemplate();
 
-		this.container.on('mouseenter', '.eyedraw-doodle-help', function() {
-			this.container.find('.eyedraw-doodle-info').hide().fadeIn(100);
-			this.container.find('.controls').hide();
+		this.container.on('mouseenter', '.ed-doodle-help', function() {
+			this.container.find('.ed-doodle-info').hide().fadeIn(100);
+			this.container.find('.ed-doodle-controls').hide();
 		}.bind(this));
 
-		this.container.on('mouseleave', '.eyedraw-doodle-help', function() {
-			this.container.find('.eyedraw-doodle-info').hide();
-			this.container.find('.controls').hide().fadeIn(100);
+		this.container.on('mouseleave', '.ed-doodle-help', function() {
+			this.container.find('.ed-doodle-info').hide();
+			this.container.find('.ed-doodle-controls').hide().fadeIn(100);
 		}.bind(this));
 	}
 
@@ -67,7 +67,7 @@ ED.Views.DoodlePopup = (function() {
 	 * Create the template for the popup.
 	 */
 	DoodlePopup.prototype.createTemplate = function() {
-		this.template = $('#eyedraw-doodle-popup-template').html();
+		this.template = $('#ed-doodle-popup-template').html();
 	};
 
 	/**

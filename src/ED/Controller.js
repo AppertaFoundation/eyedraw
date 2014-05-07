@@ -48,12 +48,12 @@ ED.Controller = (function() {
 		this.properties = properties;
 		this.canvas = document.getElementById(properties.canvasId);
 		this.input = document.getElementById(properties.inputId);
-		this.container = $(this.canvas).closest('.eyedraw-widget');
+		this.container = $(this.canvas).closest('.ed-widget');
 
 		this.Checker = Checker || ED.Checker;
 		this.drawing = drawing || this.createDrawing();
-		this.mainToolbar = mainToolbar || this.createToolbar('.eyedraw-main-toolbar');
-		this.canvasToolbar = canvasToolbar || this.createToolbar('.eyedraw-canvas-toolbar');
+		this.mainToolbar = mainToolbar || this.createToolbar('.ed-main-toolbar');
+		this.canvasToolbar = canvasToolbar || this.createToolbar('.ed-canvas-toolbar');
 		this.doodlePopup = doodlePopup || this.createDoodlePopup();
 		this.selectedDoodle = selectedDoodle || this.createSelectedDoodle();
 
@@ -104,7 +104,7 @@ ED.Controller = (function() {
 	Controller.prototype.createDoodlePopup = function() {
 		return new ED.Views.DoodlePopup(
 			this.drawing,
-			this.container.find('.eyedraw-doodle-popup')
+			this.container.find('.ed-doodle-popup')
 		);
 	};
 
@@ -115,7 +115,7 @@ ED.Controller = (function() {
 	Controller.prototype.createSelectedDoodle = function() {
 		return new ED.Views.SelectedDoodle(
 			this.drawing,
-			this.container.find('.eyedraw-selected-doodle')
+			this.container.find('.ed-selected-doodle')
 		);
 	};
 

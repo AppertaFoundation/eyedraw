@@ -14,13 +14,13 @@
 // * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
 // * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
 
-.eyedraw-widget {
+.ed-widget {
 	@extend %clearfix;
 }
 
-.eyedraw-body {
+.ed-body {
 	background: #d2dee8;
-	margin: 10px 0 10px -3px;
+	margin: 4px 0 10px -3px;
 	.column.fixed {
 		width: 320px;
 		padding-right: 0;

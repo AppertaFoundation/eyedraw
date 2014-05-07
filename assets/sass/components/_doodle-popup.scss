@@ -14,7 +14,7 @@
 // * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
 // * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
 
-.eyedraw-doodle-popup {
+.ed-doodle-popup {
 	@include transition(right 0.5s ease, opacity 0.5s ease);
 	background: #c3def5;
 	border: 1px solid #53a0c7;
@@ -32,65 +32,51 @@
 	&.closed {
 		right: 8px;
 		opacity: 0.85;
-		.eyedraw-button {
+		.ed-button {
 			.label {
 				display: none;
 			}
 		}
 	}
-	.eyedraw-toolbar-panel {
-		li {
-			margin-bottom: 0;
-			margin-right: 5px;
-			&:last-child {
-				margin-right: 0;
-			}
-		}
-	}
-	.help-msg {
-		font-size: 12px;
-		color: #666;
-		font-style: italic;
-	}
-	.description {
-		color: #444;
-		font-size: 12px;
-		font-style: italic;
-		line-height: 12px;
-		padding-top: 6px;
-	}
-	.controls {
-		padding-top: 14px;
-		max-height: 224px;
-		overflow: auto;
-		> div {
-			@extend %clearfix;
-			line-height: 12px;
-			padding-bottom: 8px;
-		}
-		label {
-			color: #477792;
-			float: left;
-			font-size: 12px;
-			margin: 0 6px 0 0;
-			&:after {
-				content: ":";
-			}
-		}
-		select {
-			width: auto;
+}
+
+.ed-doodle-popup-toolbar {
+	li {
+		margin-bottom: 0;
+		margin-right: 5px;
+		&:last-child {
+			margin-right: 0;
 		}
 	}
 }
 
-.eyedraw-doodle-popup-heading {
-	@extend %clearfix;
-	color: #000;
-	font-size: 14px;
-	line-height: 14px;
-	margin-top: 0;
-	.eyedraw-button {
+.ed-doodle-description {
+	color: #444;
+	font-size: 12px;
+	font-style: italic;
+	line-height: 12px;
+	padding-top: 6px;
+}
+
+.ed-doodle-controls {
+	padding-top: 14px;
+	max-height: 224px;
+	overflow: auto;
+	> div {
+		@extend %clearfix;
+		line-height: 12px;
+		padding-bottom: 8px;
+	}
+	label {
+		color: #477792;
 		float: left;
-		margin-right: 5px;
+		font-size: 12px;
+		margin: 0 6px 0 0;
+		&:after {
+			content: ":";
+		}
+	}
+	select {
+		width: auto;
 	}
 }

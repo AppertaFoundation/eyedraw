@@ -15,7 +15,7 @@
 // * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
 
 // Panels group buttons and other controls.
-.eyedraw-toolbar-panel {
+.ed-toolbar-panel {
 	@extend %clearfix;
 	&, ul {
 		list-style-type: none;
@@ -43,6 +43,22 @@
 		&.active {
 			ul {
 				display: block;
+			}
+		}
+	}
+	&.ed-canvas-toolbar {
+		bottom: -2px;
+		left: 6px;
+		position: absolute;
+		z-index: 103;
+		li {
+			margin: 0;
+		}
+		.ed-button {
+			background: none;
+			border: 0;
+			.label {
+				top: -32px;
 			}
 		}
 	}

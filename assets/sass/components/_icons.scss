@@ -14,11 +14,11 @@
 // * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
 // * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
 
-$eyedraw-icon-prefix: "icon-ed";
-$eyedraw-icon-width: 32px;
-$eyedraw-icon-height: 32px;
+$ed-icon-prefix: "icon-ed";
+$ed-icon-width: 32px;
+$ed-icon-height: 32px;
 
-[class*="#{$eyedraw-icon-prefix}-"] {
+[class*="#{$ed-icon-prefix}-"] {
 	@extend %hide-text;
 	display: inline-block;
 	vertical-align: middle;
@@ -27,6 +27,6 @@ $eyedraw-icon-height: 32px;
 	}
 }
 
-@include sprite("icons/32x32/**/*.png", $eyedraw-icon-prefix, $eyedraw-icon-width, $eyedraw-icon-height, true);
+@include sprite("icons/32x32/**/*.png", $ed-icon-prefix, $ed-icon-width, $ed-icon-height, true);
 
-@include sprite("icons/16x16/**/*.png", "#{$eyedraw-icon-prefix}-small", 16px, 16px, true);
+@include sprite("icons/16x16/**/*.png", "#{$ed-icon-prefix}-small", 16px, 16px, true);

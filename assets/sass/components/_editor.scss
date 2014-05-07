@@ -14,34 +14,11 @@
 // * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
 // * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
 
-.eyedraw-editor {
+.ed-editor {
 	position: relative;
 }
 
-canvas {
-	// Canvas element in edit mode
-	&.eyedraw-canvas-edit {
-		cursor: pointer;
-		position: relative;
-		z-index: 103;
-		border: 0;
-		background: #e4edf5;
-		top: 4px;
-		left: 4px;
-	}
-	// Canvas element in display mode
-	&.eyedraw-canvas-display {
-		border: none;
-		cursor: auto;
-		margin: 0px;
-	}
-	// Stop canvas being highlighted on mouse click
-	&:focus {
-		outline: none;
-	}
-}
-
-.canvas-container {
+.ed-canvas-container {
 	position: absolute;
 	z-index: 101;
 	border: 1px solid #53a0c7;
@@ -52,7 +29,27 @@ canvas {
 	top: 3px;
 }
 
-.eyedraw-doodle-info {
-	padding-top: 10px;
-	padding-bottom: 10px;
+canvas {
+	// Canvas element in edit mode
+	&.ed-canvas-edit {
+		cursor: pointer;
+		position: relative;
+		z-index: 103;
+		border: 0;
+		background: #e4edf5;
+		top: 4px;
+		left: 4px;
+	}
+	// Canvas element in display mode
+	&.ed-canvas-display {
+		border: none;
+		cursor: auto;
+		margin: 0px;
+	}
+	// Stop canvas being highlighted on mouse click
+	&.ed-canvas-edit, &.ed-canvas-display {
+		&:focus {
+			outline: none;
+		}
+	}
 }

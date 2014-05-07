@@ -40,7 +40,7 @@ ED.Views.Toolbar = (function() {
 	 */
 	function Toolbar() {
 		ED.View.apply(this, arguments);
-		this.buttons = this.container.find('.eyedraw-button');
+		this.buttons = this.container.find('.ed-button');
 		this.bindEvents();
 	}
 
@@ -62,7 +62,7 @@ ED.Views.Toolbar = (function() {
 	 * Bind UI events.
 	 */
 	Toolbar.prototype.bindEvents = function() {
-		this.container.on('click.' + EVENT_NAMESPACE, '.eyedraw-button', this.onButtonClick.bind(this));
+		this.container.on('click.' + EVENT_NAMESPACE, '.ed-button', this.onButtonClick.bind(this));
 	};
 
 	Toolbar.prototype.enableButton = function(button) {
