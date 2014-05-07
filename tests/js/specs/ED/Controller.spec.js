@@ -11,7 +11,7 @@
 	function createDOM() {
 
 		var container = $('<div />', {
-			'class': 'eyedraw-widget'
+			'class': 'ed-widget'
 		}).appendTo(document.body);
 
 		var canvas = $('<canvas />', {
@@ -26,11 +26,11 @@
 		}).appendTo(container);
 
 		var mainToolbar = $('<div />', {
-			'class': 'eyedraw-toolbar-panel eyedraw-main-toolbar'
+			'class': 'ed-toolbar-panel ed-main-toolbar'
 		}).appendTo(container);
 
 		var canvasToolbar = $('<div />', {
-			'class': 'eyedraw-toolbar-panel eyedraw-canvas-toolbar'
+			'class': 'ed-toolbar-panel ed-canvas-toolbar'
 		}).appendTo(container);
 
 		return {
@@ -456,7 +456,7 @@
 				var bindingArray = {
 					'EYEDRAW_ID_!': {
 						pupilSize: {
-							id: "eyedraw-field-1",
+							id: "ed-field-1",
 							attribute: "data-value"
 						},
 						pxe: {

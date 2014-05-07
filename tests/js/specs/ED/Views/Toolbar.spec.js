@@ -21,7 +21,7 @@
 	function createContainer(func, arg) {
 		var container = document.createElement('div');
 		var child = document.createElement('div');
-		child.className = 'eyedraw-button';
+		child.className = 'ed-button';
 		child.setAttribute('data-function', func || 'randomFunction');
 		child.setAttribute('data-arg', arg || 'catsrule');
 		container.appendChild(child);
@@ -89,7 +89,7 @@
 				var o = createToolbar();
 				initToolbar(o.toolbar);
 
-				var button = $(o.container).find('.eyedraw-button');
+				var button = $(o.container).find('.ed-button');
 				button.trigger('click');
 				expect(spy.calledOnce).to.be.true;
 				spy.restore();
@@ -104,7 +104,7 @@
 					initToolbar(o.toolbar);
 
 					var spy = sinon.spy(o.drawing, 'randomFunction');
-					var button = $(o.container).find('.eyedraw-button');
+					var button = $(o.container).find('.ed-button');
 					button.trigger('click');
 
 					expect(spy.withArgs('catsrule').called).to.be.true;
@@ -117,7 +117,7 @@
 					initToolbar(o.toolbar);
 
 					var spy = sinon.spy(o.toolbar, 'emit');
-					var button = $(o.container).find('.eyedraw-button');
+					var button = $(o.container).find('.ed-button');
 					button.trigger('click');
 
 					expect(spy.withArgs('doodle.action', {
@@ -134,7 +134,7 @@
 					initToolbar(o.toolbar);
 
 					var spy = sinon.spy(o.toolbar, 'emit');
-					var button = $(o.container).find('.eyedraw-button');
+					var button = $(o.container).find('.ed-button');
 					button.trigger('click');
 
 					expect(spy.withArgs('doodle.error').called).to.be.true;

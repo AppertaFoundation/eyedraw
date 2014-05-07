@@ -47,17 +47,6 @@
 				<div class="event-content" id="event-content">
 					<h2 class="event-title">Event title</h2>
 
-					<!-- Introduction -->
-					<section class="element hide">
-						<header class="element-header">
-							<h3 class="element-title">Introduction</h3>
-						</header>
-						<div class="element-fields">
-							<p>This document demonstrates different uses of the EyeDraw widget, and was created as part of <a href="https://openeyes.atlassian.net/browse/OED-4">OED-4</a>.</p>
-						</div>
-					</section>
-					<!-- END Introduction -->
-
 					<!-- Anterior segment EDIT -->
 					<section class="element Element_OphCiExamination_AnteriorSegment">
 						<header class="element-header">
@@ -67,222 +56,123 @@
 							<div class="element-eye right-eye column side left" data-side="right">
 
 								<!-- EYEDRAW WIDGET START -->
-								<div class="eyedraw-widget anterior-segment" id="eyedrawwidget_example">
+								<div class="ed-widget anterior-segment" id="eyedrawwidget_example">
 
 									<!-- TOOLBAR START -->
-									<div class="eyedraw-toolbar">
+									<div class="ed-toolbar">
 
 										<!-- PANEL START -->
-										<ul class="eyedraw-toolbar-panel eyedraw-main-toolbar">
+										<ul class="ed-toolbar-panel ed-main-toolbar">
 											<li>
-												<a class="eyedraw-button" href="#" data-function="addDoodle" data-arg="NuclearCataract">
+												<a class="ed-button" href="#" data-function="addDoodle" data-arg="NuclearCataract">
 													<span class="icon-ed-NuclearCataract"></span>
 													<span class="label">Nuclear cataract</span>
 												</a>
 											</li>
 											<li>
-												<a class="eyedraw-button" href="#" data-function="addDoodle" data-arg="CorticalCataract">
+												<a class="ed-button" href="#" data-function="addDoodle" data-arg="CorticalCataract">
 													<span class="icon-ed-CorticalCataract"></span>
 													<span class="label">Cortical cataract</span>
 												</a>
 											</li>
 											<li>
-												<a class="eyedraw-button" href="#" data-function="addDoodle" data-arg="PostSubcapCataract">
+												<a class="ed-button" href="#" data-function="addDoodle" data-arg="PostSubcapCataract">
 													<span class="icon-ed-PostSubcapCataract"></span>
 													<span class="label">Posterior subcapsular cataract</span>
 												</a>
 											</li>
 											<li>
-												<a class="eyedraw-button" href="#" data-function="addDoodle" data-arg="PCIOL">
+												<a class="ed-button" href="#" data-function="addDoodle" data-arg="PCIOL">
 													<span class="icon-ed-PCIOL"></span>
 													<span class="label">Posterior chamber IOL</span>
 												</a>
 											</li>
 											<li>
-												<a class="eyedraw-button" href="#" data-function="addDoodle" data-arg="ACIOL">
+												<a class="ed-button" href="#" data-function="addDoodle" data-arg="ACIOL">
 													<span class="icon-ed-ACIOL"></span>
 													<span class="label">Anterior chamber IOL</span>
 												</a>
 											</li>
 											<li>
-												<a class="eyedraw-button" href="#" data-function="addDoodle" data-arg="Bleb">
+												<a class="ed-button" href="#" data-function="addDoodle" data-arg="Bleb">
 													<span class="icon-ed-Bleb"></span>
 													<span class="label">Trabeculectomy bleb</span>
 												</a>
 											</li>
 											<li>
-												<a class="eyedraw-button" href="#" data-function="addDoodle" data-arg="PI">
+												<a class="ed-button" href="#" data-function="addDoodle" data-arg="PI">
 													<span class="icon-ed-PI"></span>
 													<span class="label">Peripheral iridectomy</span>
 												</a>
 											</li>
 											<li>
-												<a class="eyedraw-button" href="#" data-function="addDoodle" data-arg="Fuchs">
+												<a class="ed-button" href="#" data-function="addDoodle" data-arg="Fuchs">
 													<span class="icon-ed-Fuchs"></span>
 													<span class="label">Fuchs endothelial dystrophy</span>
 												</a>
 											</li>
 											<li>
-												<a class="eyedraw-button" href="#" data-function="addDoodle" data-arg="RK">
+												<a class="ed-button" href="#" data-function="addDoodle" data-arg="RK">
 													<span class="icon-ed-RK"></span>
 													<span class="label">Radial keratotomy</span>
 												</a>
 											</li>
 											<li>
-												<a class="eyedraw-button" href="#" data-function="addDoodle" data-arg="LasikFlap">
+												<a class="ed-button" href="#" data-function="addDoodle" data-arg="LasikFlap">
 													<span class="icon-ed-LasikFlap"></span>
 													<span class="label">LASIK flap</span>
 												</a>
 											</li>
 											<li>
-												<a class="eyedraw-button" href="#" data-function="addDoodle" data-arg="CornealScar">
+												<a class="ed-button" href="#" data-function="addDoodle" data-arg="CornealScar">
 													<span class="icon-ed-CornealScar"></span>
 													<span class="label">Corneal scar</span>
 												</a>
 											</li>
 											<li>
-												<a class="eyedraw-button" href="#" data-function="addDoodle" data-arg="SectorIridectomy">
+												<a class="ed-button" href="#" data-function="addDoodle" data-arg="SectorIridectomy">
 													<span class="icon-ed-SectorIridectomy"></span>
 													<span class="label">Sector iridectomy</span>
 												</a>
 											</li>
 											<li>
-												<a class="eyedraw-button" href="#" data-function="addDoodle" data-arg="PosteriorSynechia">
+												<a class="ed-button" href="#" data-function="addDoodle" data-arg="PosteriorSynechia">
 													<span class="icon-ed-PosteriorSynechia"></span>
 													<span class="label">Posterior synechia</span>
 												</a>
 											</li>
 										</ul>
 										<!-- PANEL END -->
-
-										<!-- PANEL START -->
-										<!--
-										<ul class="eyedraw-toolbar-panel">
-											<li>
-												<a class="eyedraw-button" href="#" data-function="addDoodle" data-arg="NuclearCataract">
-													<img src="../../assets/img/NuclearCataract.gif" />
-													<span class="label">Nuclear cataract</span>
-												</a>
-											</li>
-											<li>
-												<a class="eyedraw-button" href="#" data-function="addDoodle" data-arg="CorticalCataract">
-													<img src="../../assets/img/CorticalCataract.gif" />
-													<span class="label">Cortical cataract</span>
-												</a>
-											</li>
-											<li>
-												<a class="eyedraw-button" href="#" data-function="addDoodle" data-arg="PostSubcapCataract">
-													<img src="../../assets/img/PostSubcapCataract.gif" />
-													<span class="label">Posterior subcapsular cataract</span>
-												</a>
-											</li>
-											<li>
-												<a class="eyedraw-button" href="#" data-function="addDoodle" data-arg="PCIOL">
-													<img src="../../assets/img/PCIOL.gif" />
-													<span class="label">Posterior chamber IOL</span>
-												</a>
-											</li>
-											<li>
-												<a class="eyedraw-button" href="#" data-function="addDoodle" data-arg="ACIOL">
-													<img src="../../assets/img/ACIOL.gif" />
-													<span class="label">Anterior chamber IOL</span>
-												</a>
-											</li>
-											<li>
-												<a class="eyedraw-button" href="#" data-function="addDoodle" data-arg="Bleb">
-													<img src="../../assets/img/Bleb.gif" />
-													<span class="label">Trabeculectomy bleb</span>
-												</a>
-											</li>
-											<li>
-												<a class="eyedraw-button" href="#" data-function="addDoodle" data-arg="PI">
-													<img src="../../assets/img/PI.gif" />
-													<span class="label">Peripheral iridectomy</span>
-												</a>
-											</li>
-											<li class="drawer">
-												<a class="eyedraw-button" href="#">
-													<img src="../../assets/img/more.gif" />
-													<span class="label">More...</span>
-												</a>
-												<ul>
-													<li>
-														<a class="eyedraw-button" href="" data-function="addDoodle" data-arg="Fuchs">
-															<img src="../../assets/img/Fuchs.gif" />
-															<span class="label">Fuchs endothelial dystrophy</span>
-														</a>
-													</li>
-													<li>
-														<a class="eyedraw-button" href="" data-function="addDoodle" data-arg="RK">
-															<img src="../../assets/img/RK.gif" />
-															<span class="label">Radial keratotomy</span>
-														</a>
-													</li>
-													<li>
-														<a class="eyedraw-button" href="" data-function="addDoodle" data-arg="LasikFlap">
-															<img src="../../assets/img/LasikFlap.gif" />
-															<span class="label">LASIK flap</span>
-														</a>
-													</li>
-													<li>
-														<a class="eyedraw-button" href="" data-function="addDoodle" data-arg="CornealScar">
-															<img src="../../assets/img/CornealScar.gif" />
-															<span class="label">Corneal scar</span>
-														</a>
-													</li>
-													<li>
-														<a class="eyedraw-button" href="" data-function="addDoodle" data-arg="SectorIridectomy">
-															<img src="../../assets/img/SectorIridectomy.gif" />
-															<span class="label">Sector iridectomy</span>
-														</a>
-													</li>
-													<li>
-														<a class="eyedraw-button" href="" data-function="addDoodle" data-arg="PosteriorSynechia">
-															<img src="../../assets/img/PosteriorSynechia.gif" />
-															<span class="label">Posterior synechia</span>
-														</a>
-													</li>
-													<li>
-														<a class="eyedraw-button" href="" data-function="addDoodle" data-arg="Rubeosis">
-															<img src="../../assets/img/Rubeosis.gif" />
-															<span class="label">Rubeosis iridis</span>
-														</a>
-													</li>
-												</ul>
-											</li>
-										</ul>
-										-->
-										<!-- PANEL END-->
 									</div>
 									<!-- TOOLBAR END -->
 
-									<div class="eyedraw-body">
+									<div class="ed-body">
 										<div class="row">
 
 											<div class="fixed column">
 
-											 <div class="eyedraw-editor">
+												<div class="ed-editor">
 
 													<!-- CANVAS -->
-													<div class="canvas-container"></div>
+													<div class="ed-canvas-container"></div>
 													<canvas
 													id="ed_example"
-													class="eyedraw-canvas-edit"
+													class="ed-canvas-edit"
 													width="300"
 													height="300"
 													tabindex="1">
 													</canvas>
 
 													<!-- SELECTED DOODLE -->
-													<div class="eyedraw-selected-doodle">
-														<select class="eyedraw-selected-doodle-select" id="ed_example_selected_doodle">>
+													<div class="ed-selected-doodle">
+														<select class="ed-selected-doodle-select" id="ed_example_selected_doodle">>
 														</select>
 													</div>
 
 													<!-- CANVAS TOOLBAR -->
-													<ul class="eyedraw-toolbar-panel eyedraw-canvas-toolbar">
+													<ul class="ed-toolbar-panel ed-canvas-toolbar">
 														<li>
-															<a class="eyedraw-button" href="#" data-function="resetEyedraw">
+															<a class="ed-button" href="#" data-function="resetEyedraw">
 																<span class="icon-ed-reset"></span>
 																<span class="label">Reset eyedraw</span>
 															</a>
@@ -290,7 +180,7 @@
 													</ul>
 
 													<!-- DOODLE POPUP -->
-													<div class="eyedraw-doodle-popup closed">
+													<div class="ed-doodle-popup closed">
 													</div>
 
 													<!-- DATA FIELD -->
@@ -301,16 +191,16 @@
 												</div>
 											</div>
 
-											<div class="fluid column eyedraw-fields">
+											<div class="fluid column ed-fields">
 
 												<!-- FIELD ROW -->
 												<div class="field-row">
-													<label for="eyedraw-field-1">
+													<label for="ed-field-1">
 														Field 1:
 													</label>
 													<div class="row">
 														<div class="large-8 column">
-															<select name="field" id="eyedraw-field-1">
+															<select name="field" id="ed-field-1">
 																<option data-value="Large">Large</option>
 																<option data-value="Medium">Medium</option>
 																<option data-value="Small">Small</option>
@@ -320,12 +210,12 @@
 												</div>
 												<!-- FIELD ROW -->
 												<div class="field-row">
-													<label for="eyedraw-field-2">
+													<label for="ed-field-2">
 														Field 2:
 													</label>
 													<div class="row">
 														<div class="large-8 column">
-															<select name="field" id="eyedraw-field-2">
+															<select name="field" id="ed-field-2">
 																<option>Large</option>
 																<option>Medium</option>
 																<option>Small</option>
@@ -335,10 +225,10 @@
 												</div>
 												<!-- FIELD ROW -->
 												<div class="field-row">
-													<label for="eyedraw-field-3">
+													<label for="ed-field-3">
 														Field 3:
 													</label>
-													<textarea rows="2" id="eyedraw-field-3"></textarea>
+													<textarea rows="2" id="ed-field-3"></textarea>
 												</div>
 												<!-- FIELD ROW -->
 												<fieldset class="field-row">
@@ -362,15 +252,12 @@
 							<div class="element-eye left-eye column side right" data-side="left">
 								<div class="data-row">
 									<div class="data-value">
-										<p><strong>UX Notes/issues:</strong></p>
+										<p><strong>TODO:</strong></p>
 										<ul>
-											<li>The doodle popup is too high if there is lots of help text & doodle controls</li>
-											<li>Need button disabled state designed</li>
-											<li>What about <code>doodle.isForDrawing</code> and <code>doodle.addSquiggle()</code>, is this functionality still required?</li>
-										</ul>
-										<p><strong>Dev issues:</strong></p>
-										<ul>
-											<li>Doodle controls have not been implemented</li>
+											<li>Needs disabled button state designed (toby)</li>
+											<li>Needs help icon designed (toby)</li>
+											<li>Check <code>doodle.isForDrawing</code> and <code>doodle.addSquiggle()</code> is still required. (richw)</li>
+											<li>Reset eyedraw could do with some improvements (richw/bill)</li>
 										</ul>
 									</div>
 								</div>
@@ -380,7 +267,7 @@
 					<!-- END Anterior segment EDIT -->
 
 					<!-- Anterior segment VIEW -->
-					<section class="element hide Element_OphCiExamination_AnteriorSegment">
+					<section class="element Element_OphCiExamination_AnteriorSegment">
 						<header class="element-header">
 							<h3 class="element-title">Anterior Segment (view mode)</h3>
 						</header>
@@ -388,25 +275,23 @@
 							<div class="element-eye right-eye column side left" data-side="right">
 
 								<!-- EYEDRAW WIDGET START -->
-								<div class="eyedraw-widget anterior-segment" id="eyedrawwidget_example">
+								<div class="ed-widget anterior-segment" id="eyedrawwidget_example">
 
-
-
-									<div class="eyedraw-body">
+									<div class="ed-body">
 										<div class="row">
 
-											<div class="fixed column eyedraw-editor">
+											<div class="fixed column ed-editor">
 
 												<!-- CANVAS -->
 												<canvas
 												id="ed_example_display"
-												class="eyedraw-canvas-display"
+												class="ed-canvas-display"
 												width="200"
 												height="200"
 												tabindex="1">
 												</canvas>
 
-												<span class="eyedraw-canvas-tooltip" id="ed_exampleTooltip2"></span>
+												<span class="ed-canvas-tooltip" id="ed_exampleTooltip2"></span>
 
 												<!-- DATA FIELD -->
 												<input
@@ -417,7 +302,7 @@
 												/>
 											</div>
 
-											<div class="fluid column eyedraw-data">
+											<div class="fluid column ed-data">
 											</div>
 										</div>
 									</div>
@@ -434,17 +319,8 @@
 					</section>
 					<!-- END Anterior segment VIEW -->
 
-
-
-
-
-
-
-
-
-
 					<!-- CATARACT EDIT -->
-					<section class="element hide">
+					<section class="element">
 						<header class="element-header">
 							<h3 class="element-title">Cataract synced with surgeon</h3>
 						</header>
@@ -452,39 +328,24 @@
 							<div class="element-eye right-eye column side left" data-side="right">
 
 								<!-- CATARACT EYEDRAW WIDGET START -->
-								<div class="eyedraw-widget anterior-segment" id="eyedrawwidget_example">
+								<div class="ed-widget anterior-segment" id="eyedrawwidget_example">
 
-									<!-- TOOLBAR START -->
-									<div class="eyedraw-toolbar">
-
-										<!-- PANEL START -->
-										<ul class="eyedraw-toolbar-panel">
-											<li>
-												<a class="eyedraw-button" href="#" data-function="addDoodle" data-arg="PhakoIncision">
-													<span class="icon-ed-PhakoIncision"></span>
-													<span class="label">Phako incision</span>
-												</a>
-											</li>
-										</ul>
-									</div>
-									<!-- TOOLBAR END -->
-
-									<div class="eyedraw-body">
+									<div class="ed-body">
 										<div class="row">
 
-											<div class="fixed column eyedraw-editor">
+											<div class="fixed column ed-editor">
 
 												<!-- CANVAS -->
 												<canvas
 												id="ed_example_cataract"
-												class="eyedraw-canvas-edit"
+												class="ed-canvas-edit"
 												width="300"
 												height="300"
 												tabindex="1">
 												</canvas>
 
 												<!-- TOOLTIP -->
-												<span class="eyedraw-canvas-tooltip" id="ed_exampleTooltip"></span>
+												<span class="ed-canvas-tooltip" id="ed_exampleTooltip"></span>
 
 												<!-- DATA FIELD -->
 												<input
@@ -493,7 +354,7 @@
 													value='' />
 											</div>
 
-											<div class="fluid column eyedraw-fields">
+											<div class="fluid column ed-fields">
 
 											</div>
 										</div>
@@ -502,22 +363,22 @@
 								<!-- END CATARACT EYEDRAW WIDGET -->
 
 								<!-- SURGEON EYEDRAW WIDGET START -->
-								<div class="eyedraw-widget anterior-segment" id="eyedrawwidget_example">
+								<div class="ed-widget anterior-segment" id="eyedrawwidget_example">
 
-									<div class="eyedraw-body">
-										<div class="eyedraw-editor">
+									<div class="ed-body">
+										<div class="ed-editor">
 
 											<!-- CANVAS -->
 											<canvas
 											id="ed_example_surgeon"
-											class="eyedraw-canvas-edit"
+											class="ed-canvas-edit"
 											width="300"
 											height="300"
 											tabindex="1">
 											</canvas>
 
 											<!-- TOOLTIP -->
-											<span class="eyedraw-canvas-tooltip" id="ed_exampleTooltip"></span>
+											<span class="ed-canvas-tooltip" id="ed_exampleTooltip"></span>
 
 											<!-- DATA FIELD -->
 											<input
@@ -550,51 +411,51 @@
 						<div class="element-fields element-eyes row">
 							<div class="element-eye right-eye column side left">
 								<!-- EYEDRAW WIDGET START -->
-								<div class="eyedraw-widget anterior-segment" id="eyedrawwidget_example">
+								<div class="ed-widget anterior-segment" id="eyedrawwidget_example">
 
 									<!-- TOOLBAR START -->
-									<div class="eyedraw-toolbar">
+									<div class="ed-toolbar">
 
 										<!-- Manipulation icons -->
-										<ul class="eyedraw-toolbar-panel">
+										<ul class="ed-toolbar-panel">
 											<li>
-												<a class="eyedraw-button" href="#">
+												<a class="ed-button" href="#">
 													<span class="icon-ed-delete"></span>
 													<span class="label">Delete</span>
 												</a>
 											</li>
 											<li>
-												<a class="eyedraw-button" href="#">
+												<a class="ed-button" href="#">
 													<span class="icon-ed-drawer-open"></span>
 													<span class="label">Open Drawer</span>
 												</a>
 											</li>
 											<li>
-												<a class="eyedraw-button" href="#">
+												<a class="ed-button" href="#">
 													<span class="icon-ed-lock"></span>
 													<span class="label">Lock</span>
 												</a>
 											</li>
 											<li>
-												<a class="eyedraw-button" href="#">
+												<a class="ed-button" href="#">
 													<span class="icon-ed-unlock"></span>
 													<span class="label">Unlock</span>
 												</a>
 											</li>
 											<li>
-												<a class="eyedraw-button" href="#">
+												<a class="ed-button" href="#">
 													<span class="icon-ed-move-to-back"></span>
 													<span class="label">Move to back</span>
 												</a>
 											</li>
 											<li>
-												<a class="eyedraw-button" href="#">
+												<a class="ed-button" href="#">
 													<span class="icon-ed-move-to-front"></span>
 													<span class="label">Move to front</span>
 												</a>
 											</li>
 											<li>
-												<a class="eyedraw-button" href="#">
+												<a class="ed-button" href="#">
 													<span class="icon-ed-reset"></span>
 													<span class="label">Reset</span>
 												</a>
@@ -602,15 +463,15 @@
 										</ul>
 
 										<!-- Gonioscopy icons -->
-										<ul class="eyedraw-toolbar-panel">
+										<ul class="ed-toolbar-panel">
 											<li>
-												<a class="eyedraw-button" href="#">
+												<a class="ed-button" href="#">
 													<span class="icon-ed-AngleNV"></span>
 													<span class="label">Angle new vessels</span>
 												</a>
 											</li>
 											<li>
-												<a class="eyedraw-button" href="#">
+												<a class="ed-button" href="#">
 													<span class="icon-ed-AntSynech"></span>
 													<span class="label">Anterior synechiae</span>
 												</a>
@@ -618,81 +479,81 @@
 										</ul>
 
 										<!-- Anterior Segment icons -->
-										<ul class="eyedraw-toolbar-panel">
+										<ul class="ed-toolbar-panel">
 											<li>
-												<a class="eyedraw-button" href="#" data-arg="NuclearCataract">
+												<a class="ed-button" href="#" data-arg="NuclearCataract">
 													<span class="icon-ed-NuclearCataract"></span>
 													<span class="label">Nuclear cataract</span>
 												</a>
 											</li>
 											<li>
-												<a class="eyedraw-button" href="#" data-arg="CorticalCataract">
+												<a class="ed-button" href="#" data-arg="CorticalCataract">
 													<span class="icon-ed-CorticalCataract"></span>
 													<span class="label">Cortical cataract</span>
 												</a>
 											</li>
 											<li>
-												<a class="eyedraw-button" href="#" data-arg="PostSubcapCataract">
+												<a class="ed-button" href="#" data-arg="PostSubcapCataract">
 													<span class="icon-ed-PostSubcapCataract"></span>
 													<span class="label">Posterior subcapsular cataract</span>
 												</a>
 											</li>
 											<li>
-												<a class="eyedraw-button" href="#" data-arg="PCIOL">
+												<a class="ed-button" href="#" data-arg="PCIOL">
 													<span class="icon-ed-PCIOL"></span>
 													<span class="label">Posterior chamber IOL</span>
 												</a>
 											</li>
 											<li>
-												<a class="eyedraw-button" href="#" data-arg="ACIOL">
+												<a class="ed-button" href="#" data-arg="ACIOL">
 													<span class="icon-ed-ACIOL"></span>
 													<span class="label">Anterior chamber IOL</span>
 												</a>
 											</li>
 											<li>
-												<a class="eyedraw-button" href="#" data-arg="Bleb">
+												<a class="ed-button" href="#" data-arg="Bleb">
 													<span class="icon-ed-Bleb"></span>
 													<span class="label">Trabeculectomy bleb</span>
 												</a>
 											</li>
 											<li>
-												<a class="eyedraw-button" href="#" data-arg="PI">
+												<a class="ed-button" href="#" data-arg="PI">
 													<span class="icon-ed-PI"></span>
 													<span class="label">Peripheral iridectomy</span>
 												</a>
 											</li>
 											<li>
-												<a class="eyedraw-button" href="#" data-arg="Fuchs">
+												<a class="ed-button" href="#" data-arg="Fuchs">
 													<span class="icon-ed-Fuchs"></span>
 													<span class="label">Fuchs endothelial dystrophy</span>
 												</a>
 											</li>
 											<li>
-												<a class="eyedraw-button" href="#" data-arg="RK">
+												<a class="ed-button" href="#" data-arg="RK">
 													<span class="icon-ed-RK"></span>
 													<span class="label">Radial keratotomy</span>
 												</a>
 											</li>
 											<li>
-												<a class="eyedraw-button" href="#" data-arg="LasikFlap">
+												<a class="ed-button" href="#" data-arg="LasikFlap">
 													<span class="icon-ed-LasikFlap"></span>
 													<span class="label">LASIK flap</span>
 												</a>
 											</li>
 											<li>
-												<a class="eyedraw-button" href="#" data-arg="CornealScar">
+												<a class="ed-button" href="#" data-arg="CornealScar">
 													<span class="icon-ed-CornealScar"></span>
 													<span class="label">Corneal scar</span>
 												</a>
 											</li>
 											<li>
-												<a class="eyedraw-button" href="#" data-arg="SectorIridectomy">
+												<a class="ed-button" href="#" data-arg="SectorIridectomy">
 													<span class="icon-ed-SectorIridectomy"></span>
 													<span class="label">Sector iridectomy</span>
 												</a>
 											</li>
 											<li>
-												<a class="eyedraw-button" href="#" data-arg="PosteriorSynechia">
+												<a class="ed-button" href="#" data-arg="PosteriorSynechia">
 													<span class="icon-ed-PosteriorSynechia"></span>
 													<span class="label">Posterior synechia</span>
 												</a>
@@ -700,40 +561,40 @@
 										</ul>
 
 										<!-- Optic Disc icons -->
-										<ul class="eyedraw-toolbar-panel">
+										<ul class="ed-toolbar-panel">
 											<li>
-												<a class="eyedraw-button" href="#" data-arg="PeripapillaryAtrophy">
+												<a class="ed-button" href="#" data-arg="PeripapillaryAtrophy">
 													<span class="icon-ed-PeripapillaryAtrophy"></span>
 													<span class="label">Peripapillary atrophy</span>
 												</a>
 											</li>
 
 											<li>
-												<a class="eyedraw-button" href="#" data-arg="DiscPallor">
+												<a class="ed-button" href="#" data-arg="DiscPallor">
 													<span class="icon-ed-DiscPallor"></span>
 													<span class="label">Disc pallor</span>
 												</a>
 											</li>
 											<li>
-												<a class="eyedraw-button" href="#" data-arg="DiscHaemorrhage">
+												<a class="ed-button" href="#" data-arg="DiscHaemorrhage">
 													<span class="icon-ed-DiscHaemorrhage"></span>
 													<span class="label">Disc haemorrhage</span>
 												</a>
 											</li>
 											<li>
-												<a class="eyedraw-button" href="#" data-arg="NerveFibreDefect">
+												<a class="ed-button" href="#" data-arg="NerveFibreDefect">
 													<span class="icon-ed-NerveFibreDefect"></span>
 													<span class="label">Nerve fibre defect</span>
 												</a>
 											</li>
 											<li>
-												<a class="eyedraw-button" href="#" data-arg="OpticDiscPit">
+												<a class="ed-button" href="#" data-arg="OpticDiscPit">
 													<span class="icon-ed-OpticDiscPit"></span>
 													<span class="label">Optic disc pit</span>
 												</a>
 											</li>
 											<li>
-												<a class="eyedraw-button" href="#" data-arg="Papilloedema">
+												<a class="ed-button" href="#" data-arg="Papilloedema">
 													<span class="icon-ed-Papilloedema"></span>
 													<span class="label">Papilloedema</span>
 												</a>
@@ -741,195 +602,195 @@
 										</ul>
 
 										<!-- Posterior Pole -->
-										<ul class="eyedraw-toolbar-panel">
+										<ul class="ed-toolbar-panel">
 											<li>
-												<a class="eyedraw-button" href="#" data-arg="Geographic">
+												<a class="ed-button" href="#" data-arg="Geographic">
 													<span class="icon-ed-Geographic"></span>
 													<span class="label">Geographic atrophy</span>
 												</a>
 											</li>
 											<li>
-												<a class="eyedraw-button" href="#" data-arg="VitreousOpacity">
+												<a class="ed-button" href="#" data-arg="VitreousOpacity">
 													<span class="icon-ed-VitreousOpacity"></span>
 													<span class="label">Vitreous opacity</span>
 												</a>
 											</li>
 											<li>
-												<a class="eyedraw-button" href="#" data-arg="DiabeticNV">
+												<a class="ed-button" href="#" data-arg="DiabeticNV">
 													<span class="icon-ed-DiabeticNV"></span>
 													<span class="label">Diabetic new vessels</span>
 												</a>
 											</li>
 											<li>
-												<a class="eyedraw-button" href="#" data-arg="CNV">
+												<a class="ed-button" href="#" data-arg="CNV">
 													<span class="icon-ed-CNV"></span>
 													<span class="label">Choroidal new vessels</span>
 												</a>
 											</li>
 											<li>
-												<a class="eyedraw-button" href="#" data-arg="Circinate">
+												<a class="ed-button" href="#" data-arg="Circinate">
 													<span class="icon-ed-Circinate"></span>
 													<span class="label">Circinate retinopathy</span>
 												</a>
 											</li>
 											<li>
-												<a class="eyedraw-button" href="#" data-arg="CystoidMacularOedema">
+												<a class="ed-button" href="#" data-arg="CystoidMacularOedema">
 													<span class="icon-ed-CystoidMacularOedema"></span>
 													<span class="label">Cystoid macular oedema</span>
 												</a>
 											</li>
 											<li>
-												<a class="eyedraw-button" href="#" data-arg="EpiretinalMembrane">
+												<a class="ed-button" href="#" data-arg="EpiretinalMembrane">
 													<span class="icon-ed-EpiretinalMembrane"></span>
 													<span class="label">Epiretinal membrane</span>
 												</a>
 											</li>
 											<li>
-												<a class="eyedraw-button" href="#" data-arg="HardDrusen">
+												<a class="ed-button" href="#" data-arg="HardDrusen">
 													<span class="icon-ed-HardDrusen"></span>
 													<span class="label">Hard drusen</span>
 												</a>
 											</li>
 											<li>
-												<a class="eyedraw-button" href="#" data-arg="MacularHole">
+												<a class="ed-button" href="#" data-arg="MacularHole">
 													<span class="icon-ed-MacularHole"></span>
 													<span class="label">Macular hole</span>
 												</a>
 											</li>
 											<li>
-												<a class="eyedraw-button" href="#" data-arg="RPEDetachment">
+												<a class="ed-button" href="#" data-arg="RPEDetachment">
 													<span class="icon-ed-RPEDetachment"></span>
 													<span class="label">RPE detachment</span>
 												</a>
 											</li>
 											<li>
-												<a class="eyedraw-button" href="#" data-arg="MacularDystrophy">
+												<a class="ed-button" href="#" data-arg="MacularDystrophy">
 													<span class="icon-ed-MacularDystrophy"></span>
 													<span class="label">Macular dystrophy</span>
 												</a>
 											</li>
 											<li>
-												<a class="eyedraw-button" href="#" data-arg="Macroaneurysm">
+												<a class="ed-button" href="#" data-arg="Macroaneurysm">
 													<span class="icon-ed-Macroaneurysm"></span>
 													<span class="label">Macroaneurysm</span>
 												</a>
 											</li>
 											<li>
-												<a class="eyedraw-button" href="#" data-arg="RetinalVeinOcclusionPostPole">
+												<a class="ed-button" href="#" data-arg="RetinalVeinOcclusionPostPole">
 													<span class="icon-ed-RetinalVeinOcclusionPostPole"></span>
 													<span class="label">Retinal vein occluson</span>
 												</a>
 											</li>
 											<li>
-												<a class="eyedraw-button" href="#" data-arg="RetinalArteryOcclusionPostPole">
+												<a class="ed-button" href="#" data-arg="RetinalArteryOcclusionPostPole">
 													<span class="icon-ed-RetinalArteryOcclusionPostPole"></span>
 													<span class="label">Retinal artery occlusion</span>
 												</a>
 											</li>
 											<li>
-												<a class="eyedraw-button" href="#" data-arg="Microaneurysm">
+												<a class="ed-button" href="#" data-arg="Microaneurysm">
 													<span class="icon-ed-Microaneurysm"></span>
 													<span class="label">Microaneurysm</span>
 												</a>
 											</li>
 											<li>
-												<a class="eyedraw-button" href="#" data-arg="BlotHaemorrhage">
+												<a class="ed-button" href="#" data-arg="BlotHaemorrhage">
 													<span class="icon-ed-BlotHaemorrhage"></span>
 													<span class="label">Blot haemorrhage</span>
 												</a>
 											</li>
 											<li>
-												<a class="eyedraw-button" href="#" data-arg="HardExudate">
+												<a class="ed-button" href="#" data-arg="HardExudate">
 													<span class="icon-ed-HardExudate"></span>
 													<span class="label">Hard exudate</span>
 												</a>
 											</li>
 											<li>
-												<a class="eyedraw-button" href="#" data-arg="IRMA">
+												<a class="ed-button" href="#" data-arg="IRMA">
 													<span class="icon-ed-IRMA"></span>
 													<span class="label">Intraretinal microvascular abnormalities</span>
 												</a>
 											</li>
 											<li>
-												<a class="eyedraw-button" href="#" data-arg="MacularThickening">
+												<a class="ed-button" href="#" data-arg="MacularThickening">
 													<span class="icon-ed-MacularThickening"></span>
 													<span class="label">Macular thickening</span>
 												</a>
 											</li>
 											<li>
-												<a class="eyedraw-button" href="#" data-arg="PreRetinalHaemorrhage">
+												<a class="ed-button" href="#" data-arg="PreRetinalHaemorrhage">
 													<span class="icon-ed-PreRetinalHaemorrhage"></span>
 													<span class="label">Pre-retinal haemorrhage</span>
 												</a>
 											</li>
 											<li>
-												<a class="eyedraw-button" href="#" data-arg="CottonWoolSpot">
+												<a class="ed-button" href="#" data-arg="CottonWoolSpot">
 													<span class="icon-ed-CottonWoolSpot"></span>
 													<span class="label">Cotton wool spot</span>
 												</a>
 											</li>
 											<li>
-												<a class="eyedraw-button" href="#" data-arg="FibrousProliferation">
+												<a class="ed-button" href="#" data-arg="FibrousProliferation">
 													<span class="icon-ed-FibrousProliferation"></span>
 													<span class="label">Fibrous proliferation</span>
 												</a>
 											</li>
 											<li>
-												<a class="eyedraw-button" href="#" data-arg="TractionRetinalDetachment">
+												<a class="ed-button" href="#" data-arg="TractionRetinalDetachment">
 													<span class="icon-ed-TractionRetinalDetachment"></span>
 													<span class="label">Traction retinal detachment</span>
 												</a>
 											</li>
 											<li>
-												<a class="eyedraw-button" href="#" data-arg="SwollenDisc">
+												<a class="ed-button" href="#" data-arg="SwollenDisc">
 													<span class="icon-ed-SwollenDisc"></span>
 													<span class="label">Swollen disc</span>
 												</a>
 											</li>
 											<li>
-												<a class="eyedraw-button" href="#" data-arg="Telangiectasis">
+												<a class="ed-button" href="#" data-arg="Telangiectasis">
 													<span class="icon-ed-Telangiectasis"></span>
 													<span class="label">Parafoveal telangiectasia</span>
 												</a>
 											</li>
 											<li>
-												<a class="eyedraw-button" href="#" data-arg="ChoroidalHaemorrhage">
+												<a class="ed-button" href="#" data-arg="ChoroidalHaemorrhage">
 													<span class="icon-ed-ChoroidalHaemorrhage"></span>
 													<span class="label">Choroidal haemorrhage</span>
 												</a>
 											</li>
 											<li>
-												<a class="eyedraw-button" href="#" data-arg="ChoroidalNaevus">
+												<a class="ed-button" href="#" data-arg="ChoroidalNaevus">
 													<span class="icon-ed-ChoroidalNaevus"></span>
 													<span class="label">Choroidal naevus</span>
 												</a>
 											</li>
 											<li>
-												<a class="eyedraw-button" href="#" data-arg="LaserSpot">
+												<a class="ed-button" href="#" data-arg="LaserSpot">
 													<span class="icon-ed-LaserSpot"></span>
 													<span class="label">Laser spot</span>
 												</a>
 											</li>
 											<li>
-												<a class="eyedraw-button" href="#" data-arg="FocalLaser">
+												<a class="ed-button" href="#" data-arg="FocalLaser">
 													<span class="icon-ed-FocalLaser"></span>
 													<span class="label">Focal laser</span>
 												</a>
 											</li>
 											<li>
-												<a class="eyedraw-button" href="#" data-arg="MacularGrid">
+												<a class="ed-button" href="#" data-arg="MacularGrid">
 													<span class="icon-ed-MacularGrid"></span>
 													<span class="label">Macular grid laser</span>
 												</a>
 											</li>
 											<li>
-												<a class="eyedraw-button" href="#" data-arg="SectorPRPPostPole">
+												<a class="ed-button" href="#" data-arg="SectorPRPPostPole">
 													<span class="icon-ed-SectorPRPPostPole"></span>
 													<span class="label">Sector PRP (posterior pole)</span>
 												</a>
 											</li>
 											<li>
-												<a class="eyedraw-button" href="#" data-arg="PRPPostPole">
+												<a class="ed-button" href="#" data-arg="PRPPostPole">
 													<span class="icon-ed-PRPPostPole"></span>
 													<span class="label">Panretinal photocoagulation (posterior pole)</span>
 												</a>
@@ -938,15 +799,15 @@
 
 										<!-- DROP MENU -->
 										<!--
-										<ul class="eyedraw-toolbar-panel">
+										<ul class="ed-toolbar-panel">
 											<li class="drawer">
-												<a class="eyedraw-button" href="#">
+												<a class="ed-button" href="#">
 													<img src="../../assets/img/more.gif" />
 													<span class="label">More...</span>
 												</a>
 												<ul>
 													<li>
-														<a class="eyedraw-button" href="" data-function="addDoodle" data-arg="Fuchs">
+														<a class="ed-button" href="" data-function="addDoodle" data-arg="Fuchs">
 															<img src="../../assets/img/Fuchs.gif" />
 															<span class="label">Fuchs endothelial dystrophy</span>
 														</a>
@@ -959,7 +820,7 @@
 									</div>
 									<!-- TOOLBAR END -->
 
-									<div class="eyedraw-body">
+									<div class="ed-body">
 									</div>
 								</div>
 								<br/>
@@ -1014,17 +875,17 @@
 	</div>
 
 	<!-- Doodle Popup template -->
-	<script type="text/html" id="eyedraw-doodle-popup-template">
+	<script type="text/html" id="ed-doodle-popup-template">
 		{{#doodle}}
-			<ul class="eyedraw-toolbar-panel">
+			<ul class="ed-toolbar-panel ed-doodle-popup-toolbar">
 				<li>
-					<a class="eyedraw-button eyedraw-doodle-help" href="#" data-function="unlock">
+					<a class="ed-button ed-doodle-help" href="#" data-function="unlock">
 						<span class="icon-ed-help"></span>
 					</a>
 				</li>
 				{{#doodle.isLocked}}
 					<li>
-						<a class="eyedraw-button" href="#" data-function="unlock">
+						<a class="ed-button" href="#" data-function="unlock">
 							<span class="icon-ed-unlock"></span>
 							<span class="label">Unlock</span>
 						</a>
@@ -1032,46 +893,46 @@
 				{{/doodle.isLocked}}
 				{{^doodle.isLocked}}
 					<li>
-						<a class="eyedraw-button" href="#" data-function="lock">
+						<a class="ed-button" href="#" data-function="lock">
 							<span class="icon-ed-lock"></span>
 							<span class="label">Lock</span>
 						</a>
 					</li>
 				{{/doodle.isLocked}}
 				<li>
-					<a class="eyedraw-button{{lockedButtonClass}}" href="#" data-function="moveToBack">
+					<a class="ed-button{{lockedButtonClass}}" href="#" data-function="moveToBack">
 						<span class="icon-ed-move-to-back"></span>
 						<span class="label">Move to back</span>
 					</a>
 				</li>
 				<li>
-					<a class="eyedraw-button{{lockedButtonClass}}" href="#" data-function="moveToFront">
+					<a class="ed-button{{lockedButtonClass}}" href="#" data-function="moveToFront">
 						<span class="icon-ed-move-to-front"></span>
 						<span class="label">Move to front</span>
 					</a>
 				</li>
 				{{#doodle.isDeletable}}
 					<li>
-						<a class="eyedraw-button{{lockedButtonClass}}" href="#" data-function="deleteSelectedDoodle">
+						<a class="ed-button{{lockedButtonClass}}" href="#" data-function="deleteSelectedDoodle">
 							<span class="icon-ed-delete"></span>
 							<span class="label">Delete</span>
 						</a>
 					</li>
 				{{/doodle.isDeletable}}
 			</ul>
-			<div class="eyedraw-doodle-info hide">
+			<div class="ed-doodle-info hide">
 				{{#doodle.isLocked}}
-					<div class="description">
+					<div class="ed-doodle-description">
 						<strong>This doodle is locked and cannot be edited.</strong>
 					</div>
 				{{/doodle.isLocked}}
 				{{^doodle.isLocked}}
 					{{#desc}}
-						<div class="description">{{{desc}}}</div>
+						<div class="ed-doodle-description">{{{desc}}}</div>
 					{{/desc}}
 				{{/doodle.isLocked}}
 			</div>
-			<div class="controls{{#doodle.isLocked}} hide{{/doodle.isLocked}}" id="{{drawing.canvas.id}}_controls">
+			<div class="ed-doodle-controls{{#doodle.isLocked}} hide{{/doodle.isLocked}}" id="{{drawing.canvas.id}}_controls">
 			</div>
 		{{/doodle}}
 	</script>
@@ -1291,7 +1152,7 @@
 			bindingArray: {
 				AntSeg: {
 					pupilSize: {
-						id: "eyedraw-field-1",
+						id: "ed-field-1",
 						attribute: "data-value"
 					},
 					pxe: {
@@ -1312,7 +1173,6 @@
 
 	<script>
 	(function() {
-		return;
 		// Anterior segment view
 		ED.init({
 			canvasId: 'ed_example_display',
@@ -1338,7 +1198,6 @@
 
 	<script>
 	(function() {
-		return;
 		// Cataract edit
 		ED.init({
 			canvasId: 'ed_example_cataract',
