@@ -19,11 +19,6 @@
 
 /* global $:false */
 
-/**
- * @todo This controller is getting quite big. Consider sticking all the
- * drawing event related stuff into a new object.
- */
-
 var ED = ED || {};
 
 ED.Controller = (function() {
@@ -50,16 +45,18 @@ ED.Controller = (function() {
 		this.input = document.getElementById(properties.inputId);
 		this.container = $(this.canvas).closest('.ed-widget');
 
-		// FIXME: we shouldn't be instantiating this stuff if not in edit mode.
 		this.Checker = Checker || ED.Checker;
 		this.drawing = drawing || this.createDrawing();
-		this.mainToolbar = mainToolbar || this.createToolbar('.ed-main-toolbar');
-		this.canvasToolbar = canvasToolbar || this.createToolbar('.ed-canvas-toolbar');
-		this.doodlePopup = doodlePopup || this.createDoodlePopup();
-		this.selectedDoodle = selectedDoodle || this.createSelectedDoodle();
+
+		if (this.properties.isEditable) {
+			this.mainToolbar = mainToolbar || this.createToolbar('.ed-main-toolbar');
+			this.canvasToolbar = canvasToolbar || this.createToolbar('.ed-canvas-toolbar');
+			this.doodlePopup = doodlePopup || this.createDoodlePopup();
+			this.selectedDoodle = selectedDoodle || this.createSelectedDoodle();
+		}
 
 		this.registerDrawing();
-		this.registerEvents();
+		this.registerForNotifications();
 		this.initListeners();
 
 		// Initialize drawing.
@@ -121,7 +118,7 @@ ED.Controller = (function() {
 	};
 
 	/**
-	 * Register the drawing instance with the Checker, and store the instance.
+	 * Register the drawing instance with the Checker.
 	 */
 	Controller.prototype.registerDrawing = function() {
 		// Register drawing with the checker.
@@ -131,7 +128,7 @@ ED.Controller = (function() {
 	/**
 	 * Register drawing and DOM events.
 	 */
-	Controller.prototype.registerEvents = function() {
+	Controller.prototype.registerForNotifications = function() {
 		// Register controller for drawing notifications
 		this.drawing.registerForNotifications(this, 'notificationHandler', [
 			'ready',
@@ -142,14 +139,6 @@ ED.Controller = (function() {
 			'mousedragged',
 			'parameterChanged'
 		]);
-
-		// Other events.
-		this.doodlePopup.on('show', function() {
-			this.container.addClass('doodle-selected');
-		}.bind(this));
-		this.doodlePopup.on('hide', function() {
-			this.container.removeClass('doodle-selected');
-		}.bind(this));
 	};
 
 	/**
@@ -213,7 +202,6 @@ ED.Controller = (function() {
 
 	/**
 	 * Add deleted values.
-	 * @TODO
 	 */
 	Controller.prototype.addDeletedValues = function() {
 		if (!ED.objectIsEmpty(this.properties.deleteValueArray)) {
