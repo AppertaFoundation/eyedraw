@@ -15,11 +15,11 @@
 // * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
 
 .ed-doodle-popup {
-	@include transition(right 0.5s ease, opacity 0.5s ease);
+	@include transition(right 0.5s ease);
+	@include box-shadow(0 5px 14px -4px rgba(0, 0, 0, 0.5));
 	background: #c3def5;
 	border: 1px solid #53a0c7;
 	border-width: 0 1px 1px 0;
-	opacity: 1;
 	padding: 5px;
 	position: absolute;
 	right: -188px;
@@ -30,8 +30,7 @@
 	-webkit-backface-visibility: hidden;
 	-webkit-perspective: 1000;
 	&.closed {
-		right: 8px;
-		opacity: 0.85;
+		right: 5px;
 		.ed-button {
 			.label {
 				display: none;
@@ -55,17 +54,19 @@
 	font-size: 12px;
 	font-style: italic;
 	line-height: 12px;
-	padding-top: 6px;
+	padding: 12px 0 6px 0;
 }
 
 .ed-doodle-controls {
-	padding-top: 14px;
 	max-height: 224px;
 	overflow: auto;
 	> div {
 		@extend %clearfix;
 		line-height: 12px;
 		padding-bottom: 8px;
+		&:first-child {
+			margin-top: 14px;
+		}
 	}
 	label {
 		color: #477792;

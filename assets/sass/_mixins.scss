@@ -32,9 +32,9 @@
 // @param $width       The width of sprite grid.
 // @param $height      The height of the sprite grid.
 // @param $addStates   Add states to generated classes, if state images exist on filesystem?
-@mixin sprite($path, $prefixClass, $width, $height, $addStates: true) {
+@mixin icon-sprite($path, $prefixClass, $width, $height, $addStates: true) {
 	// A list of interaction states.
-	$states: (hover, active, target);
+	$states: hover, active, target;
 	// A list to store ignored images.
 	$ignore: ();
 	// Generate the sprite image map.
@@ -76,11 +76,12 @@
 			}
 			// State classes (pseudo).
 			@each $state in $imageStates {
-				.#{$prefixClass}-#{$i}:#{$state} {
+				.#{$prefixClass}-#{$i}:#{$state},
+				.#{$state} .#{$prefixClass}-#{$i} {
 					background-position: sprite-position($spriteMap, #{$i}_#{$state});
-					.disabled & {
-						background-position: sprite-position($spriteMap, $i);
-					}
+				}
+				.disabled .#{$prefixClass}-#{$i}:#{$state} {
+					background-position: sprite-position($spriteMap, $i);
 				}
 			}
 		}
