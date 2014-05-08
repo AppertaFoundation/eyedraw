@@ -124,13 +124,13 @@ ED.ToricPCIOL.prototype.draw = function(_point) {
 		// Create points
 		var phi = 0.7 * Math.PI / 4;
 		var theta = phi + Math.PI;
-		var p1 = new ED.Drawing.Point(0, 0)
+		var p1 = new ED.Point(0, 0)
 		p1.setWithPolars(r - 20, phi);
-		var p2 = new ED.Drawing.Point(0, 0);
+		var p2 = new ED.Point(0, 0);
 		p2.setWithPolars(r - 100, phi);
-		var p3 = new ED.Drawing.Point(0, 0)
+		var p3 = new ED.Point(0, 0)
 		p3.setWithPolars(r - 20, theta);
-		var p4 = new ED.Drawing.Point(0, 0);
+		var p4 = new ED.Point(0, 0);
 		p4.setWithPolars(r - 100, theta);
 
 		// Create lines
@@ -149,7 +149,7 @@ ED.ToricPCIOL.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	var point = new ED.Drawing.Point(0, 0)
+	var point = new ED.Point(0, 0)
 	point.setWithPolars(r, Math.PI / 4);
 	this.handleArray[2].location = this.transform.transformPoint(point);
 

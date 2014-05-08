@@ -29,7 +29,7 @@ ED.FieldCircle = function(_drawing, _parameterJSON) {
 	this.className = "FieldCircle";
 
 	// Derived parameters
-	this.colour = new ED.Drawing.Colour(255,0,0,1);
+	this.colour = new ED.Colour(255,0,0,1);
 
 	// Saved parameters
 	this.savedParameterArray = ['originX', 'originY', 'colour'];

@@ -76,8 +76,8 @@ ED.Doodle = function(_drawing, _parameterJSON) {
 		this.squiggleArray = new Array();
 
 		// Transform used to draw doodle (includes additional transforms specific to the doodle)
-		this.transform = new ED.Drawing.AffineTransform();
-		this.inverseTransform = new ED.Drawing.AffineTransform();
+		this.transform = new ED.AffineTransform();
+		this.inverseTransform = new ED.AffineTransform();
 
 		// Store created time
 		this.createdTime = (new Date()).getTime();
@@ -116,35 +116,35 @@ ED.Doodle = function(_drawing, _parameterJSON) {
 			originX: {
 				kind: 'simple',
 				type: 'int',
-				range: new ED.Drawing.Range(-halfWidth, +halfWidth),
+				range: new ED.Range(-halfWidth, +halfWidth),
 				defaultValue: +0,
 				delta: 15
 			},
 			originY: {
 				kind: 'simple',
 				type: 'int',
-				range: new ED.Drawing.Range(-halfHeight, +halfHeight),
+				range: new ED.Range(-halfHeight, +halfHeight),
 				defaultValue: +0,
 				delta: 15
 			},
 			width: {
 				kind: 'simple',
 				type: 'int',
-				range: new ED.Drawing.Range(+100, +halfHeight),
+				range: new ED.Range(+100, +halfHeight),
 				defaultValue: +50,
 				delta: 15
 			},
 			height: {
 				kind: 'simple',
 				type: 'int',
-				range: new ED.Drawing.Range(+100, +halfWidth),
+				range: new ED.Range(+100, +halfWidth),
 				defaultValue: +50,
 				delta: 15
 			},
 			radius: {
 				kind: 'simple',
 				type: 'float',
-				range: new ED.Drawing.Range(+100, +450),
+				range: new ED.Range(+100, +450),
 				precision: 6,
 				defaultValue: +100,
 				delta: 15
@@ -153,20 +153,20 @@ ED.Doodle = function(_drawing, _parameterJSON) {
 				kind: 'simple',
 				type: 'int',
 				defaultValue: +0,
-				range: new ED.Drawing.Range(-500, +500),
+				range: new ED.Range(-500, +500),
 				delta: 15
 			},
 			apexY: {
 				kind: 'simple',
 				type: 'int',
-				range: new ED.Drawing.Range(-500, +500),
+				range: new ED.Range(-500, +500),
 				defaultValue: +0,
 				delta: 15
 			},
 			scaleX: {
 				kind: 'simple',
 				type: 'float',
-				range: new ED.Drawing.Range(+0.5, +4.0),
+				range: new ED.Range(+0.5, +4.0),
 				precision: 6,
 				defaultValue: +1,
 				delta: 0.1
@@ -174,7 +174,7 @@ ED.Doodle = function(_drawing, _parameterJSON) {
 			scaleY: {
 				kind: 'simple',
 				type: 'float',
-				range: new ED.Drawing.Range(+0.5, +4.0),
+				range: new ED.Range(+0.5, +4.0),
 				precision: 6,
 				defaultValue: +1,
 				delta: 0.1
@@ -182,7 +182,7 @@ ED.Doodle = function(_drawing, _parameterJSON) {
 			arc: {
 				kind: 'simple',
 				type: 'float',
-				range: new ED.Drawing.Range(Math.PI / 12, Math.PI * 2),
+				range: new ED.Range(Math.PI / 12, Math.PI * 2),
 				precision: 6,
 				defaultValue: Math.PI,
 				delta: 0.1
@@ -190,7 +190,7 @@ ED.Doodle = function(_drawing, _parameterJSON) {
 			rotation: {
 				kind: 'simple',
 				type: 'float',
-				range: new ED.Drawing.Range(0, 2 * Math.PI),
+				range: new ED.Range(0, 2 * Math.PI),
 				precision: 6,
 				defaultValue: +0,
 				delta: 0.2
@@ -235,7 +235,7 @@ ED.Doodle = function(_drawing, _parameterJSON) {
 		this.pointsArray = new Array();
 		this.anglesArray = new Array();
 		this.arcArray = new Array();
-		this.quadrantPoint = new ED.Drawing.Point(200, 200);
+		this.quadrantPoint = new ED.Point(200, 200);
 
 		// Bindings to HTML element values. Associative array with parameter name as key
 		this.bindingArray = new Array();
@@ -243,16 +243,16 @@ ED.Doodle = function(_drawing, _parameterJSON) {
 
 		// Array of 5 handles
 		this.handleArray = new Array();
-		this.handleArray[0] = new ED.Doodle.Handle(new ED.Drawing.Point(-50, 50), false, ED.Mode.Scale, false);
-		this.handleArray[1] = new ED.Doodle.Handle(new ED.Drawing.Point(-50, -50), false, ED.Mode.Scale, false);
-		this.handleArray[2] = new ED.Doodle.Handle(new ED.Drawing.Point(50, -50), false, ED.Mode.Scale, false);
-		this.handleArray[3] = new ED.Doodle.Handle(new ED.Drawing.Point(50, 50), false, ED.Mode.Scale, false);
-		this.handleArray[4] = new ED.Doodle.Handle(new ED.Drawing.Point(this.apexX, this.apexY), false, ED.Mode.Apex, false);
+		this.handleArray[0] = new ED.Doodle.Handle(new ED.Point(-50, 50), false, ED.Mode.Scale, false);
+		this.handleArray[1] = new ED.Doodle.Handle(new ED.Point(-50, -50), false, ED.Mode.Scale, false);
+		this.handleArray[2] = new ED.Doodle.Handle(new ED.Point(50, -50), false, ED.Mode.Scale, false);
+		this.handleArray[3] = new ED.Doodle.Handle(new ED.Point(50, 50), false, ED.Mode.Scale, false);
+		this.handleArray[4] = new ED.Doodle.Handle(new ED.Point(this.apexX, this.apexY), false, ED.Mode.Apex, false);
 		this.setHandles();
 
 		// Extremities
-		this.leftExtremity = new ED.Drawing.Point(-100, -100);
-		this.rightExtremity = new ED.Drawing.Point(0, -100);
+		this.leftExtremity = new ED.Point(-100, -100);
+		this.rightExtremity = new ED.Point(0, -100);
 
 		// Version
 		this.version = +1.1;
@@ -294,15 +294,15 @@ ED.Doodle = function(_drawing, _parameterJSON) {
 					for (var j = 0; j < squiggleArray.length; j++) {
 						// Get parameters and create squiggle
 						var c = squiggleArray[j].colour;
-						var colour = new ED.Drawing.Colour(c.red, c.green, c.blue, c.alpha);
+						var colour = new ED.Colour(c.red, c.green, c.blue, c.alpha);
 						var thickness = squiggleArray[j].thickness;
 						var filled = squiggleArray[j].filled;
-						var squiggle = new ED.Drawing.Squiggle(this, colour, thickness, filled);
+						var squiggle = new ED.Squiggle(this, colour, thickness, filled);
 
 						// Add points to squiggle and complete it
 						var pointsArray = squiggleArray[j].pointsArray;
 						for (var k = 0; k < pointsArray.length; k++) {
-							var point = new ED.Drawing.Point(pointsArray[k].x, pointsArray[k].y);
+							var point = new ED.Point(pointsArray[k].x, pointsArray[k].y);
 							squiggle.addPoint(point);
 						}
 						squiggle.complete = true;
@@ -460,11 +460,11 @@ ED.Doodle.prototype.move = function(_x, _y) {
  */
 ED.Doodle.prototype.orientation = function() {
 	// Get position of centre of display (canvas plane relative to centre) and of an arbitrary point vertically above
-	var canvasCentre = new ED.Drawing.Point(0, 0);
-	var canvasTop = new ED.Drawing.Point(0, -100);
+	var canvasCentre = new ED.Point(0, 0);
+	var canvasTop = new ED.Point(0, -100);
 
 	// New position of doodle
-	var newDoodleOrigin = new ED.Drawing.Point(this.originX, this.originY);
+	var newDoodleOrigin = new ED.Point(this.originX, this.originY);
 
 	// Calculate angle to current position from centre relative to north
 	return this.drawing.innerAngle(canvasTop, canvasCentre, newDoodleOrigin);
@@ -1323,7 +1323,7 @@ ED.Doodle.prototype.setOriginWithDisplacements = function(_first, _next) {
 ED.Doodle.prototype.setOriginWithRotations = function(_radius, _first, _next) {
 	var direction = this.drawing.eye == ED.eye.Right ? -1 : 1;
 
-	var origin = new ED.Drawing.Point(0,0);
+	var origin = new ED.Point(0,0);
 	origin.setWithPolars(_radius, direction * _first * Math.PI / 180);
 
 	// Get last doodle to be added
@@ -1335,7 +1335,7 @@ ED.Doodle.prototype.setOriginWithRotations = function(_radius, _first, _next) {
 
 	// If there is one, make position relative to it
 	if (doodle) {
-		var doodleOrigin = new ED.Drawing.Point(doodle.originX, doodle.originY);
+		var doodleOrigin = new ED.Point(doodle.originX, doodle.originY);
 		origin.setWithPolars(_radius, doodleOrigin.direction() + direction * _next * Math.PI / 180);
 	}
 
@@ -1652,8 +1652,8 @@ ED.Doodle.prototype.clockHour = function(_offset) {
 	if (this.isRotatable && !this.isMoveable) {
 		clockHour = ((this.rotation * 6 / Math.PI) + 12 + offset) % 12;
 	} else {
-		var twelvePoint = new ED.Drawing.Point(0, -100);
-		var thisPoint = new ED.Drawing.Point(this.originX, this.originY);
+		var twelvePoint = new ED.Point(0, -100);
+		var thisPoint = new ED.Point(this.originX, this.originY);
 		var clockHour = ((twelvePoint.clockwiseAngleTo(thisPoint) * 6 / Math.PI) + 12 + offset) % 12;
 	}
 
@@ -1694,8 +1694,8 @@ ED.Doodle.prototype.degrees = function() {
 	if (this.isRotatable && !this.isMoveable) {
 		degrees = ((this.rotation * 180 / Math.PI) + 360) % 360;
 	} else {
-		var twelvePoint = new ED.Drawing.Point(0, -100);
-		var thisPoint = new ED.Drawing.Point(this.originX, this.originY);
+		var twelvePoint = new ED.Point(0, -100);
+		var thisPoint = new ED.Point(this.originX, this.originY);
 		degrees = ((twelvePoint.clockwiseAngleTo(thisPoint) * 180 / Math.PI) + 360) % 360;
 	}
 
@@ -1717,8 +1717,8 @@ ED.Doodle.prototype.clockHourExtent = function() {
 		clockHourStart = (((this.rotation - this.arc / 2) * 6 / Math.PI) + 12) % 12;
 		clockHourEnd = (((this.rotation + this.arc / 2) * 6 / Math.PI) + 12) % 12;
 	} else {
-		var twelvePoint = new ED.Drawing.Point(0, -100);
-		var thisPoint = new ED.Drawing.Point(this.originX, this.originY);
+		var twelvePoint = new ED.Point(0, -100);
+		var thisPoint = new ED.Point(this.originX, this.originY);
 		var clockHour = ((twelvePoint.clockwiseAngleTo(thisPoint) * 6 / Math.PI) + 12) % 12;
 	}
 
@@ -1806,7 +1806,7 @@ ED.Doodle.prototype.locationRelativeToFovea = function() {
  */
 ED.Doodle.prototype.addSquiggle = function() {
 	// Get colour (stored as a HEX string in the doodle) and create colour object
-	var colourObject = new ED.Drawing.Colour(0, 0, 0, 1);
+	var colourObject = new ED.Colour(0, 0, 0, 1);
 	colourObject.setWithHexString(this.colourString);
 
 	// Line thickness
@@ -1827,7 +1827,7 @@ ED.Doodle.prototype.addSquiggle = function() {
 	}
 
 	// Create new squiggle
-	var squiggle = new ED.Drawing.Squiggle(this, colourObject, lineThickness, this.filled);
+	var squiggle = new ED.Squiggle(this, colourObject, lineThickness, this.filled);
 
 	// Add it to squiggle array
 	this.squiggleArray.push(squiggle);
@@ -1867,8 +1867,8 @@ ED.Doodle.prototype.completeSquiggle = function() {
  */
 ED.Doodle.prototype.calculateArc = function() {
 	// Transform extremity points to origin of 0,0
-	var left = new ED.Drawing.Point(this.leftExtremity.x - this.drawing.canvas.width / 2, this.leftExtremity.y - this.drawing.canvas.height / 2);
-	var right = new ED.Drawing.Point(this.rightExtremity.x - this.drawing.canvas.width / 2, this.rightExtremity.y - this.drawing.canvas.height / 2);
+	var left = new ED.Point(this.leftExtremity.x - this.drawing.canvas.width / 2, this.leftExtremity.y - this.drawing.canvas.height / 2);
+	var right = new ED.Point(this.rightExtremity.x - this.drawing.canvas.width / 2, this.rightExtremity.y - this.drawing.canvas.height / 2);
 
 	// Return angle between them
 	return left.clockwiseAngleTo(right);
@@ -1877,8 +1877,8 @@ ED.Doodle.prototype.calculateArc = function() {
 /**
  * Finds the nearest point in the doodle pointsArray
  *
- * @param {ED.Drawing.Point} _point The point to test
- * @returns {ED.Drawing.Point} The nearest point
+ * @param {ED.Point} _point The point to test
+ * @returns {ED.Point} The nearest point
  */
 ED.Doodle.prototype.nearestPointTo = function(_point) {
 	// Check that pointsArray has content
@@ -2130,14 +2130,14 @@ ED.Doodle.prototype.drawNFLHaem = function(_ctx, _x, _y) {
 	var r = 10;
 
 	// Create point from parameters
-	var p = new ED.Drawing.Point(_x, _y);
+	var p = new ED.Point(_x, _y);
 
 	// Create two new points 'tangential'
 	var phi1 = p.direction() + Math.PI/2;
 	var phi2 = p.direction() + 3 * Math.PI/2;
-	var p1 = new ED.Drawing.Point(0,0);
+	var p1 = new ED.Point(0,0);
 	p1.setWithPolars(r, phi1);
-	var p2 = new ED.Drawing.Point(0,0);
+	var p2 = new ED.Point(0,0);
 	p2.setWithPolars(r, phi2);
 
 	// Draw line
@@ -2210,7 +2210,7 @@ ED.Doodle.prototype.debug = function() {
 ED.Doodle.Handle = function(_location, _isVisible, _mode, _isRotatable) {
 	// Properties
 	if (_location == null) {
-		this.location = new ED.Drawing.Point(0, 0);
+		this.location = new ED.Point(0, 0);
 	} else {
 		this.location = _location;
 	}

@@ -126,7 +126,7 @@ ED.ScleralIncision.prototype.draw = function(_point) {
 
 		// Sutures
 		var sutureSeparationAngle = 0.2;
-		var p = new ED.Drawing.Point(0, 0);
+		var p = new ED.Point(0, 0);
 		var phi = theta - sutureSeparationAngle / 2;
 
 		do {
@@ -149,7 +149,7 @@ ED.ScleralIncision.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	var point = new ED.Drawing.Point(0, 0);
+	var point = new ED.Point(0, 0);
 	point.setWithPolars(r, theta);
 	this.handleArray[3].location = this.transform.transformPoint(point);
 

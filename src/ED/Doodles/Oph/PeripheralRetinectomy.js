@@ -140,20 +140,20 @@ ED.PeripheralRetinectomy.prototype.draw = function(_point) {
 			var phi2 = theta - 2 * Math.PI / 24;
 
 			// Right points
-			var rsp = new ED.Drawing.Point(ro * Math.sin(theta), -ro * Math.cos(theta));
-			var rcp1 = new ED.Drawing.Point(r * Math.sin(theta), -r * Math.cos(theta));
-			var rcp2 = new ED.Drawing.Point(ri * Math.sin(phi1), -ri * Math.cos(phi1));
-			var rep = new ED.Drawing.Point(ri * Math.sin(phi2), -ri * Math.cos(phi2));
+			var rsp = new ED.Point(ro * Math.sin(theta), -ro * Math.cos(theta));
+			var rcp1 = new ED.Point(r * Math.sin(theta), -r * Math.cos(theta));
+			var rcp2 = new ED.Point(ri * Math.sin(phi1), -ri * Math.cos(phi1));
+			var rep = new ED.Point(ri * Math.sin(phi2), -ri * Math.cos(phi2));
 
 			// Inner arc
 			arcStart = -Math.PI / 2 + phi2;
 			arcEnd = -Math.PI / 2 - phi2;
 
 			// Left points
-			var lsp = new ED.Drawing.Point(-ri * Math.sin(phi2), -ri * Math.cos(phi2));
-			var lcp1 = new ED.Drawing.Point(-ri * Math.sin(phi1), -ri * Math.cos(phi1));
-			var lcp2 = new ED.Drawing.Point(-r * Math.sin(theta), -r * Math.cos(theta));
-			var lep = new ED.Drawing.Point(-ro * Math.sin(theta), -ro * Math.cos(theta));
+			var lsp = new ED.Point(-ri * Math.sin(phi2), -ri * Math.cos(phi2));
+			var lcp1 = new ED.Point(-ri * Math.sin(phi1), -ri * Math.cos(phi1));
+			var lcp2 = new ED.Point(-r * Math.sin(theta), -r * Math.cos(theta));
+			var lep = new ED.Point(-ro * Math.sin(theta), -ro * Math.cos(theta));
 
 			// Path
 			ctx.moveTo(rsp.x, rsp.y);
@@ -180,9 +180,9 @@ ED.PeripheralRetinectomy.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[0].location = this.transform.transformPoint(new ED.Drawing.Point(topLeftX, topLeftY));
-	this.handleArray[3].location = this.transform.transformPoint(new ED.Drawing.Point(topRightX, topRightY));
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[0].location = this.transform.transformPoint(new ED.Point(topLeftX, topLeftY));
+	this.handleArray[3].location = this.transform.transformPoint(new ED.Point(topRightX, topRightY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);

@@ -86,8 +86,8 @@ ED.Lungs.prototype.draw = function(_point) {
 	this.drawBoundary(_point);
 
 	// Calculate arc (Arc property not used naturally in this doodle)
-// 	this.leftExtremity = this.transform.transformPoint(new ED.Drawing.Point(-40, -40));
-// 	this.rightExtremity = this.transform.transformPoint(new ED.Drawing.Point(40, -40));
+// 	this.leftExtremity = this.transform.transformPoint(new ED.Point(-40, -40));
+// 	this.rightExtremity = this.transform.transformPoint(new ED.Point(40, -40));
 // 	this.arc = this.calculateArc();
 
 	// Return value indicating successful hittest

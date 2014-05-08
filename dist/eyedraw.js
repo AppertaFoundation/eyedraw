@@ -360,13 +360,13 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 	this.doodleArray = new Array();
 	this.bindingArray = new Array();
 	this.listenerArray = new Array();
-	this.transform = new ED.Drawing.AffineTransform();
-	this.inverseTransform = new ED.Drawing.AffineTransform();
+	this.transform = new ED.AffineTransform();
+	this.inverseTransform = new ED.AffineTransform();
 	this.selectedDoodle = null;
 	this.mouseDown = false;
 	this.doubleClick = false;
 	this.mode = ED.Mode.None;
-	this.lastMousePosition = new ED.Drawing.Point(0, 0);
+	this.lastMousePosition = new ED.Point(0, 0);
 	this.doubleClickMilliSeconds = 250;
 	this.readyNotificationSent = false;
 	this.newPointOnClick = false;
@@ -380,7 +380,7 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 	this.showDoodleControls = false;
 
 	// Freehand drawing properties NB from November 2013 moved to Freehand doodle
-// 	this.squiggleColour = new ED.Drawing.Colour(0, 255, 0, 1);
+// 	this.squiggleColour = new ED.Colour(0, 255, 0, 1);
 // 	this.squiggleWidth = ED.squiggleWidth.Medium;
 // 	this.squiggleStyle = ED.squiggleStyle.Outline;
 
@@ -440,8 +440,8 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 
 	// Selection rectangle
 	this.selectionRectangleIsBeingDragged = false;
-	this.selectionRectangleStart = new ED.Drawing.Point(0, 0);
-	this.selectionRectangleEnd = new ED.Drawing.Point(0, 0);
+	this.selectionRectangleStart = new ED.Point(0, 0);
+	this.selectionRectangleEnd = new ED.Point(0, 0);
 
 	// Add event listeners (NB within the event listener 'this' refers to the canvas, NOT the drawing instance)
 	if (this.isEditable) {
@@ -450,31 +450,31 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 		// Mouse listeners
 		this.canvas.addEventListener('mousedown', function(e) {
 			var position = ED.findPosition(this, e);
-			var point = new ED.Drawing.Point(position.x, position.y);
+			var point = new ED.Point(position.x, position.y);
 			drawing.mousedown(point);
 		}, false);
 
 		this.canvas.addEventListener('mouseup', function(e) {
 			var position = ED.findPosition(this, e);
-			var point = new ED.Drawing.Point(position.x, position.y);
+			var point = new ED.Point(position.x, position.y);
 			drawing.mouseup(point);
 		}, false);
 
 		this.canvas.addEventListener('mousemove', function(e) {
 			var position = ED.findPosition(this, e);
-			var point = new ED.Drawing.Point(position.x, position.y);
+			var point = new ED.Point(position.x, position.y);
 			drawing.mousemove(point);
 		}, false);
 
 		this.canvas.addEventListener('mouseover', function(e) {
 			var position = ED.findPosition(this, e);
-			var point = new ED.Drawing.Point(position.x, position.y);
+			var point = new ED.Point(position.x, position.y);
 			drawing.mouseover(point);
 		}, false);
 
 		this.canvas.addEventListener('mouseout', function(e) {
 			var position = ED.findPosition(this, e);
-			var point = new ED.Drawing.Point(position.x, position.y);
+			var point = new ED.Point(position.x, position.y);
 			drawing.mouseout(point);
 		}, false);
 
@@ -516,7 +516,7 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
     this.canvas.addEventListener('touchstart', function(e) {
       if (e.targetTouches[0] !== undefined) {
         var canvas_pos = drawing.getPositionOfElement(drawing.canvas);
-        var point = new ED.Drawing.Point(e.targetTouches[0].pageX - canvas_pos[0] - this.offsetLeft, e.targetTouches[0].pageY - canvas_pos[1]);
+        var point = new ED.Point(e.targetTouches[0].pageX - canvas_pos[0] - this.offsetLeft, e.targetTouches[0].pageY - canvas_pos[1]);
         e.preventDefault();
       } else {
         ED.errorHandler('ED.Drawing', 'Class', 'Touches undefined: ');
@@ -527,7 +527,7 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
     this.canvas.addEventListener('touchend', function(e) {
       if (e.targetTouches[0] !== undefined) {
         var canvas_pos = drawing.getPositionOfElement(drawing.canvas);
-        var point = new ED.Drawing.Point(e.targetTouches[0].pageX - canvas_pos[0] - this.offsetLeft, e.targetTouches[0].pageY - canvas_pos[1]);
+        var point = new ED.Point(e.targetTouches[0].pageX - canvas_pos[0] - this.offsetLeft, e.targetTouches[0].pageY - canvas_pos[1]);
         drawing.mouseup(point);
       }
     }, false);
@@ -535,7 +535,7 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
     this.canvas.addEventListener('touchmove', function(e) {
       if (e.targetTouches[0] !== undefined) {
         var canvas_pos = drawing.getPositionOfElement(drawing.canvas);
-        var point = new ED.Drawing.Point(e.targetTouches[0].pageX - canvas_pos[0] - this.offsetLeft, e.targetTouches[0].pageY - canvas_pos[1]);
+        var point = new ED.Point(e.targetTouches[0].pageX - canvas_pos[0] - this.offsetLeft, e.targetTouches[0].pageY - canvas_pos[1]);
         drawing.mousemove(point);
       }
     }, false);
@@ -834,7 +834,7 @@ ED.Drawing.prototype.drawAllDoodles = function() {
 			if (!started) {
 				ctx.moveTo(this.doodleArray[i].originX, this.doodleArray[i].originY);
 				started = true;
-				startPoint = new ED.Drawing.Point(this.doodleArray[i].originX, this.doodleArray[i].originY);
+				startPoint = new ED.Point(this.doodleArray[i].originX, this.doodleArray[i].originY);
 			} else {
 				ctx.lineTo(this.doodleArray[i].originX, this.doodleArray[i].originY);
 			}
@@ -1028,18 +1028,18 @@ ED.Drawing.prototype.mousemove = function(_point) {
 			var lastMousePosSelectedDoodlePlane = doodle.inverseTransform.transformPoint(this.lastMousePosition);
 
 			// Get mouse positions in canvas plane relative to centre
-			var mousePosRelCanvasCentre = new ED.Drawing.Point(_point.x - this.canvas.width / 2, _point.y - this.canvas.height / 2);
-			var lastMousePosRelCanvasCentre = new ED.Drawing.Point(this.lastMousePosition.x - this.canvas.width / 2, this.lastMousePosition.y - this.canvas.height / 2);
+			var mousePosRelCanvasCentre = new ED.Point(_point.x - this.canvas.width / 2, _point.y - this.canvas.height / 2);
+			var lastMousePosRelCanvasCentre = new ED.Point(this.lastMousePosition.x - this.canvas.width / 2, this.lastMousePosition.y - this.canvas.height / 2);
 
 			// Get position of centre of display (canvas plane relative to centre) and of an arbitrary point vertically above
-			var canvasCentre = new ED.Drawing.Point(0, 0);
-			var canvasTop = new ED.Drawing.Point(0, -100);
+			var canvasCentre = new ED.Point(0, 0);
+			var canvasTop = new ED.Point(0, -100);
 
 			// Get coordinates of origin of doodle in doodle plane
-			var doodleOrigin = new ED.Drawing.Point(doodle.originX, doodle.originY);
+			var doodleOrigin = new ED.Point(doodle.originX, doodle.originY);
 
 			// Get position of point vertically above doodle origin in doodle plane
-			var doodleTop = new ED.Drawing.Point(doodle.originX, doodle.originY - 100);
+			var doodleTop = new ED.Point(doodle.originX, doodle.originY - 100);
 
 			// Effect of dragging depends on mode
 			switch (this.mode) {
@@ -1278,7 +1278,7 @@ ED.Drawing.prototype.mousemove = function(_point) {
 					var index = doodle.draggingHandleIndex;
 
 					// Get new position into a point object
-					var newPosition = new ED.Drawing.Point(0, 0);
+					var newPosition = new ED.Point(0, 0);
 					newPosition.x = doodle.squiggleArray[0].pointsArray[index].x + (mousePosSelectedDoodlePlane.x - lastMousePosSelectedDoodlePlane.x);
 					newPosition.y = doodle.squiggleArray[0].pointsArray[index].y + (mousePosSelectedDoodlePlane.y - lastMousePosSelectedDoodlePlane.y);
 
@@ -1304,12 +1304,12 @@ ED.Drawing.prototype.mousemove = function(_point) {
 					break;
 
 				case ED.Mode.Draw:
-					var p = new ED.Drawing.Point(mousePosSelectedDoodlePlane.x, mousePosSelectedDoodlePlane.y);
+					var p = new ED.Point(mousePosSelectedDoodlePlane.x, mousePosSelectedDoodlePlane.y);
 					doodle.addPointToSquiggle(p);
 					break;
 
 				case ED.Mode.Select:
-					var p = new ED.Drawing.Point(mousePosSelectedDoodlePlane.x, mousePosSelectedDoodlePlane.y);
+					var p = new ED.Point(mousePosSelectedDoodlePlane.x, mousePosSelectedDoodlePlane.y);
 					console.log('Selecting ', p.x, p.y);
 					break;
 
@@ -1347,7 +1347,7 @@ ED.Drawing.prototype.mouseup = function(_point) {
     for (var i = 0; i < this.doodleArray.length; i++)
 	{
         var doodle = this.doodleArray[i];
-        var origin = new ED.Drawing.Point(doodle.originX, doodle.originY);
+        var origin = new ED.Point(doodle.originX, doodle.originY);
 
         var p = this.transform.transformPoint(origin);
 
@@ -3021,8 +3021,8 @@ ED.Drawing.prototype.repaint = function() {
  */
 ED.Drawing.prototype.innerAngle = function(_pointA, _pointM, _pointB) {
 	// Get vectors from midpoint to A and B
-	var a = new ED.Drawing.Point(_pointA.x - _pointM.x, _pointA.y - _pointM.y);
-	var b = new ED.Drawing.Point(_pointB.x - _pointM.x, _pointB.y - _pointM.y);
+	var a = new ED.Point(_pointA.x - _pointM.x, _pointA.y - _pointM.y);
+	var b = new ED.Point(_pointB.x - _pointM.x, _pointB.y - _pointM.y);
 
 	return a.clockwiseAngleTo(b);
 }
@@ -3222,8 +3222,8 @@ ED.Doodle = function(_drawing, _parameterJSON) {
 		this.squiggleArray = new Array();
 
 		// Transform used to draw doodle (includes additional transforms specific to the doodle)
-		this.transform = new ED.Drawing.AffineTransform();
-		this.inverseTransform = new ED.Drawing.AffineTransform();
+		this.transform = new ED.AffineTransform();
+		this.inverseTransform = new ED.AffineTransform();
 
 		// Store created time
 		this.createdTime = (new Date()).getTime();
@@ -3262,35 +3262,35 @@ ED.Doodle = function(_drawing, _parameterJSON) {
 			originX: {
 				kind: 'simple',
 				type: 'int',
-				range: new ED.Drawing.Range(-halfWidth, +halfWidth),
+				range: new ED.Range(-halfWidth, +halfWidth),
 				defaultValue: +0,
 				delta: 15
 			},
 			originY: {
 				kind: 'simple',
 				type: 'int',
-				range: new ED.Drawing.Range(-halfHeight, +halfHeight),
+				range: new ED.Range(-halfHeight, +halfHeight),
 				defaultValue: +0,
 				delta: 15
 			},
 			width: {
 				kind: 'simple',
 				type: 'int',
-				range: new ED.Drawing.Range(+100, +halfHeight),
+				range: new ED.Range(+100, +halfHeight),
 				defaultValue: +50,
 				delta: 15
 			},
 			height: {
 				kind: 'simple',
 				type: 'int',
-				range: new ED.Drawing.Range(+100, +halfWidth),
+				range: new ED.Range(+100, +halfWidth),
 				defaultValue: +50,
 				delta: 15
 			},
 			radius: {
 				kind: 'simple',
 				type: 'float',
-				range: new ED.Drawing.Range(+100, +450),
+				range: new ED.Range(+100, +450),
 				precision: 6,
 				defaultValue: +100,
 				delta: 15
@@ -3299,20 +3299,20 @@ ED.Doodle = function(_drawing, _parameterJSON) {
 				kind: 'simple',
 				type: 'int',
 				defaultValue: +0,
-				range: new ED.Drawing.Range(-500, +500),
+				range: new ED.Range(-500, +500),
 				delta: 15
 			},
 			apexY: {
 				kind: 'simple',
 				type: 'int',
-				range: new ED.Drawing.Range(-500, +500),
+				range: new ED.Range(-500, +500),
 				defaultValue: +0,
 				delta: 15
 			},
 			scaleX: {
 				kind: 'simple',
 				type: 'float',
-				range: new ED.Drawing.Range(+0.5, +4.0),
+				range: new ED.Range(+0.5, +4.0),
 				precision: 6,
 				defaultValue: +1,
 				delta: 0.1
@@ -3320,7 +3320,7 @@ ED.Doodle = function(_drawing, _parameterJSON) {
 			scaleY: {
 				kind: 'simple',
 				type: 'float',
-				range: new ED.Drawing.Range(+0.5, +4.0),
+				range: new ED.Range(+0.5, +4.0),
 				precision: 6,
 				defaultValue: +1,
 				delta: 0.1
@@ -3328,7 +3328,7 @@ ED.Doodle = function(_drawing, _parameterJSON) {
 			arc: {
 				kind: 'simple',
 				type: 'float',
-				range: new ED.Drawing.Range(Math.PI / 12, Math.PI * 2),
+				range: new ED.Range(Math.PI / 12, Math.PI * 2),
 				precision: 6,
 				defaultValue: Math.PI,
 				delta: 0.1
@@ -3336,7 +3336,7 @@ ED.Doodle = function(_drawing, _parameterJSON) {
 			rotation: {
 				kind: 'simple',
 				type: 'float',
-				range: new ED.Drawing.Range(0, 2 * Math.PI),
+				range: new ED.Range(0, 2 * Math.PI),
 				precision: 6,
 				defaultValue: +0,
 				delta: 0.2
@@ -3381,7 +3381,7 @@ ED.Doodle = function(_drawing, _parameterJSON) {
 		this.pointsArray = new Array();
 		this.anglesArray = new Array();
 		this.arcArray = new Array();
-		this.quadrantPoint = new ED.Drawing.Point(200, 200);
+		this.quadrantPoint = new ED.Point(200, 200);
 
 		// Bindings to HTML element values. Associative array with parameter name as key
 		this.bindingArray = new Array();
@@ -3389,16 +3389,16 @@ ED.Doodle = function(_drawing, _parameterJSON) {
 
 		// Array of 5 handles
 		this.handleArray = new Array();
-		this.handleArray[0] = new ED.Doodle.Handle(new ED.Drawing.Point(-50, 50), false, ED.Mode.Scale, false);
-		this.handleArray[1] = new ED.Doodle.Handle(new ED.Drawing.Point(-50, -50), false, ED.Mode.Scale, false);
-		this.handleArray[2] = new ED.Doodle.Handle(new ED.Drawing.Point(50, -50), false, ED.Mode.Scale, false);
-		this.handleArray[3] = new ED.Doodle.Handle(new ED.Drawing.Point(50, 50), false, ED.Mode.Scale, false);
-		this.handleArray[4] = new ED.Doodle.Handle(new ED.Drawing.Point(this.apexX, this.apexY), false, ED.Mode.Apex, false);
+		this.handleArray[0] = new ED.Doodle.Handle(new ED.Point(-50, 50), false, ED.Mode.Scale, false);
+		this.handleArray[1] = new ED.Doodle.Handle(new ED.Point(-50, -50), false, ED.Mode.Scale, false);
+		this.handleArray[2] = new ED.Doodle.Handle(new ED.Point(50, -50), false, ED.Mode.Scale, false);
+		this.handleArray[3] = new ED.Doodle.Handle(new ED.Point(50, 50), false, ED.Mode.Scale, false);
+		this.handleArray[4] = new ED.Doodle.Handle(new ED.Point(this.apexX, this.apexY), false, ED.Mode.Apex, false);
 		this.setHandles();
 
 		// Extremities
-		this.leftExtremity = new ED.Drawing.Point(-100, -100);
-		this.rightExtremity = new ED.Drawing.Point(0, -100);
+		this.leftExtremity = new ED.Point(-100, -100);
+		this.rightExtremity = new ED.Point(0, -100);
 
 		// Version
 		this.version = +1.1;
@@ -3440,15 +3440,15 @@ ED.Doodle = function(_drawing, _parameterJSON) {
 					for (var j = 0; j < squiggleArray.length; j++) {
 						// Get parameters and create squiggle
 						var c = squiggleArray[j].colour;
-						var colour = new ED.Drawing.Colour(c.red, c.green, c.blue, c.alpha);
+						var colour = new ED.Colour(c.red, c.green, c.blue, c.alpha);
 						var thickness = squiggleArray[j].thickness;
 						var filled = squiggleArray[j].filled;
-						var squiggle = new ED.Drawing.Squiggle(this, colour, thickness, filled);
+						var squiggle = new ED.Squiggle(this, colour, thickness, filled);
 
 						// Add points to squiggle and complete it
 						var pointsArray = squiggleArray[j].pointsArray;
 						for (var k = 0; k < pointsArray.length; k++) {
-							var point = new ED.Drawing.Point(pointsArray[k].x, pointsArray[k].y);
+							var point = new ED.Point(pointsArray[k].x, pointsArray[k].y);
 							squiggle.addPoint(point);
 						}
 						squiggle.complete = true;
@@ -3606,11 +3606,11 @@ ED.Doodle.prototype.move = function(_x, _y) {
  */
 ED.Doodle.prototype.orientation = function() {
 	// Get position of centre of display (canvas plane relative to centre) and of an arbitrary point vertically above
-	var canvasCentre = new ED.Drawing.Point(0, 0);
-	var canvasTop = new ED.Drawing.Point(0, -100);
+	var canvasCentre = new ED.Point(0, 0);
+	var canvasTop = new ED.Point(0, -100);
 
 	// New position of doodle
-	var newDoodleOrigin = new ED.Drawing.Point(this.originX, this.originY);
+	var newDoodleOrigin = new ED.Point(this.originX, this.originY);
 
 	// Calculate angle to current position from centre relative to north
 	return this.drawing.innerAngle(canvasTop, canvasCentre, newDoodleOrigin);
@@ -4469,7 +4469,7 @@ ED.Doodle.prototype.setOriginWithDisplacements = function(_first, _next) {
 ED.Doodle.prototype.setOriginWithRotations = function(_radius, _first, _next) {
 	var direction = this.drawing.eye == ED.eye.Right ? -1 : 1;
 
-	var origin = new ED.Drawing.Point(0,0);
+	var origin = new ED.Point(0,0);
 	origin.setWithPolars(_radius, direction * _first * Math.PI / 180);
 
 	// Get last doodle to be added
@@ -4481,7 +4481,7 @@ ED.Doodle.prototype.setOriginWithRotations = function(_radius, _first, _next) {
 
 	// If there is one, make position relative to it
 	if (doodle) {
-		var doodleOrigin = new ED.Drawing.Point(doodle.originX, doodle.originY);
+		var doodleOrigin = new ED.Point(doodle.originX, doodle.originY);
 		origin.setWithPolars(_radius, doodleOrigin.direction() + direction * _next * Math.PI / 180);
 	}
 
@@ -4798,8 +4798,8 @@ ED.Doodle.prototype.clockHour = function(_offset) {
 	if (this.isRotatable && !this.isMoveable) {
 		clockHour = ((this.rotation * 6 / Math.PI) + 12 + offset) % 12;
 	} else {
-		var twelvePoint = new ED.Drawing.Point(0, -100);
-		var thisPoint = new ED.Drawing.Point(this.originX, this.originY);
+		var twelvePoint = new ED.Point(0, -100);
+		var thisPoint = new ED.Point(this.originX, this.originY);
 		var clockHour = ((twelvePoint.clockwiseAngleTo(thisPoint) * 6 / Math.PI) + 12 + offset) % 12;
 	}
 
@@ -4840,8 +4840,8 @@ ED.Doodle.prototype.degrees = function() {
 	if (this.isRotatable && !this.isMoveable) {
 		degrees = ((this.rotation * 180 / Math.PI) + 360) % 360;
 	} else {
-		var twelvePoint = new ED.Drawing.Point(0, -100);
-		var thisPoint = new ED.Drawing.Point(this.originX, this.originY);
+		var twelvePoint = new ED.Point(0, -100);
+		var thisPoint = new ED.Point(this.originX, this.originY);
 		degrees = ((twelvePoint.clockwiseAngleTo(thisPoint) * 180 / Math.PI) + 360) % 360;
 	}
 
@@ -4863,8 +4863,8 @@ ED.Doodle.prototype.clockHourExtent = function() {
 		clockHourStart = (((this.rotation - this.arc / 2) * 6 / Math.PI) + 12) % 12;
 		clockHourEnd = (((this.rotation + this.arc / 2) * 6 / Math.PI) + 12) % 12;
 	} else {
-		var twelvePoint = new ED.Drawing.Point(0, -100);
-		var thisPoint = new ED.Drawing.Point(this.originX, this.originY);
+		var twelvePoint = new ED.Point(0, -100);
+		var thisPoint = new ED.Point(this.originX, this.originY);
 		var clockHour = ((twelvePoint.clockwiseAngleTo(thisPoint) * 6 / Math.PI) + 12) % 12;
 	}
 
@@ -4952,7 +4952,7 @@ ED.Doodle.prototype.locationRelativeToFovea = function() {
  */
 ED.Doodle.prototype.addSquiggle = function() {
 	// Get colour (stored as a HEX string in the doodle) and create colour object
-	var colourObject = new ED.Drawing.Colour(0, 0, 0, 1);
+	var colourObject = new ED.Colour(0, 0, 0, 1);
 	colourObject.setWithHexString(this.colourString);
 
 	// Line thickness
@@ -4973,7 +4973,7 @@ ED.Doodle.prototype.addSquiggle = function() {
 	}
 
 	// Create new squiggle
-	var squiggle = new ED.Drawing.Squiggle(this, colourObject, lineThickness, this.filled);
+	var squiggle = new ED.Squiggle(this, colourObject, lineThickness, this.filled);
 
 	// Add it to squiggle array
 	this.squiggleArray.push(squiggle);
@@ -5013,8 +5013,8 @@ ED.Doodle.prototype.completeSquiggle = function() {
  */
 ED.Doodle.prototype.calculateArc = function() {
 	// Transform extremity points to origin of 0,0
-	var left = new ED.Drawing.Point(this.leftExtremity.x - this.drawing.canvas.width / 2, this.leftExtremity.y - this.drawing.canvas.height / 2);
-	var right = new ED.Drawing.Point(this.rightExtremity.x - this.drawing.canvas.width / 2, this.rightExtremity.y - this.drawing.canvas.height / 2);
+	var left = new ED.Point(this.leftExtremity.x - this.drawing.canvas.width / 2, this.leftExtremity.y - this.drawing.canvas.height / 2);
+	var right = new ED.Point(this.rightExtremity.x - this.drawing.canvas.width / 2, this.rightExtremity.y - this.drawing.canvas.height / 2);
 
 	// Return angle between them
 	return left.clockwiseAngleTo(right);
@@ -5023,8 +5023,8 @@ ED.Doodle.prototype.calculateArc = function() {
 /**
  * Finds the nearest point in the doodle pointsArray
  *
- * @param {ED.Drawing.Point} _point The point to test
- * @returns {ED.Drawing.Point} The nearest point
+ * @param {ED.Point} _point The point to test
+ * @returns {ED.Point} The nearest point
  */
 ED.Doodle.prototype.nearestPointTo = function(_point) {
 	// Check that pointsArray has content
@@ -5276,14 +5276,14 @@ ED.Doodle.prototype.drawNFLHaem = function(_ctx, _x, _y) {
 	var r = 10;
 
 	// Create point from parameters
-	var p = new ED.Drawing.Point(_x, _y);
+	var p = new ED.Point(_x, _y);
 
 	// Create two new points 'tangential'
 	var phi1 = p.direction() + Math.PI/2;
 	var phi2 = p.direction() + 3 * Math.PI/2;
-	var p1 = new ED.Drawing.Point(0,0);
+	var p1 = new ED.Point(0,0);
 	p1.setWithPolars(r, phi1);
-	var p2 = new ED.Drawing.Point(0,0);
+	var p2 = new ED.Point(0,0);
 	p2.setWithPolars(r, phi2);
 
 	// Draw line
@@ -5356,7 +5356,7 @@ ED.Doodle.prototype.debug = function() {
 ED.Doodle.Handle = function(_location, _isVisible, _mode, _isRotatable) {
 	// Properties
 	if (_location == null) {
-		this.location = new ED.Drawing.Point(0, 0);
+		this.location = new ED.Point(0, 0);
 	} else {
 		this.location = _location;
 	}
@@ -6242,7 +6242,7 @@ ED.View = (function() {
  * @class AffineTransform
  * @property {Array} components Array representing 3x3 matrix
  */
-ED.Drawing.AffineTransform = function() {
+ED.AffineTransform = function() {
 	// Properties - array of arrays of column values one for each row
 	this.components = [
 		[1, 0, 0],
@@ -6254,7 +6254,7 @@ ED.Drawing.AffineTransform = function() {
 /**
  * Sets matrix to identity matrix
  */
-ED.Drawing.AffineTransform.prototype.setToIdentity = function() {
+ED.AffineTransform.prototype.setToIdentity = function() {
 	this.components[0][0] = 1;
 	this.components[0][1] = 0;
 	this.components[0][2] = 0;
@@ -6271,7 +6271,7 @@ ED.Drawing.AffineTransform.prototype.setToIdentity = function() {
  *
  * @param {AffineTransform} _transform Array An affine transform
  */
-ED.Drawing.AffineTransform.prototype.setToTransform = function(_transform) {
+ED.AffineTransform.prototype.setToTransform = function(_transform) {
 	this.components[0][0] = _transform.components[0][0];
 	this.components[0][1] = _transform.components[0][1];
 	this.components[0][2] = _transform.components[0][2];
@@ -6289,7 +6289,7 @@ ED.Drawing.AffineTransform.prototype.setToTransform = function(_transform) {
  * @param {float} _x value to translate along x-axis
  * @param {float} _y value to translate along y-axis
  */
-ED.Drawing.AffineTransform.prototype.translate = function(_x, _y) {
+ED.AffineTransform.prototype.translate = function(_x, _y) {
 	this.components[0][2] = this.components[0][0] * _x + this.components[0][1] * _y + this.components[0][2];
 	this.components[1][2] = this.components[1][0] * _x + this.components[1][1] * _y + this.components[1][2];
 	this.components[2][2] = this.components[2][0] * _x + this.components[2][1] * _y + this.components[2][2];
@@ -6301,7 +6301,7 @@ ED.Drawing.AffineTransform.prototype.translate = function(_x, _y) {
  * @param {float} _sx value to scale along x-axis
  * @param {float} _sy value to scale along y-axis
  */
-ED.Drawing.AffineTransform.prototype.scale = function(_sx, _sy) {
+ED.AffineTransform.prototype.scale = function(_sx, _sy) {
 	this.components[0][0] = this.components[0][0] * _sx;
 	this.components[0][1] = this.components[0][1] * _sy;
 	this.components[1][0] = this.components[1][0] * _sx;
@@ -6315,7 +6315,7 @@ ED.Drawing.AffineTransform.prototype.scale = function(_sx, _sy) {
  *
  * @param {float} _rad value to rotate by in radians
  */
-ED.Drawing.AffineTransform.prototype.rotate = function(_rad) {
+ED.AffineTransform.prototype.rotate = function(_rad) {
 	// Calulate trigonometry
 	var c = Math.cos(_rad);
 	var s = Math.sin(_rad);
@@ -6350,11 +6350,11 @@ ED.Drawing.AffineTransform.prototype.rotate = function(_rad) {
  * @param {Point} _point a point
  * @returns {Point} a transformed point
  */
-ED.Drawing.AffineTransform.prototype.transformPoint = function(_point) {
+ED.AffineTransform.prototype.transformPoint = function(_point) {
 	var newX = _point.x * this.components[0][0] + _point.y * this.components[0][1] + 1 * this.components[0][2];
 	var newY = _point.x * this.components[1][0] + _point.y * this.components[1][1] + 1 * this.components[1][2];
 
-	return new ED.Drawing.Point(newX, newY);
+	return new ED.Point(newX, newY);
 }
 
 /**
@@ -6362,7 +6362,7 @@ ED.Drawing.AffineTransform.prototype.transformPoint = function(_point) {
  *
  * @returns {Float} determinant
  */
-ED.Drawing.AffineTransform.prototype.determinant = function() {
+ED.AffineTransform.prototype.determinant = function() {
 	return this.components[0][0] * (this.components[1][1] * this.components[2][2] - this.components[1][2] * this.components[2][1]) -
 		this.components[0][1] * (this.components[1][0] * this.components[2][2] - this.components[1][2] * this.components[2][0]) +
 		this.components[0][2] * (this.components[1][0] * this.components[2][1] - this.components[1][1] * this.components[2][0]);
@@ -6373,9 +6373,9 @@ ED.Drawing.AffineTransform.prototype.determinant = function() {
  *
  * @returns {Array} inverse matrix
  */
-ED.Drawing.AffineTransform.prototype.createInverse = function() {
+ED.AffineTransform.prototype.createInverse = function() {
 	// Create new matrix
-	var inv = new ED.Drawing.AffineTransform();
+	var inv = new ED.AffineTransform();
 
 	var det = this.determinant();
 
@@ -6419,7 +6419,7 @@ ED.Drawing.AffineTransform.prototype.createInverse = function() {
 
 /**
  * A colour in the RGB space;
- * Usage: var c = new ED.Drawing.Colour(0, 0, 255, 0.75); ctx.fillStyle = c.rgba();
+ * Usage: var c = new ED.Colour(0, 0, 255, 0.75); ctx.fillStyle = c.rgba();
  *
  * @property {Int} red The red value as an integer from 0 to 255
  * @property {Int} green The green value as an integer from 0 to 255
@@ -6430,7 +6430,7 @@ ED.Drawing.AffineTransform.prototype.createInverse = function() {
  * @param {Int} _blue
  * @param {Float} _alpha
  */
-ED.Drawing.Colour = function(_red, _green, _blue, _alpha) {
+ED.Colour = function(_red, _green, _blue, _alpha) {
 	this.red = _red;
 	this.green = _green;
 	this.blue = _blue;
@@ -6442,7 +6442,7 @@ ED.Drawing.Colour = function(_red, _green, _blue, _alpha) {
  *
  * @param {String} Colour in hex format (eg 'E0AB4F')
  */
-ED.Drawing.Colour.prototype.setWithHexString = function(_hexString) {
+ED.Colour.prototype.setWithHexString = function(_hexString) {
 	// ***TODO*** add some string reality checks here
 	this.red = parseInt((_hexString.charAt(0) + _hexString.charAt(1)), 16);
 	this.green = parseInt((_hexString.charAt(2) + _hexString.charAt(3)), 16);
@@ -6457,7 +6457,7 @@ ED.Drawing.Colour.prototype.setWithHexString = function(_hexString) {
  *
  * @returns {String} Colour in hex format (eg 'E0AB4F')
  */
-ED.Drawing.Colour.prototype.hexString = function() {
+ED.Colour.prototype.hexString = function() {
 	var hexString = "";
 
 	// temporary while awaiting internet! Works for red and green only
@@ -6478,7 +6478,7 @@ ED.Drawing.Colour.prototype.hexString = function() {
  *
  * @returns {String} Colour in rgba format
  */
-ED.Drawing.Colour.prototype.rgba = function() {
+ED.Colour.prototype.rgba = function() {
 	return "rgba(" + this.red + ", " + this.green + ", " + this.blue + ", " + this.alpha + ")";
 }
 
@@ -6487,7 +6487,7 @@ ED.Drawing.Colour.prototype.rgba = function() {
  *
  * @returns {String} A JSON encoded string representing the colour
  */
-ED.Drawing.Colour.prototype.json = function() {
+ED.Colour.prototype.json = function() {
 	return "{\"red\":" + this.red + ",\"green\":" + this.green + ",\"blue\":" + this.blue + ",\"alpha\":" + this.alpha + "}";
 }
 
@@ -6519,7 +6519,7 @@ ED.Drawing.Colour.prototype.json = function() {
  * @param {Float} _x
  * @param {Float} _y
  */
-ED.Drawing.Point = function(_x, _y) {
+ED.Point = function(_x, _y) {
 	// Properties
 	this.x = Math.round(+_x);
 	this.y = Math.round(+_y);
@@ -6532,7 +6532,7 @@ ED.Drawing.Point = function(_x, _y) {
  * @param {Float} _r Distance from the origin
  * @param {Float} _p Angle in radians from North going clockwise
  */
-ED.Drawing.Point.prototype.setWithPolars = function(_r, _p) {
+ED.Point.prototype.setWithPolars = function(_r, _p) {
 	this.x = Math.round(_r * Math.sin(_p));
 	this.y = Math.round(-_r * Math.cos(_p));
 }
@@ -6543,7 +6543,7 @@ ED.Drawing.Point.prototype.setWithPolars = function(_r, _p) {
  * @param {Float} _x value of x
  * @param {Float} _y value of y
  */
-ED.Drawing.Point.prototype.setCoordinates = function(_x, _y) {
+ED.Point.prototype.setCoordinates = function(_x, _y) {
 	this.x = _x;
 	this.y = _y;
 }
@@ -6554,7 +6554,7 @@ ED.Drawing.Point.prototype.setCoordinates = function(_x, _y) {
  * @param {Point} _point
  * @returns {Float} Distance from the passed point
  */
-ED.Drawing.Point.prototype.distanceTo = function(_point) {
+ED.Point.prototype.distanceTo = function(_point) {
 	return Math.sqrt(Math.pow(this.x - _point.x, 2) + Math.pow(this.y - _point.y, 2));
 }
 
@@ -6564,7 +6564,7 @@ ED.Drawing.Point.prototype.distanceTo = function(_point) {
  * @param {Point} _point
  * @returns {Float} The dot product
  */
-ED.Drawing.Point.prototype.dotProduct = function(_point) {
+ED.Point.prototype.dotProduct = function(_point) {
 	return this.x * _point.x + this.y * _point.y;
 }
 
@@ -6574,7 +6574,7 @@ ED.Drawing.Point.prototype.dotProduct = function(_point) {
  * @param {Point} _point
  * @returns {Float} The cross product
  */
-ED.Drawing.Point.prototype.crossProduct = function(_point) {
+ED.Point.prototype.crossProduct = function(_point) {
 	return this.x * _point.y - this.y * _point.x;
 }
 
@@ -6583,7 +6583,7 @@ ED.Drawing.Point.prototype.crossProduct = function(_point) {
  *
  * @returns {Float} The length
  */
-ED.Drawing.Point.prototype.length = function() {
+ED.Point.prototype.length = function() {
 	return Math.sqrt(this.x * this.x + this.y * this.y);
 }
 
@@ -6592,8 +6592,8 @@ ED.Drawing.Point.prototype.length = function() {
  *
  * @returns {Float} The angle from zero (north) going clockwise
  */
-ED.Drawing.Point.prototype.direction = function() {
-	var north = new ED.Drawing.Point(0, -100);
+ED.Point.prototype.direction = function() {
+	var north = new ED.Point(0, -100);
 
 	return north.clockwiseAngleTo(this);
 }
@@ -6604,7 +6604,7 @@ ED.Drawing.Point.prototype.direction = function() {
  * @param {Point} _point
  * @returns {Float} The angle in radians
  */
-ED.Drawing.Point.prototype.clockwiseAngleTo = function(_point) {
+ED.Point.prototype.clockwiseAngleTo = function(_point) {
 	var angle = Math.acos(this.dotProduct(_point) / (this.length() * _point.length()));
 	if (this.crossProduct(_point) < 0) {
 		return 2 * Math.PI - angle;
@@ -6620,12 +6620,12 @@ ED.Drawing.Point.prototype.clockwiseAngleTo = function(_point) {
  * @param {Float} _phi Angle form the radius to the control point
  * @returns {Point} The control point
  */
-ED.Drawing.Point.prototype.pointAtRadiusAndClockwiseAngle = function(_r, _phi) {
+ED.Point.prototype.pointAtRadiusAndClockwiseAngle = function(_r, _phi) {
 	// Calculate direction (clockwise from north)
 	var angle = this.direction();
 
 	// Create point and set length and direction
-	var point = new ED.Drawing.Point(0, 0);
+	var point = new ED.Point(0, 0);
 	point.setWithPolars(_r, angle + _phi);
 
 	return point;
@@ -6638,9 +6638,9 @@ ED.Drawing.Point.prototype.pointAtRadiusAndClockwiseAngle = function(_r, _phi) {
  * @param {Float} _point Point at other end of straight line
  * @returns {Point} A point object
  */
-ED.Drawing.Point.prototype.pointAtAngleToLineToPointAtProportion = function(_phi, _point, _prop) {
+ED.Point.prototype.pointAtAngleToLineToPointAtProportion = function(_phi, _point, _prop) {
 	// Midpoint in coordinates as if current point is origin
-	var bp = new ED.Drawing.Point((_point.x - this.x) * _prop, (_point.y - this.y) * _prop);
+	var bp = new ED.Point((_point.x - this.x) * _prop, (_point.y - this.y) * _prop);
 
 	// Calculate radius
 	r = bp.length();
@@ -6661,8 +6661,8 @@ ED.Drawing.Point.prototype.pointAtAngleToLineToPointAtProportion = function(_phi
  *
  * @returns {Int} The clock hour
  */
-ED.Drawing.Point.prototype.clockHour = function(_point) {
-	var twelvePoint = new ED.Drawing.Point(0, -100);
+ED.Point.prototype.clockHour = function(_point) {
+	var twelvePoint = new ED.Point(0, -100);
 	var clockHour = ((twelvePoint.clockwiseAngleTo(this) * 6 / Math.PI) + 12) % 12;
 
 	clockHour = clockHour.toFixed(0);
@@ -6677,7 +6677,7 @@ ED.Drawing.Point.prototype.clockHour = function(_point) {
  * @param {Float} _phi Angle form the radius to the control point
  * @returns {Point} The control point
  */
-ED.Drawing.Point.prototype.tangentialControlPoint = function(_phi) {
+ED.Point.prototype.tangentialControlPoint = function(_phi) {
 	// Calculate length of line from origin to point and direction (clockwise from north)
 	var r = this.length();
 	var angle = this.direction();
@@ -6686,7 +6686,7 @@ ED.Drawing.Point.prototype.tangentialControlPoint = function(_phi) {
 	var h = r / Math.cos(_phi);
 
 	// Create point and set length and direction
-	var point = new ED.Drawing.Point(0, 0);
+	var point = new ED.Point(0, 0);
 	point.setWithPolars(h, angle + _phi);
 
 	return point;
@@ -6697,7 +6697,7 @@ ED.Drawing.Point.prototype.tangentialControlPoint = function(_phi) {
  *
  * @returns {String} point in JSON format
  */
-ED.Drawing.Point.prototype.json = function() {
+ED.Point.prototype.json = function() {
 	return "{\"x\":" + this.x.toFixed(2) + ",\"y\":" + this.y.toFixed(2) + "}";
 }
 /**
@@ -6728,7 +6728,7 @@ ED.Drawing.Point.prototype.json = function() {
  * @param {Float} _min
  * @param {Float} _max
  */
-ED.Drawing.Range = function(_min, _max) {
+ED.Range = function(_min, _max) {
 	// Properties
 	this.min = _min;
 	this.max = _max;
@@ -6740,7 +6740,7 @@ ED.Drawing.Range = function(_min, _max) {
  * @param {Float} _min
  * @param {Float} _max
  */
-ED.Drawing.Range.prototype.setMinAndMax = function(_min, _max) {
+ED.Range.prototype.setMinAndMax = function(_min, _max) {
 	// Set properties
 	this.min = _min;
 	this.max = _max;
@@ -6752,7 +6752,7 @@ ED.Drawing.Range.prototype.setMinAndMax = function(_min, _max) {
  * @param {Float} _num
  * @returns {Bool} True if the parameter is less than the minimum
  */
-ED.Drawing.Range.prototype.isBelow = function(_num) {
+ED.Range.prototype.isBelow = function(_num) {
 	if (_num < this.min) {
 		return true;
 	} else {
@@ -6766,7 +6766,7 @@ ED.Drawing.Range.prototype.isBelow = function(_num) {
  * @param {Float} _num
  * @returns {Bool} True if the parameter is more than the maximum
  */
-ED.Drawing.Range.prototype.isAbove = function(_num) {
+ED.Range.prototype.isAbove = function(_num) {
 	if (_num > this.max) {
 		return true;
 	} else {
@@ -6780,7 +6780,7 @@ ED.Drawing.Range.prototype.isAbove = function(_num) {
  * @param {Float} _num
  * @returns {Bool} True if the parameter is within the range
  */
-ED.Drawing.Range.prototype.includes = function(_num) {
+ED.Range.prototype.includes = function(_num) {
 	if (_num < this.min || _num > this.max) {
 		return false;
 	} else {
@@ -6794,7 +6794,7 @@ ED.Drawing.Range.prototype.includes = function(_num) {
  * @param {Float} _num
  * @returns {Float} The constrained value
  */
-ED.Drawing.Range.prototype.constrain = function(_num) {
+ED.Range.prototype.constrain = function(_num) {
 	if (_num < this.min) {
 		return this.min;
 	} else if (_num > this.max) {
@@ -6811,14 +6811,14 @@ ED.Drawing.Range.prototype.constrain = function(_num) {
  * @param {Bool} _isDegrees Flag indicating range is in degrees rather than radians
  * @returns {Bool} True if the parameter is within the range
  */
-ED.Drawing.Range.prototype.includesInAngularRange = function(_angle, _isDegrees) {
+ED.Range.prototype.includesInAngularRange = function(_angle, _isDegrees) {
 	// Arbitrary radius
 	var r = 100;
 
 	// Points representing vectos of angles within range
-	var min = new ED.Drawing.Point(0, 0);
-	var max = new ED.Drawing.Point(0, 0);
-	var angle = new ED.Drawing.Point(0, 0);
+	var min = new ED.Point(0, 0);
+	var max = new ED.Point(0, 0);
+	var angle = new ED.Point(0, 0);
 
 	// Set points using polar coordinates
 	if (!_isDegrees) {
@@ -6841,16 +6841,16 @@ ED.Drawing.Range.prototype.includesInAngularRange = function(_angle, _isDegrees)
  * @param {Bool} _isDegrees Flag indicating range is in degrees rather than radians
  * @returns {Float} The constrained value
  */
-ED.Drawing.Range.prototype.constrainToAngularRange = function(_angle, _isDegrees) {
+ED.Range.prototype.constrainToAngularRange = function(_angle, _isDegrees) {
 	// No point in constraining unless range is less than 360 degrees!
 	if ((this.max - this.min) < (_isDegrees ? 360 : (2 * Math.PI))) {
 		// Arbitrary radius
 		var r = 100;
 
 		// Points representing vectors of angles within range
-		var min = new ED.Drawing.Point(0, 0);
-		var max = new ED.Drawing.Point(0, 0);
-		var angle = new ED.Drawing.Point(0, 0);
+		var min = new ED.Point(0, 0);
+		var max = new ED.Point(0, 0);
+		var angle = new ED.Point(0, 0);
 
 		// Set points using polar coordinates
 		if (!_isDegrees) {
@@ -6912,7 +6912,7 @@ ED.Drawing.Range.prototype.constrainToAngularRange = function(_angle, _isDegrees
  * @param {Int} _thickness
  * @param {Bool} _filled
  */
-ED.Drawing.Squiggle = function(_doodle, _colour, _thickness, _filled) {
+ED.Squiggle = function(_doodle, _colour, _thickness, _filled) {
 	this.doodle = _doodle;
 	this.colour = _colour;
 	this.thickness = _thickness;
@@ -6927,7 +6927,7 @@ ED.Drawing.Squiggle = function(_doodle, _colour, _thickness, _filled) {
  *
  * @param {Point} _point
  */
-ED.Drawing.Squiggle.prototype.addPoint = function(_point) {
+ED.Squiggle.prototype.addPoint = function(_point) {
 	this.pointsArray.push(_point);
 }
 
@@ -6936,7 +6936,7 @@ ED.Drawing.Squiggle.prototype.addPoint = function(_point) {
  *
  * @returns {String} A JSON encoded string representing the squiggle
  */
-ED.Drawing.Squiggle.prototype.json = function() {
+ED.Squiggle.prototype.json = function() {
 	var s = '{';
 	s = s + '"colour":' + this.colour.json() + ',';
 	s = s + '"thickness": ' + this.thickness + ',';
@@ -7764,7 +7764,7 @@ ED.FamilyMember.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['dimension'] = {
 		kind: 'derived',
 		type: 'int',
-		range: new ED.Drawing.Range(0, 1000),
+		range: new ED.Range(0, 1000),
 		animate: true
 	};
 	this.parameterValidationArray['gender'] = {
@@ -8067,7 +8067,7 @@ ED.Freehand.prototype.draw = function(_point) {
 	ctx.closePath();
 
 	// Create colour object for squiggle
-	var colourObject = new ED.Drawing.Colour(0, 0, 0, 1);
+	var colourObject = new ED.Colour(0, 0, 0, 1);
 	colourObject.setWithHexString(this.colourString);
 
 	// Set attributes for border (colour changes to indicate drawing mode)
@@ -8117,7 +8117,7 @@ ED.Freehand.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[2].location = this.transform.transformPoint(new ED.Drawing.Point(halfWidth, -halfWidth));
+	this.handleArray[2].location = this.transform.transformPoint(new ED.Point(halfWidth, -halfWidth));
 
 	// Draw handles if selected but not if for drawing
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -8467,7 +8467,7 @@ ED.Label.prototype.draw = function(_point) {
 		ctx.fillText(this.labelText, -this.labelWidth / 2 + this.padding, this.labelHeight / 6);
 
 		// Coordinate of start of arrow
-		var arrowStart = new ED.Drawing.Point(0, 0);
+		var arrowStart = new ED.Point(0, 0);
 
 		// Calculation of which quadrant arrowEnd is in
 		var q;
@@ -8493,7 +8493,7 @@ ED.Label.prototype.draw = function(_point) {
 		}
 
 		// Coordinates of end of arrow
-		var arrowEnd = new ED.Drawing.Point(this.apexX, this.apexY);
+		var arrowEnd = new ED.Point(this.apexX, this.apexY);
 
 		// Draw arrow
 		ctx.beginPath();
@@ -8505,7 +8505,7 @@ ED.Label.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -8622,7 +8622,7 @@ ED.MemberConnector.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['length'] = {
 		kind: 'derived',
 		type: 'int',
-		range: new ED.Drawing.Range(0, 1000),
+		range: new ED.Range(0, 1000),
 		animate: true
 	};
 	this.parameterValidationArray['type'] = {
@@ -9247,7 +9247,7 @@ ED.Surgeon.prototype.draw = function(_point) {
 	ctx.strokeStyle = "rgba(120,120,120,1)";
 
 	// Set light blue for surgeon's gown
-	var colour = new ED.Drawing.Colour(0, 0, 0, 1);
+	var colour = new ED.Colour(0, 0, 0, 1);
 	colour.setWithHexString('3AFEFA');
 	ctx.fillStyle = colour.rgba();
 
@@ -9544,7 +9544,7 @@ ED.AgentDose.prototype.setPropertyDefaults = function() {
 // 	this.parameterValidationArray['value'] = {
 // 		kind: 'derived',
 // 		type: 'int',
-// 		range: new ED.Drawing.Range(0, 240),
+// 		range: new ED.Range(0, 240),
 // 		animate: false
 // 	};
 	// Update component of validation array for simple parameters
@@ -9658,7 +9658,7 @@ ED.AgentDose.prototype.draw = function(_point) { //console.log(this.originX);
 	}
 
 	// Coordinates of handles (in canvas plane)
-	//this.handleArray[3].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	//this.handleArray[3].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	//if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -9874,7 +9874,7 @@ ED.AgentDuration.prototype.draw = function(_point) {
 	// Only draw handle for range, not fixed
 	if (this.type == 'range') {
 		// Coordinates of handles (in canvas plane)
-		this.handleArray[3].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+		this.handleArray[3].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 		// Draw handles if selected
 		if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -10205,7 +10205,7 @@ ED.RecordReading.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['value'] = {
 		kind: 'derived',
 		type: 'int',
-		range: new ED.Drawing.Range(0, 240),
+		range: new ED.Range(0, 240),
 		animate: true
 	};
 	this.parameterValidationArray['type'] = {
@@ -10592,7 +10592,7 @@ ED.Heart.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -10736,7 +10736,7 @@ ED.Aorta.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -10872,7 +10872,7 @@ ED.RightCoronaryArtery.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -11066,7 +11066,7 @@ ED.LeftCoronaryArtery.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -11273,7 +11273,7 @@ ED.AnomalousVessels.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -11373,8 +11373,8 @@ ED.Bypass.prototype.draw = function(_point) {
 	ctx.beginPath();
 
 	// Start point and end point
-	var startPoint = new ED.Drawing.Point(-320, -200);
-	var endPoint = new ED.Drawing.Point(this.apexX, this.apexY);
+	var startPoint = new ED.Point(-320, -200);
+	var endPoint = new ED.Point(this.apexX, this.apexY);
 
 	var d = startPoint.distanceTo(endPoint);
 	var r = 20;
@@ -11387,18 +11387,18 @@ ED.Bypass.prototype.draw = function(_point) {
 	var angleToApex = Math.atan((endPoint.y - startPoint.y) / (endPoint.x - startPoint.x));
 	if (angleToApex < 0) angleToApex = Math.PI / 2 + (Math.PI / 2 + angleToApex);
 
-	var firstPoint = new ED.Drawing.Point(0, 0);
+	var firstPoint = new ED.Point(0, 0);
 	firstPoint.setWithPolars(r, angleToApex);
 
-	var firstControlPoint = new ED.Drawing.Point(0, 0);
+	var firstControlPoint = new ED.Point(0, 0);
 	firstControlPoint.setWithPolars(d / 2, angleToApex + Math.PI / 2 - phi);
 
-	var secondPoint = new ED.Drawing.Point(firstPoint.x + endPoint.x, firstPoint.y + endPoint.y);
+	var secondPoint = new ED.Point(firstPoint.x + endPoint.x, firstPoint.y + endPoint.y);
 
-	var fourthPoint = new ED.Drawing.Point(0, 0);
+	var fourthPoint = new ED.Point(0, 0);
 	fourthPoint.setWithPolars(r, angleToApex + Math.PI);
 
-	var thirdPoint = new ED.Drawing.Point(fourthPoint.x + endPoint.x, fourthPoint.y + endPoint.y);
+	var thirdPoint = new ED.Point(fourthPoint.x + endPoint.x, fourthPoint.y + endPoint.y);
 
 
 	ctx.lineTo(startPoint.x + firstPoint.x, startPoint.y + firstPoint.y);
@@ -11434,15 +11434,15 @@ ED.Bypass.prototype.draw = function(_point) {
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {}
 
 	// Coordinates of handles (in canvas plane)
-	//this.handleArray[3].location = this.transform.transformPoint(new ED.Drawing.Point(40, -40));
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	//this.handleArray[3].location = this.transform.transformPoint(new ED.Point(40, -40));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
 
 	// Calculate arc (Arc property not used naturally in this doodle)
-	this.leftExtremity = this.transform.transformPoint(new ED.Drawing.Point(-40, -40));
-	this.rightExtremity = this.transform.transformPoint(new ED.Drawing.Point(40, -40));
+	this.leftExtremity = this.transform.transformPoint(new ED.Point(-40, -40));
+	this.rightExtremity = this.transform.transformPoint(new ED.Point(40, -40));
 	this.arc = this.calculateArc();
 
 	// Return value indicating successful hittest
@@ -11564,7 +11564,7 @@ ED.MetalStent.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	var point = new ED.Drawing.Point(-50, -10);
+	var point = new ED.Point(-50, -10);
 	this.handleArray[2].location = this.transform.transformPoint(point);
 
 	// Draw handles if selected
@@ -11687,7 +11687,7 @@ ED.DrugStent.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	var point = new ED.Drawing.Point(-50, -10);
+	var point = new ED.Point(-50, -10);
 	this.handleArray[2].location = this.transform.transformPoint(point);
 
 	// Draw handles if selected
@@ -11761,7 +11761,7 @@ ED.Stenosis.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['degree'] = {
 		kind: 'derived',
 		type: 'int',
-		range: new ED.Drawing.Range(0, 100),
+		range: new ED.Range(0, 100),
 		precision: 0,
 		animate: true
 	};
@@ -11885,7 +11885,7 @@ ED.Stenosis.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	point = new ED.Drawing.Point(this.apexX, this.apexY);
+	point = new ED.Point(this.apexX, this.apexY);
 	this.handleArray[4].location = this.transform.transformPoint(point);
 
 	// Draw handles if selected
@@ -12029,7 +12029,7 @@ ED.Groin.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -12115,7 +12115,7 @@ ED.Haematoma.prototype.draw = function(_point) {
 	this.drawBoundary(_point);
 
 	// Coordinates of handles (in canvas plane)
-	var point = new ED.Drawing.Point(0, 0);
+	var point = new ED.Point(0, 0);
 	point.setWithPolars(r, Math.PI / 4);
 	this.handleArray[2].location = this.transform.transformPoint(point);
 
@@ -12189,7 +12189,7 @@ ED.Bruising.prototype.setPropertyDefaults = function() {
 	//    //    this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.5, +1.5);
 	//
 	//    // Add complete validation arrays for derived parameters
-	//    this.parameterValidationArray['degree'] = {kind:'derived', type:'int', range:new ED.Drawing.Range(0, 100), precision:0, animate:true};
+	//    this.parameterValidationArray['degree'] = {kind:'derived', type:'int', range:new ED.Range(0, 100), precision:0, animate:true};
 	//    this.parameterValidationArray['type'] = {kind:'derived', type:'string', list:['Calcified', 'Non-calcified'], animate:true};
 }
 
@@ -12223,7 +12223,7 @@ ED.Bruising.prototype.draw = function(_point) {
 	this.drawBoundary(_point);
 
 	// Coordinates of handles (in canvas plane)
-	var point = new ED.Drawing.Point(0, 0);
+	var point = new ED.Point(0, 0);
 	point.setWithPolars(r, Math.PI / 4);
 	this.handleArray[2].location = this.transform.transformPoint(point);
 
@@ -12349,7 +12349,7 @@ ED.Bruit.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	//    var point = new ED.Drawing.Point(0, 0);
+	//    var point = new ED.Point(0, 0);
 	//    point.setWithPolars(rc, Math.PI/4);
 	//	this.handleArray[2].location = this.transform.transformPoint(point);
 
@@ -12357,7 +12357,7 @@ ED.Bruit.prototype.draw = function(_point) {
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
 
 	// Coordinates of handles (in canvas plane)
-	var point = new ED.Drawing.Point(0, 0);
+	var point = new ED.Point(0, 0);
 	point.setWithPolars(r, Math.PI / 4);
 	this.handleArray[2].location = this.transform.transformPoint(point);
 
@@ -12512,7 +12512,7 @@ ED.Crepitations.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -12658,7 +12658,7 @@ ED.Effusion.prototype.draw = function(_point) {
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -12835,8 +12835,8 @@ ED.Lungs.prototype.draw = function(_point) {
 	this.drawBoundary(_point);
 
 	// Calculate arc (Arc property not used naturally in this doodle)
-// 	this.leftExtremity = this.transform.transformPoint(new ED.Drawing.Point(-40, -40));
-// 	this.rightExtremity = this.transform.transformPoint(new ED.Drawing.Point(40, -40));
+// 	this.leftExtremity = this.transform.transformPoint(new ED.Point(-40, -40));
+// 	this.rightExtremity = this.transform.transformPoint(new ED.Point(40, -40));
 // 	this.arc = this.calculateArc();
 
 	// Return value indicating successful hittest
@@ -13337,14 +13337,14 @@ ED.Grommet.prototype.draw = function(_point) {
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[2].location = this.transform.transformPoint(new ED.Drawing.Point(21, -21));
+	this.handleArray[2].location = this.transform.transformPoint(new ED.Point(21, -21));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
 
 	// Calculate arc (Arc property not used naturally in this doodle ***TODO** more elegant method of doing this possible!)
-	var centre = this.transform.transformPoint(new ED.Drawing.Point(0, 0));
-	var oneWidthToRight = this.transform.transformPoint(new ED.Drawing.Point(60, 0));
+	var centre = this.transform.transformPoint(new ED.Point(0, 0));
+	var oneWidthToRight = this.transform.transformPoint(new ED.Point(60, 0));
 	var xco = centre.x - this.drawing.canvas.width / 2;
 	var yco = centre.y - this.drawing.canvas.height / 2;
 	var radius = this.scaleX * Math.sqrt(xco * xco + yco * yco);
@@ -13528,7 +13528,7 @@ ED.Perforation.prototype.draw = function(_point) {
 	this.drawBoundary(_point);
 
 	// Coordinates of handles (in canvas plane)
-	var point = new ED.Drawing.Point(0, 0);
+	var point = new ED.Point(0, 0);
 	point.setWithPolars(r, Math.PI / 4);
 	this.handleArray[2].location = this.transform.transformPoint(point);
 
@@ -13713,7 +13713,7 @@ ED.ACIOL.prototype.draw = function(_point) {
 	this.drawBoundary(_point);
 
 	// Coordinates of handles (in canvas plane)
-	var point = new ED.Drawing.Point(0, 0)
+	var point = new ED.Point(0, 0)
 	point.setWithPolars(r, Math.PI / 4);
 	this.handleArray[2].location = this.transform.transformPoint(point);
 
@@ -14002,7 +14002,7 @@ ED.Ahmed.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -14239,7 +14239,7 @@ ED.AngleGradeEast.prototype.draw = function(_point) {
 	this.drawBoundary(_point);
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -14460,7 +14460,7 @@ ED.AngleGradeNorth.prototype.draw = function(_point) {
 	this.drawBoundary(_point);
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -14681,7 +14681,7 @@ ED.AngleGradeSouth.prototype.draw = function(_point) {
 	this.drawBoundary(_point);
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -14902,7 +14902,7 @@ ED.AngleGradeWest.prototype.draw = function(_point) {
 	this.drawBoundary(_point);
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -15036,8 +15036,8 @@ ED.AngleNV.prototype.draw = function(_point) {
 	this.drawBoundary(_point);
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[0].location = this.transform.transformPoint(new ED.Drawing.Point(topLeftX, topLeftY));
-	this.handleArray[3].location = this.transform.transformPoint(new ED.Drawing.Point(topRightX, topRightY));
+	this.handleArray[0].location = this.transform.transformPoint(new ED.Point(topLeftX, topLeftY));
+	this.handleArray[3].location = this.transform.transformPoint(new ED.Point(topRightX, topRightY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -15181,8 +15181,8 @@ ED.AngleRecession.prototype.draw = function(_point) {
 	this.drawBoundary(_point);
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[0].location = this.transform.transformPoint(new ED.Drawing.Point(topLeftX, topLeftY));
-	this.handleArray[3].location = this.transform.transformPoint(new ED.Drawing.Point(topRightX, topRightY));
+	this.handleArray[0].location = this.transform.transformPoint(new ED.Point(topLeftX, topLeftY));
+	this.handleArray[3].location = this.transform.transformPoint(new ED.Point(topRightX, topRightY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -15313,9 +15313,9 @@ ED.AntPVR.prototype.draw = function(_point) {
 	this.drawBoundary(_point);
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[0].location = this.transform.transformPoint(new ED.Drawing.Point(topLeftX, topLeftY));
-	this.handleArray[3].location = this.transform.transformPoint(new ED.Drawing.Point(topRightX, topRightY));
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[0].location = this.transform.transformPoint(new ED.Point(topLeftX, topLeftY));
+	this.handleArray[3].location = this.transform.transformPoint(new ED.Point(topRightX, topRightY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -15541,9 +15541,9 @@ ED.AntSeg.prototype.draw = function(_point) {
 		var colAngleOuter = Math.PI/6;
 		var rimSize = 20;
 
-		var p1 = new ED.Drawing.Point(0,0);
+		var p1 = new ED.Point(0,0);
 		p1.setWithPolars(ri, Math.PI + colAngle/2);
-		var p2 = new ED.Drawing.Point(0,0);
+		var p2 = new ED.Point(0,0);
 		p2.setWithPolars(ro - rimSize, Math.PI + colAngleOuter/2);
 
 		// Coloboma
@@ -15624,7 +15624,7 @@ ED.AntSeg.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -15860,7 +15860,7 @@ ED.AntSegCrossSection.prototype.draw = function(_point) {
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -16000,9 +16000,9 @@ ED.AntSynech.prototype.draw = function(_point) { console.log(this.apexY);
 	this.drawBoundary(_point);
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[0].location = this.transform.transformPoint(new ED.Drawing.Point(topLeftX, topLeftY));
-	this.handleArray[3].location = this.transform.transformPoint(new ED.Drawing.Point(topRightX, topRightY));
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(0, this.apexY));
+	this.handleArray[0].location = this.transform.transformPoint(new ED.Point(topLeftX, topLeftY));
+	this.handleArray[3].location = this.transform.transformPoint(new ED.Point(topRightX, topRightY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(0, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -16258,7 +16258,7 @@ ED.ArcuateScotoma.prototype.draw = function(_point) {
 	this.drawBoundary(_point);
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -16347,7 +16347,7 @@ ED.AxialLengthGraph.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'float',
 		precision: 2,
-		range: new ED.Drawing.Range(14, 38),
+		range: new ED.Range(14, 38),
 		animate: true
 	};
 }
@@ -16679,8 +16679,8 @@ ED.Baerveldt.prototype.draw = function(_point) {
 // 		ctx.lineTo(20 * s, this.apexY);
 // 		ctx.lineTo(20 * s, 290 * s + d);
 
-		var cp1 = new ED.Drawing.Point(0, (290 * s + d) + (this.apexY - (290 * s + d)) * 1);
-		var cp2 = new ED.Drawing.Point(this.apexX * 0.3, this.apexY);
+		var cp1 = new ED.Point(0, (290 * s + d) + (this.apexY - (290 * s + d)) * 1);
+		var cp2 = new ED.Point(this.apexX * 0.3, this.apexY);
 		var yd = this.apexX > 0?1:-1;
 
 		ctx.bezierCurveTo(cp1.x - 20 * s, cp1.y, cp2.x - 20 * s, cp2.y, this.apexX - 20 * s, this.apexY + 20 * s * yd);
@@ -16694,7 +16694,7 @@ ED.Baerveldt.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -16824,7 +16824,7 @@ ED.BiopsySite.prototype.draw = function(_point) {
 	// Other paths and drawing here
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {}
 
-	var point = new ED.Drawing.Point(0, 0);
+	var point = new ED.Point(0, 0);
 	point.setWithPolars(r, Math.PI / 4);
 	this.handleArray[2].location = this.transform.transformPoint(point);
 
@@ -17052,7 +17052,7 @@ ED.BlotHaemorrhage.prototype.draw = function(_point) {
 	this.drawBoundary(_point);
 
 	// Coordinates of handles (in canvas plane)
-	var point = new ED.Drawing.Point(0, 0);
+	var point = new ED.Point(0, 0);
 	point.setWithPolars(r, Math.PI / 4);
 	this.handleArray[2].location = this.transform.transformPoint(point);
 
@@ -17577,10 +17577,10 @@ ED.CNV.prototype.draw = function(_point) {
 	var phi = 2 * Math.PI / n;
 	var th = 0.5 * Math.PI / n;
 	var b = 4;
-	var point = new ED.Drawing.Point(0, 0);
+	var point = new ED.Point(0, 0);
 
 	// First point
-	var fp = new ED.Drawing.Point(0, 0);
+	var fp = new ED.Point(0, 0);
 	fp.setWithPolars(r, 0);
 	ctx.moveTo(fp.x, fp.y);
 	var rl = r;
@@ -17591,15 +17591,15 @@ ED.CNV.prototype.draw = function(_point) {
 		var rn = r * (b + ED.randomArray[i]) / b;
 
 		// Control point 1
-		var cp1 = new ED.Drawing.Point(0, 0);
+		var cp1 = new ED.Point(0, 0);
 		cp1.setWithPolars(rl, i * phi + th);
 
 		// Control point 2
-		var cp2 = new ED.Drawing.Point(0, 0);
+		var cp2 = new ED.Point(0, 0);
 		cp2.setWithPolars(rn, (i + 1) * phi - th);
 
 		// Next point
-		var pn = new ED.Drawing.Point(0, 0);
+		var pn = new ED.Point(0, 0);
 		pn.setWithPolars(rn, (i + 1) * phi);
 
 		// Assign next point
@@ -17765,22 +17765,22 @@ ED.CapsularTensionRing.prototype.draw = function(_point) {
 	// Outer ring
 	ctx.arc(0, 0, ro, -theta, theta, true);
 
-	var p1c1 = new ED.Drawing.Point(0, 0)
+	var p1c1 = new ED.Point(0, 0)
 	p1c1.setWithPolars(ro, Math.PI / 2 + 0.8 * theta);
 
-	var p1c2 = new ED.Drawing.Point(0, 0)
+	var p1c2 = new ED.Point(0, 0)
 	p1c2.setWithPolars(ri, Math.PI / 2 + 0.8 * theta);
 
-	var p1 = new ED.Drawing.Point(0, 0)
+	var p1 = new ED.Point(0, 0)
 	p1.setWithPolars(ri, Math.PI / 2 + theta);
 
-	var p2c1 = new ED.Drawing.Point(0, 0)
+	var p2c1 = new ED.Point(0, 0)
 	p2c1.setWithPolars(ri, Math.PI / 2 + 1.1 * theta);
 
-	var p2c2 = new ED.Drawing.Point(0, 0)
+	var p2c2 = new ED.Point(0, 0)
 	p2c2.setWithPolars(rm, Math.PI / 2 + 1.1 * theta);
 
-	var p2 = new ED.Drawing.Point(0, 0)
+	var p2 = new ED.Point(0, 0)
 	p2.setWithPolars(rm, Math.PI / 2 + 1.2 * theta);
 
 	ctx.bezierCurveTo(p1c1.x, p1c1.y, p1c2.x, p1c2.y, p1.x, p1.y);
@@ -17789,39 +17789,39 @@ ED.CapsularTensionRing.prototype.draw = function(_point) {
 	// Inner ring
 	ctx.arc(0, 0, rm, 1.2 * theta, -1.2 * theta, false);
 
-	var p3c1 = new ED.Drawing.Point(0, 0)
+	var p3c1 = new ED.Point(0, 0)
 	p3c1.setWithPolars(rm, Math.PI / 2 - 1.1 * theta);
 
-	var p3c2 = new ED.Drawing.Point(0, 0)
+	var p3c2 = new ED.Point(0, 0)
 	p3c2.setWithPolars(ri, Math.PI / 2 - 1.1 * theta);
 
-	var p3 = new ED.Drawing.Point(0, 0)
+	var p3 = new ED.Point(0, 0)
 	p3.setWithPolars(ri, Math.PI / 2 - theta);
 
-	var p4c1 = new ED.Drawing.Point(0, 0)
+	var p4c1 = new ED.Point(0, 0)
 	p4c1.setWithPolars(ri, Math.PI / 2 - 0.8 * theta);
 
-	var p4c2 = new ED.Drawing.Point(0, 0)
+	var p4c2 = new ED.Point(0, 0)
 	p4c2.setWithPolars(ro, Math.PI / 2 - 0.8 * theta);
 
-	var p4 = new ED.Drawing.Point(0, 0)
+	var p4 = new ED.Point(0, 0)
 	p4.setWithPolars(ro, Math.PI / 2 - theta);
 
 	ctx.bezierCurveTo(p3c1.x, p3c1.y, p3c2.x, p3c2.y, p3.x, p3.y);
 	ctx.bezierCurveTo(p4c1.x, p4c1.y, p4c2.x, p4c2.y, p4.x, p4.y);
 
 	// Hole in end 1
-	var cp1 = new ED.Drawing.Point(0, 0)
+	var cp1 = new ED.Point(0, 0)
 	cp1.setWithPolars(rm - 8, Math.PI / 2 - theta);
-	var ep1 = new ED.Drawing.Point(0, 0)
+	var ep1 = new ED.Point(0, 0)
 	ep1.setWithPolars(rm - 8 + rh, Math.PI / 2 - theta);
 	ctx.moveTo(ep1.x, ep1.y);
 	ctx.arc(cp1.x, cp1.y, 15, 0, 2 * Math.PI, false);
 
 	// Hole in end 2
-	var cp2 = new ED.Drawing.Point(0, 0)
+	var cp2 = new ED.Point(0, 0)
 	cp2.setWithPolars(rm - 8, Math.PI / 2 + theta);
-	var ep2 = new ED.Drawing.Point(0, 0)
+	var ep2 = new ED.Point(0, 0)
 	ep2.setWithPolars(rm - 8 + rh, Math.PI / 2 + theta);
 	ctx.moveTo(ep2.x, ep2.y);
 	ctx.arc(cp2.x, cp2.y, 15, 0, 2 * Math.PI, false);
@@ -18287,9 +18287,9 @@ ED.ChoroidalHaemorrhage.prototype.draw = function(_point) {
 	this.drawBoundary(_point);
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[1].location = this.transform.transformPoint(new ED.Drawing.Point(topLeftX, topLeftY));
-	this.handleArray[2].location = this.transform.transformPoint(new ED.Drawing.Point(topRightX, topRightY));
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[1].location = this.transform.transformPoint(new ED.Point(topLeftX, topLeftY));
+	this.handleArray[2].location = this.transform.transformPoint(new ED.Point(topRightX, topRightY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -18402,8 +18402,8 @@ ED.ChoroidalNaevus.prototype.setPropertyDefaults = function() {
 		// Create a range object for each handle
 		var n = this.numberOfHandles;
 		var range = new Object;
-		range.length = new ED.Drawing.Range(+50, +290);
-		range.angle = new ED.Drawing.Range((((2 * n - 1) * cir / (2 * n)) + i * cir / n) % cir, ((1 * cir / (2 * n)) + i * cir / n) % cir);
+		range.length = new ED.Range(+50, +290);
+		range.angle = new ED.Range((((2 * n - 1) * cir / (2 * n)) + i * cir / n) % cir, ((1 * cir / (2 * n)) + i * cir / n) % cir);
 		this.handleVectorRangeArray[i] = range;
 	}
 
@@ -18422,14 +18422,14 @@ ED.ChoroidalNaevus.prototype.setParameterDefaults = function() {
 	this.setOriginWithDisplacements(200, 150);
 
 	// Create a squiggle to store the handles points
-	var squiggle = new ED.Drawing.Squiggle(this, new ED.Drawing.Colour(100, 100, 100, 1), 4, true);
+	var squiggle = new ED.Squiggle(this, new ED.Colour(100, 100, 100, 1), 4, true);
 
 	// Add it to squiggle array
 	this.squiggleArray.push(squiggle);
 
 	// Populate with handles at equidistant points around circumference
 	for (var i = 0; i < this.numberOfHandles; i++) {
-		var point = new ED.Drawing.Point(0, 0);
+		var point = new ED.Point(0, 0);
 		point.setWithPolars(this.initialRadius, i * 2 * Math.PI / this.numberOfHandles);
 		this.addPointToSquiggle(point);
 	}
@@ -18491,7 +18491,7 @@ ED.ChoroidalNaevus.prototype.draw = function(_point) {
 	// Non boundary paths
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
 		// Drusen
-		p = new ED.Drawing.Point(0,0);
+		p = new ED.Point(0,0);
 		fill = "yellow";
 		var dr = 4;
 		n = Math.abs(Math.floor((-this.apexY + 50) / 5));
@@ -18505,7 +18505,7 @@ ED.ChoroidalNaevus.prototype.draw = function(_point) {
 	for (var i = 0; i < this.numberOfHandles; i++) {
 		this.handleArray[i].location = this.transform.transformPoint(this.squiggleArray[0].pointsArray[i]);
 	}
-	this.handleArray[this.numberOfHandles].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[this.numberOfHandles].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -18673,8 +18673,8 @@ ED.CiliaryInjection.prototype.draw = function(_point) {
 		var n = Math.floor(this.arc / phi);
 
 		// Start and end points of vessel
-		var sp = new ED.Drawing.Point(0, 0);
-		var ep = new ED.Drawing.Point(0, 0);
+		var sp = new ED.Point(0, 0);
+		var ep = new ED.Point(0, 0);
 
 		ctx.beginPath();
 
@@ -18694,8 +18694,8 @@ ED.CiliaryInjection.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[0].location = this.transform.transformPoint(new ED.Drawing.Point(topLeftX, topLeftY));
-	this.handleArray[3].location = this.transform.transformPoint(new ED.Drawing.Point(topRightX, topRightY));
+	this.handleArray[0].location = this.transform.transformPoint(new ED.Point(topLeftX, topLeftY));
+	this.handleArray[3].location = this.transform.transformPoint(new ED.Point(topRightX, topRightY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -18818,8 +18818,8 @@ ED.Circinate.prototype.draw = function(_point) {
 		var el = 30;
 
 		// Point objects
-		var cp = new ED.Drawing.Point(0, 0);
-		var ep = new ED.Drawing.Point(0, 0);
+		var cp = new ED.Point(0, 0);
+		var ep = new ED.Point(0, 0);
 
 		// Red centre
 		ctx.beginPath();
@@ -18845,7 +18845,7 @@ ED.Circinate.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	var point = new ED.Drawing.Point(0, 0);
+	var point = new ED.Point(0, 0);
 	point.setWithPolars(rc, Math.PI / 4);
 	this.handleArray[2].location = this.transform.transformPoint(point);
 
@@ -19021,9 +19021,9 @@ ED.CircumferentialBuckle.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[0].location = this.transform.transformPoint(new ED.Drawing.Point(topLeftX, topLeftY));
-	this.handleArray[3].location = this.transform.transformPoint(new ED.Drawing.Point(topRightX, topRightY));
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, -ro));
+	this.handleArray[0].location = this.transform.transformPoint(new ED.Point(topLeftX, topLeftY));
+	this.handleArray[3].location = this.transform.transformPoint(new ED.Point(topRightX, topRightY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, -ro));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -19196,11 +19196,11 @@ ED.ConjunctivalFlap.prototype.draw = function(_point) {
 	var phi = this.arc / 6;
 
 	// Apex point
-	var apex = new ED.Drawing.Point(this.apexX, this.apexY);
+	var apex = new ED.Point(this.apexX, this.apexY);
 
 	// Coordinates of corners of flap
-	var right = new ED.Drawing.Point(r * Math.sin(theta), -r * Math.cos(theta));
-	var left = new ED.Drawing.Point(-r * Math.sin(theta), -r * Math.cos(theta));
+	var right = new ED.Point(r * Math.sin(theta), -r * Math.cos(theta));
+	var left = new ED.Point(-r * Math.sin(theta), -r * Math.cos(theta));
 
 	// Boundary path
 	ctx.beginPath();
@@ -19358,14 +19358,14 @@ ED.ConjunctivalSuture.prototype.setParameterDefaults = function() {
 
 	var doodle = this.drawing.lastDoodleOfClass(this.className);
 	if (doodle) {
-		var p = new ED.Drawing.Point(doodle.originX, doodle.originY);
+		var p = new ED.Point(doodle.originX, doodle.originY);
 
-		var np = new ED.Drawing.Point(0, 0);
+		var np = new ED.Point(0, 0);
 		np.setWithPolars(p.length(), p.direction() + Math.PI / 6);
 
 		this.move(np.x, np.y);
 	} else {
-		var np = new ED.Drawing.Point(0, 0);
+		var np = new ED.Point(0, 0);
 		var m = (this.drawing.eye == ED.eye.Right ? 11 : 1);
 		np.setWithPolars(380, m * Math.PI / 6);
 		this.move(np.x, np.y);
@@ -19514,8 +19514,8 @@ ED.ConjunctivalSuture.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[2].location = this.transform.transformPoint(new ED.Drawing.Point(-this.boundaryWidth/2, -this.boundaryHeight/2));
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[2].location = this.transform.transformPoint(new ED.Point(-this.boundaryWidth/2, -this.boundaryHeight/2));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -19777,7 +19777,7 @@ ED.CornealAbrasion.prototype.draw = function(_point) {
 	this.drawBoundary(_point);
 
 	// Coordinates of handles (in canvas plane)
-	var point = new ED.Drawing.Point(0, 0);
+	var point = new ED.Point(0, 0);
 	point.setWithPolars(r, Math.PI / 4);
 	this.handleArray[2].location = this.transform.transformPoint(point);
 
@@ -19917,7 +19917,7 @@ ED.CornealErosion.prototype.draw = function(_point) {
 	this.drawBoundary(_point);
 
 	// Coordinates of handles (in canvas plane)
-	var point = new ED.Drawing.Point(0, 0);
+	var point = new ED.Point(0, 0);
 	point.setWithPolars(r, Math.PI / 4);
 	this.handleArray[2].location = this.transform.transformPoint(point);
 
@@ -20084,9 +20084,9 @@ ED.CornealGraft.prototype.draw = function(_point) {
 		for (var i = 0; i < this.numberOfSutures; i++) {
 			// Suture points
 			var phi = i * 2 * Math.PI/this.numberOfSutures;
-			var p1 = new ED.Drawing.Point(0,0);
+			var p1 = new ED.Point(0,0);
 			p1.setWithPolars(ri, phi);
-			var p2 = new ED.Drawing.Point(0,0);
+			var p2 = new ED.Point(0,0);
 			p2.setWithPolars(ro, phi);
 
 			// No sutures
@@ -20125,7 +20125,7 @@ ED.CornealGraft.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -20234,8 +20234,8 @@ ED.CornealOedema.prototype.setPropertyDefaults = function() {
 		// Create a range object for each handle
 		var n = this.numberOfHandles;
 		var range = new Object;
-		range.length = new ED.Drawing.Range(+50, +380);
-		range.angle = new ED.Drawing.Range((((2 * n - 1) * cir / (2 * n)) + i * cir / n) % cir, ((1 * cir / (2 * n)) + i * cir / n) % cir);
+		range.length = new ED.Range(+50, +380);
+		range.angle = new ED.Range((((2 * n - 1) * cir / (2 * n)) + i * cir / n) % cir, ((1 * cir / (2 * n)) + i * cir / n) % cir);
 		this.handleVectorRangeArray[i] = range;
 	}
 	*/
@@ -20249,14 +20249,14 @@ ED.CornealOedema.prototype.setParameterDefaults = function() {
 
 /*
 	// Create a squiggle to store the handles points
-	var squiggle = new ED.Drawing.Squiggle(this, new ED.Drawing.Colour(100, 100, 100, 1), 4, true);
+	var squiggle = new ED.Squiggle(this, new ED.Colour(100, 100, 100, 1), 4, true);
 
 	// Add it to squiggle array
 	this.squiggleArray.push(squiggle);
 
 	// Populate with handles at equidistant points around circumference
 	for (var i = 0; i < this.numberOfHandles; i++) {
-		var point = new ED.Drawing.Point(0, 0);
+		var point = new ED.Point(0, 0);
 		point.setWithPolars(this.initialRadius, i * 2 * Math.PI / this.numberOfHandles);
 		this.addPointToSquiggle(point);
 	}
@@ -20342,7 +20342,7 @@ ED.CornealOedema.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 // 	for (var i = 0; i < this.numberOfHandles; i++) {
 // 		this.handleArray[i].location = this.transform.transformPoint(this.squiggleArray[0].pointsArray[i]);
 // 	}
@@ -20476,7 +20476,7 @@ ED.CornealScar.prototype.draw = function(_point) {
 	// Non-boundary paths
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
 		// Work out whether visual axis is involved
-		var centre = new ED.Drawing.Point(0, 0);
+		var centre = new ED.Point(0, 0);
 		var visualAxis = this.drawing.transform.transformPoint(centre);
 		var ctx = this.drawing.context;
 		if (ctx.isPointInPath(visualAxis.x, visualAxis.y)) this.isInVisualAxis = true;
@@ -20484,10 +20484,10 @@ ED.CornealScar.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	var point = new ED.Drawing.Point(0, 0);
+	var point = new ED.Point(0, 0);
 	point.setWithPolars(r, Math.PI / 4);
 	this.handleArray[2].location = this.transform.transformPoint(point);
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -20639,7 +20639,7 @@ ED.CornealStriae.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	//     this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	//     this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	// 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -20932,7 +20932,7 @@ ED.CorticalCataract.prototype.draw = function(_point) {
 	var ri = -this.apexY; // Radius of inner clear area
 
 	// Draw cortical spokes
-	var sp = new ED.Drawing.Point(0, 0);
+	var sp = new ED.Point(0, 0);
 	sp.setWithPolars(rs, -phi);
 	ctx.moveTo(sp.x, sp.y);
 
@@ -20940,12 +20940,12 @@ ED.CorticalCataract.prototype.draw = function(_point) {
 		var startAngle = i * theta - phi;
 		var endAngle = startAngle + theta;
 
-		var op = new ED.Drawing.Point(0, 0);
+		var op = new ED.Point(0, 0);
 		op.setWithPolars(rs, startAngle);
 		ctx.lineTo(op.x, op.y);
 
 		//ctx.arc(0, 0, ro, startAngle, endAngle, false);
-		var ip = new ED.Drawing.Point(0, 0);
+		var ip = new ED.Point(0, 0);
 		ip.setWithPolars(ri, i * theta);
 		ctx.lineTo(ip.x, ip.y);
 	}
@@ -20969,7 +20969,7 @@ ED.CorticalCataract.prototype.draw = function(_point) {
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -21190,7 +21190,7 @@ ED.CorticalCataractCrossSection.prototype.draw = function(_point) {
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(ld, this.apexY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(ld, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -21319,7 +21319,7 @@ ED.CottonWoolSpot.prototype.draw = function(_point) {
 	this.drawBoundary(_point);
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[2].location = this.transform.transformPoint(new ED.Drawing.Point(r, -h));
+	this.handleArray[2].location = this.transform.transformPoint(new ED.Point(r, -h));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -21409,9 +21409,9 @@ ED.Cryo.prototype.setParameterDefaults = function() {
 	// Displacement from fovea, and from last doodle
 	var doodle = this.drawing.lastDoodleOfClass(this.className);
 	if (doodle) {
-		var p = new ED.Drawing.Point(doodle.originX, doodle.originY);
+		var p = new ED.Point(doodle.originX, doodle.originY);
 
-		var np = new ED.Drawing.Point(0, 0);
+		var np = new ED.Point(0, 0);
 		np.setWithPolars(p.length(), p.direction() + Math.PI / 6);
 
 		this.move(np.x, np.y);
@@ -21451,7 +21451,7 @@ ED.Cryo.prototype.draw = function(_point) {
 	this.drawBoundary(_point);
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -21685,7 +21685,7 @@ ED.CystoidMacularOedema.prototype.draw = function(_point) {
 		var stroke = "rgba(255, 82, 0, 0.7)";
 
 		// Peripheral cysts
-		var point = new ED.Drawing.Point(0, 0);
+		var point = new ED.Point(0, 0);
 		var n = 8;
 		for (var i = 0; i < n; i++) {
 			var angle = i * 2 * Math.PI / n;
@@ -21698,7 +21698,7 @@ ED.CystoidMacularOedema.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[2].location = this.transform.transformPoint(new ED.Drawing.Point(84, -84));
+	this.handleArray[2].location = this.transform.transformPoint(new ED.Point(84, -84));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -21840,11 +21840,11 @@ ED.DiabeticNV.prototype.draw = function(_point) {
 	var n = 8;
 
 	// Do a vessel
-	var cp1 = new ED.Drawing.Point(0, 0);
-	var cp2 = new ED.Drawing.Point(0, 0);
-	var tip = new ED.Drawing.Point(0, 0);
-	var cp3 = new ED.Drawing.Point(0, 0);
-	var cp4 = new ED.Drawing.Point(0, 0);
+	var cp1 = new ED.Point(0, 0);
+	var cp2 = new ED.Point(0, 0);
+	var tip = new ED.Point(0, 0);
+	var cp3 = new ED.Point(0, 0);
+	var cp4 = new ED.Point(0, 0);
 
 	// Move to centre
 	ctx.moveTo(0, 0);
@@ -21876,7 +21876,7 @@ ED.DiabeticNV.prototype.draw = function(_point) {
 	this.drawBoundary(_point);
 
 	// Coordinates of handles (in canvas plane)
-	point = new ED.Drawing.Point(0, 0);
+	point = new ED.Point(0, 0);
 	point.setWithPolars(r, Math.PI / 4);
 	this.handleArray[2].location = this.transform.transformPoint(point);
 
@@ -22020,9 +22020,9 @@ ED.Dialysis.prototype.draw = function(_point) {
 	this.drawBoundary(_point);
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[1].location = this.transform.transformPoint(new ED.Drawing.Point(topLeftX, topLeftY));
-	this.handleArray[2].location = this.transform.transformPoint(new ED.Drawing.Point(topRightX, topRightY));
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[1].location = this.transform.transformPoint(new ED.Point(topLeftX, topLeftY));
+	this.handleArray[2].location = this.transform.transformPoint(new ED.Point(topRightX, topRightY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -22374,8 +22374,8 @@ ED.DiscPallor.prototype.draw = function(_point) {
 	this.drawBoundary(_point);
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[0].location = this.transform.transformPoint(new ED.Drawing.Point(topLeftX, topLeftY));
-	this.handleArray[3].location = this.transform.transformPoint(new ED.Drawing.Point(topRightX, topRightY));
+	this.handleArray[0].location = this.transform.transformPoint(new ED.Point(topLeftX, topLeftY));
+	this.handleArray[3].location = this.transform.transformPoint(new ED.Point(topRightX, topRightY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -22904,8 +22904,8 @@ ED.EntrySiteBreak.prototype.draw = function(_point) {
 	this.drawBoundary(_point);
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[0].location = this.transform.transformPoint(new ED.Drawing.Point(topLeftX, topLeftY));
-	this.handleArray[3].location = this.transform.transformPoint(new ED.Drawing.Point(topRightX, topRightY));
+	this.handleArray[0].location = this.transform.transformPoint(new ED.Point(topLeftX, topLeftY));
+	this.handleArray[3].location = this.transform.transformPoint(new ED.Point(topRightX, topRightY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -23058,7 +23058,7 @@ ED.EpiretinalMembrane.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[2].location = this.transform.transformPoint(new ED.Drawing.Point(r * 0.7, -r * 0.7));
+	this.handleArray[2].location = this.transform.transformPoint(new ED.Point(r * 0.7, -r * 0.7));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -23206,7 +23206,7 @@ ED.FibrousProliferation.prototype.draw = function(_point) {
 	this.drawBoundary(_point);
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[2].location = this.transform.transformPoint(new ED.Drawing.Point(w, -h));
+	this.handleArray[2].location = this.transform.transformPoint(new ED.Point(w, -h));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -23255,7 +23255,7 @@ ED.FieldCircle = function(_drawing, _parameterJSON) {
 	this.className = "FieldCircle";
 
 	// Derived parameters
-	this.colour = new ED.Drawing.Colour(255,0,0,1);
+	this.colour = new ED.Colour(255,0,0,1);
 
 	// Saved parameters
 	this.savedParameterArray = ['originX', 'originY', 'colour'];
@@ -23409,8 +23409,8 @@ ED.FocalChoroiditis.prototype.setPropertyDefaults = function() {
 		// Create a range object for each handle
 		var n = this.numberOfHandles;
 		var range = new Object;
-		range.length = new ED.Drawing.Range(+50, +290);
-		range.angle = new ED.Drawing.Range((((2 * n - 1) * cir / (2 * n)) + i * cir / n) % cir, ((1 * cir / (2 * n)) + i * cir / n) % cir);
+		range.length = new ED.Range(+50, +290);
+		range.angle = new ED.Range((((2 * n - 1) * cir / (2 * n)) + i * cir / n) % cir, ((1 * cir / (2 * n)) + i * cir / n) % cir);
 		this.handleVectorRangeArray[i] = range;
 	}
 
@@ -23436,14 +23436,14 @@ ED.FocalChoroiditis.prototype.setParameterDefaults = function() {
 	this.setOriginWithDisplacements(200, 150);
 
 	// Create a squiggle to store the handles points
-	var squiggle = new ED.Drawing.Squiggle(this, new ED.Drawing.Colour(100, 100, 100, 1), 4, true);
+	var squiggle = new ED.Squiggle(this, new ED.Colour(100, 100, 100, 1), 4, true);
 
 	// Add it to squiggle array
 	this.squiggleArray.push(squiggle);
 
 	// Populate with handles at equidistant points around circumference
 	for (var i = 0; i < this.numberOfHandles; i++) {
-		var point = new ED.Drawing.Point(0, 0);
+		var point = new ED.Point(0, 0);
 		point.setWithPolars(this.initialRadius, i * 2 * Math.PI / this.numberOfHandles);
 		this.addPointToSquiggle(point);
 	}
@@ -23516,7 +23516,7 @@ ED.FocalChoroiditis.prototype.draw = function(_point) {
 	for (var i = 0; i < this.numberOfHandles; i++) {
 		this.handleArray[i].location = this.transform.transformPoint(this.squiggleArray[0].pointsArray[i]);
 	}
-	this.handleArray[this.numberOfHandles].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[this.numberOfHandles].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -23673,7 +23673,7 @@ ED.FocalLaser.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	var point = new ED.Drawing.Point(0, 0);
+	var point = new ED.Point(0, 0);
 	point.setWithPolars(ro, Math.PI / 4);
 	this.handleArray[4].location = this.transform.transformPoint(point);
 
@@ -23786,7 +23786,7 @@ ED.Fuchs.prototype.draw = function(_point) {
 	this.drawBoundary(_point);
 
 	// Coordinates of handles (in canvas plane)
-	var point = new ED.Drawing.Point(0, 0);
+	var point = new ED.Point(0, 0);
 	point.setWithPolars(r, Math.PI / 4);
 	this.handleArray[2].location = this.transform.transformPoint(point);
 
@@ -24082,9 +24082,9 @@ ED.GRT.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[1].location = this.transform.transformPoint(new ED.Drawing.Point(topLeftX, topLeftY));
-	this.handleArray[2].location = this.transform.transformPoint(new ED.Drawing.Point(topRightX, topRightY));
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[1].location = this.transform.transformPoint(new ED.Point(topLeftX, topLeftY));
+	this.handleArray[2].location = this.transform.transformPoint(new ED.Point(topRightX, topRightY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -24231,7 +24231,7 @@ ED.Geographic.prototype.draw = function(_point) {
 	// Boundary path
 	ctx.beginPath();
 
-	var point = new ED.Drawing.Point(0, 0);
+	var point = new ED.Point(0, 0);
 
 	// Outer arc
 	if (this.drawing.eye == ED.eye.Right) {
@@ -24261,10 +24261,10 @@ ED.Geographic.prototype.draw = function(_point) {
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {}
 
 	// Coordinates of handles (in canvas plane)
-	point = new ED.Drawing.Point(0, 0);
+	point = new ED.Point(0, 0);
 	point.setWithPolars(ro, Math.PI / 4);
 	this.handleArray[2].location = this.transform.transformPoint(point);
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -24465,8 +24465,8 @@ ED.Gonioscopy.prototype.draw = function(_point) {
 
 		// Draw radial lines
 		var firstAngle = 15;
-		var innerPoint = new ED.Drawing.Point(0, 0);
-		var outerPoint = new ED.Drawing.Point(0, 0);
+		var innerPoint = new ED.Point(0, 0);
+		var outerPoint = new ED.Point(0, 0);
 		var i = 0;
 
 		// Loop through clock face
@@ -24514,7 +24514,7 @@ ED.Gonioscopy.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -24610,9 +24610,9 @@ ED.HVT.prototype.setPropertyDefaults = function() {
 	this.isShowHighlight = false;
 
 	// Adjust ranges for simple parameters
-	this.parameterValidationArray['originX']['range'] = new ED.Drawing.Range(-350, -150);
-	this.parameterValidationArray['originY']['range'] = new ED.Drawing.Range(-100, +100);
-	this.parameterValidationArray['rotation']['range'] = new ED.Drawing.Range(0, Math.PI / 2);
+	this.parameterValidationArray['originX']['range'] = new ED.Range(-350, -150);
+	this.parameterValidationArray['originY']['range'] = new ED.Range(-100, +100);
+	this.parameterValidationArray['rotation']['range'] = new ED.Range(0, Math.PI / 2);
 
 	// Speed up horizontal and vertical animation
 	//this.parameterValidationArray['originX']['delta'] = 30;
@@ -24640,19 +24640,19 @@ ED.HVT.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['horValue'] = {
 		kind: 'derived',
 		type: 'int',
-		range: new ED.Drawing.Range(0, 50),
+		range: new ED.Range(0, 50),
 		animate: true
 	};
 	this.parameterValidationArray['verValue'] = {
 		kind: 'derived',
 		type: 'int',
-		range: new ED.Drawing.Range(0, 50),
+		range: new ED.Range(0, 50),
 		animate: true
 	};
 	this.parameterValidationArray['torValue'] = {
 		kind: 'derived',
 		type: 'int',
-		range: new ED.Drawing.Range(0, 20),
+		range: new ED.Range(0, 20),
 		animate: true
 	};
 }
@@ -24836,7 +24836,7 @@ ED.HVT.prototype.draw = function(_point) {
 
 	// Use polar coordinates to draw axis line and handle
 	var phi = 1.75 * Math.PI;
-	var p = new ED.Drawing.Point(0, 0);
+	var p = new ED.Point(0, 0);
 
 	// Boundary path
 	ctx.beginPath();
@@ -25096,7 +25096,7 @@ ED.HardDrusen.prototype.draw = function(_point) {
 
 		var dr = 10 / this.scaleX;
 
-		var p = new ED.Drawing.Point(0, 0);
+		var p = new ED.Point(0, 0);
 		var n = 20 + Math.abs(Math.floor(this.apexY / 2));
 		for (var i = 0; i < n; i++) {
 			p.setWithPolars(r * ED.randomArray[i], 2 * Math.PI * ED.randomArray[i + 100]);
@@ -25105,8 +25105,8 @@ ED.HardDrusen.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[2].location = this.transform.transformPoint(new ED.Drawing.Point(r * 0.7, -r * 0.7));
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[2].location = this.transform.transformPoint(new ED.Point(r * 0.7, -r * 0.7));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -25335,7 +25335,7 @@ ED.Hyphaema.prototype.draw = function(_point) {
 	this.drawBoundary(_point);
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -25466,7 +25466,7 @@ ED.Hypopyon.prototype.draw = function(_point) {
 	this.drawBoundary(_point);
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -25587,7 +25587,7 @@ ED.ILMPeel.prototype.draw = function(_point) {
 	this.drawBoundary(_point);
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -25707,7 +25707,7 @@ ED.IRMA.prototype.draw = function(_point) {
 	this.drawBoundary(_point);
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[2].location = this.transform.transformPoint(new ED.Drawing.Point(50, -40));
+	this.handleArray[2].location = this.transform.transformPoint(new ED.Point(50, -40));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -25820,8 +25820,8 @@ ED.IatrogenicBreak.prototype.draw = function(_point) {
 	// Oval break
 	var d = 40;
 	var p = 0.8;
-	var sp = new ED.Drawing.Point(-d, d);
-	var ep = new ED.Drawing.Point(d, -d);
+	var sp = new ED.Point(-d, d);
+	var ep = new ED.Point(d, -d);
 
 	// Oval shape
 	ctx.moveTo(sp.x, sp.y);
@@ -26070,7 +26070,7 @@ ED.InjectionSite.prototype.draw = function(_point) {
 		ctx.stroke();
 
 		// Get apex point in canvas coordinates
-		var ap = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+		var ap = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 		// Save context and reset
 		ctx.save();
@@ -26087,7 +26087,7 @@ ED.InjectionSite.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -26370,10 +26370,10 @@ ED.IrisNaevus.prototype.draw = function(_point) {
 	this.drawBoundary(_point);
 
 	// Coordinates of handles (in canvas plane)
-	var point = new ED.Drawing.Point(0, 0);
+	var point = new ED.Point(0, 0);
 	point.setWithPolars(r, Math.PI / 4);
 	this.handleArray[2].location = this.transform.transformPoint(point);
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -26508,7 +26508,7 @@ ED.KeraticPrecipitates.prototype.draw = function(_point) {
 
 		var dr = 10 * ((this.apexX + 20) / 20) / this.scaleX;
 
-		var p = new ED.Drawing.Point(0, 0);
+		var p = new ED.Point(0, 0);
 		var n = 40 + Math.abs(Math.floor(this.apexY / 2));
 		for (var i = 0; i < n; i++) {
 			p.setWithPolars(r * ED.randomArray[i], 2 * Math.PI * ED.randomArray[i + 100]);
@@ -26517,8 +26517,8 @@ ED.KeraticPrecipitates.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[2].location = this.transform.transformPoint(new ED.Drawing.Point(r * 0.7, -r * 0.7));
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[2].location = this.transform.transformPoint(new ED.Point(r * 0.7, -r * 0.7));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -26743,7 +26743,7 @@ ED.KrukenbergSpindle.prototype.draw = function(_point) {;
 	this.drawBoundary(_point);
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -26831,9 +26831,9 @@ ED.LaserCircle.prototype.setParameterDefaults = function() {
 
 	var doodle = this.drawing.lastDoodleOfClass(this.className);
 	if (doodle) {
-		var p = new ED.Drawing.Point(doodle.originX, doodle.originY);
+		var p = new ED.Point(doodle.originX, doodle.originY);
 
-		var np = new ED.Drawing.Point(0, 0);
+		var np = new ED.Point(0, 0);
 		np.setWithPolars(p.length(), p.direction() + Math.PI / 6);
 
 		this.move(np.x, np.y);
@@ -26877,7 +26877,7 @@ ED.LaserCircle.prototype.draw = function(_point) {
 		var ss = 25;
 
 		// Point for spot
-		var p = new ED.Drawing.Point(0, 0);
+		var p = new ED.Point(0, 0);
 
 		// Difference indicating aspect ratio
 		var d = this.apexX + this.apexY;
@@ -26934,7 +26934,7 @@ ED.LaserCircle.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -27099,7 +27099,7 @@ ED.LaserDemarcation.prototype.draw = function(_point) {
 		var ss = 25;
 
 		// Location of laser spot
-		var p = new ED.Drawing.Point(0, 0);
+		var p = new ED.Point(0, 0);
 
 		// Unless 360, go out to the ora with an elegant semicircle
 		if (this.arc < 1.9 * Math.PI) {
@@ -27113,7 +27113,7 @@ ED.LaserDemarcation.prototype.draw = function(_point) {
 			var n = (Math.round(quad / (ss / rc)));
 
 			// Centre of first quarter circle
-			var c1 = new ED.Drawing.Point(-ro * Math.sin(theta - rc / ro), -ro * Math.cos(theta - rc / ro));
+			var c1 = new ED.Point(-ro * Math.sin(theta - rc / ro), -ro * Math.cos(theta - rc / ro));
 
 			// Draw first quarter circle, including adjustment for improved junction
 			for (var i = 0; i < n; i++) {
@@ -27135,7 +27135,7 @@ ED.LaserDemarcation.prototype.draw = function(_point) {
 			}
 
 			// Centre of second quarter circle
-			var c2 = new ED.Drawing.Point(-ro * Math.sin(-theta + rc / ro), -ro * Math.cos(-theta + rc / ro));
+			var c2 = new ED.Point(-ro * Math.sin(-theta + rc / ro), -ro * Math.cos(-theta + rc / ro));
 
 			// Draw second quarter circle, including adjustment for improved junction
 			for (var i = 0; i < n; i++) {
@@ -27155,9 +27155,9 @@ ED.LaserDemarcation.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[0].location = this.transform.transformPoint(new ED.Drawing.Point(topLeftX, topLeftY));
-	this.handleArray[3].location = this.transform.transformPoint(new ED.Drawing.Point(topRightX, topRightY));
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[0].location = this.transform.transformPoint(new ED.Point(topLeftX, topLeftY));
+	this.handleArray[3].location = this.transform.transformPoint(new ED.Point(topRightX, topRightY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -27285,7 +27285,7 @@ ED.LaserSpot.prototype.draw = function(_point) {
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 
-	var point = new ED.Drawing.Point(0, 0);
+	var point = new ED.Point(0, 0);
 	point.setWithPolars(r, Math.PI / 4);
 	this.handleArray[2].location = this.transform.transformPoint(point);
 
@@ -27415,7 +27415,7 @@ ED.LasikFlap.prototype.draw = function(_point) {
 	this.drawBoundary(_point);
 
 	// Coordinates of handles (in canvas plane)
-	var point = new ED.Drawing.Point(0, 0)
+	var point = new ED.Point(0, 0)
 	point.setWithPolars(r, angle);
 	this.handleArray[2].location = this.transform.transformPoint(point);
 
@@ -27699,7 +27699,7 @@ ED.Lens.prototype.draw = function(_point) {
 
 			// Spokes
 			ctx.beginPath();
-			var sp = new ED.Drawing.Point(0, 0);
+			var sp = new ED.Point(0, 0);
 			sp.setWithPolars(rs, -phi);
 			ctx.moveTo(sp.x, sp.y);
 
@@ -27707,12 +27707,12 @@ ED.Lens.prototype.draw = function(_point) {
 				var startAngle = i * theta - phi;
 				var endAngle = startAngle + theta;
 
-				var op = new ED.Drawing.Point(0, 0);
+				var op = new ED.Point(0, 0);
 				op.setWithPolars(rs, startAngle);
 				ctx.lineTo(op.x, op.y);
 
 				//ctx.arc(0, 0, ro, startAngle, endAngle, false);
-				var ip = new ED.Drawing.Point(0, 0);
+				var ip = new ED.Point(0, 0);
 				ip.setWithPolars(ri, i * theta);
 				ctx.lineTo(ip.x, ip.y);
 			}
@@ -27738,7 +27738,7 @@ ED.Lens.prototype.draw = function(_point) {
 
 			// Iterate through radius and angle to draw spots
 			for (var a = 0; a < 2 * Math.PI; a += inc) {
-				var p = new ED.Drawing.Point(0, 0);
+				var p = new ED.Point(0, 0);
 				p.setWithPolars(rc, a);
 				this.drawCircle(ctx, p.x, p.y, sr, "rgba(200,200,255,1)", 4, "rgba(200,200,255,1)");
 			}
@@ -28089,7 +28089,7 @@ ED.LimbalRelaxingIncision.prototype.draw = function(_point) {
 	this.drawBoundary(_point);
 
 	// Coordinates of handles (in canvas plane)
-	var point = new ED.Drawing.Point(0, 0);
+	var point = new ED.Point(0, 0);
 	point.setWithPolars(r, theta);
 	this.handleArray[3].location = this.transform.transformPoint(point);
 
@@ -28373,10 +28373,10 @@ ED.MacularDystrophy.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	var point = new ED.Drawing.Point(0, 0);
+	var point = new ED.Point(0, 0);
 	point.setWithPolars(r, Math.PI / 4);
 	this.handleArray[2].location = this.transform.transformPoint(point);
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -28552,10 +28552,10 @@ ED.MacularGrid.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	var point = new ED.Drawing.Point(0, 0);
+	var point = new ED.Point(0, 0);
 	point.setWithPolars(ro, Math.PI / 4);
 	this.handleArray[2].location = this.transform.transformPoint(point);
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -28691,7 +28691,7 @@ ED.MacularHole.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	point = new ED.Drawing.Point(0, 0);
+	point = new ED.Point(0, 0);
 	point.setWithPolars(r, Math.PI / 4);
 	this.handleArray[2].location = this.transform.transformPoint(point);
 
@@ -28865,7 +28865,7 @@ ED.MacularThickening.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -29321,7 +29321,7 @@ ED.Molteno.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -29446,7 +29446,7 @@ ED.MultifocalChoroiditis.prototype.draw = function(_point) {
 
 			for (var j = 0; j < nd; j++) {
 				var r = (0.5 + j) * rs/nd;
-				var p = new ED.Drawing.Point(0,0);
+				var p = new ED.Point(0,0);
 				p.setWithPolars(r, theta);
 
 				var dis = 80;
@@ -29596,9 +29596,9 @@ ED.NerveFibreDefect.prototype.draw = function(_point) {
 	this.drawBoundary(_point);
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[0].location = this.transform.transformPoint(new ED.Drawing.Point(topLeftX, topLeftY));
-	this.handleArray[3].location = this.transform.transformPoint(new ED.Drawing.Point(topRightX, topRightY));
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[0].location = this.transform.transformPoint(new ED.Point(topLeftX, topLeftY));
+	this.handleArray[3].location = this.transform.transformPoint(new ED.Point(topRightX, topRightY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -29791,7 +29791,7 @@ ED.NuclearCataract.prototype.draw = function(_point) {
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -30011,7 +30011,7 @@ ED.NuclearCataractCrossSection.prototype.draw = function(_point) {
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -30120,8 +30120,8 @@ ED.OpticDisc.prototype.setPropertyDefaults = function() {
 
 		// Create a range object for each handle
 		var range = new Object;
-		range.length = new ED.Drawing.Range(+50, +290);
-		range.angle = new ED.Drawing.Range(((15 * cir / 16) + i * cir / 8) % cir, ((1 * cir / 16) + i * cir / 8) % cir);
+		range.length = new ED.Range(+50, +290);
+		range.angle = new ED.Range(((15 * cir / 16) + i * cir / 8) % cir, ((1 * cir / 16) + i * cir / 8) % cir);
 		this.handleVectorRangeArray[i] = range;
 	}
 }
@@ -30135,14 +30135,14 @@ ED.OpticDisc.prototype.setParameterDefaults = function() {
 	this.setParameterFromString('cdRatio', '0.3');
 
 	// Create a squiggle to store the handles points
-	var squiggle = new ED.Drawing.Squiggle(this, new ED.Drawing.Colour(100, 100, 100, 1), 4, true);
+	var squiggle = new ED.Squiggle(this, new ED.Colour(100, 100, 100, 1), 4, true);
 
 	// Add it to squiggle array
 	this.squiggleArray.push(squiggle);
 
 	// Populate with handles at equidistant points around circumference
 	for (var i = 0; i < this.numberOfHandles; i++) {
-		var point = new ED.Drawing.Point(0, 0);
+		var point = new ED.Point(0, 0);
 		point.setWithPolars(-this.apexY, i * 2 * Math.PI / this.numberOfHandles);
 		this.addPointToSquiggle(point);
 	}
@@ -30290,7 +30290,7 @@ ED.OpticDisc.prototype.draw = function(_point) {
 		ctx.closePath();
 
 		// Set margin attributes
-		var colour = new ED.Drawing.Colour(0, 0, 0, 1);
+		var colour = new ED.Colour(0, 0, 0, 1);
 		colour.setWithHexString('FFA83C'); // Taken from disc margin of a fundus photo
 		ctx.fillStyle = colour.rgba();
 
@@ -30309,60 +30309,60 @@ ED.OpticDisc.prototype.draw = function(_point) {
 		}
 
 		// Superotemporal vessel
-		var startPoint = new ED.Drawing.Point(0, 0);
+		var startPoint = new ED.Point(0, 0);
 		startPoint.setWithPolars(150, -sign * Math.PI / 2);
 
-		var controlPoint1 = new ED.Drawing.Point(0, 0);
+		var controlPoint1 = new ED.Point(0, 0);
 		controlPoint1.setWithPolars(400, -sign * Math.PI / 8);
-		var controlPoint2 = new ED.Drawing.Point(0, 0);
+		var controlPoint2 = new ED.Point(0, 0);
 		controlPoint2.setWithPolars(450, sign * Math.PI / 8);
 
-		var endPoint = new ED.Drawing.Point(0, 0);
+		var endPoint = new ED.Point(0, 0);
 		endPoint.setWithPolars(500, sign * Math.PI / 4);
 
 		ctx.moveTo(startPoint.x, startPoint.y);
 		ctx.bezierCurveTo(controlPoint1.x, controlPoint1.y, controlPoint2.x, controlPoint2.y, endPoint.x, endPoint.y);
 
 		// Inferotemporal vessel
-		var startPoint = new ED.Drawing.Point(0, 0);
+		var startPoint = new ED.Point(0, 0);
 		startPoint.setWithPolars(150, -sign * Math.PI / 2);
 
-		var controlPoint1 = new ED.Drawing.Point(0, 0);
+		var controlPoint1 = new ED.Point(0, 0);
 		controlPoint1.setWithPolars(400, -sign * 7 * Math.PI / 8);
-		var controlPoint2 = new ED.Drawing.Point(0, 0);
+		var controlPoint2 = new ED.Point(0, 0);
 		controlPoint2.setWithPolars(450, sign * 7 * Math.PI / 8);
 
-		var endPoint = new ED.Drawing.Point(0, 0);
+		var endPoint = new ED.Point(0, 0);
 		endPoint.setWithPolars(500, sign * 3 * Math.PI / 4);
 
 		ctx.moveTo(startPoint.x, startPoint.y);
 		ctx.bezierCurveTo(controlPoint1.x, controlPoint1.y, controlPoint2.x, controlPoint2.y, endPoint.x, endPoint.y);
 
 		// Superonasal vessel
-		var startPoint = new ED.Drawing.Point(0, 0);
+		var startPoint = new ED.Point(0, 0);
 		startPoint.setWithPolars(150, -sign * Math.PI / 2);
 
-		var controlPoint1 = new ED.Drawing.Point(0, 0);
+		var controlPoint1 = new ED.Point(0, 0);
 		controlPoint1.setWithPolars(300, -sign * 2 * Math.PI / 8);
-		var controlPoint2 = new ED.Drawing.Point(0, 0);
+		var controlPoint2 = new ED.Point(0, 0);
 		controlPoint2.setWithPolars(350, -sign * 5 * Math.PI / 16);
 
-		var endPoint = new ED.Drawing.Point(0, 0);
+		var endPoint = new ED.Point(0, 0);
 		endPoint.setWithPolars(450, -sign * 3 * Math.PI / 8);
 
 		ctx.moveTo(startPoint.x, startPoint.y);
 		ctx.bezierCurveTo(controlPoint1.x, controlPoint1.y, controlPoint2.x, controlPoint2.y, endPoint.x, endPoint.y);
 
 		// Inferonasal vessel
-		var startPoint = new ED.Drawing.Point(0, 0);
+		var startPoint = new ED.Point(0, 0);
 		startPoint.setWithPolars(150, -sign * Math.PI / 2);
 
-		var controlPoint1 = new ED.Drawing.Point(0, 0);
+		var controlPoint1 = new ED.Point(0, 0);
 		controlPoint1.setWithPolars(300, -sign * 6 * Math.PI / 8);
-		var controlPoint2 = new ED.Drawing.Point(0, 0);
+		var controlPoint2 = new ED.Point(0, 0);
 		controlPoint2.setWithPolars(350, -sign * 11 * Math.PI / 16);
 
-		var endPoint = new ED.Drawing.Point(0, 0);
+		var endPoint = new ED.Point(0, 0);
 		endPoint.setWithPolars(450, -sign * 5 * Math.PI / 8);
 
 		ctx.moveTo(startPoint.x, startPoint.y);
@@ -30395,7 +30395,7 @@ ED.OpticDisc.prototype.draw = function(_point) {
 	}
 
 	// Location of apex handle
-	this.handleArray[this.numberOfHandles].location = this.transform.transformPoint(new ED.Drawing.Point(0, this.apexY));
+	this.handleArray[this.numberOfHandles].location = this.transform.transformPoint(new ED.Point(0, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -30707,7 +30707,7 @@ ED.OpticDiscPit.prototype.draw = function(_point) {
 	this.drawBoundary(_point);
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[2].location = this.transform.transformPoint(new ED.Drawing.Point(55, -55));
+	this.handleArray[2].location = this.transform.transformPoint(new ED.Point(55, -55));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -30839,7 +30839,7 @@ ED.PCIOL.prototype.draw = function(_point) {
 	this.drawBoundary(_point);
 
 	// Coordinates of handles (in canvas plane)
-	var point = new ED.Drawing.Point(0, 0)
+	var point = new ED.Point(0, 0)
 	point.setWithPolars(r, Math.PI / 4);
 	this.handleArray[2].location = this.transform.transformPoint(point);
 
@@ -31449,8 +31449,8 @@ ED.Patch.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[3].location = this.transform.transformPoint(new ED.Drawing.Point(this.width / 2, -this.height / 2));
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[3].location = this.transform.transformPoint(new ED.Point(this.width / 2, -this.height / 2));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -31557,20 +31557,20 @@ ED.PeripapillaryAtrophy.prototype.setPropertyDefaults = function() {
 	var max = this.outerRadius * 1.4;
 	var min = this.outerRadius;
 	this.handleCoordinateRangeArray[0] = {
-		x: new ED.Drawing.Range(-max, -min),
-		y: new ED.Drawing.Range(-0, +0)
+		x: new ED.Range(-max, -min),
+		y: new ED.Range(-0, +0)
 	};
 	this.handleCoordinateRangeArray[1] = {
-		x: new ED.Drawing.Range(-0, +0),
-		y: new ED.Drawing.Range(-max, -min)
+		x: new ED.Range(-0, +0),
+		y: new ED.Range(-max, -min)
 	};
 	this.handleCoordinateRangeArray[2] = {
-		x: new ED.Drawing.Range(min, max),
-		y: new ED.Drawing.Range(-0, +0)
+		x: new ED.Range(min, max),
+		y: new ED.Range(-0, +0)
 	};
 	this.handleCoordinateRangeArray[3] = {
-		x: new ED.Drawing.Range(-0, +0),
-		y: new ED.Drawing.Range(min, max)
+		x: new ED.Range(-0, +0),
+		y: new ED.Range(min, max)
 	};
 }
 
@@ -31579,16 +31579,16 @@ ED.PeripapillaryAtrophy.prototype.setPropertyDefaults = function() {
  */
 ED.PeripapillaryAtrophy.prototype.setParameterDefaults = function() {
 	// Create a squiggle to store the handles points
-	var squiggle = new ED.Drawing.Squiggle(this, new ED.Drawing.Colour(100, 100, 100, 1), 4, true);
+	var squiggle = new ED.Squiggle(this, new ED.Colour(100, 100, 100, 1), 4, true);
 
 	// Add it to squiggle array
 	this.squiggleArray.push(squiggle);
 
 	// Add four points to the squiggle
-	this.addPointToSquiggle(new ED.Drawing.Point(-this.outerRadius - (this.drawing.eye == ED.eye.Right ? 100 : 0), 0));
-	this.addPointToSquiggle(new ED.Drawing.Point(0, -this.outerRadius));
-	this.addPointToSquiggle(new ED.Drawing.Point(this.outerRadius + (this.drawing.eye == ED.eye.Right ? 0 : 100), 0));
-	this.addPointToSquiggle(new ED.Drawing.Point(0, this.outerRadius));
+	this.addPointToSquiggle(new ED.Point(-this.outerRadius - (this.drawing.eye == ED.eye.Right ? 100 : 0), 0));
+	this.addPointToSquiggle(new ED.Point(0, -this.outerRadius));
+	this.addPointToSquiggle(new ED.Point(this.outerRadius + (this.drawing.eye == ED.eye.Right ? 0 : 100), 0));
+	this.addPointToSquiggle(new ED.Point(0, this.outerRadius));
 }
 
 /**
@@ -31651,7 +31651,7 @@ ED.PeripapillaryAtrophy.prototype.draw = function(_point) {
 
 	// Set attributes
 	ctx.lineWidth = 2;
-	var colour = new ED.Drawing.Colour(0, 0, 0, 1);
+	var colour = new ED.Colour(0, 0, 0, 1);
 	colour.setWithHexString('DFD989');
 	ctx.fillStyle = colour.rgba();
 	ctx.strokeStyle = "gray";
@@ -31838,12 +31838,12 @@ ED.PeripheralRRD.prototype.draw = function(_point) {
 	var topLeftY = topRightY;
 
 	// Centre of first quarter circle
-	var c1 = new ED.Drawing.Point(0, 0);
+	var c1 = new ED.Point(0, 0);
 	c1.x = -ro * Math.sin(theta - rc / ro);
 	c1.y = -ro * Math.cos(theta - rc / ro);
 
 	// Centre of second quarter circle
-	var c2 = new ED.Drawing.Point(0, 0);
+	var c2 = new ED.Point(0, 0);
 	c2.x = -ro * Math.sin(-theta + rc / ro);
 	c2.y = -ro * Math.cos(-theta + rc / ro);
 
@@ -31876,9 +31876,9 @@ ED.PeripheralRRD.prototype.draw = function(_point) {
 	this.drawBoundary(_point);
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[0].location = this.transform.transformPoint(new ED.Drawing.Point(topLeftX, topLeftY));
-	this.handleArray[3].location = this.transform.transformPoint(new ED.Drawing.Point(topRightX, topRightY));
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[0].location = this.transform.transformPoint(new ED.Point(topLeftX, topLeftY));
+	this.handleArray[3].location = this.transform.transformPoint(new ED.Point(topRightX, topRightY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -32047,20 +32047,20 @@ ED.PeripheralRetinectomy.prototype.draw = function(_point) {
 			var phi2 = theta - 2 * Math.PI / 24;
 
 			// Right points
-			var rsp = new ED.Drawing.Point(ro * Math.sin(theta), -ro * Math.cos(theta));
-			var rcp1 = new ED.Drawing.Point(r * Math.sin(theta), -r * Math.cos(theta));
-			var rcp2 = new ED.Drawing.Point(ri * Math.sin(phi1), -ri * Math.cos(phi1));
-			var rep = new ED.Drawing.Point(ri * Math.sin(phi2), -ri * Math.cos(phi2));
+			var rsp = new ED.Point(ro * Math.sin(theta), -ro * Math.cos(theta));
+			var rcp1 = new ED.Point(r * Math.sin(theta), -r * Math.cos(theta));
+			var rcp2 = new ED.Point(ri * Math.sin(phi1), -ri * Math.cos(phi1));
+			var rep = new ED.Point(ri * Math.sin(phi2), -ri * Math.cos(phi2));
 
 			// Inner arc
 			arcStart = -Math.PI / 2 + phi2;
 			arcEnd = -Math.PI / 2 - phi2;
 
 			// Left points
-			var lsp = new ED.Drawing.Point(-ri * Math.sin(phi2), -ri * Math.cos(phi2));
-			var lcp1 = new ED.Drawing.Point(-ri * Math.sin(phi1), -ri * Math.cos(phi1));
-			var lcp2 = new ED.Drawing.Point(-r * Math.sin(theta), -r * Math.cos(theta));
-			var lep = new ED.Drawing.Point(-ro * Math.sin(theta), -ro * Math.cos(theta));
+			var lsp = new ED.Point(-ri * Math.sin(phi2), -ri * Math.cos(phi2));
+			var lcp1 = new ED.Point(-ri * Math.sin(phi1), -ri * Math.cos(phi1));
+			var lcp2 = new ED.Point(-r * Math.sin(theta), -r * Math.cos(theta));
+			var lep = new ED.Point(-ro * Math.sin(theta), -ro * Math.cos(theta));
 
 			// Path
 			ctx.moveTo(rsp.x, rsp.y);
@@ -32087,9 +32087,9 @@ ED.PeripheralRetinectomy.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[0].location = this.transform.transformPoint(new ED.Drawing.Point(topLeftX, topLeftY));
-	this.handleArray[3].location = this.transform.transformPoint(new ED.Drawing.Point(topRightX, topRightY));
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[0].location = this.transform.transformPoint(new ED.Point(topLeftX, topLeftY));
+	this.handleArray[3].location = this.transform.transformPoint(new ED.Point(topRightX, topRightY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -32189,14 +32189,14 @@ ED.PhakoIncision.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['incisionMeridian'] = {
 		kind: 'derived',
 		type: 'mod',
-		range: new ED.Drawing.Range(0, 360),
+		range: new ED.Range(0, 360),
 		clock: 'bottom',
 		animate: true
 	};
 	this.parameterValidationArray['incisionLength'] = {
 		kind: 'derived',
 		type: 'float',
-		range: new ED.Drawing.Range(1, 9.9),
+		range: new ED.Range(1, 9.9),
 		precision: 1,
 		animate: true
 	};
@@ -32396,7 +32396,7 @@ ED.PhakoIncision.prototype.draw = function(_point) {
 
 			// Sutures
 			var sutureSeparationAngle = this.sutureSeparation * this.defaultRadius / (6 * this.radius);
-			var p = new ED.Drawing.Point(0, 0);
+			var p = new ED.Point(0, 0);
 			var phi = theta - sutureSeparationAngle / 2;
 
 			do {
@@ -32421,10 +32421,10 @@ ED.PhakoIncision.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	var point = new ED.Drawing.Point(0, 0);
+	var point = new ED.Point(0, 0);
 	point.setWithPolars(r, theta);
 	this.handleArray[3].location = this.transform.transformPoint(point);
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -32530,7 +32530,7 @@ ED.PostPole.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['cdRatio'] = {
 		kind: 'derived',
 		type: 'float',
-		range: new ED.Drawing.Range(0, 1),
+		range: new ED.Range(0, 1),
 		precision: 1,
 		animate: false
 	};
@@ -32659,7 +32659,7 @@ ED.PostPole.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -32849,7 +32849,7 @@ ED.PostSubcapCataract.prototype.draw = function(_point) {
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {}
 
 	// Coordinates of handles (in canvas plane)
-	var point = new ED.Drawing.Point(0, 0)
+	var point = new ED.Point(0, 0)
 	point.setWithPolars(this.radius, Math.PI / 4);
 	this.handleArray[4].location = this.transform.transformPoint(point);
 
@@ -33018,7 +33018,7 @@ ED.PostSubcapCataractCrossSection.prototype.draw = function(_point) {
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {}
 
 	// Coordinates of handles (in canvas plane)
-	//this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(ld, this.apexY));
+	//this.handleArray[4].location = this.transform.transformPoint(new ED.Point(ld, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -33399,10 +33399,10 @@ ED.PosteriorRetinectomy.prototype.setParameterDefaults = function() {
 
 	var doodle = this.drawing.lastDoodleOfClass(this.className);
 	if (doodle) {
-		var point = new ED.Drawing.Point(doodle.originX, doodle.originY);
+		var point = new ED.Point(doodle.originX, doodle.originY);
 		var direction = point.direction() + Math.PI / 8;
 		var distance = point.length();
-		var np = new ED.Drawing.Point(0, 0);
+		var np = new ED.Point(0, 0);
 		np.setWithPolars(distance, direction);
 
 		this.originX = np.x;
@@ -33454,7 +33454,7 @@ ED.PosteriorRetinectomy.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -33543,7 +33543,7 @@ ED.PosteriorSynechia.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['size'] = {
 		kind: 'derived',
 		type: 'float',
-		range: new ED.Drawing.Range(20, 100),
+		range: new ED.Range(20, 100),
 		precision: 1,
 		animate: true
 	};
@@ -33627,8 +33627,8 @@ ED.PosteriorSynechia.prototype.draw = function(_point) {
 	var arcEnd = -Math.PI / 2 - theta;
 
 	// Coordinates of 'corners' of SectorPRPPostPole
-	var startHandle = new ED.Drawing.Point(-ro * Math.sin(theta), -ro * Math.cos(theta));
-	var endHandle = new ED.Drawing.Point(ro * Math.sin(theta), -ro * Math.cos(theta));
+	var startHandle = new ED.Point(-ro * Math.sin(theta), -ro * Math.cos(theta));
+	var endHandle = new ED.Point(ro * Math.sin(theta), -ro * Math.cos(theta));
 
 	// Boundary path
 	ctx.beginPath();
@@ -33637,7 +33637,7 @@ ED.PosteriorSynechia.prototype.draw = function(_point) {
 	ctx.arc(0, 0, ro, arcEnd, arcStart, false);
 
 	//var cp = bp.pointAtRadiusAndClockwiseAngle(pr/2, Math.PI/16);
-	var apex = new ED.Drawing.Point(this.apexX, this.apexY);
+	var apex = new ED.Point(this.apexX, this.apexY);
 
 	// Curve from endpoint to apex
 	var cp1 = endHandle.pointAtAngleToLineToPointAtProportion(Math.PI / 12, apex, 0.33);
@@ -33701,7 +33701,7 @@ ED.PosteriorSynechia.prototype.draw = function(_point) {
 	// Coordinates of handles (in canvas plane)
 	this.handleArray[0].location = this.transform.transformPoint(startHandle);
 	this.handleArray[3].location = this.transform.transformPoint(endHandle);
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -33842,8 +33842,8 @@ ED.PreRetinalHaemorrhage.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[2].location = this.transform.transformPoint(new ED.Drawing.Point(100, 0));
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[2].location = this.transform.transformPoint(new ED.Point(100, 0));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -33990,9 +33990,9 @@ ED.RK.prototype.draw = function(_point) {
 		var i;
 		for (i = 0; i < n; i++) {
 			var angle = i * theta;
-			var pi = new ED.Drawing.Point(0, 0);
+			var pi = new ED.Point(0, 0);
 			pi.setWithPolars(ri, angle);
-			var po = new ED.Drawing.Point(0, 0);
+			var po = new ED.Point(0, 0);
 			po.setWithPolars(ro, angle);
 			ctx.moveTo(pi.x, pi.y);
 			ctx.lineTo(po.x, po.y);
@@ -34002,10 +34002,10 @@ ED.RK.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	var point = new ED.Drawing.Point(0, 0)
+	var point = new ED.Point(0, 0)
 	point.setWithPolars(ro, Math.PI / 4);
 	this.handleArray[2].location = this.transform.transformPoint(point);
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -34097,8 +34097,8 @@ ED.RPEDetachment.prototype.setPropertyDefaults = function() {
 		// Create a range object for each handle
 		var n = this.numberOfHandles;
 		var range = new Object;
-		range.length = new ED.Drawing.Range(+50, +290);
-		range.angle = new ED.Drawing.Range((((2 * n - 1) * cir / (2 * n)) + i * cir / n) % cir, ((1 * cir / (2 * n)) + i * cir / n) % cir);
+		range.length = new ED.Range(+50, +290);
+		range.angle = new ED.Range((((2 * n - 1) * cir / (2 * n)) + i * cir / n) % cir, ((1 * cir / (2 * n)) + i * cir / n) % cir);
 		this.handleVectorRangeArray[i] = range;
 	}
 }
@@ -34109,21 +34109,21 @@ ED.RPEDetachment.prototype.setPropertyDefaults = function() {
 ED.RPEDetachment.prototype.setParameterDefaults = function() {
 	var doodle = this.drawing.lastDoodleOfClass(this.className);
 	if (doodle) {
-		var np = new ED.Drawing.Point(doodle.originX + 150, 0);
+		var np = new ED.Point(doodle.originX + 150, 0);
 		this.move(np.x, np.y);
 	} else {
 		//this.move((this.drawing.eye == ED.eye.Right ? -1 : 1) * 100, 0);
 	}
 
 	// Create a squiggle to store the handles points
-	var squiggle = new ED.Drawing.Squiggle(this, new ED.Drawing.Colour(100, 100, 100, 1), 4, true);
+	var squiggle = new ED.Squiggle(this, new ED.Colour(100, 100, 100, 1), 4, true);
 
 	// Add it to squiggle array
 	this.squiggleArray.push(squiggle);
 
 	// Populate with handles at equidistant points around circumference
 	for (var i = 0; i < this.numberOfHandles; i++) {
-		var point = new ED.Drawing.Point(0, 0);
+		var point = new ED.Point(0, 0);
 		point.setWithPolars(this.initialRadius, i * 2 * Math.PI / this.numberOfHandles);
 		this.addPointToSquiggle(point);
 	}
@@ -34346,10 +34346,10 @@ ED.RPERip.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[1].location = this.transform.transformPoint(new ED.Drawing.Point(topLeftX, topLeftY));
-	this.handleArray[2].location = this.transform.transformPoint(new ED.Drawing.Point(topRightX, topRightY));
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
-	var point = new ED.Drawing.Point(0, 0);
+	this.handleArray[1].location = this.transform.transformPoint(new ED.Point(topLeftX, topLeftY));
+	this.handleArray[2].location = this.transform.transformPoint(new ED.Point(topRightX, topRightY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
+	var point = new ED.Point(0, 0);
 	point.setWithPolars(r, Math.PI / 8);
 	this.handleArray[3].location = this.transform.transformPoint(point);
 
@@ -34516,9 +34516,9 @@ ED.RRD.prototype.draw = function(_point) {
 	this.drawBoundary(_point);
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[1].location = this.transform.transformPoint(new ED.Drawing.Point(topLeftX, topLeftY));
-	this.handleArray[2].location = this.transform.transformPoint(new ED.Drawing.Point(topRightX, topRightY));
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[1].location = this.transform.transformPoint(new ED.Point(topLeftX, topLeftY));
+	this.handleArray[2].location = this.transform.transformPoint(new ED.Point(topRightX, topRightY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -34572,9 +34572,9 @@ ED.RRD.prototype.diagnosticHierarchy = function() {
 ED.RRD.prototype.isMacOff = function() {
 	// Get coordinates of macula in doodle plane
 	if (this.drawing.eye == ED.eye.Right) {
-		var macula = new ED.Drawing.Point(-100, 0);
+		var macula = new ED.Point(-100, 0);
 	} else {
-		var macula = new ED.Drawing.Point(100, 0);
+		var macula = new ED.Point(100, 0);
 	}
 
 	// Convert to canvas plane
@@ -34806,7 +34806,7 @@ ED.Rectus.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['recession'] = {
 		kind: 'derived',
 		type: 'float',
-		range: new ED.Drawing.Range(-12.5, 6.5),
+		range: new ED.Range(-12.5, 6.5),
 		precision: 1,
 		animate: true
 	};
@@ -35009,7 +35009,7 @@ ED.Rectus.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -35153,9 +35153,9 @@ ED.RetinalArteryOcclusionPostPole.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[0].location = this.transform.transformPoint(new ED.Drawing.Point(topLeftX, topLeftY));
-	this.handleArray[3].location = this.transform.transformPoint(new ED.Drawing.Point(topRightX, topRightY));
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[0].location = this.transform.transformPoint(new ED.Point(topLeftX, topLeftY));
+	this.handleArray[3].location = this.transform.transformPoint(new ED.Point(topRightX, topRightY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -35345,8 +35345,8 @@ ED.RetinalTouch.prototype.draw = function(_point) {
 		var theta = 0;
 		for (var i = 0; i < n; i++) {
 			theta += 2 * Math.PI / n;
-			var sp = new ED.Drawing.Point(0, 0);
-			var ep = new ED.Drawing.Point(0, 0);
+			var sp = new ED.Point(0, 0);
+			var ep = new ED.Point(0, 0);
 			sp.setWithPolars(ri, theta);
 			ep.setWithPolars(ro, theta);
 
@@ -35505,7 +35505,7 @@ ED.RetinalVeinOcclusionPostPole.prototype.draw = function(_point) {
 			for (var a = -Math.PI / 2 - arcStart; a < this.arc - Math.PI / 2 - arcStart; a += sd / r) {
 				a = -Math.PI / 2 - arcStart + j * 2 * Math.PI / count[i];
 
-				var p = new ED.Drawing.Point(0, 0);
+				var p = new ED.Point(0, 0);
 				p.setWithPolars(r, a);
 				this.drawNFLHaem(ctx, p.x, p.y);
 
@@ -35517,9 +35517,9 @@ ED.RetinalVeinOcclusionPostPole.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[0].location = this.transform.transformPoint(new ED.Drawing.Point(topLeftX, topLeftY));
-	this.handleArray[3].location = this.transform.transformPoint(new ED.Drawing.Point(topRightX, topRightY));
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[0].location = this.transform.transformPoint(new ED.Point(topLeftX, topLeftY));
+	this.handleArray[3].location = this.transform.transformPoint(new ED.Point(topRightX, topRightY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -35679,10 +35679,10 @@ ED.RoundHole.prototype.setParameterDefaults = function() {
 
 	var doodle = this.drawing.lastDoodleOfClass(this.className);
 	if (doodle) {
-		var point = new ED.Drawing.Point(doodle.originX, doodle.originY);
+		var point = new ED.Point(doodle.originX, doodle.originY);
 		var direction = point.direction() + Math.PI / 8;
 		var distance = point.length();
-		var np = new ED.Drawing.Point(0, 0);
+		var np = new ED.Point(0, 0);
 		np.setWithPolars(distance, direction);
 
 		this.originX = np.x;
@@ -35723,14 +35723,14 @@ ED.RoundHole.prototype.draw = function(_point) {
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[2].location = this.transform.transformPoint(new ED.Drawing.Point(21, -21));
+	this.handleArray[2].location = this.transform.transformPoint(new ED.Point(21, -21));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
 
 	// Calculate arc (Arc property not used naturally in this doodle ***TODO** more elegant method of doing this possible!)
-	var centre = this.transform.transformPoint(new ED.Drawing.Point(0, 0));
-	var oneWidthToRight = this.transform.transformPoint(new ED.Drawing.Point(60, 0));
+	var centre = this.transform.transformPoint(new ED.Point(0, 0));
+	var oneWidthToRight = this.transform.transformPoint(new ED.Point(60, 0));
 	var xco = centre.x - this.drawing.canvas.width / 2;
 	var yco = centre.y - this.drawing.canvas.height / 2;
 	var radius = this.scaleX * Math.sqrt(xco * xco + yco * yco);
@@ -35851,7 +35851,7 @@ ED.Rubeosis.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['severity'] = {
 		kind: 'derived',
 		type: 'float',
-		range: new ED.Drawing.Range(20, 100),
+		range: new ED.Range(20, 100),
 		precision: 1,
 		animate: true
 	};
@@ -35942,8 +35942,8 @@ ED.Rubeosis.prototype.draw = function(_point) {
 	var arcEnd = -Math.PI / 2 - theta;
 
 	// Coordinates of 'corners' of SectorPRPPostPole
-	var startHandle = new ED.Drawing.Point(-r * Math.sin(theta), -r * Math.cos(theta));
-	var endHandle = new ED.Drawing.Point(r * Math.sin(theta), -r * Math.cos(theta));
+	var startHandle = new ED.Point(-r * Math.sin(theta), -r * Math.cos(theta));
+	var endHandle = new ED.Point(r * Math.sin(theta), -r * Math.cos(theta));
 
 	// Boundary path
 	ctx.beginPath();
@@ -36011,7 +36011,7 @@ ED.Rubeosis.prototype.draw = function(_point) {
 	// Coordinates of handles (in canvas plane)
 	this.handleArray[0].location = this.transform.transformPoint(startHandle);
 	this.handleArray[3].location = this.transform.transformPoint(endHandle);
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -36166,7 +36166,7 @@ ED.ScleralIncision.prototype.draw = function(_point) {
 
 		// Sutures
 		var sutureSeparationAngle = 0.2;
-		var p = new ED.Drawing.Point(0, 0);
+		var p = new ED.Point(0, 0);
 		var phi = theta - sutureSeparationAngle / 2;
 
 		do {
@@ -36189,7 +36189,7 @@ ED.ScleralIncision.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	var point = new ED.Drawing.Point(0, 0);
+	var point = new ED.Point(0, 0);
 	point.setWithPolars(r, theta);
 	this.handleArray[3].location = this.transform.transformPoint(point);
 
@@ -36324,7 +36324,7 @@ ED.ScleralPatch.prototype.draw = function(_point) {
 	}
 
     // Coordinates of handles (in canvas plane)
-    this.handleArray[3].location = this.transform.transformPoint(new ED.Drawing.Point(50, -50));
+    this.handleArray[3].location = this.transform.transformPoint(new ED.Point(50, -50));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -36595,7 +36595,7 @@ ED.Sclerostomy.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -36792,8 +36792,8 @@ ED.SectorIridectomy.prototype.draw = function(_point) {
 	this.drawBoundary(_point);
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[0].location = this.transform.transformPoint(new ED.Drawing.Point(topLeftX, topLeftY));
-	this.handleArray[3].location = this.transform.transformPoint(new ED.Drawing.Point(topRightX, topRightY));
+	this.handleArray[0].location = this.transform.transformPoint(new ED.Point(topLeftX, topLeftY));
+	this.handleArray[3].location = this.transform.transformPoint(new ED.Point(topRightX, topRightY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -36957,7 +36957,7 @@ ED.SectorPRP.prototype.draw = function(_point) {
 			for (var a = -Math.PI / 2 - arcStart; a < this.arc - Math.PI / 2 - arcStart; a += sd / r) {
 				a = -Math.PI / 2 - arcStart + j * 2 * Math.PI / count[i];
 
-				var p = new ED.Drawing.Point(0, 0);
+				var p = new ED.Point(0, 0);
 				p.setWithPolars(r, a);
 				this.drawLaserSpot(ctx, p.x, p.y);
 
@@ -36969,8 +36969,8 @@ ED.SectorPRP.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[0].location = this.transform.transformPoint(new ED.Drawing.Point(topLeftX, topLeftY));
-	this.handleArray[3].location = this.transform.transformPoint(new ED.Drawing.Point(topRightX, topRightY));
+	this.handleArray[0].location = this.transform.transformPoint(new ED.Point(topLeftX, topLeftY));
+	this.handleArray[3].location = this.transform.transformPoint(new ED.Point(topRightX, topRightY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -37121,7 +37121,7 @@ ED.SectorPRPPostPole.prototype.draw = function(_point) {
 			for (var a = -Math.PI / 2 - arcStart; a < this.arc - Math.PI / 2 - arcStart; a += sd / r) {
 				a = -Math.PI / 2 - arcStart + j * 2 * Math.PI / count[i];
 
-				var p = new ED.Drawing.Point(0, 0);
+				var p = new ED.Point(0, 0);
 				p.setWithPolars(r, a);
 				this.drawLaserSpot(ctx, p.x, p.y);
 
@@ -37133,8 +37133,8 @@ ED.SectorPRPPostPole.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[0].location = this.transform.transformPoint(new ED.Drawing.Point(topLeftX, topLeftY));
-	this.handleArray[3].location = this.transform.transformPoint(new ED.Drawing.Point(topRightX, topRightY));
+	this.handleArray[0].location = this.transform.transformPoint(new ED.Point(topLeftX, topLeftY));
+	this.handleArray[3].location = this.transform.transformPoint(new ED.Point(topRightX, topRightY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -37352,9 +37352,9 @@ ED.StarFold.prototype.setParameterDefaults = function() {
 	// Place at 6 o'clock
 	var doodle = this.drawing.lastDoodleOfClass(this.className);
 	if (doodle) {
-		var p = new ED.Drawing.Point(doodle.originX, doodle.originY);
+		var p = new ED.Point(doodle.originX, doodle.originY);
 
-		var np = new ED.Drawing.Point(0, 0);
+		var np = new ED.Point(0, 0);
 		np.setWithPolars(p.length(), p.direction() + Math.PI / 6);
 
 		this.move(np.x, np.y);
@@ -37403,8 +37403,8 @@ ED.StarFold.prototype.draw = function(_point) {
 	this.arc = Math.atan2(600 * this.scaleX, Math.abs(this.originY));
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[2].location = this.transform.transformPoint(new ED.Drawing.Point(-300, 200));
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[2].location = this.transform.transformPoint(new ED.Point(-300, 200));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -37506,7 +37506,7 @@ ED.SteepAxis.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['axis'] = {
 		kind: 'derived',
 		type: 'mod',
-		range: new ED.Drawing.Range(0, 180),
+		range: new ED.Range(0, 180),
 		clock: 'bottom',
 		animate: true
 	};
@@ -37788,8 +37788,8 @@ ED.SubretinalFluid.prototype.setPropertyDefaults = function() {
 		// Create a range object for each handle
 		var n = this.numberOfHandles;
 		var range = new Object;
-		range.length = new ED.Drawing.Range(+50, +290);
-		range.angle = new ED.Drawing.Range((((2 * n - 1) * cir / (2 * n)) + i * cir / n) % cir, ((1 * cir / (2 * n)) + i * cir / n) % cir);
+		range.length = new ED.Range(+50, +290);
+		range.angle = new ED.Range((((2 * n - 1) * cir / (2 * n)) + i * cir / n) % cir, ((1 * cir / (2 * n)) + i * cir / n) % cir);
 		this.handleVectorRangeArray[i] = range;
 	}
 }
@@ -37800,21 +37800,21 @@ ED.SubretinalFluid.prototype.setPropertyDefaults = function() {
 ED.SubretinalFluid.prototype.setParameterDefaults = function() {
 	var doodle = this.drawing.lastDoodleOfClass(this.className);
 	if (doodle) {
-		var np = new ED.Drawing.Point(doodle.originX + 100, 0);
+		var np = new ED.Point(doodle.originX + 100, 0);
 		this.move(np.x, np.y);
 	} else {
 		this.move((this.drawing.eye == ED.eye.Right ? -1 : 1) * 100, 0);
 	}
 
 	// Create a squiggle to store the handles points
-	var squiggle = new ED.Drawing.Squiggle(this, new ED.Drawing.Colour(100, 100, 100, 1), 4, true);
+	var squiggle = new ED.Squiggle(this, new ED.Colour(100, 100, 100, 1), 4, true);
 
 	// Add it to squiggle array
 	this.squiggleArray.push(squiggle);
 
 	// Populate with handles at equidistant points around circumference
 	for (var i = 0; i < this.numberOfHandles; i++) {
-		var point = new ED.Drawing.Point(0, 0);
+		var point = new ED.Point(0, 0);
 		point.setWithPolars(this.initialRadius, i * 2 * Math.PI / this.numberOfHandles);
 		this.addPointToSquiggle(point);
 	}
@@ -37968,9 +37968,9 @@ ED.SubretinalPFCL.prototype.setParameterDefaults = function() {
 	// Displacement from fovea, and from last doodle
 	var doodle = this.drawing.lastDoodleOfClass(this.className);
 	if (doodle) {
-		var p = new ED.Drawing.Point(doodle.originX, doodle.originY);
+		var p = new ED.Point(doodle.originX, doodle.originY);
 
-		var np = new ED.Drawing.Point(0, 0);
+		var np = new ED.Point(0, 0);
 		np.setWithPolars(p.length(), p.direction() + Math.PI / 6);
 
 		this.move(np.x, np.y);
@@ -38016,7 +38016,7 @@ ED.SubretinalPFCL.prototype.draw = function(_point) {
 	this.drawBoundary(_point);
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -38092,7 +38092,7 @@ ED.Supramid.prototype.setPropertyDefaults = function() {
 	this.isOrientated = true;
 	this.isRotatable = false;
 	this.snapToQuadrant = true;
-	this.quadrantPoint = new ED.Drawing.Point(10, 10);
+	this.quadrantPoint = new ED.Point(10, 10);
 
 	// Update component of validation array for simple parameters
 	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
@@ -38130,17 +38130,17 @@ ED.Supramid.prototype.draw = function(_point) {
 	ED.Supramid.superclass.draw.call(this, _point);
 
 	// Calculate key points for supramid bezier
-	var startPoint = new ED.Drawing.Point(0, this.apexY);
-	var tubePoint = new ED.Drawing.Point(0, -450);
-	var controlPoint1 = new ED.Drawing.Point(0, -600);
+	var startPoint = new ED.Point(0, this.apexY);
+	var tubePoint = new ED.Point(0, -450);
+	var controlPoint1 = new ED.Point(0, -600);
 
 	// Calculate mid point x coordinate
 	var midPointX = -450;
-	var controlPoint2 = new ED.Drawing.Point(midPointX, -300);
-	var midPoint = new ED.Drawing.Point(midPointX, 0);
-	var controlPoint3 = new ED.Drawing.Point(midPointX, 300);
-	var controlPoint4 = new ED.Drawing.Point(midPointX * 0.5, 450);
-	var endPoint = new ED.Drawing.Point(midPointX * 0.2, 450);
+	var controlPoint2 = new ED.Point(midPointX, -300);
+	var midPoint = new ED.Point(midPointX, 0);
+	var controlPoint3 = new ED.Point(midPointX, 300);
+	var controlPoint4 = new ED.Point(midPointX * 0.5, 450);
+	var endPoint = new ED.Point(midPointX * 0.2, 450);
 
 	// Boundary path
 	ctx.beginPath();
@@ -38177,7 +38177,7 @@ ED.Supramid.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(0, this.apexY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(0, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -38459,7 +38459,7 @@ ED.Telangiectasis.prototype.draw = function(_point) {
 
 		var dr = 10 / this.scaleX;
 
-		var p = new ED.Drawing.Point(0, 0);
+		var p = new ED.Point(0, 0);
 		var n = 10;
 		for (var i = 0; i < n; i++) {
 			p.setWithPolars(r * 0.8 * ED.randomArray[i], 2 * Math.PI * ED.randomArray[i + 100]);
@@ -38486,7 +38486,7 @@ ED.Telangiectasis.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -38630,13 +38630,13 @@ ED.ToricPCIOL.prototype.draw = function(_point) {
 		// Create points
 		var phi = 0.7 * Math.PI / 4;
 		var theta = phi + Math.PI;
-		var p1 = new ED.Drawing.Point(0, 0)
+		var p1 = new ED.Point(0, 0)
 		p1.setWithPolars(r - 20, phi);
-		var p2 = new ED.Drawing.Point(0, 0);
+		var p2 = new ED.Point(0, 0);
 		p2.setWithPolars(r - 100, phi);
-		var p3 = new ED.Drawing.Point(0, 0)
+		var p3 = new ED.Point(0, 0)
 		p3.setWithPolars(r - 20, theta);
-		var p4 = new ED.Drawing.Point(0, 0);
+		var p4 = new ED.Point(0, 0);
 		p4.setWithPolars(r - 100, theta);
 
 		// Create lines
@@ -38655,7 +38655,7 @@ ED.ToricPCIOL.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	var point = new ED.Drawing.Point(0, 0)
+	var point = new ED.Point(0, 0)
 	point.setWithPolars(r, Math.PI / 4);
 	this.handleArray[2].location = this.transform.transformPoint(point);
 
@@ -38867,8 +38867,8 @@ ED.Trabectome.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[0].location = this.transform.transformPoint(new ED.Drawing.Point(topLeftX, topLeftY));
-	this.handleArray[3].location = this.transform.transformPoint(new ED.Drawing.Point(topRightX, topRightY));
+	this.handleArray[0].location = this.transform.transformPoint(new ED.Point(topLeftX, topLeftY));
+	this.handleArray[3].location = this.transform.transformPoint(new ED.Point(topRightX, topRightY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -38924,8 +38924,8 @@ ED.TrabyFlap = function(_drawing, _parameterJSON) {
 
 	// Doodle specific parameters
 	this.r = 380;
-	this.right = new ED.Drawing.Point(0, 0);
-	this.left = new ED.Drawing.Point(0, 0);
+	this.right = new ED.Point(0, 0);
+	this.left = new ED.Point(0, 0);
 
 	// Saved parameters
 	this.savedParameterArray = ['apexX', 'apexY', 'arc', 'rotation'];
@@ -39099,7 +39099,7 @@ ED.TrabyFlap.prototype.draw = function(_point) {
 	var phi = this.arc / 6;
 
 	// Apex point
-	var apex = new ED.Drawing.Point(0, this.height);
+	var apex = new ED.Point(0, this.height);
 
 	this.right.x = this.r * Math.sin(theta);
 	this.right.y = -this.r * Math.cos(theta);
@@ -39140,7 +39140,7 @@ ED.TrabyFlap.prototype.draw = function(_point) {
 			var angle = theta / 2;
 			arcStart = -Math.PI / 2 + angle;
 			arcEnd = -Math.PI / 2 - angle;
-			var top = new ED.Drawing.Point(0, -this.r + (this.height + this.r) / 2);
+			var top = new ED.Point(0, -this.r + (this.height + this.r) / 2);
 
 			ctx.arc(0, 0, this.r, arcStart, arcEnd, true);
 			ctx.lineTo(-this.r * Math.sin(angle), top.y);
@@ -39156,7 +39156,7 @@ ED.TrabyFlap.prototype.draw = function(_point) {
 	// Coordinates of handles (in canvas plane)
 	this.handleArray[0].location = this.transform.transformPoint(this.left);
 	this.handleArray[3].location = this.transform.transformPoint(this.right);
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -39281,7 +39281,7 @@ ED.TrabySuture.prototype.setParameterDefaults = function() {
 	this.size = '10/0';
 
 	// Create a squiggle to store the handles points
-	var squiggle = new ED.Drawing.Squiggle(this, new ED.Colour(100, 100, 100, 1), 4, true);
+	var squiggle = new ED.Squiggle(this, new ED.Colour(100, 100, 100, 1), 4, true);
 
 	// Add it to squiggle array
 	this.squiggleArray.push(squiggle);
@@ -39295,7 +39295,7 @@ ED.TrabySuture.prototype.setParameterDefaults = function() {
 		{x: 100, y: 200},
 	];
 	for (var i = 0; i < positionSet.length; i++) {
-		var point = new ED.Drawing.Point(positionSet[i].x, positionSet[i].y);
+		var point = new ED.Point(positionSet[i].x, positionSet[i].y);
 		this.addPointToSquiggle(point);
 	}
 }
@@ -39386,10 +39386,10 @@ ED.TrabySuture.prototype.draw = function(_point) {
 // 				ctx.bezierCurveTo(32, 74, 34, 100, 34, 100);
 
 				// From point
-				//var fp = new ED.Drawing.Point(34, 100);
+				//var fp = new ED.Point(34, 100);
 
 				// Suture exit through cornea
-				// 				var ep = new ED.Drawing.Point(this.firstOriginX, -60);
+				// 				var ep = new ED.Point(this.firstOriginX, -60);
 				//
 				// 				// Set up a new transform and centre in canvas
 				// 				var at = new ED.AffineTransform();
@@ -39406,7 +39406,7 @@ ED.TrabySuture.prototype.draw = function(_point) {
 
 				/*
 				// Suture exit through cornea
-				var ep = new ED.Drawing.Point(this.firstOriginX, -60);
+				var ep = new ED.Point(this.firstOriginX, -60);
 
 				// Set up a new transform and centre in canvas
 				var at = new ED.AffineTransform();
@@ -39427,7 +39427,7 @@ ED.TrabySuture.prototype.draw = function(_point) {
 				else if (this.id == 6) d = d * +1;
 				else d = d * -1;
 
-				var mp = new ED.Drawing.Point(this.firstOriginX - d, -90);
+				var mp = new ED.Point(this.firstOriginX - d, -90);
 				var tmp = at.transformPoint(mp);
 				var fmp = this.inverseTransform.transformPoint(tmp);
 
@@ -39454,8 +39454,8 @@ ED.TrabySuture.prototype.draw = function(_point) {
 					tp = this.squiggleArray[0].pointsArray[i];
 
 					// Control points
-// 					cp1 = new ED.Drawing.Point(fp.x + (tp.x - fp.x)/3, fp.y);
-// 					cp2 = new ED.Drawing.Point(fp.x + 2 * (tp.x - fp.x)/3, tp.y);
+// 					cp1 = new ED.Point(fp.x + (tp.x - fp.x)/3, fp.y);
+// 					cp2 = new ED.Point(fp.x + 2 * (tp.x - fp.x)/3, tp.y);
 
 					// Draw Bezier curve
 					//ctx.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, tp.x, tp.y);
@@ -39644,7 +39644,7 @@ ED.TractionRetinalDetachment.prototype.draw = function(_point) {
 	this.drawBoundary(_point);
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[2].location = this.transform.transformPoint(new ED.Drawing.Point(s, -s));
+	this.handleArray[2].location = this.transform.transformPoint(new ED.Point(s, -s));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -39806,15 +39806,15 @@ ED.TransilluminationDefect.prototype.draw = function(_point) {
 
 		// Iterate through radius and angle to draw spots
 		for (var a = -Math.PI / 2 - arcStart + inc / 2; a < this.arc - Math.PI / 2 - arcStart; a += inc) {
-			var p = new ED.Drawing.Point(0, 0);
+			var p = new ED.Point(0, 0);
 			p.setWithPolars(r, a);
 			this.drawCircle(ctx, p.x, p.y, sr, "rgba(255,255,255,1)", 4, "rgba(255,255,255,1)");
 		}
 	}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[0].location = this.transform.transformPoint(new ED.Drawing.Point(topLeftX, topLeftY));
-	this.handleArray[3].location = this.transform.transformPoint(new ED.Drawing.Point(topRightX, topRightY));
+	this.handleArray[0].location = this.transform.transformPoint(new ED.Point(topLeftX, topLeftY));
+	this.handleArray[3].location = this.transform.transformPoint(new ED.Point(topRightX, topRightY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -39943,11 +39943,11 @@ ED.TrialFrame.prototype.draw = function(_point) {
 		var theta = 0;
 
 		// Points for each line
-		var pi = new ED.Drawing.Point(0, 0);
-		var pj = new ED.Drawing.Point(0, 0);
-		var pt = new ED.Drawing.Point(0, 0);
-		var po = new ED.Drawing.Point(0, 0);
-		var pp = new ED.Drawing.Point(0, 0);
+		var pi = new ED.Point(0, 0);
+		var pj = new ED.Point(0, 0);
+		var pt = new ED.Point(0, 0);
+		var po = new ED.Point(0, 0);
+		var pp = new ED.Point(0, 0);
 
 		for (var i = 0; i < 19; i++) {
 			var text = i.toFixed(0);
@@ -40048,7 +40048,7 @@ ED.TrialLens.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['axis'] = {
 		kind: 'derived',
 		type: 'mod',
-		range: new ED.Drawing.Range(0, 180),
+		range: new ED.Range(0, 180),
 		clock: 'bottom',
 		animate: true
 	};
@@ -40212,9 +40212,9 @@ ED.UTear.prototype.setParameterDefaults = function() {
 
 	var doodle = this.drawing.lastDoodleOfClass(this.className);
 	if (doodle) {
-		var p = new ED.Drawing.Point(doodle.originX, doodle.originY);
+		var p = new ED.Point(doodle.originX, doodle.originY);
 
-		var np = new ED.Drawing.Point(0, 0);
+		var np = new ED.Point(0, 0);
 		np.setWithPolars(p.length(), p.direction() + Math.PI / 6);
 
 		this.move(np.x, np.y);
@@ -40257,15 +40257,15 @@ ED.UTear.prototype.draw = function(_point) {
 	this.drawBoundary(_point);
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[3].location = this.transform.transformPoint(new ED.Drawing.Point(40, -40));
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[3].location = this.transform.transformPoint(new ED.Point(40, -40));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
 
 	// Calculate arc (Arc property not used naturally in this doodle)
-	this.leftExtremity = this.transform.transformPoint(new ED.Drawing.Point(-40, -40));
-	this.rightExtremity = this.transform.transformPoint(new ED.Drawing.Point(40, -40));
+	this.leftExtremity = this.transform.transformPoint(new ED.Point(-40, -40));
+	this.rightExtremity = this.transform.transformPoint(new ED.Point(40, -40));
 	this.arc = this.calculateArc();
 
 	// Return value indicating successful hittest
@@ -40545,7 +40545,7 @@ ED.ViewObscured.prototype.draw = function(_point) {
 	this.drawBoundary(_point);
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -40671,8 +40671,8 @@ ED.VisualField.prototype.setPropertyDefaults = function() {
 
 		// Create a range object for each handle
 		var range = new Object;
-		range.length = new ED.Drawing.Range(+0, +400);
-		range.angle = new ED.Drawing.Range(((15 * cir / 16) + i * cir / 8) % cir, ((1 * cir / 16) + i * cir / 8) % cir);
+		range.length = new ED.Range(+0, +400);
+		range.angle = new ED.Range(((15 * cir / 16) + i * cir / 8) % cir, ((1 * cir / 16) + i * cir / 8) % cir);
 		this.handleVectorRangeArray[i] = range;
 	}
 }
@@ -40684,7 +40684,7 @@ ED.VisualField.prototype.setParameterDefaults = function() {
 	this.apexY = -40;
 
 	// Create a squiggle to store the handles points
-	var squiggle = new ED.Drawing.Squiggle(this, new ED.Drawing.Colour(100, 100, 100, 1), 4, true);
+	var squiggle = new ED.Squiggle(this, new ED.Colour(100, 100, 100, 1), 4, true);
 
 	// Add it to squiggle array
 	this.squiggleArray.push(squiggle);
@@ -40702,7 +40702,7 @@ ED.VisualField.prototype.setParameterDefaults = function() {
 	];
 	for (var i = 0; i < this.numberOfHandles; i++) {
 		var coordArray = defaultPointsArray[i];
-		var point = new ED.Drawing.Point(coordArray[0], coordArray[1]);
+		var point = new ED.Point(coordArray[0], coordArray[1]);
 		this.addPointToSquiggle(point);
 	}
 
@@ -40799,7 +40799,7 @@ ED.VisualField.prototype.draw = function(_point) {
 	}
 
 	// Location of apex handle
-	this.handleArray[this.numberOfHandles].location = this.transform.transformPoint(new ED.Drawing.Point(this.blindSpotX, this.apexY));
+	this.handleArray[this.numberOfHandles].location = this.transform.transformPoint(new ED.Point(this.blindSpotX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -40876,7 +40876,7 @@ ED.VisualFieldChart.prototype.setPropertyDefaults = function() {
  */
 ED.VisualFieldChart.prototype.setParameterDefaults = function() {
 	// Create a squiggle to store the handles points
-	var squiggle = new ED.Drawing.Squiggle(this, new ED.Drawing.Colour(100, 100, 100, 1), 4, true);
+	var squiggle = new ED.Squiggle(this, new ED.Colour(100, 100, 100, 1), 4, true);
 
 	// Add it to squiggle array
 	this.squiggleArray.push(squiggle);
@@ -40894,7 +40894,7 @@ ED.VisualFieldChart.prototype.setParameterDefaults = function() {
 	];
 	for (var i = 0; i < this.numberOfHandles; i++) {
 		var coordArray = defaultPointsArray[i];
-		var point = new ED.Drawing.Point(coordArray[0], coordArray[1]);
+		var point = new ED.Point(coordArray[0], coordArray[1]);
 		this.addPointToSquiggle(point);
 	}
 
@@ -41077,10 +41077,10 @@ ED.VitreousOpacity.prototype.draw = function(_point) {
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {}
 
 	// Coordinates of handles (in canvas plane)
-	point = new ED.Drawing.Point(0, 0);
+	point = new ED.Point(0, 0);
 	point.setWithPolars(ro, Math.PI / 4);
 	this.handleArray[2].location = this.transform.transformPoint(point);
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);

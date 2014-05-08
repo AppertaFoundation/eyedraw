@@ -26,7 +26,7 @@
  * @param {Float} _min
  * @param {Float} _max
  */
-ED.Drawing.Range = function(_min, _max) {
+ED.Range = function(_min, _max) {
 	// Properties
 	this.min = _min;
 	this.max = _max;
@@ -38,7 +38,7 @@ ED.Drawing.Range = function(_min, _max) {
  * @param {Float} _min
  * @param {Float} _max
  */
-ED.Drawing.Range.prototype.setMinAndMax = function(_min, _max) {
+ED.Range.prototype.setMinAndMax = function(_min, _max) {
 	// Set properties
 	this.min = _min;
 	this.max = _max;
@@ -50,7 +50,7 @@ ED.Drawing.Range.prototype.setMinAndMax = function(_min, _max) {
  * @param {Float} _num
  * @returns {Bool} True if the parameter is less than the minimum
  */
-ED.Drawing.Range.prototype.isBelow = function(_num) {
+ED.Range.prototype.isBelow = function(_num) {
 	if (_num < this.min) {
 		return true;
 	} else {
@@ -64,7 +64,7 @@ ED.Drawing.Range.prototype.isBelow = function(_num) {
  * @param {Float} _num
  * @returns {Bool} True if the parameter is more than the maximum
  */
-ED.Drawing.Range.prototype.isAbove = function(_num) {
+ED.Range.prototype.isAbove = function(_num) {
 	if (_num > this.max) {
 		return true;
 	} else {
@@ -78,7 +78,7 @@ ED.Drawing.Range.prototype.isAbove = function(_num) {
  * @param {Float} _num
  * @returns {Bool} True if the parameter is within the range
  */
-ED.Drawing.Range.prototype.includes = function(_num) {
+ED.Range.prototype.includes = function(_num) {
 	if (_num < this.min || _num > this.max) {
 		return false;
 	} else {
@@ -92,7 +92,7 @@ ED.Drawing.Range.prototype.includes = function(_num) {
  * @param {Float} _num
  * @returns {Float} The constrained value
  */
-ED.Drawing.Range.prototype.constrain = function(_num) {
+ED.Range.prototype.constrain = function(_num) {
 	if (_num < this.min) {
 		return this.min;
 	} else if (_num > this.max) {
@@ -109,14 +109,14 @@ ED.Drawing.Range.prototype.constrain = function(_num) {
  * @param {Bool} _isDegrees Flag indicating range is in degrees rather than radians
  * @returns {Bool} True if the parameter is within the range
  */
-ED.Drawing.Range.prototype.includesInAngularRange = function(_angle, _isDegrees) {
+ED.Range.prototype.includesInAngularRange = function(_angle, _isDegrees) {
 	// Arbitrary radius
 	var r = 100;
 
 	// Points representing vectos of angles within range
-	var min = new ED.Drawing.Point(0, 0);
-	var max = new ED.Drawing.Point(0, 0);
-	var angle = new ED.Drawing.Point(0, 0);
+	var min = new ED.Point(0, 0);
+	var max = new ED.Point(0, 0);
+	var angle = new ED.Point(0, 0);
 
 	// Set points using polar coordinates
 	if (!_isDegrees) {
@@ -139,16 +139,16 @@ ED.Drawing.Range.prototype.includesInAngularRange = function(_angle, _isDegrees)
  * @param {Bool} _isDegrees Flag indicating range is in degrees rather than radians
  * @returns {Float} The constrained value
  */
-ED.Drawing.Range.prototype.constrainToAngularRange = function(_angle, _isDegrees) {
+ED.Range.prototype.constrainToAngularRange = function(_angle, _isDegrees) {
 	// No point in constraining unless range is less than 360 degrees!
 	if ((this.max - this.min) < (_isDegrees ? 360 : (2 * Math.PI))) {
 		// Arbitrary radius
 		var r = 100;
 
 		// Points representing vectors of angles within range
-		var min = new ED.Drawing.Point(0, 0);
-		var max = new ED.Drawing.Point(0, 0);
-		var angle = new ED.Drawing.Point(0, 0);
+		var min = new ED.Point(0, 0);
+		var max = new ED.Point(0, 0);
+		var angle = new ED.Point(0, 0);
 
 		// Set points using polar coordinates
 		if (!_isDegrees) {

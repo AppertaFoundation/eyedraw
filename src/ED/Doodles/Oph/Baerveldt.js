@@ -217,8 +217,8 @@ ED.Baerveldt.prototype.draw = function(_point) {
 // 		ctx.lineTo(20 * s, this.apexY);
 // 		ctx.lineTo(20 * s, 290 * s + d);
 
-		var cp1 = new ED.Drawing.Point(0, (290 * s + d) + (this.apexY - (290 * s + d)) * 1);
-		var cp2 = new ED.Drawing.Point(this.apexX * 0.3, this.apexY);
+		var cp1 = new ED.Point(0, (290 * s + d) + (this.apexY - (290 * s + d)) * 1);
+		var cp2 = new ED.Point(this.apexX * 0.3, this.apexY);
 		var yd = this.apexX > 0?1:-1;
 
 		ctx.bezierCurveTo(cp1.x - 20 * s, cp1.y, cp2.x - 20 * s, cp2.y, this.apexX - 20 * s, this.apexY + 20 * s * yd);
@@ -232,7 +232,7 @@ ED.Baerveldt.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);

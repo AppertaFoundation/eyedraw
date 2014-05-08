@@ -75,8 +75,8 @@ ED.ChoroidalNaevus.prototype.setPropertyDefaults = function() {
 		// Create a range object for each handle
 		var n = this.numberOfHandles;
 		var range = new Object;
-		range.length = new ED.Drawing.Range(+50, +290);
-		range.angle = new ED.Drawing.Range((((2 * n - 1) * cir / (2 * n)) + i * cir / n) % cir, ((1 * cir / (2 * n)) + i * cir / n) % cir);
+		range.length = new ED.Range(+50, +290);
+		range.angle = new ED.Range((((2 * n - 1) * cir / (2 * n)) + i * cir / n) % cir, ((1 * cir / (2 * n)) + i * cir / n) % cir);
 		this.handleVectorRangeArray[i] = range;
 	}
 
@@ -95,14 +95,14 @@ ED.ChoroidalNaevus.prototype.setParameterDefaults = function() {
 	this.setOriginWithDisplacements(200, 150);
 
 	// Create a squiggle to store the handles points
-	var squiggle = new ED.Drawing.Squiggle(this, new ED.Drawing.Colour(100, 100, 100, 1), 4, true);
+	var squiggle = new ED.Squiggle(this, new ED.Colour(100, 100, 100, 1), 4, true);
 
 	// Add it to squiggle array
 	this.squiggleArray.push(squiggle);
 
 	// Populate with handles at equidistant points around circumference
 	for (var i = 0; i < this.numberOfHandles; i++) {
-		var point = new ED.Drawing.Point(0, 0);
+		var point = new ED.Point(0, 0);
 		point.setWithPolars(this.initialRadius, i * 2 * Math.PI / this.numberOfHandles);
 		this.addPointToSquiggle(point);
 	}
@@ -164,7 +164,7 @@ ED.ChoroidalNaevus.prototype.draw = function(_point) {
 	// Non boundary paths
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
 		// Drusen
-		p = new ED.Drawing.Point(0,0);
+		p = new ED.Point(0,0);
 		fill = "yellow";
 		var dr = 4;
 		n = Math.abs(Math.floor((-this.apexY + 50) / 5));
@@ -178,7 +178,7 @@ ED.ChoroidalNaevus.prototype.draw = function(_point) {
 	for (var i = 0; i < this.numberOfHandles; i++) {
 		this.handleArray[i].location = this.transform.transformPoint(this.squiggleArray[0].pointsArray[i]);
 	}
-	this.handleArray[this.numberOfHandles].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[this.numberOfHandles].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);

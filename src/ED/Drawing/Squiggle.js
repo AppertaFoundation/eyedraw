@@ -33,7 +33,7 @@
  * @param {Int} _thickness
  * @param {Bool} _filled
  */
-ED.Drawing.Squiggle = function(_doodle, _colour, _thickness, _filled) {
+ED.Squiggle = function(_doodle, _colour, _thickness, _filled) {
 	this.doodle = _doodle;
 	this.colour = _colour;
 	this.thickness = _thickness;
@@ -48,7 +48,7 @@ ED.Drawing.Squiggle = function(_doodle, _colour, _thickness, _filled) {
  *
  * @param {Point} _point
  */
-ED.Drawing.Squiggle.prototype.addPoint = function(_point) {
+ED.Squiggle.prototype.addPoint = function(_point) {
 	this.pointsArray.push(_point);
 }
 
@@ -57,7 +57,7 @@ ED.Drawing.Squiggle.prototype.addPoint = function(_point) {
  *
  * @returns {String} A JSON encoded string representing the squiggle
  */
-ED.Drawing.Squiggle.prototype.json = function() {
+ED.Squiggle.prototype.json = function() {
 	var s = '{';
 	s = s + '"colour":' + this.colour.json() + ',';
 	s = s + '"thickness": ' + this.thickness + ',';

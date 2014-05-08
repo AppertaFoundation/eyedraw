@@ -105,7 +105,7 @@ ED.TrabySuture.prototype.setParameterDefaults = function() {
 	this.size = '10/0';
 
 	// Create a squiggle to store the handles points
-	var squiggle = new ED.Drawing.Squiggle(this, new ED.Colour(100, 100, 100, 1), 4, true);
+	var squiggle = new ED.Squiggle(this, new ED.Colour(100, 100, 100, 1), 4, true);
 
 	// Add it to squiggle array
 	this.squiggleArray.push(squiggle);
@@ -119,7 +119,7 @@ ED.TrabySuture.prototype.setParameterDefaults = function() {
 		{x: 100, y: 200},
 	];
 	for (var i = 0; i < positionSet.length; i++) {
-		var point = new ED.Drawing.Point(positionSet[i].x, positionSet[i].y);
+		var point = new ED.Point(positionSet[i].x, positionSet[i].y);
 		this.addPointToSquiggle(point);
 	}
 }
@@ -210,10 +210,10 @@ ED.TrabySuture.prototype.draw = function(_point) {
 // 				ctx.bezierCurveTo(32, 74, 34, 100, 34, 100);
 
 				// From point
-				//var fp = new ED.Drawing.Point(34, 100);
+				//var fp = new ED.Point(34, 100);
 
 				// Suture exit through cornea
-				// 				var ep = new ED.Drawing.Point(this.firstOriginX, -60);
+				// 				var ep = new ED.Point(this.firstOriginX, -60);
 				//
 				// 				// Set up a new transform and centre in canvas
 				// 				var at = new ED.AffineTransform();
@@ -230,7 +230,7 @@ ED.TrabySuture.prototype.draw = function(_point) {
 
 				/*
 				// Suture exit through cornea
-				var ep = new ED.Drawing.Point(this.firstOriginX, -60);
+				var ep = new ED.Point(this.firstOriginX, -60);
 
 				// Set up a new transform and centre in canvas
 				var at = new ED.AffineTransform();
@@ -251,7 +251,7 @@ ED.TrabySuture.prototype.draw = function(_point) {
 				else if (this.id == 6) d = d * +1;
 				else d = d * -1;
 
-				var mp = new ED.Drawing.Point(this.firstOriginX - d, -90);
+				var mp = new ED.Point(this.firstOriginX - d, -90);
 				var tmp = at.transformPoint(mp);
 				var fmp = this.inverseTransform.transformPoint(tmp);
 
@@ -278,8 +278,8 @@ ED.TrabySuture.prototype.draw = function(_point) {
 					tp = this.squiggleArray[0].pointsArray[i];
 
 					// Control points
-// 					cp1 = new ED.Drawing.Point(fp.x + (tp.x - fp.x)/3, fp.y);
-// 					cp2 = new ED.Drawing.Point(fp.x + 2 * (tp.x - fp.x)/3, tp.y);
+// 					cp1 = new ED.Point(fp.x + (tp.x - fp.x)/3, fp.y);
+// 					cp2 = new ED.Point(fp.x + 2 * (tp.x - fp.x)/3, tp.y);
 
 					// Draw Bezier curve
 					//ctx.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, tp.x, tp.y);

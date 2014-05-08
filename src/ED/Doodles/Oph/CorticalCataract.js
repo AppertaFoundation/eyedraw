@@ -145,7 +145,7 @@ ED.CorticalCataract.prototype.draw = function(_point) {
 	var ri = -this.apexY; // Radius of inner clear area
 
 	// Draw cortical spokes
-	var sp = new ED.Drawing.Point(0, 0);
+	var sp = new ED.Point(0, 0);
 	sp.setWithPolars(rs, -phi);
 	ctx.moveTo(sp.x, sp.y);
 
@@ -153,12 +153,12 @@ ED.CorticalCataract.prototype.draw = function(_point) {
 		var startAngle = i * theta - phi;
 		var endAngle = startAngle + theta;
 
-		var op = new ED.Drawing.Point(0, 0);
+		var op = new ED.Point(0, 0);
 		op.setWithPolars(rs, startAngle);
 		ctx.lineTo(op.x, op.y);
 
 		//ctx.arc(0, 0, ro, startAngle, endAngle, false);
-		var ip = new ED.Drawing.Point(0, 0);
+		var ip = new ED.Point(0, 0);
 		ip.setWithPolars(ri, i * theta);
 		ctx.lineTo(ip.x, ip.y);
 	}
@@ -182,7 +182,7 @@ ED.CorticalCataract.prototype.draw = function(_point) {
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);

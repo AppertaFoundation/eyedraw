@@ -24,7 +24,7 @@
  * @class AffineTransform
  * @property {Array} components Array representing 3x3 matrix
  */
-ED.Drawing.AffineTransform = function() {
+ED.AffineTransform = function() {
 	// Properties - array of arrays of column values one for each row
 	this.components = [
 		[1, 0, 0],
@@ -36,7 +36,7 @@ ED.Drawing.AffineTransform = function() {
 /**
  * Sets matrix to identity matrix
  */
-ED.Drawing.AffineTransform.prototype.setToIdentity = function() {
+ED.AffineTransform.prototype.setToIdentity = function() {
 	this.components[0][0] = 1;
 	this.components[0][1] = 0;
 	this.components[0][2] = 0;
@@ -53,7 +53,7 @@ ED.Drawing.AffineTransform.prototype.setToIdentity = function() {
  *
  * @param {AffineTransform} _transform Array An affine transform
  */
-ED.Drawing.AffineTransform.prototype.setToTransform = function(_transform) {
+ED.AffineTransform.prototype.setToTransform = function(_transform) {
 	this.components[0][0] = _transform.components[0][0];
 	this.components[0][1] = _transform.components[0][1];
 	this.components[0][2] = _transform.components[0][2];
@@ -71,7 +71,7 @@ ED.Drawing.AffineTransform.prototype.setToTransform = function(_transform) {
  * @param {float} _x value to translate along x-axis
  * @param {float} _y value to translate along y-axis
  */
-ED.Drawing.AffineTransform.prototype.translate = function(_x, _y) {
+ED.AffineTransform.prototype.translate = function(_x, _y) {
 	this.components[0][2] = this.components[0][0] * _x + this.components[0][1] * _y + this.components[0][2];
 	this.components[1][2] = this.components[1][0] * _x + this.components[1][1] * _y + this.components[1][2];
 	this.components[2][2] = this.components[2][0] * _x + this.components[2][1] * _y + this.components[2][2];
@@ -83,7 +83,7 @@ ED.Drawing.AffineTransform.prototype.translate = function(_x, _y) {
  * @param {float} _sx value to scale along x-axis
  * @param {float} _sy value to scale along y-axis
  */
-ED.Drawing.AffineTransform.prototype.scale = function(_sx, _sy) {
+ED.AffineTransform.prototype.scale = function(_sx, _sy) {
 	this.components[0][0] = this.components[0][0] * _sx;
 	this.components[0][1] = this.components[0][1] * _sy;
 	this.components[1][0] = this.components[1][0] * _sx;
@@ -97,7 +97,7 @@ ED.Drawing.AffineTransform.prototype.scale = function(_sx, _sy) {
  *
  * @param {float} _rad value to rotate by in radians
  */
-ED.Drawing.AffineTransform.prototype.rotate = function(_rad) {
+ED.AffineTransform.prototype.rotate = function(_rad) {
 	// Calulate trigonometry
 	var c = Math.cos(_rad);
 	var s = Math.sin(_rad);
@@ -132,11 +132,11 @@ ED.Drawing.AffineTransform.prototype.rotate = function(_rad) {
  * @param {Point} _point a point
  * @returns {Point} a transformed point
  */
-ED.Drawing.AffineTransform.prototype.transformPoint = function(_point) {
+ED.AffineTransform.prototype.transformPoint = function(_point) {
 	var newX = _point.x * this.components[0][0] + _point.y * this.components[0][1] + 1 * this.components[0][2];
 	var newY = _point.x * this.components[1][0] + _point.y * this.components[1][1] + 1 * this.components[1][2];
 
-	return new ED.Drawing.Point(newX, newY);
+	return new ED.Point(newX, newY);
 }
 
 /**
@@ -144,7 +144,7 @@ ED.Drawing.AffineTransform.prototype.transformPoint = function(_point) {
  *
  * @returns {Float} determinant
  */
-ED.Drawing.AffineTransform.prototype.determinant = function() {
+ED.AffineTransform.prototype.determinant = function() {
 	return this.components[0][0] * (this.components[1][1] * this.components[2][2] - this.components[1][2] * this.components[2][1]) -
 		this.components[0][1] * (this.components[1][0] * this.components[2][2] - this.components[1][2] * this.components[2][0]) +
 		this.components[0][2] * (this.components[1][0] * this.components[2][1] - this.components[1][1] * this.components[2][0]);
@@ -155,9 +155,9 @@ ED.Drawing.AffineTransform.prototype.determinant = function() {
  *
  * @returns {Array} inverse matrix
  */
-ED.Drawing.AffineTransform.prototype.createInverse = function() {
+ED.AffineTransform.prototype.createInverse = function() {
 	// Create new matrix
-	var inv = new ED.Drawing.AffineTransform();
+	var inv = new ED.AffineTransform();
 
 	var det = this.determinant();
 

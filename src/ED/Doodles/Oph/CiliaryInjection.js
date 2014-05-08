@@ -139,8 +139,8 @@ ED.CiliaryInjection.prototype.draw = function(_point) {
 		var n = Math.floor(this.arc / phi);
 
 		// Start and end points of vessel
-		var sp = new ED.Drawing.Point(0, 0);
-		var ep = new ED.Drawing.Point(0, 0);
+		var sp = new ED.Point(0, 0);
+		var ep = new ED.Point(0, 0);
 
 		ctx.beginPath();
 
@@ -160,8 +160,8 @@ ED.CiliaryInjection.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[0].location = this.transform.transformPoint(new ED.Drawing.Point(topLeftX, topLeftY));
-	this.handleArray[3].location = this.transform.transformPoint(new ED.Drawing.Point(topRightX, topRightY));
+	this.handleArray[0].location = this.transform.transformPoint(new ED.Point(topLeftX, topLeftY));
+	this.handleArray[3].location = this.transform.transformPoint(new ED.Point(topRightX, topRightY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);

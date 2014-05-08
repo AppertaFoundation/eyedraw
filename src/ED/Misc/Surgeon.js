@@ -208,7 +208,7 @@ ED.Surgeon.prototype.draw = function(_point) {
 	ctx.strokeStyle = "rgba(120,120,120,1)";
 
 	// Set light blue for surgeon's gown
-	var colour = new ED.Drawing.Colour(0, 0, 0, 1);
+	var colour = new ED.Colour(0, 0, 0, 1);
 	colour.setWithHexString('3AFEFA');
 	ctx.fillStyle = colour.rgba();
 

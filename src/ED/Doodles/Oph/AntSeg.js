@@ -197,9 +197,9 @@ ED.AntSeg.prototype.draw = function(_point) {
 		var colAngleOuter = Math.PI/6;
 		var rimSize = 20;
 
-		var p1 = new ED.Drawing.Point(0,0);
+		var p1 = new ED.Point(0,0);
 		p1.setWithPolars(ri, Math.PI + colAngle/2);
-		var p2 = new ED.Drawing.Point(0,0);
+		var p2 = new ED.Point(0,0);
 		p2.setWithPolars(ro - rimSize, Math.PI + colAngleOuter/2);
 
 		// Coloboma
@@ -280,7 +280,7 @@ ED.AntSeg.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);

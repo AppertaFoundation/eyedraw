@@ -84,8 +84,8 @@ ED.IatrogenicBreak.prototype.draw = function(_point) {
 	// Oval break
 	var d = 40;
 	var p = 0.8;
-	var sp = new ED.Drawing.Point(-d, d);
-	var ep = new ED.Drawing.Point(d, -d);
+	var sp = new ED.Point(-d, d);
+	var ep = new ED.Point(d, -d);
 
 	// Oval shape
 	ctx.moveTo(sp.x, sp.y);

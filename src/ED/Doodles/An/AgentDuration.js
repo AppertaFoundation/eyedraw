@@ -189,7 +189,7 @@ ED.AgentDuration.prototype.draw = function(_point) {
 	// Only draw handle for range, not fixed
 	if (this.type == 'range') {
 		// Coordinates of handles (in canvas plane)
-		this.handleArray[3].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+		this.handleArray[3].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 		// Draw handles if selected
 		if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);

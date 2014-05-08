@@ -20,7 +20,7 @@
 
 /**
  * A colour in the RGB space;
- * Usage: var c = new ED.Drawing.Colour(0, 0, 255, 0.75); ctx.fillStyle = c.rgba();
+ * Usage: var c = new ED.Colour(0, 0, 255, 0.75); ctx.fillStyle = c.rgba();
  *
  * @property {Int} red The red value as an integer from 0 to 255
  * @property {Int} green The green value as an integer from 0 to 255
@@ -31,7 +31,7 @@
  * @param {Int} _blue
  * @param {Float} _alpha
  */
-ED.Drawing.Colour = function(_red, _green, _blue, _alpha) {
+ED.Colour = function(_red, _green, _blue, _alpha) {
 	this.red = _red;
 	this.green = _green;
 	this.blue = _blue;
@@ -43,7 +43,7 @@ ED.Drawing.Colour = function(_red, _green, _blue, _alpha) {
  *
  * @param {String} Colour in hex format (eg 'E0AB4F')
  */
-ED.Drawing.Colour.prototype.setWithHexString = function(_hexString) {
+ED.Colour.prototype.setWithHexString = function(_hexString) {
 	// ***TODO*** add some string reality checks here
 	this.red = parseInt((_hexString.charAt(0) + _hexString.charAt(1)), 16);
 	this.green = parseInt((_hexString.charAt(2) + _hexString.charAt(3)), 16);
@@ -58,7 +58,7 @@ ED.Drawing.Colour.prototype.setWithHexString = function(_hexString) {
  *
  * @returns {String} Colour in hex format (eg 'E0AB4F')
  */
-ED.Drawing.Colour.prototype.hexString = function() {
+ED.Colour.prototype.hexString = function() {
 	var hexString = "";
 
 	// temporary while awaiting internet! Works for red and green only
@@ -79,7 +79,7 @@ ED.Drawing.Colour.prototype.hexString = function() {
  *
  * @returns {String} Colour in rgba format
  */
-ED.Drawing.Colour.prototype.rgba = function() {
+ED.Colour.prototype.rgba = function() {
 	return "rgba(" + this.red + ", " + this.green + ", " + this.blue + ", " + this.alpha + ")";
 }
 
@@ -88,6 +88,6 @@ ED.Drawing.Colour.prototype.rgba = function() {
  *
  * @returns {String} A JSON encoded string representing the colour
  */
-ED.Drawing.Colour.prototype.json = function() {
+ED.Colour.prototype.json = function() {
 	return "{\"red\":" + this.red + ",\"green\":" + this.green + ",\"blue\":" + this.blue + ",\"alpha\":" + this.alpha + "}";
 }

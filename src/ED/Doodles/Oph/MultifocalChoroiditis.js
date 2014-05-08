@@ -98,7 +98,7 @@ ED.MultifocalChoroiditis.prototype.draw = function(_point) {
 
 			for (var j = 0; j < nd; j++) {
 				var r = (0.5 + j) * rs/nd;
-				var p = new ED.Drawing.Point(0,0);
+				var p = new ED.Point(0,0);
 				p.setWithPolars(r, theta);
 
 				var dis = 80;

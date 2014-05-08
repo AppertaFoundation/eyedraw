@@ -107,7 +107,7 @@ ED.Telangiectasis.prototype.draw = function(_point) {
 
 		var dr = 10 / this.scaleX;
 
-		var p = new ED.Drawing.Point(0, 0);
+		var p = new ED.Point(0, 0);
 		var n = 10;
 		for (var i = 0; i < n; i++) {
 			p.setWithPolars(r * 0.8 * ED.randomArray[i], 2 * Math.PI * ED.randomArray[i + 100]);
@@ -134,7 +134,7 @@ ED.Telangiectasis.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);

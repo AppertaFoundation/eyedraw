@@ -140,7 +140,7 @@ ED.RetinalVeinOcclusionPostPole.prototype.draw = function(_point) {
 			for (var a = -Math.PI / 2 - arcStart; a < this.arc - Math.PI / 2 - arcStart; a += sd / r) {
 				a = -Math.PI / 2 - arcStart + j * 2 * Math.PI / count[i];
 
-				var p = new ED.Drawing.Point(0, 0);
+				var p = new ED.Point(0, 0);
 				p.setWithPolars(r, a);
 				this.drawNFLHaem(ctx, p.x, p.y);
 
@@ -152,9 +152,9 @@ ED.RetinalVeinOcclusionPostPole.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[0].location = this.transform.transformPoint(new ED.Drawing.Point(topLeftX, topLeftY));
-	this.handleArray[3].location = this.transform.transformPoint(new ED.Drawing.Point(topRightX, topRightY));
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[0].location = this.transform.transformPoint(new ED.Point(topLeftX, topLeftY));
+	this.handleArray[3].location = this.transform.transformPoint(new ED.Point(topRightX, topRightY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);

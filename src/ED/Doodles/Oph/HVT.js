@@ -62,9 +62,9 @@ ED.HVT.prototype.setPropertyDefaults = function() {
 	this.isShowHighlight = false;
 
 	// Adjust ranges for simple parameters
-	this.parameterValidationArray['originX']['range'] = new ED.Drawing.Range(-350, -150);
-	this.parameterValidationArray['originY']['range'] = new ED.Drawing.Range(-100, +100);
-	this.parameterValidationArray['rotation']['range'] = new ED.Drawing.Range(0, Math.PI / 2);
+	this.parameterValidationArray['originX']['range'] = new ED.Range(-350, -150);
+	this.parameterValidationArray['originY']['range'] = new ED.Range(-100, +100);
+	this.parameterValidationArray['rotation']['range'] = new ED.Range(0, Math.PI / 2);
 
 	// Speed up horizontal and vertical animation
 	//this.parameterValidationArray['originX']['delta'] = 30;
@@ -92,19 +92,19 @@ ED.HVT.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['horValue'] = {
 		kind: 'derived',
 		type: 'int',
-		range: new ED.Drawing.Range(0, 50),
+		range: new ED.Range(0, 50),
 		animate: true
 	};
 	this.parameterValidationArray['verValue'] = {
 		kind: 'derived',
 		type: 'int',
-		range: new ED.Drawing.Range(0, 50),
+		range: new ED.Range(0, 50),
 		animate: true
 	};
 	this.parameterValidationArray['torValue'] = {
 		kind: 'derived',
 		type: 'int',
-		range: new ED.Drawing.Range(0, 20),
+		range: new ED.Range(0, 20),
 		animate: true
 	};
 }
@@ -288,7 +288,7 @@ ED.HVT.prototype.draw = function(_point) {
 
 	// Use polar coordinates to draw axis line and handle
 	var phi = 1.75 * Math.PI;
-	var p = new ED.Drawing.Point(0, 0);
+	var p = new ED.Point(0, 0);
 
 	// Boundary path
 	ctx.beginPath();

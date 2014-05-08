@@ -239,7 +239,7 @@ ED.Lens.prototype.draw = function(_point) {
 
 			// Spokes
 			ctx.beginPath();
-			var sp = new ED.Drawing.Point(0, 0);
+			var sp = new ED.Point(0, 0);
 			sp.setWithPolars(rs, -phi);
 			ctx.moveTo(sp.x, sp.y);
 
@@ -247,12 +247,12 @@ ED.Lens.prototype.draw = function(_point) {
 				var startAngle = i * theta - phi;
 				var endAngle = startAngle + theta;
 
-				var op = new ED.Drawing.Point(0, 0);
+				var op = new ED.Point(0, 0);
 				op.setWithPolars(rs, startAngle);
 				ctx.lineTo(op.x, op.y);
 
 				//ctx.arc(0, 0, ro, startAngle, endAngle, false);
-				var ip = new ED.Drawing.Point(0, 0);
+				var ip = new ED.Point(0, 0);
 				ip.setWithPolars(ri, i * theta);
 				ctx.lineTo(ip.x, ip.y);
 			}
@@ -278,7 +278,7 @@ ED.Lens.prototype.draw = function(_point) {
 
 			// Iterate through radius and angle to draw spots
 			for (var a = 0; a < 2 * Math.PI; a += inc) {
-				var p = new ED.Drawing.Point(0, 0);
+				var p = new ED.Point(0, 0);
 				p.setWithPolars(rc, a);
 				this.drawCircle(ctx, p.x, p.y, sr, "rgba(200,200,255,1)", 4, "rgba(200,200,255,1)");
 			}

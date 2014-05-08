@@ -72,9 +72,9 @@ ED.SubretinalPFCL.prototype.setParameterDefaults = function() {
 	// Displacement from fovea, and from last doodle
 	var doodle = this.drawing.lastDoodleOfClass(this.className);
 	if (doodle) {
-		var p = new ED.Drawing.Point(doodle.originX, doodle.originY);
+		var p = new ED.Point(doodle.originX, doodle.originY);
 
-		var np = new ED.Drawing.Point(0, 0);
+		var np = new ED.Point(0, 0);
 		np.setWithPolars(p.length(), p.direction() + Math.PI / 6);
 
 		this.move(np.x, np.y);
@@ -120,7 +120,7 @@ ED.SubretinalPFCL.prototype.draw = function(_point) {
 	this.drawBoundary(_point);
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);

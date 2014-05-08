@@ -112,7 +112,7 @@ ED.CystoidMacularOedema.prototype.draw = function(_point) {
 		var stroke = "rgba(255, 82, 0, 0.7)";
 
 		// Peripheral cysts
-		var point = new ED.Drawing.Point(0, 0);
+		var point = new ED.Point(0, 0);
 		var n = 8;
 		for (var i = 0; i < n; i++) {
 			var angle = i * 2 * Math.PI / n;
@@ -125,7 +125,7 @@ ED.CystoidMacularOedema.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[2].location = this.transform.transformPoint(new ED.Drawing.Point(84, -84));
+	this.handleArray[2].location = this.transform.transformPoint(new ED.Point(84, -84));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);

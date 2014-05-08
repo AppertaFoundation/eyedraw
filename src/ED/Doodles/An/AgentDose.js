@@ -69,7 +69,7 @@ ED.AgentDose.prototype.setPropertyDefaults = function() {
 // 	this.parameterValidationArray['value'] = {
 // 		kind: 'derived',
 // 		type: 'int',
-// 		range: new ED.Drawing.Range(0, 240),
+// 		range: new ED.Range(0, 240),
 // 		animate: false
 // 	};
 	// Update component of validation array for simple parameters
@@ -183,7 +183,7 @@ ED.AgentDose.prototype.draw = function(_point) { //console.log(this.originX);
 	}
 
 	// Coordinates of handles (in canvas plane)
-	//this.handleArray[3].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	//this.handleArray[3].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	//if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);

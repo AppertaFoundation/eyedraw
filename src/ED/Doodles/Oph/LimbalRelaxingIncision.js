@@ -130,7 +130,7 @@ ED.LimbalRelaxingIncision.prototype.draw = function(_point) {
 	this.drawBoundary(_point);
 
 	// Coordinates of handles (in canvas plane)
-	var point = new ED.Drawing.Point(0, 0);
+	var point = new ED.Point(0, 0);
 	point.setWithPolars(r, theta);
 	this.handleArray[3].location = this.transform.transformPoint(point);
 

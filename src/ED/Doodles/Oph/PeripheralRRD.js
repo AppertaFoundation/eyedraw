@@ -117,12 +117,12 @@ ED.PeripheralRRD.prototype.draw = function(_point) {
 	var topLeftY = topRightY;
 
 	// Centre of first quarter circle
-	var c1 = new ED.Drawing.Point(0, 0);
+	var c1 = new ED.Point(0, 0);
 	c1.x = -ro * Math.sin(theta - rc / ro);
 	c1.y = -ro * Math.cos(theta - rc / ro);
 
 	// Centre of second quarter circle
-	var c2 = new ED.Drawing.Point(0, 0);
+	var c2 = new ED.Point(0, 0);
 	c2.x = -ro * Math.sin(-theta + rc / ro);
 	c2.y = -ro * Math.cos(-theta + rc / ro);
 
@@ -155,9 +155,9 @@ ED.PeripheralRRD.prototype.draw = function(_point) {
 	this.drawBoundary(_point);
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[0].location = this.transform.transformPoint(new ED.Drawing.Point(topLeftX, topLeftY));
-	this.handleArray[3].location = this.transform.transformPoint(new ED.Drawing.Point(topRightX, topRightY));
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[0].location = this.transform.transformPoint(new ED.Point(topLeftX, topLeftY));
+	this.handleArray[3].location = this.transform.transformPoint(new ED.Point(topRightX, topRightY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);

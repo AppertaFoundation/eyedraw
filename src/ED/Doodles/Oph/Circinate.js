@@ -103,8 +103,8 @@ ED.Circinate.prototype.draw = function(_point) {
 		var el = 30;
 
 		// Point objects
-		var cp = new ED.Drawing.Point(0, 0);
-		var ep = new ED.Drawing.Point(0, 0);
+		var cp = new ED.Point(0, 0);
+		var ep = new ED.Point(0, 0);
 
 		// Red centre
 		ctx.beginPath();
@@ -130,7 +130,7 @@ ED.Circinate.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	var point = new ED.Drawing.Point(0, 0);
+	var point = new ED.Point(0, 0);
 	point.setWithPolars(rc, Math.PI / 4);
 	this.handleArray[2].location = this.transform.transformPoint(point);
 

@@ -26,7 +26,7 @@
  * @param {Float} _x
  * @param {Float} _y
  */
-ED.Drawing.Point = function(_x, _y) {
+ED.Point = function(_x, _y) {
 	// Properties
 	this.x = Math.round(+_x);
 	this.y = Math.round(+_y);
@@ -39,7 +39,7 @@ ED.Drawing.Point = function(_x, _y) {
  * @param {Float} _r Distance from the origin
  * @param {Float} _p Angle in radians from North going clockwise
  */
-ED.Drawing.Point.prototype.setWithPolars = function(_r, _p) {
+ED.Point.prototype.setWithPolars = function(_r, _p) {
 	this.x = Math.round(_r * Math.sin(_p));
 	this.y = Math.round(-_r * Math.cos(_p));
 }
@@ -50,7 +50,7 @@ ED.Drawing.Point.prototype.setWithPolars = function(_r, _p) {
  * @param {Float} _x value of x
  * @param {Float} _y value of y
  */
-ED.Drawing.Point.prototype.setCoordinates = function(_x, _y) {
+ED.Point.prototype.setCoordinates = function(_x, _y) {
 	this.x = _x;
 	this.y = _y;
 }
@@ -61,7 +61,7 @@ ED.Drawing.Point.prototype.setCoordinates = function(_x, _y) {
  * @param {Point} _point
  * @returns {Float} Distance from the passed point
  */
-ED.Drawing.Point.prototype.distanceTo = function(_point) {
+ED.Point.prototype.distanceTo = function(_point) {
 	return Math.sqrt(Math.pow(this.x - _point.x, 2) + Math.pow(this.y - _point.y, 2));
 }
 
@@ -71,7 +71,7 @@ ED.Drawing.Point.prototype.distanceTo = function(_point) {
  * @param {Point} _point
  * @returns {Float} The dot product
  */
-ED.Drawing.Point.prototype.dotProduct = function(_point) {
+ED.Point.prototype.dotProduct = function(_point) {
 	return this.x * _point.x + this.y * _point.y;
 }
 
@@ -81,7 +81,7 @@ ED.Drawing.Point.prototype.dotProduct = function(_point) {
  * @param {Point} _point
  * @returns {Float} The cross product
  */
-ED.Drawing.Point.prototype.crossProduct = function(_point) {
+ED.Point.prototype.crossProduct = function(_point) {
 	return this.x * _point.y - this.y * _point.x;
 }
 
@@ -90,7 +90,7 @@ ED.Drawing.Point.prototype.crossProduct = function(_point) {
  *
  * @returns {Float} The length
  */
-ED.Drawing.Point.prototype.length = function() {
+ED.Point.prototype.length = function() {
 	return Math.sqrt(this.x * this.x + this.y * this.y);
 }
 
@@ -99,8 +99,8 @@ ED.Drawing.Point.prototype.length = function() {
  *
  * @returns {Float} The angle from zero (north) going clockwise
  */
-ED.Drawing.Point.prototype.direction = function() {
-	var north = new ED.Drawing.Point(0, -100);
+ED.Point.prototype.direction = function() {
+	var north = new ED.Point(0, -100);
 
 	return north.clockwiseAngleTo(this);
 }
@@ -111,7 +111,7 @@ ED.Drawing.Point.prototype.direction = function() {
  * @param {Point} _point
  * @returns {Float} The angle in radians
  */
-ED.Drawing.Point.prototype.clockwiseAngleTo = function(_point) {
+ED.Point.prototype.clockwiseAngleTo = function(_point) {
 	var angle = Math.acos(this.dotProduct(_point) / (this.length() * _point.length()));
 	if (this.crossProduct(_point) < 0) {
 		return 2 * Math.PI - angle;
@@ -127,12 +127,12 @@ ED.Drawing.Point.prototype.clockwiseAngleTo = function(_point) {
  * @param {Float} _phi Angle form the radius to the control point
  * @returns {Point} The control point
  */
-ED.Drawing.Point.prototype.pointAtRadiusAndClockwiseAngle = function(_r, _phi) {
+ED.Point.prototype.pointAtRadiusAndClockwiseAngle = function(_r, _phi) {
 	// Calculate direction (clockwise from north)
 	var angle = this.direction();
 
 	// Create point and set length and direction
-	var point = new ED.Drawing.Point(0, 0);
+	var point = new ED.Point(0, 0);
 	point.setWithPolars(_r, angle + _phi);
 
 	return point;
@@ -145,9 +145,9 @@ ED.Drawing.Point.prototype.pointAtRadiusAndClockwiseAngle = function(_r, _phi) {
  * @param {Float} _point Point at other end of straight line
  * @returns {Point} A point object
  */
-ED.Drawing.Point.prototype.pointAtAngleToLineToPointAtProportion = function(_phi, _point, _prop) {
+ED.Point.prototype.pointAtAngleToLineToPointAtProportion = function(_phi, _point, _prop) {
 	// Midpoint in coordinates as if current point is origin
-	var bp = new ED.Drawing.Point((_point.x - this.x) * _prop, (_point.y - this.y) * _prop);
+	var bp = new ED.Point((_point.x - this.x) * _prop, (_point.y - this.y) * _prop);
 
 	// Calculate radius
 	r = bp.length();
@@ -168,8 +168,8 @@ ED.Drawing.Point.prototype.pointAtAngleToLineToPointAtProportion = function(_phi
  *
  * @returns {Int} The clock hour
  */
-ED.Drawing.Point.prototype.clockHour = function(_point) {
-	var twelvePoint = new ED.Drawing.Point(0, -100);
+ED.Point.prototype.clockHour = function(_point) {
+	var twelvePoint = new ED.Point(0, -100);
 	var clockHour = ((twelvePoint.clockwiseAngleTo(this) * 6 / Math.PI) + 12) % 12;
 
 	clockHour = clockHour.toFixed(0);
@@ -184,7 +184,7 @@ ED.Drawing.Point.prototype.clockHour = function(_point) {
  * @param {Float} _phi Angle form the radius to the control point
  * @returns {Point} The control point
  */
-ED.Drawing.Point.prototype.tangentialControlPoint = function(_phi) {
+ED.Point.prototype.tangentialControlPoint = function(_phi) {
 	// Calculate length of line from origin to point and direction (clockwise from north)
 	var r = this.length();
 	var angle = this.direction();
@@ -193,7 +193,7 @@ ED.Drawing.Point.prototype.tangentialControlPoint = function(_phi) {
 	var h = r / Math.cos(_phi);
 
 	// Create point and set length and direction
-	var point = new ED.Drawing.Point(0, 0);
+	var point = new ED.Point(0, 0);
 	point.setWithPolars(h, angle + _phi);
 
 	return point;
@@ -204,6 +204,6 @@ ED.Drawing.Point.prototype.tangentialControlPoint = function(_phi) {
  *
  * @returns {String} point in JSON format
  */
-ED.Drawing.Point.prototype.json = function() {
+ED.Point.prototype.json = function() {
 	return "{\"x\":" + this.x.toFixed(2) + ",\"y\":" + this.y.toFixed(2) + "}";
 }

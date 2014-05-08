@@ -74,7 +74,7 @@ ED.PostPole.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['cdRatio'] = {
 		kind: 'derived',
 		type: 'float',
-		range: new ED.Drawing.Range(0, 1),
+		range: new ED.Range(0, 1),
 		precision: 1,
 		animate: false
 	};
@@ -203,7 +203,7 @@ ED.PostPole.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);

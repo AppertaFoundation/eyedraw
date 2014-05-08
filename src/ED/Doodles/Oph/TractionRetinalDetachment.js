@@ -104,7 +104,7 @@ ED.TractionRetinalDetachment.prototype.draw = function(_point) {
 	this.drawBoundary(_point);
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[2].location = this.transform.transformPoint(new ED.Drawing.Point(s, -s));
+	this.handleArray[2].location = this.transform.transformPoint(new ED.Point(s, -s));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);

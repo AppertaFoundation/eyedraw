@@ -57,7 +57,7 @@ ED.VisualFieldChart.prototype.setPropertyDefaults = function() {
  */
 ED.VisualFieldChart.prototype.setParameterDefaults = function() {
 	// Create a squiggle to store the handles points
-	var squiggle = new ED.Drawing.Squiggle(this, new ED.Drawing.Colour(100, 100, 100, 1), 4, true);
+	var squiggle = new ED.Squiggle(this, new ED.Colour(100, 100, 100, 1), 4, true);
 
 	// Add it to squiggle array
 	this.squiggleArray.push(squiggle);
@@ -75,7 +75,7 @@ ED.VisualFieldChart.prototype.setParameterDefaults = function() {
 	];
 	for (var i = 0; i < this.numberOfHandles; i++) {
 		var coordArray = defaultPointsArray[i];
-		var point = new ED.Drawing.Point(coordArray[0], coordArray[1]);
+		var point = new ED.Point(coordArray[0], coordArray[1]);
 		this.addPointToSquiggle(point);
 	}
 

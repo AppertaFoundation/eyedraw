@@ -112,14 +112,14 @@ ED.Grommet.prototype.draw = function(_point) {
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[2].location = this.transform.transformPoint(new ED.Drawing.Point(21, -21));
+	this.handleArray[2].location = this.transform.transformPoint(new ED.Point(21, -21));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
 
 	// Calculate arc (Arc property not used naturally in this doodle ***TODO** more elegant method of doing this possible!)
-	var centre = this.transform.transformPoint(new ED.Drawing.Point(0, 0));
-	var oneWidthToRight = this.transform.transformPoint(new ED.Drawing.Point(60, 0));
+	var centre = this.transform.transformPoint(new ED.Point(0, 0));
+	var oneWidthToRight = this.transform.transformPoint(new ED.Point(60, 0));
 	var xco = centre.x - this.drawing.canvas.width / 2;
 	var yco = centre.y - this.drawing.canvas.height / 2;
 	var radius = this.scaleX * Math.sqrt(xco * xco + yco * yco);

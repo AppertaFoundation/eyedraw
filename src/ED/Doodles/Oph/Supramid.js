@@ -56,7 +56,7 @@ ED.Supramid.prototype.setPropertyDefaults = function() {
 	this.isOrientated = true;
 	this.isRotatable = false;
 	this.snapToQuadrant = true;
-	this.quadrantPoint = new ED.Drawing.Point(10, 10);
+	this.quadrantPoint = new ED.Point(10, 10);
 
 	// Update component of validation array for simple parameters
 	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
@@ -94,17 +94,17 @@ ED.Supramid.prototype.draw = function(_point) {
 	ED.Supramid.superclass.draw.call(this, _point);
 
 	// Calculate key points for supramid bezier
-	var startPoint = new ED.Drawing.Point(0, this.apexY);
-	var tubePoint = new ED.Drawing.Point(0, -450);
-	var controlPoint1 = new ED.Drawing.Point(0, -600);
+	var startPoint = new ED.Point(0, this.apexY);
+	var tubePoint = new ED.Point(0, -450);
+	var controlPoint1 = new ED.Point(0, -600);
 
 	// Calculate mid point x coordinate
 	var midPointX = -450;
-	var controlPoint2 = new ED.Drawing.Point(midPointX, -300);
-	var midPoint = new ED.Drawing.Point(midPointX, 0);
-	var controlPoint3 = new ED.Drawing.Point(midPointX, 300);
-	var controlPoint4 = new ED.Drawing.Point(midPointX * 0.5, 450);
-	var endPoint = new ED.Drawing.Point(midPointX * 0.2, 450);
+	var controlPoint2 = new ED.Point(midPointX, -300);
+	var midPoint = new ED.Point(midPointX, 0);
+	var controlPoint3 = new ED.Point(midPointX, 300);
+	var controlPoint4 = new ED.Point(midPointX * 0.5, 450);
+	var endPoint = new ED.Point(midPointX * 0.2, 450);
 
 	// Boundary path
 	ctx.beginPath();
@@ -141,7 +141,7 @@ ED.Supramid.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(0, this.apexY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(0, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);

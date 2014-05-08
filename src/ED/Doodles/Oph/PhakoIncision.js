@@ -80,14 +80,14 @@ ED.PhakoIncision.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['incisionMeridian'] = {
 		kind: 'derived',
 		type: 'mod',
-		range: new ED.Drawing.Range(0, 360),
+		range: new ED.Range(0, 360),
 		clock: 'bottom',
 		animate: true
 	};
 	this.parameterValidationArray['incisionLength'] = {
 		kind: 'derived',
 		type: 'float',
-		range: new ED.Drawing.Range(1, 9.9),
+		range: new ED.Range(1, 9.9),
 		precision: 1,
 		animate: true
 	};
@@ -287,7 +287,7 @@ ED.PhakoIncision.prototype.draw = function(_point) {
 
 			// Sutures
 			var sutureSeparationAngle = this.sutureSeparation * this.defaultRadius / (6 * this.radius);
-			var p = new ED.Drawing.Point(0, 0);
+			var p = new ED.Point(0, 0);
 			var phi = theta - sutureSeparationAngle / 2;
 
 			do {
@@ -312,10 +312,10 @@ ED.PhakoIncision.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	var point = new ED.Drawing.Point(0, 0);
+	var point = new ED.Point(0, 0);
 	point.setWithPolars(r, theta);
 	this.handleArray[3].location = this.transform.transformPoint(point);
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);

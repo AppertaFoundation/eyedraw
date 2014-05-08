@@ -99,13 +99,13 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 	this.doodleArray = new Array();
 	this.bindingArray = new Array();
 	this.listenerArray = new Array();
-	this.transform = new ED.Drawing.AffineTransform();
-	this.inverseTransform = new ED.Drawing.AffineTransform();
+	this.transform = new ED.AffineTransform();
+	this.inverseTransform = new ED.AffineTransform();
 	this.selectedDoodle = null;
 	this.mouseDown = false;
 	this.doubleClick = false;
 	this.mode = ED.Mode.None;
-	this.lastMousePosition = new ED.Drawing.Point(0, 0);
+	this.lastMousePosition = new ED.Point(0, 0);
 	this.doubleClickMilliSeconds = 250;
 	this.readyNotificationSent = false;
 	this.newPointOnClick = false;
@@ -119,7 +119,7 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 	this.showDoodleControls = false;
 
 	// Freehand drawing properties NB from November 2013 moved to Freehand doodle
-// 	this.squiggleColour = new ED.Drawing.Colour(0, 255, 0, 1);
+// 	this.squiggleColour = new ED.Colour(0, 255, 0, 1);
 // 	this.squiggleWidth = ED.squiggleWidth.Medium;
 // 	this.squiggleStyle = ED.squiggleStyle.Outline;
 
@@ -179,8 +179,8 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 
 	// Selection rectangle
 	this.selectionRectangleIsBeingDragged = false;
-	this.selectionRectangleStart = new ED.Drawing.Point(0, 0);
-	this.selectionRectangleEnd = new ED.Drawing.Point(0, 0);
+	this.selectionRectangleStart = new ED.Point(0, 0);
+	this.selectionRectangleEnd = new ED.Point(0, 0);
 
 	// Add event listeners (NB within the event listener 'this' refers to the canvas, NOT the drawing instance)
 	if (this.isEditable) {
@@ -189,31 +189,31 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 		// Mouse listeners
 		this.canvas.addEventListener('mousedown', function(e) {
 			var position = ED.findPosition(this, e);
-			var point = new ED.Drawing.Point(position.x, position.y);
+			var point = new ED.Point(position.x, position.y);
 			drawing.mousedown(point);
 		}, false);
 
 		this.canvas.addEventListener('mouseup', function(e) {
 			var position = ED.findPosition(this, e);
-			var point = new ED.Drawing.Point(position.x, position.y);
+			var point = new ED.Point(position.x, position.y);
 			drawing.mouseup(point);
 		}, false);
 
 		this.canvas.addEventListener('mousemove', function(e) {
 			var position = ED.findPosition(this, e);
-			var point = new ED.Drawing.Point(position.x, position.y);
+			var point = new ED.Point(position.x, position.y);
 			drawing.mousemove(point);
 		}, false);
 
 		this.canvas.addEventListener('mouseover', function(e) {
 			var position = ED.findPosition(this, e);
-			var point = new ED.Drawing.Point(position.x, position.y);
+			var point = new ED.Point(position.x, position.y);
 			drawing.mouseover(point);
 		}, false);
 
 		this.canvas.addEventListener('mouseout', function(e) {
 			var position = ED.findPosition(this, e);
-			var point = new ED.Drawing.Point(position.x, position.y);
+			var point = new ED.Point(position.x, position.y);
 			drawing.mouseout(point);
 		}, false);
 
@@ -255,7 +255,7 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
     this.canvas.addEventListener('touchstart', function(e) {
       if (e.targetTouches[0] !== undefined) {
         var canvas_pos = drawing.getPositionOfElement(drawing.canvas);
-        var point = new ED.Drawing.Point(e.targetTouches[0].pageX - canvas_pos[0] - this.offsetLeft, e.targetTouches[0].pageY - canvas_pos[1]);
+        var point = new ED.Point(e.targetTouches[0].pageX - canvas_pos[0] - this.offsetLeft, e.targetTouches[0].pageY - canvas_pos[1]);
         e.preventDefault();
       } else {
         ED.errorHandler('ED.Drawing', 'Class', 'Touches undefined: ');
@@ -266,7 +266,7 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
     this.canvas.addEventListener('touchend', function(e) {
       if (e.targetTouches[0] !== undefined) {
         var canvas_pos = drawing.getPositionOfElement(drawing.canvas);
-        var point = new ED.Drawing.Point(e.targetTouches[0].pageX - canvas_pos[0] - this.offsetLeft, e.targetTouches[0].pageY - canvas_pos[1]);
+        var point = new ED.Point(e.targetTouches[0].pageX - canvas_pos[0] - this.offsetLeft, e.targetTouches[0].pageY - canvas_pos[1]);
         drawing.mouseup(point);
       }
     }, false);
@@ -274,7 +274,7 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
     this.canvas.addEventListener('touchmove', function(e) {
       if (e.targetTouches[0] !== undefined) {
         var canvas_pos = drawing.getPositionOfElement(drawing.canvas);
-        var point = new ED.Drawing.Point(e.targetTouches[0].pageX - canvas_pos[0] - this.offsetLeft, e.targetTouches[0].pageY - canvas_pos[1]);
+        var point = new ED.Point(e.targetTouches[0].pageX - canvas_pos[0] - this.offsetLeft, e.targetTouches[0].pageY - canvas_pos[1]);
         drawing.mousemove(point);
       }
     }, false);
@@ -573,7 +573,7 @@ ED.Drawing.prototype.drawAllDoodles = function() {
 			if (!started) {
 				ctx.moveTo(this.doodleArray[i].originX, this.doodleArray[i].originY);
 				started = true;
-				startPoint = new ED.Drawing.Point(this.doodleArray[i].originX, this.doodleArray[i].originY);
+				startPoint = new ED.Point(this.doodleArray[i].originX, this.doodleArray[i].originY);
 			} else {
 				ctx.lineTo(this.doodleArray[i].originX, this.doodleArray[i].originY);
 			}
@@ -767,18 +767,18 @@ ED.Drawing.prototype.mousemove = function(_point) {
 			var lastMousePosSelectedDoodlePlane = doodle.inverseTransform.transformPoint(this.lastMousePosition);
 
 			// Get mouse positions in canvas plane relative to centre
-			var mousePosRelCanvasCentre = new ED.Drawing.Point(_point.x - this.canvas.width / 2, _point.y - this.canvas.height / 2);
-			var lastMousePosRelCanvasCentre = new ED.Drawing.Point(this.lastMousePosition.x - this.canvas.width / 2, this.lastMousePosition.y - this.canvas.height / 2);
+			var mousePosRelCanvasCentre = new ED.Point(_point.x - this.canvas.width / 2, _point.y - this.canvas.height / 2);
+			var lastMousePosRelCanvasCentre = new ED.Point(this.lastMousePosition.x - this.canvas.width / 2, this.lastMousePosition.y - this.canvas.height / 2);
 
 			// Get position of centre of display (canvas plane relative to centre) and of an arbitrary point vertically above
-			var canvasCentre = new ED.Drawing.Point(0, 0);
-			var canvasTop = new ED.Drawing.Point(0, -100);
+			var canvasCentre = new ED.Point(0, 0);
+			var canvasTop = new ED.Point(0, -100);
 
 			// Get coordinates of origin of doodle in doodle plane
-			var doodleOrigin = new ED.Drawing.Point(doodle.originX, doodle.originY);
+			var doodleOrigin = new ED.Point(doodle.originX, doodle.originY);
 
 			// Get position of point vertically above doodle origin in doodle plane
-			var doodleTop = new ED.Drawing.Point(doodle.originX, doodle.originY - 100);
+			var doodleTop = new ED.Point(doodle.originX, doodle.originY - 100);
 
 			// Effect of dragging depends on mode
 			switch (this.mode) {
@@ -1017,7 +1017,7 @@ ED.Drawing.prototype.mousemove = function(_point) {
 					var index = doodle.draggingHandleIndex;
 
 					// Get new position into a point object
-					var newPosition = new ED.Drawing.Point(0, 0);
+					var newPosition = new ED.Point(0, 0);
 					newPosition.x = doodle.squiggleArray[0].pointsArray[index].x + (mousePosSelectedDoodlePlane.x - lastMousePosSelectedDoodlePlane.x);
 					newPosition.y = doodle.squiggleArray[0].pointsArray[index].y + (mousePosSelectedDoodlePlane.y - lastMousePosSelectedDoodlePlane.y);
 
@@ -1043,12 +1043,12 @@ ED.Drawing.prototype.mousemove = function(_point) {
 					break;
 
 				case ED.Mode.Draw:
-					var p = new ED.Drawing.Point(mousePosSelectedDoodlePlane.x, mousePosSelectedDoodlePlane.y);
+					var p = new ED.Point(mousePosSelectedDoodlePlane.x, mousePosSelectedDoodlePlane.y);
 					doodle.addPointToSquiggle(p);
 					break;
 
 				case ED.Mode.Select:
-					var p = new ED.Drawing.Point(mousePosSelectedDoodlePlane.x, mousePosSelectedDoodlePlane.y);
+					var p = new ED.Point(mousePosSelectedDoodlePlane.x, mousePosSelectedDoodlePlane.y);
 					console.log('Selecting ', p.x, p.y);
 					break;
 
@@ -1086,7 +1086,7 @@ ED.Drawing.prototype.mouseup = function(_point) {
     for (var i = 0; i < this.doodleArray.length; i++)
 	{
         var doodle = this.doodleArray[i];
-        var origin = new ED.Drawing.Point(doodle.originX, doodle.originY);
+        var origin = new ED.Point(doodle.originX, doodle.originY);
 
         var p = this.transform.transformPoint(origin);
 
@@ -2760,8 +2760,8 @@ ED.Drawing.prototype.repaint = function() {
  */
 ED.Drawing.prototype.innerAngle = function(_pointA, _pointM, _pointB) {
 	// Get vectors from midpoint to A and B
-	var a = new ED.Drawing.Point(_pointA.x - _pointM.x, _pointA.y - _pointM.y);
-	var b = new ED.Drawing.Point(_pointB.x - _pointM.x, _pointB.y - _pointM.y);
+	var a = new ED.Point(_pointA.x - _pointM.x, _pointA.y - _pointM.y);
+	var b = new ED.Point(_pointB.x - _pointM.x, _pointB.y - _pointM.y);
 
 	return a.clockwiseAngleTo(b);
 }

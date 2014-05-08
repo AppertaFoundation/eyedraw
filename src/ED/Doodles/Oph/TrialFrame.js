@@ -109,11 +109,11 @@ ED.TrialFrame.prototype.draw = function(_point) {
 		var theta = 0;
 
 		// Points for each line
-		var pi = new ED.Drawing.Point(0, 0);
-		var pj = new ED.Drawing.Point(0, 0);
-		var pt = new ED.Drawing.Point(0, 0);
-		var po = new ED.Drawing.Point(0, 0);
-		var pp = new ED.Drawing.Point(0, 0);
+		var pi = new ED.Point(0, 0);
+		var pj = new ED.Point(0, 0);
+		var pt = new ED.Point(0, 0);
+		var po = new ED.Point(0, 0);
+		var pp = new ED.Point(0, 0);
 
 		for (var i = 0; i < 19; i++) {
 			var text = i.toFixed(0);
