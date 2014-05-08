@@ -12258,6 +12258,151 @@ ED.ACIOL.prototype.description = function() {
  */
 
 /**
+ * Chandelier (single)
+ *
+ * @class ACMaintainer
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Object} _parameterJSON
+ */
+ED.ACMaintainer = function(_drawing, _parameterJSON) {
+	// Set classname
+	this.className = "ACMaintainer";
+
+	// Private parameters
+	this.limbus = -400;
+
+	// Saved parameters
+	this.savedParameterArray = ['rotation'];
+
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _parameterJSON);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.ACMaintainer.prototype = new ED.Doodle;
+ED.ACMaintainer.prototype.constructor = ED.ACMaintainer;
+ED.ACMaintainer.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets default dragging attributes
+ */
+ED.ACMaintainer.prototype.setPropertyDefaults = function() {
+	this.isScaleable = false;
+	this.isMoveable = false;
+}
+
+/**
+ * Sets default parameters
+ */
+ED.ACMaintainer.prototype.setParameterDefaults = function() {
+	this.setRotationWithDisplacements(180, 90);
+	
+	// Position over SidePort if present
+	var doodle = this.drawing.lastDoodleOfClass("SidePort");
+	if (doodle) {
+		this.rotation = doodle.rotation;
+	}
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.ACMaintainer.prototype.draw = function(_point) {
+	// Get context
+	var ctx = this.drawing.context;
+
+	// Call draw method in superclass
+	ED.ACMaintainer.superclass.draw.call(this, _point);
+
+	// Boundary path
+	ctx.beginPath();
+
+	// Port
+	ctx.rect(-60, this.limbus - 60, 120, 160);
+
+	// Set line attributes
+	ctx.lineWidth = 2;
+	ctx.strokeStyle = "rgba(0, 0, 0, 0)";
+
+	ctx.fillStyle = "rgba(0, 0, 0, 0)";
+
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+
+	// Non boundary paths
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+		// Trocar
+		ctx.beginPath();
+		ctx.moveTo(-20, this.limbus + 60);
+		ctx.lineTo(+20, this.limbus + 60);
+		ctx.lineTo(+20, this.limbus + 160);
+		ctx.lineTo(-20, this.limbus + 200);
+		ctx.lineTo(-20, this.limbus + 60);
+		ctx.fillStyle = "rgba(120, 120, 120, 0.5)";
+		ctx.fill();
+
+		// Body
+		ctx.beginPath();
+		ctx.rect(-30, this.limbus, 60, 80);
+		ctx.fillStyle = "rgba(120, 120, 120, 0.75)";
+		ctx.fill();
+
+		// Fibre optic
+		ctx.beginPath();
+		ctx.moveTo(0, this.limbus);
+		ctx.bezierCurveTo(0, this.limbus - 50, 50, this.limbus - 100, 100, this.limbus - 100);
+		ctx.lineWidth = 40;
+		ctx.strokeStyle = "rgba(120, 120, 120, 0.5)";
+		ctx.stroke();
+	}
+
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * Returns a String which, if not empty, determines the root descriptions of multiple instances of the doodle
+ *
+ * @returns {String} Group description
+ */
+ED.ACMaintainer.prototype.groupDescription = function() {
+	return "Chandelier at ";
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.ACMaintainer.prototype.description = function() {
+	// Location (clockhours)
+	return this.clockHour() + " o'clock";
+}
+
+/**
+ * OpenEyes
+ *
+ * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
+ * (C) OpenEyes Foundation, 2011-2013
+ * This file is part of OpenEyes.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package OpenEyes
+ * @link http://www.openeyes.org.uk
+ * @author OpenEyes <info@openeyes.org.uk>
+ * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
+ * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ */
+
+/**
  * AngleGradeEast
  *
  * @class AngleGradeEast
@@ -17249,15 +17394,15 @@ ED.ConjunctivalSuture = function(_drawing, _parameterJSON) {
 	this.orientated = true;
 
 	// Derived parameters
-	this.shape = "Buried Mattress";
-	this.type = 'Nylon';
+	this.type = "Buried Mattress";
+	this.material = 'Nylon';
 	this.size = '10/0';
 
 	// Saved parameters
-	this.savedParameterArray = ['originX', 'originY', 'rotation', 'orientated', 'shape', 'type', 'size'];
+	this.savedParameterArray = ['originX', 'originY', 'rotation', 'orientated', 'type', 'material', 'size'];
 
 	// Parameters in doodle control bar (parameter name: parameter label)
-	this.controlParameterArray = {'orientated':'Orientated', 'shape':'Shape', 'type':'Type', 'size':'Size'};
+	this.controlParameterArray = {'orientated':'Orientated', 'type':'Type', 'material':'Material', 'size':'Size'};
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -17290,28 +17435,28 @@ ED.ConjunctivalSuture.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['apexY']['range'].setMinAndMax(-0, +0);
 
 	// Add complete validation arrays for derived parameters
-	this.parameterValidationArray['shape'] = {
-		kind: 'derived',
-		type: 'string',
-		list: ['Purse String', 'Mattress', 'Buried Mattress', 'Interrupted', 'Continuous'],
-		animate: true
-	};
 	this.parameterValidationArray['type'] = {
 		kind: 'derived',
 		type: 'string',
+		list: ['Purse String', 'Mattress', 'Buried Mattress', 'Interrupted', 'Continuous'],
+		animate: false
+	};
+	this.parameterValidationArray['material'] = {
+		kind: 'derived',
+		type: 'string',
 		list: ['Nylon', 'Prolene', 'Vicryl', 'Silk'],
-		animate: true
+		animate: false
 	}
 	this.parameterValidationArray['size'] = {
 		kind: 'derived',
 		type: 'string',
 		list: ['11/0', '10/0', '9/0', '8/0', '7/0', '6/0'],
-		animate: true
+		animate: false
 	}
 	this.parameterValidationArray['orientated'] = {
 		kind: 'derived',
 		type: 'bool',
-		display: true
+		display: false
 	};
 }
 
@@ -17321,7 +17466,7 @@ ED.ConjunctivalSuture.prototype.setPropertyDefaults = function() {
  */
 ED.ConjunctivalSuture.prototype.setParameterDefaults = function() {
 	this.apexX = this.boundaryWidth/2;
-	this.setParameterFromString('shape', 'Purse String');
+	this.setParameterFromString('type', 'Purse String');
 
 	var doodle = this.drawing.lastDoodleOfClass(this.className);
 	if (doodle) {
@@ -17334,7 +17479,7 @@ ED.ConjunctivalSuture.prototype.setParameterDefaults = function() {
 	} else {
 		var np = new ED.Point(0, 0);
 		var m = (this.drawing.eye == ED.eye.Right ? 11 : 1);
-		np.setWithPolars(380, m * Math.PI / 6);
+		np.setWithPolars(290, m * Math.PI / 6);
 		this.move(np.x, np.y);
 	}
 }
@@ -17351,7 +17496,7 @@ ED.ConjunctivalSuture.prototype.dependentParameterValues = function(_parameter, 
 	var returnArray = new Array();
 
 	switch (_parameter) {
-		case 'shape':
+		case 'type':
 			if (_value == 'Mattress' || _value == 'Continuous'){
 				this.boundaryWidth = 160;
 				this.boundaryHeight = 50;
@@ -17422,7 +17567,7 @@ ED.ConjunctivalSuture.prototype.draw = function(_point) {
 		var endLength = 20;
 		var r = this.boundaryHeight/2;
 		ctx.beginPath();
-		switch (this.shape) {
+		switch (this.type) {
 			case 'Purse String':
 				ctx.arc(0, 0, r, 0, Math.PI * 2, true);
 				ctx.moveTo(0 - endLength, r + endLength)
@@ -17476,7 +17621,7 @@ ED.ConjunctivalSuture.prototype.draw = function(_point) {
 				break;
 		}
 		ctx.lineWidth = 4;
-		ctx.strokeStyle = "green";
+		ctx.strokeStyle = "blue";
 		ctx.stroke();
 	}
 
@@ -17499,7 +17644,7 @@ ED.ConjunctivalSuture.prototype.draw = function(_point) {
 ED.ConjunctivalSuture.prototype.description = function() {
 	var returnValue;
 
-	returnValue = this.size + " " + this.type + " " + this.shape + " conjunctival suture at " + this.clockHour() + " o'clock";
+	returnValue = this.size + " " + this.material + " " + this.type + " conjunctival suture at " + this.clockHour() + " o'clock";
 
 	return returnValue;
 }
@@ -29267,6 +29412,14 @@ ED.Patch.prototype.setParameterDefaults = function() {
 				break;	
 		}
 	}
+
+	// Different size and position for a trabeculectomy flap
+	var doodle = this.drawing.lastDoodleOfClass("TrabyFlap");
+	if (doodle) {
+		this.originY = -360;
+		this.width = 488;
+		this.height = 228;
+	}
 }
 
 /**
@@ -36798,6 +36951,168 @@ ED.Trabectome.prototype.description = function() {
  */
 
 /**
+ * Peripheral retinectomy
+ *
+ * @class TrabyConjIncision
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Object} _parameterJSON
+ */
+ED.TrabyConjIncision = function(_drawing, _parameterJSON) {
+	// Set classname
+	this.className = "TrabyConjIncision";
+
+	// Saved parameters
+	this.savedParameterArray = ['arc', 'rotation'];
+	
+	// Call super-class constructor
+	ED.Doodle.call(this, _drawing, _parameterJSON);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.TrabyConjIncision.prototype = new ED.Doodle;
+ED.TrabyConjIncision.prototype.constructor = ED.TrabyConjIncision;
+ED.TrabyConjIncision.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.TrabyConjIncision.prototype.setHandles = function() {
+	this.handleArray[0] = new ED.Handle(null, true, ED.Mode.Arc, false);
+}
+
+/**
+ * Sets default properties
+ */
+ED.TrabyConjIncision.prototype.setPropertyDefaults = function() {
+	this.isMoveable = false;
+	this.isArcSymmetrical = true
+
+	// Update component of validation array for simple parameters
+	this.parameterValidationArray['arc']['range'].setMinAndMax(Math.PI / 8, Math.PI);
+}
+
+/**
+ * Sets default parameters (Only called for new doodles)
+ * Use the setParameter function for derived parameters, as this will also update dependent variables
+ */
+ED.TrabyConjIncision.prototype.setParameterDefaults = function() {
+	this.arc = 80 * Math.PI / 180;
+
+	// If more than one, rotate it a bit to distinguish it
+	var doodle = this.drawing.lastDoodleOfClass(this.className);
+	if (doodle) {
+		this.rotation = doodle.rotation + Math.PI / 4;
+	} else {
+		this.rotation = 0;
+	}
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.TrabyConjIncision.prototype.draw = function(_point) {
+	// Get context
+	var ctx = this.drawing.context;
+
+	// Call draw method in superclass
+	ED.TrabyConjIncision.superclass.draw.call(this, _point);
+
+	// Radius of outer end of radial incision
+	var ro = 660;
+	var ri = 400;
+
+	// Calculate parameters for arcs
+	var theta = this.arc / 2;
+	var arcStart = -Math.PI / 2 + theta;
+	var arcEnd = -Math.PI / 2 - theta;
+	
+	// Coordinates of 'corners'
+	var topRightX = ro * Math.sin(theta);
+	var topRightY = -ro * Math.cos(theta);
+	var topLeftX = -ro * Math.sin(theta);
+	var topLeftY = topRightY;
+	var bottomRightX = ri * Math.sin(theta);
+	var bottomRightY = -ri * Math.cos(theta);
+	var bottomLeftX = -ri * Math.sin(theta);
+	var bottomLeftY = bottomRightY;
+
+	// Boundary path
+	ctx.beginPath();
+
+	// Arc across to mirror image point on the other side
+	ctx.arc(0, 0, ro, arcStart, arcEnd, true);
+
+	// Arc back to mirror image point on the other side
+	ctx.arc(0, 0, ri, arcEnd, arcStart, false);
+
+	// Set line attributes
+	ctx.lineWidth = 4;
+	ctx.fillStyle = "rgba(255,255,0,0)";
+	ctx.strokeStyle = "rgba(255,0,255,0)";
+
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+
+	// Other paths and drawing here
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+		// Path for incision
+		ctx.beginPath();
+
+		// Path
+		ctx.moveTo(topRightX, topRightY);
+		ctx.lineTo(bottomRightX, bottomRightY);
+		ctx.arc(0, 0, ri, arcStart, arcEnd, true);
+		ctx.lineTo(topLeftX, topLeftY);
+
+		// Draw retinectomy
+		ctx.lineWidth = 4;
+		ctx.strokeStyle = "gray";
+		ctx.stroke();
+	}
+
+	// Coordinates of handles (in canvas plane)limbus
+	this.handleArray[0].location = this.transform.transformPoint(new ED.Point(topLeftX, topLeftY));
+
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+
+	// Return value indicating successful hit test
+	return this.isClicked;
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.TrabyConjIncision.prototype.description = function() {
+	return "";
+}
+
+/**
+ * OpenEyes
+ *
+ * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
+ * (C) OpenEyes Foundation, 2011-2013
+ * This file is part of OpenEyes.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package OpenEyes
+ * @link http://www.openeyes.org.uk
+ * @author OpenEyes <info@openeyes.org.uk>
+ * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
+ * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ */
+
+/**
  * TrabyFlap
  *
  * @class TrabyFlap
@@ -36863,19 +37178,19 @@ ED.TrabyFlap.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'string',
 		list: ['Superior', 'Superonasal', 'Superotemporal'],
-		animate: true
+		animate: false
 	};
 	this.parameterValidationArray['size'] = {
 		kind: 'derived',
 		type: 'string',
 		list: ['4x3', '5x2'],
-		animate: true
+		animate: false
 	};
 	this.parameterValidationArray['sclerostomy'] = {
 		kind: 'derived',
 		type: 'string',
-		list: ['Punch', 'Block'],
-		animate: true
+		list: ['Punch', 'Block', 'Ex-Press shunt'],
+		animate: false
 	};
 
 	// Array of arcs to snap to
@@ -36907,7 +37222,8 @@ ED.TrabyFlap.prototype.dependentParameterValues = function(_parameter, _value) {
 	switch (_parameter) {
 
 		case 'apexX':
-			if (_value < 0) returnArray['sclerostomy'] = 'Punch';
+			if (_value < -15) returnArray['sclerostomy'] = 'Punch';
+			else if (_value > + 15) returnArray['sclerostomy'] = 'Ex-Press shunt';
 			else returnArray['sclerostomy'] = 'Block';
 			break;
 
@@ -36962,6 +37278,9 @@ ED.TrabyFlap.prototype.dependentParameterValues = function(_parameter, _value) {
 					returnArray['apexX'] = -50;
 					break;
 				case 'Block':
+					returnArray['apexX'] = +0;
+					break;
+				case 'Ex-Press shunt':
 					returnArray['apexX'] = +50;
 					break;
 			}
@@ -37026,19 +37345,29 @@ ED.TrabyFlap.prototype.draw = function(_point) {
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
 		ctx.beginPath();
 
-		if (this.sclerostomy == 'Punch') {
-			ctx.arc(0, this.apexY, 50, 0, 2 * Math.PI, true);
-		} else {
-			// Draw block at half width and height
-			var angle = theta / 2;
-			arcStart = -Math.PI / 2 + angle;
-			arcEnd = -Math.PI / 2 - angle;
-			var top = new ED.Point(0, -this.r + (this.height + this.r) / 2);
+		switch (this.sclerostomy) {
+			case 'Punch':
+				ctx.arc(0, this.apexY, 50, 0, 2 * Math.PI, true);
+				break;
+			case 'Block':
+				// Draw block at half width and height
+				var angle = theta / 2;
+				arcStart = -Math.PI / 2 + angle;
+				arcEnd = -Math.PI / 2 - angle;
+				var top = new ED.Point(0, -this.r + (this.height + this.r) / 2);
 
-			ctx.arc(0, 0, this.r, arcStart, arcEnd, true);
-			ctx.lineTo(-this.r * Math.sin(angle), top.y);
-			ctx.lineTo(this.r * Math.sin(angle), top.y);
-			ctx.closePath();
+				ctx.arc(0, 0, this.r, arcStart, arcEnd, true);
+				ctx.lineTo(-this.r * Math.sin(angle), top.y);
+				ctx.lineTo(this.r * Math.sin(angle), top.y);
+				ctx.closePath();
+				break;
+			case 'Ex-Press shunt':
+				ctx.arc(0, this.apexY, 40, 0, 2 * Math.PI, true);
+				ctx.moveTo(- 20, -420);
+				ctx.lineTo(-20, -300);
+				ctx.lineTo(20, -300);
+				ctx.lineTo(20, -420);
+				break;
 		}
 
 		// Colour of fill
@@ -37098,18 +37427,18 @@ ED.TrabySuture = function(_drawing, _parameterJSON) {
 	this.className = "TrabySuture";
 
 	// Derived parameters
-	this.shape = 'Releasable';
-	this.type = 'Nylon';
+	this.type = 'Fixed';
+	this.material = 'Nylon';
 	this.size = '10/0';
 	
-	// Number of handles for releasable suture
+	// Number of additional handles for releasable suture
 	this.numberOfHandles = 5;
 
 	// Saved parameters
-	this.savedParameterArray = ['originX', 'originY', 'apexX', 'apexY', 'arc', 'rotation', 'shape', 'type', 'size'];
+	this.savedParameterArray = ['originX', 'originY', 'apexX', 'apexY', 'arc', 'rotation', 'type', 'material', 'size'];
 
 	// Parameters in doodle control bar (parameter name: parameter label)
-	this.controlParameterArray = {'shape':'Shape', 'type':'Type', 'size':'Size'};
+	this.controlParameterArray = {'type':'Shape', 'material':'Material', 'size':'Size'};
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -37126,12 +37455,8 @@ ED.TrabySuture.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.TrabySuture.prototype.setHandles = function() {
-	// Array of handles for releasable suture
-	for (var i = 0; i < this.numberOfHandles; i++) {
-		this.handleArray[i] = new ED.Handle(null, true, ED.Mode.Handles, false);
-	}
-
-	//this.handleArray[this.numberOfHandles] = new ED.Handle(null, true, ED.Mode.Rotate, false);
+	// Rotation Handle
+	this.handleArray[0] = new ED.Handle(null, true, ED.Mode.Rotate, false);
 }
 
 /**
@@ -37143,23 +37468,23 @@ ED.TrabySuture.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['apexY']['range'].setMinAndMax(+70, +70);
 
 	// Add complete validation arrays for derived parameters
-	this.parameterValidationArray['shape'] = {
-		kind: 'derived',
-		type: 'string',
-		list: ['Fixed', 'Adjustable', 'Releasable'],
-		animate: true
-	};
 	this.parameterValidationArray['type'] = {
 		kind: 'derived',
 		type: 'string',
+		list: ['Fixed', 'Adjustable', 'Releasable'],
+		animate: false
+	};
+	this.parameterValidationArray['material'] = {
+		kind: 'derived',
+		type: 'string',
 		list: ['Nylon', 'Prolene', 'Vicryl', 'Silk'],
-		animate: true
+		animate: false
 	}
 	this.parameterValidationArray['size'] = {
 		kind: 'derived',
 		type: 'string',
 		list: ['11/0', '10/0', '9/0', '8/0', '7/0', '6/0'],
-		animate: true
+		animate: false
 	}
 }
 
@@ -37169,8 +37494,8 @@ ED.TrabySuture.prototype.setPropertyDefaults = function() {
 ED.TrabySuture.prototype.setParameterDefaults = function() {
 	this.apexX = +50;
 	this.apexY = +70;
-	this.shape = 'Releasable';
-	this.type = 'Nylon';
+	this.type = 'Releasable';
+	this.material = 'Nylon';
 	this.size = '10/0';
 	
 	// Create a squiggle to store the handles points
@@ -37179,56 +37504,20 @@ ED.TrabySuture.prototype.setParameterDefaults = function() {
 	// Add it to squiggle array
 	this.squiggleArray.push(squiggle);
 
-	// Populate handle array
+	// Populate handle array (value of d determines size) for releasable suture
+	var d = 50;
 	var positionSet = [
-		{x: 100, y: -100},
-		{x: -100, y: 100},
-		{x: -100, y: 200},
-		{x: 0, y: 250},
-		{x: 100, y: 200},
+		{x: d, y: -d},
+		{x: -d, y: d},
+		{x: -d, y: 3 * d},
+		{x: 0, y: 7 * d},
+		{x: d, y: 2 * d},
 	];
 	for (var i = 0; i < positionSet.length; i++) {
 		var point = new ED.Point(positionSet[i].x, positionSet[i].y);
 		this.addPointToSquiggle(point);
 	}
 }
-
-/**
- * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
- * The returned parameters are animated if their 'animate' property is set to true
- *
- * @param {String} _parameter Name of parameter that has changed
- * @value {Undefined} _value Value of parameter to calculate
- * @returns {Array} Associative array of values of dependent parameters
- */ 
- /*
-ED.TrabySuture.prototype.dependentParameterValues = function(_parameter, _value) {
-	var returnArray = new Array();
-
-	switch (_parameter) {
-		case 'apexX':
-			if (_value > 17) returnArray['shape'] = "Releasable";
-			else if (_value > -17) returnArray['shape'] = "Adjustable";
-			else returnArray['shape'] = "Fixed";
-			break;
-
-		case 'shape':
-			switch (_value) {
-				case 'Fixed':
-					returnArray['apexX'] = -50;
-					break;
-				case 'Adjustable':
-					returnArray['apexX'] = 0;
-					break;
-				case 'Releasable':
-					returnArray['apexX'] = +50;
-					break;
-			}
-	}
-
-	return returnArray;
-}
-*/
 
 /**
  * Draws doodle or performs a hit test if a Point parameter is passed
@@ -37266,96 +37555,47 @@ ED.TrabySuture.prototype.draw = function(_point) {
 		ctx.beginPath();
 
 		// Type of suture
-		switch (this.shape) {
+		switch (this.type) {
 			case 'Releasable':
-// 				ctx.moveTo(-2, 64);
-// 				ctx.bezierCurveTo(20, 36, -15, 16, -16, -7);
-// 				ctx.bezierCurveTo(-18, -30, -12, -43, -4, -43);
-// 				ctx.bezierCurveTo(6, -43, 12, -28, 12, -9);
-// 				ctx.bezierCurveTo(12, 11, 0, 23, -2, 30);
-// 				ctx.bezierCurveTo(-3, 36, 3, 37, 2, 30);
-// 				ctx.bezierCurveTo(2, 20, -4, 24, -3, 29);
-// 				ctx.bezierCurveTo(-3, 36, 14, 37, 23, 56);
-// 				ctx.bezierCurveTo(32, 74, 34, 100, 34, 100);
-				
-				// From point
-				//var fp = new ED.Point(34, 100);
+				// Decorative knot between first two points
+				var fp = this.squiggleArray[0].pointsArray[0];
+				ctx.moveTo(fp.x, fp.y);
+				var tp = this.squiggleArray[0].pointsArray[1];
+								
+				// ***TODO*** not sure this function is working as planned, but result here is OK
+				var cp1 = fp.pointAtAngleToLineToPointAtProportion(Math.PI/3, tp, 0.5);
+				var cp2 = fp.pointAtAngleToLineToPointAtProportion(-Math.PI/3, tp, 0.5);
+				ctx.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, tp.x, tp.y);
 
-				// Suture exit through cornea
-				// 				var ep = new ED.Point(this.firstOriginX, -60);
-				//
-				// 				// Set up a new transform and centre in canvas
-				// 				var at = new ED.AffineTransform();
-				// 				at.translate(150, 150);
-				//
-				// 				// Add rotation of traby flap and transform
-				// 				var trab = this.drawing.lastDoodleOfClass('TrabyFlap');
-				// 				if (trab) at.rotate(trab.rotation);
-				// 				var np = at.transformPoint(ep);
-				//
-				// 				// Tranform back to get fixed point in canvas
-				// 				var pp = this.inverseTransform.transformPoint(np);
-				// 				ctx.lineTo(pp.x, pp.y);
-
-				/*
-				// Suture exit through cornea
-				var ep = new ED.Point(this.firstOriginX, -60);
-
-				// Set up a new transform and centre in canvas
-				var at = new ED.AffineTransform();
-				at.translate(150, 150);
-
-				// Add rotation of traby flap and transform
-				var trab = this.drawing.lastDoodleOfClass('TrabyFlap');
-				if (trab) at.rotate(trab.rotation);
-
-				var tep = at.transformPoint(ep);
-
-				// Transform back to get fixed point
-				var fep = this.inverseTransform.transformPoint(tep);
-
-				// Calculate a midpoint
-				var d = 119 / 8;
-				if (this.id == 5) d = d * 0;
-				else if (this.id == 6) d = d * +1;
-				else d = d * -1;
-
-				var mp = new ED.Point(this.firstOriginX - d, -90);
-				var tmp = at.transformPoint(mp);
-				var fmp = this.inverseTransform.transformPoint(tmp);
-
-				ctx.bezierCurveTo(fmp.x, fmp.y, fmp.x, fmp.y, fep.x, fep.y);
-				//ctx.lineTo(fmp.x, fmp.y);
-				//ctx.lineTo(fep.x, fep.y);
-				*/
-
-				// Releasable
-// 				var fp;
-// 				var tp;
-// 				var cp1;
-// 				var cp2;
-
-				// Angle of control point from radius line to point (this value makes path a circle Math.PI/12 for 8 points
-				//var phi = 2 * Math.PI / (10 * this.numberOfHandles);
-				
-				tp = this.squiggleArray[0].pointsArray[0];
+				// First three segments are straight				
+				var tp = this.squiggleArray[0].pointsArray[0];
 				ctx.moveTo(tp.x, tp.y);
-				
-				for (var i = 1; i < this.numberOfHandles; i++) {
-
-					// To point
+				for (var i = 1; i < 3; i++) {
 					tp = this.squiggleArray[0].pointsArray[i];
-
-					// Control points
-// 					cp1 = new ED.Point(fp.x + (tp.x - fp.x)/3, fp.y);
-// 					cp2 = new ED.Point(fp.x + 2 * (tp.x - fp.x)/3, tp.y);
-
-					// Draw Bezier curve
-					//ctx.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, tp.x, tp.y);
 					ctx.lineTo(tp.x, tp.y);
 					fp = tp;
 				}
-			
+				
+				// Next two segments are curved
+				var fp = this.squiggleArray[0].pointsArray[2];
+				var tp = this.squiggleArray[0].pointsArray[3];
+				var p = 2;
+				var cp1 = new ED.Point(fp.x, fp.y + (tp.y - fp.y)/p);
+				var cp2 = new ED.Point(tp.x - (tp.x - fp.x)/p, tp.y);				
+				ctx.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, tp.x, tp.y);
+				
+				fp = this.squiggleArray[0].pointsArray[3];
+				tp = this.squiggleArray[0].pointsArray[4];
+				p = 2;
+				cp1 = new ED.Point(fp.x + (tp.x - fp.x)/p, fp.y);
+				cp2 = new ED.Point(tp.x, tp.y - (tp.y - fp.y)/p);
+				ctx.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, tp.x, tp.y);
+					
+				// Array of handles for releasable suture
+				for (var i = 0; i < this.numberOfHandles; i++) {
+					this.handleArray[i] = new ED.Handle(null, true, ED.Mode.Handles, false);
+					this.handleArray[i].location = this.transform.transformPoint(this.squiggleArray[0].pointsArray[i]);
+				}
 				break;
 
 			case 'Adjustable':
@@ -37368,6 +37608,10 @@ ED.TrabySuture.prototype.draw = function(_point) {
 				ctx.bezierCurveTo(2, 20, -4, 24, -3, 29);
 				ctx.bezierCurveTo(-3, 36, 14, 37, 23, 56);
 				ctx.bezierCurveTo(32, 74, 34, 100, 34, 100);
+				
+				this.handleArray.length = 1;
+				this.handleArray[0] = new ED.Handle(null, true, ED.Mode.Rotate, false);
+				this.handleArray[0].location = this.transform.transformPoint(new ED.Point(40, -70));
 				break;
 
 			case 'Fixed':
@@ -37377,6 +37621,10 @@ ED.TrabySuture.prototype.draw = function(_point) {
 				ctx.moveTo(-5, 50);
 				ctx.lineTo(0, 30);
 				ctx.lineTo(5, 50);
+				
+				this.handleArray.length = 1;
+				this.handleArray[0] = new ED.Handle(null, true, ED.Mode.Rotate, false);
+				this.handleArray[0].location = this.transform.transformPoint(new ED.Point(40, -70));
 				break;
 		}
 
@@ -37389,11 +37637,6 @@ ED.TrabySuture.prototype.draw = function(_point) {
 		ctx.stroke();
 	}
 
-	// Coordinates of handles (in canvas plane)
-	for (var i = 0; i < this.numberOfHandles; i++) {
-		this.handleArray[i].location = this.transform.transformPoint(this.squiggleArray[0].pointsArray[i]);
-	}
-
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
 
@@ -37402,31 +37645,12 @@ ED.TrabySuture.prototype.draw = function(_point) {
 }
 
 /**
- * Draws extra items if the doodle is highlighted
- */
- /*
-ED.TrabySuture.prototype.drawHighlightExtras = function() {
-	// Get context
-	var ctx = this.drawing.context;
-
-	// Draw text description of gauge
-	ctx.lineWidth = 1;
-	ctx.fillStyle = "gray";
-	ctx.font = "64px sans-serif";
-	ctx.fillText(this.shape, 80, 0 + 20);
-}
-*/
-
-
-/**
  * Returns a string containing a text description of the doodle
  *
  * @returns {String} Description of doodle
  */
 ED.TrabySuture.prototype.description = function() {
-	var returnValue;
-
-	returnValue = this.size + " " + this.type + " " + this.shape + " suture at " + this.clockHour() + " o'clock";
+	var returnValue = this.size + " " + this.material + " " + this.type + " suture at " + this.clockHour() + " o'clock";
 
 	return returnValue;
 }

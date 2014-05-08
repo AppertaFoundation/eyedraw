@@ -34,15 +34,15 @@ ED.ConjunctivalSuture = function(_drawing, _parameterJSON) {
 	this.orientated = true;
 
 	// Derived parameters
-	this.shape = "Buried Mattress";
-	this.type = 'Nylon';
+	this.type = "Buried Mattress";
+	this.material = 'Nylon';
 	this.size = '10/0';
 
 	// Saved parameters
-	this.savedParameterArray = ['originX', 'originY', 'rotation', 'orientated', 'shape', 'type', 'size'];
+	this.savedParameterArray = ['originX', 'originY', 'rotation', 'orientated', 'type', 'material', 'size'];
 
 	// Parameters in doodle control bar (parameter name: parameter label)
-	this.controlParameterArray = {'orientated':'Orientated', 'shape':'Shape', 'type':'Type', 'size':'Size'};
+	this.controlParameterArray = {'orientated':'Orientated', 'type':'Type', 'material':'Material', 'size':'Size'};
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -75,28 +75,28 @@ ED.ConjunctivalSuture.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['apexY']['range'].setMinAndMax(-0, +0);
 
 	// Add complete validation arrays for derived parameters
-	this.parameterValidationArray['shape'] = {
-		kind: 'derived',
-		type: 'string',
-		list: ['Purse String', 'Mattress', 'Buried Mattress', 'Interrupted', 'Continuous'],
-		animate: true
-	};
 	this.parameterValidationArray['type'] = {
 		kind: 'derived',
 		type: 'string',
+		list: ['Purse String', 'Mattress', 'Buried Mattress', 'Interrupted', 'Continuous'],
+		animate: false
+	};
+	this.parameterValidationArray['material'] = {
+		kind: 'derived',
+		type: 'string',
 		list: ['Nylon', 'Prolene', 'Vicryl', 'Silk'],
-		animate: true
+		animate: false
 	}
 	this.parameterValidationArray['size'] = {
 		kind: 'derived',
 		type: 'string',
 		list: ['11/0', '10/0', '9/0', '8/0', '7/0', '6/0'],
-		animate: true
+		animate: false
 	}
 	this.parameterValidationArray['orientated'] = {
 		kind: 'derived',
 		type: 'bool',
-		display: true
+		display: false
 	};
 }
 
@@ -106,7 +106,7 @@ ED.ConjunctivalSuture.prototype.setPropertyDefaults = function() {
  */
 ED.ConjunctivalSuture.prototype.setParameterDefaults = function() {
 	this.apexX = this.boundaryWidth/2;
-	this.setParameterFromString('shape', 'Purse String');
+	this.setParameterFromString('type', 'Purse String');
 
 	var doodle = this.drawing.lastDoodleOfClass(this.className);
 	if (doodle) {
@@ -119,7 +119,7 @@ ED.ConjunctivalSuture.prototype.setParameterDefaults = function() {
 	} else {
 		var np = new ED.Point(0, 0);
 		var m = (this.drawing.eye == ED.eye.Right ? 11 : 1);
-		np.setWithPolars(380, m * Math.PI / 6);
+		np.setWithPolars(290, m * Math.PI / 6);
 		this.move(np.x, np.y);
 	}
 }
@@ -136,7 +136,7 @@ ED.ConjunctivalSuture.prototype.dependentParameterValues = function(_parameter, 
 	var returnArray = new Array();
 
 	switch (_parameter) {
-		case 'shape':
+		case 'type':
 			if (_value == 'Mattress' || _value == 'Continuous'){
 				this.boundaryWidth = 160;
 				this.boundaryHeight = 50;
@@ -207,7 +207,7 @@ ED.ConjunctivalSuture.prototype.draw = function(_point) {
 		var endLength = 20;
 		var r = this.boundaryHeight/2;
 		ctx.beginPath();
-		switch (this.shape) {
+		switch (this.type) {
 			case 'Purse String':
 				ctx.arc(0, 0, r, 0, Math.PI * 2, true);
 				ctx.moveTo(0 - endLength, r + endLength)
@@ -261,7 +261,7 @@ ED.ConjunctivalSuture.prototype.draw = function(_point) {
 				break;
 		}
 		ctx.lineWidth = 4;
-		ctx.strokeStyle = "green";
+		ctx.strokeStyle = "blue";
 		ctx.stroke();
 	}
 
@@ -284,7 +284,7 @@ ED.ConjunctivalSuture.prototype.draw = function(_point) {
 ED.ConjunctivalSuture.prototype.description = function() {
 	var returnValue;
 
-	returnValue = this.size + " " + this.type + " " + this.shape + " conjunctival suture at " + this.clockHour() + " o'clock";
+	returnValue = this.size + " " + this.material + " " + this.type + " conjunctival suture at " + this.clockHour() + " o'clock";
 
 	return returnValue;
 }

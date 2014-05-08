@@ -105,6 +105,14 @@ ED.Patch.prototype.setParameterDefaults = function() {
 				break;	
 		}
 	}
+
+	// Different size and position for a trabeculectomy flap
+	var doodle = this.drawing.lastDoodleOfClass("TrabyFlap");
+	if (doodle) {
+		this.originY = -360;
+		this.width = 488;
+		this.height = 228;
+	}
 }
 
 /**

@@ -82,19 +82,19 @@ ED.TrabyFlap.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'string',
 		list: ['Superior', 'Superonasal', 'Superotemporal'],
-		animate: true
+		animate: false
 	};
 	this.parameterValidationArray['size'] = {
 		kind: 'derived',
 		type: 'string',
 		list: ['4x3', '5x2'],
-		animate: true
+		animate: false
 	};
 	this.parameterValidationArray['sclerostomy'] = {
 		kind: 'derived',
 		type: 'string',
-		list: ['Punch', 'Block'],
-		animate: true
+		list: ['Punch', 'Block', 'Ex-Press shunt'],
+		animate: false
 	};
 
 	// Array of arcs to snap to
@@ -126,7 +126,8 @@ ED.TrabyFlap.prototype.dependentParameterValues = function(_parameter, _value) {
 	switch (_parameter) {
 
 		case 'apexX':
-			if (_value < 0) returnArray['sclerostomy'] = 'Punch';
+			if (_value < -15) returnArray['sclerostomy'] = 'Punch';
+			else if (_value > + 15) returnArray['sclerostomy'] = 'Ex-Press shunt';
 			else returnArray['sclerostomy'] = 'Block';
 			break;
 
@@ -181,6 +182,9 @@ ED.TrabyFlap.prototype.dependentParameterValues = function(_parameter, _value) {
 					returnArray['apexX'] = -50;
 					break;
 				case 'Block':
+					returnArray['apexX'] = +0;
+					break;
+				case 'Ex-Press shunt':
 					returnArray['apexX'] = +50;
 					break;
 			}
@@ -245,19 +249,29 @@ ED.TrabyFlap.prototype.draw = function(_point) {
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
 		ctx.beginPath();
 
-		if (this.sclerostomy == 'Punch') {
-			ctx.arc(0, this.apexY, 50, 0, 2 * Math.PI, true);
-		} else {
-			// Draw block at half width and height
-			var angle = theta / 2;
-			arcStart = -Math.PI / 2 + angle;
-			arcEnd = -Math.PI / 2 - angle;
-			var top = new ED.Point(0, -this.r + (this.height + this.r) / 2);
+		switch (this.sclerostomy) {
+			case 'Punch':
+				ctx.arc(0, this.apexY, 50, 0, 2 * Math.PI, true);
+				break;
+			case 'Block':
+				// Draw block at half width and height
+				var angle = theta / 2;
+				arcStart = -Math.PI / 2 + angle;
+				arcEnd = -Math.PI / 2 - angle;
+				var top = new ED.Point(0, -this.r + (this.height + this.r) / 2);
 
-			ctx.arc(0, 0, this.r, arcStart, arcEnd, true);
-			ctx.lineTo(-this.r * Math.sin(angle), top.y);
-			ctx.lineTo(this.r * Math.sin(angle), top.y);
-			ctx.closePath();
+				ctx.arc(0, 0, this.r, arcStart, arcEnd, true);
+				ctx.lineTo(-this.r * Math.sin(angle), top.y);
+				ctx.lineTo(this.r * Math.sin(angle), top.y);
+				ctx.closePath();
+				break;
+			case 'Ex-Press shunt':
+				ctx.arc(0, this.apexY, 40, 0, 2 * Math.PI, true);
+				ctx.moveTo(- 20, -420);
+				ctx.lineTo(-20, -300);
+				ctx.lineTo(20, -300);
+				ctx.lineTo(20, -420);
+				break;
 		}
 
 		// Colour of fill
