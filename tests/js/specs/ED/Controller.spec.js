@@ -162,6 +162,20 @@
 				expect(spy.called).to.be.true;
 				spy.reset();
 			});
+
+			it('should not create view instances if the eyedraw is not in edit mode', function() {
+
+				var properties = $.extend({}, defaultProperties, {
+					isEditable: false
+				});
+
+				var controller = new ED.Controller(properties);
+
+				expect(controller.mainToolbar).to.be.undefined;
+				expect(controller.canvasToolbar).to.be.undefined;
+				expect(controller.doodlePopup).to.be.undefined;
+				expect(controller.selectedDoodle).to.be.undefined;
+			});
 		});
 
 		describe('Handling drawing events', function() {

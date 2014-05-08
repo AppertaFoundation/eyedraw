@@ -3,16 +3,16 @@
     <head>
         <!-- EyeDraw CSS style sheet -->
         <link rel="stylesheet" href="../css/oe-eyedraw.css" type="text/css" media="screen" />
-        
+
         <!-- Mandatory file containing key drawing classes -->
         <script src="../js/eyedraw.js" type="text/javascript"></script>
-        
+
         <!-- This script handles the drawings for the page -->
         <script type="text/javascript">
-            
+
             // Assign a global variable to the drawing
             var drawingEdit;
-            
+
             // Runs on page load
             function init()
             {
@@ -21,23 +21,23 @@
 
                 // Create a controller object for this drawing
                 var controller = new eyeDrawController(drawingEdit);
-                
+
                 // Initialise drawing
                 drawingEdit.init();
             }
-            
+
             // Controller class
             function eyeDrawController(_drawing)
             {
                 // Register controller for notifications
                 _drawing.registerForNotifications(this, 'notificationHandler', []);
-                
+
                 // Method called for notification
                 this.notificationHandler = function(_messageArray)
                 {
                     // Element used to display saved content for debugging purposes
                     var saveInput = document.getElementById('saveInput');
-                    
+
                     switch (_messageArray['eventName'])
                     {
                         // Ready notification
@@ -55,44 +55,44 @@
                                                  }
                                                  }
                                                  );
-                        
+
                             _drawing.addDeleteValues({Eyedraw_stringField1:'None'});
-                        
+
                             _drawing.deselectDoodles();
-                        
+
                             break;
-                        
+
                         case 'doodleAdded':
                             saveInput.value = _drawing.save();
                             break;
-                        
+
                         case 'doodleDeleted':
                             saveInput.value = _drawing.save();
                             break;
-                        
+
                         case 'mousedragged':
                             saveInput.value = _drawing.save();
                             break;
-                        
+
                         case 'parameterChanged':
                             saveInput.value = _drawing.save();
                             break;
                     }
                 }
             }
-            
+
              </script>
     </head>
     <body onload="init();">
-        
+
         <!-- Toolbar -->
         <button class="imgbutton" disabled="disabled" id="deleteSelectedDoodleRPS" title="Delete" onclick="drawingEdit.deleteSelectedDoodle(); return false;" ><img src="img/deleteSelectedDoodle.gif" /></button>
         <button class="imgbutton" id="PhakoIncisionRPS" onclick="drawingEdit.addDoodle('PhakoIncision'); return false;" ><img src="img/PhakoIncision.gif" /></button>
         <br/>
-        
+
         <!-- Canvas tooltip -->
         <span class="canvasTooltip" id="canvasEditTooltip"></span>
-        
+
         <!-- Canvas element -->
         <canvas id="canvasEdit" class="ed_canvas_edit" width="300" height="300" tabindex="1"></canvas>
 
@@ -103,14 +103,14 @@
             <option value="3" data-edval="Small">Small</option>
         </select>
 
-        
-        
+
+
         <input type="text" id="transpositionInput" value='None' />
 
 
         <input id="pxeCheckBox" value="1" type="checkbox">
          -->
-    
+
         <select id="Eyedraw_stringField1">
             <option value="0" data-edval="None">None</option>
             <option value="1" selected="selected" data-edval="Corneal">Corneal</option>
@@ -123,16 +123,16 @@
             <option value="1" selected="selected" data-edval="Pocket">Pocket</option>
             <option value="2" data-edval="Section">Section</option>
         </select>
-            
-        <!--  
+
+        <!--
         <select id="opticDiscModeSelect">
             <option value="1" data-edval="Basic">Basic</option>
             <option value="2" data-edval="Expert" selected="true">Expert</option>
         </select>
          -->
-            
+
         <button onclick="alert(drawingEdit.report()); return false;" >Report</button>
-        
+
         <br/>
         <textarea rows="4" cols="180" id="saveInput"></textarea>
 

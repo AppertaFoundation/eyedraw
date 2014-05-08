@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<!-- EyeDraw CSS style sheet -->
+		<link rel="stylesheet" href="../../assets/css/oe-eyedraw.css" type="text/css" media="screen" />
+
+		<!-- 3rd-party dependencies -->
+		<script src="../../../assets/components/jquery/jquery.min.js"></script>
+		<script src="../../../assets/components/eventemitter2/lib/eventemitter2.js"></script>
+		<script src="../../../assets/components/mustache/mustache.js"></script>
+
+		<script src="../../../dist/eyedraw.js"></script>
+
+		<!-- This script handles the drawings for the page -->
+		<script type="text/javascript">
+
+			// Assign a global variable to the drawing
+			var drawingEdit;
+
+			// Runs on page load
+			function init()
+			{
+				// Create a drawing linked to the canvas
+				drawingEdit = new ED.Drawing(document.getElementById('canvasEdit'), ED.eye.Right, 'RPS', true, {
+					graphicsPath: "../../assets/img/",
+				});
+
+				// Create a controller object for this drawing
+				var controller = new eyeDrawController(drawingEdit);
+
+				// Initialise drawing
+				drawingEdit.init();
+			}
+
+			// Controller class
+			function eyeDrawController(_drawing)
+			{
+				// Register controller for notifications
+				_drawing.registerForNotifications(this, 'notificationHandler', ['ready']);
+
+				// Method called for notification
+				this.notificationHandler = function(_messageArray)
+				{
+					switch (_messageArray['eventName'])
+					{
+						// Ready notification
+						case 'ready':
+							_drawing.addDoodle('GraphAxes');
+							_drawing.addDoodle('Slider2D', {}, {
+								sphereSign:{id:'r_sph_sign'},
+								sphereInteger:{id:'r_sph_int'},
+								sphereFractional:{id:'r_sph_fra'},
+								cylinderSign:{id:'r_cyl_sign'},
+								cylinderInteger:{id:'r_cyl_int'},
+								cylinderFractional:{id:'r_cyl_fra'},
+								});
+						break;
+					}
+				}
+			}
+		</script>
+	</head>
+	<body onload="init();">
+
+		<!-- Canvas element -->
+		<canvas id="canvasEdit" class="ed_canvas_edit" width="300" height="300" tabindex="1"></canvas>
+
+		<!-- Sphere -->
+		<select id="r_sph_sign">
+			<option value="+">+</option>
+			<option value="="> </option>
+			<option value="-">-</option>
+		</select>
+		<select id="r_sph_int">
+			<option value = 0>0</option>
+			<option value = 1>1</option>
+			<option value = 2>2</option>
+			<option value = 3>3</option>
+			<option value = 4>4</option>
+			<option value = 5>5</option>
+			<option value = 6>6</option>
+			<option value = 7>7</option>
+			<option value = 8>8</option>
+			<option value = 9>9</option>
+			<option value = 10>10</option>
+			<option value = 11>11</option>
+			<option value = 12>12</option>
+			<option value = 13>13</option>
+			<option value = 14>14</option>
+			<option value = 15>15</option>
+			<option value = 16>16</option>
+			<option value = 17>17</option>
+			<option value = 18>18</option>
+			<option value = 19>19</option>
+			<option value = 20>20</option>
+		</select>
+		<select id="r_sph_fra">
+			<option value = ".00">.00</option>
+			<option value = ".25">.25</option>
+			<option value = ".50">.50</option>
+			<option value = ".75">.75</option>
+		</select>
+		<!-- Cylinder -->
+		<select id="r_cyl_sign">
+			<option value="+">+</option>
+			<option value="="> </option>
+			<option value="-">-</option>
+		</select>
+		<select id="r_cyl_int">
+			<option value = 0>0</option>
+			<option value = 1>1</option>
+			<option value = 2>2</option>
+			<option value = 3>3</option>
+			<option value = 4>4</option>
+			<option value = 5>5</option>
+			<option value = 6>6</option>
+			<option value = 7>7</option>
+			<option value = 8>8</option>
+			<option value = 9>9</option>
+			<option value = 10>10</option>
+			<option value = 11>11</option>
+			<option value = 12>12</option>
+			<option value = 13>13</option>
+			<option value = 14>14</option>
+			<option value = 15>15</option>
+			<option value = 16>16</option>
+			<option value = 17>17</option>
+			<option value = 18>18</option>
+			<option value = 19>19</option>
+			<option value = 20>20</option>
+		</select>
+		<select id="r_cyl_fra">
+			<option value = ".00">.00</option>
+			<option value = ".25">.25</option>
+			<option value = ".50">.50</option>
+			<option value = ".75">.75</option>
+		</select>
+		<br />
+	</body>
+</html>
