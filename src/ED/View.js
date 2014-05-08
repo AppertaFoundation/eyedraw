@@ -17,7 +17,7 @@
  * along with OpenEyes.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* global EventEmitter2: false, $: false, Mustache: false */
+/* global EventEmitter2: false, $: false */
 
 var ED = ED || {};
 
@@ -39,11 +39,6 @@ ED.View = (function() {
 	 */
 	function View(drawing, container) {
 		EventEmitter2.call(this);
-
-		this.drawing = drawing;
-		this.container = $(container);
-
-		this.registerForNotifications();
 	}
 
 	View.prototype = Object.create(EventEmitter2.prototype);

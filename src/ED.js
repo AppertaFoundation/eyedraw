@@ -1,3 +1,5 @@
+/* global jQuery:false */
+
 /**
  * Defines the EyeDraw namespace
  * @namespace Namespace for all EyeDraw classes
@@ -23,7 +25,7 @@ ED.squiggleWidth = {
 	Thin: 4,
 	Medium: 12,
 	Thick: 20
-}
+};
 
 /**
  * SquiggleStyle
@@ -31,7 +33,7 @@ ED.squiggleWidth = {
 ED.squiggleStyle = {
 	Outline: 0,
 	Solid: 1
-}
+};
 
 /**
  * Flag to detect double clicks
@@ -44,7 +46,7 @@ ED.recentClick = false;
 ED.eye = {
 	Right: 0,
 	Left: 1
-}
+};
 
 /**
  * Draw function mode (Canvas pointInPath function requires a path)
@@ -52,7 +54,7 @@ ED.eye = {
 ED.drawFunctionMode = {
 	Draw: 0,
 	HitTest: 1
-}
+};
 
 /**
  * Mouse dragging mode
@@ -68,7 +70,7 @@ ED.Mode = {
 	Draw: 7,
 	Select: 8,
 	Size: 9
-}
+};
 
 /**
  * Handle ring
@@ -76,7 +78,7 @@ ED.Mode = {
 ED.handleRing = {
 	Inner: 0,
 	Outer: 1
-}
+};
 
 /**
  * Flag to indicate when the drawing has been modified
@@ -94,25 +96,26 @@ ED.findOffset = function(obj, curleft, curtop) {
 		do {
 			curleft += obj.offsetLeft;
 			curtop += obj.offsetTop;
-		} while (obj = obj.offsetParent);
+		} while (!!(obj = obj.offsetParent));
 		return {
 			left: curleft,
 			top: curtop
 		};
 	}
-}
+};
 
 ED.findPosition = function(obj, event) {
-	if (typeof jQuery != 'undefined') {
-		var offset = jQuery(obj).offset();
+	var offset;
+	if (typeof jQuery !== 'undefined') {
+		offset = jQuery(obj).offset();
 	} else {
-		var offset = ED.findOffset(obj, 0, 0);
+		offset = ED.findOffset(obj, 0, 0);
 	}
 	return {
 		x: event.pageX - offset.left,
 		y: event.pageY - offset.top
 	};
-}
+};
 
 /*
  * Function to test whether a Javascript object is empty
@@ -122,11 +125,13 @@ ED.findPosition = function(obj, event) {
  */
 ED.objectIsEmpty = function(_object) {
 	for (var property in _object) {
-		if (_object.hasOwnProperty(property)) return false;
+		if (_object.hasOwnProperty(property)) {
+			return false;
+		}
 	}
 
 	return true;
-}
+};
 
 /*
  * Returns true if browser is firefox
@@ -143,12 +148,12 @@ ED.isFirefox = function() {
 	} else {
 		return false;
 	}
-}
+};
 
 // Checks that the value is numeric http://stackoverflow.com/questions/18082/validate-numbers-in-javascript-isnumeric
 ED.isNumeric = function(_value) {
-	return (_value - 0) == _value && _value.length > 0;
-}
+	return (_value - 0) === _value && _value.length > 0;
+};
 
 /**
  * Returns 'true' remainder of a number divided by a modulus (i.e. always positive, unlike x%y)
@@ -159,7 +164,7 @@ ED.isNumeric = function(_value) {
  */
 ED.Mod = function Mod(_x, _y) {
 	return _x - Math.floor(_x / _y) * _y;
-}
+};
 
 /**
  * Converts an angle (positive or negative) into a positive angle (ie a bearing)
@@ -177,7 +182,7 @@ ED.positiveAngle = function(_angle) {
 
 	// Return remainder
 	return _angle % circle;
-}
+};
 
 /**
  * Error handler
@@ -188,12 +193,15 @@ ED.positiveAngle = function(_angle) {
  */
 ED.errorHandler = function(_class, _method, _message) {
 	console.log('EYEDRAW ERROR! class: [' + _class + '] method: [' + _method + '] message: [' + _message + ']');
-}
+};
 
+/**
+ * Return a string with the first letter as uppercase.
+ * @param  {String} str The string.
+ */
 ED.firstLetterToUpperCase = function(str) {
 	return str.charAt(0).toUpperCase() + str.slice(1);
 };
-
 
 /**
  * Additional function for String object
@@ -203,7 +211,7 @@ ED.firstLetterToUpperCase = function(str) {
 ED.firstLetterToLowerCase = function(str) {
 	var secondChar = str.charAt(1);
 
-	if (secondChar == secondChar.toUpperCase()) {
+	if (secondChar === secondChar.toUpperCase()) {
 		return str;
 	} else {
 		return str.charAt(0).toLowerCase() + str.slice(1);
@@ -219,19 +227,24 @@ ED.addAndAfterLastComma = function(str) {
 	// Search backwards from end of string for comma
 	var found = false;
 	for (var pos = str.length - 1; pos >= 0; pos--) {
-		if (str.charAt(pos) == ',') {
+		if (str.charAt(pos) === ',') {
 			found = true;
 			break;
 		}
 	}
 
-	if (found) return str.substring(0, pos) + ", and" + str.substring(pos + 1, str.length);
-	else return str;
+	if (found) {
+		return str.substring(0, pos) + ", and" + str.substring(pos + 1, str.length);
+	} else {
+		return str;
+	}
 };
 
 
-ED.titles = {};
-
+/**
+ * Set titles.
+ * @param {Object} titles An object containing the doodle titles.
+ */
 ED.setTitles = function(titles) {
 	this.titles = titles;
 };

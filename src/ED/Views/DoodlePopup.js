@@ -33,11 +33,16 @@ ED.Views.DoodlePopup = (function() {
 	 * DoodlePopup constructor
 	 * @param {ED.Drawing} drawing   A doodle drawing instance.
 	 * @param {HTMLElement} widgetContainer The widget container element
-	 * @extends {EventEmitter2}
+	 * @extends {ED.View}
 	 */
-	function DoodlePopup() {
+	function DoodlePopup(drawing, container) {
 		ED.View.apply(this, arguments);
+
+		this.drawing = drawing;
+		this.container = container;
 		this.delayTimer = 0;
+
+		this.registerForNotifications();
 		this.createToolbar();
 		this.createHelpButton();
 		this.createTemplate();
@@ -54,9 +59,12 @@ ED.Views.DoodlePopup = (function() {
 		this.toolbar.on('button.action', this.render.bind(this));
 	};
 
+	/**
+	 * Create the help button.
+	 */
 	DoodlePopup.prototype.createHelpButton = function() {
 		this.helpButton = new ED.Views.DoodlePopup.Help(this);
-	}
+	};
 
 	/**
 	 * Create the template for the popup.
@@ -85,6 +93,11 @@ ED.Views.DoodlePopup = (function() {
 
 		var doodle = this.drawing.selectedDoodle;
 
+		// In some cases we won't have a selected doodle (like when deleting a doodle)
+		if (!doodle) {
+			return;
+		}
+
 		// Template data
 		var data = {
 			doodle: doodle,
@@ -100,14 +113,6 @@ ED.Views.DoodlePopup = (function() {
 
 		// Add doodle controls
 		doodle.showDoodleControls();
-
-		// TODO: this should be moved into the showDoodleControls method
-		var controls = this.container.find('.controls');
-		if (!controls.children().length) {
-			controls.addClass('hide');
-		}
-
-		console.log('re-rendered');
 
 		this.emit('render');
 	};

@@ -36,11 +36,16 @@ ED.Views.Toolbar = (function() {
 	 * Toolbar constructor
 	 * @param {ED.Drawing} drawing   A doodle drawing instance.
 	 * @param {HTMLElement} container The widget container element
-	 * @extends {EventEmitter2}
+	 * @extends {ED.View}
 	 */
-	function Toolbar() {
+	function Toolbar(drawing, container) {
 		ED.View.apply(this, arguments);
+
+		this.drawing = drawing;
+		this.container = container;
 		this.buttons = this.container.find('.ed-button');
+
+		this.registerForNotifications();
 		this.bindEvents();
 	}
 
@@ -88,6 +93,7 @@ ED.Views.Toolbar = (function() {
 		var func = button.data('function');
 		var arg = button.data('arg');
 
+		// Only update the states for "add doodle" buttons.
 		if (func !== 'addDoodle') {
 			return;
 		}
@@ -110,20 +116,11 @@ ED.Views.Toolbar = (function() {
 		}.bind(this));
 	};
 
-	/*********************
-	 * EVENT HANDLERS
-	 *********************/
-
 	/**
-	 * Run an action when clicking on a toolbar button.
-	 * @param  {Object} e Event object.
+	 * Execute the button function.
+	 * @param  {jQuery} button The button jQuery instance.
 	 */
-	Toolbar.prototype.onButtonClick = function(e) {
-
-		e.preventDefault();
-		e.stopImmediatePropagation();
-
-		var button = $(e.currentTarget);
+	Toolbar.prototype.execButtonFunction = function(button) {
 
 		if (button.hasClass('disabled')) {
 			return;
@@ -141,9 +138,26 @@ ED.Views.Toolbar = (function() {
 		this.emit('button.action', {
 			fn: fn,
 			arg: arg,
-			button: button,
-			e: e
+			button: button
 		});
+	};
+
+	/*********************
+	 * EVENT HANDLERS
+	 *********************/
+
+	/**
+	 * Run an action when clicking on a toolbar button.
+	 * @param  {Object} e Event object.
+	 */
+	Toolbar.prototype.onButtonClick = function(e) {
+
+		e.preventDefault();
+		e.stopImmediatePropagation();
+
+		var button = $(e.currentTarget);
+
+		this.execButtonFunction(button);
 	};
 
 	/**
@@ -152,8 +166,7 @@ ED.Views.Toolbar = (function() {
 	 */
 	Toolbar.prototype.onButtonMouseEnter = function(e) {
 		this.emit('button.mouseenter', {
-			button: $(e.currentTarget),
-			e: e
+			button: $(e.currentTarget)
 		});
 	};
 
@@ -163,8 +176,7 @@ ED.Views.Toolbar = (function() {
 	 */
 	Toolbar.prototype.onButtonMouseLeave = function(e) {
 		this.emit('button.mouseleave', {
-			button: $(e.currentTarget),
-			e: e
+			button: $(e.currentTarget)
 		});
 	};
 

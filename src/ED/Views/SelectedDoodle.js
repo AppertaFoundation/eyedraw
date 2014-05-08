@@ -36,11 +36,16 @@ ED.Views.SelectedDoodle = (function() {
 	 * SelectedDoodle constructor
 	 * @param {ED.Drawing} drawing   A doodle drawing instance.
 	 * @param {HTMLElement} container The widget container element
-	 * @extends {EventEmitter2}
+	 * @extends {ED.View}
 	 */
-	function SelectedDoodle() {
+	function SelectedDoodle(drawing, container) {
 		ED.View.apply(this, arguments);
+
+		this.drawing = drawing;
+		this.container = container;
 		this.select = this.container.find('select');
+
+		this.registerForNotifications();
 		this.bindEvents();
 	}
 
@@ -75,7 +80,7 @@ ED.Views.SelectedDoodle = (function() {
 	/**
 	 * Render the select element.
 	 */
-	SelectedDoodle.prototype.render = function(notification) {
+	SelectedDoodle.prototype.render = function() {
 
 		var optgroup = $('<optgroup label="Selected doodle" />');
 
@@ -115,7 +120,7 @@ ED.Views.SelectedDoodle = (function() {
 	 */
 	SelectedDoodle.prototype.createDoodleOption = function(doodle) {
 
-		var text = ED.titles[doodle.className] || doodle.className
+		var text = ED.titles[doodle.className] || doodle.className;
 		var selected = (doodle === this.drawing.selectedDoodle);
 
 		// Find matching doodles, in order of created time.
@@ -132,7 +137,7 @@ ED.Views.SelectedDoodle = (function() {
 		}
 
 		if (doodle.isLocked) {
-			text += ' (Locked)';
+			text += ' (*)';
 		}
 
 		var option = this.createOption(text, selected);

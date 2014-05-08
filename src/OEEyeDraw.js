@@ -25,8 +25,6 @@
  * @version 0.95
  */
 
-/* global ED: false */
-
 var ED = ED || {};
 
 /**

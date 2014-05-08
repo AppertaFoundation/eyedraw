@@ -65,14 +65,14 @@
  */
 ED.Doodle = function(_drawing, _parameterJSON) {
 	// Function called as part of prototype assignment has no parameters passed
-	if (typeof(_drawing) != 'undefined') {
+	if (typeof(_drawing) !== 'undefined') {
 		// Drawing containing this doodle
 		this.drawing = _drawing;
 
 		// Unique ID of doodle within this drawing
 		this.id = this.drawing.nextDoodleId();
 
-		// Optional rray of squiggles
+		// Optional array of squiggles
 		this.squiggleArray = new Array();
 
 		// Transform used to draw doodle (includes additional transforms specific to the doodle)

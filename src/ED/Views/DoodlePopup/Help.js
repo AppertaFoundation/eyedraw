@@ -17,9 +17,32 @@
  * along with OpenEyes.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* global $: false, ED: true */
+/* global ED: true */
 
+var ED = ED || {};
+ED.Views = ED.Views || {};
+
+/**
+ * This view class manages the display of the doodle help text within the doodle popup.
+ */
 ED.Views.DoodlePopup.Help = (function() {
+
+	'use strict';
+
+	/**
+	 * Helpers
+	 */
+
+	function ifHelpButton(fn) {
+		return function(data) {
+			return (
+				// If it's the help button and it's not disabled then execute fn.
+				data.button.hasClass('ed-doodle-help') &&
+				!data.button.hasClass('disabled') &&
+				fn(data)
+			);
+		};
+	}
 
 	/**
 	 * DoodleHelp class
@@ -37,46 +60,14 @@ ED.Views.DoodlePopup.Help = (function() {
 	 */
 	DoodleHelp.prototype.bindEvents = function() {
 
-		// Store a reference to the elements each time the doodle popup is re-rendered.
 		var doodlePopup = this.doodlePopup;
 		doodlePopup.on('render', this.onDoodlePopupRender.bind(this));
 		doodlePopup.on('hide', this.onDoodlePopupHide.bind(this));
 
-		// Bind handlers for doodle events on the toolbar.
 		var toolbar = doodlePopup.toolbar;
-		toolbar.on('button.mouseenter', this.curryEvent(this.onButtonMouseEnter.bind(this)));
-		toolbar.on('button.mouseleave', this.curryEvent(this.onButtonMouseLeave.bind(this)));
-		toolbar.on('button.action', this.curryEvent(this.onButtonMouseClick.bind(this)));
-	};
-
-	/**
-	 * Only execute the handler if the button is the (enabled) help button.
-	 * @param  {Function} fn The handler function to execute.
-	 */
-	DoodleHelp.prototype.curryEvent = function(fn) {
-		return function(data) {
-			return (
-				data.button.hasClass('ed-doodle-help')
-				&& !data.button.hasClass('disabled')
-				&& fn(data)
-			);
-		}
-	};
-
-	/**
-	 * Store reference to elements whenever the doodlePopup view is re-rendered.
-	 */
-	DoodleHelp.prototype.onDoodlePopupRender = function() {
-		this.doodleInfo = this.doodlePopup.container.find('.ed-doodle-info');
-		this.doodleControls = this.doodlePopup.container.find('.ed-doodle-controls');
-		this.button = this.doodlePopup.toolbar.container.find('.ed-doodle-help');
-	};
-
-	/**
-	 * Unlock the help whenever the doodle popup is hidden.
-	 */
-	DoodleHelp.prototype.onDoodlePopupHide = function() {
-		this.locked = false;
+		toolbar.on('button.mouseenter', ifHelpButton(this.onButtonMouseEnter.bind(this)));
+		toolbar.on('button.mouseleave', ifHelpButton(this.onButtonMouseLeave.bind(this)));
+		toolbar.on('button.action', ifHelpButton(this.onButtonMouseClick.bind(this)));
 	};
 
 	/**
@@ -104,6 +95,22 @@ ED.Views.DoodlePopup.Help = (function() {
 	 */
 
 	/**
+	 * Store reference to elements whenever the doodlePopup view is re-rendered.
+	 */
+	DoodleHelp.prototype.onDoodlePopupRender = function() {
+		this.doodleInfo = this.doodlePopup.container.find('.ed-doodle-info');
+		this.doodleControls = this.doodlePopup.container.find('.ed-doodle-controls');
+		this.button = this.doodlePopup.toolbar.container.find('.ed-doodle-help');
+	};
+
+	/**
+	 * Unlock the help whenever the doodle popup is hidden.
+	 */
+	DoodleHelp.prototype.onDoodlePopupHide = function() {
+		this.locked = false;
+	};
+
+	/**
 	 * On button mouse enter. Delay showing the help text.
 	 * @param  {Object} data Event data.
 	 */
@@ -126,11 +133,11 @@ ED.Views.DoodlePopup.Help = (function() {
 	 * @param  {Object} data The event data.
 	 */
 	DoodleHelp.prototype.onButtonMouseClick = function() {
-
-		(this.locked)
-			? this.hideDescription()
-			: this.showDescription();
-
+		if (this.locked) {
+			this.hideDescription();
+		} else {
+			this.showDescription();
+		}
 		this.locked = !this.locked;
 	};
 
