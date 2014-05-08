@@ -1,3 +1,5 @@
+/* global jQuery:false */
+
 /**
  * Defines the EyeDraw namespace
  * @namespace Namespace for all EyeDraw classes
@@ -23,7 +25,7 @@ ED.squiggleWidth = {
 	Thin: 4,
 	Medium: 12,
 	Thick: 20
-}
+};
 
 /**
  * SquiggleStyle
@@ -31,7 +33,7 @@ ED.squiggleWidth = {
 ED.squiggleStyle = {
 	Outline: 0,
 	Solid: 1
-}
+};
 
 /**
  * Flag to detect double clicks
@@ -44,7 +46,7 @@ ED.recentClick = false;
 ED.eye = {
 	Right: 0,
 	Left: 1
-}
+};
 
 /**
  * Draw function mode (Canvas pointInPath function requires a path)
@@ -52,7 +54,7 @@ ED.eye = {
 ED.drawFunctionMode = {
 	Draw: 0,
 	HitTest: 1
-}
+};
 
 /**
  * Mouse dragging mode
@@ -68,7 +70,7 @@ ED.Mode = {
 	Draw: 7,
 	Select: 8,
 	Size: 9
-}
+};
 
 /**
  * Handle ring
@@ -76,7 +78,7 @@ ED.Mode = {
 ED.handleRing = {
 	Inner: 0,
 	Outer: 1
-}
+};
 
 /**
  * Flag to indicate when the drawing has been modified
@@ -94,25 +96,26 @@ ED.findOffset = function(obj, curleft, curtop) {
 		do {
 			curleft += obj.offsetLeft;
 			curtop += obj.offsetTop;
-		} while (obj = obj.offsetParent);
+		} while (!!(obj = obj.offsetParent));
 		return {
 			left: curleft,
 			top: curtop
 		};
 	}
-}
+};
 
 ED.findPosition = function(obj, event) {
-	if (typeof jQuery != 'undefined') {
-		var offset = jQuery(obj).offset();
+	var offset;
+	if (typeof jQuery !== 'undefined') {
+		offset = jQuery(obj).offset();
 	} else {
-		var offset = ED.findOffset(obj, 0, 0);
+		offset = ED.findOffset(obj, 0, 0);
 	}
 	return {
 		x: event.pageX - offset.left,
 		y: event.pageY - offset.top
 	};
-}
+};
 
 /*
  * Function to test whether a Javascript object is empty
@@ -122,11 +125,13 @@ ED.findPosition = function(obj, event) {
  */
 ED.objectIsEmpty = function(_object) {
 	for (var property in _object) {
-		if (_object.hasOwnProperty(property)) return false;
+		if (_object.hasOwnProperty(property)) {
+			return false;
+		}
 	}
 
 	return true;
-}
+};
 
 /*
  * Returns true if browser is firefox
@@ -143,12 +148,12 @@ ED.isFirefox = function() {
 	} else {
 		return false;
 	}
-}
+};
 
 // Checks that the value is numeric http://stackoverflow.com/questions/18082/validate-numbers-in-javascript-isnumeric
 ED.isNumeric = function(_value) {
-	return (_value - 0) == _value && _value.length > 0;
-}
+	return (_value - 0) === _value && _value.length > 0;
+};
 
 /**
  * Returns 'true' remainder of a number divided by a modulus (i.e. always positive, unlike x%y)
@@ -159,7 +164,7 @@ ED.isNumeric = function(_value) {
  */
 ED.Mod = function Mod(_x, _y) {
 	return _x - Math.floor(_x / _y) * _y;
-}
+};
 
 /**
  * Converts an angle (positive or negative) into a positive angle (ie a bearing)
@@ -177,7 +182,7 @@ ED.positiveAngle = function(_angle) {
 
 	// Return remainder
 	return _angle % circle;
-}
+};
 
 /**
  * Error handler
@@ -187,14 +192,16 @@ ED.positiveAngle = function(_angle) {
  * @param {String} _message Error message
  */
 ED.errorHandler = function(_class, _method, _message) {
-	console.error(_message);
-	throw new Error('EYEDRAW ERROR! class: [' + _class + '] method: [' + _method + '] message: [' + _message + ']');
-}
+	console.log('EYEDRAW ERROR! class: [' + _class + '] method: [' + _method + '] message: [' + _message + ']');
+};
 
+/**
+ * Return a string with the first letter as uppercase.
+ * @param  {String} str The string.
+ */
 ED.firstLetterToUpperCase = function(str) {
 	return str.charAt(0).toUpperCase() + str.slice(1);
 };
-
 
 /**
  * Additional function for String object
@@ -204,7 +211,7 @@ ED.firstLetterToUpperCase = function(str) {
 ED.firstLetterToLowerCase = function(str) {
 	var secondChar = str.charAt(1);
 
-	if (secondChar == secondChar.toUpperCase()) {
+	if (secondChar === secondChar.toUpperCase()) {
 		return str;
 	} else {
 		return str.charAt(0).toLowerCase() + str.slice(1);
@@ -220,47 +227,31 @@ ED.addAndAfterLastComma = function(str) {
 	// Search backwards from end of string for comma
 	var found = false;
 	for (var pos = str.length - 1; pos >= 0; pos--) {
-		if (str.charAt(pos) == ',') {
+		if (str.charAt(pos) === ',') {
 			found = true;
 			break;
 		}
 	}
 
-	if (found) return str.substring(0, pos) + ", and" + str.substring(pos + 1, str.length);
-	else return str;
+	if (found) {
+		return str.substring(0, pos) + ", and" + str.substring(pos + 1, str.length);
+	} else {
+		return str;
+	}
 };
-
 
 /**
- * FIXME
+ * Default titles
+ * @type {Object}
  */
-
-ED.instances = {};
-
-ED.setInstance = function(instance) {
-	var id = instance.idSuffix;
-	if (!id) {
-		console.log(instance);
-		throw new Error('Instance does not contain idSuffix');
-	}
-	if (id in ED.instances) {
-		throw new Error('Instance with id ' + id + ' has already been set');
-	}
-	ED.instances[id] = instance;
-};
-
-ED.getInstance = function(idSuffix) {
-	return ED.instances[idSuffix];
-};
-
-ED.resetInstances = function() {
-	ED.instances = {};
-};
-
 ED.titles = {};
 
+/**
+ * Set titles.
+ * @param {Object} titles An object containing the doodle titles.
+ */
 ED.setTitles = function(titles) {
-	this.titles = titles;
+	$.extend(this.titles, titles);
 };
 
 /**
@@ -345,7 +336,7 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 	var offsetY = 0;
 	var toImage = false;
 	this.controllerFunctionName = 'eyeDrawController';
-	this.graphicsPath = 'img/';
+	this.graphicsPath = 'assets/img';
 	this.scaleOn = 'height';
 
 	// If optional parameters exist, use them instead
@@ -496,10 +487,10 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 			var isEyeDrawElement = false;
 
 			var ignore = '(' + [
-				'eyedraw-doodle-popup',
-				'eyedraw-button',
-				'eyedraw-canvas',
-				'eyedraw-selected-doodle-select'
+				'ed-doodle-popup',
+				'ed-button',
+				'ed-canvas',
+				'ed-selected-doodle-select'
 			].join(')|(') + ')';
 
 			do {
@@ -2028,6 +2019,13 @@ ED.Drawing.prototype.unlock = function() {
 }
 
 /**
+ * Toggle doodle help text
+ */
+ED.Drawing.prototype.toggleHelp = function() {
+	this.notify('toggleDoodleHelp');
+};
+
+/**
  * Deselect any selected doodles
  */
 ED.Drawing.prototype.deselectDoodles = function() {
@@ -2139,11 +2137,12 @@ ED.Drawing.prototype.selectDoodle = function(doodle) {
 
 	// Run onDeselection code for last doodle
 	if (this.lastSelectedDoodle) this.lastSelectedDoodle.onDeselection();
-	// Run onSelection code
-	this.selectedDoodle.onSelection();
 
 	// Notify
 	this.notify("doodleSelected");
+
+	// Run onSelection code
+	this.selectedDoodle.onSelection();
 
 	this.repaint();
 };
@@ -3212,14 +3211,14 @@ ED.Drawing.prototype.nextDoodleId = function() {
  */
 ED.Doodle = function(_drawing, _parameterJSON) {
 	// Function called as part of prototype assignment has no parameters passed
-	if (typeof(_drawing) != 'undefined') {
+	if (typeof(_drawing) !== 'undefined') {
 		// Drawing containing this doodle
 		this.drawing = _drawing;
 
 		// Unique ID of doodle within this drawing
 		this.id = this.drawing.nextDoodleId();
 
-		// Optional rray of squiggles
+		// Optional array of squiggles
 		this.squiggleArray = new Array();
 
 		// Transform used to draw doodle (includes additional transforms specific to the doodle)
@@ -4081,16 +4080,7 @@ ED.Doodle.prototype.parameterControlElementId = function(_parameter) {
 ED.Doodle.prototype.onSelection = function() {
 	// Show control bar
 	if (this.drawing.showDoodleControls) {
-		var controlDiv = document.getElementById(this.drawing.canvas.id + '_' + 'controls');
-
-		for (var parameter in this.controlParameterArray) {
-			// Create element and add to control bar
-			var element = this.parameterElement(parameter);
-			controlDiv.appendChild(element);
-
-			// Add binding
-			this.addBinding(parameter, {id:this.parameterControlElementId(parameter)});
-		}
+		this.showDoodleControls();
 	}
 }
 
@@ -4100,18 +4090,87 @@ ED.Doodle.prototype.onSelection = function() {
 ED.Doodle.prototype.onDeselection = function() {
 	// Hide control bar
 	if (this.drawing.showDoodleControls) {
-		// Remove all bindings
-		for (var parameter in this.controlParameterArray) {
-			this.removeBinding(parameter);
-		}
-
-		// Remove all child elements in control div
-		var controlDiv = document.getElementById(this.drawing.canvas.id + '_' + 'controls');
-		while(controlDiv.hasChildNodes()){
-			controlDiv.removeChild(controlDiv.lastChild);
-		}
+		this.removeDoodleControls();
 	}
 }
+
+/**
+ * Creates an array of control elements
+ * @return {Array}    The array of elements.
+ */
+ED.Doodle.prototype.getControlElements = function() {
+	var elements = [];
+	for (var parameter in this.controlParameterArray) {
+		// Create element
+		elements.push(
+			this.parameterElement(parameter)
+		);
+	}
+	return elements;
+};
+
+/**
+ * Add bindings to the control elements.
+ */
+ED.Doodle.prototype.addControlBindings = function() {
+	for (var parameter in this.controlParameterArray) {
+		this.addBinding(parameter, {
+			id: this.parameterControlElementId(parameter)
+		});
+	}
+};
+
+/**
+ * Generate and append the control elements to the DOM.
+ * @param  {HTMLElement} controlDiv The container element.
+ */
+ED.Doodle.prototype.showDoodleControls = function(controlDiv) {
+
+	// Find the container element
+	if (!controlDiv) {
+
+		var id = this.drawing.canvas.id + '_' + 'controls';
+		var controlDiv = document.getElementById(id);
+
+		if (!controlDiv) {
+			return ED.errorHandler('ED.Doodle', 'showDoodleControls', 'Unable to create doodle controls: element with id ' + id + ' does not exist');
+		}
+	}
+
+	// Append controls to the container
+	this.getControlElements().forEach(function(element) {
+		controlDiv.appendChild(element);
+	});
+	// Add bindings
+	this.addControlBindings();
+};
+
+/**
+ * Remove controls elements.
+ * @param  {HTMLElement} controlDiv The container element.
+ */
+ED.Doodle.prototype.removeDoodleControls = function(controlDiv) {
+
+	// Find the container element
+	if (!controlDiv) {
+		var id = this.drawing.canvas.id + '_' + 'controls';
+		var controlDiv = document.getElementById(id);
+
+		if (!controlDiv) {
+			return ED.errorHandler('ED.Doodle', 'removeDoodleControls', 'Unable to remove doodle controls: element with id ' + id + ' does not exist');
+		}
+	}
+
+	// Remove all bindings
+	for (var parameter in this.controlParameterArray) {
+		this.removeBinding(parameter);
+	}
+
+	// Remove elements
+	while(controlDiv.hasChildNodes()){
+		controlDiv.removeChild(controlDiv.lastChild);
+	}
+};
 
 /**
  * Creates an element for parameter in the doodle control bar
@@ -4184,9 +4243,11 @@ ED.Doodle.prototype.parameterElement = function(_parameter) {
 			ED.errorHandler('ED.Doodle', 'parameterElement', 'Unexpected type: ' + this.parameterValidationArray[_parameter].type + ' for parameter: ' + _parameter);
 			break;
 	}
+
 	// Create label  ***TODO*** deal with optional label and language
 	var label = document.createElement('label');
 	label.innerText = this.controlParameterArray[_parameter];
+	label.setAttribute('for', this.parameterControlElementId(_parameter));
 
 	// Wrap in div to allow display in vertical block
 	var div = document.createElement('div');
@@ -5593,8 +5654,12 @@ ED.Checker = ED.Checker || (function() {
 			return;
 		}
 
+		// Store instance
+		instances.push(instance);
+
+		// Register 'doodlesLoaded' event
 		instance.registerForNotifications({
-			callback: function callback() {
+			callback: function onDoodlesLoaded() {
 				ready++;
 				if (isAllReady()) {
 					executeCallbacks();
@@ -5623,9 +5688,31 @@ ED.Checker = ED.Checker || (function() {
 		}
 	}
 
+	/**
+	 * Returns an eyedraw instance by idSuffix
+	 * @param {String} idSuffix The eyedraw instance idSuffix
+	 * @return {ED.Drawing} An eyedraw instance.
+	 */
+	function getInstance(idSuffix) {
+		return instances.filter(function(instance) {
+			return (instance.idSuffix === idSuffix);
+		})[0];
+	}
+
+	/**
+	 * Resets all eyedraw instances and registered callback functions.
+	 */
+	function reset() {
+		instances = [];
+		callbacks = [];
+		ready = 0;
+	}
+
 	return {
 		register: register,
-		onAllReady: allReady
+		onAllReady: allReady,
+		getInstance: getInstance,
+		reset: reset
 	};
 }());
 /**
@@ -5649,11 +5736,6 @@ ED.Checker = ED.Checker || (function() {
 
 /* global $:false */
 
-/**
- * @todo This controller is getting quite big. Consider sticking all the
- * drawing event related stuff into a new object.
- */
-
 var ED = ED || {};
 
 ED.Controller = (function() {
@@ -5669,24 +5751,29 @@ ED.Controller = (function() {
 	 * @param {Object} properties The EyeDraw widget properties.
 	 * @param {ED.Checker} [Checker] The EyeDraw checker.
 	 * @param {ED.Drawing} [drawing] An ED.Drawing instance.
-	 * @param {ED.Views.Toolbar} [toolbar] An ED.Views.Toolbar instance.
+	 * @param {ED.Views.Toolbar} [mainToolbar] An ED.Views.Toolbar instance.
+	 * @param {ED.Views.Toolbar} [canvasToolbar] An ED.Views.Toolbar instance.
 	 * @param {ED.Views.DoodlePopup} [doodlePopup] An ED.Views.DoodlePopup instance.
 	 */
-	function Controller(properties, Checker, drawing, toolbar, doodlePopup, selectedDoodle) {
+	function Controller(properties, Checker, drawing, mainToolbar, canvasToolbar, doodlePopup, selectedDoodle) {
 
 		this.properties = properties;
 		this.canvas = document.getElementById(properties.canvasId);
 		this.input = document.getElementById(properties.inputId);
-		this.container = $(this.canvas).closest('.eyedraw-widget');
+		this.container = $(this.canvas).closest('.ed-widget');
 
 		this.Checker = Checker || ED.Checker;
 		this.drawing = drawing || this.createDrawing();
-		this.toolbar = toolbar || this.createToolbar();
-		this.doodlePopup = doodlePopup || this.createDoodlePopup();
-		this.selectedDoodle = selectedDoodle || this.createSelectedDoodle();
+
+		if (this.properties.isEditable) {
+			this.mainToolbar = mainToolbar || this.createToolbar('.ed-main-toolbar');
+			this.canvasToolbar = canvasToolbar || this.createToolbar('.ed-canvas-toolbar');
+			this.doodlePopup = doodlePopup || this.createDoodlePopup();
+			this.selectedDoodle = selectedDoodle || this.createSelectedDoodle();
+		}
 
 		this.registerDrawing();
-		this.registerEvents();
+		this.registerForNotifications();
 		this.initListeners();
 
 		// Initialize drawing.
@@ -5717,47 +5804,48 @@ ED.Controller = (function() {
 	};
 
 	/**
-	 * Create the toolbar view instance.
+	 * Create a Toolbar view instance.
 	 */
-	Controller.prototype.createToolbar = function() {
+	Controller.prototype.createToolbar = function(container) {
 		return new ED.Views.Toolbar(
 			this.drawing,
-			this.container.find('.eyedraw-toolbar-panel')
+			this.container.find(container)
 		);
 	};
 
 	/**
-	 * Create the doodle popup view instance.
+	 * Create a DoodlePopup view instance.
 	 */
 	Controller.prototype.createDoodlePopup = function() {
 		return new ED.Views.DoodlePopup(
 			this.drawing,
-			this.container.find('.eyedraw-doodle-popup')
-		);
-	};
-
-	Controller.prototype.createSelectedDoodle = function() {
-		return new ED.Views.SelectedDoodle(
-			this.drawing,
-			this.container.find('.eyedraw-selected-doodle')
+			this.container.find('.ed-doodle-popup')
 		);
 	};
 
 	/**
-	 * Register the drawing instance with the Checker, and store the instance.
+	 * Create a SelectedDoodle instance.
+	 * @return {ED.Views.SelectedDoodle} [description]
+	 */
+	Controller.prototype.createSelectedDoodle = function() {
+		return new ED.Views.SelectedDoodle(
+			this.drawing,
+			this.container.find('.ed-selected-doodle')
+		);
+	};
+
+	/**
+	 * Register the drawing instance with the Checker.
 	 */
 	Controller.prototype.registerDrawing = function() {
 		// Register drawing with the checker.
 		this.Checker.register(this.drawing);
-		// Store the drawing instance.
-		/** @todo This should be moved into the Checker */
-		ED.setInstance(this.drawing);
 	};
 
 	/**
 	 * Register drawing and DOM events.
 	 */
-	Controller.prototype.registerEvents = function() {
+	Controller.prototype.registerForNotifications = function() {
 		// Register controller for drawing notifications
 		this.drawing.registerForNotifications(this, 'notificationHandler', [
 			'ready',
@@ -5831,7 +5919,6 @@ ED.Controller = (function() {
 
 	/**
 	 * Add deleted values.
-	 * @TODO
 	 */
 	Controller.prototype.addDeletedValues = function() {
 		if (!ED.objectIsEmpty(this.properties.deleteValueArray)) {
@@ -5888,8 +5975,7 @@ ED.Controller = (function() {
 	 * @return {ED.Drawing}
 	 */
 	Controller.prototype.getEyeDrawInstance = function(idSuffix) {
-		/** @todo This should be moved into the Checker */
-		return ED.getInstance(idSuffix);
+		return ED.Checker.getInstance(idSuffix);
 	};
 
 	/**
@@ -6087,7 +6173,7 @@ ED.Controller = (function() {
  * along with OpenEyes.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* global EventEmitter2: false, $: false, Mustache: false */
+/* global EventEmitter2: false, $: false */
 
 var ED = ED || {};
 
@@ -6109,11 +6195,6 @@ ED.View = (function() {
 	 */
 	function View(drawing, container) {
 		EventEmitter2.call(this);
-
-		this.drawing = drawing;
-		this.container = $(container);
-
-		this.registerForNotifications();
 	}
 
 	View.prototype = Object.create(EventEmitter2.prototype);
@@ -6898,7 +6979,7 @@ var ED = ED || {};
 ED.Views = ED.Views || {};
 
 /**
- * The DoodlePopup view manages the doodle popup menu.
+ * This view class manages the doodle popup.
  */
 ED.Views.DoodlePopup = (function() {
 
@@ -6908,12 +6989,18 @@ ED.Views.DoodlePopup = (function() {
 	 * DoodlePopup constructor
 	 * @param {ED.Drawing} drawing   A doodle drawing instance.
 	 * @param {HTMLElement} widgetContainer The widget container element
-	 * @extends {EventEmitter2}
+	 * @extends {ED.View}
 	 */
-	function DoodlePopup() {
+	function DoodlePopup(drawing, container) {
 		ED.View.apply(this, arguments);
+
+		this.drawing = drawing;
+		this.container = container;
 		this.delayTimer = 0;
+
+		this.registerForNotifications();
 		this.createToolbar();
+		this.createHelpButton();
 		this.createTemplate();
 	}
 
@@ -6925,14 +7012,21 @@ ED.Views.DoodlePopup = (function() {
 	 */
 	DoodlePopup.prototype.createToolbar = function() {
 		this.toolbar = new ED.Views.Toolbar(this.drawing, this.container);
-		this.toolbar.on('doodle.action', this.render.bind(this));
+		this.toolbar.on('button.action', this.render.bind(this));
+	};
+
+	/**
+	 * Create the help button.
+	 */
+	DoodlePopup.prototype.createHelpButton = function() {
+		this.helpButton = new ED.Views.DoodlePopup.Help(this);
 	};
 
 	/**
 	 * Create the template for the popup.
 	 */
 	DoodlePopup.prototype.createTemplate = function() {
-		this.template = $('#eyedraw-doodle-popup-template').html();
+		this.template = $('#ed-doodle-popup-template').html();
 	};
 
 	/**
@@ -6952,15 +7046,31 @@ ED.Views.DoodlePopup = (function() {
 	 * @param  {Object} data Template data.
 	 */
 	DoodlePopup.prototype.render = function() {
+
 		var doodle = this.drawing.selectedDoodle;
+
+		// In some cases we won't have a selected doodle (like when deleting a doodle)
+		if (!doodle) {
+			return;
+		}
+
+		// Template data
 		var data = {
 			doodle: doodle,
-			title: doodle ? ED.titles[doodle.className] : '',
-			desc: doodle ? ED.trans[doodle.className] : '',
-			lockedButtonClass: (doodle && doodle.isLocked) ? ' disabled' : ''
+			drawing: this.drawing,
+			title: ED.titles[doodle.className],
+			desc: ED.trans[doodle.className],
+			lockedButtonClass: doodle.isLocked ? ' disabled' : '',
 		};
+
+		// Render the template
 		var html = Mustache.render(this.template, data);
 		this.container.html(html);
+
+		// Add doodle controls
+		doodle.showDoodleControls();
+
+		this.emit('render');
 	};
 
 	/**
@@ -6968,7 +7078,7 @@ ED.Views.DoodlePopup = (function() {
 	 * @param  {Boolean} show   Show or hide the menu.
 	 */
 	DoodlePopup.prototype.update = function(show) {
-		if (show) {
+		if (show && this.drawing.selectedDoodle) {
 			this.render();
 			this.show();
 		} else {
@@ -6981,6 +7091,7 @@ ED.Views.DoodlePopup = (function() {
 	 */
 	DoodlePopup.prototype.hide = function() {
 		this.delay(function() {
+			this.emit('hide');
 			this.container.addClass('closed');
 		}.bind(this));
 	};
@@ -6990,6 +7101,7 @@ ED.Views.DoodlePopup = (function() {
 	 */
 	DoodlePopup.prototype.show = function() {
 		this.delay(function() {
+			this.emit('show');
 			this.container.removeClass('closed');
 		}.bind(this));
 	};
@@ -6997,10 +7109,12 @@ ED.Views.DoodlePopup = (function() {
 	/**
 	 * Delay executing a callback.
 	 * @param  {Function} fn    The callback function to execute.
+	 * @param {Integer} amount The delay time (in ms)
 	 */
-	DoodlePopup.prototype.delay = function(fn) {
+	DoodlePopup.prototype.delay = function(fn, amount) {
 		clearTimeout(this.delayTimer);
-		this.delayTimer = setTimeout(fn, 50);
+		amount = typeof amount === 'number' ? amount : 50;
+		this.delayTimer = setTimeout(fn, amount);
 	};
 
 	/*********************
@@ -7008,7 +7122,7 @@ ED.Views.DoodlePopup = (function() {
 	 *********************/
 
 	DoodlePopup.prototype.onDoodleAdded = function() {
-		this.update(true);
+		this.drawing.selectDoodle(this.drawing.selectedDoodle);
 	};
 
 	DoodlePopup.prototype.onDoodleDeleted = function() {
@@ -7016,6 +7130,8 @@ ED.Views.DoodlePopup = (function() {
 	};
 
 	DoodlePopup.prototype.onDoodleSelected = function() {
+		// We do this in the next event loop as the "doodleDeselect" event
+		// is triggered before the "doodleSelect" event.
 		setTimeout(this.update.bind(this, true));
 	};
 
@@ -7045,13 +7161,159 @@ ED.Views.DoodlePopup = (function() {
  * along with OpenEyes.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/* global ED: true */
+
+var ED = ED || {};
+ED.Views = ED.Views || {};
+
+/**
+ * This view class manages the display of the doodle help text within the doodle popup.
+ */
+ED.Views.DoodlePopup.Help = (function() {
+
+	'use strict';
+
+	/**
+	 * Helpers
+	 */
+
+	function ifHelpButton(fn) {
+		return function(data) {
+			return (
+				// If it's the help button and it's not disabled then execute fn.
+				data.button.hasClass('ed-doodle-help') &&
+				!data.button.hasClass('disabled') &&
+				fn(data)
+			);
+		};
+	}
+
+	/**
+	 * DoodleHelp class
+	 * @param {ED.Views.DoodlePopup} doodlePopup The doodle popup view.
+	 */
+	function DoodleHelp(doodlePopup) {
+		this.doodlePopup = doodlePopup;
+		this.locked = false;
+		this.delayTimer = 0;
+		this.bindEvents();
+	}
+
+	/**
+	 * Bind event handlers
+	 */
+	DoodleHelp.prototype.bindEvents = function() {
+
+		var doodlePopup = this.doodlePopup;
+		doodlePopup.on('render', this.onDoodlePopupRender.bind(this));
+		doodlePopup.on('hide', this.onDoodlePopupHide.bind(this));
+
+		var toolbar = doodlePopup.toolbar;
+		toolbar.on('button.mouseenter', ifHelpButton(this.onButtonMouseEnter.bind(this)));
+		toolbar.on('button.mouseleave', ifHelpButton(this.onButtonMouseLeave.bind(this)));
+		toolbar.on('button.action', ifHelpButton(this.onButtonMouseClick.bind(this)));
+	};
+
+	/**
+	 * Show the help text.
+	 */
+	DoodleHelp.prototype.showDescription = function() {
+		clearTimeout(this.delayTimer);
+		this.button.addClass('hover');
+		this.doodleInfo.show();
+		this.doodleControls.hide();
+	};
+
+	/**
+	 * Hide the help text.
+	 */
+	DoodleHelp.prototype.hideDescription = function() {
+		clearTimeout(this.delayTimer);
+		this.button.removeClass('hover');
+		this.doodleInfo.hide();
+		this.doodleControls.show();
+	};
+
+	/**
+	 * EVENT HANDLERS
+	 */
+
+	/**
+	 * Store reference to elements whenever the doodlePopup view is re-rendered.
+	 */
+	DoodleHelp.prototype.onDoodlePopupRender = function() {
+		this.doodleInfo = this.doodlePopup.container.find('.ed-doodle-info');
+		this.doodleControls = this.doodlePopup.container.find('.ed-doodle-controls');
+		this.button = this.doodlePopup.toolbar.container.find('.ed-doodle-help');
+	};
+
+	/**
+	 * Unlock the help whenever the doodle popup is hidden.
+	 */
+	DoodleHelp.prototype.onDoodlePopupHide = function() {
+		this.locked = false;
+	};
+
+	/**
+	 * On button mouse enter. Delay showing the help text.
+	 * @param  {Object} data Event data.
+	 */
+	DoodleHelp.prototype.onButtonMouseEnter = function() {
+		this.delayTimer = setTimeout(this.showDescription.bind(this), 300);
+	};
+
+	/**
+	 * On button mouse leave, hide the help text if not locked.
+	 * @param  {Object} data The event data.
+	 */
+	DoodleHelp.prototype.onButtonMouseLeave = function() {
+		if (!this.locked) {
+			this.hideDescription();
+		}
+	};
+
+	/**
+	 * On button mouse click, show or hide the help text.
+	 * @param  {Object} data The event data.
+	 */
+	DoodleHelp.prototype.onButtonMouseClick = function() {
+		if (this.locked) {
+			this.hideDescription();
+		} else {
+			this.showDescription();
+		}
+		this.locked = !this.locked;
+	};
+
+	return DoodleHelp;
+
+}());
+/**
+ * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
+ * (C) OpenEyes Foundation, 2011-2014
+ * This file is part of OpenEyes.
+ *
+ * OpenEyes is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * OpenEyes is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with OpenEyes.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 /* global $: false, ED: true */
 
 var ED = ED || {};
 ED.Views = ED.Views || {};
 
 /**
- * The selected-doodle view manages interactions on the main doodle selected-doodle.
+ * This view class manages the selected doodle dropdown.
  */
 ED.Views.SelectedDoodle = (function() {
 
@@ -7064,11 +7326,16 @@ ED.Views.SelectedDoodle = (function() {
 	 * SelectedDoodle constructor
 	 * @param {ED.Drawing} drawing   A doodle drawing instance.
 	 * @param {HTMLElement} container The widget container element
-	 * @extends {EventEmitter2}
+	 * @extends {ED.View}
 	 */
-	function SelectedDoodle() {
+	function SelectedDoodle(drawing, container) {
 		ED.View.apply(this, arguments);
+
+		this.drawing = drawing;
+		this.container = container;
 		this.select = this.container.find('select');
+
+		this.registerForNotifications();
 		this.bindEvents();
 	}
 
@@ -7103,7 +7370,7 @@ ED.Views.SelectedDoodle = (function() {
 	/**
 	 * Render the select element.
 	 */
-	SelectedDoodle.prototype.render = function(notification) {
+	SelectedDoodle.prototype.render = function() {
 
 		var optgroup = $('<optgroup label="Selected doodle" />');
 
@@ -7113,9 +7380,13 @@ ED.Views.SelectedDoodle = (function() {
 		optgroup.append(this.createOption(noneText, noneSelected));
 
 		// Doodle options
-		var doodleOptions = this.drawing.doodleArray.map(this.createDoodleOption.bind(this));
+		var doodles = this.drawing.doodleArray.slice(); // break reference
+		doodles.reverse();
+
+		var doodleOptions = doodles.map(this.createDoodleOption.bind(this));
 		optgroup.append(doodleOptions);
 
+		// Update the select dropdown.
 		this.select.html(optgroup);
 	};
 
@@ -7139,7 +7410,7 @@ ED.Views.SelectedDoodle = (function() {
 	 */
 	SelectedDoodle.prototype.createDoodleOption = function(doodle) {
 
-		var text = ED.titles[doodle.className] || doodle.className
+		var text = ED.titles[doodle.className] || doodle.className;
 		var selected = (doodle === this.drawing.selectedDoodle);
 
 		// Find matching doodles, in order of created time.
@@ -7156,7 +7427,7 @@ ED.Views.SelectedDoodle = (function() {
 		}
 
 		if (doodle.isLocked) {
-			text += ' (Locked)';
+			text += ' (*)';
 		}
 
 		var option = this.createOption(text, selected);
@@ -7211,7 +7482,7 @@ var ED = ED || {};
 ED.Views = ED.Views || {};
 
 /**
- * The toolbar view manages interactions on the main doodle toolbar.
+ * This view class manages the toolbar.
  */
 ED.Views.Toolbar = (function() {
 
@@ -7224,11 +7495,16 @@ ED.Views.Toolbar = (function() {
 	 * Toolbar constructor
 	 * @param {ED.Drawing} drawing   A doodle drawing instance.
 	 * @param {HTMLElement} container The widget container element
-	 * @extends {EventEmitter2}
+	 * @extends {ED.View}
 	 */
-	function Toolbar() {
+	function Toolbar(drawing, container) {
 		ED.View.apply(this, arguments);
-		this.buttons = this.container.find('.eyedraw-button');
+
+		this.drawing = drawing;
+		this.container = container;
+		this.buttons = this.container.find('.ed-button');
+
+		this.registerForNotifications();
 		this.bindEvents();
 	}
 
@@ -7250,7 +7526,10 @@ ED.Views.Toolbar = (function() {
 	 * Bind UI events.
 	 */
 	Toolbar.prototype.bindEvents = function() {
-		this.container.on('click.' + EVENT_NAMESPACE, '.eyedraw-button', this.onButtonClick.bind(this));
+		this.container
+			.on('click.' + EVENT_NAMESPACE, '.ed-button', this.onButtonClick.bind(this))
+			.on('mouseenter.' + EVENT_NAMESPACE, '.ed-button', this.onButtonMouseEnter.bind(this))
+			.on('mouseleave.' + EVENT_NAMESPACE, '.ed-button', this.onButtonMouseLeave.bind(this));
 	};
 
 	Toolbar.prototype.enableButton = function(button) {
@@ -7263,7 +7542,7 @@ ED.Views.Toolbar = (function() {
 
 	/**
 	 * Update the state of a toolbar button. Find the associated doodle
-	 * and detrmine if the button should be enabled or disabled.
+	 * and determine if the button should be enabled or disabled.
 	 * @param  {jQuery} button A jQuery button instance
 	 */
 	Toolbar.prototype.updateButtonState = function(button) {
@@ -7273,6 +7552,7 @@ ED.Views.Toolbar = (function() {
 		var func = button.data('function');
 		var arg = button.data('arg');
 
+		// Only update the states for "add doodle" buttons.
 		if (func !== 'addDoodle') {
 			return;
 		}
@@ -7295,6 +7575,32 @@ ED.Views.Toolbar = (function() {
 		}.bind(this));
 	};
 
+	/**
+	 * Execute the button function.
+	 * @param  {jQuery} button The button jQuery instance.
+	 */
+	Toolbar.prototype.execButtonFunction = function(button) {
+
+		if (button.hasClass('disabled')) {
+			return;
+		}
+
+		var fn = button.data('function');
+		var arg = button.data('arg');
+
+		if (fn && typeof this.drawing[fn] === 'function') {
+			this.drawing[fn](arg);
+		} else {
+			this.emit('button.error', 'Invalid doodle function: ' + fn);
+		}
+
+		this.emit('button.action', {
+			fn: fn,
+			arg: arg,
+			button: button
+		});
+	};
+
 	/*********************
 	 * EVENT HANDLERS
 	 *********************/
@@ -7310,22 +7616,27 @@ ED.Views.Toolbar = (function() {
 
 		var button = $(e.currentTarget);
 
-		if (button.hasClass('disabled')) {
-			return;
-		}
+		this.execButtonFunction(button);
+	};
 
-		var fn = button.data('function');
-		var arg = button.data('arg');
+	/**
+	 * Emit mouseenter event on button mouse enter
+	 * @param  {Object} e Event object.
+	 */
+	Toolbar.prototype.onButtonMouseEnter = function(e) {
+		this.emit('button.mouseenter', {
+			button: $(e.currentTarget)
+		});
+	};
 
-		if (typeof this.drawing[fn] === 'function') {
-			this.drawing[fn](arg);
-			this.emit('doodle.action', {
-				fn: fn,
-				arg: arg
-			});
-		} else {
-			this.emit('doodle.error', 'Invalid doodle function: ' + fn);
-		}
+	/**
+	 * Emit mouseleave event on button mouse leave.
+	 * @param  {Object} e Event object.
+	 */
+	Toolbar.prototype.onButtonMouseLeave = function(e) {
+		this.emit('button.mouseleave', {
+			button: $(e.currentTarget)
+		});
 	};
 
 	return Toolbar;
@@ -9020,7 +9331,7 @@ ED.trans['AngleGradeSouth'] = 'Drag handle to adjust amount of angle obscure by 
 ED.trans['AngleGradeWest'] = 'Drag handle to adjust amount of angle obscure by iris';
 ED.trans['AngleNV'] = 'Drag to move around angle<br/>Drag handles to change extent';
 ED.trans['AngleRecession'] = 'Drag to move around angle<br/>Drag handles to change extent';
-ED.trans['AntSeg'] = 'Drag the handle to resize the pupil<br/><br/>The iris is semi-transparent so that IOLs, and<br/>other structures can be seen behind it';
+ED.trans['AntSeg'] = 'Drag the handle to resize the pupil<br/><br/>The iris is semi-transparent so that IOLs, and other structures can be seen behind it';
 ED.trans['AntSegCrossSection'] = '';
 ED.trans['AntSynech'] = 'Drag to move around angle<br/>Drag handles to change extent';
 ED.trans['ArcuateScotoma'] = 'Drag handle to change size';
@@ -15071,7 +15382,7 @@ ED.AntSeg = function(_drawing, _parameterJSON) {
 	this.ectropion = false;
 
 	// Saved parameters
-	this.savedParameterArray = ['apexY', 'rotation', 'pxe', 'coloboma', 'colour', 'ectropion'];
+	this.savedParameterArray = ['pupilSize', 'apexY', 'rotation', 'pxe', 'coloboma', 'colour', 'ectropion'];
 
 	// Parameters in doodle control bar (parameter name: parameter label)
 	this.controlParameterArray = {'pupilSize':'Pupil size', 'pxe':'PXE', 'coloboma':'Coloboma', 'colour':'Colour', 'ectropion':'Ectropion uveae'};
@@ -16368,14 +16679,14 @@ ED.Baerveldt.prototype.draw = function(_point) {
 // 		ctx.lineTo(20 * s, this.apexY);
 // 		ctx.lineTo(20 * s, 290 * s + d);
 
-		var cp1 = new ED.Point(0, (290 * s + d) + (this.apexY - (290 * s + d)) * 1);
-		var cp2 = new ED.Point(this.apexX * 0.3, this.apexY);
+		var cp1 = new ED.Drawing.Point(0, (290 * s + d) + (this.apexY - (290 * s + d)) * 1);
+		var cp2 = new ED.Drawing.Point(this.apexX * 0.3, this.apexY);
 		var yd = this.apexX > 0?1:-1;
-		
+
 		ctx.bezierCurveTo(cp1.x - 20 * s, cp1.y, cp2.x - 20 * s, cp2.y, this.apexX - 20 * s, this.apexY + 20 * s * yd);
 		ctx.lineTo(this.apexX + 20 * s, this.apexY - 20 * s * yd);
 		ctx.bezierCurveTo(cp2.x + 20 * s, cp2.y, cp1.x + 20 * s, cp1.y, 20 * s, 290 * s + d);
-		
+
 		//ctx.lineTo(cp1.x, cp1.y);
 
 		ctx.strokeStyle = "rgba(150,150,150,0.5)";
@@ -38984,7 +39295,7 @@ ED.TrabySuture.prototype.setParameterDefaults = function() {
 		{x: 100, y: 200},
 	];
 	for (var i = 0; i < positionSet.length; i++) {
-		var point = new ED.Point(positionSet[i].x, positionSet[i].y);
+		var point = new ED.Drawing.Point(positionSet[i].x, positionSet[i].y);
 		this.addPointToSquiggle(point);
 	}
 }
@@ -39075,10 +39386,10 @@ ED.TrabySuture.prototype.draw = function(_point) {
 // 				ctx.bezierCurveTo(32, 74, 34, 100, 34, 100);
 
 				// From point
-				//var fp = new ED.Point(34, 100);
+				//var fp = new ED.Drawing.Point(34, 100);
 
 				// Suture exit through cornea
-				// 				var ep = new ED.Point(this.firstOriginX, -60);
+				// 				var ep = new ED.Drawing.Point(this.firstOriginX, -60);
 				//
 				// 				// Set up a new transform and centre in canvas
 				// 				var at = new ED.AffineTransform();
@@ -39095,7 +39406,7 @@ ED.TrabySuture.prototype.draw = function(_point) {
 
 				/*
 				// Suture exit through cornea
-				var ep = new ED.Point(this.firstOriginX, -60);
+				var ep = new ED.Drawing.Point(this.firstOriginX, -60);
 
 				// Set up a new transform and centre in canvas
 				var at = new ED.AffineTransform();
@@ -39116,7 +39427,7 @@ ED.TrabySuture.prototype.draw = function(_point) {
 				else if (this.id == 6) d = d * +1;
 				else d = d * -1;
 
-				var mp = new ED.Point(this.firstOriginX - d, -90);
+				var mp = new ED.Drawing.Point(this.firstOriginX - d, -90);
 				var tmp = at.transformPoint(mp);
 				var fmp = this.inverseTransform.transformPoint(tmp);
 
@@ -39143,8 +39454,8 @@ ED.TrabySuture.prototype.draw = function(_point) {
 					tp = this.squiggleArray[0].pointsArray[i];
 
 					// Control points
-// 					cp1 = new ED.Point(fp.x + (tp.x - fp.x)/3, fp.y);
-// 					cp2 = new ED.Point(fp.x + 2 * (tp.x - fp.x)/3, tp.y);
+// 					cp1 = new ED.Drawing.Point(fp.x + (tp.x - fp.x)/3, fp.y);
+// 					cp2 = new ED.Drawing.Point(fp.x + 2 * (tp.x - fp.x)/3, tp.y);
 
 					// Draw Bezier curve
 					//ctx.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, tp.x, tp.y);
@@ -40234,7 +40545,7 @@ ED.ViewObscured.prototype.draw = function(_point) {
 	this.drawBoundary(_point);
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Drawing.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);

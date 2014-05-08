@@ -2,10 +2,15 @@
 <html>
     <head>
         <!-- EyeDraw CSS style sheet -->
-        <link rel="stylesheet" href="../css/oe-eyedraw.css" type="text/css" media="screen" />
+        <link rel="stylesheet" href="../../assets/css/oe-eyedraw.css" type="text/css" media="screen" />
+
+        <!-- Depedendant 3rd-party libraries -->
+        <script type="text/javascript" src="../../assets/components/jquery/jquery.min.js"></script>
+				<script type="text/javascript" src="../../assets/components/mustache/mustache.js"></script>
+				<script type="text/javascript" src="../../assets/components/eventemitter2/lib/eventemitter2.js"></script>
 
         <!-- Mandatory file containing key drawing classes -->
-        <script src="../js/eyedraw.js" type="text/javascript"></script>
+        <script src="../../dist/eyedraw.js" type="text/javascript"></script>
 
         <!-- This script handles the drawings for the page -->
         <script type="text/javascript">
@@ -17,7 +22,7 @@
             function init()
             {
                 // Create a drawing linked to the canvas
-                drawingEdit = new ED.Drawing(document.getElementById('canvasEdit'), ED.eye.Right, 'RPS', true, {graphicsPath:'../img/'});
+                drawingEdit = new ED.Drawing(document.getElementById('canvasEdit'), ED.eye.Right, 'RPS', true, {graphicsPath:'../../assets/img/'});
 
                 // Create a controller object for this drawing
                 var controller = new eyeDrawController(drawingEdit);
@@ -86,15 +91,15 @@
     <body onload="init();">
 
         <!-- Toolbar -->
-        <button class="imgbutton" disabled="disabled" id="deleteSelectedDoodleRPS" title="Delete" onclick="drawingEdit.deleteSelectedDoodle(); return false;" ><img src="img/deleteSelectedDoodle.gif" /></button>
-        <button class="imgbutton" id="PhakoIncisionRPS" onclick="drawingEdit.addDoodle('PhakoIncision'); return false;" ><img src="img/PhakoIncision.gif" /></button>
+        <button class="imgbutton" disabled="disabled" id="deleteSelectedDoodleRPS" title="Delete" onclick="drawingEdit.deleteSelectedDoodle(); return false;" ><img src="../../assets/img/old/deleteSelectedDoodle.gif" /></button>
+        <button class="imgbutton" id="PhakoIncisionRPS" onclick="drawingEdit.addDoodle('PhakoIncision'); return false;" ><img src="../../assets/img/old/PhakoIncision.gif" /></button>
         <br/>
 
         <!-- Canvas tooltip -->
         <span class="canvasTooltip" id="canvasEditTooltip"></span>
 
         <!-- Canvas element -->
-        <canvas id="canvasEdit" class="ed_canvas_edit" width="300" height="300" tabindex="1"></canvas>
+        <canvas id="canvasEdit" class="ed_canvas_edit ed-canvas-edit" width="300" height="300" tabindex="1"></canvas>
 
         <!--
         <select id="pupilSizeSelect">
