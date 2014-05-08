@@ -75,7 +75,7 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 	var offsetY = 0;
 	var toImage = false;
 	this.controllerFunctionName = 'eyeDrawController';
-	this.graphicsPath = 'img/';
+	this.graphicsPath = 'assets/img';
 	this.scaleOn = 'height';
 
 	// If optional parameters exist, use them instead

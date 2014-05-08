@@ -240,13 +240,18 @@ ED.addAndAfterLastComma = function(str) {
 	}
 };
 
+/**
+ * Default titles
+ * @type {Object}
+ */
+ED.titles = {};
 
 /**
  * Set titles.
  * @param {Object} titles An object containing the doodle titles.
  */
 ED.setTitles = function(titles) {
-	this.titles = titles;
+	$.extend(this.titles, titles);
 };
 
 /**
