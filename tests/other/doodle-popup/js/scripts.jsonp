@@ -209,6 +209,7 @@ scriptsLoadCallback({
     "ED/Views/DoodlePopup.js",
     "ED/Views/SelectedDoodle.js",
     "ED/Views/Toolbar.js",
+    "ED/Views/templates.js",
     "ED/Views/DoodlePopup/Help.js",
     "OEEyeDraw.js"
   ]

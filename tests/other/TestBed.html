@@ -336,7 +336,7 @@
     <body onload="init();">
 
         <!-- Doodle controls toolbar -->
-        <div class="ed_toolbar">
+        <div class="ed-toolbar">
             <button class="imgbutton" class="imgbutton" disabled="disabled" id="moveToFrontRPS" title="Move to front" onclick="drawingEdit.moveToFront(); return false;" ><img src="../../assets/img/old/moveToFront.gif"/></button>
             <button class="imgbutton" disabled="disabled" id="moveToBackRPS" title="Move to back" onclick="drawingEdit.moveToBack(); return false;" ><img src="../../assets/img/old/moveToBack.gif" /></button>
             <button class="imgbutton" disabled="disabled" id="flipVerRPS" title="Flip around vertical axis" onclick="drawingEdit.flipVer(); return false;" ><img src="../../assets/img/old/flipVer.gif" /></button>
@@ -374,7 +374,7 @@
         </div>
 
         <!-- Doodle selection toolbar -->
-        <div class="ed_toolbar" id="canvasEdit1doodleToolbar">
+        <div class="ed-toolbar" id="canvasEdit1doodleToolbar">
 <!--
             <button id="LensRPS" class="imgbutton" title="Lens" onclick="
 				var vals = grid.getNextValues('sys');
@@ -403,7 +403,7 @@
         <span class="canvasTooltip" id="canvasEditTooltip"></span>
 
         <!-- Canvas element style="border: none;" style="background-color: #DAE6F1;"-->
-        <canvas id="canvasEdit" class="ed_canvas_edit ed-canvas-edit" width="300" height="300" tabindex="1" style="border: 1px solid gray; float:left;"></canvas>
+        <canvas id="canvasEdit" class="ed-canvas-edit ed-canvas-edit" width="300" height="300" tabindex="1" style="border: 1px solid gray; float:left;"></canvas>
 
         <!-- Doodle control panel -->
         <div id="canvasEdit_controls" style="background-color: #DAE6F1; float:left;">

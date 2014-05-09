@@ -18,7 +18,7 @@ var pattern = '{' + [
 
 // Glob options.
 var globOpt = {
-	cwd: path.join('..', '..', '..', 'src'),
+	cwd: path.join('..', '..', '..', '..', 'src'),
 	sync: true,
 	nosort: true
 };
