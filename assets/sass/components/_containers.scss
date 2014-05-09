@@ -19,16 +19,18 @@
 }
 
 .ed-body {
+	@extend %clearfix;
 	background: #d2dee8;
-	margin: 4px 0 10px -3px;
+	margin: 4px 0 0 0;
+	padding-bottom: 8px;
 	.column.fixed {
-		width: 320px;
-		padding-right: 0;
+		width: 306px;
+		padding: 0;
 	}
 	.column.fluid {
-		width: -moz-calc(100% - 320px);
-		width: -o-calc(100% - 320px);
-		width: -webkit-calc(100% - 320px);
-		width: calc(100% - 320px);
+		width: -moz-calc(100% - 306px);
+		width: -o-calc(100% - 306px);
+		width: -webkit-calc(100% - 306px);
+		width: calc(100% - 306px);
 	}
 }
