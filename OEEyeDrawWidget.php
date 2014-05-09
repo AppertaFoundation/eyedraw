@@ -47,6 +47,12 @@
 class OEEyeDrawWidget extends CWidget
 {
 	/**
+	 * The extra fields HTML string
+	 * @var string
+	 */
+	public $fields = null;
+
+	/**
 	 * Array of EyeDraw script files required (defaults to all available files)
 	 * @todo Search model attribute and contents of doodleToolBarArray to determine subset of files to register
 	 * @var array
@@ -251,9 +257,9 @@ class OEEyeDrawWidget extends CWidget
 	public function init()
 	{
 		// Set values of paths
-		$this->cssPath = Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('application.modules.eyedraw.css'), false, -1);
-		$this->jsPath = Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('application.modules.eyedraw.dist'), false, -1);
-		$this->imgPath = Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('application.modules.eyedraw.img'), false, -1).'/';
+		$this->cssPath = Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('application.modules.eyedraw.assets.css'), false, -1);
+		$this->jsPath = Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('application.modules.eyedraw.assets.js.dist'), false, -1);
+		$this->imgPath = Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('application.modules.eyedraw.assets.img'), false, -1).'/';
 
 		// Create a unique and descriptive variable name for the drawing object and the corresponding canvas element
 		$this->drawingName = 'ed_drawing_'.$this->mode.'_'.$this->idSuffix;
@@ -278,14 +284,6 @@ class OEEyeDrawWidget extends CWidget
 
 		// Flag indicating whether the drawing is editable or not (normally corresponded to edit and view mode)
 		$this->isEditable = $this->mode == 'edit'?true:false;
-
-		// jquery dependency
-		$cs = Yii::app()->clientScript;
-		$cs->registerCoreScript('jquery');
-
-		// Register the chosen scripts and CSS files
-		$this->registerScripts();
-		$this->registerCss();
 
 		if (sizeof($this->doodleToolBarArray) > 0) {
 			// check if need to convert into one row array to have all buttons in one row
@@ -312,6 +310,13 @@ class OEEyeDrawWidget extends CWidget
 			}
 		}
 		$this->doodleToolBarArray = $finalToolBar;
+
+		// Register package (dependent scripts and stylesheets)
+		Yii::app()->clientScript->registerPackage('eyedraw');
+
+		// Register inline scripts
+		$this->registerScripts();
+
 		// Render the widget
 		$this->render($this->template, get_object_vars($this));
 	}
@@ -324,20 +329,15 @@ class OEEyeDrawWidget extends CWidget
 	}
 
 	/**
-	 * Registers all necessary javascript files
+	 * Registers the JavaScript used to init the eyedraw editor.
 	 */
 	protected function registerScripts()
 	{
-				// Get client script object
-		$cs = Yii::app()->getClientScript();
+		$cs = Yii::app()->clientScript;
 
-		$minified = (YII_DEBUG) ? '' : '.min';
-
-		// Register the EyeDraw mandatory scripts
-		$cs->registerScriptFile($this->jsPath.'/oe-eyedraw'.$minified.'.js', CClientScript::POS_HEAD);
-		// For languages that require utf8, use the following line in the view file (***TODO*** should be possible using Yii function)
-		// <script src="dist/eyedraw.js" type="text/javascript" charset="utf-8"></script>
-		$cs->registerScriptFile($this->jsPath.'/eyedraw'.$minified.'.js', CClientScript::POS_HEAD);
+		// Set the eyedraw doodle titles.
+		$titles = CJavaScript::encode(DoodleInfo::$titles);
+		$cs->registerScript('eyedraw_titles', "ED.setTitles({$titles});", CClientScript::POS_END);
 
 		// Create array of parameters to pass to the javascript function which runs on page load
 		$properties = array(
@@ -367,16 +367,7 @@ class OEEyeDrawWidget extends CWidget
 
 		// Encode parameters and pass to a javascript function to set up canvas
 		$properties = CJavaScript::encode($properties);
-		$cs->registerScript('scr_'.$this->canvasId, "eyeDrawInit($properties)", CClientScript::POS_READY);
-	}
-
-	/**
-	 * Registers all necessary css files
-	 */
-	protected function registerCss()
-	{
-		$cssFile = $this->cssPath.'/oe-eyedraw.css';
-		Yii::app()->getClientScript()->registerCssFile($cssFile);
+		$cs->registerScript('scr_'.$this->canvasId, "ED.init($properties);", CClientScript::POS_READY);
 	}
 
 	public function getDrawingName()

@@ -17,8 +17,10 @@
  * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
  */
 ?>
-<div class="EyeDrawWidget" id="eyedrawwidget_<?php echo $idSuffix ?>">
+<div class="EyeDrawWidget ed-widget" id="eyedrawwidget_<?php echo $idSuffix ?>">
 
+	<!-- MANIPULATION ICONS -->
+	<?php /*
 	<?php if ($isEditable && $toolbar) { ?>
 	<ul class="ed_toolbar clearfix">
 		<?php
@@ -48,98 +50,77 @@
 			</a>
 			<span>Label</span>
 		</li> -->
-
 	</ul>
 	<?php } ?>
+	*/?>
 
-	<?php if ($isEditable && count($doodleToolBarArray) > 0) {
-		foreach ($doodleToolBarArray as $row => $rowItems) { ?>
-	<ul class="ed_toolbar clearfix" id="<?php echo $canvasId.'doodleToolbar' . $row ?>">
-		<?php
-			$main_items = array_slice($rowItems, 0, 7);
-			$extra_items = array_slice($rowItems, 7);
-			foreach ($main_items as $item) {
-		?>
-		<li class="ed_img_button action" id="<?php echo $item['classname'].$idSuffix ?>">
-			<a href="#" data-function="addDoodle" data-arg="<?php echo $item['classname'] ?>">
-				<img src="<?php echo $imgPath.$item['classname'] ?>.gif" />
-			</a>
-			<span><?php echo $item['title'] ?></span>
-		</li>
-		<?php
-			}
-			if (count($extra_items)) {
-		?>
-		<li class="ed_img_button drawer">
-			<a href="#">
-				<img src="<?php echo $imgPath ?>more.gif" />
-			</a>
-			<span>More...</span>
-			<ul class="clearfix">
-				<?php foreach ($extra_items as $item) { ?>
-				<li class="ed_img_button action"  id="<?php echo $item['classname'].$idSuffix ?>">
-					<a href="" data-function="addDoodle" data-arg="<?php echo $item['classname'] ?>">
-						<img src="<?php echo $imgPath.$item['classname'] ?>.gif" />
-					</a>
-					<span><?php echo $item['title'] ?></span>
-				</li>
-				<?php } ?>
-			</ul>
-		</li>
-		<?php } ?>
-	</ul>
-	<?php } ?>
+	<?php if ($isEditable && count($doodleToolBarArray) > 0) {?>
+		<div class="ed-toolbar">
+			<?php foreach ($doodleToolBarArray as $row => $rowItems) { ?>
+				<ul class="ed-toolbar-panel ed-main-toolbar">
+					<?php foreach($rowItems as $item) {?>
+						<li id="<?php echo $item['classname'].$idSuffix ?>">
+							<a class="ed-button" href="#" data-function="addDoodle" data-arg="<?php echo $item['classname'] ?>">
+								<span class="icon-ed-<?php echo $item['classname'];?>"></span>
+								<span class="label"><?php echo $item['title'] ?></span>
+							</a>
+						</li>
+					<?php } ?>
+				</ul>
+			<?php } ?>
+		</div>
 	<?php } ?>
 
-	<span class="canvasTooltip" id="<?php echo $canvasId.'Tooltip' ?>"></span>
-	<canvas id="<?php echo $canvasId ?>"
-		class="<?php if ($isEditable) { echo 'ed_canvas_edit'; } else { echo 'ed_canvas_display'; } ?>"
-		width="<?php echo $width ?>" height="<?php echo $height ?>"
-		tabindex="1" data-drawing-name="<?php echo $drawingName ?>"
-		<?php if ($canvasStyle) { ?> style="<?php echo $canvasStyle ?>"<?php } ?>>
-	</canvas>
-	<?php if ($inputId) { ?>
-	<input type="hidden" id="<?php echo $inputId ?>"
-		name="<?php echo $inputName ?>"
-		value='<?php echo $this->model[$this->attribute] ?>' />
-	<?php } ?>
+	<div class="ed-body">
+		<div class="row">
+			<div class="fixed column">
+				<div class="ed-editor">
+
+					<!-- CANVAS -->
+					<div class="ed-canvas-container"></div>
+					<canvas
+						id="<?php echo $canvasId ?>"
+						class="<?php if ($isEditable) { echo 'ed-canvas-edit'; } else { echo 'ed-canvas-display'; } ?>"
+						width="<?php echo $width ?>" height="<?php echo $height ?>"
+						tabindex="1"
+						data-drawing-name="<?php echo $drawingName ?>"
+						<?php if ($canvasStyle) { ?> style="<?php echo $canvasStyle ?>"<?php } ?>>
+					</canvas>
+
+					<!-- SELECTED DOODLE -->
+					<div class="ed-selected-doodle">
+						<select class="ed-selected-doodle-select" id="ed_example_selected_doodle">>
+						</select>
+					</div>
+
+					<!-- CANVAS TOOLBAR -->
+					<ul class="ed-toolbar-panel ed-canvas-toolbar">
+						<li>
+							<a class="ed-button" href="#" data-function="resetEyedraw">
+								<span class="icon-ed-reset"></span>
+								<span class="label">Reset eyedraw</span>
+							</a>
+						</li>
+					</ul>
+
+					<!-- DOODLE POPUP -->
+					<div class="ed-doodle-popup closed">
+					</div>
+
+					<?php if ($inputId) { ?>
+						<!-- DATA FIELD -->
+						<input
+							type="hidden"
+							id="<?php echo $inputId ?>"
+							name="<?php echo $inputName ?>"
+							value='<?php echo $this->model[$this->attribute] ?>' />
+					<?php } ?>
+				</div>
+			</div>
+			<div class="fluid column ed-fields">
+				<?php echo $fields;?>
+			</div>
+		</div>
+	</div>
 </div>
 
-<script type="text/javascript">
-
-	// Use jQuery.hoverIntent if available
-	var hover_event = 'hover';
-	if ($.fn.hoverIntent) {
-		hover_event = 'hoverIntent';
-	}
-	$('#eyedrawwidget_<?php echo $idSuffix ?> .ed_toolbar a')[hover_event](
-			function(e) {
-				$(this).next().addClass('active');
-			},
-			function(e) {
-				$(this).next().removeClass('active');
-			}
-	);
-
-	$('#eyedrawwidget_<?php echo $idSuffix ?> .ed_toolbar li.action a').click(function(e) {
-		var fn = $(this).attr('data-function');
-		var arg = $(this).attr('data-arg');
-		if (typeof(<?php echo $drawingName?>[fn]) == "function") {
-			<?php echo $drawingName?>[fn](arg);
-		}
-		$(".EyeDrawWidget .drawer").removeClass('active');
-		e.preventDefault();
-	});
-
-	// Show/hide drawer when clicked on/away
-	$(document).click(function() {
-		$(".EyeDrawWidget .drawer").removeClass('active'); //click came from somewhere else
-	});
-	$('#eyedrawwidget_<?php echo $idSuffix ?> .ed_toolbar li.drawer > a').click(function(e) {
-		$(".EyeDrawWidget .drawer").removeClass('active');
-		$(this).parent().addClass('active');
-		e.stopPropagation();
-		e.preventDefault();
-	});
-
-</script>
