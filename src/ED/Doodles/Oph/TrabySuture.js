@@ -96,9 +96,20 @@ ED.TrabySuture.prototype.setPropertyDefaults = function() {
 ED.TrabySuture.prototype.setParameterDefaults = function() {
 	this.apexX = +50;
 	this.apexY = +70;
-	this.type = 'Releasable';
 	this.material = 'Nylon';
 	this.size = '10/0';
+	
+	// Make type same as last one
+	var doodle = this.drawing.lastDoodleOfClass("TrabySuture");
+	if (doodle) {
+		this.type = doodle.type;
+	}
+	else {
+		this.type = 'Releasable';
+	}
+	
+	// Additional doodles displaced to left
+	this.setOriginWithDisplacements(0, -40);
 	
 	// Create a squiggle to store the handles points
 	var squiggle = new ED.Squiggle(this, new ED.Colour(100, 100, 100, 1), 4, true);

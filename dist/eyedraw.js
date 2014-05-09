@@ -7800,6 +7800,7 @@ ED.trans = new Object();
 
 // For UTF.8, this file should be loaded with the 'charset="utf-8"' attribute. This currently cannot be done with the Yii registerScriptFile method
 ED.trans['ACIOL'] = 'Anterior chamber IOL<br/><br/>Drag to move<br/>Drag the handle to rotate';
+ED.trans['ACMaintainer'] = 'AC maintainer<br/><br/>Drag to move';
 ED.trans['AngleGradeEast'] = 'Grade of angle (Iris)<br/><br/>Drag handle to adjust amount of angle obscure by iris';
 ED.trans['AngleGradeNorth'] = 'Grade of angle (Iris)<br/><br/>Drag handle to adjust amount of angle obscure by iris';
 ED.trans['AngleGradeSouth'] = 'Grade of angle (Iris)<br/><br/>Drag handle to adjust amount of angle obscure by iris';
@@ -7926,11 +7927,13 @@ ED.trans['SwollenDisc'] = 'Swollen disc';
 ED.trans['Telangiectasis'] = 'Parafoveal Telangiectasia<br/><br/>Drag middle handle to add pigment and exudate';
 ED.trans['ToricPCIOL'] = 'Toric posterior chamber IOL<br/><br/>Drag to move<br/>Drag the handle to rotate';
 ED.trans['Trabectome'] = 'Trabectome<br/><br/>Drag to position<br/>Drag either end handle to adjust extent';
+ED.trans['TrabyConjIncision'] = 'Trabeculectomy conjunctival flap<br/><br/>Drag to position<br/>Drag end handle to adjust extent';
 ED.trans['TrabyFlap'] = 'Trabeculectomy flap<br/><br/>Drag to position<br/>Drag either end handle to adjust size</br>Drag middle handle to change sclerostomy';
 ED.trans['TrabySuture'] = 'Trabeculectomy suture<br/><br/>Drag to position<br/>Drag corner handle to adjust orientation</br>Drag lower handle to change suture type';
 ED.trans['TractionRetinalDetachment'] = 'Traction retinal detachment<br/><br/>Drag to position<br/>Drag inner handle to change shape and size<br/>Drag outer handle to rotate';
 ED.trans['TransilluminationDefect'] = 'Transillumination defects of the iris<br/><br/>Drag to rotate around centre<br/>Drag each end handle to alter extent';
 ED.trans['Tube'] = 'Drainage tube<br/><br/>Drag to change quadrant<br/>Drag handle to move end of tube';
+ED.trans['TubeExtender'] = 'Tube extender<br/><br/>Drag to change quadrant<br/>Drag handle to move end of tube';
 ED.trans['UTear'] = '';
 ED.trans['ViewObscured'] = 'View obscured<br/><br/>Drag handle to change opacity';
 ED.trans['VitreousOpacity'] = 'Vitreous Opacity<br/><br/>Drag to move<br/>Drag the inner handle up and down to alter opacity<br/>Drag the outer handle to scale';
@@ -37494,9 +37497,20 @@ ED.TrabySuture.prototype.setPropertyDefaults = function() {
 ED.TrabySuture.prototype.setParameterDefaults = function() {
 	this.apexX = +50;
 	this.apexY = +70;
-	this.type = 'Releasable';
 	this.material = 'Nylon';
 	this.size = '10/0';
+	
+	// Make type same as last one
+	var doodle = this.drawing.lastDoodleOfClass("TrabySuture");
+	if (doodle) {
+		this.type = doodle.type;
+	}
+	else {
+		this.type = 'Releasable';
+	}
+	
+	// Additional doodles displaced to left
+	this.setOriginWithDisplacements(0, -40);
 	
 	// Create a squiggle to store the handles points
 	var squiggle = new ED.Squiggle(this, new ED.Colour(100, 100, 100, 1), 4, true);
