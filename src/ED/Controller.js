@@ -100,9 +100,16 @@ ED.Controller = (function() {
 	 * Create a DoodlePopup view instance.
 	 */
 	Controller.prototype.createDoodlePopup = function() {
+
+		// We need to match the width of the doodle popup with the width
+		// of the selected doodle. The selected doodle's width is not set (could be
+		// anything), thus we have to calculate it at run-time.
+		var width = this.container.find('.ed-selected-doodle').outerWidth();
+
 		return new ED.Views.DoodlePopup(
 			this.drawing,
-			this.container.find('.ed-doodle-popup')
+			this.container.find('.ed-doodle-popup'),
+			width
 		);
 	};
 

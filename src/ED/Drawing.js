@@ -74,7 +74,6 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 	var offsetX = 0;
 	var offsetY = 0;
 	var toImage = false;
-	this.controllerFunctionName = 'eyeDrawController';
 	this.graphicsPath = 'assets/img';
 	this.scaleOn = 'height';
 
@@ -83,7 +82,6 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 		if (_options['offsetX']) offsetX = _options['offsetX'];
 		if (_options['offsetY']) offsetY = _options['offsetY'];
 		if (_options['toImage']) toImage = _options['toImage'];
-		if (_options['controllerFunctionName']) this.controllerFunctionName = _options['controllerFunctionName'];
 		if (_options['graphicsPath']) this.graphicsPath = _options['graphicsPath'];
 		if (_options['scaleOn']) this.scaleOn = _options['scaleOn'];
 	}

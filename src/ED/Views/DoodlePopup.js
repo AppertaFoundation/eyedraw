@@ -32,14 +32,16 @@ ED.Views.DoodlePopup = (function() {
 	/**
 	 * DoodlePopup constructor
 	 * @param {ED.Drawing} drawing   A doodle drawing instance.
+	 * @param {Number} width The width of the container.
 	 * @param {HTMLElement} widgetContainer The widget container element
 	 * @extends {ED.View}
 	 */
-	function DoodlePopup(drawing, container) {
+	function DoodlePopup(drawing, container, width) {
 		ED.View.apply(this, arguments);
 
 		this.drawing = drawing;
 		this.container = container;
+		this.width = width;
 		this.delayTimer = 0;
 
 		this.registerForNotifications();
@@ -70,7 +72,7 @@ ED.Views.DoodlePopup = (function() {
 	 * Create the template for the popup.
 	 */
 	DoodlePopup.prototype.createTemplate = function() {
-		this.template = $('#ed-doodle-popup-template').html();
+		this.template = ED.scriptTemplates['doodle-popup'];
 	};
 
 	/**
@@ -136,7 +138,9 @@ ED.Views.DoodlePopup = (function() {
 	DoodlePopup.prototype.hide = function() {
 		this.delay(function() {
 			this.emit('hide');
-			this.container.addClass('closed');
+			this.container.css({
+				right: 4
+			}).addClass('closed');
 		}.bind(this));
 	};
 
@@ -146,7 +150,10 @@ ED.Views.DoodlePopup = (function() {
 	DoodlePopup.prototype.show = function() {
 		this.delay(function() {
 			this.emit('show');
-			this.container.removeClass('closed');
+			this.container.css({
+				width: this.width,
+				right: -1 * this.width
+			}).removeClass('closed');
 		}.bind(this));
 	};
 
