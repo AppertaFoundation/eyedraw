@@ -10,7 +10,7 @@
 	<link rel="stylesheet" type="text/css" href="css/test.css" />
 
 	<!-- The eyedraw widget stylesheet -->
-	<link rel="stylesheet" type="text/css" href="../../../assets/css/oe-eyedraw.css" />
+	<!-- <link rel="stylesheet" type="text/css" href="../../../assets/css/oe-eyedraw.css" /> -->
 
 	<!-- Other dependent scripts -->
 	<script type="text/javascript" src="../../../assets/components/jquery/jquery.min.js"></script>
@@ -728,5 +728,14 @@
 	}());
 	</script>
 	<!-- END EYEDRAW INIT -->
+	<script>
+	(function() {
+		$(function() {
+			// We're dynamically adding in this styelsheet to test if the eyedraw is
+			// initiated only after the dependent stylesheets are loaded.
+			$('<link rel="stylesheet" type="text/css" href="../../../assets/css/oe-eyedraw.css?cache=' + (new Date).getTime() + '" />').appendTo(document.body);
+		});
+	}());
+	</script>
 </body>
 </html>

@@ -389,38 +389,18 @@
 					}
 				};
 				var properties = $.extend({}, defaultProperties);
-
 				var controller = new ED.Controller(properties, null, fakeDrawing);
-
 				var drawing = controller.drawing;
-
-				var spy1 = sinon.spy(controller, 'hasInputFieldData');
-				var spy2 = sinon.spy(drawing, 'save');
-
-				// First, lets clear the input field value to test if saving
-				// the data is prevented if the input value is null.
-
-				dom.input.val('');
-				controller.saveDrawingToInputField();
-
-				expect(spy1.calledOnce).to.be.true;
-				expect(spy2.called).to.be.false;
-
-
-				// Now let's test that the input field value is updated, only if
-				// the input field already has data.
+				var spy = sinon.spy(drawing, 'save');
 
 				var data1 = JSON.stringify({ cats: 'rule' });
 				dom.input.val(data1);
 				controller.saveDrawingToInputField();
 
-				expect(spy1.calledTwice).to.be.true;
-				expect(spy2.called).to.be.true;
-
+				expect(spy.calledOnce).to.be.true;
 				expect(dom.input.val()).to.equal(JSON.stringify({ test: 'data' }));
 
-				spy1.reset();
-				spy2.reset();
+				spy.reset();
 				dom.destroy();
 			});
 			it('should load data from the input field', function() {
