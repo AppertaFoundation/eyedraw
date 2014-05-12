@@ -72,54 +72,51 @@
 	<?php } ?>
 
 	<div class="ed-body">
-		<div class="row">
-			<div class="fixed column">
-				<div class="ed-editor">
+		<div class="fixed column">
+			<div class="ed-editor">
 
-					<!-- CANVAS -->
-					<div class="ed-canvas-container"></div>
-					<canvas
-						id="<?php echo $canvasId ?>"
-						class="<?php if ($isEditable) { echo 'ed-canvas-edit'; } else { echo 'ed-canvas-display'; } ?>"
-						width="<?php echo $width ?>" height="<?php echo $height ?>"
-						tabindex="1"
-						data-drawing-name="<?php echo $drawingName ?>"
-						<?php if ($canvasStyle) { ?> style="<?php echo $canvasStyle ?>"<?php } ?>>
-					</canvas>
+				<!-- CANVAS -->
+				<div class="ed-canvas-container"></div>
+				<canvas
+					id="<?php echo $canvasId ?>"
+					class="<?php if ($isEditable) { echo 'ed-canvas-edit'; } else { echo 'ed-canvas-display'; } ?>"
+					width="<?php echo $width ?>" height="<?php echo $height ?>"
+					tabindex="1"
+					data-drawing-name="<?php echo $drawingName ?>"
+					<?php if ($canvasStyle) { ?> style="<?php echo $canvasStyle ?>"<?php } ?>>
+				</canvas>
 
-					<!-- SELECTED DOODLE -->
-					<div class="ed-selected-doodle">
-						<select class="ed-selected-doodle-select" id="ed_example_selected_doodle">>
-						</select>
-					</div>
+				<!-- CANVAS TOOLBAR -->
+				<ul class="ed-toolbar-panel ed-canvas-toolbar">
+					<li>
+						<a class="ed-button" href="#" data-function="resetEyedraw">
+							<span class="icon-ed-reset"></span>
+							<span class="label">Reset eyedraw</span>
+						</a>
+					</li>
+				</ul>
 
-					<!-- CANVAS TOOLBAR -->
-					<ul class="ed-toolbar-panel ed-canvas-toolbar">
-						<li>
-							<a class="ed-button" href="#" data-function="resetEyedraw">
-								<span class="icon-ed-reset"></span>
-								<span class="label">Reset eyedraw</span>
-							</a>
-						</li>
-					</ul>
-
-					<!-- DOODLE POPUP -->
-					<div class="ed-doodle-popup closed">
-					</div>
-
-					<?php if ($inputId) { ?>
-						<!-- DATA FIELD -->
-						<input
-							type="hidden"
-							id="<?php echo $inputId ?>"
-							name="<?php echo $inputName ?>"
-							value='<?php echo $this->model[$this->attribute] ?>' />
-					<?php } ?>
+				<!-- DOODLE POPUP -->
+				<div class="ed-doodle-popup closed">
 				</div>
+
+				<?php if ($inputId) { ?>
+					<!-- DATA FIELD -->
+					<input
+						type="hidden"
+						id="<?php echo $inputId ?>"
+						name="<?php echo $inputName ?>"
+						value='<?php echo $this->model[$this->attribute] ?>' />
+				<?php } ?>
 			</div>
-			<div class="fluid column ed-fields">
-				<?php echo $fields;?>
+		</div>
+		<div class="fluid column ed-fields">
+			<!-- SELECTED DOODLE -->
+			<div class="ed-selected-doodle">
+				<select class="ed-selected-doodle-select" id="ed_example_selected_doodle">>
+				</select>
 			</div>
+			<?php echo $fields;?>
 		</div>
 	</div>
 </div>
