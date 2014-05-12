@@ -39,7 +39,41 @@ var ED = ED || {};
  *     @property graphicsPath Path to folder containing EyeDraw graphics
  *     @property onReadyCommandArray Array of commands and arguments to be run when images are loaded
  */
-ED.init = function(properties) {
+ED.init = (function() {
+
 	'use strict';
-	return new ED.Controller(properties);
-};
+
+	var maxTime = 5000; // 5 seconds
+
+	function waitForStyleSheet(fileName, done, startTime) {
+
+		if (!startTime) {
+			startTime = (new Date()).getTime();
+		}
+		if (((new Date()).getTime() - startTime) >= maxTime) {
+			return ED.errorHandler('OEEyeDraw.js', 'init', 'Unable to init eyedraw, stylesheet is not loaded.');
+		}
+
+		var found = false;
+		var styleSheets = window.document.styleSheets;
+
+		for(var i = 0, j = styleSheets.length; i < j; i++) {
+			var sheet = styleSheets[i];
+			if (sheet.href && sheet.href.indexOf(fileName) >= 0) {
+				found = true;
+				break;
+			}
+		}
+		if (!found) {
+			window.setTimeout(waitForStyleSheet.bind(null, fileName, done, startTime), 100);
+		} else {
+			done();
+		}
+	}
+
+	return function(properties) {
+		waitForStyleSheet('oe-eyedraw', function() {
+			new ED.Controller(properties);
+		});
+	};
+}());
