@@ -41,6 +41,9 @@
 	li {
 		margin-bottom: 0;
 		margin-right: 5px;
+		.sub-element & {
+			margin-right: 1px;
+		}
 		&:last-child {
 			margin-right: 0;
 		}

@@ -27,9 +27,6 @@
 	&:hover, &.hover {
 		background: #118afb;
 	}
-	.active &, &.active {
-		background: #dae6f1;
-	}
 	// Button icon
 	[class*="icon-ed-"] {
 		// Account for the borders
