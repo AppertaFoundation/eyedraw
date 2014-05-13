@@ -265,6 +265,96 @@
 					</section>
 					<!-- END Anterior segment EDIT -->
 
+					<!-- Refraction EDIT -->
+					<section class="element">
+						<header class="element-header">
+							<h3 class="element-title">Refraction</h3>
+						</header>
+						<div class="element-fields element-eyes row">
+							<div class="element-eye right-eye column side left" data-side="right">
+
+								<div class="eyedraw-row refraction">
+
+									<!-- EYEDRAW WIDGET START -->
+									<div class="ed-widget anterior-segment" id="eyedrawwidget_example">
+
+										<div class="ed-body">
+
+											<div class="fixed column">
+
+												<div class="ed-editor">
+
+													<!-- CANVAS -->
+													<div class="ed-canvas-container"></div>
+													<canvas
+													id="ed_example_refraction"
+													class="ed-canvas-edit"
+													width="160"
+													height="160"
+													tabindex="1">
+													</canvas>
+
+													<!-- CANVAS TOOLBAR -->
+													<ul class="ed-toolbar-panel ed-canvas-toolbar">
+														<li>
+															<a class="ed-button" href="#" data-function="resetEyedraw">
+																<span class="icon-ed-reset"></span>
+																<span class="label">Reset eyedraw</span>
+															</a>
+														</li>
+													</ul>
+
+													<!-- DATA FIELD -->
+													<input
+														type="hidden"
+														id="ed_example_refraction_data"
+														value='' />
+												</div>
+											</div>
+
+											<div class="fluid column ed-fields">
+
+												<!-- FIELD ROW -->
+												<div class="field-row">
+													<label for="ed-field-1">
+														Field 1:
+													</label>
+													<div class="row">
+														<div class="large-8 column">
+															<select name="field" id="ed-field-1">
+																<option data-value="Large">Large</option>
+																<option data-value="Medium">Medium</option>
+																<option data-value="Small">Small</option>
+															</select>
+														</div>
+													</div>
+												</div>
+												<!-- FIELD ROW -->
+												<div class="field-row">
+													<label for="ed-field-2">
+														Field 2:
+													</label>
+													<div class="row">
+														<div class="large-8 column">
+															<select name="field" id="ed-field-2">
+																<option>Large</option>
+																<option>Medium</option>
+																<option>Small</option>
+															</select>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="element-eye left-eye column side right" data-side="left">
+							</div>
+						</div>
+					</section>
+					<!-- END Refraction EDIT -->
+
 					<!-- Anterior segment VIEW -->
 					<section class="element Element_OphCiExamination_AnteriorSegment">
 						<header class="element-header">
@@ -594,7 +684,11 @@
 			"Bruising": "Bruising",
 			"Haematoma": "Haematoma"
 		});
+	}());
+	</script>
 
+	<script>
+	(function() {
 		// Anterior segment edit
 		ED.init({
 			canvasId: "ed_example",
@@ -629,6 +723,36 @@
 					}
 				}
 			},
+			syncArray: {},
+			listenerArray: [
+				TestListener
+			],
+			offsetX: 0,
+			offsetY: 0,
+			toImage: false
+		});
+	}());
+	</script>
+
+	<script>
+	(function() {
+		// Refraction edit
+		ED.init({
+			canvasId: "ed_example_refraction",
+			eye: 0,
+			scale: 1,
+			idSuffix: "_refraction",
+			isEditable: true,
+			focus: false,
+			graphicsPath: "../../../assets/img/",
+			inputId: "ed_example_refraction_data",
+			onReadyCommandArray: [
+				['addDoodle', ['TrialFrame']],
+				['addDoodle', ['TrialLens']],
+				['deselectDoodles', []]
+			],
+			onDoodlesLoadedCommandArray: [],
+			bindingArray: {},
 			syncArray: {},
 			listenerArray: [
 				TestListener

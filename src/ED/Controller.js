@@ -44,6 +44,7 @@ ED.Controller = (function() {
 		this.canvas = document.getElementById(properties.canvasId);
 		this.input = document.getElementById(properties.inputId);
 		this.container = $(this.canvas).closest('.ed-widget');
+		this.canvasContainer = this.container.find('.ed-canvas-container');
 
 		this.Checker = Checker || ED.Checker;
 		this.drawing = drawing || this.createDrawing();
@@ -55,6 +56,7 @@ ED.Controller = (function() {
 			this.selectedDoodle = selectedDoodle || this.createSelectedDoodle();
 		}
 
+		this.setDimensions();
 		this.registerDrawing();
 		this.registerForNotifications();
 		this.initListeners();
@@ -89,11 +91,14 @@ ED.Controller = (function() {
 	/**
 	 * Create a Toolbar view instance.
 	 */
-	Controller.prototype.createToolbar = function(container) {
-		return new ED.Views.Toolbar(
+	Controller.prototype.createToolbar = function(selector) {
+
+		var container = this.container.find(selector);
+
+		return container.length ? new ED.Views.Toolbar(
 			this.drawing,
-			this.container.find(container)
-		);
+			container
+		) : null;
 	};
 
 	/**
@@ -101,16 +106,18 @@ ED.Controller = (function() {
 	 */
 	Controller.prototype.createDoodlePopup = function() {
 
+		var container = this.container.find('.ed-doodle-popup');
+
 		// We need to match the width of the doodle popup with the width
 		// of the selected doodle. The selected doodle's width is not set (could be
 		// anything), thus we have to calculate it at run-time.
 		var width = this.container.find('.ed-selected-doodle').outerWidth();
 
-		return new ED.Views.DoodlePopup(
+		return container.length ? new ED.Views.DoodlePopup(
 			this.drawing,
-			this.container.find('.ed-doodle-popup'),
+			container,
 			width
-		);
+		) : null;
 	};
 
 	/**
@@ -118,10 +125,25 @@ ED.Controller = (function() {
 	 * @return {ED.Views.SelectedDoodle} [description]
 	 */
 	Controller.prototype.createSelectedDoodle = function() {
-		return new ED.Views.SelectedDoodle(
+
+		var container = this.container.find('.ed-selected-doodle');
+
+		return container.length ? new ED.Views.SelectedDoodle(
 			this.drawing,
-			this.container.find('.ed-selected-doodle')
-		);
+			container
+		) : null;
+	};
+
+	/**
+	 * Set the dimensions of the canvas container element to match the dimensions
+	 * of the canvas element.
+	 */
+	Controller.prototype.setDimensions = function() {
+		var canvas = $(this.canvas);
+		this.canvasContainer.css({
+			width: canvas.width() + 2,
+			height: canvas.height() + 2
+		});
 	};
 
 	/**

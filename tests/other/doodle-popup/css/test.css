@@ -49,3 +49,14 @@ body {
 #event-content .EyeDrawWidget .ed-toolbar {
 	margin: 0;
 }
+
+.eyedraw-row.refraction .column.fixed {
+  width: 186px;
+}
+/* line 118, ../../../../assets/sass/openeyes/_mixins.scss */
+.eyedraw-row.refraction .column.fluid {
+  width: -moz-calc(100% - 186px);
+  width: -o-calc(100% - 186px);
+  width: -webkit-calc(100% - 186px);
+  width: calc(100% - 186px);
+}
