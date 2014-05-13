@@ -190,7 +190,6 @@
 				properties = $.extend({
 					focus: true
 				}, defaultProperties);
-
 				controller = new ED.Controller(properties, null, null, new Function(), new Function(), new Function(), new Function());
 				drawing = controller.drawing;
 			});
@@ -259,7 +258,7 @@
 				});
 
 				it('should save the drawing data to the input field', function() {
-					var spy = sinon.spy(controller, 'saveDrawingToInputField');
+					var spy = sinon.spy(drawing, 'save');
 					drawing.notify('ready');
 					expect(spy.calledOnce).to.be.true;
 					spy.reset();
@@ -573,6 +572,8 @@
 					],
 				});
 
+				console.log(props);
+
 				var dom = createDOM();
 				var controller = new ED.Controller(props);
 
@@ -584,7 +585,12 @@
 				controller.runOnReadyCommands();
 
 				expect(spy1.withArgs('AntSeg').calledOnce).to.be.true;
-				expect(spy2.calledOnce).to.be.true;
+
+				// NOTE: the reason 'deselectDoodles' is called twice is because
+				// we're notifying the 'doodleSelected' event on doodle add, which in turn
+				// deselects other doodles.
+				// See: https://github.com/openeyes/eyedraw/commit/8dd09115d3327bca942cf88f414f7cfd943b9cff
+				expect(spy2.calledTwice).to.be.true;
 				spy1.reset();
 				spy2.reset();
 				dom.destroy();
@@ -617,7 +623,12 @@
 				controller.runOnDoodlesLoadedCommands();
 
 				expect(spy1.withArgs('AntSeg').calledOnce).to.be.true;
-				expect(spy2.calledOnce).to.be.true;
+
+				// NOTE: the reason 'deselectDoodles' is called twice is because
+				// we're notifying the 'doodleSelected' event on doodle add, which in turn
+				// deselects other doodles.
+				// See: https://github.com/openeyes/eyedraw/commit/8dd09115d3327bca942cf88f414f7cfd943b9cff
+				expect(spy2.calledTwice).to.be.true;
 
 				spy1.reset();
 				spy2.reset();
