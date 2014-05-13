@@ -152,7 +152,7 @@ ED.isFirefox = function() {
 
 // Checks that the value is numeric http://stackoverflow.com/questions/18082/validate-numbers-in-javascript-isnumeric
 ED.isNumeric = function(_value) {
-	return (_value - 0) === _value && _value.length > 0;
+	return (_value - 0) == _value && _value.length > 0;
 };
 
 /**
@@ -258,7 +258,6 @@ ED.setTitles = function(titles) {
  * Array of 200 random numbers
  */
 ED.randomArray = [0.6570, 0.2886, 0.7388, 0.1621, 0.9896, 0.0434, 0.1695, 0.9099, 0.1948, 0.4433, 0.1580, 0.7392, 0.8730, 0.2165, 0.7138, 0.6316, 0.3425, 0.2838, 0.4551, 0.4153, 0.7421, 0.3364, 0.6087, 0.1986, 0.5764, 0.1952, 0.6179, 0.6699, 0.0903, 0.2968, 0.2684, 0.9383, 0.2488, 0.4579, 0.2921, 0.9085, 0.7951, 0.4500, 0.2255, 0.3366, 0.6670, 0.7300, 0.5511, 0.5623, 0.1376, 0.5553, 0.9898, 0.4317, 0.5922, 0.6452, 0.5008, 0.7077, 0.0704, 0.2293, 0.5697, 0.7415, 0.1557, 0.2944, 0.4566, 0.4129, 0.2449, 0.5620, 0.4105, 0.5486, 0.8917, 0.9346, 0.0921, 0.7998, 0.7717, 0.0357, 0.1179, 0.0168, 0.1520, 0.5187, 0.3466, 0.1663, 0.5935, 0.7524, 0.8410, 0.1859, 0.6012, 0.8171, 0.9272, 0.3367, 0.8133, 0.4868, 0.3665, 0.9625, 0.7839, 0.3052, 0.1651, 0.6414, 0.7361, 0.0065, 0.3267, 0.0554, 0.3389, 0.8967, 0.8777, 0.0557, 0.9201, 0.6015, 0.2676, 0.3365, 0.2606, 0.0989, 0.2085, 0.3526, 0.8476, 0.0146, 0.0190, 0.6896, 0.5198, 0.9871, 0.0288, 0.8037, 0.6741, 0.2148, 0.2584, 0.8447, 0.8480, 0.5557, 0.2480, 0.4736, 0.8869, 0.1867, 0.3869, 0.6871, 0.1011, 0.7561, 0.7340, 0.1525, 0.9968, 0.8179, 0.7103, 0.5462, 0.4150, 0.4187, 0.0478, 0.6511, 0.0386, 0.5243, 0.7271, 0.9093, 0.4461, 0.1264, 0.0756, 0.9405, 0.7287, 0.0684, 0.2820, 0.4059, 0.3694, 0.7641, 0.4188, 0.0498, 0.7841, 0.9136, 0.6210, 0.2249, 0.9935, 0.9709, 0.0741, 0.6218, 0.3166, 0.2237, 0.7754, 0.4191, 0.2195, 0.2935, 0.4529, 0.9112, 0.9183, 0.3275, 0.1856, 0.8345, 0.0442, 0.6297, 0.9030, 0.4689, 0.9512, 0.2219, 0.9993, 0.8981, 0.1018, 0.9362, 0.6426, 0.4563, 0.1267, 0.7889, 0.5057, 0.8588, 0.4669, 0.0687, 0.6623, 0.3681, 0.8152, 0.9004, 0.0822, 0.3652];
-
 /**
  * @fileOverview Contains the core classes for EyeDraw
  * @author <a href="mailto:bill.aylward@mac.com">Bill Aylward</a>
@@ -323,7 +322,7 @@ var ED = ED || {};
  * @param {Array} _options Associative array of optional parameters
  */
 
-ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
+ED.Drawing = function(_drawingName, _canvas, _eye, _idSuffix, _isEditable, _options) {
 
 	// Check we're working with an actual canvas HTML element.
 	if (!_canvas || !(_canvas instanceof HTMLCanvasElement)) {
@@ -348,6 +347,7 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 	}
 
 	// Initialise properties
+	this.drawingName = _drawingName;
 	this.canvas = _canvas;
 	this.eye = _eye;
 	this.idSuffix = _idSuffix;
@@ -5687,13 +5687,13 @@ ED.Checker = ED.Checker || (function() {
 	}
 
 	/**
-	 * Returns an eyedraw instance by idSuffix
-	 * @param {String} idSuffix The eyedraw instance idSuffix
+	 * Returns an eyedraw instance by drawing name.
+	 * @param {String} idSuffix The eyedraw drawing name
 	 * @return {ED.Drawing} An eyedraw instance.
 	 */
-	function getInstance(idSuffix) {
+	function getInstance(drawingName) {
 		return instances.filter(function(instance) {
-			return (instance.idSuffix === idSuffix);
+			return (instance.drawingName === drawingName);
 		})[0];
 	}
 
@@ -5706,13 +5706,29 @@ ED.Checker = ED.Checker || (function() {
 		ready = 0;
 	}
 
+	/**
+	 * Get eyedraw instance by drawingName.
+	 */
+	ED.getInstance = getInstance;
+
+	/**
+	 * Public API
+	 */
 	return {
 		register: register,
 		onAllReady: allReady,
 		getInstance: getInstance,
-		reset: reset
+		reset: reset,
+
+		/** BACKWARDS COMPATABILITY **/
+		registerForReady: allReady
 	};
 }());
+
+/** BACKWARDS COMPATABILITY **/
+window.getOEEyeDrawChecker = function() {
+	return ED.Checker;
+};
 /**
  * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
  * (C) OpenEyes Foundation, 2011-2014
@@ -5791,10 +5807,11 @@ ED.Controller = (function() {
 			offsetX: this.properties.offsetX,
 			offsetY: this.properties.offsetY,
 			toImage: this.properties.toImage,
-			graphicsPath: this.properties.graphicsPath
+			graphicsPath: this.properties.graphicsPath,
 		};
 
 		var drawing = new ED.Drawing(
+			this.properties.drawingName,
 			this.canvas,
 			this.properties.eye,
 			this.properties.idSuffix,
