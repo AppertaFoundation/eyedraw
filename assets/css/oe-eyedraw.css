@@ -24,16 +24,16 @@
  * @version 0.9
  */
 /* line 17, ../sass/_placeholders.scss */
-.ed-widget, .ed-body, .ed-toolbar-panel, .ed-doodle-controls > div {
+.ed-toolbar-panel, .ed-widget, .ed-doodle-controls > div {
   *zoom: 1;
 }
 /* line 20, ../sass/_mixins.scss */
-.ed-widget:before, .ed-body:before, .ed-toolbar-panel:before, .ed-doodle-controls > div:before, .ed-widget:after, .ed-body:after, .ed-toolbar-panel:after, .ed-doodle-controls > div:after {
+.ed-toolbar-panel:before, .ed-widget:before, .ed-doodle-controls > div:before, .ed-toolbar-panel:after, .ed-widget:after, .ed-doodle-controls > div:after {
   content: " ";
   display: table;
 }
 /* line 24, ../sass/_mixins.scss */
-.ed-widget:after, .ed-body:after, .ed-toolbar-panel:after, .ed-doodle-controls > div:after {
+.ed-toolbar-panel:after, .ed-widget:after, .ed-doodle-controls > div:after {
   clear: both;
 }
 
@@ -44,25 +44,6 @@
   color: transparent;
   font: 0/0 a;
   text-shadow: none;
-}
-
-/* line 21, ../sass/components/_containers.scss */
-.ed-body {
-  background: #d2dee8;
-  margin: 4px 0 0 0;
-  padding-bottom: 8px;
-}
-/* line 26, ../sass/components/_containers.scss */
-.ed-body .column.fixed {
-  width: 306px;
-  padding: 0;
-}
-/* line 30, ../sass/components/_containers.scss */
-.ed-body .column.fluid {
-  width: -moz-calc(100% - 306px);
-  width: -o-calc(100% - 306px);
-  width: -webkit-calc(100% - 306px);
-  width: calc(100% - 306px);
 }
 
 /* line 18, ../sass/components/_toolbar.scss */
@@ -1180,14 +1161,34 @@
   background-position: 0 0;
 }
 
-/* line 17, ../sass/components/_editor.scss */
+/* line 22, ../sass/components/_editor.scss */
+.ed-body {
+  background: #d2dee8;
+  margin: 4px 0 0 0;
+  padding-bottom: 8px;
+  display: table;
+  width: 100%;
+}
+
+/* line 31, ../sass/components/_editor.scss */
 .ed-editor {
   position: relative;
   margin-left: 2px;
+  width: 310px;
+  display: table-cell;
+  vertical-align: top;
 }
 
-/* line 22, ../sass/components/_editor.scss */
-.ed-canvas-container {
+/* line 39, ../sass/components/_editor.scss */
+.ed-fields {
+  display: table-cell;
+  vertical-align: top;
+  padding-left: 0.75rem;
+  padding-right: 2px;
+}
+
+/* line 46, ../sass/components/_editor.scss */
+.ed-canvas-border {
   position: absolute;
   z-index: 101;
   border: 1px solid #53a0c7;
@@ -1196,7 +1197,12 @@
   top: 3px;
 }
 
-/* line 33, ../sass/components/_editor.scss */
+/* line 55, ../sass/components/_editor.scss */
+.ed-canvas-container {
+  position: relative;
+}
+
+/* line 61, ../sass/components/_editor.scss */
 canvas.ed-canvas-edit {
   cursor: pointer;
   position: relative;
@@ -1206,13 +1212,13 @@ canvas.ed-canvas-edit {
   top: 4px;
   left: 4px;
 }
-/* line 43, ../sass/components/_editor.scss */
+/* line 71, ../sass/components/_editor.scss */
 canvas.ed-canvas-display {
   border: none;
   cursor: auto;
   margin: 0px;
 }
-/* line 50, ../sass/components/_editor.scss */
+/* line 78, ../sass/components/_editor.scss */
 canvas.ed-canvas-edit:focus, canvas.ed-canvas-display:focus {
   outline: none;
 }
@@ -1252,7 +1258,7 @@ span.squiggle {
   padding: 8px 4px;
   height: 36px;
   position: relative;
-  margin: 3px -0.75rem 0.75rem -0.75rem;
+  margin: 3px 0 0.75rem -0.75rem;
   z-index: 101;
 }
 

@@ -55,10 +55,10 @@
 						<div class="element-fields element-eyes row">
 							<div class="element-eye right-eye column side left" data-side="right">
 
-								<div class="eyedraw-row">
+								<div class="eyedraw-row row">
 
 									<!-- EYEDRAW WIDGET START -->
-									<div class="ed-widget anterior-segment" id="eyedrawwidget_example">
+									<div class="ed-widget large-12 column anterior-segment" id="eyedrawwidget_example">
 
 										<!-- TOOLBAR START -->
 										<div class="ed-toolbar">
@@ -150,12 +150,12 @@
 
 										<div class="ed-body">
 
-											<div class="fixed column">
+											<div class="ed-editor">
 
-												<div class="ed-editor">
+												<!-- CANVAS -->
+												<div class="ed-canvas-border"></div>
+												<div class="ed-canvas-container">
 
-													<!-- CANVAS -->
-													<div class="ed-canvas-container"></div>
 													<canvas
 													id="ed_example"
 													class="ed-canvas-edit"
@@ -173,20 +173,20 @@
 															</a>
 														</li>
 													</ul>
-
-													<!-- DOODLE POPUP -->
-													<div class="ed-doodle-popup closed">
-													</div>
-
-													<!-- DATA FIELD -->
-													<input
-														type="hidden"
-														id="ed_example_data"
-														value='' />
 												</div>
+
+												<!-- DOODLE POPUP -->
+												<div class="ed-doodle-popup closed">
+												</div>
+
+												<!-- DATA FIELD -->
+												<input
+													type="hidden"
+													id="ed_example_data"
+													value='' />
 											</div>
 
-											<div class="fluid column ed-fields">
+											<div class="ed-fields">
 
 												<!-- SELECTED DOODLE -->
 												<div class="ed-selected-doodle">
@@ -232,6 +232,36 @@
 													<textarea rows="2" id="ed-field-3"></textarea>
 												</div>
 												<!-- FIELD ROW -->
+												<div class="field-row">
+													<label for="ed-field-4">
+														Field 4:
+													</label>
+													<div class="row">
+														<div class="large-8 column">
+															<select name="field" id="ed-field-4">
+																<option>Large</option>
+																<option>Medium</option>
+																<option>Small</option>
+															</select>
+														</div>
+													</div>
+												</div>
+												<!-- FIELD ROW -->
+												<div class="field-row">
+													<label for="ed-field-5">
+														Field 5:
+													</label>
+													<div class="row">
+														<div class="large-8 column">
+															<select name="field" id="ed-field-5">
+																<option>Large</option>
+																<option>Medium</option>
+																<option>Small</option>
+															</select>
+														</div>
+													</div>
+												</div>
+												<!-- FIELD ROW -->
 												<fieldset class="field-row">
 													<label>
 														<input type="checkbox" id="field-option-1" /> Option 1
@@ -273,19 +303,19 @@
 						<div class="element-fields element-eyes row">
 							<div class="element-eye right-eye column side left" data-side="right">
 
-								<div class="eyedraw-row refraction">
+								<div class="eyedraw-row row refraction">
 
 									<!-- EYEDRAW WIDGET START -->
-									<div class="ed-widget anterior-segment" id="eyedrawwidget_example">
+									<div class="ed-widget large-12 column anterior-segment" id="eyedrawwidget_example">
 
 										<div class="ed-body">
 
-											<div class="fixed column">
 
-												<div class="ed-editor">
+											<div class="ed-editor">
 
-													<!-- CANVAS -->
-													<div class="ed-canvas-container"></div>
+												<!-- CANVAS -->
+												<div class="ed-canvas-border"></div>
+												<div class="ed-canvas-container">
 													<canvas
 													id="ed_example_refraction"
 													class="ed-canvas-edit"
@@ -303,16 +333,16 @@
 															</a>
 														</li>
 													</ul>
-
-													<!-- DATA FIELD -->
-													<input
-														type="hidden"
-														id="ed_example_refraction_data"
-														value='' />
 												</div>
+
+												<!-- DATA FIELD -->
+												<input
+													type="hidden"
+													id="ed_example_refraction_data"
+													value='' />
 											</div>
 
-											<div class="fluid column ed-fields">
+											<div class="ed-fields">
 
 												<!-- FIELD ROW -->
 												<div class="field-row">
@@ -362,14 +392,14 @@
 						</header>
 						<div class="element-fields element-eyes row">
 							<div class="element-eye right-eye column side left" data-side="right">
-								<div class="eyedraw-row">
+								<div class="eyedraw-row row">
 
 									<!-- EYEDRAW WIDGET START -->
-									<div class="ed-widget anterior-segment" id="eyedrawwidget_example">
+									<div class="ed-widget large-12 column anterior-segment" id="eyedrawwidget_example">
 
 										<div class="ed-body">
 
-											<div class="fixed column ed-editor">
+											<div class="ed-editor">
 
 												<!-- CANVAS -->
 												<canvas
@@ -391,7 +421,7 @@
 												/>
 											</div>
 
-											<div class="fluid column ed-data">
+											<div class="ed-data">
 											</div>
 										</div>
 									</div>
@@ -416,14 +446,14 @@
 						<div class="element-fields element-eyes row">
 							<div class="element-eye right-eye column side left" data-side="right">
 
-								<div class="eyedraw-row">
+								<div class="eyedraw-row row">
 
 									<!-- CATARACT EYEDRAW WIDGET START -->
-									<div class="ed-widget anterior-segment" id="eyedrawwidget_example">
+									<div class="ed-widget large-12 column anterior-segment" id="eyedrawwidget_example">
 
 										<div class="ed-body">
 
-											<div class="fixed column ed-editor">
+											<div class="ed-editor">
 
 												<!-- CANVAS -->
 												<canvas
@@ -444,7 +474,7 @@
 													value='' />
 											</div>
 
-											<div class="fluid column ed-fields">
+											<div class="ed-fields">
 
 											</div>
 										</div>
@@ -453,8 +483,8 @@
 								<!-- END CATARACT EYEDRAW WIDGET -->
 
 								<!-- SURGEON EYEDRAW WIDGET START -->
-								<div class="eyedraw-row">
-									<div class="ed-widget anterior-segment" id="eyedrawwidget_example">
+								<div class="eyedraw-row row">
+									<div class="ed-widget large-12 column anterior-segment" id="eyedrawwidget_example">
 
 										<div class="ed-body">
 											<div class="ed-editor">

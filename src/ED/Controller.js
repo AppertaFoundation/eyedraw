@@ -44,10 +44,13 @@ ED.Controller = (function() {
 		this.canvas = document.getElementById(properties.canvasId);
 		this.input = document.getElementById(properties.inputId);
 		this.container = $(this.canvas).closest('.ed-widget');
-		this.canvasContainer = this.container.find('.ed-canvas-container');
+		this.canvasBorder = this.container.find('.ed-canvas-border');
+		this.editorContainer = this.container.find('.ed-editor');
 
 		this.Checker = Checker || ED.Checker;
 		this.drawing = drawing || this.createDrawing();
+
+		this.setDimensions();
 
 		if (this.properties.isEditable) {
 			this.mainToolbar = mainToolbar || this.createToolbar('.ed-main-toolbar');
@@ -56,7 +59,6 @@ ED.Controller = (function() {
 			this.selectedDoodle = selectedDoodle || this.createSelectedDoodle();
 		}
 
-		this.setDimensions();
 		this.registerDrawing();
 		this.registerForNotifications();
 		this.initListeners();
@@ -140,9 +142,12 @@ ED.Controller = (function() {
 	 */
 	Controller.prototype.setDimensions = function() {
 		var canvas = $(this.canvas);
-		this.canvasContainer.css({
+		this.canvasBorder.css({
 			width: canvas.width() + 2,
 			height: canvas.height() + 2
+		});
+		this.editorContainer.css({
+			width: canvas.width() + 4
 		});
 	};
 

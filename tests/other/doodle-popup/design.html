@@ -35,17 +35,18 @@
 						</header>
 						<div class="element-fields element-eyes row">
 							<div class="element-eye right-eye column side left">
-								<div class="eyedraw-row">
-									<div class="ed-widget anterior-segment" id="eyedrawwidget_example">
+								<div class="eyedraw-row row">
+									<div class="ed-widget large-12 column anterior-segment" id="eyedrawwidget_example">
 										<div class="ed-toolbar">
 											<ul class="ed-toolbar-panel ed-main-toolbar">
 											</ul>
 										</div>
 										<div class="ed-body">
-											<div class="fixed column">
-												<div class="ed-editor">
+											<div class="ed-editor" style="width:304px">
 
-													<div class="ed-canvas-container" style="width:302px;height:302px"></div>
+												<div class="ed-canvas-border" style="width:302px;height:302px"></div>
+
+												<div class="ed-canvas-container">
 													<canvas
 													id="ed-design-example"
 													class="ed-canvas-edit"
@@ -62,13 +63,13 @@
 															</a>
 														</li>
 													</ul>
+												</div>
 
-													<div class="ed-doodle-popup closed">
-													</div>
+												<div class="ed-doodle-popup closed">
 												</div>
 											</div>
 
-											<div class="fluid column ed-fields">
+											<div class="ed-fields">
 
 												<div class="ed-selected-doodle">
 													<select class="ed-selected-doodle-select" id="ed_example_selected_doodle">
@@ -146,17 +147,17 @@
 						</header>
 						<div class="element-fields element-eyes row">
 							<div class="element-eye right-eye column side left">
-								<div class="eyedraw-row">
-									<div class="ed-widget anterior-segment" id="eyedrawwidget_example">
+								<div class="eyedraw-row row">
+									<div class="ed-widget large-12 column anterior-segment" id="eyedrawwidget_example">
 										<div class="ed-toolbar">
 											<ul class="ed-toolbar-panel ed-main-toolbar">
 											</ul>
 										</div>
 										<div class="ed-body">
-											<div class="fixed column">
-												<div class="ed-editor">
+											<div class="ed-editor" style="width:304px">
 
-													<div class="ed-canvas-container" style="width:302px;height:302px"></div>
+												<div class="ed-canvas-border" style="width:302px;height:302px"></div>
+												<div class="ed-canvas-container">
 													<canvas
 													id="ed-design-example"
 													class="ed-canvas-edit"
@@ -173,43 +174,43 @@
 															</a>
 														</li>
 													</ul>
+												</div>
 
-													<div class="ed-doodle-popup" style="width:188px;right:-187px">
-														<ul class="ed-toolbar-panel ed-doodle-popup-toolbar">
+												<div class="ed-doodle-popup" style="width:188px;right:-187px">
+													<ul class="ed-toolbar-panel ed-doodle-popup-toolbar">
+														<li>
+															<a class="ed-button ed-doodle-help" href="#" data-function="unlock">
+																<span class="icon-ed-help"></span>
+															</a>
+														</li>
 															<li>
-																<a class="ed-button ed-doodle-help" href="#" data-function="unlock">
-																	<span class="icon-ed-help"></span>
+																<a class="ed-button" href="#" data-function="lock">
+																	<span class="icon-ed-lock"></span>
+																	<span class="label">Lock</span>
 																</a>
 															</li>
-																<li>
-																	<a class="ed-button" href="#" data-function="lock">
-																		<span class="icon-ed-lock"></span>
-																		<span class="label">Lock</span>
-																	</a>
-																</li>
-															<li>
-																<a class="ed-button" href="#" data-function="moveToBack">
-																	<span class="icon-ed-move-to-back"></span>
-																	<span class="label">Move to back</span>
-																</a>
-															</li>
-															<li>
-																<a class="ed-button" href="#" data-function="moveToFront">
-																	<span class="icon-ed-move-to-front"></span>
-																	<span class="label">Move to front</span>
-																</a>
-															</li>
-														</ul>
-														<div class="ed-doodle-info hide">
-															<div class="ed-doodle-description">Drag the handle to resize the pupil<br><br>The iris is semi-transparent so that IOLs, and other structures can be seen behind it</div>
-														</div>
-														<div class="ed-doodle-controls" id="ed_example_controls">
-														<div><label for="ed_example_pupilSize_control">Pupil size</label><select id="ed_example_pupilSize_control"><option>Large</option><option>Medium</option><option>Small</option></select></div><div><label for="ed_example_pxe_control">PXE</label><input type="checkbox" id="ed_example_pxe_control"></div><div><label for="ed_example_coloboma_control">Coloboma</label><input type="checkbox" id="ed_example_coloboma_control"></div><div><label for="ed_example_colour_control">Colour</label><select id="ed_example_colour_control"><option>Blue</option><option>Brown</option><option>Gray</option><option>Green</option></select></div><div><label for="ed_example_ectropion_control">Ectropion uveae</label><input type="checkbox" id="ed_example_ectropion_control"></div></div>
+														<li>
+															<a class="ed-button" href="#" data-function="moveToBack">
+																<span class="icon-ed-move-to-back"></span>
+																<span class="label">Move to back</span>
+															</a>
+														</li>
+														<li>
+															<a class="ed-button" href="#" data-function="moveToFront">
+																<span class="icon-ed-move-to-front"></span>
+																<span class="label">Move to front</span>
+															</a>
+														</li>
+													</ul>
+													<div class="ed-doodle-info hide">
+														<div class="ed-doodle-description">Drag the handle to resize the pupil<br><br>The iris is semi-transparent so that IOLs, and other structures can be seen behind it</div>
 													</div>
+													<div class="ed-doodle-controls" id="ed_example_controls">
+													<div><label for="ed_example_pupilSize_control">Pupil size</label><select id="ed_example_pupilSize_control"><option>Large</option><option>Medium</option><option>Small</option></select></div><div><label for="ed_example_pxe_control">PXE</label><input type="checkbox" id="ed_example_pxe_control"></div><div><label for="ed_example_coloboma_control">Coloboma</label><input type="checkbox" id="ed_example_coloboma_control"></div><div><label for="ed_example_colour_control">Colour</label><select id="ed_example_colour_control"><option>Blue</option><option>Brown</option><option>Gray</option><option>Green</option></select></div><div><label for="ed_example_ectropion_control">Ectropion uveae</label><input type="checkbox" id="ed_example_ectropion_control"></div></div>
 												</div>
 											</div>
 
-											<div class="fluid column ed-fields">
+											<div class="ed-fields">
 
 												<div class="ed-selected-doodle">
 													<select class="ed-selected-doodle-select" id="ed_example_selected_doodle">
@@ -284,17 +285,18 @@
 						</header>
 						<div class="element-fields element-eyes row">
 							<div class="element-eye right-eye column side left">
-								<div class="eyedraw-row">
-									<div class="ed-widget anterior-segment" id="eyedrawwidget_example">
+								<div class="eyedraw-row row">
+									<div class="ed-widget large-12 column anterior-segment" id="eyedrawwidget_example">
 										<div class="ed-toolbar">
 											<ul class="ed-toolbar-panel ed-main-toolbar">
 											</ul>
 										</div>
 										<div class="ed-body">
-											<div class="fixed column">
-												<div class="ed-editor">
+											<div class="ed-editor" style="width:304px;">
 
-													<div class="ed-canvas-container" style="width:302px;height:302px;"></div>
+												<div class="ed-canvas-border" style="width:302px;height:302px;"></div>
+
+												<div class="ed-canvas-container">
 													<canvas
 													id="ed-design-example"
 													class="ed-canvas-edit"
@@ -311,44 +313,44 @@
 															</a>
 														</li>
 													</ul>
+												</div>
 
-													<div class="ed-doodle-popup" style="width:188px;right:-187px;">
-														<ul class="ed-toolbar-panel ed-doodle-popup-toolbar">
+												<div class="ed-doodle-popup" style="width:188px;right:-187px;">
+													<ul class="ed-toolbar-panel ed-doodle-popup-toolbar">
+														<li>
+															<a class="ed-button ed-doodle-help" href="#" data-function="unlock">
+																<span class="icon-ed-help"></span>
+															</a>
+														</li>
 															<li>
-																<a class="ed-button ed-doodle-help" href="#" data-function="unlock">
-																	<span class="icon-ed-help"></span>
+																<a class="ed-button" href="#" data-function="lock">
+																	<span class="icon-ed-lock"></span>
+																	<span class="label">Lock</span>
 																</a>
 															</li>
-																<li>
-																	<a class="ed-button" href="#" data-function="lock">
-																		<span class="icon-ed-lock"></span>
-																		<span class="label">Lock</span>
-																	</a>
-																</li>
-															<li>
-																<a class="ed-button" href="#" data-function="moveToBack">
-																	<span class="icon-ed-move-to-back"></span>
-																	<span class="label">Move to back</span>
-																</a>
-															</li>
-															<li>
-																<a class="ed-button" href="#" data-function="moveToFront">
-																	<span class="icon-ed-move-to-front"></span>
-																	<span class="label">Move to front</span>
-																</a>
-															</li>
-														</ul>
-														<div class="ed-doodle-info">
-															<div class="ed-doodle-description">Drag the handle to resize the pupil<br><br>The iris is semi-transparent so that IOLs, and other structures can be seen behind it</div>
-														</div>
-														<div class="ed-doodle-controls hide" id="ed_example_controls">
-															<div><label for="ed_example_pupilSize_control">Pupil size</label><select id="ed_example_pupilSize_control"><option>Large</option><option>Medium</option><option>Small</option></select></div><div><label for="ed_example_pxe_control">PXE</label><input type="checkbox" id="ed_example_pxe_control"></div><div><label for="ed_example_coloboma_control">Coloboma</label><input type="checkbox" id="ed_example_coloboma_control"></div><div><label for="ed_example_colour_control">Colour</label><select id="ed_example_colour_control"><option>Blue</option><option>Brown</option><option>Gray</option><option>Green</option></select></div><div><label for="ed_example_ectropion_control">Ectropion uveae</label><input type="checkbox" id="ed_example_ectropion_control"></div>
-														</div>
+														<li>
+															<a class="ed-button" href="#" data-function="moveToBack">
+																<span class="icon-ed-move-to-back"></span>
+																<span class="label">Move to back</span>
+															</a>
+														</li>
+														<li>
+															<a class="ed-button" href="#" data-function="moveToFront">
+																<span class="icon-ed-move-to-front"></span>
+																<span class="label">Move to front</span>
+															</a>
+														</li>
+													</ul>
+													<div class="ed-doodle-info">
+														<div class="ed-doodle-description">Drag the handle to resize the pupil<br><br>The iris is semi-transparent so that IOLs, and other structures can be seen behind it</div>
+													</div>
+													<div class="ed-doodle-controls hide" id="ed_example_controls">
+														<div><label for="ed_example_pupilSize_control">Pupil size</label><select id="ed_example_pupilSize_control"><option>Large</option><option>Medium</option><option>Small</option></select></div><div><label for="ed_example_pxe_control">PXE</label><input type="checkbox" id="ed_example_pxe_control"></div><div><label for="ed_example_coloboma_control">Coloboma</label><input type="checkbox" id="ed_example_coloboma_control"></div><div><label for="ed_example_colour_control">Colour</label><select id="ed_example_colour_control"><option>Blue</option><option>Brown</option><option>Gray</option><option>Green</option></select></div><div><label for="ed_example_ectropion_control">Ectropion uveae</label><input type="checkbox" id="ed_example_ectropion_control"></div>
 													</div>
 												</div>
 											</div>
 
-											<div class="fluid column ed-fields">
+											<div class="ed-fields">
 
 												<div class="ed-selected-doodle">
 													<select class="ed-selected-doodle-select" id="ed_example_selected_doodle">
@@ -418,17 +420,18 @@
 						</header>
 						<div class="element-fields element-eyes row">
 							<div class="element-eye right-eye column side left">
-								<div class="eyedraw-row">
-									<div class="ed-widget anterior-segment" id="eyedrawwidget_example">
+								<div class="eyedraw-row row">
+									<div class="ed-widget large-12 column anterior-segment" id="eyedrawwidget_example">
 										<div class="ed-toolbar">
 											<ul class="ed-toolbar-panel ed-main-toolbar">
 											</ul>
 										</div>
 										<div class="ed-body">
-											<div class="fixed column">
-												<div class="ed-editor">
+											<div class="ed-editor" style="width:304px;">
 
-													<div class="ed-canvas-container" style="width:302px;height:302px;"></div>
+												<div class="ed-canvas-border" style="width:302px;height:302px;"></div>
+
+												<div class="ed-canvas-container">
 													<canvas
 													id="ed-design-example"
 													class="ed-canvas-edit"
@@ -445,53 +448,53 @@
 															</a>
 														</li>
 													</ul>
+												</div>
 
-													<div class="ed-doodle-popup" style="width:188px;right:-187px">
-														<ul class="ed-toolbar-panel ed-doodle-popup-toolbar">
+												<div class="ed-doodle-popup" style="width:188px;right:-187px">
+													<ul class="ed-toolbar-panel ed-doodle-popup-toolbar">
+														<li>
+															<a class="ed-button ed-doodle-help" href="#" data-function="unlock">
+																<span class="icon-ed-help"></span>
+															</a>
+														</li>
 															<li>
-																<a class="ed-button ed-doodle-help" href="#" data-function="unlock">
-																	<span class="icon-ed-help"></span>
+																<a class="ed-button" href="#" data-function="lock">
+																	<span class="icon-ed-lock"></span>
+																	<span class="label">Lock</span>
 																</a>
 															</li>
-																<li>
-																	<a class="ed-button" href="#" data-function="lock">
-																		<span class="icon-ed-lock"></span>
-																		<span class="label">Lock</span>
-																	</a>
-																</li>
-															<li>
-																<a class="ed-button" href="#" data-function="moveToBack">
-																	<span class="icon-ed-move-to-back"></span>
-																	<span class="label">Move to back</span>
-																</a>
-															</li>
-															<li>
-																<a class="ed-button" href="#" data-function="moveToFront">
-																	<span class="icon-ed-move-to-front"></span>
-																	<span class="label">Move to front</span>
-																</a>
-															</li>
-														</ul>
-														<div class="ed-doodle-info hide">
-															<div class="ed-doodle-description">Drag the handle to resize the pupil<br><br>The iris is semi-transparent so that IOLs, and other structures can be seen behind it</div>
-														</div>
-														<div class="ed-doodle-controls" id="ed_example_controls">
-															<div><label for="ed_example_pupilSize_control">Pupil size</label><select id="ed_example_pupilSize_control"><option>Large</option><option>Medium</option><option>Small</option></select></div><div><label for="ed_example_pxe_control">PXE</label><input type="checkbox" id="ed_example_pxe_control"></div><div><label for="ed_example_coloboma_control">Coloboma</label><input type="checkbox" id="ed_example_coloboma_control"></div><div><label for="ed_example_colour_control">Colour</label><select id="ed_example_colour_control"><option>Blue</option><option>Brown</option><option>Gray</option><option>Green</option></select></div><div><label for="ed_example_ectropion_control">Ectropion uveae</label><input type="checkbox" id="ed_example_ectropion_control"></div>
-															<div><label>Additional field</label><input type="checkbox" /></div>
-															<div><label>Additional field</label><input type="checkbox" /></div>
-															<div><label>Additional field</label><input type="checkbox" /></div>
-															<div><label>Additional field</label><input type="checkbox" /></div>
-															<div><label>Additional field</label><input type="checkbox" /></div>
-															<div><label>Additional field</label><input type="checkbox" /></div>
-															<div><label>Additional field</label><input type="checkbox" /></div>
-															<div><label>Additional field</label><input type="checkbox" /></div>
-															<div><label>Additional field</label><input type="checkbox" /></div>
-														</div>
+														<li>
+															<a class="ed-button" href="#" data-function="moveToBack">
+																<span class="icon-ed-move-to-back"></span>
+																<span class="label">Move to back</span>
+															</a>
+														</li>
+														<li>
+															<a class="ed-button" href="#" data-function="moveToFront">
+																<span class="icon-ed-move-to-front"></span>
+																<span class="label">Move to front</span>
+															</a>
+														</li>
+													</ul>
+													<div class="ed-doodle-info hide">
+														<div class="ed-doodle-description">Drag the handle to resize the pupil<br><br>The iris is semi-transparent so that IOLs, and other structures can be seen behind it</div>
+													</div>
+													<div class="ed-doodle-controls" id="ed_example_controls">
+														<div><label for="ed_example_pupilSize_control">Pupil size</label><select id="ed_example_pupilSize_control"><option>Large</option><option>Medium</option><option>Small</option></select></div><div><label for="ed_example_pxe_control">PXE</label><input type="checkbox" id="ed_example_pxe_control"></div><div><label for="ed_example_coloboma_control">Coloboma</label><input type="checkbox" id="ed_example_coloboma_control"></div><div><label for="ed_example_colour_control">Colour</label><select id="ed_example_colour_control"><option>Blue</option><option>Brown</option><option>Gray</option><option>Green</option></select></div><div><label for="ed_example_ectropion_control">Ectropion uveae</label><input type="checkbox" id="ed_example_ectropion_control"></div>
+														<div><label>Additional field</label><input type="checkbox" /></div>
+														<div><label>Additional field</label><input type="checkbox" /></div>
+														<div><label>Additional field</label><input type="checkbox" /></div>
+														<div><label>Additional field</label><input type="checkbox" /></div>
+														<div><label>Additional field</label><input type="checkbox" /></div>
+														<div><label>Additional field</label><input type="checkbox" /></div>
+														<div><label>Additional field</label><input type="checkbox" /></div>
+														<div><label>Additional field</label><input type="checkbox" /></div>
+														<div><label>Additional field</label><input type="checkbox" /></div>
 													</div>
 												</div>
 											</div>
 
-											<div class="fluid column ed-fields">
+											<div class="ed-fields">
 
 												<div class="ed-selected-doodle">
 													<select class="ed-selected-doodle-select" id="ed_example_selected_doodle">
@@ -637,8 +640,8 @@
 									<div class="element-eye right-eye column side left" data-side="right">
 										<div class="active-form">
 											<a href="#" class="icon-remove-side remove-side">Remove eye</a>
-											<div class="eyedraw-row">
-												<div class="EyeDrawWidget ed-widget" id="eyedrawwidget_right_15">
+											<div class="eyedraw-row row">
+												<div class="EyeDrawWidget large-12 column ed-widget" id="eyedrawwidget_right_15">
 													<div class="ed-toolbar">
 														<ul class="ed-toolbar-panel ed-main-toolbar">
 															<li id="LaserSpotright_15">
@@ -662,11 +665,12 @@
 														</ul>
 													</div>
 													<div class="ed-body clearfix">
-														<div class="fixed column">
-															<div class="ed-editor">
+														<div class="ed-editor" style="width:304px">
 
-																<!-- CANVAS -->
-																<div class="ed-canvas-container" style="width:302px;height:302px"></div>
+															<!-- CANVAS -->
+															<div class="ed-canvas-border" style="width:302px;height:302px"></div>
+
+															<div class="ed-canvas-container">
 																<canvas id="ed_canvas_edit_right_15" class="ed-canvas-edit" width="300" height="300" tabindex="1" data-drawing-name="ed_drawing_edit_right_15">
 																</canvas>
 
@@ -679,16 +683,16 @@
 																		</a>
 																	</li>
 																</ul>
-
-																<!-- DOODLE POPUP -->
-																<div class="ed-doodle-popup closed">
-																</div>
-
-																<!-- DATA FIELD -->
-																<input type="hidden" id="Element_OphTrLaser_AnteriorSegment_right_eyedraw" name="Element_OphTrLaser_AnteriorSegment[right_eyedraw]" value="">
 															</div>
+
+															<!-- DOODLE POPUP -->
+															<div class="ed-doodle-popup closed">
+															</div>
+
+															<!-- DATA FIELD -->
+															<input type="hidden" id="Element_OphTrLaser_AnteriorSegment_right_eyedraw" name="Element_OphTrLaser_AnteriorSegment[right_eyedraw]" value="">
 														</div>
-														<div class="fluid column ed-fields">
+														<div class="ed-fields">
 																<!-- SELECTED DOODLE -->
 																<div class="ed-selected-doodle">
 																	<select class="ed-selected-doodle-select" id="ed_example_selected_doodle"><optgroup label="Selected doodle"><option selected="selected">None</option><option>Anterior segment</option></optgroup></select>
@@ -726,10 +730,11 @@
 								<div class="eyedraw-row refraction">
 									<div class="ed-widget anterior-segment" id="eyedrawwidget_example">
 										<div class="ed-body">
-											<div class="fixed column">
-												<div class="ed-editor">
+											<div class="ed-editor" style="width:164px">
 
-													<div class="ed-canvas-container" style="width:162px;height:162px"></div>
+												<div class="ed-canvas-border" style="width:162px;height:162px"></div>
+
+												<div class="ed-canvas-container">
 													<canvas
 													id="ed-design-example"
 													class="ed-canvas-edit"
@@ -746,11 +751,10 @@
 															</a>
 														</li>
 													</ul>
-
 												</div>
 											</div>
 
-											<div class="fluid column ed-fields">
+											<div class="ed-fields">
 												<fieldset class="row field-row">
 													<legend class="large-3 column">
 														Sphere:

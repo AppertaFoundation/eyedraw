@@ -17,7 +17,7 @@
  * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
  */
 ?>
-<div class="EyeDrawWidget ed-widget" id="eyedrawwidget_<?php echo $idSuffix ?>">
+<div class="EyeDrawWidget ed-widget large-12 column" id="eyedrawwidget_<?php echo $idSuffix ?>">
 
 	<!-- MANIPULATION ICONS -->
 	<?php /*
@@ -72,11 +72,11 @@
 	<?php } ?>
 
 	<div class="ed-body">
-		<div class="fixed column">
-			<div class="ed-editor">
+		<div class="ed-editor">
 
-				<!-- CANVAS -->
-				<div class="ed-canvas-container"></div>
+			<!-- CANVAS -->
+			<div class="ed-canvas-border"></div>
+			<div class="ed-canvas-container">
 				<canvas
 					id="<?php echo $canvasId ?>"
 					class="<?php if ($isEditable) { echo 'ed-canvas-edit'; } else { echo 'ed-canvas-display'; } ?>"
@@ -86,36 +86,42 @@
 					<?php if ($canvasStyle) { ?> style="<?php echo $canvasStyle ?>"<?php } ?>>
 				</canvas>
 
-				<!-- CANVAS TOOLBAR -->
-				<ul class="ed-toolbar-panel ed-canvas-toolbar">
-					<li>
-						<a class="ed-button" href="#" data-function="resetEyedraw">
-							<span class="icon-ed-reset"></span>
-							<span class="label">Reset eyedraw</span>
-						</a>
-					</li>
-				</ul>
+				<?php if ($showCanvasToolbar) {?>
+					<!-- CANVAS TOOLBAR -->
+					<ul class="ed-toolbar-panel ed-canvas-toolbar">
+						<li>
+							<a class="ed-button" href="#" data-function="resetEyedraw">
+								<span class="icon-ed-reset"></span>
+								<span class="label">Reset eyedraw</span>
+							</a>
+						</li>
+					</ul>
+				<?php }?>
+			</div>
 
+			<?php if ($showDoodlePopup) {?>
 				<!-- DOODLE POPUP -->
 				<div class="ed-doodle-popup closed">
 				</div>
+			<?php }?>
 
-				<?php if ($inputId) { ?>
-					<!-- DATA FIELD -->
-					<input
-						type="hidden"
-						id="<?php echo $inputId ?>"
-						name="<?php echo $inputName ?>"
-						value='<?php echo $this->model[$this->attribute] ?>' />
-				<?php } ?>
-			</div>
+			<?php if ($inputId) { ?>
+				<!-- DATA FIELD -->
+				<input
+					type="hidden"
+					id="<?php echo $inputId ?>"
+					name="<?php echo $inputName ?>"
+					value='<?php echo $this->model[$this->attribute] ?>' />
+			<?php } ?>
 		</div>
-		<div class="fluid column ed-fields">
-			<!-- SELECTED DOODLE -->
-			<div class="ed-selected-doodle">
-				<select class="ed-selected-doodle-select" id="ed_example_selected_doodle">>
-				</select>
-			</div>
+		<div class="ed-fields">
+			<?php if ($showSelectedDoodle) {?>
+				<!-- SELECTED DOODLE -->
+				<div class="ed-selected-doodle">
+					<select class="ed-selected-doodle-select" id="ed_example_selected_doodle">>
+					</select>
+				</div>
+			<?php }?>
 			<?php echo $fields;?>
 		</div>
 	</div>

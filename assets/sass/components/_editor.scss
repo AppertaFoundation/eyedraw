@@ -13,19 +13,47 @@
 // * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
 // * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
 // * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+//
+
+.ed-widget {
+	@extend %clearfix;
+}
+
+.ed-body {
+	// @extend %clearfix;
+	background: #d2dee8;
+	margin: 4px 0 0 0;
+	padding-bottom: 8px;
+	display: table;
+	width: 100%;
+}
 
 .ed-editor {
 	position: relative;
 	margin-left: 2px;
+	width: 310px;
+	display: table-cell;
+	vertical-align: top;
 }
 
-.ed-canvas-container {
+.ed-fields {
+	display: table-cell;
+	vertical-align: top;
+	padding-left: 0.75rem;
+	padding-right: 2px;
+}
+
+.ed-canvas-border {
 	position: absolute;
 	z-index: 101;
 	border: 1px solid #53a0c7;
 	background: #e4edf5;
 	left: 3px;
 	top: 3px;
+}
+
+.ed-canvas-container {
+	position: relative;
 }
 
 canvas {
