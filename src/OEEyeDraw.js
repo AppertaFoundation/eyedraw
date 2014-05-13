@@ -27,25 +27,22 @@
 
 var ED = ED || {};
 
-/**
- * Initialise an EyeDraw widget.
- *
- * @param {object} properties Object of properties passed from widget
- *     @property drawingName The EyeDraw drawing object
- *     @property canvasId The DOM id of the associated canvas element
- *     @property eye The eye (right = 0, left = 1) ***TODO*** handle this better
- *     @property idSuffix A suffix for DOM elements to distinguish those associated with this drawing object
- *     @property isEditable Flag indicating whether drawing object is editable or not
- *     @property graphicsPath Path to folder containing EyeDraw graphics
- *     @property onReadyCommandArray Array of commands and arguments to be run when images are loaded
- */
 ED.init = (function() {
 
 	'use strict';
 
-	var maxTime = 5000; // 5 seconds
-
-	function waitForStyleSheet(fileName, done, startTime) {
+	/**
+	 * In some scenarios, we load the eyedraw markup (including all dependent
+	 * scripts and stylesheets) via AJAX, and then insert the markup into the DOM. This
+	 * causes the scripts to be loaded synchronously, and the stylesheet to be
+	 * loaded asynchronously. Some of the eyedraw script relies on the existing of
+	 * certain CSS rules, thus we have to ensure the styles are loaded before initiating
+	 * the eyedraw.
+	 * @param  {String}   fileName  The string to match the filename of the stylesheet.
+	 * @param  {Number}   maxTime   The max amount of time to check for existence of stylesheet (ms).
+	 * @param  {Function} done      Callback function.
+	 */
+	function waitForStyleSheet(fileName, maxTime, done, startTime) {
 
 		if (!startTime) {
 			startTime = (new Date()).getTime();
@@ -54,25 +51,34 @@ ED.init = (function() {
 			return ED.errorHandler('OEEyeDraw.js', 'init', 'Unable to init eyedraw, stylesheet is not loaded.');
 		}
 
-		var found = false;
 		var styleSheets = window.document.styleSheets;
+		var i = 0;
+		var j = styleSheets.length;
 
-		for(var i = 0, j = styleSheets.length; i < j; i++) {
+		for(; i < j; i++) {
 			var sheet = styleSheets[i];
 			if (sheet.href && sheet.href.indexOf(fileName) >= 0) {
-				found = true;
-				break;
+				return done();
 			}
 		}
-		if (!found) {
-			window.setTimeout(waitForStyleSheet.bind(null, fileName, done, startTime), 100);
-		} else {
-			done();
-		}
+		window.setTimeout(
+			waitForStyleSheet.bind(null, fileName, maxTime, done, startTime), 100);
 	}
 
-	return function(properties) {
-		waitForStyleSheet('oe-eyedraw', function() {
+	/**
+	 * Public init method: Initialise an EyeDraw widget.
+	 *
+	 * @param {object} properties Object of properties passed from widget
+	 *     @property drawingName The EyeDraw drawing object
+	 *     @property canvasId The DOM id of the associated canvas element
+	 *     @property eye The eye (right = 0, left = 1) ***TODO*** handle this better
+	 *     @property idSuffix A suffix for DOM elements to distinguish those associated with this drawing object
+	 *     @property isEditable Flag indicating whether drawing object is editable or not
+	 *     @property graphicsPath Path to folder containing EyeDraw graphics
+	 *     @property onReadyCommandArray Array of commands and arguments to be run when images are loaded
+	 */
+	return function init(properties) {
+		waitForStyleSheet('oe-eyedraw', 5000, function() {
 			new ED.Controller(properties);
 		});
 	};
