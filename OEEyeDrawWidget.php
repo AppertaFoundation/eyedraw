@@ -47,10 +47,22 @@
 class OEEyeDrawWidget extends CWidget
 {
 	/**
-	 * The extra fields HTML string
+	 * The extra fields HTML string.
 	 * @var string
 	 */
 	public $fields = null;
+
+	/**
+	 * Show the drawing controls panel?
+	 * @var boolean
+	 */
+	public $showDrawingControls = true;
+
+	/**
+	 * Show the doodle popup panel?
+	 * @var boolean
+	 */
+	public $showDoodlePopup = true;
 
 	/**
 	 * Array of EyeDraw script files required (defaults to all available files)

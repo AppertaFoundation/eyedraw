@@ -62,7 +62,7 @@ var ED = ED || {};
  * @param {Array} _options Associative array of optional parameters
  */
 
-ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
+ED.Drawing = function(_drawingName, _canvas, _eye, _idSuffix, _isEditable, _options) {
 
 	// Check we're working with an actual canvas HTML element.
 	if (!_canvas || !(_canvas instanceof HTMLCanvasElement)) {
@@ -87,6 +87,7 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 	}
 
 	// Initialise properties
+	this.drawingName = _drawingName;
 	this.canvas = _canvas;
 	this.eye = _eye;
 	this.idSuffix = _idSuffix;

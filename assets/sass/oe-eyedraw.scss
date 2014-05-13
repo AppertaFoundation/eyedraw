@@ -31,11 +31,9 @@
 @import "mixins";
 @import "placeholders";
 
-@import "components/containers";
 @import "components/toolbar";
 @import "components/icons";
 @import "components/editor";
 @import "components/squiggle";
-@import "components/fields";
-@import "components/selected-doodle";
+@import "components/drawing-controls";
 @import "components/doodle-popup";

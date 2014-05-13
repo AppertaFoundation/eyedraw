@@ -30,19 +30,24 @@ ED.Views.DoodlePopup = (function() {
 	'use strict';
 
 	/**
+	 * The amount of time (in ms) for the animation to complete. This should match
+	 * the animation time set in CSS.
+	 * @type {Number}
+	 */
+	var animateTime = 440;
+
+	/**
 	 * DoodlePopup constructor
 	 * @param {ED.Drawing} drawing   A doodle drawing instance.
-	 * @param {Number} width The width of the container.
 	 * @param {HTMLElement} widgetContainer The widget container element
 	 * @extends {ED.View}
 	 */
-	function DoodlePopup(drawing, container, width) {
+	function DoodlePopup(drawing, container) {
 		ED.View.apply(this, arguments);
 
 		this.drawing = drawing;
 		this.container = container;
-		this.width = width;
-		this.delayTimer = 0;
+		this.containerWidth = container.outerWidth();
 
 		this.registerForNotifications();
 		this.createToolbar();
@@ -137,10 +142,18 @@ ED.Views.DoodlePopup = (function() {
 	 */
 	DoodlePopup.prototype.hide = function() {
 		this.delay(function() {
-			this.emit('hide');
+
+			this.emit('hide.before');
+
 			this.container.css({
-				right: 4
-			}).addClass('closed');
+				right: 0
+			});
+
+			setTimeout(function() {
+				this.container.addClass('closed');
+				this.emit('hide.after');
+			}.bind(this), animateTime);
+
 		}.bind(this));
 	};
 
@@ -149,23 +162,18 @@ ED.Views.DoodlePopup = (function() {
 	 */
 	DoodlePopup.prototype.show = function() {
 		this.delay(function() {
-			this.emit('show');
-			this.container.css({
-				width: this.width,
-				right: -1 * this.width
-			}).removeClass('closed');
-		}.bind(this));
-	};
 
-	/**
-	 * Delay executing a callback.
-	 * @param  {Function} fn    The callback function to execute.
-	 * @param {Integer} amount The delay time (in ms)
-	 */
-	DoodlePopup.prototype.delay = function(fn, amount) {
-		clearTimeout(this.delayTimer);
-		amount = typeof amount === 'number' ? amount : 50;
-		this.delayTimer = setTimeout(fn, amount);
+			this.emit('show.before');
+
+			this.container.css({
+				right: -1 * (this.containerWidth - 1)
+			}).removeClass('closed');
+
+			setTimeout(function() {
+				this.emit('show.after');
+			}.bind(this), animateTime);
+
+		}.bind(this));
 	};
 
 	/*********************

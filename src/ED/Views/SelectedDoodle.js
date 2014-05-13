@@ -38,12 +38,13 @@ ED.Views.SelectedDoodle = (function() {
 	 * @param {HTMLElement} container The widget container element
 	 * @extends {ED.View}
 	 */
-	function SelectedDoodle(drawing, container) {
+	function SelectedDoodle(drawing, container, doodlePopup) {
 		ED.View.apply(this, arguments);
 
 		this.drawing = drawing;
 		this.container = container;
 		this.select = this.container.find('select');
+		this.doodlePopup = doodlePopup;
 
 		this.registerForNotifications();
 		this.bindEvents();
@@ -56,12 +57,14 @@ ED.Views.SelectedDoodle = (function() {
 	 * Register a ED.Drawing notification handler. For each event, re-render the view.
 	 */
 	SelectedDoodle.prototype.registerForNotifications = function() {
+
 		this.drawing.registerForNotifications(this, 'render', [
 			'ready',
 			'doodleAdded',
 			'doodleDeleted',
 			'doodleSelected',
 			'doodleDeselected',
+			'doodlesLoaded',
 			'moveToFront',
 			'moveToBack',
 			'doodleLocked',

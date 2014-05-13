@@ -33,6 +33,10 @@
 			'class': 'ed-toolbar-panel ed-canvas-toolbar'
 		}).appendTo(container);
 
+		var doodlePopup = $('<div />', {
+			'class': 'ed-doodle-popup'
+		}).appendTo(container);
+
 		return {
 			container: container,
 			canvas: canvas,
@@ -117,6 +121,8 @@
 				var properties = $.extend({}, defaultProperties);
 				var controller = new ED.Controller(properties);
 
+				console.log(controller);
+
 				expect(controller.mainToolbar instanceof ED.Views.Toolbar).to.be.true;
 				expect(controller.doodlePopup instanceof ED.Views.DoodlePopup).to.be.true;
 				expect(controller.mainToolbar.container[0]).to.equal(dom.mainToolbar[0]);
@@ -190,7 +196,7 @@
 				properties = $.extend({
 					focus: true
 				}, defaultProperties);
-				controller = new ED.Controller(properties, null, null, new Function(), new Function(), new Function(), new Function());
+				controller = new ED.Controller(properties, null, null, new Function(), new Function(), function(){}, new Function());
 				drawing = controller.drawing;
 			});
 			afterEach(function() {

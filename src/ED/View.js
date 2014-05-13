@@ -39,6 +39,7 @@ ED.View = (function() {
 	 */
 	function View(drawing, container) {
 		EventEmitter2.call(this);
+		this.delayTimer = 0;
 	}
 
 	View.prototype = Object.create(EventEmitter2.prototype);
@@ -55,6 +56,17 @@ ED.View = (function() {
 			console.error('No handler defined for event:', handlerName);
 		}
 		this[handlerName](notification);
+	};
+
+	/**
+	 * Delay executing a callback.
+	 * @param  {Function} fn    The callback function to execute.
+	 * @param {Integer} amount The delay time (in ms)
+	 */
+	View.prototype.delay = function(fn, amount) {
+		clearTimeout(this.delayTimer);
+		amount = typeof amount === 'number' ? amount : 50;
+		this.delayTimer = setTimeout(fn, amount);
 	};
 
 	return View;

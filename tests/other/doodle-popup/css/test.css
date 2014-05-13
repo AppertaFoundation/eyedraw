@@ -44,8 +44,33 @@ body {
 	background-image: url("../img/medium.png?1383822301");
 }
 
-
-
 #event-content .EyeDrawWidget .ed-toolbar {
 	margin: 0;
+}
+
+.eyedraw-row.refraction .column.fixed {
+  width: 186px;
+}
+/* line 118, ../../../../assets/sass/openeyes/_mixins.scss */
+.eyedraw-row.refraction .column.fluid {
+  width: -moz-calc(100% - 186px);
+  width: -o-calc(100% - 186px);
+  width: -webkit-calc(100% - 186px);
+  width: calc(100% - 186px);
+}
+
+#eyedrawwidget_Cataract .ed-selected-doodle {
+	width: 200px;
+	/*display: none;*/
+}
+
+.eyedraw-row.cataract-version2 .column.fixed {
+	width: 328px;
+}
+
+.eyedraw-row.cataract-version2 .column.fluid {
+	width: -moz-calc(100% - 328px);
+  width: -o-calc(100% - 328px);
+  width: -webkit-calc(100% - 328px);
+  width: calc(100% - 328px);
 }

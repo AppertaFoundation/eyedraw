@@ -46,20 +46,16 @@
 			}
 		}
 	}
-	&.ed-canvas-toolbar {
-		bottom: -2px;
-		left: 6px;
-		position: absolute;
-		z-index: 103;
+	&.ed-drawing-toolbar {
+		margin-top: -6px;
+		margin-left: -5px;
+		float: left;
 		li {
 			margin: 0;
 		}
 		.ed-button {
 			background: none;
 			border: 0;
-			.label {
-				top: -32px;
-			}
 		}
 	}
 }

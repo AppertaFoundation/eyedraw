@@ -35,10 +35,10 @@ ED.Controller = (function() {
 	 * @param {ED.Checker} [Checker] The EyeDraw checker.
 	 * @param {ED.Drawing} [drawing] An ED.Drawing instance.
 	 * @param {ED.Views.Toolbar} [mainToolbar] An ED.Views.Toolbar instance.
-	 * @param {ED.Views.Toolbar} [canvasToolbar] An ED.Views.Toolbar instance.
+	 * @param {ED.Views.Toolbar} [drawingToolbar] An ED.Views.Toolbar instance.
 	 * @param {ED.Views.DoodlePopup} [doodlePopup] An ED.Views.DoodlePopup instance.
 	 */
-	function Controller(properties, Checker, drawing, mainToolbar, canvasToolbar, doodlePopup, selectedDoodle) {
+	function Controller(properties, Checker, drawing, mainToolbar, drawingToolbar, doodlePopup, selectedDoodle) {
 
 		this.properties = properties;
 		this.canvas = document.getElementById(properties.canvasId);
@@ -50,9 +50,10 @@ ED.Controller = (function() {
 
 		if (this.properties.isEditable) {
 			this.mainToolbar = mainToolbar || this.createToolbar('.ed-main-toolbar');
-			this.canvasToolbar = canvasToolbar || this.createToolbar('.ed-canvas-toolbar');
+			this.drawingToolbar = drawingToolbar || this.createToolbar('.ed-drawing-toolbar');
 			this.doodlePopup = doodlePopup || this.createDoodlePopup();
 			this.selectedDoodle = selectedDoodle || this.createSelectedDoodle();
+			this.bindEditEvents();
 		}
 
 		this.registerDrawing();
@@ -72,10 +73,11 @@ ED.Controller = (function() {
 			offsetX: this.properties.offsetX,
 			offsetY: this.properties.offsetY,
 			toImage: this.properties.toImage,
-			graphicsPath: this.properties.graphicsPath
+			graphicsPath: this.properties.graphicsPath,
 		};
 
 		var drawing = new ED.Drawing(
+			this.properties.drawingName,
 			this.canvas,
 			this.properties.eye,
 			this.properties.idSuffix,
@@ -89,11 +91,14 @@ ED.Controller = (function() {
 	/**
 	 * Create a Toolbar view instance.
 	 */
-	Controller.prototype.createToolbar = function(container) {
-		return new ED.Views.Toolbar(
+	Controller.prototype.createToolbar = function(selector) {
+
+		var container = this.container.find(selector);
+
+		return container.length ? new ED.Views.Toolbar(
 			this.drawing,
-			this.container.find(container)
-		);
+			container
+		) : null;
 	};
 
 	/**
@@ -101,16 +106,12 @@ ED.Controller = (function() {
 	 */
 	Controller.prototype.createDoodlePopup = function() {
 
-		// We need to match the width of the doodle popup with the width
-		// of the selected doodle. The selected doodle's width is not set (could be
-		// anything), thus we have to calculate it at run-time.
-		var width = this.container.find('.ed-selected-doodle').outerWidth();
+		var container = this.container.find('.ed-doodle-popup');
 
-		return new ED.Views.DoodlePopup(
+		return container.length ? new ED.Views.DoodlePopup(
 			this.drawing,
-			this.container.find('.ed-doodle-popup'),
-			width
-		);
+			container
+		) : null;
 	};
 
 	/**
@@ -118,17 +119,20 @@ ED.Controller = (function() {
 	 * @return {ED.Views.SelectedDoodle} [description]
 	 */
 	Controller.prototype.createSelectedDoodle = function() {
-		return new ED.Views.SelectedDoodle(
+
+		var container = this.container.find('.ed-selected-doodle');
+
+		return container.length ? new ED.Views.SelectedDoodle(
 			this.drawing,
-			this.container.find('.ed-selected-doodle')
-		);
+			container,
+			this.doodlePopup
+		) : null;
 	};
 
 	/**
 	 * Register the drawing instance with the Checker.
 	 */
 	Controller.prototype.registerDrawing = function() {
-		// Register drawing with the checker.
 		this.Checker.register(this.drawing);
 	};
 
@@ -146,6 +150,22 @@ ED.Controller = (function() {
 			'mousedragged',
 			'parameterChanged'
 		]);
+	};
+
+	/**
+	 * Bind edit related event handlers.
+	 */
+	Controller.prototype.bindEditEvents = function() {
+		if (this.doodlePopup && this.doodlePopup instanceof ED.Views.DoodlePopup) {
+
+			this.doodlePopup.on('show.before', function() {
+				this.container.addClass('ed-state-doodle-popup-show');
+			}.bind(this));
+
+			this.doodlePopup.on('hide.after', function() {
+				this.container.removeClass('ed-state-doodle-popup-show');
+			}.bind(this));
+		}
 	};
 
 	/**
@@ -265,7 +285,7 @@ ED.Controller = (function() {
 	 * @return {ED.Drawing}
 	 */
 	Controller.prototype.getEyeDrawInstance = function(idSuffix) {
-		return ED.Checker.getInstance(idSuffix);
+		return ED.Checker.getInstanceByIdSuffix(idSuffix);
 	};
 
 	/**
