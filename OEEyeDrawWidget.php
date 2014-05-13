@@ -53,6 +53,24 @@ class OEEyeDrawWidget extends CWidget
 	public $fields = null;
 
 	/**
+	 * Show the selected doodle panel?
+	 * @var boolean
+	 */
+	public $showSelectedDoodle = true;
+
+	/**
+	 * Show the doodle popup panel?
+	 * @var boolean
+	 */
+	public $showDoodlePopup = true;
+
+	/**
+	 * Show the canvas toolbar (eg, reset button)
+	 * @var boolean
+	 */
+	public $showCanvasToolbar = true;
+
+	/**
 	 * Array of EyeDraw script files required (defaults to all available files)
 	 * @todo Search model attribute and contents of doodleToolBarArray to determine subset of files to register
 	 * @var array
