@@ -152,7 +152,7 @@ ED.isFirefox = function() {
 
 // Checks that the value is numeric http://stackoverflow.com/questions/18082/validate-numbers-in-javascript-isnumeric
 ED.isNumeric = function(_value) {
-	return (_value - 0) === _value && _value.length > 0;
+	return (_value - 0) == _value && _value.length > 0;
 };
 
 /**

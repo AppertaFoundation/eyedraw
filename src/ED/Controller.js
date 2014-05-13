@@ -76,10 +76,11 @@ ED.Controller = (function() {
 			offsetX: this.properties.offsetX,
 			offsetY: this.properties.offsetY,
 			toImage: this.properties.toImage,
-			graphicsPath: this.properties.graphicsPath
+			graphicsPath: this.properties.graphicsPath,
 		};
 
 		var drawing = new ED.Drawing(
+			this.properties.drawingName,
 			this.canvas,
 			this.properties.eye,
 			this.properties.idSuffix,

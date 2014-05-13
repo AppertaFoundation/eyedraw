@@ -86,13 +86,13 @@ ED.Checker = ED.Checker || (function() {
 	}
 
 	/**
-	 * Returns an eyedraw instance by idSuffix
-	 * @param {String} idSuffix The eyedraw instance idSuffix
+	 * Returns an eyedraw instance by drawing name.
+	 * @param {String} idSuffix The eyedraw drawing name
 	 * @return {ED.Drawing} An eyedraw instance.
 	 */
-	function getInstance(idSuffix) {
+	function getInstance(drawingName) {
 		return instances.filter(function(instance) {
-			return (instance.idSuffix === idSuffix);
+			return (instance.drawingName === drawingName);
 		})[0];
 	}
 
@@ -105,10 +105,26 @@ ED.Checker = ED.Checker || (function() {
 		ready = 0;
 	}
 
+	/**
+	 * Get eyedraw instance by drawingName.
+	 */
+	ED.getInstance = getInstance;
+
+	/**
+	 * Public API
+	 */
 	return {
 		register: register,
 		onAllReady: allReady,
 		getInstance: getInstance,
-		reset: reset
+		reset: reset,
+
+		/** BACKWARDS COMPATABILITY **/
+		registerForReady: allReady
 	};
 }());
+
+/** BACKWARDS COMPATABILITY **/
+window.getOEEyeDrawChecker = function() {
+	return ED.Checker;
+};
