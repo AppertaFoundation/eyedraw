@@ -184,8 +184,8 @@ ED.Controller = (function() {
 	/**
 	 * Save drawing data to the associated input field.
 	 */
-	Controller.prototype.saveDrawingToInputField = function() {
-		if (this.hasInputFieldData()) {
+	Controller.prototype.saveDrawingToInputField = function(force) {
+		if (force || this.hasInputFieldData()) {
 			this.input.value = this.drawing.save();
 		}
 	};
@@ -373,7 +373,7 @@ ED.Controller = (function() {
 
 		this.addBindings();
 		this.addDeletedValues();
-		this.saveDrawingToInputField();
+		this.saveDrawingToInputField(true);
 
 		// Optionally make canvas element focused
 		if (this.properties.focus) {
