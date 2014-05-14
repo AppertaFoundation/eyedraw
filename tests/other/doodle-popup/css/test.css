@@ -60,3 +60,8 @@ body {
   width: -webkit-calc(100% - 186px);
   width: calc(100% - 186px);
 }
+
+#eyedrawwidget_Cataract .ed-selected-doodle {
+	width: 200px;
+	/*display: none;*/
+}

@@ -42,7 +42,6 @@ ED.Views.DoodlePopup = (function() {
 		this.drawing = drawing;
 		this.container = container;
 		this.width = width;
-		this.delayTimer = 0;
 
 		this.registerForNotifications();
 		this.createToolbar();
@@ -155,17 +154,6 @@ ED.Views.DoodlePopup = (function() {
 				right: -1 * this.width
 			}).removeClass('closed');
 		}.bind(this));
-	};
-
-	/**
-	 * Delay executing a callback.
-	 * @param  {Function} fn    The callback function to execute.
-	 * @param {Integer} amount The delay time (in ms)
-	 */
-	DoodlePopup.prototype.delay = function(fn, amount) {
-		clearTimeout(this.delayTimer);
-		amount = typeof amount === 'number' ? amount : 50;
-		this.delayTimer = setTimeout(fn, amount);
 	};
 
 	/*********************

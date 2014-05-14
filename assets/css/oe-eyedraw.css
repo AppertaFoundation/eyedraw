@@ -1164,61 +1164,63 @@
 /* line 22, ../sass/components/_editor.scss */
 .ed-body {
   background: #d2dee8;
+  display: table;
   margin: 4px 0 0 0;
   padding-bottom: 8px;
-  display: table;
   width: 100%;
 }
 
 /* line 31, ../sass/components/_editor.scss */
 .ed-editor {
-  position: relative;
-  margin-left: 2px;
-  width: 310px;
   display: table-cell;
+  margin-left: 2px;
+  position: relative;
   vertical-align: top;
+  width: 310px;
 }
 
 /* line 39, ../sass/components/_editor.scss */
 .ed-fields {
   display: table-cell;
-  vertical-align: top;
   padding-left: 0.75rem;
   padding-right: 2px;
+  padding-top: 10px;
+  position: relative;
+  vertical-align: top;
 }
 
-/* line 46, ../sass/components/_editor.scss */
+/* line 48, ../sass/components/_editor.scss */
 .ed-canvas-border {
-  position: absolute;
-  z-index: 101;
-  border: 1px solid #53a0c7;
   background: #e4edf5;
+  border: 1px solid #53a0c7;
   left: 3px;
+  position: absolute;
   top: 3px;
+  z-index: 101;
 }
 
-/* line 55, ../sass/components/_editor.scss */
+/* line 57, ../sass/components/_editor.scss */
 .ed-canvas-container {
   position: relative;
 }
 
-/* line 61, ../sass/components/_editor.scss */
+/* line 63, ../sass/components/_editor.scss */
 canvas.ed-canvas-edit {
-  cursor: pointer;
-  position: relative;
-  z-index: 103;
-  border: 0;
   background: #e4edf5;
-  top: 4px;
+  border: 0;
+  cursor: pointer;
   left: 4px;
+  position: relative;
+  top: 4px;
+  z-index: 103;
 }
-/* line 71, ../sass/components/_editor.scss */
+/* line 73, ../sass/components/_editor.scss */
 canvas.ed-canvas-display {
   border: none;
   cursor: auto;
   margin: 0px;
 }
-/* line 78, ../sass/components/_editor.scss */
+/* line 80, ../sass/components/_editor.scss */
 canvas.ed-canvas-edit:focus, canvas.ed-canvas-display:focus {
   outline: none;
 }
@@ -1258,8 +1260,19 @@ span.squiggle {
   padding: 8px 4px;
   height: 36px;
   position: relative;
-  margin: 3px 0 0.75rem -0.75rem;
+  margin: -7px 0 0.75rem -0.75rem;
   z-index: 101;
+}
+/* line 29, ../sass/components/_selected-doodle.scss */
+.ed-selected-doodle.floated {
+  -webkit-transition: left 0.5s ease;
+  -moz-transition: left 0.5s ease;
+  -o-transition: left 0.5s ease;
+  transition: left 0.5s ease;
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin: 3px 0 0 0;
 }
 
 /* line 17, ../sass/components/_doodle-popup.scss */

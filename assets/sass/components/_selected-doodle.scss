@@ -24,6 +24,13 @@
 	padding: 8px 4px;
 	height: 36px;
 	position: relative;
-	margin: 3px 0 0.75rem -0.75rem;
+	margin: -7px 0 0.75rem -0.75rem;
 	z-index: 101;
+	&.floated {
+		@include transition(left 0.5s ease);
+		position: absolute;
+		top: 0;
+		left: 0;
+		margin: 3px 0 0 0;
+	}
 }

@@ -38,12 +38,13 @@ ED.Views.SelectedDoodle = (function() {
 	 * @param {HTMLElement} container The widget container element
 	 * @extends {ED.View}
 	 */
-	function SelectedDoodle(drawing, container) {
+	function SelectedDoodle(drawing, container, floated) {
 		ED.View.apply(this, arguments);
 
 		this.drawing = drawing;
 		this.container = container;
 		this.select = this.container.find('select');
+		this.floated = !!floated;
 
 		this.registerForNotifications();
 		this.bindEvents();
@@ -56,7 +57,7 @@ ED.Views.SelectedDoodle = (function() {
 	 * Register a ED.Drawing notification handler. For each event, re-render the view.
 	 */
 	SelectedDoodle.prototype.registerForNotifications = function() {
-		this.drawing.registerForNotifications(this, 'render', [
+		this.drawing.registerForNotifications(this, 'notificationHandler', [
 			'ready',
 			'doodleAdded',
 			'doodleDeleted',
@@ -75,6 +76,30 @@ ED.Views.SelectedDoodle = (function() {
 	 */
 	SelectedDoodle.prototype.bindEvents = function() {
 		this.select.on('change.' + EVENT_NAMESPACE, this.onSelectChange.bind(this));
+	};
+
+	SelectedDoodle.prototype.notificationHandler = function(notification) {
+
+		var eventName = notification.eventName;
+
+		if (this.floated) {
+			switch(eventName) {
+				case 'ready':
+					this.container.addClass('floated');
+					break;
+				case 'doodleSelected':
+					// We do this in the next event loop as the "doodleDeselect" event
+					// is triggered before the "doodleSelect" event.
+					setTimeout(this.show.bind(this));
+					break;
+				case 'doodleDeselected':
+				case 'doodleDeleted':
+					this.hide();
+					break;
+			}
+		}
+
+		this.render();
 	};
 
 	/**
@@ -146,6 +171,28 @@ ED.Views.SelectedDoodle = (function() {
 		option.data('doodle', doodle);
 
 		return option;
+	};
+
+	SelectedDoodle.prototype.show = function() {
+		if (!this.drawing.selectedDoodle) {
+			return;
+		}
+		this.delay(function() {
+			this.emit('show');
+			this.container.css({
+				width: this.width,
+				left: 0
+			});
+		}.bind(this));
+	};
+
+	SelectedDoodle.prototype.hide = function() {
+		this.delay(function() {
+			this.emit('hide');
+			this.container.css({
+				left: (-1 * (this.container.outerWidth())) - 4
+			}).show();
+		}.bind(this));
 	};
 
 	/*********************

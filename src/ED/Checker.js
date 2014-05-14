@@ -87,12 +87,23 @@ ED.Checker = ED.Checker || (function() {
 
 	/**
 	 * Returns an eyedraw instance by drawing name.
-	 * @param {String} idSuffix The eyedraw drawing name
+	 * @param {String} drawingName The eyedraw drawing name
 	 * @return {ED.Drawing} An eyedraw instance.
 	 */
 	function getInstance(drawingName) {
 		return instances.filter(function(instance) {
 			return (instance.drawingName === drawingName);
+		})[0];
+	}
+
+	/**
+	 * Returns an eyedraw instance by idSuffix.
+	 * @param {String} idSuffix The idSuffix of the eyedraw instance.
+	 * @return {ED.Drawing} An eyedraw instance.
+	 */
+	function getInstanceByIdSuffix(idSuffix) {
+		return instances.filter(function(instance) {
+			return (instance.idSuffix === idSuffix);
 		})[0];
 	}
 
@@ -117,6 +128,7 @@ ED.Checker = ED.Checker || (function() {
 		register: register,
 		onAllReady: allReady,
 		getInstance: getInstance,
+		getInstanceByIdSuffix: getInstanceByIdSuffix,
 		reset: reset,
 
 		/** BACKWARDS COMPATABILITY **/

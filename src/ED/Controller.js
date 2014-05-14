@@ -133,7 +133,8 @@ ED.Controller = (function() {
 
 		return container.length ? new ED.Views.SelectedDoodle(
 			this.drawing,
-			container
+			container,
+			this.properties.floatSelectedDoodle
 		) : null;
 	};
 
@@ -142,11 +143,16 @@ ED.Controller = (function() {
 	 * of the canvas element.
 	 */
 	Controller.prototype.setDimensions = function() {
+
 		var canvas = $(this.canvas);
-		this.canvasBorder.css({
-			width: canvas.width() + 2,
-			height: canvas.height() + 2
-		});
+
+		if (this.canvasBorder.length) {
+			this.canvasBorder.css({
+				width: canvas.width() + 2,
+				height: canvas.height() + 2
+			});
+		}
+
 		this.editorContainer.css({
 			width: canvas.width() + 4
 		});
@@ -293,7 +299,7 @@ ED.Controller = (function() {
 	 * @return {ED.Drawing}
 	 */
 	Controller.prototype.getEyeDrawInstance = function(idSuffix) {
-		return ED.Checker.getInstance(idSuffix);
+		return ED.Checker.getInstanceByIdSuffix(idSuffix);
 	};
 
 	/**
