@@ -5889,15 +5889,20 @@ ED.Controller = (function() {
 
 		var canvas = $(this.canvas);
 
+		// We use the width and height attributes as the canvas containers might be hidden,
+		// thus we won't be able to get the computed dimensions.
+		var canvasWidth = parseInt(canvas.attr('width'), 10);
+		var canvasHeight = parseInt(canvas.attr('height'), 10);
+
 		if (this.canvasBorder.length) {
 			this.canvasBorder.css({
-				width: canvas.width() + 2,
-				height: canvas.height() + 2
+				width: canvasWidth + 2,
+				height: canvasHeight + 2
 			});
 		}
 
 		this.editorContainer.css({
-			width: canvas.width() + 4
+			width: canvasWidth + (this.properties.isEditable ? 4 : 8)
 		});
 	};
 
@@ -7427,6 +7432,7 @@ ED.Views.SelectedDoodle = (function() {
 			'doodleDeleted',
 			'doodleSelected',
 			'doodleDeselected',
+			'doodlesLoaded',
 			'moveToFront',
 			'moveToBack',
 			'doodleLocked',

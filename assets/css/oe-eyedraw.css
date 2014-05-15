@@ -1169,17 +1169,23 @@
   padding-bottom: 8px;
   width: 100%;
 }
+/* line 29, ../sass/components/_editor.scss */
+.ed-widget.display .ed-body {
+  width: auto;
+  display: inline-block;
+  padding-bottom: 6px;
+}
 
-/* line 31, ../sass/components/_editor.scss */
+/* line 36, ../sass/components/_editor.scss */
 .ed-editor {
   display: table-cell;
   margin-left: 2px;
   position: relative;
   vertical-align: top;
-  width: 310px;
+  width: auto;
 }
 
-/* line 39, ../sass/components/_editor.scss */
+/* line 44, ../sass/components/_editor.scss */
 .ed-fields {
   display: table-cell;
   padding-left: 0.75rem;
@@ -1189,7 +1195,7 @@
   vertical-align: top;
 }
 
-/* line 48, ../sass/components/_editor.scss */
+/* line 53, ../sass/components/_editor.scss */
 .ed-canvas-border {
   background: #e4edf5;
   border: 1px solid #53a0c7;
@@ -1199,12 +1205,12 @@
   z-index: 101;
 }
 
-/* line 57, ../sass/components/_editor.scss */
+/* line 62, ../sass/components/_editor.scss */
 .ed-canvas-container {
   position: relative;
 }
 
-/* line 63, ../sass/components/_editor.scss */
+/* line 68, ../sass/components/_editor.scss */
 canvas.ed-canvas-edit {
   background: #e4edf5;
   border: 0;
@@ -1214,13 +1220,15 @@ canvas.ed-canvas-edit {
   top: 4px;
   z-index: 103;
 }
-/* line 73, ../sass/components/_editor.scss */
+/* line 78, ../sass/components/_editor.scss */
 canvas.ed-canvas-display {
   border: none;
   cursor: auto;
   margin: 0px;
+  position: relative;
+  z-index: 103;
 }
-/* line 80, ../sass/components/_editor.scss */
+/* line 87, ../sass/components/_editor.scss */
 canvas.ed-canvas-edit:focus, canvas.ed-canvas-display:focus {
   outline: none;
 }

@@ -63,6 +63,7 @@ ED.Views.SelectedDoodle = (function() {
 			'doodleDeleted',
 			'doodleSelected',
 			'doodleDeselected',
+			'doodlesLoaded',
 			'moveToFront',
 			'moveToBack',
 			'doodleLocked',

@@ -26,6 +26,11 @@
 	margin: 4px 0 0 0;
 	padding-bottom: 8px;
 	width: 100%;
+	.ed-widget.display & {
+		width: auto;
+		display: inline-block;
+		padding-bottom: 6px;
+	}
 }
 
 .ed-editor {
@@ -33,7 +38,7 @@
 	margin-left: 2px;
 	position: relative;
 	vertical-align: top;
-	width: 310px;
+	width: auto;
 }
 
 .ed-fields {
@@ -74,6 +79,8 @@ canvas {
 		border: none;
 		cursor: auto;
 		margin: 0px;
+		position: relative;
+		z-index: 103;
 	}
 	// Stop canvas being highlighted on mouse click
 	&.ed-canvas-edit, &.ed-canvas-display {

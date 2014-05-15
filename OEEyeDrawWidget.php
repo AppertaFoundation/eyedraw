@@ -71,6 +71,12 @@ class OEEyeDrawWidget extends CWidget
 	public $showCanvasToolbar = true;
 
 	/**
+	 * Used to display 'child' eyedraws within the parent eyedraw widget.
+	 * @var string
+	 */
+	public $childEyeDraws = null;
+
+	/**
 	 * Array of EyeDraw script files required (defaults to all available files)
 	 * @todo Search model attribute and contents of doodleToolBarArray to determine subset of files to register
 	 * @var array

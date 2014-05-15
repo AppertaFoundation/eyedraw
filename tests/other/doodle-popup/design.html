@@ -838,10 +838,10 @@
 						</div>
 					</section>
 
-					<!-- Full element width -->
+					<!-- Full element width with floated selected doodle -->
 					<section class="sub-element Element_OphTrOperationnote_Cataract on-demand row">
 						<header class="sub-element-header">
-							<h4 class="sub-element-title">Cataract (full width)</h4>
+							<h4 class="sub-element-title">Cataract (full width with floated selected doodle)</h4>
 						</header>
 						<div class="element-fields">
 							<div class="row cataract eyedraw-row">
@@ -907,6 +907,216 @@
 										<div class="ed-fields">
 											<!-- SELECTED DOODLE -->
 											<div class="ed-selected-doodle floated">
+												<select class="ed-selected-doodle-select" id="ed_example_selected_doodle">
+													<optgroup label="Selected doodle">
+														<option selected="selected">None</option>
+														<option>Side port (2)</option>
+														<option>Side port (1)</option>
+														<option>Phako incision</option>
+														<option>Anterior segment</option>
+														<option>Posterior chamber IOL</option>
+													</optgroup>
+												</select>
+											</div>
+
+											<div id="div_Element_OphTrOperationnote_Cataract_incision_site_id" class="row field-row">
+
+												<div class="large-3 column">
+													<label for="Element_OphTrOperationnote_Cataract_incision_site_id">Incision site:</label>
+												</div>
+
+												<div class="large-4 column end">
+
+													<select textattribute="data-value" name="Element_OphTrOperationnote_Cataract[incision_site_id]" id="Element_OphTrOperationnote_Cataract_incision_site_id">
+														<option value="">- Please select -</option>
+														<option value="1" selected="selected" data-value="Corneal">Corneal</option>
+														<option value="2" data-value="Limbal">Limbal</option>
+														<option value="3" data-value="Scleral">Scleral</option>
+													</select>
+												</div>
+											</div>
+											<div id="div_Element_OphTrOperationnote_Cataract_length" class="row field-row">
+												<div class="large-3 column">
+													<label for="Element_OphTrOperationnote_Cataract_length">Length:</label>
+												</div>
+												<div class="large-2 column end">
+													<input type="text" value="2.8" name="Element_OphTrOperationnote_Cataract[length]" id="Element_OphTrOperationnote_Cataract_length">
+												</div>
+											</div>
+											<div id="div_Element_OphTrOperationnote_Cataract_meridian" class="row field-row">
+												<div class="large-3 column">
+													<label for="Element_OphTrOperationnote_Cataract_meridian">Meridian:</label>
+												</div>
+												<div class="large-2 column end">
+													<input type="text" value="0" name="Element_OphTrOperationnote_Cataract[meridian]" id="Element_OphTrOperationnote_Cataract_meridian">
+												</div>
+											</div>
+											<div id="div_Element_OphTrOperationnote_Cataract_incision_type_id" class="row field-row">
+
+												<div class="large-3 column">
+													<label for="Element_OphTrOperationnote_Cataract_incision_type_id">Incision type:</label>
+												</div>
+
+												<div class="large-4 column end">
+
+													<select textattribute="data-value" name="Element_OphTrOperationnote_Cataract[incision_type_id]" id="Element_OphTrOperationnote_Cataract_incision_type_id">
+														<option value="">- Please select -</option>
+														<option value="1" selected="selected" data-value="Pocket">Pocket</option>
+														<option value="2" data-value="Section">Section</option>
+													</select>
+												</div>
+											</div>
+											<div id="div_Element_OphTrOperationnote_Cataract_report" class="row field-row">
+												<div class="large-3 column">
+													<label for="Element_OphTrOperationnote_Cataract_report">Details:</label>
+												</div>
+												<div class="large-9 column end">
+													<textarea rows="6" id="Element_OphTrOperationnote_Cataract_report" name="Element_OphTrOperationnote_Cataract[report]">Continuous Circular Capsulorrhexis Hydrodissection Phakoemulsification of lens nucleus Aspiration of soft lens matter Viscoelastic removed</textarea>
+												</div>
+											</div>
+
+											<div id="div_Element_OphTrOperationnote_Cataract_Devices" class="eventDetail row field-row widget">
+												<div class="large-3 column">
+													<label for="OphTrOperationnote_CataractOperativeDevices">
+														Devices:
+													</label>
+												</div>
+												<div class="large-4 column end">
+													<div class="multi-select multi-select-list" data-options="{&quot;sorted&quot;:false}">
+														<input type="hidden" name="Element_OphTrOperationnote_Cataract[MultiSelectList_OphTrOperationnote_CataractOperativeDevices]" class="multi-select-list-name">
+														<div class="multi-select-dropdown-container">
+															<select id="OphTrOperationnote_CataractOperativeDevices" class="MultiSelectList" name="">
+																<option value="">- Devices -</option>
+															</select>
+														</div>
+														<ul class="MultiSelectList multi-select-selections hide">
+														</ul>
+
+													</div>
+												</div>
+											</div>
+
+											<div id="div_Element_OphTrOperationnote_Cataract_Complications" class="eventDetail row field-row widget">
+												<div class="large-3 column">
+													<label for="OphTrOperationnote_CataractComplications">
+														Complications:
+													</label>
+												</div>
+												<div class="large-4 column end">
+													<div class="multi-select multi-select-list" data-options="{&quot;sorted&quot;:false}">
+														<input type="hidden" name="Element_OphTrOperationnote_Cataract[MultiSelectList_OphTrOperationnote_CataractComplications]" class="multi-select-list-name">
+														<div class="multi-select-dropdown-container">
+															<select id="OphTrOperationnote_CataractComplications" class="MultiSelectList" name="">
+																<option value="">- Complications -</option>
+																<option value="16">Anterior Capsular tear</option>
+																<option value="1">Choroidal haem</option>
+																<option value="2">Corneal odema</option>
+																<option value="3">Decentered IOL</option>
+																<option value="4">Dropped nucleus</option>
+																<option value="17">Hyphaema</option>
+																<option value="5">IOL exchange</option>
+																<option value="6">IOL into vitreous</option>
+																<option value="7">Iris prolapse</option>
+																<option value="8">Iris trauma</option>
+																<option value="9">Op cancelled</option>
+																<option value="10">Other IOL problem</option>
+																<option value="11">PC rupture</option>
+																<option value="12">Vitreous loss</option>
+																<option value="13">Wound burn</option>
+																<option value="14">Zonular dialysis</option>
+																<option value="15">Zonular rupture</option>
+															</select>
+														</div>
+														<ul class="MultiSelectList multi-select-selections hide">
+														</ul>
+
+													</div>
+												</div>
+											</div>
+											<div id="div_Element_OphTrOperationnote_Cataract_complication_notes" class="row field-row">
+												<div class="large-3 column">
+													<label for="Element_OphTrOperationnote_Cataract_complication_notes">Complication notes:</label>
+												</div>
+												<div class="large-9 column end">
+													<textarea rows="6" id="Element_OphTrOperationnote_Cataract_complication_notes" name="Element_OphTrOperationnote_Cataract[complication_notes]"></textarea>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</section>
+
+					<!-- Full element width -->
+					<section class="sub-element Element_OphTrOperationnote_Cataract on-demand row">
+						<header class="sub-element-header">
+							<h4 class="sub-element-title">Cataract (full width)</h4>
+						</header>
+						<div class="element-fields">
+							<div class="row cataract eyedraw-row">
+								<div class="EyeDrawWidget ed-widget large-12 column" id="eyedrawwidget_Cataract">
+									<div class="ed-toolbar">
+										<ul class="ed-toolbar-panel ed-main-toolbar">
+										</ul>
+									</div>
+									<div class="ed-body">
+										<div class="ed-editor" style="width: 304px;">
+
+											<!-- CANVAS -->
+											<div class="ed-canvas-border" style="width: 302px; height: 302px;"></div>
+											<div class="ed-canvas-container">
+												<canvas id="ed_canvas_edit_Cataract" class="ed-canvas-edit" width="300" height="300" tabindex="1" data-drawing-name="ed_drawing_edit_Cataract">
+												</canvas>
+												<!-- CANVAS TOOLBAR -->
+												<ul class="ed-toolbar-panel ed-canvas-toolbar">
+													<li>
+														<a class="ed-button" href="#" data-function="resetEyedraw">
+															<span class="icon-ed-reset"></span>
+															<span class="label">Reset eyedraw</span>
+														</a>
+													</li>
+												</ul>
+											</div>
+
+											<!-- DOODLE POPUP -->
+											<div class="ed-doodle-popup" style="right: 4px; width:200px;">
+												<ul class="ed-toolbar-panel ed-doodle-popup-toolbar">
+													<li>
+														<a class="ed-button ed-doodle-help" href="#" data-function="toggleHelp">
+															<span class="icon-ed-help"></span>
+														</a>
+													</li>
+														<li>
+															<a class="ed-button" href="#" data-function="lock">
+																<span class="icon-ed-lock"></span>
+																<span class="label">Lock</span>
+															</a>
+														</li>
+													<li>
+														<a class="ed-button" href="#" data-function="moveToBack">
+															<span class="icon-ed-move-to-back"></span>
+															<span class="label">Move to back</span>
+														</a>
+													</li>
+													<li>
+														<a class="ed-button" href="#" data-function="moveToFront">
+															<span class="icon-ed-move-to-front"></span>
+															<span class="label">Move to front</span>
+														</a>
+													</li>
+												</ul>
+												<div class="ed-doodle-info hide">
+													<div class="ed-doodle-description">Drag the handle to resize the pupil<br><br>The iris is semi-transparent so that IOLs, and other structures can be seen behind it</div>
+												</div>
+												<div class="ed-doodle-controls" id="ed_canvas_edit_Cataract_controls">
+													<div><label for="ed_canvas_edit_Cataract_pupilSize_control">Pupil size</label><select id="ed_canvas_edit_Cataract_pupilSize_control"><option>Large</option><option>Medium</option><option>Small</option></select></div><div><label for="ed_canvas_edit_Cataract_pxe_control">PXE</label><input type="checkbox" id="ed_canvas_edit_Cataract_pxe_control"></div><div><label for="ed_canvas_edit_Cataract_coloboma_control">Coloboma</label><input type="checkbox" id="ed_canvas_edit_Cataract_coloboma_control"></div><div><label for="ed_canvas_edit_Cataract_colour_control">Colour</label><select id="ed_canvas_edit_Cataract_colour_control"><option>Blue</option><option>Brown</option><option>Gray</option><option>Green</option></select></div><div><label for="ed_canvas_edit_Cataract_ectropion_control">Ectropion uveae</label><input type="checkbox" id="ed_canvas_edit_Cataract_ectropion_control"></div>
+												</div>
+											</div>
+										</div>
+										<div class="ed-fields">
+											<!-- SELECTED DOODLE -->
+											<div class="ed-selected-doodle">
 												<select class="ed-selected-doodle-select" id="ed_example_selected_doodle">
 													<optgroup label="Selected doodle">
 														<option selected="selected">None</option>
