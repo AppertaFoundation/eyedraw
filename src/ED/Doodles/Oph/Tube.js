@@ -66,6 +66,8 @@ ED.Tube.prototype.setPropertyDefaults = function() {
 	this.isMoveable = false;
 	this.isRotatable = true;
 	this.snapToAngles = true;
+	this.isDeletable = false;
+	this.isUnique = true;
 
 	// Update component of validation array for simple parameters
 	this.parameterValidationArray['apexX']['range'].setMinAndMax(-300, +300);

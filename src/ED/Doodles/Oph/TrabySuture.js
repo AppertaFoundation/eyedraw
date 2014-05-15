@@ -108,8 +108,17 @@ ED.TrabySuture.prototype.setParameterDefaults = function() {
 		this.type = 'Releasable';
 	}
 	
-	// Additional doodles displaced to left
-	this.setOriginWithDisplacements(0, -40);
+	// If two sutures, place in between
+	if (this.drawing.numberOfDoodlesOfClass("TrabySuture") == 2) {
+		var doodle1 = this.drawing.firstDoodleOfClass("TrabySuture");
+		var doodle2 = this.drawing.lastDoodleOfClass("TrabySuture");
+		this.originX = doodle1.originX + (doodle2.originX - doodle1.originX)/2;
+		this.originY = doodle1.originY + (doodle2.originY - doodle1.originY)/2;
+	}
+	else {
+		// Additional doodles displaced to left
+		this.setOriginWithDisplacements(0, -40);
+	}
 	
 	// Create a squiggle to store the handles points
 	var squiggle = new ED.Squiggle(this, new ED.Colour(100, 100, 100, 1), 4, true);
