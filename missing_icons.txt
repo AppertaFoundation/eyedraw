@@ -1,0 +1,29 @@
+Missing icons:
+
+Cataract:
+* Phako incision : PhakoIncision
+* Side port : SidePort
+* Iris hook : IrisHook
+* Mattress suture : MattressSuture
+* Capsular Tension Ring : CapsularTensionRing
+* Corneal suture : CornealSuture
+* Toric posterior chamber IOL : ToricPCIOL
+* Limbal relaxing incision : LimbalRelaxingIncision
+
+Vitrectomy:
+* Rhegmatogenous retinal detachment : RRD
+* Traction ‘U’ tear : UTear
+* Round hole : RoundHole
+* Dialysis : Dialysis
+* Giant retinal tear : GRT
+* Star fold : StarFold
+* Anterior PVR : AntPVR
+* Cryotherapy scar : Cryo
+* Circle of laser photocoagulation : LaserCircle
+
+Buckle:
+* Circumferential buckle : CircumferentialBuckle
+* Encircling band : EncirclingBand
+* Radial sponge : RadialSponge
+* Buckle suture : BuckleSuture
+* Drainage site : DrainageSite

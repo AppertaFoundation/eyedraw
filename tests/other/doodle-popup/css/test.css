@@ -44,8 +44,6 @@ body {
 	background-image: url("../img/medium.png?1383822301");
 }
 
-
-
 #event-content .EyeDrawWidget .ed-toolbar {
 	margin: 0;
 }
@@ -64,4 +62,15 @@ body {
 #eyedrawwidget_Cataract .ed-selected-doodle {
 	width: 200px;
 	/*display: none;*/
+}
+
+.eyedraw-row.cataract-version2 .column.fixed {
+	width: 330px;
+}
+
+.eyedraw-row.cataract-version2 .column.fluid {
+	width: -moz-calc(100% - 330px);
+  width: -o-calc(100% - 330px);
+  width: -webkit-calc(100% - 330px);
+  width: calc(100% - 330px);
 }
