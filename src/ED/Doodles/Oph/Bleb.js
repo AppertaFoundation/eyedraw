@@ -98,8 +98,6 @@ ED.Bleb.prototype.draw = function(_point) {
 	var phi = Math.PI/40;
 	var arcStart = -Math.PI / 2 + theta;
 	var arcEnd = -Math.PI / 2 - theta;
-// 	var handleStart = -Math.PI / 2 + (theta + phi);
-// 	var handleEnd = -Math.PI / 2 - (theta + phi);
 
 	// Coordinates of 'corners' of doodle
 	var topRightX = ro * Math.sin(theta);

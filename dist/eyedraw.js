@@ -15059,8 +15059,6 @@ ED.Bleb.prototype.draw = function(_point) {
 	var phi = Math.PI/40;
 	var arcStart = -Math.PI / 2 + theta;
 	var arcEnd = -Math.PI / 2 - theta;
-// 	var handleStart = -Math.PI / 2 + (theta + phi);
-// 	var handleEnd = -Math.PI / 2 - (theta + phi);
 
 	// Coordinates of 'corners' of doodle
 	var topRightX = ro * Math.sin(theta);
@@ -38010,7 +38008,35 @@ ED.TransilluminationDefect.prototype.draw = function(_point) {
 		for (var a = -Math.PI / 2 - arcStart + inc / 2; a < this.arc - Math.PI / 2 - arcStart; a += inc) {
 			var p = new ED.Point(0, 0);
 			p.setWithPolars(r, a);
-			this.drawCircle(ctx, p.x, p.y, sr, "rgba(255,255,255,1)", 4, "rgba(255,255,255,1)");
+			
+			// Circle
+			//this.drawCircle(ctx, p.x, p.y, sr, "rgba(255,255,255,1)", 4, "rgba(255,255,255,1)");
+			
+			// Slit
+			var p1 = new ED.Point(0,0);
+			p1.setWithPolars(r - sr, a);
+			var p2 = new ED.Point(0,0);
+			p2.setWithPolars(r + sr, a);
+			var phi = Math.PI/40;
+			var cp1 = new ED.Point(0,0);
+			cp1.setWithPolars(r, a - phi);
+			var cp2 = new ED.Point(0,0);
+			cp2.setWithPolars(r, a + phi);
+			
+			ctx.save();
+
+			ctx.beginPath();
+			ctx.moveTo(p1.x, p1.y);
+			ctx.quadraticCurveTo(cp1.x, cp1.y, p2.x, p2.y);
+			ctx.quadraticCurveTo(cp2.x, cp2.y, p1.x, p1.y);
+			
+			ctx.fillStyle = "rgba(255,255,255,1)";
+			ctx.fill();				
+			ctx.lineWidth = 4;
+			ctx.strokeStyle = "rgba(255,255,255,1)";
+			ctx.stroke();
+			
+			ctx.restore();			
 		}
 	}
 
