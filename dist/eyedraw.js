@@ -7848,6 +7848,7 @@ ED.trans['EncirclingBand'] = 'Encircling band<br/><br/>Drag to change orientatio
 ED.trans['EntrySiteBreak'] = 'Entry site break<br/><br/>Drag to position<br/>Drag either end handle to increase extent';
 ED.trans['EpiretinalMembrane'] = 'Epiretinal membrane<br/><br/>Drag inner handle to change shape and size<br/>Drag outer handle to rotate';
 ED.trans['FibrousProliferation'] = 'Fibrous Proliferation<br/><br/>Drag to position<br/>Drag inner handle to change shape and size<br/>Drag outer handle to rotate';
+ED.trans['FibrovascularScar'] = 'Fibrovascular scar<br/><br/>Drag to move<br/>Drag handle to scale';
 ED.trans['FocalLaser'] = 'Focal laser burns<br/><br/>Drag the handle for a bigger area with more burns';
 ED.trans['Freehand'] = 'Freehand drawing<br/><br/>Double-click to start drawing<br/>Drag inner handle to change size<br/>Drag outer handle to rotate<br/><br/>Adjust colours and settings in tool bar';
 ED.trans['Fundus'] = '';
@@ -7909,7 +7910,10 @@ ED.trans['RetinalTouch'] = 'Retinal touch<br/><br/>Drag to change position';
 ED.trans['RetinalVeinOcclusionPostPole'] = 'Retinal vein occlusion<br/><br/>Drag to position<br/>Drag handles to change extent<br/>Drag central handle to alter macular involvement';
 ED.trans['RK'] = 'Radial keratotomy<br/><br/>Drag to rotate<br/>Drag outer handle to resize<br/>Drag inner handle to adjust central extent';
 ED.trans['RoundHole'] = '';
+ED.trans['RPEAtrophy'] = 'RPE Atrophy<br/><br/>Drag to position<br/>Drag the handle to change size';
 ED.trans['RPEDetachment'] = 'RPE detachment<br/><br/>Drag to position<br/>Drag handles to change shape<br/>Drag to position<br/>Drag outer ring of top handles to rotate';
+ED.trans['RetinalHaemorrhage'] = 'Retinal haemorrhage<br/><br/>Drag to position<br/>Drag the handle to change size';
+ED.trans['RPEHypertrophy'] = 'RPE Hypertrophy<br/><br/>Drag to position<br/>Drag the handle to change size';
 ED.trans['RPERip'] = 'RPE rip<br/><br/>Drag to move<br/>Drag large handle to resize and rotate<br/>Drag other handles to adjust shape';
 ED.trans['RRD'] = 'Rhegmatogenous retinal detachment<br/><br/>Drag to move around eye<br/>Drag outer handles to change size</br>Drag middle handle to change posterior extent';
 ED.trans['Rubeosis'] = 'Rubeosis iridis<br/><br/>Drag to rotate around centre<br/>Drag handles to increase extent';
@@ -21543,6 +21547,198 @@ ED.FibrousProliferation.prototype.description = function() {
  */
 
 /**
+ * FibrovascularScar
+ *
+ * @class FibrovascularScar
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Object} _parameterJSON
+ */
+ED.FibrovascularScar = function(_drawing, _parameterJSON) {
+	// Set classname
+	this.className = "FibrovascularScar";
+	
+	// Saved parameters
+	this.savedParameterArray = ['originX', 'originY', 'scaleX', 'scaleY'];
+	
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _parameterJSON);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.FibrovascularScar.prototype = new ED.Doodle;
+ED.FibrovascularScar.prototype.constructor = ED.FibrovascularScar;
+ED.FibrovascularScar.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.FibrovascularScar.prototype.setHandles = function() {
+	this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, false);
+}
+
+/**
+ * Set default properties
+ */
+ED.FibrovascularScar.prototype.setPropertyDefaults = function() {
+	this.isRotatable = false;
+
+	// Update component of validation array for simple parameters
+	this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.5, +2);
+	this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.5, +2);
+}
+
+/**
+ * Sets default parameters
+ */
+ED.FibrovascularScar.prototype.setParameterDefaults = function() {
+	this.setOriginWithDisplacements(0, -100);
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.FibrovascularScar.prototype.draw = function(_point) {
+	// Get context
+	var ctx = this.drawing.context;
+
+	// Call draw method in superclass
+	ED.FibrovascularScar.superclass.draw.call(this, _point);
+
+	// Boundary path
+	ctx.beginPath();
+
+	// Radius of FibrovascularScar
+	var r = 80;
+
+	// Parameters of random curve
+	var n = 16;
+	var phi = 2 * Math.PI / n;
+	var th = 0.5 * Math.PI / n;
+	var b = 4;
+	var point = new ED.Point(0, 0);
+
+	// First point
+	var fp = new ED.Point(0, 0);
+	fp.setWithPolars(r, 0);
+	ctx.moveTo(fp.x, fp.y);
+	var rl = r;
+
+	// Subsequent points
+	for (var i = 0; i < n; i++) {
+		// Get radius of next point
+		var rn = r * (b + ED.randomArray[i]) / b;
+
+		// Control point 1
+		var cp1 = new ED.Point(0, 0);
+		cp1.setWithPolars(rl, i * phi + th);
+
+		// Control point 2
+		var cp2 = new ED.Point(0, 0);
+		cp2.setWithPolars(rn, (i + 1) * phi - th);
+
+		// Next point
+		var pn = new ED.Point(0, 0);
+		pn.setWithPolars(rn, (i + 1) * phi);
+
+		// Assign next point
+		rl = rn;
+
+		// Next point
+		if (i == n - 1) {
+			ctx.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, fp.x, fp.y);
+		} else {
+			ctx.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, pn.x, pn.y);
+		}
+
+		// Control handle point
+		if (i == 1) {
+			point.x = pn.x;
+			point.y = pn.y;
+		}
+	}
+
+	// Close path
+	ctx.closePath();
+
+	// Set attributes
+	ctx.lineWidth = 0;
+	ctx.fillStyle = "rgba(255,255,190,1)";
+	ctx.strokeStyle = ctx.fillStyle;
+
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+
+	// Other paths and drawing here
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+		// Yellow centre
+		ctx.beginPath();
+		ctx.arc(0, 0, r * 0.8, 0, 2 * Math.PI, false);
+		ctx.closePath();
+		ctx.fillStyle = "rgba(255,255,230,1)";
+		ctx.fill();
+	}
+
+	// Coordinates of handles (in canvas plane)
+	this.handleArray[2].location = this.transform.transformPoint(point);
+
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+
+	// Return value indicating successful hit test
+	return this.isClicked;
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.FibrovascularScar.prototype.description = function() {
+	return "Fibrovascular scar";
+}
+
+/**
+ * Returns the SnoMed code of the doodle
+ *
+ * @returns {Int} SnoMed code of entity representated by doodle
+ */
+// ED.FibrovascularScar.prototype.snomedCode = function() {
+// 	return 314517003;
+// }
+
+/**
+ * Returns a number indicating position in a hierarchy of diagnoses from 0 to 9 (highest)
+ *
+ * @returns {Int} Position in diagnostic hierarchy
+ */
+// ED.FibrovascularScar.prototype.diagnosticHierarchy = function() {
+// 	return 2;
+// }
+
+/**
+ * OpenEyes
+ *
+ * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
+ * (C) OpenEyes Foundation, 2011-2013
+ * This file is part of OpenEyes.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package OpenEyes
+ * @link http://www.openeyes.org.uk
+ * @author OpenEyes <info@openeyes.org.uk>
+ * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
+ * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ */
+
+/**
  * Round hole
  *
  * @class FieldCircle
@@ -32122,6 +32318,115 @@ ED.RK.prototype.description = function() {
  */
 
 /**
+ * Blot Haemorrhage
+ *
+ * @class RPEAtrophy
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Object} _parameterJSON
+ */
+ED.RPEAtrophy = function(_drawing, _parameterJSON) {
+	// Set classname
+	this.className = "RPEAtrophy";
+	
+	// Saved parameters
+	this.savedParameterArray = ['originX', 'originY', 'scaleX', 'scaleY'];
+	
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _parameterJSON);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.RPEAtrophy.prototype = new ED.Doodle;
+ED.RPEAtrophy.prototype.constructor = ED.RPEAtrophy;
+ED.RPEAtrophy.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.RPEAtrophy.prototype.setHandles = function() {
+	this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, false);
+}
+
+/**
+ * Sets default parameters (Only called for new doodles)
+ * Use the setParameter function for derived parameters, as this will also update dependent variables
+ */
+ED.RPEAtrophy.prototype.setParameterDefaults = function() {
+	this.setOriginWithDisplacements(0, -60);
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.RPEAtrophy.prototype.draw = function(_point) {
+	// Get context
+	var ctx = this.drawing.context;
+
+	// Call draw method in superclass
+	ED.RPEAtrophy.superclass.draw.call(this, _point);
+
+	// Radius
+	var r = 120;
+
+	// Boundary path
+	ctx.beginPath();
+
+	// Haemorrhage
+	ctx.arc(0, 0, r, 0, 2 * Math.PI, true);
+
+	// Set attributes
+	ctx.lineWidth = 1;
+	ctx.fillStyle = "rgba(253, 238, 173, 0.75)";
+	ctx.strokeStyle = ctx.fillStyle;
+	
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+
+	// Coordinates of handles (in canvas plane)
+	var point = new ED.Point(0, 0);
+	point.setWithPolars(r, Math.PI / 4);
+	this.handleArray[2].location = this.transform.transformPoint(point);
+
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * Returns a String which, if not empty, determines the root descriptions of multiple instances of the doodle
+ *
+ * @returns {String} Group description
+ */
+ED.RPEAtrophy.prototype.groupDescription = function() {
+	return "RPE atrophy";
+}
+
+/**
+ * OpenEyes
+ *
+ * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
+ * (C) OpenEyes Foundation, 2011-2013
+ * This file is part of OpenEyes.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package OpenEyes
+ * @link http://www.openeyes.org.uk
+ * @author OpenEyes <info@openeyes.org.uk>
+ * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
+ * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ */
+
+/**
  * The optic disc
  *
  * @class RPEDetachment
@@ -32281,6 +32586,115 @@ ED.RPEDetachment.prototype.draw = function(_point) {
  */
 ED.RPEDetachment.prototype.description = function() {
 	return 'Retinal pigment epithelial detachment';
+}
+
+/**
+ * OpenEyes
+ *
+ * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
+ * (C) OpenEyes Foundation, 2011-2013
+ * This file is part of OpenEyes.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package OpenEyes
+ * @link http://www.openeyes.org.uk
+ * @author OpenEyes <info@openeyes.org.uk>
+ * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
+ * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ */
+
+/**
+ * Blot Haemorrhage
+ *
+ * @class RPEHypertrophy
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Object} _parameterJSON
+ */
+ED.RPEHypertrophy = function(_drawing, _parameterJSON) {
+	// Set classname
+	this.className = "RPEHypertrophy";
+	
+	// Saved parameters
+	this.savedParameterArray = ['originX', 'originY', 'scaleX', 'scaleY'];
+	
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _parameterJSON);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.RPEHypertrophy.prototype = new ED.Doodle;
+ED.RPEHypertrophy.prototype.constructor = ED.RPEHypertrophy;
+ED.RPEHypertrophy.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.RPEHypertrophy.prototype.setHandles = function() {
+	this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, false);
+}
+
+/**
+ * Sets default parameters (Only called for new doodles)
+ * Use the setParameter function for derived parameters, as this will also update dependent variables
+ */
+ED.RPEHypertrophy.prototype.setParameterDefaults = function() {
+	this.setOriginWithDisplacements(-300, -60);
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.RPEHypertrophy.prototype.draw = function(_point) {
+	// Get context
+	var ctx = this.drawing.context;
+
+	// Call draw method in superclass
+	ED.RPEHypertrophy.superclass.draw.call(this, _point);
+
+	// Radius
+	var r = 60;
+
+	// Boundary path
+	ctx.beginPath();
+
+	// Haemorrhage
+	ctx.arc(0, 0, r, 0, 2 * Math.PI, true);
+
+	// Set attributes
+	ctx.lineWidth = 1;
+	ctx.fillStyle = "rgba(145, 96, 80, 1.0)";
+	ctx.strokeStyle = ctx.fillStyle;
+	
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+
+	// Coordinates of handles (in canvas plane)
+	var point = new ED.Point(0, 0);
+	point.setWithPolars(r, Math.PI / 4);
+	this.handleArray[2].location = this.transform.transformPoint(point);
+
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * Returns a String which, if not empty, determines the root descriptions of multiple instances of the doodle
+ *
+ * @returns {String} Group description
+ */
+ED.RPEHypertrophy.prototype.groupDescription = function() {
+	return "RPE hypertrophy";
 }
 
 /**
@@ -33327,6 +33741,171 @@ ED.RetinalArteryOcclusionPostPole.prototype.type = function() {
 	if (this.arc > 1.5 * Math.PI) return "central";
 	else if (this.arc > 0.8 * Math.PI) return 'hemispheric';
 	else return 'branch';
+}
+
+/**
+ * OpenEyes
+ *
+ * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
+ * (C) OpenEyes Foundation, 2011-2013
+ * This file is part of OpenEyes.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package OpenEyes
+ * @link http://www.openeyes.org.uk
+ * @author OpenEyes <info@openeyes.org.uk>
+ * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
+ * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ */
+
+/**
+ * Blot Haemorrhage
+ *
+ * @class RetinalHaemorrhage
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Object} _parameterJSON
+ */
+ED.RetinalHaemorrhage = function(_drawing, _parameterJSON) {
+	// Set classname
+	this.className = "RetinalHaemorrhage";
+	
+	// Derived parameters
+	this.layer = 'Pre-retinal';
+	
+	// Saved parameters
+	this.savedParameterArray = ['originX', 'originY', 'scaleX', 'scaleY'];
+	
+	// Parameters in doodle control bar (parameter name: parameter label)
+	this.controlParameterArray = {'layer':'Layer'};
+	
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _parameterJSON);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.RetinalHaemorrhage.prototype = new ED.Doodle;
+ED.RetinalHaemorrhage.prototype.constructor = ED.RetinalHaemorrhage;
+ED.RetinalHaemorrhage.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.RetinalHaemorrhage.prototype.setHandles = function() {
+	this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, false);
+}
+
+/**
+ * Sets default dragging attributes
+ */
+ED.RetinalHaemorrhage.prototype.setPropertyDefaults = function() {
+	// Add complete validation arrays for derived parameters
+	this.parameterValidationArray['layer'] = {
+		kind: 'other',
+		type: 'string',
+		list: ['Pre-retinal', 'Intra-retinal', 'Sub-retinal', 'Sub-RPE'],
+		animate: false
+	};
+}
+
+/**
+ * Sets default parameters (Only called for new doodles)
+ * Use the setParameter function for derived parameters, as this will also update dependent variables
+ */
+ED.RetinalHaemorrhage.prototype.setParameterDefaults = function() {
+	this.setOriginWithDisplacements(0, -60);
+	this.setParameterFromString('layer', 'Pre-retinal');
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.RetinalHaemorrhage.prototype.draw = function(_point) {
+	// Get context
+	var ctx = this.drawing.context;
+
+	// Call draw method in superclass
+	ED.RetinalHaemorrhage.superclass.draw.call(this, _point);
+
+	// Radius
+	var r = 90;
+
+	// Boundary path
+	ctx.beginPath();
+
+	// Haemorrhage
+	ctx.arc(0, 0, r, 0, 2 * Math.PI, true);
+
+	// Set attributes
+	ctx.lineWidth = 1;
+	
+	switch (this.layer) {
+		case 'Pre-retinal':
+			ctx.fillStyle = "rgba(255,0,0,1.0)";
+			ctx.strokeStyle = ctx.fillStyle;
+			break;
+		case 'Intra-retinal':
+			ctx.fillStyle = "rgba(255,0,0,0.75)";
+			ctx.strokeStyle = ctx.fillStyle;
+			break;
+		case 'Sub-retinal':
+			ctx.fillStyle = "rgba(255,0,0,0.5)";
+			ctx.strokeStyle = ctx.fillStyle;
+			break;
+		case 'Sub-RPE':
+			ctx.fillStyle = "rgba(255,0,0,0.25)";
+			ctx.strokeStyle = ctx.fillStyle;
+			break;
+	}
+
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+
+	// Coordinates of handles (in canvas plane)
+	var point = new ED.Point(0, 0);
+	point.setWithPolars(r, Math.PI / 4);
+	this.handleArray[2].location = this.transform.transformPoint(point);
+
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * Returns a String which, if not empty, determines the root descriptions of multiple instances of the doodle
+ *
+ * @returns {String} Group description
+ */
+ED.RetinalHaemorrhage.prototype.groupDescription = function() {
+	var returnString = "";
+	
+	switch (this.layer) {
+		case 'Pre-retinal':
+			returnString = 'Pre-retinal'
+			break;
+		case 'Intra-retinal':
+			returnString = 'Intra-retinal'
+			break;
+		case 'Sub-retinal':
+			returnString = 'Sub-retinal'
+			break;
+		case 'Sub-RPE':
+			returnString = 'Sub-RPE'
+			break;
+	}
+	
+	returnString += ' haemorrhage';
+	
+	return returnString;
 }
 
 /**
