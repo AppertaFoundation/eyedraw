@@ -7812,7 +7812,7 @@ ED.trans['AntSegCrossSection'] = '';
 ED.trans['AntSynech'] = 'Anterior synechiae<br/><br/>Drag to move around angle<br/>Drag handles to change extent';
 ED.trans['ArcuateScotoma'] = 'Arcuate scotoma<br/><br/>Drag handle to change size';
 ED.trans['BiopsySite'] = 'Biopsy site<br/><br/>Drag to position';
-ED.trans['Bleb'] = 'Trabeculectomy bleb<br/><br/>Drag to move around the limbus';
+ED.trans['Bleb'] = 'Trabeculectomy bleb<br/><br/>Drag to move around the limbus<br/>Drag handle to change size';
 ED.trans['BlotHaemorrhage'] = 'Blot haemorrhage<br/><br/>Drag to position<br/>Drag the handle to change size';
 ED.trans['BuckleSuture'] = 'Buckle suture<br/><br/>Drag to position';
 ED.trans['BusaccaNodule'] = 'Busacca nodule<br/><br/>Drag to move around the iris';
@@ -15004,11 +15004,22 @@ ED.Bleb.prototype.constructor = ED.Bleb;
 ED.Bleb.superclass = ED.Doodle.prototype;
 
 /**
+ * Sets handle attributes
+ */
+ED.Bleb.prototype.setHandles = function() {
+	this.handleArray[3] = new ED.Handle(null, true, ED.Mode.Arc, false);
+}
+
+/**
  * Sets default dragging attributes
  */
 ED.Bleb.prototype.setPropertyDefaults = function() {
 	this.isScaleable = false;
 	this.isMoveable = false;
+	this.isArcSymmetrical = true;
+	
+	// Update component of validation array for simple parameters
+	this.parameterValidationArray['arc']['range'].setMinAndMax(Math.PI / 12, Math.PI / 2);
 }
 
 /**
@@ -15016,6 +15027,7 @@ ED.Bleb.prototype.setPropertyDefaults = function() {
  */
 ED.Bleb.prototype.setParameterDefaults = function() {
 	this.setRotationWithDisplacements(30, 30);
+	this.arc = Math.PI/8;
 }
 
 /**
@@ -15035,12 +15047,55 @@ ED.Bleb.prototype.draw = function(_point) {
 
 	// Boundary path
 	ctx.beginPath();
+	
+	// Radii
+	var ro = 500;
+	var r = 470;
+	var ri = 384;
 
-	// Draw limbal base
-	var phi = Math.PI / 12;
-	ctx.arc(0, 0, r, -phi - Math.PI / 2, phi - Math.PI / 2, false);
-	ctx.lineTo(r / 4, -r * 1.25);
-	ctx.lineTo(-r / 4, -r * 1.25);
+	// Calculate parameters for arcs
+	var theta = this.arc / 2;
+	var eps = Math.PI/30;
+	var phi = Math.PI/40;
+	var arcStart = -Math.PI / 2 + theta;
+	var arcEnd = -Math.PI / 2 - theta;
+// 	var handleStart = -Math.PI / 2 + (theta + phi);
+// 	var handleEnd = -Math.PI / 2 - (theta + phi);
+
+	// Coordinates of 'corners' of doodle
+	var topRightX = ro * Math.sin(theta);
+	var topRightY = -ro * Math.cos(theta);
+	var topLeftX = -ro * Math.sin(theta);
+	var topLeftY = topRightY;
+	var handleRightX = r * Math.sin(theta + eps);
+	var handleRightY = -r * Math.cos(theta + eps);
+	var handleLeftX = -r * Math.sin(theta + eps);
+	var handleLeftY = handleRightY;
+	var cpRightX = r * Math.sin(theta + eps + phi);
+	var cpRightY = -r * Math.cos(theta + eps + phi);
+	var cpLeftX = -r * Math.sin(theta + eps + phi);
+	var cpLeftY = cpRightY;
+	var bottomRightX = ri * Math.sin(theta);
+	var bottomRightY = -ri * Math.cos(theta);
+	var bottomLeftX = -ri * Math.sin(theta);
+	var bottomLeftY = bottomRightY;
+	
+	// Boundary path
+	ctx.beginPath();
+
+	// Arc across
+	ctx.arc(0, 0, ro, -Math.PI / 2 + theta, -Math.PI / 2 - theta, true);
+	
+	// Curvy left hand edge
+	ctx.quadraticCurveTo(cpLeftX, cpLeftY, bottomLeftX, bottomLeftY);
+
+	// Arc back to mirror image point on the other side
+	ctx.arc(0, 0, ri, -Math.PI / 2 - theta, -Math.PI / 2 + theta, false);
+	
+	// Curvy right hand edge
+	ctx.quadraticCurveTo(cpRightX, cpRightY, topRightX, topRightY);
+	
+	// Close path
 	ctx.closePath();
 
 	// Colour of fill
@@ -15058,12 +15113,18 @@ ED.Bleb.prototype.draw = function(_point) {
 	// Non-boundary paths
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
 		ctx.beginPath();
-		ctx.moveTo(-40, -r);
-		ctx.lineTo(-40, -r * 1.15);
-		ctx.lineTo(40, -r * 1.15);
-		ctx.lineTo(40, -r);
+		ctx.moveTo(-50, -ri);
+		ctx.lineTo(-50, -ri * 1.2);
+		ctx.lineTo(50, -ri * 1.2);
+		ctx.lineTo(50, -ri);
 		ctx.stroke();
 	}
+	
+	// Coordinates of handles (in canvas plane)
+	this.handleArray[3].location = this.transform.transformPoint(new ED.Point(handleRightX, handleRightY));
+
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point)
 
 	// Return value indicating successful hittest
 	return this.isClicked;
