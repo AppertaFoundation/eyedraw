@@ -530,7 +530,7 @@
 
 					<section class="sub-element Element_OphTrOperationnote_Cataract on-demand row">
 						<header class="sub-element-header">
-							<h4 class="sub-element-title">Cataract (full width)</h4>
+							<h4 class="sub-element-title">Cataract On-demand (full width with fixed-width doodle popup)</h4>
 						</header>
 						<div class="element-fields">
 							<div class="row cataract eyedraw-row">
@@ -785,7 +785,7 @@
 
 					<section class="sub-element Element_OphTrOperationnote_Cataract on-demand row">
 						<header class="sub-element-header">
-							<h4 class="sub-element-title">Cataract (full width with floated selected doodle)</h4>
+							<h4 class="sub-element-title">Cataract On-demand (fixed width popup hidden if no doodles selected)</h4>
 						</header>
 						<div class="element-fields">
 							<div class="row cataract eyedraw-row">
@@ -1038,6 +1038,262 @@
 						</div>
 					</section>
 
+					<section class="sub-element Element_OphTrOperationnote_Cataract on-demand row">
+						<header class="sub-element-header">
+							<h4 class="sub-element-title">Cataract V2 (fixed width with floated selected doodle that bleeds outside of eyedraw container)</h4>
+						</header>
+						<div class="element-fields">
+							<div class="row eyedraw-row cataract-version2">
+								<div class="fixed column">
+								<div class="EyeDrawWidget ed-widget" id="eyedrawwidget_Cataract">
+									<div class="ed-toolbar">
+										<ul class="ed-toolbar-panel ed-main-toolbar">
+											<li>
+												<a class="ed-button" href="#" data-function="addDoodle" data-arg="NuclearCataract">
+													<span class="icon-ed-NuclearCataract"></span>
+													<span class="label">Nuclear cataract</span>
+												</a>
+											</li>
+											<li>
+												<a class="ed-button" href="#" data-function="addDoodle" data-arg="CorticalCataract">
+													<span class="icon-ed-CorticalCataract"></span>
+													<span class="label">Cortical cataract</span>
+												</a>
+											</li>
+											<li>
+												<a class="ed-button" href="#" data-function="addDoodle" data-arg="PostSubcapCataract">
+													<span class="icon-ed-PostSubcapCataract"></span>
+													<span class="label">Posterior subcapsular cataract</span>
+												</a>
+											</li>
+											<li>
+												<a class="ed-button" href="#" data-function="addDoodle" data-arg="PCIOL">
+													<span class="icon-ed-PCIOL"></span>
+													<span class="label">Posterior chamber IOL</span>
+												</a>
+											</li>
+											<li>
+												<a class="ed-button" href="#" data-function="addDoodle" data-arg="ACIOL">
+													<span class="icon-ed-ACIOL"></span>
+													<span class="label">Anterior chamber IOL</span>
+												</a>
+											</li>
+											<li>
+												<a class="ed-button" href="#" data-function="addDoodle" data-arg="Bleb">
+													<span class="icon-ed-Bleb"></span>
+													<span class="label">Trabeculectomy bleb</span>
+												</a>
+											</li>
+											<li>
+												<a class="ed-button" href="#" data-function="addDoodle" data-arg="PI">
+													<span class="icon-ed-PI"></span>
+													<span class="label">Peripheral iridectomy</span>
+												</a>
+											</li>
+											<li>
+												<a class="ed-button" href="#" data-function="addDoodle" data-arg="Fuchs">
+													<span class="icon-ed-Fuchs"></span>
+													<span class="label">Fuchs endothelial dystrophy</span>
+												</a>
+											</li>
+											<li>
+												<a class="ed-button" href="#" data-function="addDoodle" data-arg="RK">
+													<span class="icon-ed-RK"></span>
+													<span class="label">Radial keratotomy</span>
+												</a>
+											</li>
+											<li>
+												<a class="ed-button" href="#" data-function="addDoodle" data-arg="LasikFlap">
+													<span class="icon-ed-LasikFlap"></span>
+													<span class="label">LASIK flap</span>
+												</a>
+											</li>
+											<li>
+												<a class="ed-button" href="#" data-function="addDoodle" data-arg="CornealScar">
+													<span class="icon-ed-CornealScar"></span>
+													<span class="label">Corneal scar</span>
+												</a>
+											</li>
+											<li>
+												<a class="ed-button" href="#" data-function="addDoodle" data-arg="SectorIridectomy">
+													<span class="icon-ed-SectorIridectomy"></span>
+													<span class="label">Sector iridectomy</span>
+												</a>
+											</li>
+											<li>
+												<a class="ed-button" href="#" data-function="addDoodle" data-arg="PosteriorSynechia">
+													<span class="icon-ed-PosteriorSynechia"></span>
+													<span class="label">Posterior synechia</span>
+												</a>
+											</li>
+										</ul>
+									</div>
+									<div class="ed-body">
+										<div class="ed-editor" style="width: 304px;">
+
+											<!-- CANVAS -->
+											<div class="ed-canvas-border" style="width: 302px; height: 302px;"></div>
+											<div class="ed-canvas-container">
+												<canvas id="ed_canvas_edit_Cataract_3" class="ed-canvas-edit" width="300" height="300" tabindex="1" data-drawing-name="ed_drawing_edit_Cataract_2">
+												</canvas>
+
+												<!-- CANVAS TOOLBAR -->
+												<ul class="ed-toolbar-panel ed-canvas-toolbar">
+													<li>
+														<a class="ed-button" href="#" data-function="resetEyedraw">
+															<span class="icon-ed-reset"></span>
+															<span class="label">Reset eyedraw</span>
+														</a>
+													</li>
+												</ul>
+
+												<input
+												type="hidden"
+												id="ed_canvas_edit_Cataract_data_3"
+												value='' />
+
+											</div>
+
+											<!-- SELECTED DOODLE -->
+											<div class="ed-selected-doodle floated">
+												<select class="ed-selected-doodle-select" id="ed_example_selected_doodle">
+												</select>
+											</div>
+
+											<!-- DOODLE POPUP -->
+											<div class="ed-doodle-popup closed">
+											</div>
+										</div>
+									</div>
+								</div>
+								</div>
+								<div class="fluid column">
+									<div id="div_Element_OphTrOperationnote_Cataract_incision_site_id" class="row field-row">
+
+										<div class="large-3 column">
+											<label for="Element_OphTrOperationnote_Cataract_incision_site_id">Incision site:</label>
+										</div>
+
+										<div class="large-3 column end">
+
+											<select textattribute="data-value" name="Element_OphTrOperationnote_Cataract[incision_site_id]" id="Element_OphTrOperationnote_Cataract_incision_site_id">
+												<option value="">- Please select -</option>
+												<option value="1" selected="selected" data-value="Corneal">Corneal</option>
+												<option value="2" data-value="Limbal">Limbal</option>
+												<option value="3" data-value="Scleral">Scleral</option>
+											</select>
+										</div>
+									</div>
+									<div id="div_Element_OphTrOperationnote_Cataract_length" class="row field-row">
+										<div class="large-3 column">
+											<label for="Element_OphTrOperationnote_Cataract_length">Length:</label>
+										</div>
+										<div class="large-2 column end">
+											<input type="text" value="2.8" name="Element_OphTrOperationnote_Cataract[length]" id="Element_OphTrOperationnote_Cataract_length">
+										</div>
+									</div>
+									<div id="div_Element_OphTrOperationnote_Cataract_meridian" class="row field-row">
+										<div class="large-3 column">
+											<label for="Element_OphTrOperationnote_Cataract_meridian">Meridian:</label>
+										</div>
+										<div class="large-2 column end">
+											<input type="text" value="0" name="Element_OphTrOperationnote_Cataract[meridian]" id="Element_OphTrOperationnote_Cataract_meridian">
+										</div>
+									</div>
+									<div id="div_Element_OphTrOperationnote_Cataract_incision_type_id" class="row field-row">
+
+										<div class="large-3 column">
+											<label for="Element_OphTrOperationnote_Cataract_incision_type_id">Incision type:</label>
+										</div>
+
+										<div class="large-3 column end">
+
+											<select textattribute="data-value" name="Element_OphTrOperationnote_Cataract[incision_type_id]" id="Element_OphTrOperationnote_Cataract_incision_type_id">
+												<option value="">- Please select -</option>
+												<option value="1" selected="selected" data-value="Pocket">Pocket</option>
+												<option value="2" data-value="Section">Section</option>
+											</select>
+										</div>
+									</div>
+									<div id="div_Element_OphTrOperationnote_Cataract_report" class="row field-row">
+										<div class="large-3 column">
+											<label for="Element_OphTrOperationnote_Cataract_report">Details:</label>
+										</div>
+										<div class="large-9 column end">
+											<textarea rows="6" id="Element_OphTrOperationnote_Cataract_report" name="Element_OphTrOperationnote_Cataract[report]">Continuous Circular Capsulorrhexis Hydrodissection Phakoemulsification of lens nucleus Aspiration of soft lens matter Viscoelastic removed</textarea>
+										</div>
+									</div>
+
+									<div id="div_Element_OphTrOperationnote_Cataract_Devices" class="eventDetail row field-row widget">
+										<div class="large-3 column">
+											<label for="OphTrOperationnote_CataractOperativeDevices">
+												Devices:
+											</label>
+										</div>
+										<div class="large-3 column end">
+											<div class="multi-select multi-select-list" data-options="{&quot;sorted&quot;:false}">
+												<input type="hidden" name="Element_OphTrOperationnote_Cataract[MultiSelectList_OphTrOperationnote_CataractOperativeDevices]" class="multi-select-list-name">
+												<div class="multi-select-dropdown-container">
+													<select id="OphTrOperationnote_CataractOperativeDevices" class="MultiSelectList" name="">
+														<option value="">- Devices -</option>
+													</select>
+												</div>
+												<ul class="MultiSelectList multi-select-selections hide">
+												</ul>
+
+											</div>
+										</div>
+									</div>
+
+									<div id="div_Element_OphTrOperationnote_Cataract_Complications" class="eventDetail row field-row widget">
+										<div class="large-3 column">
+											<label for="OphTrOperationnote_CataractComplications">
+												Complications:
+											</label>
+										</div>
+										<div class="large-3 column end">
+											<div class="multi-select multi-select-list" data-options="{&quot;sorted&quot;:false}">
+												<input type="hidden" name="Element_OphTrOperationnote_Cataract[MultiSelectList_OphTrOperationnote_CataractComplications]" class="multi-select-list-name">
+												<div class="multi-select-dropdown-container">
+													<select id="OphTrOperationnote_CataractComplications" class="MultiSelectList" name="">
+														<option value="">- Complications -</option>
+														<option value="16">Anterior Capsular tear</option>
+														<option value="1">Choroidal haem</option>
+														<option value="2">Corneal odema</option>
+														<option value="3">Decentered IOL</option>
+														<option value="4">Dropped nucleus</option>
+														<option value="17">Hyphaema</option>
+														<option value="5">IOL exchange</option>
+														<option value="6">IOL into vitreous</option>
+														<option value="7">Iris prolapse</option>
+														<option value="8">Iris trauma</option>
+														<option value="9">Op cancelled</option>
+														<option value="10">Other IOL problem</option>
+														<option value="11">PC rupture</option>
+														<option value="12">Vitreous loss</option>
+														<option value="13">Wound burn</option>
+														<option value="14">Zonular dialysis</option>
+														<option value="15">Zonular rupture</option>
+													</select>
+												</div>
+												<ul class="MultiSelectList multi-select-selections hide">
+												</ul>
+
+											</div>
+										</div>
+									</div>
+									<div id="div_Element_OphTrOperationnote_Cataract_complication_notes" class="row field-row">
+										<div class="large-3 column">
+											<label for="Element_OphTrOperationnote_Cataract_complication_notes">Complication notes:</label>
+										</div>
+										<div class="large-9 column end">
+											<textarea rows="6" id="Element_OphTrOperationnote_Cataract_complication_notes" name="Element_OphTrOperationnote_Cataract[complication_notes]"></textarea>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</section>
 				</div>
 			</div>
 		</div>
@@ -1471,6 +1727,45 @@
 			offsetY: 0,
 			toImage: false,
 			floatSelectedDoodle: true
+		})
+	}());
+	</script>
+
+	<script>
+	// Cataract with floated
+	(function() {
+		ED.init({
+			canvasId: "ed_canvas_edit_Cataract_3",
+			eye: 0,
+			scale: 1,
+			idSuffix: "Cataract",
+			isEditable: true,
+			focus: false,
+			graphicsPath: "../../../assets/img/",
+			inputId: "ed_canvas_edit_Cataract_data_3",
+			onReadyCommandArray: [
+				[
+					"addDoodle",
+					[
+						"AntSeg"
+					]
+				],
+				[
+					"deselectDoodles",
+					[]
+				]
+			],
+			onDoodlesLoadedCommandArray: [],
+			bindingArray: {},
+			syncArray: {},
+			listenerArray: [
+				TestListener
+			],
+			offsetX: 0,
+			offsetY: 0,
+			toImage: false,
+			floatSelectedDoodle: true,
+			inline: true
 		})
 	}());
 	</script>

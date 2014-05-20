@@ -36,12 +36,13 @@ ED.Views.DoodlePopup = (function() {
 	 * @param {HTMLElement} widgetContainer The widget container element
 	 * @extends {ED.View}
 	 */
-	function DoodlePopup(drawing, container, width) {
+	function DoodlePopup(drawing, container, width, inline) {
 		ED.View.apply(this, arguments);
 
 		this.drawing = drawing;
 		this.container = container;
 		this.width = width;
+		this.inline = !!inline;
 
 		this.registerForNotifications();
 		this.createToolbar();
@@ -151,7 +152,7 @@ ED.Views.DoodlePopup = (function() {
 			this.emit('show');
 			this.container.css({
 				width: this.width,
-				right: -1 * this.width
+				right: -1 * (this.width - (this.inline ? 2 : 0))
 			}).removeClass('closed');
 		}.bind(this));
 	};

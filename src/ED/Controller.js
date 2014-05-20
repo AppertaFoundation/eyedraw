@@ -119,7 +119,8 @@ ED.Controller = (function() {
 		return container.length ? new ED.Views.DoodlePopup(
 			this.drawing,
 			container,
-			width
+			width,
+			this.properties.inline
 		) : null;
 	};
 
@@ -134,7 +135,8 @@ ED.Controller = (function() {
 		return container.length ? new ED.Views.SelectedDoodle(
 			this.drawing,
 			container,
-			this.properties.floatSelectedDoodle
+			this.properties.floatSelectedDoodle,
+			this.properties.inline
 		) : null;
 	};
 

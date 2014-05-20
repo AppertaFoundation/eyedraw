@@ -38,13 +38,14 @@ ED.Views.SelectedDoodle = (function() {
 	 * @param {HTMLElement} container The widget container element
 	 * @extends {ED.View}
 	 */
-	function SelectedDoodle(drawing, container, floated) {
+	function SelectedDoodle(drawing, container, floated, inline) {
 		ED.View.apply(this, arguments);
 
 		this.drawing = drawing;
 		this.container = container;
 		this.select = this.container.find('select');
 		this.floated = !!floated;
+		this.inline = !!inline;
 
 		this.registerForNotifications();
 		this.bindEvents();
@@ -83,10 +84,15 @@ ED.Views.SelectedDoodle = (function() {
 
 		var eventName = notification.eventName;
 
-		if (this.floated) {
+		if (this.floated || this.inline) {
 			switch(eventName) {
 				case 'ready':
-					this.container.addClass('floated');
+					if (this.floated) {
+						this.container.addClass('floated');
+					}
+					if (this.inline) {
+						this.container.addClass('inline');
+					}
 					break;
 				case 'doodleSelected':
 					// We do this in the next event loop as the "doodleDeselect" event
@@ -180,19 +186,31 @@ ED.Views.SelectedDoodle = (function() {
 		}
 		this.delay(function() {
 			this.emit('show');
-			this.container.css({
-				width: this.width,
-				left: 0
-			});
+			var css = {};
+			if (this.inline) {
+				css.right = -1 * (this.container.outerWidth() - 2);
+				css.width = this.container.outerWidth();
+			} else {
+				css.left = 0;
+				css.width = this.container.outerWidth();
+			}
+
+			this.container.css(css);
 		}.bind(this));
 	};
 
 	SelectedDoodle.prototype.hide = function() {
 		this.delay(function() {
 			this.emit('hide');
-			this.container.css({
-				left: (-1 * (this.container.outerWidth())) - 4
-			}).show();
+			var css = {};
+			if (this.inline) {
+				css.left = 'auto';
+				css.right = 2;
+			} else {
+				css.left = (-1 * (this.container.outerWidth())) - 4;
+				css.right = 'auto';
+			}
+			this.container.css(css).show();
 		}.bind(this));
 	};
 
