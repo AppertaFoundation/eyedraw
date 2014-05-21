@@ -58,6 +58,9 @@
 
 .ed-canvas-container {
 	position: relative;
+	margin: 0 0 0 2px;
+	border: 1px solid #53a0c7;
+	border-top: 0;
 }
 
 .ed-editor {
@@ -68,11 +71,10 @@ canvas {
 	// Canvas element in edit mode
 	&.ed-canvas-edit {
 		background: #e4edf5;
-		border: 1px solid #53a0c7;
 		cursor: pointer;
 		position: relative;
-		z-index: 103;
-		margin: 0 0 0 2px;
+		z-index: 105;
+		border: 0;
 	}
 	// Canvas element in display mode
 	&.ed-canvas-display {
@@ -80,7 +82,8 @@ canvas {
 		cursor: auto;
 		margin: 0px;
 		position: relative;
-		z-index: 103;
+		z-index: 105;
+		border: 0;
 	}
 	// Stop canvas being highlighted on mouse click
 	&.ed-canvas-edit, &.ed-canvas-display {

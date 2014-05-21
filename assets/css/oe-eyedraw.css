@@ -95,7 +95,7 @@
   bottom: 0px;
   left: 2px;
   position: absolute;
-  z-index: 104;
+  z-index: 106;
 }
 /* line 54, ../sass/components/toolbar/_panels.scss */
 .ed-toolbar-panel.ed-canvas-toolbar li {
@@ -1326,31 +1326,34 @@
 /* line 59, ../sass/components/_editor.scss */
 .ed-canvas-container {
   position: relative;
+  margin: 0 0 0 2px;
+  border: 1px solid #53a0c7;
+  border-top: 0;
 }
 
-/* line 63, ../sass/components/_editor.scss */
+/* line 66, ../sass/components/_editor.scss */
 .ed-editor {
   position: relative;
 }
 
-/* line 69, ../sass/components/_editor.scss */
+/* line 72, ../sass/components/_editor.scss */
 canvas.ed-canvas-edit {
   background: #e4edf5;
-  border: 1px solid #53a0c7;
   cursor: pointer;
   position: relative;
-  z-index: 103;
-  margin: 0 0 0 2px;
+  z-index: 105;
+  border: 0;
 }
-/* line 78, ../sass/components/_editor.scss */
+/* line 80, ../sass/components/_editor.scss */
 canvas.ed-canvas-display {
   border: none;
   cursor: auto;
   margin: 0px;
   position: relative;
-  z-index: 103;
+  z-index: 105;
+  border: 0;
 }
-/* line 87, ../sass/components/_editor.scss */
+/* line 90, ../sass/components/_editor.scss */
 canvas.ed-canvas-edit:focus, canvas.ed-canvas-display:focus {
   outline: none;
 }
@@ -1383,16 +1386,15 @@ span.squiggle {
 
 /* line 17, ../sass/components/_selected-doodle.scss */
 .ed-selected-doodle {
-  background-color: #c3def5;
+  background-color: #e4edf5;
   border: 1px solid #53a0c7;
   border-width: 1px 1px 0 1px;
-  padding: 8px 4px;
-  height: 36px;
+  padding: 4px;
   margin: 4px 0 0 2px;
   position: relative;
-  z-index: 104;
+  z-index: 105;
 }
-/* line 28, ../sass/components/_selected-doodle.scss */
+/* line 27, ../sass/components/_selected-doodle.scss */
 .ed-selected-doodle.ed-state-doodle-selected {
   border-right-color: transparent;
 }
@@ -1406,13 +1408,13 @@ span.squiggle {
   -webkit-box-shadow: 0 5px 14px -4px rgba(0, 0, 0, 0.5);
   -moz-box-shadow: 0 5px 14px -4px rgba(0, 0, 0, 0.5);
   box-shadow: 0 5px 14px -4px rgba(0, 0, 0, 0.5);
-  background: #c3def5;
+  background: #e4edf5;
   border: 1px solid #53a0c7;
   border-width: 1px 1px 1px 0;
   padding: 5px;
   position: absolute;
   top: 0;
-  z-index: 103;
+  z-index: 104;
   -webkit-transform: translate3d(0, 0, 0);
   -webkit-backface-visibility: hidden;
   -webkit-perspective: 1000;
@@ -1454,7 +1456,7 @@ span.squiggle {
 
 /* line 65, ../sass/components/_doodle-popup.scss */
 .ed-doodle-controls {
-  max-height: 294px;
+  max-height: 293px;
   overflow: auto;
 }
 /* line 68, ../sass/components/_doodle-popup.scss */

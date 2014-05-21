@@ -17,13 +17,13 @@
 .ed-doodle-popup {
 	@include transition(right 0.5s ease);
 	@include box-shadow(0 5px 14px -4px rgba(0, 0, 0, 0.5));
-	background: #c3def5;
+	background: #e4edf5;
 	border: 1px solid #53a0c7;
 	border-width: 1px 1px 1px 0;
 	padding: 5px;
 	position: absolute;
 	top: 0;
-	z-index: 103;
+	z-index: 104;
 	-webkit-transform: translate3d(0, 0, 0);
 	-webkit-backface-visibility: hidden;
 	-webkit-perspective: 1000;
@@ -63,7 +63,7 @@
 }
 
 .ed-doodle-controls {
-	max-height: 294px;
+	max-height: 293px;
 	overflow: auto;
 	> div {
 		@extend %clearfix;

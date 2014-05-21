@@ -16,15 +16,14 @@
 
 .ed-selected-doodle {
 	background: {
-		color: #c3def5;
+		color: #e4edf5;
 	};
 	border: 1px solid #53a0c7;
 	border-width: 1px 1px 0 1px;
-	padding: 8px 4px;
-	height: 36px;
+	padding: 4px;
 	margin: 4px 0 0 2px;
 	position: relative;
-	z-index: 104;
+	z-index: 105;
 	&.ed-state-doodle-selected {
 		border-right-color: transparent;
 	}

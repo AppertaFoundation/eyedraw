@@ -76,8 +76,8 @@ body {
 }
 
 img.ed-canvas-edit.demo {
-	left: 3px;
+	left: 0;
 	position: absolute;
-	top: 1px;
+	top: 0;
 	z-index: 104;
 }
