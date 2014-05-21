@@ -47,7 +47,7 @@
 class OEEyeDrawWidget extends CWidget
 {
 	/**
-	 * The extra fields HTML string
+	 * The extra fields HTML string.
 	 * @var string
 	 */
 	public $fields = null;
@@ -69,12 +69,6 @@ class OEEyeDrawWidget extends CWidget
 	 * @var boolean
 	 */
 	public $showCanvasToolbar = true;
-
-	/**
-	 * Used to display 'child' eyedraws within the parent eyedraw widget.
-	 * @var string
-	 */
-	public $childEyeDraws = null;
 
 	/**
 	 * Array of EyeDraw script files required (defaults to all available files)

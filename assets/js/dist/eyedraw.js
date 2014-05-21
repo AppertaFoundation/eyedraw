@@ -5787,13 +5787,9 @@ ED.Controller = (function() {
 		this.canvas = document.getElementById(properties.canvasId);
 		this.input = document.getElementById(properties.inputId);
 		this.container = $(this.canvas).closest('.ed-widget');
-		this.canvasBorder = this.container.find('.ed-canvas-border');
-		this.editorContainer = this.container.find('.ed-editor');
 
 		this.Checker = Checker || ED.Checker;
 		this.drawing = drawing || this.createDrawing();
-
-		this.setDimensions();
 
 		if (this.properties.isEditable) {
 			this.mainToolbar = mainToolbar || this.createToolbar('.ed-main-toolbar');
@@ -5854,15 +5850,9 @@ ED.Controller = (function() {
 
 		var container = this.container.find('.ed-doodle-popup');
 
-		// We need to match the width of the doodle popup with the width
-		// of the selected doodle. The selected doodle's width is not set (could be
-		// anything), thus we have to calculate it at run-time.
-		var width = this.container.find('.ed-selected-doodle').outerWidth();
-
 		return container.length ? new ED.Views.DoodlePopup(
 			this.drawing,
-			container,
-			width
+			container
 		) : null;
 	};
 
@@ -5877,33 +5867,8 @@ ED.Controller = (function() {
 		return container.length ? new ED.Views.SelectedDoodle(
 			this.drawing,
 			container,
-			this.properties.floatSelectedDoodle
+			this.doodlePopup
 		) : null;
-	};
-
-	/**
-	 * Set the dimensions of the canvas container element to match the dimensions
-	 * of the canvas element.
-	 */
-	Controller.prototype.setDimensions = function() {
-
-		var canvas = $(this.canvas);
-
-		// We use the width and height attributes as the canvas containers might be hidden,
-		// thus we won't be able to get the computed dimensions.
-		var canvasWidth = parseInt(canvas.attr('width'), 10);
-		var canvasHeight = parseInt(canvas.attr('height'), 10);
-
-		if (this.canvasBorder.length) {
-			this.canvasBorder.css({
-				width: canvasWidth + 2,
-				height: canvasHeight + 2
-			});
-		}
-
-		this.editorContainer.css({
-			width: canvasWidth + (this.properties.isEditable ? 4 : 8)
-		});
 	};
 
 	/**
@@ -7070,18 +7035,24 @@ ED.Views.DoodlePopup = (function() {
 	'use strict';
 
 	/**
+	 * The amount of time (in ms) for the animation to complete. This should match
+	 * the animation time set in CSS.
+	 * @type {Number}
+	 */
+	var animateTime = 440;
+
+	/**
 	 * DoodlePopup constructor
 	 * @param {ED.Drawing} drawing   A doodle drawing instance.
-	 * @param {Number} width The width of the container.
 	 * @param {HTMLElement} widgetContainer The widget container element
 	 * @extends {ED.View}
 	 */
-	function DoodlePopup(drawing, container, width) {
+	function DoodlePopup(drawing, container) {
 		ED.View.apply(this, arguments);
 
 		this.drawing = drawing;
 		this.container = container;
-		this.width = width;
+		this.containerWidth = container.outerWidth();
 
 		this.registerForNotifications();
 		this.createToolbar();
@@ -7176,10 +7147,18 @@ ED.Views.DoodlePopup = (function() {
 	 */
 	DoodlePopup.prototype.hide = function() {
 		this.delay(function() {
-			this.emit('hide');
+
+			this.emit('hide.before');
+
 			this.container.css({
-				right: 4
-			}).addClass('closed');
+				right: 0
+			});
+
+			setTimeout(function() {
+				this.container.addClass('closed');
+				this.emit('hide.after');
+			}.bind(this), animateTime);
+
 		}.bind(this));
 	};
 
@@ -7188,11 +7167,17 @@ ED.Views.DoodlePopup = (function() {
 	 */
 	DoodlePopup.prototype.show = function() {
 		this.delay(function() {
-			this.emit('show');
+
+			this.emit('show.before');
+
 			this.container.css({
-				width: this.width,
-				right: -1 * this.width
+				right: -1 * (this.containerWidth - 1)
 			}).removeClass('closed');
+
+			setTimeout(function() {
+				this.emit('show.after');
+			}.bind(this), animateTime);
+
 		}.bind(this));
 	};
 
@@ -7407,13 +7392,13 @@ ED.Views.SelectedDoodle = (function() {
 	 * @param {HTMLElement} container The widget container element
 	 * @extends {ED.View}
 	 */
-	function SelectedDoodle(drawing, container, floated) {
+	function SelectedDoodle(drawing, container, doodlePopup) {
 		ED.View.apply(this, arguments);
 
 		this.drawing = drawing;
 		this.container = container;
 		this.select = this.container.find('select');
-		this.floated = !!floated;
+		this.doodlePopup = doodlePopup;
 
 		this.registerForNotifications();
 		this.bindEvents();
@@ -7426,7 +7411,8 @@ ED.Views.SelectedDoodle = (function() {
 	 * Register a ED.Drawing notification handler. For each event, re-render the view.
 	 */
 	SelectedDoodle.prototype.registerForNotifications = function() {
-		this.drawing.registerForNotifications(this, 'notificationHandler', [
+
+		this.drawing.registerForNotifications(this, 'render', [
 			'ready',
 			'doodleAdded',
 			'doodleDeleted',
@@ -7445,31 +7431,16 @@ ED.Views.SelectedDoodle = (function() {
 	 * @return {[type]}
 	 */
 	SelectedDoodle.prototype.bindEvents = function() {
+
 		this.select.on('change.' + EVENT_NAMESPACE, this.onSelectChange.bind(this));
-	};
 
-	SelectedDoodle.prototype.notificationHandler = function(notification) {
+		this.doodlePopup.on('show.before', function() {
+			this.container.addClass('ed-state-doodle-selected');
+		}.bind(this));
 
-		var eventName = notification.eventName;
-
-		if (this.floated) {
-			switch(eventName) {
-				case 'ready':
-					this.container.addClass('floated');
-					break;
-				case 'doodleSelected':
-					// We do this in the next event loop as the "doodleDeselect" event
-					// is triggered before the "doodleSelect" event.
-					setTimeout(this.show.bind(this));
-					break;
-				case 'doodleDeselected':
-				case 'doodleDeleted':
-					this.hide();
-					break;
-			}
-		}
-
-		this.render();
+		this.doodlePopup.on('hide.after', function() {
+			this.container.removeClass('ed-state-doodle-selected');
+		}.bind(this));
 	};
 
 	/**
@@ -7541,28 +7512,6 @@ ED.Views.SelectedDoodle = (function() {
 		option.data('doodle', doodle);
 
 		return option;
-	};
-
-	SelectedDoodle.prototype.show = function() {
-		if (!this.drawing.selectedDoodle) {
-			return;
-		}
-		this.delay(function() {
-			this.emit('show');
-			this.container.css({
-				width: this.width,
-				left: 0
-			});
-		}.bind(this));
-	};
-
-	SelectedDoodle.prototype.hide = function() {
-		this.delay(function() {
-			this.emit('hide');
-			this.container.css({
-				left: (-1 * (this.container.outerWidth())) - 4
-			}).show();
-		}.bind(this));
 	};
 
 	/*********************
@@ -7768,7 +7717,7 @@ ED.Views.Toolbar = (function() {
 
 	return Toolbar;
 }());
-/*! Generated on 14/5/2014 */
+/*! Generated on 21/5/2014 */
 ED.scriptTemplates = {
   "doodle-popup": "\n\n\n\n{{#doodle}}\n\t<ul class=\"ed-toolbar-panel ed-doodle-popup-toolbar\">\n\t\t<li>\n\t\t\t<a class=\"ed-button ed-doodle-help{{lockedButtonClass}}\" href=\"#\" data-function=\"toggleHelp\">\n\t\t\t\t<span class=\"icon-ed-help\"></span>\n\t\t\t</a>\n\t\t</li>\n\t\t{{#doodle.isLocked}}\n\t\t\t<li>\n\t\t\t\t<a class=\"ed-button\" href=\"#\" data-function=\"unlock\">\n\t\t\t\t\t<span class=\"icon-ed-unlock\"></span>\n\t\t\t\t\t<span class=\"label\">Unlock</span>\n\t\t\t\t</a>\n\t\t\t</li>\n\t\t{{/doodle.isLocked}}\n\t\t{{^doodle.isLocked}}\n\t\t\t<li>\n\t\t\t\t<a class=\"ed-button\" href=\"#\" data-function=\"lock\">\n\t\t\t\t\t<span class=\"icon-ed-lock\"></span>\n\t\t\t\t\t<span class=\"label\">Lock</span>\n\t\t\t\t</a>\n\t\t\t</li>\n\t\t{{/doodle.isLocked}}\n\t\t<li>\n\t\t\t<a class=\"ed-button{{lockedButtonClass}}\" href=\"#\" data-function=\"moveToBack\">\n\t\t\t\t<span class=\"icon-ed-move-to-back\"></span>\n\t\t\t\t<span class=\"label\">Move to back</span>\n\t\t\t</a>\n\t\t</li>\n\t\t<li>\n\t\t\t<a class=\"ed-button{{lockedButtonClass}}\" href=\"#\" data-function=\"moveToFront\">\n\t\t\t\t<span class=\"icon-ed-move-to-front\"></span>\n\t\t\t\t<span class=\"label\">Move to front</span>\n\t\t\t</a>\n\t\t</li>\n\t\t{{#doodle.isDeletable}}\n\t\t\t<li>\n\t\t\t\t<a class=\"ed-button{{lockedButtonClass}}\" href=\"#\" data-function=\"deleteSelectedDoodle\">\n\t\t\t\t\t<span class=\"icon-ed-delete\"></span>\n\t\t\t\t\t<span class=\"label\">Delete</span>\n\t\t\t\t</a>\n\t\t\t</li>\n\t\t{{/doodle.isDeletable}}\n\t</ul>\n\t<div class=\"ed-doodle-info hide\">\n\t\t{{#doodle.isLocked}}\n\t\t\t<div class=\"ed-doodle-description\">\n\t\t\t\t<strong>This doodle is locked and cannot be edited.</strong>\n\t\t\t</div>\n\t\t{{/doodle.isLocked}}\n\t\t{{^doodle.isLocked}}\n\t\t\t{{#desc}}\n\t\t\t\t<div class=\"ed-doodle-description\">{{{desc}}}</div>\n\t\t\t{{/desc}}\n\t\t{{/doodle.isLocked}}\n\t</div>\n\t<div class=\"ed-doodle-controls{{#doodle.isLocked}} hide{{/doodle.isLocked}}\" id=\"{{drawing.canvas.id}}_controls\">\n\t</div>\n{{/doodle}}"
 };

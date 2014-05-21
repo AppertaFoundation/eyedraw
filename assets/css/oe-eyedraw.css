@@ -92,10 +92,10 @@
 }
 /* line 49, ../sass/components/toolbar/_panels.scss */
 .ed-toolbar-panel.ed-canvas-toolbar {
-  bottom: -2px;
-  left: 6px;
+  bottom: 0px;
+  left: 2px;
   position: absolute;
-  z-index: 103;
+  z-index: 104;
 }
 /* line 54, ../sass/components/toolbar/_panels.scss */
 .ed-toolbar-panel.ed-canvas-toolbar li {
@@ -158,7 +158,7 @@
   position: absolute;
   top: 32px;
   white-space: nowrap;
-  z-index: 104;
+  z-index: 105;
 }
 /* line 31, ../sass/components/toolbar/_label.scss */
 .ed-button:active .label {
@@ -195,7 +195,7 @@
 
 /* line 43, ../sass/_mixins.scss */
 [class*="icon-ed-"] {
-  background-image: url('../img/sprites/icons/32x32-s4799545532.png');
+  background-image: url('../img/sprites/icons/32x32-s3bd63e6ce9.png');
   background-repeat: no-repeat;
   background-position: -9999px -9999px;
   width: 32px;
@@ -234,7 +234,7 @@
 
 /* line 74, ../sass/_mixins.scss */
 .icon-ed-CornealScar {
-  background-position: 0 -3743px;
+  background-position: 0 -3775px;
 }
 
 /* line 79, ../sass/_mixins.scss */
@@ -244,7 +244,7 @@
 
 /* line 82, ../sass/_mixins.scss */
 .disabled .icon-ed-CornealScar:hover {
-  background-position: 0 -3743px;
+  background-position: 0 -3775px;
 }
 
 /* line 74, ../sass/_mixins.scss */
@@ -369,7 +369,7 @@
 
 /* line 74, ../sass/_mixins.scss */
 .icon-ed-RK {
-  background-position: 0 -3679px;
+  background-position: 0 -3711px;
 }
 
 /* line 79, ../sass/_mixins.scss */
@@ -379,7 +379,7 @@
 
 /* line 82, ../sass/_mixins.scss */
 .disabled .icon-ed-RK:hover {
-  background-position: 0 -3679px;
+  background-position: 0 -3711px;
 }
 
 /* line 74, ../sass/_mixins.scss */
@@ -429,27 +429,27 @@
 
 /* line 74, ../sass/_mixins.scss */
 .icon-ed-AntPVR {
-  background-position: 0 -4479px;
+  background-position: 0 -4543px;
 }
 
 /* line 74, ../sass/_mixins.scss */
 .icon-ed-BuckleSuture {
-  background-position: 0 -4223px;
-}
-
-/* line 74, ../sass/_mixins.scss */
-.icon-ed-CapsularTensionRing {
-  background-position: 0 -4607px;
-}
-
-/* line 74, ../sass/_mixins.scss */
-.icon-ed-CircumferentialBuckle {
   background-position: 0 -4287px;
 }
 
 /* line 74, ../sass/_mixins.scss */
-.icon-ed-CornealSuture {
+.icon-ed-CapsularTensionRing {
   background-position: 0 -4671px;
+}
+
+/* line 74, ../sass/_mixins.scss */
+.icon-ed-CircumferentialBuckle {
+  background-position: 0 -4351px;
+}
+
+/* line 74, ../sass/_mixins.scss */
+.icon-ed-CornealSuture {
+  background-position: 0 -4735px;
 }
 
 /* line 74, ../sass/_mixins.scss */
@@ -459,27 +459,27 @@
 
 /* line 74, ../sass/_mixins.scss */
 .icon-ed-Dialysis {
-  background-position: 0 -4255px;
+  background-position: 0 -4319px;
 }
 
 /* line 74, ../sass/_mixins.scss */
 .icon-ed-DrainageSite {
-  background-position: 0 -4415px;
+  background-position: 0 -4479px;
 }
 
 /* line 74, ../sass/_mixins.scss */
 .icon-ed-EncirclingBand {
-  background-position: 0 -3999px;
+  background-position: 0 -4063px;
 }
 
 /* line 74, ../sass/_mixins.scss */
 .icon-ed-GRT {
-  background-position: 0 -4191px;
+  background-position: 0 -4255px;
 }
 
 /* line 74, ../sass/_mixins.scss */
 .icon-ed-IrisHook {
-  background-position: 0 -4543px;
+  background-position: 0 -4607px;
 }
 
 /* line 74, ../sass/_mixins.scss */
@@ -488,58 +488,68 @@
 }
 
 /* line 74, ../sass/_mixins.scss */
+.icon-ed-LaserDemarcation {
+  background-position: 0 -4031px;
+}
+
+/* line 74, ../sass/_mixins.scss */
 .icon-ed-LimbalRelaxingIncision {
-  background-position: 0 -4639px;
+  background-position: 0 -4703px;
 }
 
 /* line 74, ../sass/_mixins.scss */
 .icon-ed-MattressSuture {
-  background-position: 0 -4447px;
-}
-
-/* line 74, ../sass/_mixins.scss */
-.icon-ed-PhakoIncision {
   background-position: 0 -4511px;
 }
 
 /* line 74, ../sass/_mixins.scss */
-.icon-ed-RRD {
-  background-position: 0 -4383px;
-}
-
-/* line 74, ../sass/_mixins.scss */
-.icon-ed-RadialSponge {
-  background-position: 0 -4159px;
-}
-
-/* line 74, ../sass/_mixins.scss */
-.icon-ed-RoundHole {
-  background-position: 0 -4351px;
-}
-
-/* line 74, ../sass/_mixins.scss */
-.icon-ed-SidePort {
+.icon-ed-PhakoIncision {
   background-position: 0 -4575px;
 }
 
 /* line 74, ../sass/_mixins.scss */
+.icon-ed-RRD {
+  background-position: 0 -4447px;
+}
+
+/* line 74, ../sass/_mixins.scss */
+.icon-ed-RadialSponge {
+  background-position: 0 -4223px;
+}
+
+/* line 74, ../sass/_mixins.scss */
+.icon-ed-RoundHole {
+  background-position: 0 -4415px;
+}
+
+/* line 74, ../sass/_mixins.scss */
+.icon-ed-SectorPRP {
+  background-position: 0 -3679px;
+}
+
+/* line 74, ../sass/_mixins.scss */
+.icon-ed-SidePort {
+  background-position: 0 -4639px;
+}
+
+/* line 74, ../sass/_mixins.scss */
 .icon-ed-StarFold {
-  background-position: 0 -4319px;
+  background-position: 0 -4383px;
 }
 
 /* line 74, ../sass/_mixins.scss */
 .icon-ed-ToricPCIOL {
-  background-position: 0 -4127px;
+  background-position: 0 -4191px;
 }
 
 /* line 74, ../sass/_mixins.scss */
 .icon-ed-UTear {
-  background-position: 0 -4063px;
+  background-position: 0 -4127px;
 }
 
 /* line 74, ../sass/_mixins.scss */
 .icon-ed-DiscHaemorrhage {
-  background-position: 0 -3775px;
+  background-position: 0 -3807px;
 }
 
 /* line 79, ../sass/_mixins.scss */
@@ -549,7 +559,7 @@
 
 /* line 82, ../sass/_mixins.scss */
 .disabled .icon-ed-DiscHaemorrhage:hover {
-  background-position: 0 -3775px;
+  background-position: 0 -3807px;
 }
 
 /* line 74, ../sass/_mixins.scss */
@@ -584,7 +594,7 @@
 
 /* line 74, ../sass/_mixins.scss */
 .icon-ed-OpticDiscPit {
-  background-position: 0 -3807px;
+  background-position: 0 -3839px;
 }
 
 /* line 79, ../sass/_mixins.scss */
@@ -594,7 +604,7 @@
 
 /* line 82, ../sass/_mixins.scss */
 .disabled .icon-ed-OpticDiscPit:hover {
-  background-position: 0 -3807px;
+  background-position: 0 -3839px;
 }
 
 /* line 74, ../sass/_mixins.scss */
@@ -629,7 +639,7 @@
 
 /* line 74, ../sass/_mixins.scss */
 .icon-ed-BlotHaemorrhage {
-  background-position: 0 -3711px;
+  background-position: 0 -3743px;
 }
 
 /* line 79, ../sass/_mixins.scss */
@@ -639,7 +649,7 @@
 
 /* line 82, ../sass/_mixins.scss */
 .disabled .icon-ed-BlotHaemorrhage:hover {
-  background-position: 0 -3711px;
+  background-position: 0 -3743px;
 }
 
 /* line 74, ../sass/_mixins.scss */
@@ -824,17 +834,17 @@
 
 /* line 74, ../sass/_mixins.scss */
 .icon-ed-HardExudate {
-  background-position: 0 -4095px;
+  background-position: 0 -4159px;
 }
 
 /* line 79, ../sass/_mixins.scss */
 .icon-ed-HardExudate:hover {
-  background-position: 0 -3903px;
+  background-position: 0 -3935px;
 }
 
 /* line 82, ../sass/_mixins.scss */
 .disabled .icon-ed-HardExudate:hover {
-  background-position: 0 -4095px;
+  background-position: 0 -4159px;
 }
 
 /* line 74, ../sass/_mixins.scss */
@@ -944,7 +954,7 @@
 
 /* line 74, ../sass/_mixins.scss */
 .icon-ed-Microaneurysm {
-  background-position: 0 -4031px;
+  background-position: 0 -4095px;
 }
 
 /* line 79, ../sass/_mixins.scss */
@@ -954,7 +964,7 @@
 
 /* line 82, ../sass/_mixins.scss */
 .disabled .icon-ed-Microaneurysm:hover {
-  background-position: 0 -4031px;
+  background-position: 0 -4095px;
 }
 
 /* line 74, ../sass/_mixins.scss */
@@ -1144,17 +1154,17 @@
 
 /* line 74, ../sass/_mixins.scss */
 .icon-ed-drawer-open {
-  background-position: 0 -3967px;
+  background-position: 0 -3999px;
 }
 
 /* line 79, ../sass/_mixins.scss */
 .icon-ed-drawer-open:hover {
-  background-position: 0 -3935px;
+  background-position: 0 -3967px;
 }
 
 /* line 82, ../sass/_mixins.scss */
 .disabled .icon-ed-drawer-open:hover {
-  background-position: 0 -3967px;
+  background-position: 0 -3999px;
 }
 
 /* line 74, ../sass/_mixins.scss */
@@ -1219,17 +1229,17 @@
 
 /* line 74, ../sass/_mixins.scss */
 .icon-ed-reset {
-  background-position: 0 -3839px;
+  background-position: 0 -3871px;
 }
 
 /* line 79, ../sass/_mixins.scss */
 .icon-ed-reset:hover {
-  background-position: 0 -3871px;
+  background-position: 0 -3903px;
 }
 
 /* line 82, ../sass/_mixins.scss */
 .disabled .icon-ed-reset:hover {
-  background-position: 0 -3839px;
+  background-position: 0 -3871px;
 }
 
 /* line 74, ../sass/_mixins.scss */
@@ -1273,39 +1283,37 @@
 
 /* line 22, ../sass/components/_editor.scss */
 .ed-body {
-  background: #d2dee8;
   display: table;
-  margin: 4px 0 0 0;
-  padding-bottom: 8px;
+  padding-bottom: 4px;
   width: 100%;
 }
-/* line 29, ../sass/components/_editor.scss */
+/* line 26, ../sass/components/_editor.scss */
 .ed-widget.display .ed-body {
   width: auto;
   display: inline-block;
   padding-bottom: 5px;
 }
 
-/* line 36, ../sass/components/_editor.scss */
-.ed-editor {
+/* line 33, ../sass/components/_editor.scss */
+.ed-editor-container {
   display: table-cell;
-  margin-left: 2px;
   position: relative;
   vertical-align: top;
   width: auto;
 }
 
-/* line 44, ../sass/components/_editor.scss */
-.ed-fields {
+/* line 40, ../sass/components/_editor.scss */
+.ed-fields-container {
   display: table-cell;
   padding-left: 0.75rem;
   padding-right: 2px;
   padding-top: 10px;
   position: relative;
   vertical-align: top;
+  width: 100%;
 }
 
-/* line 53, ../sass/components/_editor.scss */
+/* line 50, ../sass/components/_editor.scss */
 .ed-canvas-border {
   background: #e4edf5;
   border: 1px solid #53a0c7;
@@ -1315,20 +1323,24 @@
   z-index: 101;
 }
 
-/* line 62, ../sass/components/_editor.scss */
+/* line 59, ../sass/components/_editor.scss */
 .ed-canvas-container {
   position: relative;
 }
 
-/* line 68, ../sass/components/_editor.scss */
+/* line 63, ../sass/components/_editor.scss */
+.ed-editor {
+  position: relative;
+}
+
+/* line 69, ../sass/components/_editor.scss */
 canvas.ed-canvas-edit {
   background: #e4edf5;
-  border: 0;
+  border: 1px solid #53a0c7;
   cursor: pointer;
-  left: 4px;
   position: relative;
-  top: 4px;
   z-index: 103;
+  margin: 0 0 0 2px;
 }
 /* line 78, ../sass/components/_editor.scss */
 canvas.ed-canvas-display {
@@ -1372,36 +1384,17 @@ span.squiggle {
 /* line 17, ../sass/components/_selected-doodle.scss */
 .ed-selected-doodle {
   background-color: #c3def5;
-  background-repeat: no-repeat;
   border: 1px solid #53a0c7;
-  border-left: 0;
+  border-width: 1px 1px 0 1px;
   padding: 8px 4px;
   height: 36px;
+  margin: 4px 0 0 2px;
   position: relative;
-  margin: -7px 0 0.75rem -0.75rem;
-  z-index: 101;
+  z-index: 104;
 }
-/* line 29, ../sass/components/_selected-doodle.scss */
-.ed-selected-doodle.floated {
-  -webkit-transition: left 0.5s ease;
-  -moz-transition: left 0.5s ease;
-  -o-transition: left 0.5s ease;
-  transition: left 0.5s ease;
-  position: absolute;
-  top: 0;
-  left: 0;
-  margin: 3px 0 0 0;
-}
-/* line 35, ../sass/components/_selected-doodle.scss */
-.ed-selected-doodle.floated.inline {
-  -webkit-transition: left 0;
-  -moz-transition: left 0;
-  -o-transition: left 0;
-  transition: left 0;
-  -webkit-transition: right 0.5s ease;
-  -moz-transition: right 0.5s ease;
-  -o-transition: right 0.5s ease;
-  transition: right 0.5s ease;
+/* line 28, ../sass/components/_selected-doodle.scss */
+.ed-selected-doodle.ed-state-doodle-selected {
+  border-right-color: transparent;
 }
 
 /* line 17, ../sass/components/_doodle-popup.scss */
@@ -1415,39 +1408,42 @@ span.squiggle {
   box-shadow: 0 5px 14px -4px rgba(0, 0, 0, 0.5);
   background: #c3def5;
   border: 1px solid #53a0c7;
-  border-width: 0 1px 1px 0;
+  border-width: 1px 1px 1px 0;
   padding: 5px;
   position: absolute;
-  top: 38px;
-  z-index: 102;
+  top: 0;
+  z-index: 103;
   -webkit-transform: translate3d(0, 0, 0);
   -webkit-backface-visibility: hidden;
   -webkit-perspective: 1000;
-}
-/* line 30, ../sass/components/_doodle-popup.scss */
-.ed-doodle-popup.closed {
-  right: 5px;
+  opacity: 1;
+  width: 188px;
 }
 /* line 33, ../sass/components/_doodle-popup.scss */
+.ed-doodle-popup.closed {
+  right: 0;
+  opacity: 0;
+}
+/* line 37, ../sass/components/_doodle-popup.scss */
 .ed-doodle-popup.closed .ed-button .label {
   display: none;
 }
 
-/* line 41, ../sass/components/_doodle-popup.scss */
+/* line 45, ../sass/components/_doodle-popup.scss */
 .ed-doodle-popup-toolbar li {
   margin-bottom: 0;
   margin-right: 4px;
 }
-/* line 44, ../sass/components/_doodle-popup.scss */
+/* line 48, ../sass/components/_doodle-popup.scss */
 .sub-element .ed-doodle-popup-toolbar li {
   margin-right: 1px;
 }
-/* line 47, ../sass/components/_doodle-popup.scss */
+/* line 51, ../sass/components/_doodle-popup.scss */
 .ed-doodle-popup-toolbar li:last-child {
   margin-right: 0;
 }
 
-/* line 53, ../sass/components/_doodle-popup.scss */
+/* line 57, ../sass/components/_doodle-popup.scss */
 .ed-doodle-description {
   color: #444;
   font-size: 12px;
@@ -1456,32 +1452,32 @@ span.squiggle {
   padding: 12px 0 6px 0;
 }
 
-/* line 61, ../sass/components/_doodle-popup.scss */
+/* line 65, ../sass/components/_doodle-popup.scss */
 .ed-doodle-controls {
-  max-height: 224px;
+  max-height: 294px;
   overflow: auto;
 }
-/* line 64, ../sass/components/_doodle-popup.scss */
+/* line 68, ../sass/components/_doodle-popup.scss */
 .ed-doodle-controls > div {
   line-height: 12px;
   padding-bottom: 8px;
 }
-/* line 68, ../sass/components/_doodle-popup.scss */
+/* line 72, ../sass/components/_doodle-popup.scss */
 .ed-doodle-controls > div:first-child {
   margin-top: 14px;
 }
-/* line 72, ../sass/components/_doodle-popup.scss */
+/* line 76, ../sass/components/_doodle-popup.scss */
 .ed-doodle-controls label {
   color: #477792;
   float: left;
   font-size: 12px;
   margin: 0 6px 0 0;
 }
-/* line 77, ../sass/components/_doodle-popup.scss */
+/* line 81, ../sass/components/_doodle-popup.scss */
 .ed-doodle-controls label:after {
   content: ":";
 }
-/* line 81, ../sass/components/_doodle-popup.scss */
+/* line 85, ../sass/components/_doodle-popup.scss */
 .ed-doodle-controls select {
   width: auto;
 }

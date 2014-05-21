@@ -44,13 +44,9 @@ ED.Controller = (function() {
 		this.canvas = document.getElementById(properties.canvasId);
 		this.input = document.getElementById(properties.inputId);
 		this.container = $(this.canvas).closest('.ed-widget');
-		this.canvasBorder = this.container.find('.ed-canvas-border');
-		this.editorContainer = this.container.find('.ed-editor');
 
 		this.Checker = Checker || ED.Checker;
 		this.drawing = drawing || this.createDrawing();
-
-		this.setDimensions();
 
 		if (this.properties.isEditable) {
 			this.mainToolbar = mainToolbar || this.createToolbar('.ed-main-toolbar');
@@ -111,16 +107,9 @@ ED.Controller = (function() {
 
 		var container = this.container.find('.ed-doodle-popup');
 
-		// We need to match the width of the doodle popup with the width
-		// of the selected doodle. The selected doodle's width is not set (could be
-		// anything), thus we have to calculate it at run-time.
-		var width = this.container.find('.ed-selected-doodle').outerWidth();
-
 		return container.length ? new ED.Views.DoodlePopup(
 			this.drawing,
-			container,
-			width,
-			this.properties.inline
+			container
 		) : null;
 	};
 
@@ -135,34 +124,8 @@ ED.Controller = (function() {
 		return container.length ? new ED.Views.SelectedDoodle(
 			this.drawing,
 			container,
-			this.properties.floatSelectedDoodle,
-			this.properties.inline
+			this.doodlePopup
 		) : null;
-	};
-
-	/**
-	 * Set the dimensions of the canvas container element to match the dimensions
-	 * of the canvas element.
-	 */
-	Controller.prototype.setDimensions = function() {
-
-		var canvas = $(this.canvas);
-
-		// We use the width and height attributes as the canvas containers might be hidden,
-		// thus we won't be able to get the computed dimensions.
-		var canvasWidth = parseInt(canvas.attr('width'), 10);
-		var canvasHeight = parseInt(canvas.attr('height'), 10);
-
-		if (this.canvasBorder.length) {
-			this.canvasBorder.css({
-				width: canvasWidth + 2,
-				height: canvasHeight + 2
-			});
-		}
-
-		this.editorContainer.css({
-			width: canvasWidth + (this.properties.isEditable ? 4 : 8)
-		});
 	};
 
 	/**

@@ -20,11 +20,8 @@
 }
 
 .ed-body {
-	// @extend %clearfix;
-	background: #d2dee8;
 	display: table;
-	margin: 4px 0 0 0;
-	padding-bottom: 8px;
+	padding-bottom: 4px;
 	width: 100%;
 	.ed-widget.display & {
 		width: auto;
@@ -33,21 +30,21 @@
 	}
 }
 
-.ed-editor {
+.ed-editor-container {
 	display: table-cell;
-	margin-left: 2px;
 	position: relative;
 	vertical-align: top;
 	width: auto;
 }
 
-.ed-fields {
+.ed-fields-container {
 	display: table-cell;
 	padding-left: 0.75rem;
 	padding-right: 2px;
 	padding-top: 10px;
 	position: relative;
 	vertical-align: top;
+	width: 100%;
 }
 
 .ed-canvas-border {
@@ -63,16 +60,19 @@
 	position: relative;
 }
 
+.ed-editor {
+	position: relative;
+}
+
 canvas {
 	// Canvas element in edit mode
 	&.ed-canvas-edit {
 		background: #e4edf5;
-		border: 0;
+		border: 1px solid #53a0c7;
 		cursor: pointer;
-		left: 4px;
 		position: relative;
-		top: 4px;
 		z-index: 103;
+		margin: 0 0 0 2px;
 	}
 	// Canvas element in display mode
 	&.ed-canvas-display {

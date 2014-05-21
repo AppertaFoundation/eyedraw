@@ -19,16 +19,20 @@
 	@include box-shadow(0 5px 14px -4px rgba(0, 0, 0, 0.5));
 	background: #c3def5;
 	border: 1px solid #53a0c7;
-	border-width: 0 1px 1px 0;
+	border-width: 1px 1px 1px 0;
 	padding: 5px;
 	position: absolute;
-	top: 38px;
-	z-index: 102;
+	top: 0;
+	z-index: 103;
 	-webkit-transform: translate3d(0, 0, 0);
 	-webkit-backface-visibility: hidden;
 	-webkit-perspective: 1000;
+	opacity: 1;
+	// default width, override in the module
+	width: 188px;
 	&.closed {
-		right: 5px;
+		right: 0;
+		opacity: 0;
 		.ed-button {
 			.label {
 				display: none;
@@ -59,7 +63,7 @@
 }
 
 .ed-doodle-controls {
-	max-height: 224px;
+	max-height: 294px;
 	overflow: auto;
 	> div {
 		@extend %clearfix;

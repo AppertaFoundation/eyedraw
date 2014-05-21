@@ -65,12 +65,19 @@ body {
 }
 
 .eyedraw-row.cataract-version2 .column.fixed {
-	width: 330px;
+	width: 328px;
 }
 
 .eyedraw-row.cataract-version2 .column.fluid {
-	width: -moz-calc(100% - 330px);
-  width: -o-calc(100% - 330px);
-  width: -webkit-calc(100% - 330px);
-  width: calc(100% - 330px);
+	width: -moz-calc(100% - 328px);
+  width: -o-calc(100% - 328px);
+  width: -webkit-calc(100% - 328px);
+  width: calc(100% - 328px);
+}
+
+img.ed-canvas-edit.demo {
+	left: 3px;
+	position: absolute;
+	top: 1px;
+	z-index: 104;
 }

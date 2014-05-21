@@ -19,25 +19,25 @@
 ?>
 <div class="EyeDrawWidget ed-widget <?php echo ($isEditable) ? ' edit' : ' display';?>" id="eyedrawwidget_<?php echo $idSuffix ?>">
 
-	<?php if ($isEditable && count($doodleToolBarArray) > 0) {?>
-		<div class="ed-toolbar">
-			<?php foreach ($doodleToolBarArray as $row => $rowItems) { ?>
-				<ul class="ed-toolbar-panel ed-main-toolbar">
-					<?php foreach($rowItems as $item) {?>
-						<li id="<?php echo $item['classname'].$idSuffix ?>">
-							<a class="ed-button" href="#" data-function="addDoodle" data-arg="<?php echo $item['classname'] ?>">
-								<span class="icon-ed-<?php echo $item['classname'];?>"></span>
-								<span class="label"><?php echo $item['title'] ?></span>
-							</a>
-						</li>
-					<?php } ?>
-				</ul>
-			<?php } ?>
-		</div>
-	<?php } ?>
-
 	<div class="ed-body">
 		<div class="ed-editor-container">
+
+			<?php if ($isEditable && count($doodleToolBarArray) > 0) {?>
+				<div class="ed-toolbar">
+					<?php foreach ($doodleToolBarArray as $row => $rowItems) { ?>
+						<ul class="ed-toolbar-panel ed-main-toolbar">
+							<?php foreach($rowItems as $item) {?>
+								<li id="<?php echo $item['classname'].$idSuffix ?>">
+									<a class="ed-button" href="#" data-function="addDoodle" data-arg="<?php echo $item['classname'] ?>">
+										<span class="icon-ed-<?php echo $item['classname'];?>"></span>
+										<span class="label"><?php echo $item['title'] ?></span>
+									</a>
+								</li>
+							<?php } ?>
+						</ul>
+					<?php } ?>
+				</div>
+			<?php } ?>
 
 			<div class="ed-editor">
 

@@ -38,14 +38,13 @@ ED.Views.SelectedDoodle = (function() {
 	 * @param {HTMLElement} container The widget container element
 	 * @extends {ED.View}
 	 */
-	function SelectedDoodle(drawing, container, floated, inline) {
+	function SelectedDoodle(drawing, container, doodlePopup) {
 		ED.View.apply(this, arguments);
 
 		this.drawing = drawing;
 		this.container = container;
 		this.select = this.container.find('select');
-		this.floated = !!floated;
-		this.inline = !!inline;
+		this.doodlePopup = doodlePopup;
 
 		this.registerForNotifications();
 		this.bindEvents();
@@ -58,7 +57,8 @@ ED.Views.SelectedDoodle = (function() {
 	 * Register a ED.Drawing notification handler. For each event, re-render the view.
 	 */
 	SelectedDoodle.prototype.registerForNotifications = function() {
-		this.drawing.registerForNotifications(this, 'notificationHandler', [
+
+		this.drawing.registerForNotifications(this, 'render', [
 			'ready',
 			'doodleAdded',
 			'doodleDeleted',
@@ -77,36 +77,16 @@ ED.Views.SelectedDoodle = (function() {
 	 * @return {[type]}
 	 */
 	SelectedDoodle.prototype.bindEvents = function() {
+
 		this.select.on('change.' + EVENT_NAMESPACE, this.onSelectChange.bind(this));
-	};
 
-	SelectedDoodle.prototype.notificationHandler = function(notification) {
+		this.doodlePopup.on('show.before', function() {
+			this.container.addClass('ed-state-doodle-selected');
+		}.bind(this));
 
-		var eventName = notification.eventName;
-
-		if (this.floated || this.inline) {
-			switch(eventName) {
-				case 'ready':
-					if (this.floated) {
-						this.container.addClass('floated');
-					}
-					if (this.inline) {
-						this.container.addClass('inline');
-					}
-					break;
-				case 'doodleSelected':
-					// We do this in the next event loop as the "doodleDeselect" event
-					// is triggered before the "doodleSelect" event.
-					setTimeout(this.show.bind(this));
-					break;
-				case 'doodleDeselected':
-				case 'doodleDeleted':
-					this.hide();
-					break;
-			}
-		}
-
-		this.render();
+		this.doodlePopup.on('hide.after', function() {
+			this.container.removeClass('ed-state-doodle-selected');
+		}.bind(this));
 	};
 
 	/**
@@ -178,40 +158,6 @@ ED.Views.SelectedDoodle = (function() {
 		option.data('doodle', doodle);
 
 		return option;
-	};
-
-	SelectedDoodle.prototype.show = function() {
-		if (!this.drawing.selectedDoodle) {
-			return;
-		}
-		this.delay(function() {
-			this.emit('show');
-			var css = {};
-			if (this.inline) {
-				css.right = -1 * (this.container.outerWidth() - 2);
-				css.width = this.container.outerWidth();
-			} else {
-				css.left = 0;
-				css.width = this.container.outerWidth();
-			}
-
-			this.container.css(css);
-		}.bind(this));
-	};
-
-	SelectedDoodle.prototype.hide = function() {
-		this.delay(function() {
-			this.emit('hide');
-			var css = {};
-			if (this.inline) {
-				css.left = 'auto';
-				css.right = 2;
-			} else {
-				css.left = (-1 * (this.container.outerWidth())) - 4;
-				css.right = 'auto';
-			}
-			this.container.css(css).show();
-		}.bind(this));
 	};
 
 	/*********************
