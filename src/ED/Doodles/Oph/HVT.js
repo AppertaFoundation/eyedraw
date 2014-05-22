@@ -51,7 +51,7 @@ ED.HVT.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.HVT.prototype.setHandles = function() {
-	this.handleArray[1] = new ED.Handle(null, true, ED.Mode.Rotate, false);
+	this.handleArray[1] = new ED.Doodle.Handle(null, true, ED.Mode.Rotate, false);
 }
 
 /**

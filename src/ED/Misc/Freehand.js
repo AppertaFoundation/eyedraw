@@ -60,7 +60,7 @@ ED.Freehand.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.Freehand.prototype.setHandles = function() {
-	this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, true);
+	this.handleArray[2] = new ED.Doodle.Handle(null, true, ED.Mode.Scale, true);
 }
 
 /**

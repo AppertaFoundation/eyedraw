@@ -46,8 +46,8 @@ ED.CiliaryInjection.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.CiliaryInjection.prototype.setHandles = function() {
-	this.handleArray[0] = new ED.Handle(null, true, ED.Mode.Arc, false);
-	this.handleArray[3] = new ED.Handle(null, true, ED.Mode.Arc, false);
+	this.handleArray[0] = new ED.Doodle.Handle(null, true, ED.Mode.Arc, false);
+	this.handleArray[3] = new ED.Doodle.Handle(null, true, ED.Mode.Arc, false);
 }
 
 /**
@@ -144,7 +144,7 @@ ED.CiliaryInjection.prototype.draw = function(_point) {
 
 		ctx.beginPath();
 
-		// Radial lines		
+		// Radial lines
 		for (var i = 0; i < n; i++) {
 			var theta = Math.PI / 2 + arcEnd + i * phi;
 			sp.setWithPolars(ro, theta);

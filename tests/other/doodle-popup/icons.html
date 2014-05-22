@@ -1,0 +1,520 @@
+<!doctype html>
+<html>
+<head>
+	<title>Eyedraw doodle popup menu prototype</title>
+
+	<!-- This is the main OpenEyes stlesheet -->
+	<link rel="stylesheet" type="text/css" href="css/style.css" />
+
+	<!-- This is purely used for test/demo purposes -->
+	<link rel="stylesheet" type="text/css" href="css/test.css" />
+
+	<!-- The eyedraw widget stylesheet -->
+	<link rel="stylesheet" type="text/css" href="../../../assets/css/oe-eyedraw.css" id="ed-stylesheet" />
+
+	<style type="text/css">
+		.container {
+			max-width: 1000px;
+			margin-top: 10px;
+		}
+		#icons {
+			margin-bottom: 18px;
+		}
+		.icon-example {
+			outline: 1px solid #ddd;
+			padding: 2px;
+			margin: 4px;
+			position: relative;
+		}
+		.show-centre .icon-example {
+			border-color: #07f801;
+		}
+		.show-centre .icon-example:before {
+			content: "";
+			position: absolute;
+			background: #07f801;
+			width: 100%;
+			height: 1px;
+			top: 50%;
+			margin-top: -1px;
+			left: 0;
+		}
+		.show-centre .icon-example:after {
+			content: "";
+			position: absolute;
+			background: #07f801;
+			width: 1px;
+			height: 100%;
+			margin-left: -1px;
+			top: 0;
+			left: 50%;
+		}
+		.ed-toolbar {
+			margin-bottom: 1em;
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<div class="box generic">
+			<h2>EyeDraw Icons</h2>
+			<div id="icons">
+				<!-- icons to go here -->
+			</div>
+			<p>
+				<button id="show-centres" class="small">Toggle icon centres</button>
+			</p>
+		</div>
+		<div class="box generic">
+			<h2>Toolbar icons</h2>
+			<div class="ed-widget anterior-segment" id="eyedrawwidget_example">
+
+				<h3>Manipulation icons</h3>
+				<!-- TOOLBAR START -->
+				<div class="ed-toolbar">
+					<!-- Manipulation icons -->
+					<ul class="ed-toolbar-panel">
+						<li>
+							<a class="ed-button" href="#">
+								<span class="icon-ed-delete"></span>
+								<span class="label">Delete</span>
+							</a>
+						</li>
+						<li>
+							<a class="ed-button" href="#">
+								<span class="icon-ed-drawer-open"></span>
+								<span class="label">Open Drawer</span>
+							</a>
+						</li>
+						<li>
+							<a class="ed-button" href="#">
+								<span class="icon-ed-lock"></span>
+								<span class="label">Lock</span>
+							</a>
+						</li>
+						<li>
+							<a class="ed-button" href="#">
+								<span class="icon-ed-unlock"></span>
+								<span class="label">Unlock</span>
+							</a>
+						</li>
+						<li>
+							<a class="ed-button" href="#">
+								<span class="icon-ed-move-to-back"></span>
+								<span class="label">Move to back</span>
+							</a>
+						</li>
+						<li>
+							<a class="ed-button" href="#">
+								<span class="icon-ed-move-to-front"></span>
+								<span class="label">Move to front</span>
+							</a>
+						</li>
+						<li>
+							<a class="ed-button" href="#">
+								<span class="icon-ed-reset"></span>
+								<span class="label">Reset</span>
+							</a>
+						</li>
+					</ul>
+				</div>
+
+				<h3>Gonioscopy icons</h3>
+				<div class="ed-toolbar">
+
+					<!-- Gonioscopy icons -->
+					<ul class="ed-toolbar-panel">
+						<li>
+							<a class="ed-button" href="#">
+								<span class="icon-ed-AngleNV"></span>
+								<span class="label">Angle new vessels</span>
+							</a>
+						</li>
+						<li>
+							<a class="ed-button" href="#">
+								<span class="icon-ed-AntSynech"></span>
+								<span class="label">Anterior synechiae</span>
+							</a>
+						</li>
+					</ul>
+				</div>
+
+				<h3>Anterior Segment icons</h3>
+				<div class="ed-toolbar">
+
+					<!-- Anterior Segment icons -->
+					<ul class="ed-toolbar-panel">
+						<li>
+							<a class="ed-button" href="#" data-arg="NuclearCataract">
+								<span class="icon-ed-NuclearCataract"></span>
+								<span class="label">Nuclear cataract</span>
+							</a>
+						</li>
+						<li>
+							<a class="ed-button" href="#" data-arg="CorticalCataract">
+								<span class="icon-ed-CorticalCataract"></span>
+								<span class="label">Cortical cataract</span>
+							</a>
+						</li>
+						<li>
+							<a class="ed-button" href="#" data-arg="PostSubcapCataract">
+								<span class="icon-ed-PostSubcapCataract"></span>
+								<span class="label">Posterior subcapsular cataract</span>
+							</a>
+						</li>
+						<li>
+							<a class="ed-button" href="#" data-arg="PCIOL">
+								<span class="icon-ed-PCIOL"></span>
+								<span class="label">Posterior chamber IOL</span>
+							</a>
+						</li>
+						<li>
+							<a class="ed-button" href="#" data-arg="ACIOL">
+								<span class="icon-ed-ACIOL"></span>
+								<span class="label">Anterior chamber IOL</span>
+							</a>
+						</li>
+						<li>
+							<a class="ed-button" href="#" data-arg="Bleb">
+								<span class="icon-ed-Bleb"></span>
+								<span class="label">Trabeculectomy bleb</span>
+							</a>
+						</li>
+						<li>
+							<a class="ed-button" href="#" data-arg="PI">
+								<span class="icon-ed-PI"></span>
+								<span class="label">Peripheral iridectomy</span>
+							</a>
+						</li>
+						<li>
+							<a class="ed-button" href="#" data-arg="Fuchs">
+								<span class="icon-ed-Fuchs"></span>
+								<span class="label">Fuchs endothelial dystrophy</span>
+							</a>
+						</li>
+						<li>
+							<a class="ed-button" href="#" data-arg="RK">
+								<span class="icon-ed-RK"></span>
+								<span class="label">Radial keratotomy</span>
+							</a>
+						</li>
+						<li>
+							<a class="ed-button" href="#" data-arg="LasikFlap">
+								<span class="icon-ed-LasikFlap"></span>
+								<span class="label">LASIK flap</span>
+							</a>
+						</li>
+						<li>
+							<a class="ed-button" href="#" data-arg="CornealScar">
+								<span class="icon-ed-CornealScar"></span>
+								<span class="label">Corneal scar</span>
+							</a>
+						</li>
+						<li>
+							<a class="ed-button" href="#" data-arg="SectorIridectomy">
+								<span class="icon-ed-SectorIridectomy"></span>
+								<span class="label">Sector iridectomy</span>
+							</a>
+						</li>
+						<li>
+							<a class="ed-button" href="#" data-arg="PosteriorSynechia">
+								<span class="icon-ed-PosteriorSynechia"></span>
+								<span class="label">Posterior synechia</span>
+							</a>
+						</li>
+					</ul>
+				</div>
+
+				<h3>Optic Disc icons</h3>
+				<div class="ed-toolbar">
+
+					<!-- Optic Disc icons -->
+					<ul class="ed-toolbar-panel">
+						<li>
+							<a class="ed-button" href="#" data-arg="PeripapillaryAtrophy">
+								<span class="icon-ed-PeripapillaryAtrophy"></span>
+								<span class="label">Peripapillary atrophy</span>
+							</a>
+						</li>
+
+						<li>
+							<a class="ed-button" href="#" data-arg="DiscPallor">
+								<span class="icon-ed-DiscPallor"></span>
+								<span class="label">Disc pallor</span>
+							</a>
+						</li>
+						<li>
+							<a class="ed-button" href="#" data-arg="DiscHaemorrhage">
+								<span class="icon-ed-DiscHaemorrhage"></span>
+								<span class="label">Disc haemorrhage</span>
+							</a>
+						</li>
+						<li>
+							<a class="ed-button" href="#" data-arg="NerveFibreDefect">
+								<span class="icon-ed-NerveFibreDefect"></span>
+								<span class="label">Nerve fibre defect</span>
+							</a>
+						</li>
+						<li>
+							<a class="ed-button" href="#" data-arg="OpticDiscPit">
+								<span class="icon-ed-OpticDiscPit"></span>
+								<span class="label">Optic disc pit</span>
+							</a>
+						</li>
+						<li>
+							<a class="ed-button" href="#" data-arg="Papilloedema">
+								<span class="icon-ed-Papilloedema"></span>
+								<span class="label">Papilloedema</span>
+							</a>
+						</li>
+					</ul>
+				</div>
+
+				<h3>Posterior Pole icons</h3>
+
+				<div class="ed-toolbar">
+
+					<!-- Posterior Pole -->
+					<ul class="ed-toolbar-panel">
+						<li>
+							<a class="ed-button" href="#" data-arg="Geographic">
+								<span class="icon-ed-Geographic"></span>
+								<span class="label">Geographic atrophy</span>
+							</a>
+						</li>
+						<li>
+							<a class="ed-button" href="#" data-arg="VitreousOpacity">
+								<span class="icon-ed-VitreousOpacity"></span>
+								<span class="label">Vitreous opacity</span>
+							</a>
+						</li>
+						<li>
+							<a class="ed-button" href="#" data-arg="DiabeticNV">
+								<span class="icon-ed-DiabeticNV"></span>
+								<span class="label">Diabetic new vessels</span>
+							</a>
+						</li>
+						<li>
+							<a class="ed-button" href="#" data-arg="CNV">
+								<span class="icon-ed-CNV"></span>
+								<span class="label">Choroidal new vessels</span>
+							</a>
+						</li>
+						<li>
+							<a class="ed-button" href="#" data-arg="Circinate">
+								<span class="icon-ed-Circinate"></span>
+								<span class="label">Circinate retinopathy</span>
+							</a>
+						</li>
+						<li>
+							<a class="ed-button" href="#" data-arg="CystoidMacularOedema">
+								<span class="icon-ed-CystoidMacularOedema"></span>
+								<span class="label">Cystoid macular oedema</span>
+							</a>
+						</li>
+						<li>
+							<a class="ed-button" href="#" data-arg="EpiretinalMembrane">
+								<span class="icon-ed-EpiretinalMembrane"></span>
+								<span class="label">Epiretinal membrane</span>
+							</a>
+						</li>
+						<li>
+							<a class="ed-button" href="#" data-arg="HardDrusen">
+								<span class="icon-ed-HardDrusen"></span>
+								<span class="label">Hard drusen</span>
+							</a>
+						</li>
+						<li>
+							<a class="ed-button" href="#" data-arg="MacularHole">
+								<span class="icon-ed-MacularHole"></span>
+								<span class="label">Macular hole</span>
+							</a>
+						</li>
+						<li>
+							<a class="ed-button" href="#" data-arg="RPEDetachment">
+								<span class="icon-ed-RPEDetachment"></span>
+								<span class="label">RPE detachment</span>
+							</a>
+						</li>
+						<li>
+							<a class="ed-button" href="#" data-arg="MacularDystrophy">
+								<span class="icon-ed-MacularDystrophy"></span>
+								<span class="label">Macular dystrophy</span>
+							</a>
+						</li>
+						<li>
+							<a class="ed-button" href="#" data-arg="Macroaneurysm">
+								<span class="icon-ed-Macroaneurysm"></span>
+								<span class="label">Macroaneurysm</span>
+							</a>
+						</li>
+						<li>
+							<a class="ed-button" href="#" data-arg="RetinalVeinOcclusionPostPole">
+								<span class="icon-ed-RetinalVeinOcclusionPostPole"></span>
+								<span class="label">Retinal vein occluson</span>
+							</a>
+						</li>
+						<li>
+							<a class="ed-button" href="#" data-arg="RetinalArteryOcclusionPostPole">
+								<span class="icon-ed-RetinalArteryOcclusionPostPole"></span>
+								<span class="label">Retinal artery occlusion</span>
+							</a>
+						</li>
+						<li>
+							<a class="ed-button" href="#" data-arg="Microaneurysm">
+								<span class="icon-ed-Microaneurysm"></span>
+								<span class="label">Microaneurysm</span>
+							</a>
+						</li>
+						<li>
+							<a class="ed-button" href="#" data-arg="BlotHaemorrhage">
+								<span class="icon-ed-BlotHaemorrhage"></span>
+								<span class="label">Blot haemorrhage</span>
+							</a>
+						</li>
+						<li>
+							<a class="ed-button" href="#" data-arg="HardExudate">
+								<span class="icon-ed-HardExudate"></span>
+								<span class="label">Hard exudate</span>
+							</a>
+						</li>
+						<li>
+							<a class="ed-button" href="#" data-arg="IRMA">
+								<span class="icon-ed-IRMA"></span>
+								<span class="label">Intraretinal microvascular abnormalities</span>
+							</a>
+						</li>
+						<li>
+							<a class="ed-button" href="#" data-arg="MacularThickening">
+								<span class="icon-ed-MacularThickening"></span>
+								<span class="label">Macular thickening</span>
+							</a>
+						</li>
+						<li>
+							<a class="ed-button" href="#" data-arg="PreRetinalHaemorrhage">
+								<span class="icon-ed-PreRetinalHaemorrhage"></span>
+								<span class="label">Pre-retinal haemorrhage</span>
+							</a>
+						</li>
+						<li>
+							<a class="ed-button" href="#" data-arg="CottonWoolSpot">
+								<span class="icon-ed-CottonWoolSpot"></span>
+								<span class="label">Cotton wool spot</span>
+							</a>
+						</li>
+						<li>
+							<a class="ed-button" href="#" data-arg="FibrousProliferation">
+								<span class="icon-ed-FibrousProliferation"></span>
+								<span class="label">Fibrous proliferation</span>
+							</a>
+						</li>
+						<li>
+							<a class="ed-button" href="#" data-arg="TractionRetinalDetachment">
+								<span class="icon-ed-TractionRetinalDetachment"></span>
+								<span class="label">Traction retinal detachment</span>
+							</a>
+						</li>
+						<li>
+							<a class="ed-button" href="#" data-arg="SwollenDisc">
+								<span class="icon-ed-SwollenDisc"></span>
+								<span class="label">Swollen disc</span>
+							</a>
+						</li>
+						<li>
+							<a class="ed-button" href="#" data-arg="Telangiectasis">
+								<span class="icon-ed-Telangiectasis"></span>
+								<span class="label">Parafoveal telangiectasia</span>
+							</a>
+						</li>
+						<li>
+							<a class="ed-button" href="#" data-arg="ChoroidalHaemorrhage">
+								<span class="icon-ed-ChoroidalHaemorrhage"></span>
+								<span class="label">Choroidal haemorrhage</span>
+							</a>
+						</li>
+						<li>
+							<a class="ed-button" href="#" data-arg="ChoroidalNaevus">
+								<span class="icon-ed-ChoroidalNaevus"></span>
+								<span class="label">Choroidal naevus</span>
+							</a>
+						</li>
+						<li>
+							<a class="ed-button" href="#" data-arg="LaserSpot">
+								<span class="icon-ed-LaserSpot"></span>
+								<span class="label">Laser spot</span>
+							</a>
+						</li>
+						<li>
+							<a class="ed-button" href="#" data-arg="FocalLaser">
+								<span class="icon-ed-FocalLaser"></span>
+								<span class="label">Focal laser</span>
+							</a>
+						</li>
+						<li>
+							<a class="ed-button" href="#" data-arg="MacularGrid">
+								<span class="icon-ed-MacularGrid"></span>
+								<span class="label">Macular grid laser</span>
+							</a>
+						</li>
+						<li>
+							<a class="ed-button" href="#" data-arg="SectorPRPPostPole">
+								<span class="icon-ed-SectorPRPPostPole"></span>
+								<span class="label">Sector PRP (posterior pole)</span>
+							</a>
+						</li>
+						<li>
+							<a class="ed-button" href="#" data-arg="PRPPostPole">
+								<span class="icon-ed-PRPPostPole"></span>
+								<span class="label">Panretinal photocoagulation (posterior pole)</span>
+							</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script>
+
+	(function toggleIconCentres() {
+		var container = document.getElementById('icons');
+		var button = document.getElementById('show-centres');
+		button.addEventListener('click', function() {
+			container.className = /show-centre/.test(container.className) ? '' : 'show-centre';
+		}, false);
+	}());
+
+	(function createIconSpans() {
+
+		if (/file/.test(window.location.protocol)) {
+			return alert([
+				'Unable to parse the stylesheet because this file is being served using the file:// prototcol.',
+				'You need to serve this page through a web-server (http) in order to view the icons.'
+			].join('\n\n'));
+		}
+
+		// Converts a NodeList/HTMLCollection to an array
+		function toArray(list) {
+			return Array.prototype.slice.call(list);
+		}
+
+		// Get the oe-eyedraw stylesheet.
+		var styleSheet = toArray(document.styleSheets).filter(function(ss) {
+			return ss.ownerNode.id === 'ed-stylesheet';
+		})[0];
+
+		// Loop through the stylesheet rules, filter out the icon clasess...
+		var iconClasses = toArray(styleSheet.cssRules).filter(function(rule) {
+			return /^\.icon-/.test(rule.selectorText) && !/:/.test(rule.selectorText)
+		});
+
+		// ..and create <span> elements for the classes
+		var html = iconClasses.map(function(rule) {
+			var className = rule.selectorText.replace(/[\.,]/g, '');
+			return '<span class="icon-example ' + className + '" title=".' + className + '"></span>';
+		}).join('');
+
+		document.getElementById('icons').innerHTML = html;
+	}());
+	</script>
+</body>
+</html>

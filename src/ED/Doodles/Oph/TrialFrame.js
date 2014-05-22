@@ -27,7 +27,7 @@
 ED.TrialFrame = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "TrialFrame";
-	
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 }

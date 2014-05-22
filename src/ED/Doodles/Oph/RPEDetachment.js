@@ -52,9 +52,9 @@ ED.RPEDetachment.superclass = ED.Doodle.prototype;
 ED.RPEDetachment.prototype.setHandles = function() {
 	// Array of handles
 	for (var i = 0; i < this.numberOfHandles; i++) {
-		this.handleArray[i] = new ED.Handle(null, true, ED.Mode.Handles, false);
+		this.handleArray[i] = new ED.Doodle.Handle(null, true, ED.Mode.Handles, false);
 	}
-	
+
 	// Allow top handle to rotate doodle
 	this.handleArray[0].isRotatable = true;
 }
@@ -89,7 +89,7 @@ ED.RPEDetachment.prototype.setParameterDefaults = function() {
 	} else {
 		//this.move((this.drawing.eye == ED.eye.Right ? -1 : 1) * 100, 0);
 	}
-	
+
 	// Create a squiggle to store the handles points
 	var squiggle = new ED.Squiggle(this, new ED.Colour(100, 100, 100, 1), 4, true);
 
@@ -164,7 +164,7 @@ ED.RPEDetachment.prototype.draw = function(_point) {
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
-	
+
 	// Return value indicating successful hittest
 	return this.isClicked;
 }

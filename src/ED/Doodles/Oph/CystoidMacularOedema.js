@@ -27,10 +27,10 @@
 ED.CystoidMacularOedema = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "CystoidMacularOedema";
-	
+
 	// Saved parameters
 	this.savedParameterArray = ['scaleX', 'scaleY'];
-	
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
@@ -46,7 +46,7 @@ ED.CystoidMacularOedema.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.CystoidMacularOedema.prototype.setHandles = function() {
-	this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, false);
+	this.handleArray[2] = new ED.Doodle.Handle(null, true, ED.Mode.Scale, false);
 }
 
 /**
@@ -67,7 +67,7 @@ ED.CystoidMacularOedema.prototype.setPropertyDefaults = function() {
  * Use the setParameter function for derived parameters, as this will also update dependent variables
  */
 ED.CystoidMacularOedema.prototype.setParameterDefaults = function() {
-	
+
 	// Set size according to template
 	if (this.drawing.hasDoodleOfClass('Fundus')) {
 		this.scaleX = 0.5;

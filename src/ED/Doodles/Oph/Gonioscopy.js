@@ -38,10 +38,10 @@ ED.Gonioscopy = function(_drawing, _parameterJSON) {
 	this.riro = 190;
 	this.riri = 176;
 	this.rpu = 100;
-	
+
 	// Saved parameters
 	this.savedParameterArray = ['apexX', 'apexY'];
-	
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
@@ -57,7 +57,7 @@ ED.Gonioscopy.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.Gonioscopy.prototype.setHandles = function() {
-	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+	this.handleArray[4] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
 }
 
 /**

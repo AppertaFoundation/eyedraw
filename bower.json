@@ -1,0 +1,26 @@
+{
+  "name": "eyedraw",
+  "version": "1.6.0",
+  "homepage": "https://github.com/openeyes/eyedraw",
+  "authors": [
+    "Bill Aylward <bill.aylward@openeyes.org>"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "assets/components"
+  ],
+  "devDependencies": {
+    "jquery": "~1.8.3",
+    "mocha": "~1.18.2",
+    "chai": "~1.9.1",
+    "sinonjs": "~1.9.1",
+    "blanket": "~1.1.5"
+  },
+  "dependencies": {
+    "mustache": "~0.8.1",
+    "eventemitter2": "~0.4.13"
+  }
+}

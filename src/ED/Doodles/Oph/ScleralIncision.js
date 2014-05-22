@@ -27,10 +27,10 @@
 ED.ScleralIncision = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "ScleralIncision";
-	
+
 	// Saved parameters
 	this.savedParameterArray = ['arc', 'rotation'];
-	
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
@@ -46,7 +46,7 @@ ED.ScleralIncision.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.ScleralIncision.prototype.setHandles = function() {
-	this.handleArray[3] = new ED.Handle(null, true, ED.Mode.Arc, false);
+	this.handleArray[3] = new ED.Doodle.Handle(null, true, ED.Mode.Arc, false);
 }
 
 /**

@@ -49,7 +49,7 @@ ED.Baerveldt.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.Baerveldt.prototype.setHandles = function() {
-	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+	this.handleArray[4] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
 }
 
 /**
@@ -220,11 +220,11 @@ ED.Baerveldt.prototype.draw = function(_point) {
 		var cp1 = new ED.Point(0, (290 * s + d) + (this.apexY - (290 * s + d)) * 1);
 		var cp2 = new ED.Point(this.apexX * 0.3, this.apexY);
 		var yd = this.apexX > 0?1:-1;
-		
+
 		ctx.bezierCurveTo(cp1.x - 20 * s, cp1.y, cp2.x - 20 * s, cp2.y, this.apexX - 20 * s, this.apexY + 20 * s * yd);
 		ctx.lineTo(this.apexX + 20 * s, this.apexY - 20 * s * yd);
 		ctx.bezierCurveTo(cp2.x + 20 * s, cp2.y, cp1.x + 20 * s, cp1.y, 20 * s, 290 * s + d);
-		
+
 		//ctx.lineTo(cp1.x, cp1.y);
 
 		ctx.strokeStyle = "rgba(150,150,150,0.5)";

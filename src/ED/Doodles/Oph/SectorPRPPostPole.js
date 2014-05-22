@@ -27,7 +27,7 @@
 ED.SectorPRPPostPole = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "SectorPRPPostPole";
-	
+
 	// Saved parameters
 	this.savedParameterArray = ['arc', 'rotation'];
 
@@ -46,8 +46,8 @@ ED.SectorPRPPostPole.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.SectorPRPPostPole.prototype.setHandles = function() {
-	this.handleArray[0] = new ED.Handle(null, true, ED.Mode.Arc, false);
-	this.handleArray[3] = new ED.Handle(null, true, ED.Mode.Arc, false);
+	this.handleArray[0] = new ED.Doodle.Handle(null, true, ED.Mode.Arc, false);
+	this.handleArray[3] = new ED.Doodle.Handle(null, true, ED.Mode.Arc, false);
 }
 
 /**

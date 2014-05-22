@@ -51,7 +51,7 @@ ED.Slider2D.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['sphereInteger'] = {
 		kind: 'derived',
 		type: 'int',
-		range: new ED.Range(0, +20),
+		range: new ED.Drawing.Range(0, +20),
 		animate: true
 	};
 	this.parameterValidationArray['sphereFractional'] = {
@@ -69,7 +69,7 @@ ED.Slider2D.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['cylinderInteger'] = {
 		kind: 'derived',
 		type: 'int',
-		range: new ED.Range(0, +20),
+		range: new ED.Drawing.Range(0, +20),
 		animate: true
 	};
 	this.parameterValidationArray['cylinderFractional'] = {

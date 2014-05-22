@@ -55,7 +55,7 @@ ED.AgentDuration.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.AgentDuration.prototype.setHandles = function() {
-	this.handleArray[3] = new ED.Handle(null, true, ED.Mode.Apex, false);
+	this.handleArray[3] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
 }
 
 /**

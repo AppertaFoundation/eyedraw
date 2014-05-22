@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <!-- EyeDraw CSS style sheet -->
+        <link rel="stylesheet" href="../../assets/css/oe-eyedraw.css" type="text/css" media="screen" />
+
+                <!-- Depedendant 3rd-party libraries -->
+        <script type="text/javascript" src="../../assets/components/jquery/jquery.min.js"></script>
+				<script type="text/javascript" src="../../assets/components/mustache/mustache.js"></script>
+				<script type="text/javascript" src="../../assets/components/eventemitter2/lib/eventemitter2.js"></script>
+
+        <script src="../../dist/eyedraw.js" type="text/javascript"></script>
+
+        <!-- This script handles the drawings for the page -->
+        <script type="text/javascript">
+
+            // Assign a global variable to the drawing
+            var drawingEdit;
+
+            // Runs on page load
+            function init()
+            {
+                // Create a drawing linked to the canvas
+                drawingEdit = new ED.Drawing(document.getElementById('canvasEdit'), ED.eye.Right, 'RPS', true, {graphicsPath:'../../assets/img/'});
+
+                // Create a controller object for this drawing
+                var controller = new eyeDrawController(drawingEdit);
+
+                // Initialise drawing
+                drawingEdit.init();
+            }
+
+            // Controller class
+            function eyeDrawController(_drawing)
+            {
+                // Register controller for notifications
+                _drawing.registerForNotifications(this, 'notificationHandler', ['ready']);
+
+                // Method called for notification
+                this.notificationHandler = function(_messageArray)
+                {
+                    switch (_messageArray['eventName'])
+                    {
+                        // Ready notification
+                        case 'ready':
+                            _drawing.addDoodle('AntSeg');
+                            break;
+                    }
+                }
+            }
+
+             </script>
+    </head>
+    <body onload="init();">
+
+        <!-- Canvas element -->
+        <canvas id="canvasEdit" class="ed-canvas-edit ed-canvas-edit" width="300" height="300" tabindex="1"></canvas>
+
+    </body>
+</html>

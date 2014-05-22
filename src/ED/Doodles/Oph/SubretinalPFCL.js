@@ -30,10 +30,10 @@ ED.SubretinalPFCL = function(_drawing, _parameterJSON) {
 
 	// Saved parameters
 	this.savedParameterArray = ['apexY', 'originX', 'originY'];
-	
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
-	
+
 	// Invariate parameters
 	this.rotation = Math.PI / 4;
 }
@@ -49,7 +49,7 @@ ED.SubretinalPFCL.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.SubretinalPFCL.prototype.setHandles = function() {
-	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+	this.handleArray[4] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
 }
 
 /**
@@ -98,7 +98,7 @@ ED.SubretinalPFCL.prototype.draw = function(_point) {
 	// Boundary path
 	ctx.beginPath();
 
-	// Radius 
+	// Radius
 	var r = Math.sqrt(this.apexX * this.apexX + this.apexY * this.apexY);
 
 	// Circular bleb

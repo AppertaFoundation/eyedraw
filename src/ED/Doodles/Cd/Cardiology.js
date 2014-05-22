@@ -57,7 +57,7 @@ ED.Heart.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.Heart.prototype.setHandles = function() {
-	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+	this.handleArray[4] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
 }
 
 /**
@@ -195,7 +195,7 @@ ED.Aorta.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.Aorta.prototype.setHandles = function() {
-	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+	this.handleArray[4] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
 }
 
 /**
@@ -339,7 +339,7 @@ ED.RightCoronaryArtery.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.RightCoronaryArtery.prototype.setHandles = function() {
-	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+	this.handleArray[4] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
 }
 
 /**
@@ -475,7 +475,7 @@ ED.LeftCoronaryArtery.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.LeftCoronaryArtery.prototype.setHandles = function() {
-	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+	this.handleArray[4] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
 }
 
 /**
@@ -670,7 +670,7 @@ ED.AnomalousVessels.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.AnomalousVessels.prototype.setHandles = function() {
-	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+	this.handleArray[4] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
 }
 
 /**
@@ -880,8 +880,8 @@ ED.Bypass.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.Bypass.prototype.setHandles = function() {
-	//	this.handleArray[3] = new ED.Handle(null, true, ED.Mode.Scale, false);
-	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+	//	this.handleArray[3] = new ED.Doodle.Handle(null, true, ED.Mode.Scale, false);
+	this.handleArray[4] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
 }
 
 /**
@@ -1052,7 +1052,7 @@ ED.MetalStent.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.MetalStent.prototype.setHandles = function() {
-	this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, true);
+	this.handleArray[2] = new ED.Doodle.Handle(null, true, ED.Mode.Scale, true);
 }
 
 /**
@@ -1173,7 +1173,7 @@ ED.DrugStent.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.DrugStent.prototype.setHandles = function() {
-	this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, true);
+	this.handleArray[2] = new ED.Doodle.Handle(null, true, ED.Mode.Scale, true);
 }
 
 /**
@@ -1300,8 +1300,8 @@ ED.Stenosis.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.Stenosis.prototype.setHandles = function() {
-	//this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, true);
-	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+	//this.handleArray[2] = new ED.Doodle.Handle(null, true, ED.Mode.Scale, true);
+	this.handleArray[4] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
 }
 
 /**
@@ -1428,13 +1428,13 @@ ED.Stenosis.prototype.draw = function(_point) {
 
 		}
 		//        ctx.fillStyle = "blue";
-		//        
+		//
 		//        ctx.beginPath();
 		//        ctx.moveTo(-100, -50);
 		//        ctx.bezierCurveTo(this.apexX, this.apexY, this.apexX, this.apexY, 100, -50);
 		//        ctx.closePath();
 		//        ctx.fill();
-		//        
+		//
 		//        ctx.beginPath();
 		//        ctx.moveTo(-100, 50);
 		//        ctx.bezierCurveTo(this.apexX, -this.apexY, this.apexX, -this.apexY, 100, 50);
@@ -1494,7 +1494,7 @@ ED.Groin.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.Groin.prototype.setHandles = function() {
-	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+	this.handleArray[4] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
 }
 
 /**
@@ -1632,7 +1632,7 @@ ED.Haematoma.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.Haematoma.prototype.setHandles = function() {
-	this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, false);
+	this.handleArray[2] = new ED.Doodle.Handle(null, true, ED.Mode.Scale, false);
 }
 
 /**
@@ -1721,7 +1721,7 @@ ED.Bruising.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.Bruising.prototype.setHandles = function() {
-	this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, false);
+	this.handleArray[2] = new ED.Doodle.Handle(null, true, ED.Mode.Scale, false);
 }
 
 /**
@@ -1745,7 +1745,7 @@ ED.Bruising.prototype.setPropertyDefaults = function() {
 	//    //    this.parameterValidationArray['arc']['range'].setMinAndMax(Math.PI/6, Math.PI*2);
 	//    //    this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.5, +1.5);
 	//    //    this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.5, +1.5);
-	//    
+	//
 	//    // Add complete validation arrays for derived parameters
 	//    this.parameterValidationArray['degree'] = {kind:'derived', type:'int', range:new ED.Range(0, 100), precision:0, animate:true};
 	//    this.parameterValidationArray['type'] = {kind:'derived', type:'string', list:['Calcified', 'Non-calcified'], animate:true};
@@ -1828,8 +1828,8 @@ ED.Bruit.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.Bruit.prototype.setHandles = function() {
-	//	this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, false);
-	//	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+	//	this.handleArray[2] = new ED.Doodle.Handle(null, true, ED.Mode.Scale, false);
+	//	this.handleArray[4] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
 }
 
 /**

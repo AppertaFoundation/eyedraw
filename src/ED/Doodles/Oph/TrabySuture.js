@@ -32,7 +32,7 @@ ED.TrabySuture = function(_drawing, _parameterJSON) {
 	this.shape = 'Releasable';
 	this.type = 'Nylon';
 	this.size = '10/0';
-	
+
 	// Number of handles for releasable suture
 	this.numberOfHandles = 5;
 
@@ -59,10 +59,10 @@ ED.TrabySuture.superclass = ED.Doodle.prototype;
 ED.TrabySuture.prototype.setHandles = function() {
 	// Array of handles for releasable suture
 	for (var i = 0; i < this.numberOfHandles; i++) {
-		this.handleArray[i] = new ED.Handle(null, true, ED.Mode.Handles, false);
+		this.handleArray[i] = new ED.Doodle.Handle(null, true, ED.Mode.Handles, false);
 	}
 
-	//this.handleArray[this.numberOfHandles] = new ED.Handle(null, true, ED.Mode.Rotate, false);
+	//this.handleArray[this.numberOfHandles] = new ED.Doodle.Handle(null, true, ED.Mode.Rotate, false);
 }
 
 /**
@@ -103,7 +103,7 @@ ED.TrabySuture.prototype.setParameterDefaults = function() {
 	this.shape = 'Releasable';
 	this.type = 'Nylon';
 	this.size = '10/0';
-	
+
 	// Create a squiggle to store the handles points
 	var squiggle = new ED.Squiggle(this, new ED.Colour(100, 100, 100, 1), 4, true);
 
@@ -131,7 +131,7 @@ ED.TrabySuture.prototype.setParameterDefaults = function() {
  * @param {String} _parameter Name of parameter that has changed
  * @value {Undefined} _value Value of parameter to calculate
  * @returns {Array} Associative array of values of dependent parameters
- */ 
+ */
  /*
 ED.TrabySuture.prototype.dependentParameterValues = function(_parameter, _value) {
 	var returnArray = new Array();
@@ -208,7 +208,7 @@ ED.TrabySuture.prototype.draw = function(_point) {
 // 				ctx.bezierCurveTo(2, 20, -4, 24, -3, 29);
 // 				ctx.bezierCurveTo(-3, 36, 14, 37, 23, 56);
 // 				ctx.bezierCurveTo(32, 74, 34, 100, 34, 100);
-				
+
 				// From point
 				//var fp = new ED.Point(34, 100);
 
@@ -268,10 +268,10 @@ ED.TrabySuture.prototype.draw = function(_point) {
 
 				// Angle of control point from radius line to point (this value makes path a circle Math.PI/12 for 8 points
 				//var phi = 2 * Math.PI / (10 * this.numberOfHandles);
-				
+
 				tp = this.squiggleArray[0].pointsArray[0];
 				ctx.moveTo(tp.x, tp.y);
-				
+
 				for (var i = 1; i < this.numberOfHandles; i++) {
 
 					// To point
@@ -286,7 +286,7 @@ ED.TrabySuture.prototype.draw = function(_point) {
 					ctx.lineTo(tp.x, tp.y);
 					fp = tp;
 				}
-			
+
 				break;
 
 			case 'Adjustable':
@@ -361,4 +361,3 @@ ED.TrabySuture.prototype.description = function() {
 
 	return returnValue;
 }
-

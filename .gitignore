@@ -3,3 +3,6 @@
 /.project
 .DS_Store
 /node_modules
+.sass-cache
+.sublime-grunt.cache
+/bak

@@ -33,7 +33,7 @@ ED.ACIOL = function(_drawing, _parameterJSON) {
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
-	
+
 	// Invariate parameters
 	this.scaleX = 0.8;
 	this.scaleY = 0.8;
@@ -50,7 +50,7 @@ ED.ACIOL.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.ACIOL.prototype.setHandles = function() {
-	this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Rotate, false);
+	this.handleArray[2] = new ED.Doodle.Handle(null, true, ED.Mode.Rotate, false);
 }
 
 /**
