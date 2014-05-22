@@ -42,7 +42,7 @@
 
 			<div class="ed-editor">
 
-				<?php if ($showDrawingControls) {?>
+				<?php if ($showDrawingControls && $mode !== 'view') {?>
 					<div class="ed-drawing-controls">
 						<!-- DRAWING TOOLBAR -->
 						<ul class="ed-toolbar-panel ed-drawing-toolbar">

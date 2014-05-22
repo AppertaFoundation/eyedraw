@@ -21,16 +21,30 @@ var ED = ED || {};
 
 /**
  * ED.Checker is used to track when eyedraws are "ready" and execute callbacks
- * when ready. An eyedraw is ready when all doodles have been loaded, thus this
- * checker is *only useful for eyedraws in "view" mode*.
+ * when ready. An eyedraw is ready when all doodles have been loaded.
  */
 ED.Checker = ED.Checker || (function() {
 
 	'use strict';
 
 	var callbacks = [];
+	var ids = [];
+	var readyIds = [];
 	var instances = [];
-	var ready = 0;
+
+	function registerCanvasEyeDraws() {
+		$('canvas').each(function() {
+			var canvas = $(this);
+			var id = this.id;
+			// Is it an eyedraw canvas?
+			if (canvas.hasClass('ed-canvas-edit') || canvas.hasClass('ed-canvas-display')) {
+				if (ids.indexOf(id) === -1) {
+					ids.push(id);
+				}
+			}
+		});
+	}
+	$(registerCanvasEyeDraws);
 
 	/**
 	 * Loop through all the registered callbacks and execute them.
@@ -47,6 +61,7 @@ ED.Checker = ED.Checker || (function() {
 	 */
 	function register(instance) {
 
+		// Already registered this instance?
 		if (instances.indexOf(instance) !== -1) {
 			return;
 		}
@@ -57,7 +72,12 @@ ED.Checker = ED.Checker || (function() {
 		// Register 'doodlesLoaded' event
 		instance.registerForNotifications({
 			callback: function onDoodlesLoaded() {
-				ready++;
+
+				var id = instance.canvas.id;
+				if (readyIds.indexOf(id) === -1) {
+					readyIds.push(id);
+				}
+
 				if (isAllReady()) {
 					executeCallbacks();
 				}
@@ -70,7 +90,7 @@ ED.Checker = ED.Checker || (function() {
 	 * @return {Boolean}
 	 */
 	function isAllReady() {
-		return (instances.length === ready);
+		return (ids.length === readyIds.length);
 	}
 
 	/**
@@ -113,7 +133,7 @@ ED.Checker = ED.Checker || (function() {
 	function reset() {
 		instances = [];
 		callbacks = [];
-		ready = 0;
+		ids = [];
 	}
 
 	/**
