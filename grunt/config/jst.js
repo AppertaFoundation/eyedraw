@@ -21,7 +21,7 @@ module.exports = function(grunt) {
 	return {
 		dist: {
 			src: [
-				'views/script_templates/*.jst'
+				'views/script_templates/*.html'
 			],
 			options: {
 				dest: 'src/ED/Views/templates.js',

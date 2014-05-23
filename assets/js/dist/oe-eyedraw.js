@@ -35,7 +35,7 @@ ED.init = (function() {
 	 * In some scenarios, we load the eyedraw markup (including all dependent
 	 * scripts and stylesheets) via AJAX, and then insert the markup into the DOM. This
 	 * causes the scripts to be loaded synchronously, and the stylesheet to be
-	 * loaded asynchronously. Some of the eyedraw script relies on the existing of
+	 * loaded asynchronously. Some of the eyedraw script relies on the existance of
 	 * certain CSS rules, thus we have to ensure the styles are loaded before initiating
 	 * the eyedraw.
 	 * @param  {String}   fileName  The string to match the filename of the stylesheet.
@@ -48,7 +48,7 @@ ED.init = (function() {
 			startTime = (new Date()).getTime();
 		}
 		if (((new Date()).getTime() - startTime) >= maxTime) {
-			return ED.errorHandler('OEEyeDraw.js', 'init', 'Unable to init eyedraw, stylesheet is not loaded.');
+			return ED.errorHandler('OEEyeDraw.js', 'waitForStyleSheet', 'Unable to init eyedraw, stylesheet is not loaded.');
 		}
 
 		var styleSheets = window.document.styleSheets;
