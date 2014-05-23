@@ -70,6 +70,7 @@ ED.Controller = (function() {
 	Controller.prototype.createDrawing = function() {
 
 		var options = {
+			drawingName: this.properties.drawingName,
 			offsetX: this.properties.offsetX,
 			offsetY: this.properties.offsetY,
 			toImage: this.properties.toImage,
@@ -77,7 +78,6 @@ ED.Controller = (function() {
 		};
 
 		var drawing = new ED.Drawing(
-			this.properties.drawingName,
 			this.canvas,
 			this.properties.eye,
 			this.properties.idSuffix,

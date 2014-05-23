@@ -322,7 +322,7 @@ var ED = ED || {};
  * @param {Array} _options Associative array of optional parameters
  */
 
-ED.Drawing = function(_drawingName, _canvas, _eye, _idSuffix, _isEditable, _options) {
+ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 
 	// Check we're working with an actual canvas HTML element.
 	if (!_canvas || !(_canvas instanceof HTMLCanvasElement)) {
@@ -347,7 +347,7 @@ ED.Drawing = function(_drawingName, _canvas, _eye, _idSuffix, _isEditable, _opti
 	}
 
 	// Initialise properties
-	this.drawingName = _drawingName;
+	this.drawingName = _options.drawingName;
 	this.canvas = _canvas;
 	this.eye = _eye;
 	this.idSuffix = _idSuffix;
@@ -5833,6 +5833,7 @@ ED.Controller = (function() {
 	Controller.prototype.createDrawing = function() {
 
 		var options = {
+			drawingName: this.properties.drawingName,
 			offsetX: this.properties.offsetX,
 			offsetY: this.properties.offsetY,
 			toImage: this.properties.toImage,
@@ -5840,7 +5841,6 @@ ED.Controller = (function() {
 		};
 
 		var drawing = new ED.Drawing(
-			this.properties.drawingName,
 			this.canvas,
 			this.properties.eye,
 			this.properties.idSuffix,
@@ -8932,7 +8932,7 @@ ED.Slider2D.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['sphereInteger'] = {
 		kind: 'derived',
 		type: 'int',
-		range: new ED.Drawing.Range(0, +20),
+		range: new ED.Range(0, +20),
 		animate: true
 	};
 	this.parameterValidationArray['sphereFractional'] = {
@@ -8950,7 +8950,7 @@ ED.Slider2D.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['cylinderInteger'] = {
 		kind: 'derived',
 		type: 'int',
-		range: new ED.Drawing.Range(0, +20),
+		range: new ED.Range(0, +20),
 		animate: true
 	};
 	this.parameterValidationArray['cylinderFractional'] = {
