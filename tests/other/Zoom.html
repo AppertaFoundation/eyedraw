@@ -14,9 +14,21 @@
 	<script type="text/javascript" src="../../assets/components/mustache/mustache.js"></script>
 	<script type="text/javascript" src="../../assets/components/eventemitter2/lib/eventemitter2.js"></script>
 
-	<!-- Eyedraw -->
-	<script type="text/javascript" src="../../assets/js/dist/eyedraw.js"></script>
-	<script type="text/javascript" src="../../assets/js/dist/oe-eyedraw.js"></script>
+	<!-- Load in the eyedraw scripts -->
+	<script>
+	(function() {
+		// We have to use 'jsonp' here so that we can run this test document on the
+		// file:// protocol (ie, without the use of a webserver)
+		this.scriptsLoadCallback = function(obj) {
+			obj.files.forEach(function(file) {
+				// We use document.write to force the files to be loaded synchronously.
+				document.write('<script src="../../src/' + file + '"><\/script>');
+			});
+		};
+	}.call(this));
+	</script>
+	<script type="text/javascript" src="./doodle-popup/js/scripts.jsonp"></script>
+	<!-- End loading in eyedraw scripts -->
 
 	<style type="text/css">
 	.container.main {
@@ -144,7 +156,7 @@
 								</li>
 							</ul>
 							<div class="ed-selected-doodle">
-								<select id="ed_example_selected_doodle" class="ed-selected-doodle-select">
+								<select id="ed_example_selected_doodle">>
 								</select>
 							</div>
 						</div>

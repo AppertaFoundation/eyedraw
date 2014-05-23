@@ -116,6 +116,7 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 	this.isNew = true;
 	this.isReady = false;
 	this.showDoodleControls = false;
+	this.isZoomed = false;
 
 	// Freehand drawing properties NB from November 2013 moved to Freehand doodle
 // 	this.squiggleColour = new ED.Colour(0, 255, 0, 1);
@@ -1687,6 +1688,20 @@ ED.Drawing.prototype.resetEyedraw = function() {
 	this.deselectDoodles();
 	this.drawAllDoodles();
 }
+
+/**
+ * Zooms the eydraw
+ */
+ED.Drawing.prototype.toogleZoom = function() {
+	if (this.isZoomed) {
+		// zoom out
+		this.notify("drawingZoomOut");
+	} else {
+		// zoom in
+		this.notify("drawingZoomIn");
+	}
+	this.isZoomed = !this.isZoomed;
+};
 
 /**
  * Sets a property on currently selected doodle NB currently only supports boolean properties

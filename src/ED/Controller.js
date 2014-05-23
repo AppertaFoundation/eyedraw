@@ -49,8 +49,8 @@ ED.Controller = (function() {
 		this.drawing = drawing || this.createDrawing();
 
 		if (this.properties.isEditable) {
-			this.mainToolbar = mainToolbar || this.createToolbar('.ed-main-toolbar');
-			this.drawingToolbar = drawingToolbar || this.createToolbar('.ed-drawing-toolbar');
+			this.mainToolbar = mainToolbar || this.createMainToolbar();
+			this.drawingToolbar = drawingToolbar || this.createDrawingToolbar();
 			this.doodlePopup = doodlePopup || this.createDoodlePopup();
 			this.selectedDoodle = selectedDoodle || this.createSelectedDoodle();
 			this.bindEditEvents();
@@ -91,11 +91,21 @@ ED.Controller = (function() {
 	/**
 	 * Create a Toolbar view instance.
 	 */
-	Controller.prototype.createToolbar = function(selector) {
+	Controller.prototype.createMainToolbar = function() {
 
-		var container = this.container.find(selector);
+		var container = this.container.find('.ed-main-toolbar');
 
-		return container.length ? new ED.Views.Toolbar(
+		return container.length ? new ED.Views.Toolbar.Main(
+			this.drawing,
+			container
+		) : null;
+	};
+
+	Controller.prototype.createDrawingToolbar = function() {
+
+		var container = this.container.find('.ed-drawing-toolbar');
+
+		return container.length ? new ED.Views.Toolbar.Drawing(
 			this.drawing,
 			container
 		) : null;

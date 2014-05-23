@@ -376,6 +376,7 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 	this.isNew = true;
 	this.isReady = false;
 	this.showDoodleControls = false;
+	this.isZoomed = false;
 
 	// Freehand drawing properties NB from November 2013 moved to Freehand doodle
 // 	this.squiggleColour = new ED.Colour(0, 255, 0, 1);
@@ -1947,6 +1948,20 @@ ED.Drawing.prototype.resetEyedraw = function() {
 	this.deselectDoodles();
 	this.drawAllDoodles();
 }
+
+/**
+ * Zooms the eydraw
+ */
+ED.Drawing.prototype.toogleZoom = function() {
+	if (this.isZoomed) {
+		// zoom out
+		this.notify("drawingZoomOut");
+	} else {
+		// zoom in
+		this.notify("drawingZoomIn");
+	}
+	this.isZoomed = !this.isZoomed;
+};
 
 /**
  * Sets a property on currently selected doodle NB currently only supports boolean properties
@@ -5802,8 +5817,8 @@ ED.Controller = (function() {
 		this.drawing = drawing || this.createDrawing();
 
 		if (this.properties.isEditable) {
-			this.mainToolbar = mainToolbar || this.createToolbar('.ed-main-toolbar');
-			this.drawingToolbar = drawingToolbar || this.createToolbar('.ed-drawing-toolbar');
+			this.mainToolbar = mainToolbar || this.createMainToolbar();
+			this.drawingToolbar = drawingToolbar || this.createDrawingToolbar();
 			this.doodlePopup = doodlePopup || this.createDoodlePopup();
 			this.selectedDoodle = selectedDoodle || this.createSelectedDoodle();
 			this.bindEditEvents();
@@ -5844,11 +5859,21 @@ ED.Controller = (function() {
 	/**
 	 * Create a Toolbar view instance.
 	 */
-	Controller.prototype.createToolbar = function(selector) {
+	Controller.prototype.createMainToolbar = function() {
 
-		var container = this.container.find(selector);
+		var container = this.container.find('.ed-main-toolbar');
 
-		return container.length ? new ED.Views.Toolbar(
+		return container.length ? new ED.Views.Toolbar.Main(
+			this.drawing,
+			container
+		) : null;
+	};
+
+	Controller.prototype.createDrawingToolbar = function() {
+
+		var container = this.container.find('.ed-drawing-toolbar');
+
+		return container.length ? new ED.Views.Toolbar.Drawing(
 			this.drawing,
 			container
 		) : null;
@@ -7756,6 +7781,104 @@ ED.Views.Toolbar = (function() {
 	};
 
 	return Toolbar;
+}());
+/**
+ * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
+ * (C) OpenEyes Foundation, 2011-2014
+ * This file is part of OpenEyes.
+ *
+ * OpenEyes is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * OpenEyes is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with OpenEyes.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/* global $: false */
+
+/**
+ * This view class manages the main toolbar.
+ */
+ED.Views.Toolbar.Drawing = (function() {
+
+	function DrawingToolbar(drawing, container) {
+		ED.Views.Toolbar.apply(this, arguments);
+		this.zoomIcon = this.container.find('.icon-ed-zoom-in');
+	}
+
+	DrawingToolbar.prototype = Object.create(ED.Views.Toolbar.prototype);
+	DrawingToolbar.prototype.constructor = DrawingToolbar;
+
+	DrawingToolbar.prototype.registerForNotifications = function() {
+
+		ED.Views.Toolbar.prototype.registerForNotifications.apply(this, arguments);
+
+		this.drawing.registerForNotifications(this, 'handleZoom', [
+			'drawingZoomOut',
+			'drawingZoomIn',
+		]);
+	};
+
+	DrawingToolbar.prototype.handleZoom = function(notification) {
+		switch(notification.eventName) {
+			case 'drawingZoomIn':
+				this.updateIcon('icon-ed-zoom-out');
+			break;
+			case 'drawingZoomOut':
+				this.updateIcon('icon-ed-zoom-in');
+			break;
+		}
+	};
+
+	DrawingToolbar.prototype.updateIcon = function(className) {
+		this.zoomIcon
+			.removeClass('icon-ed-zoom-in icon-ed-zoom-out')
+			.addClass(className);
+	};
+
+	return DrawingToolbar;
+}());
+/**
+ * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
+ * (C) OpenEyes Foundation, 2011-2014
+ * This file is part of OpenEyes.
+ *
+ * OpenEyes is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * OpenEyes is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with OpenEyes.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/* global $: false */
+
+/**
+ * This Toolbar view class manages the main toolbar.
+ */
+ED.Views.Toolbar.Main = (function() {
+
+	function MainToolbar(drawing, container) {
+		ED.Views.Toolbar.apply(this, arguments);
+	}
+
+	MainToolbar.prototype = Object.create(ED.Views.Toolbar.prototype);
+	MainToolbar.prototype.constructor = MainToolbar;
+
+	return MainToolbar;
 }());
 /*! Generated on 17/6/2014 */
 ED.scriptTemplates = {
