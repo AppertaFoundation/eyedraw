@@ -32,7 +32,7 @@ ED.NuclearCataractCrossSection = function(_drawing, _parameterJSON) {
 	this.grade = 'Mild';
 
 	// Call superclass constructor
-ED.Doodle.call(this, _drawing, _parameterJSON);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**

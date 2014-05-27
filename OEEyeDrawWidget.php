@@ -551,6 +551,7 @@ class DoodleInfo
         "TransilluminationDefect" =>"Transillumination defect",
         "Tube" => "Drainage tube",
         "TubeExtender" => "Tube externder",
+        "TubeLigation" => "Ligation suture",
         "UpDrift" => "Up drift",
         "UpShoot" => "Up shoot",
         "UTear" => "Traction ‘U’ tear",

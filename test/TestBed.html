@@ -41,7 +41,7 @@
                 var canvasEdit = document.getElementById('canvasEdit');
                 
                 // Create a drawingEdit , {scaleOn:'width'}
-                drawingEdit = new ED.Drawing(canvasEdit, ED.eye.Right, 'RPS', true, {graphicsPath:'../img/'});
+                drawingEdit = new ED.Drawing(canvasEdit, ED.eye.Left, 'RPS', true, {graphicsPath:'../img/'});
                 
                 // Instantiate a controller object
                 controller = new eyeDrawController(drawingEdit);
@@ -69,7 +69,7 @@
             {
                 this.drawing = _drawing;
                 this.gsf = 1;
-                //this.gsf = 0.72;
+                this.gsf = 0.72;
                 
                 // Specify call back function
                 this.callBack = callBack;
@@ -92,8 +92,9 @@
 							this.drawing.globalScaleFactor = this.gsf;
 							
 							//this.drawing.addDoodle('AxialLengthGraph', {'axialLength':'25'});
-							this.drawing.addDoodle('PostPole');
-							this.drawing.addDoodle('RetinalHaemorrhage');
+							this.drawing.addDoodle('AntSeg');
+							this.drawing.addDoodle('Tube');
+							//this.drawing.addDoodle('TubeLigation');
 							//this.drawing.addDoodle('TrabySuture');
 							//this.drawing.addDoodle('TubeExtender');
 							//this.drawing.addDoodle('Supramid');
@@ -390,7 +391,7 @@
  -->
             <button id="LensRPS" class="imgbutton" title="Freehand" onclick="drawingEdit.addDoodle('Freehand'); return false;" ><img src="../img/Freehand.gif" /></button>
             <button id="LensRPS" class="imgbutton" title="Perforation" onclick="drawingEdit.addDoodle('Supramid'); return false;" ><img src="../img/Supramid.gif" /></button>
-            <button id="LensRPS" class="imgbutton" title="TrabySuture" onclick="drawingEdit.addDoodle('Bleb'); return false;" ><img src="../img/TrabySuture.gif" /></button>
+            <button id="LensRPS" class="imgbutton" title="TubeLigation" onclick="drawingEdit.addDoodle('TubeLigation'); return false;" ><img src="../img/TrabySuture.gif" /></button>
             <br />
         </div>
         

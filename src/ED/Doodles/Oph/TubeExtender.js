@@ -62,6 +62,7 @@ ED.TubeExtender.prototype.setPropertyDefaults = function() {
 	this.isMoveable = false;
 	this.isRotatable = true;
 	this.snapToAngles = true;
+	this.isUnique = true;
 
 	// Update component of validation array for simple parameters
 	this.parameterValidationArray['apexY']['range'].setMinAndMax(-600, -100);
@@ -85,6 +86,12 @@ ED.TubeExtender.prototype.setPropertyDefaults = function() {
 ED.TubeExtender.prototype.setParameterDefaults = function() {
 	this.apexY = -300;
 	this.setParameterFromString('platePosition', 'STQ');
+	
+	// Make rotation same as tube
+	var doodle = this.drawing.lastDoodleOfClass("Tube");
+	if (doodle) {
+		this.rotation = doodle.rotation;
+	}
 }
 
 /**

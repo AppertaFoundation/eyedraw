@@ -179,6 +179,7 @@ ED.trans['TractionRetinalDetachment'] = 'Traction retinal detachment<br/><br/>Dr
 ED.trans['TransilluminationDefect'] = 'Transillumination defects of the iris<br/><br/>Drag to rotate around centre<br/>Drag each end handle to alter extent';
 ED.trans['Tube'] = 'Drainage tube<br/><br/>Drag to change quadrant<br/>Drag handle to move end of tube';
 ED.trans['TubeExtender'] = 'Tube extender<br/><br/>Drag to change quadrant<br/>Drag handle to move end of tube';
+ED.trans['TubeLigation'] = 'Ligation suture<br/><br/>Drag to change position';
 ED.trans['UTear'] = '';
 ED.trans['ViewObscured'] = 'View obscured<br/><br/>Drag handle to change opacity';
 ED.trans['VitreousOpacity'] = 'Vitreous Opacity<br/><br/>Drag to move<br/>Drag the inner handle up and down to alter opacity<br/>Drag the outer handle to scale';
