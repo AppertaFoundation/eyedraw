@@ -30,10 +30,10 @@ ED.FieldCircle = function(_drawing, _parameterJSON) {
 
 	// Derived parameters
 	this.colour = new ED.Colour(255,0,0,1);
-	
+
 	// Saved parameters
 	this.savedParameterArray = ['originX', 'originY', 'colour'];
-	
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
@@ -51,7 +51,7 @@ ED.FieldCircle.superclass = ED.Doodle.prototype;
 ED.FieldCircle.prototype.setPropertyDefaults = function() {
 	this.isMoveable = false;
 	this.isRotatable = false;
-	
+
 	// Add complete validation arrays for derived parameters
 	this.parameterValidationArray['colour'] = {
 		kind: 'derived',

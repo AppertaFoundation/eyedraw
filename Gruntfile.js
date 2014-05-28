@@ -1,58 +1,30 @@
+/**
+ * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
+ * (C) OpenEyes Foundation, 2011-2014
+ * This file is part of OpenEyes.
+ *
+ * OpenEyes is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * OpenEyes is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with OpenEyes.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 module.exports = function(grunt) {
 
-	grunt.initConfig({
-		pkg : grunt.file.readJSON('package.json'),
-		concat : {
-			basic_and_extras : {
-				files: {
-					'dist/eyedraw.js': [ 'src/ED/Drawing.js', 'src/ED/Misc/**/*.js', 'src/ED/Doodles/**/*.js' ],
-					'dist/oe-eyedraw.js': [ 'src/OEEyeDraw.js' ]
-				}
-			}
-		},
-		uglify : {
-			options : {
-				banner : '/*! <%= pkg.name %> <%= grunt.template.today("dd-mm-yyyy") %> */\n'
-			},
-			dist : {
-				files : {
-					'dist/eyedraw.min.js' : [ 'dist/eyedraw.js' ],
-					'dist/oe-eyedraw.min.js' : [ 'dist/oe-eyedraw.js' ]
-				}
-			}
-		},
-		qunit : {
-			files : [ 'test/**/*.html' ]
-		},
-		jshint : {
-			files : [ 'gruntfile.js', 'src/**/*.js', 'test/**/*.js' ],
-			options : {
-				// options here to override JSHint defaults
-				globals : {
-					jQuery : true,
-					console : true,
-					module : true,
-					document : true
-				}
-			}
-		},
-		watch : {
-			files : [ '<%= jshint.files %>' ],
-			//tasks : [ 'jshint', 'qunit' ]
-			tasks : [ 'concat' ]
-		}
-	});
+	/* Set the config */
+	grunt.initConfig(require('./grunt/config')(grunt));
 
-	grunt.loadNpmTasks('grunt-contrib-uglify');
-	grunt.loadNpmTasks('grunt-contrib-jshint');
-	grunt.loadNpmTasks('grunt-contrib-qunit');
-	grunt.loadNpmTasks('grunt-contrib-watch');
-	grunt.loadNpmTasks('grunt-contrib-concat');
+	/* Load the npm grunt tasks */
+	require('load-grunt-tasks')(grunt, 'grunt-*');
 
-	grunt.registerTask('test', [ 'jshint', 'qunit' ]);
-	grunt.registerTask('build', [ 'concat', 'uglify' ])
-
-	//grunt.registerTask('default', [ 'jshint', 'qunit', 'concat', 'uglify' ]);
-	grunt.registerTask('default', [ 'build' ]);
-
+	/* Load our custom grunt tasks */
+	grunt.loadTasks('./grunt/tasks');
 };

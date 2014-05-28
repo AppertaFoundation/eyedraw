@@ -27,16 +27,16 @@
 ED.LasikFlap = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "LasikFlap";
-	
+
 	// Other parameters
 	this.gradeDLK = 'None';
-	
+
 	// Saved parameters
 	this.savedParameterArray = ['scaleX', 'scaleY', 'rotation', 'gradeDLK'];
 
 	// Parameters in doodle control bar (parameter name: parameter label)
 	this.controlParameterArray = {'gradeDLK':'DLK Grade'};
-		
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
@@ -52,7 +52,7 @@ ED.LasikFlap.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.LasikFlap.prototype.setHandles = function() {
-	this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, false);
+	this.handleArray[2] = new ED.Doodle.Handle(null, true, ED.Mode.Scale, false);
 }
 
 /**
@@ -65,7 +65,7 @@ ED.LasikFlap.prototype.setPropertyDefaults = function() {
 	// Update component of validation array for simple parameters
 	this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.75, +1.00);
 	this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.75, +1.00);
-	
+
 	this.parameterValidationArray['gradeDLK'] = {
 		kind: 'other',
 		type: 'string',
@@ -140,7 +140,7 @@ ED.LasikFlap.prototype.draw = function(_point) {
 		}
 		ctx.fill();
 	}
-	
+
 	// Coordinates of handles (in canvas plane)
 	var point = new ED.Point(0, 0)
 	point.setWithPolars(r, angle);
@@ -181,7 +181,7 @@ ED.LasikFlap.prototype.description = function() {
 	if (s < c && as < ac) quadrant = "superior";
 
 	returnString = "LASIK flap with " + quadrant + " hinge";
-	
+
 	if(this.gradeDLK != 'None') returnString += ", DLK " + this.gradeDLK;
 
 	return returnString;

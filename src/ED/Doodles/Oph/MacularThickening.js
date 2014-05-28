@@ -30,10 +30,10 @@ ED.MacularThickening = function(_drawing, _parameterJSON) {
 
 	// Saved parameters
 	this.savedParameterArray = ['originX', 'originY', 'apexX', 'apexY'];
-	
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
-	
+
 	// Invariate parameters
 	this.rotation = -Math.PI / 4;
 }
@@ -49,7 +49,7 @@ ED.MacularThickening.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.MacularThickening.prototype.setHandles = function() {
-	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+	this.handleArray[4] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
 }
 
 /**

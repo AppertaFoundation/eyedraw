@@ -27,7 +27,7 @@
 ED.MultifocalChoroiditis = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "MultifocalChoroiditis";
-	
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
@@ -63,7 +63,7 @@ ED.MultifocalChoroiditis.prototype.draw = function(_point) {
 
 	// Boundary path
 	ctx.beginPath();
-	
+
 	var rb = 480;
 
 	// Invisible boundary - matches fundus
@@ -95,12 +95,12 @@ ED.MultifocalChoroiditis.prototype.draw = function(_point) {
 		// Draw spots
 		for (var i = 0; i < nr; i++) {
 			var theta = i * 2 * Math.PI/nr;
-			
+
 			for (var j = 0; j < nd; j++) {
 				var r = (0.5 + j) * rs/nd;
 				var p = new ED.Point(0,0);
 				p.setWithPolars(r, theta);
-				
+
 				var dis = 80;
 				var xd = (ED.randomArray[i + j] - 0.5) * dis;
 				var yd = (ED.randomArray[nr * nd + i + j] - 0.5) * dis;

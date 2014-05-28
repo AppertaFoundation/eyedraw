@@ -27,7 +27,7 @@
 ED.Crepitations = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "Crepitations";
-	
+
 	// Saved parameters
 	this.savedParameterArray = ['originX', 'originY', 'apexX', 'apexY'];
 
@@ -46,7 +46,7 @@ ED.Crepitations.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.Crepitations.prototype.setHandles = function() {
-	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+	this.handleArray[4] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
 }
 
 /**

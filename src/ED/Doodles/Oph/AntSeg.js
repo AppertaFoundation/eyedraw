@@ -38,7 +38,7 @@ ED.AntSeg = function(_drawing, _parameterJSON) {
 	this.ectropion = false;
 
 	// Saved parameters
-	this.savedParameterArray = ['apexY', 'rotation', 'pxe', 'coloboma', 'colour', 'ectropion'];
+	this.savedParameterArray = ['pupilSize', 'apexY', 'rotation', 'pxe', 'coloboma', 'colour', 'ectropion'];
 
 	// Parameters in doodle control bar (parameter name: parameter label)
 	this.controlParameterArray = {'pupilSize':'Pupil size', 'pxe':'PXE', 'coloboma':'Coloboma', 'colour':'Colour', 'ectropion':'Ectropion uveae'};
@@ -58,7 +58,7 @@ ED.AntSeg.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.AntSeg.prototype.setHandles = function() {
-	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+	this.handleArray[4] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
 }
 
 /**
@@ -163,6 +163,7 @@ ED.AntSeg.prototype.dependentParameterValues = function(_parameter, _value) {
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
 ED.AntSeg.prototype.draw = function(_point) {
+
 	// Get context
 	var ctx = this.drawing.context;
 

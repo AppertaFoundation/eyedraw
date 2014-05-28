@@ -27,7 +27,7 @@
 ED.Supramid = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "Supramid";
-	
+
 	// Saved parameters
 	this.savedParameterArray = ['apexY', 'rotation'];
 	
@@ -46,7 +46,7 @@ ED.Supramid.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.Supramid.prototype.setHandles = function() {
-	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+	this.handleArray[4] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
 }
 
 /**
@@ -149,22 +149,22 @@ ED.Supramid.prototype.draw = function(_point) {
 // ED.Supramid.prototype.getParameter = function(_parameter)
 // {
 //     var returnValue;
-//     
+//
 //     switch (_parameter)
 //     {
 //         // Position of end of suture
 //         case 'endPosition':
 //             var r = Math.sqrt(this.apexX * this.apexX + this.apexY * this.apexY);
-//             
+//
 //             if (r < 280 ) returnValue = 'in the AC';
 //             else returnValue = ((r - 280)/14).toFixed(0) + 'mm from limbus';
 //             break;
-// 
+//
 //         default:
 //             returnValue = "";
 //             break;
 //     }
-//     
+//
 //     return returnValue;
 // }
 

@@ -30,14 +30,14 @@ ED.FocalChoroiditis = function(_drawing, _parameterJSON) {
 
 	// Other parameters
 	this.pigmented = false;
-	
+
 	// Private parameters
 	this.numberOfHandles = 4;
 	this.initialRadius = 80;
 
 	// Saved parameters
 	this.savedParameterArray = ['pigmented', 'originX', 'originY', 'apexX', 'apexY', 'rotation'];
-	
+
 	// Parameters in doodle control bar (parameter name: parameter label)
 	this.controlParameterArray = {'pigmented':'Pigmented'};
 
@@ -58,14 +58,14 @@ ED.FocalChoroiditis.superclass = ED.Doodle.prototype;
 ED.FocalChoroiditis.prototype.setHandles = function() {
 	// Array of handles
 	for (var i = 0; i < this.numberOfHandles; i++) {
-		this.handleArray[i] = new ED.Handle(null, true, ED.Mode.Handles, false);
+		this.handleArray[i] = new ED.Doodle.Handle(null, true, ED.Mode.Handles, false);
 	}
-	
+
 	// Allow top handle to rotate doodle
 	this.handleArray[0].isRotatable = true;
-	
+
 	// Handle for apex
-	//this.handleArray[this.numberOfHandles] = new ED.Handle(null, true, ED.Mode.Apex, false);
+	//this.handleArray[this.numberOfHandles] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
 }
 
 /**
@@ -85,13 +85,13 @@ ED.FocalChoroiditis.prototype.setPropertyDefaults = function() {
 		range.angle = new ED.Range((((2 * n - 1) * cir / (2 * n)) + i * cir / n) % cir, ((1 * cir / (2 * n)) + i * cir / n) % cir);
 		this.handleVectorRangeArray[i] = range;
 	}
-	
+
 	// Update component of validation array for simple parameters
 	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
 	this.parameterValidationArray['apexY']['range'].setMinAndMax(-50, +50);
 
 	this.addAtBack = true;
-	
+
 	// Add complete validation arrays for derived parameters
 	this.parameterValidationArray['pigmented'] = {
 		kind: 'derived',
@@ -175,24 +175,24 @@ ED.FocalChoroiditis.prototype.draw = function(_point) {
 	else {
 		ctx.fillStyle = "rgba(255, 255, 0, 0.8)";
 		ctx.strokeStyle = ctx.fillStyle;
-	}	
+	}
 
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
-	
+
 	// Non boundary paths
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
 	}
-	
+
 	// Coordinates of handles (in canvas plane)
 	for (var i = 0; i < this.numberOfHandles; i++) {
 		this.handleArray[i].location = this.transform.transformPoint(this.squiggleArray[0].pointsArray[i]);
 	}
 	this.handleArray[this.numberOfHandles].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
-		
+
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
-	
+
 	// Return value indicating successful hittest
 	return this.isClicked;
 }

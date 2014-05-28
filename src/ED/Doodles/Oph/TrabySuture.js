@@ -32,7 +32,7 @@ ED.TrabySuture = function(_drawing, _parameterJSON) {
 	this.type = 'Fixed';
 	this.material = 'Nylon';
 	this.size = '10/0';
-	
+
 	// Number of additional handles for releasable suture
 	this.numberOfHandles = 5;
 
@@ -58,7 +58,7 @@ ED.TrabySuture.superclass = ED.Doodle.prototype;
  */
 ED.TrabySuture.prototype.setHandles = function() {
 	// Rotation Handle
-	this.handleArray[0] = new ED.Handle(null, true, ED.Mode.Rotate, false);
+	this.handleArray[0] = new ED.Doodle.Handle(null, true, ED.Mode.Rotate, false);
 }
 
 /**
@@ -98,7 +98,7 @@ ED.TrabySuture.prototype.setParameterDefaults = function() {
 	this.apexY = +70;
 	this.material = 'Nylon';
 	this.size = '10/0';
-	
+
 	// Make type same as last one
 	var doodle = this.drawing.lastDoodleOfClass("TrabySuture");
 	if (doodle) {
@@ -197,7 +197,7 @@ ED.TrabySuture.prototype.draw = function(_point) {
 					ctx.lineTo(tp.x, tp.y);
 					fp = tp;
 				}
-				
+
 				// Next two segments are curved
 				var fp = this.squiggleArray[0].pointsArray[2];
 				var tp = this.squiggleArray[0].pointsArray[3];
@@ -276,4 +276,3 @@ ED.TrabySuture.prototype.description = function() {
 
 	return returnValue;
 }
-

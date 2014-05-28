@@ -27,20 +27,20 @@
 ED.AgentDose = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "AgentDose";
-		
+
 	// Derived parameters
 	//this.value = '0';
-	
+
 	// Private parameters
 	this.halfWidth = 50;
 	this.halfHeight = 20;
 	this.minimumWidth = 40;
-	
+
 	this.valueString = "200mg";
-	
+
 	// Saved parameters
 	//this.savedParameterArray = ['originX', 'originY', 'value'];
-	
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
@@ -56,7 +56,7 @@ ED.AgentDose.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.AgentDose.prototype.setHandles = function() {
-	this.handleArray[3] = new ED.Handle(null, true, ED.Mode.Apex, false);
+	this.handleArray[3] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
 }
 
 /**
@@ -64,7 +64,7 @@ ED.AgentDose.prototype.setHandles = function() {
  */
 ED.AgentDose.prototype.setPropertyDefaults = function() {
 	this.isRotatable = false;
-	
+
 	// Add complete validation arrays for derived parameters
 // 	this.parameterValidationArray['value'] = {
 // 		kind: 'derived',
@@ -86,7 +86,7 @@ ED.AgentDose.prototype.setPropertyDefaults = function() {
  */
 ED.AgentDose.prototype.setParameterDefaults = function() {
 	this.apexX = 100;
-// 	
+//
 // 	var lastAgentDose = this.drawing.lastDoodleOfClass('AgentDose');
 // 	if (lastAgentDose) {
 // 		this.setParameterFromString('value', lastAgentDose.value.toString());
@@ -94,7 +94,7 @@ ED.AgentDose.prototype.setParameterDefaults = function() {
 // 	else {
 // 		this.setParameterFromString('value', '80');
 // 	}
-	
+
 	// Get x separation of drawing
 // 	var recordGrid = this.drawing.lastDoodleOfClass('RecordGrid');
 // 	if (recordGrid) {
@@ -114,17 +114,17 @@ ED.AgentDose.prototype.setParameterDefaults = function() {
  */
 // ED.AgentDose.prototype.dependentParameterValues = function(_parameter, _value) {
 // 	var returnArray = new Array();
-// 
+//
 // 	switch (_parameter) {
 // 		case 'originY':
 // 			returnArray['value'] = Math.round(240 * (this.drawing.doodlePlaneHeight/2 - _value)/this.drawing.doodlePlaneHeight);
 // 			break;
-// 
+//
 // 		case 'value':
 // 			returnArray['originY'] = - (_value * this.drawing.doodlePlaneHeight/240) + this.drawing.doodlePlaneHeight/2;
 // 			break;
 // 	}
-// 
+//
 // 	return returnArray;
 // }
 
@@ -147,7 +147,7 @@ ED.AgentDose.prototype.draw = function(_point) { //console.log(this.originX);
 	var d = 5;
 	var f = 1.5;
 	this.halfWidth = ctx.measureText(this.valueString).width * f;
-	
+
 	ctx.moveTo(-this.halfWidth, -this.halfHeight + d);
 	ctx.lineTo(-d, -this.halfHeight + d);
 	ctx.lineTo(0, -this.halfHeight);
@@ -169,14 +169,14 @@ ED.AgentDose.prototype.draw = function(_point) { //console.log(this.originX);
 
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
-	
+
 	// Non boundary drawing
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
 		// Text properties
 		ctx.font = "24px sans-serif";
 		ctx.strokeStyle = "gray";
 		ctx.fillStyle = "gray";
-	
+
 		// Draw text centred on grid line
 		var textWidth = ctx.measureText(this.valueString).width;
 		ctx.fillText(this.valueString, - textWidth/2, 8);
@@ -187,7 +187,7 @@ ED.AgentDose.prototype.draw = function(_point) { //console.log(this.originX);
 
 	// Draw handles if selected
 	//if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
-		
+
 	// Return value indicating successful hittest
 	return this.isClicked;
 }
@@ -198,7 +198,7 @@ ED.AgentDose.prototype.draw = function(_point) { //console.log(this.originX);
 // ED.AgentDose.prototype.drawHighlightExtras = function() {
 // 	// Get context
 // 	var ctx = this.drawing.context;
-// 
+//
 // 	// Draw text description of gauge
 // 	ctx.lineWidth = 1;
 // 	ctx.font = "64px sans-serif";

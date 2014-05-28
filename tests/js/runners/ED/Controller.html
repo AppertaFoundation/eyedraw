@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Mocha</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<!-- Add spec CSS dependencies here -->
+		<!-- <link rel="stylesheet" type="text/css" href="style.css" /> -->
+
+		<!-- Test framework CSS -->
+		<link rel="stylesheet" href="../../../../assets/components/mocha/mocha.css" />
+		<style type="text/css">
+		html, body { background: #fff; }
+		</style>
+	</head>
+	<body>
+
+		<div id="mocha"></div>
+
+		<!-- Test framework dependencies -->
+		<script src="../../../../assets/components/mocha/mocha.js"></script>
+		<script src="../../../../assets/components/chai/chai.js"></script>
+		<script src="../../../../assets/components/sinonjs/sinon.js"></script>
+
+		<script>
+			this.expect = chai.expect;
+			this.assert = chai.assert;
+			mocha.setup('bdd');
+		</script>
+
+		<!-- Add spec JS dependencies here -->
+		<script src="../../../../assets/components/jquery/jquery.min.js"></script>
+		<script src="../../../../assets/components/eventemitter2/lib/eventemitter2.js"></script>
+		<script src="../../../../assets/components/mustache/mustache.js"></script>
+		<script src="../../../../src/ED.js"></script>
+		<script src="../../../../src/ED/Report.js"></script>
+		<script src="../../../../src/ED/Checker.js"></script>
+		<script src="../../../../src/ED/Doodle.js"></script>
+		<script src="../../../../src/ED/View.js"></script>
+		<script src="../../../../src/ED/Drawing.js"></script>
+		<script src="../../../../src/ED/Drawing/AffineTransform.js"></script>
+		<script src="../../../../src/ED/Drawing/Colour.js"></script>
+		<script src="../../../../src/ED/Drawing/Point.js"></script>
+		<script src="../../../../src/ED/Drawing/Range.js"></script>
+		<script src="../../../../src/ED/Drawing/Squiggle.js"></script>
+		<script src="../../../../src/ED/Doodles/Oph/PhakoIncision.js"></script>
+		<script src="../../../../src/ED/Doodles/Oph/AntSeg.js"></script>
+		<script data-cover src="../../../../src/ED/Controller.js"></script>
+		<script src="../../../../src/ED/Views/Toolbar.js"></script>
+		<script src="../../../../src/ED/Views/DoodlePopup.js"></script>
+		<script src="../../../../src/ED/Views/SelectedDoodle.js"></script>
+		<script src="../../../../src/ED/Views/DoodlePopup/Help.js"></script>
+		<script src="../../../../src/ED/Misc/Tooltips.js"></script>
+		<script src="../../../../src/ED/Views/templates.js"></script>
+
+		<!-- Add spec files here -->
+		<script src="../../specs/ED/Controller.spec.js"></script>
+
+		<!-- Code coverage dependencies -->
+		<script src="../../../../assets/components/blanket/dist/qunit/blanket.min.js"
+			data-cover-adapter="../../adapters/mocha-blanket.js"></script>
+
+		<!-- Run the tests -->
+		<script>
+		if (navigator.userAgent.indexOf('PhantomJS') < 0) {
+			mocha.run(function done() {});
+		}
+		</script>
+	</body>
+</html>

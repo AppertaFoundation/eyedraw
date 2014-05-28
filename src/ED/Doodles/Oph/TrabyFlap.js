@@ -57,9 +57,9 @@ ED.TrabyFlap.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.TrabyFlap.prototype.setHandles = function() {
-	this.handleArray[0] = new ED.Handle(null, true, ED.Mode.Arc, false);
-	this.handleArray[3] = new ED.Handle(null, true, ED.Mode.Arc, false);
-	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+	this.handleArray[0] = new ED.Doodle.Handle(null, true, ED.Mode.Arc, false);
+	this.handleArray[3] = new ED.Doodle.Handle(null, true, ED.Mode.Arc, false);
+	this.handleArray[4] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
 }
 
 /**
@@ -297,5 +297,5 @@ ED.TrabyFlap.prototype.draw = function(_point) {
  * @returns {String} Description of doodle
  */
 ED.TrabyFlap.prototype.description = function() {
-	return "Trabeculectomy flap at " + this.clockHour() + " o'clock with " + this.sclerostomy.firstLetterToLowerCase() + " sclerostomy";
+	return "Trabeculectomy flap at " + this.clockHour() + " o'clock with " + ED.firstLetterToLowerCase(this.sclerostomy) + " sclerostomy";
 }

@@ -27,13 +27,13 @@
 ED.RPERip = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "RPERip";
-	
+
 	// Private parameters
 	this.initialRadius = 150;
 
 	// Saved parameters
 	this.savedParameterArray = ['originX', 'originY', 'apexY', 'scaleX', 'scaleY', 'arc', 'rotation'];
-	
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
@@ -49,10 +49,10 @@ ED.RPERip.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.RPERip.prototype.setHandles = function() {
-	this.handleArray[1] = new ED.Handle(null, true, ED.Mode.Arc, false);
-	this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Arc, false);
-	this.handleArray[3] = new ED.Handle(null, true, ED.Mode.Scale, true);
-	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+	this.handleArray[1] = new ED.Doodle.Handle(null, true, ED.Mode.Arc, false);
+	this.handleArray[2] = new ED.Doodle.Handle(null, true, ED.Mode.Arc, false);
+	this.handleArray[3] = new ED.Doodle.Handle(null, true, ED.Mode.Scale, true);
+	this.handleArray[4] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
 }
 
 /**
@@ -114,10 +114,10 @@ ED.RPERip.prototype.draw = function(_point) {
 	ctx.lineWidth = 4;
 	ctx.fillStyle = "rgba(251, 147, 76, 0.75)";
 	ctx.strokeStyle = "red";
-		
+
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
-	
+
 	// Non boundary paths
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
 		// Boundary path
@@ -125,7 +125,7 @@ ED.RPERip.prototype.draw = function(_point) {
 
 		// Arc across from top right to to mirror image point on the other side
 		ctx.arc(0, 0, r, arcStart, arcEnd, true);
-	
+
 		// Connect across the bottom via the apex point
 		var bp = +0.6;
 		ctx.bezierCurveTo(topLeftX, topLeftY, bp * topLeftX, this.apexY, this.apexX, this.apexY);
@@ -135,7 +135,7 @@ ED.RPERip.prototype.draw = function(_point) {
 		ctx.lineWidth = 4;
 		ctx.fillStyle = "rgba(180, 125, 60, 0.75)";
 		ctx.strokeStyle = "brown";
-		
+
 		ctx.fill();
 		ctx.stroke();
 	}
@@ -147,7 +147,7 @@ ED.RPERip.prototype.draw = function(_point) {
 	var point = new ED.Point(0, 0);
 	point.setWithPolars(r, Math.PI / 8);
 	this.handleArray[3].location = this.transform.transformPoint(point);
-	
+
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
 

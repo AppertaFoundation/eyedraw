@@ -27,10 +27,10 @@
 ED.RetinalArteryOcclusionPostPole = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "RetinalArteryOcclusionPostPole";
-	
+
 	// Saved parameters
 	this.savedParameterArray = ['apexX', 'apexY', 'arc', 'rotation'];
-	
+
 	// Call super-class constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
@@ -46,9 +46,9 @@ ED.RetinalArteryOcclusionPostPole.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.RetinalArteryOcclusionPostPole.prototype.setHandles = function() {
-	this.handleArray[0] = new ED.Handle(null, true, ED.Mode.Arc, false);
-	this.handleArray[3] = new ED.Handle(null, true, ED.Mode.Arc, false);
-	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+	this.handleArray[0] = new ED.Doodle.Handle(null, true, ED.Mode.Arc, false);
+	this.handleArray[3] = new ED.Doodle.Handle(null, true, ED.Mode.Arc, false);
+	this.handleArray[4] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
 }
 
 /**
@@ -84,7 +84,7 @@ ED.RetinalArteryOcclusionPostPole.prototype.draw = function(_point) {
 
 	// Call draw method in superclass
 	ED.RetinalArteryOcclusionPostPole.superclass.draw.call(this, _point);
-	
+
 	// Radii
 	var ro = 420;
 	var ri = -this.apexY;
@@ -151,7 +151,7 @@ ED.RetinalArteryOcclusionPostPole.prototype.draw = function(_point) {
  */
 ED.RetinalArteryOcclusionPostPole.prototype.description = function() {
 	var returnString = "";
-	
+
 	// Type
 	var type = this.type();
 	switch (type){
@@ -164,7 +164,7 @@ ED.RetinalArteryOcclusionPostPole.prototype.description = function() {
 			}
 			returnString += 'branch ';
 			break;
-		
+
 		case 'hemispheric':
 			if (this.rotation > Math.PI / 2 && this.rotation < 3 * Math.PI / 2) {
 				returnString = 'Inferior ';
@@ -174,13 +174,13 @@ ED.RetinalArteryOcclusionPostPole.prototype.description = function() {
 			}
 			returnString += 'hemispheric ';
 			break;
-			
+
 		case 'central':
 			returnString += 'Central ';
 			break;
 	}
 	returnString += "retinal artery occlusion";
-	
+
 	// Macula
 	if (this.apexY < -150) {
 		returnString += ' sparing';
@@ -188,11 +188,11 @@ ED.RetinalArteryOcclusionPostPole.prototype.description = function() {
 	else {
 		returnString += ' involving';
 	}
-	
+
 	returnString += ' the macula';
-	
+
 	if (this.apexY > -70) returnString += ' with a cherry red spot';
-	
+
 	return returnString;
 }
 
@@ -214,7 +214,7 @@ ED.RetinalArteryOcclusionPostPole.prototype.snomedCode = function() {
 		case 'central':
 			return 38742007;
 			break;
-	}	
+	}
 }
 
 /**

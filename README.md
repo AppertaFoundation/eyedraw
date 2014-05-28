@@ -1,7 +1,9 @@
 Eyedraw
 =======
 
-This README file should be contained in a folder containing javascript and other files required for running EyeDraw, the OpenEyes medical drawing packages. The enclosing folder should contain the following files and folders:
+This README file should be contained in a folder containing javascript and other files required for running EyeDraw, the OpenEyes medical drawing packages.
+
+The enclosing folder should contain the following files and folders:
 
 ED_Drawing.js		Required for all EyeDraw functions
 ED_Adnexal.hs		Doodles for Adnexal drawings
@@ -33,5 +35,5 @@ Generating Documentation
 To update the documentation files, cd to the jsdoc-toolkit directory and run;
 
 	java -jar jsrun.jar app/run.js -a -t=templates/jsdoc -d=/Users/bill/Sites/OpenEyesWebSite/Website/htdocs/reference/eyedraw ../*.js
-	
+
 Updated files can be found by pointing your browser to the destination specified by the -d parameter

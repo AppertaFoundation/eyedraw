@@ -27,10 +27,10 @@
 ED.MacularDystrophy = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "MacularDystrophy";
-	
+
 	// Saved parameters
 	this.savedParameterArray = ['apexX', 'apexY', 'scaleX', 'scaleY'];
-	
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
@@ -46,8 +46,8 @@ ED.MacularDystrophy.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.MacularDystrophy.prototype.setHandles = function() {
-	this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, false);
-	this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+	this.handleArray[2] = new ED.Doodle.Handle(null, true, ED.Mode.Scale, false);
+	this.handleArray[4] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
 }
 
 /**
@@ -57,7 +57,7 @@ ED.MacularDystrophy.prototype.setPropertyDefaults = function() {
 	this.isMoveable = false;
 	this.isRotatable = false;
 	this.isUnique = true;
-	
+
 	// Update component of validation array for simple parameters
 	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
 	this.parameterValidationArray['apexY']['range'].setMinAndMax(-100, +100);
@@ -99,10 +99,10 @@ ED.MacularDystrophy.prototype.draw = function(_point) {
 
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
-	
+
 	// Other paths and drawing here
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
-		
+
 		if (this.apexY < -50) {
 			// Bull's eye maculopathy
 			ctx.beginPath();
@@ -113,7 +113,7 @@ ED.MacularDystrophy.prototype.draw = function(_point) {
 			ctx.bezierCurveTo(-100, 140, -200, 70, -200, 0);
 			ctx.fillStyle = "rgba(223,80,20,1)";
 			ctx.fill();
-		
+
 			ctx.beginPath();
 			ctx.moveTo(-100, 0);
 			ctx.bezierCurveTo(-100, -35, -50, -70, 0, -70);
@@ -149,7 +149,7 @@ ED.MacularDystrophy.prototype.draw = function(_point) {
 	point.setWithPolars(r, Math.PI / 4);
 	this.handleArray[2].location = this.transform.transformPoint(point);
 	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
-	
+
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
 

@@ -30,7 +30,7 @@ ED.PeripapillaryAtrophy = function(_drawing, _parameterJSON) {
 
 	// Private parameters
 	this.outerRadius = 340;
-	
+
 	// Saved parameters
 	this.savedParameterArray = ['rotation'];
 
@@ -49,10 +49,10 @@ ED.PeripapillaryAtrophy.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.PeripapillaryAtrophy.prototype.setHandles = function() {
-	this.handleArray[0] = new ED.Handle(null, true, ED.Mode.Handles, false);
-	this.handleArray[1] = new ED.Handle(null, true, ED.Mode.Handles, false);
-	this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Handles, false);
-	this.handleArray[3] = new ED.Handle(null, true, ED.Mode.Handles, false);
+	this.handleArray[0] = new ED.Doodle.Handle(null, true, ED.Mode.Handles, false);
+	this.handleArray[1] = new ED.Doodle.Handle(null, true, ED.Mode.Handles, false);
+	this.handleArray[2] = new ED.Doodle.Handle(null, true, ED.Mode.Handles, false);
+	this.handleArray[3] = new ED.Doodle.Handle(null, true, ED.Mode.Handles, false);
 }
 
 /**

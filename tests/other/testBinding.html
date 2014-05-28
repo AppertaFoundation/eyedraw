@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <!-- EyeDraw CSS style sheet -->
+        <link rel="stylesheet" href="../../assets/css/oe-eyedraw.css" type="text/css" media="screen" />
+
+        <!-- Depedendant 3rd-party libraries -->
+        <script type="text/javascript" src="../../assets/components/jquery/jquery.min.js"></script>
+				<script type="text/javascript" src="../../assets/components/mustache/mustache.js"></script>
+				<script type="text/javascript" src="../../assets/components/eventemitter2/lib/eventemitter2.js"></script>
+
+        <!-- Mandatory file containing key drawing classes -->
+        <script src="../../assets/js/dist/eyedraw.js" type="text/javascript"></script>
+
+        <!-- This script handles the drawings for the page -->
+        <script type="text/javascript">
+
+            // Assign a global variable to the drawing
+            var drawingEdit;
+
+            // Runs on page load
+            function init()
+            {
+                // Create a drawing linked to the canvas
+                drawingEdit = new ED.Drawing(document.getElementById('canvasEdit'), ED.eye.Right, 'RPS', true, {graphicsPath:'../../assets/img/'});
+
+                // Create a controller object for this drawing
+                var controller = new eyeDrawController(drawingEdit);
+
+                // Initialise drawing
+                drawingEdit.init();
+            }
+
+            // Controller class
+            function eyeDrawController(_drawing)
+            {
+                // Register controller for notifications
+                _drawing.registerForNotifications(this, 'notificationHandler', []);
+
+                // Method called for notification
+                this.notificationHandler = function(_messageArray)
+                {
+                    // Element used to display saved content for debugging purposes
+                    var saveInput = document.getElementById('saveInput');
+
+                    switch (_messageArray['eventName'])
+                    {
+                        // Ready notification
+                        case 'ready':
+                            _drawing.addDoodle('AntSeg');
+                            _drawing.addDoodle('PhakoIncision');
+
+                            _drawing.addBindings(
+                                                 {
+                                                 PhakoIncision:{
+                                                    incisionSite:{id:'Eyedraw_stringField1', attribute:'data-edval'},
+                                                    incisionLength:{id:'Eyedraw_stringField2'},
+                                                    incisionMeridian:{id:'Eyedraw_stringField3'},
+                                                    incisionType:{id:'Eyedraw_stringField4', attribute:'data-edval'},
+                                                 }
+                                                 }
+                                                 );
+
+                            _drawing.addDeleteValues({Eyedraw_stringField1:'None'});
+
+                            _drawing.deselectDoodles();
+
+                            break;
+
+                        case 'doodleAdded':
+                            saveInput.value = _drawing.save();
+                            break;
+
+                        case 'doodleDeleted':
+                            saveInput.value = _drawing.save();
+                            break;
+
+                        case 'mousedragged':
+                            saveInput.value = _drawing.save();
+                            break;
+
+                        case 'parameterChanged':
+                            saveInput.value = _drawing.save();
+                            break;
+                    }
+                }
+            }
+
+             </script>
+    </head>
+    <body onload="init();">
+
+        <!-- Toolbar -->
+        <button class="imgbutton" disabled="disabled" id="deleteSelectedDoodleRPS" title="Delete" onclick="drawingEdit.deleteSelectedDoodle(); return false;" ><img src="../../assets/img/old/deleteSelectedDoodle.gif" /></button>
+        <button class="imgbutton" id="PhakoIncisionRPS" onclick="drawingEdit.addDoodle('PhakoIncision'); return false;" ><img src="../../assets/img/old/PhakoIncision.gif" /></button>
+        <br/>
+
+        <!-- Canvas tooltip -->
+        <span class="canvasTooltip" id="canvasEditTooltip"></span>
+
+        <!-- Canvas element -->
+        <canvas id="canvasEdit" class="ed-canvas-edit ed-canvas-edit" width="300" height="300" tabindex="1"></canvas>
+
+        <!--
+        <select id="pupilSizeSelect">
+            <option value="1" data-edval="Large">Large</option>
+            <option value="2" data-edval="Medium">Medium</option>
+            <option value="3" data-edval="Small">Small</option>
+        </select>
+
+
+
+        <input type="text" id="transpositionInput" value='None' />
+
+
+        <input id="pxeCheckBox" value="1" type="checkbox">
+         -->
+
+        <select id="Eyedraw_stringField1">
+            <option value="0" data-edval="None">None</option>
+            <option value="1" selected="selected" data-edval="Corneal">Corneal</option>
+            <option value="2" data-edval="Limbal">Limbal</option>
+            <option value="3" data-edval="Scleral">Scleral</option>
+        </select>
+        <input type="text" id="Eyedraw_stringField2" value="2.8">
+        <input type="text" id="Eyedraw_stringField3" value="180">
+        <select id="Eyedraw_stringField4">
+            <option value="1" selected="selected" data-edval="Pocket">Pocket</option>
+            <option value="2" data-edval="Section">Section</option>
+        </select>
+
+        <!--
+        <select id="opticDiscModeSelect">
+            <option value="1" data-edval="Basic">Basic</option>
+            <option value="2" data-edval="Expert" selected="true">Expert</option>
+        </select>
+         -->
+
+        <button onclick="alert(drawingEdit.report()); return false;" >Report</button>
+
+        <br/>
+        <textarea rows="4" cols="180" id="saveInput"></textarea>
+
+    </body>
+</html>

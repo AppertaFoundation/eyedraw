@@ -17,8 +17,31 @@
  * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
  */
 
+$min = (defined('YII_DEBUG') && YII_DEBUG) ? '' : '.min';
+
 return array(
-		'import' => array(
-				'application.modules.eyedraw.*',
-		),
+	'import' => array(
+		'application.modules.eyedraw.*',
+	),
+	'components' => array(
+		'clientScript' => array(
+			'packages' => array(
+				'eyedraw' => array(
+					'js' => array(
+						"js/dist/eyedraw{$min}.js",
+						"js/dist/oe-eyedraw{$min}.js"
+					),
+					'css' => array(
+						'css/oe-eyedraw.css'
+					),
+					'basePath' => 'application.modules.eyedraw.assets',
+					'depends' => array(
+						'jquery',
+						'mustache',
+						'eventemitter2'
+					),
+				)
+			),
+		)
+	)
 );
