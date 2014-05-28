@@ -554,7 +554,7 @@ class DoodleInfo
         "TractionRetinalDetachment" => "Traction retinal detachment",
         "TransilluminationDefect" =>"Transillumination defect",
         "Tube" => "Drainage tube",
-        "TubeExtender" => "Tube externder",
+        "TubeExtender" => "Tube extender",
         "TubeLigation" => "Ligation suture",
         "UpDrift" => "Up drift",
         "UpShoot" => "Up shoot",
