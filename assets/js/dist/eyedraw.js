@@ -16644,7 +16644,7 @@ ED.Bleb.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.Bleb.prototype.setHandles = function() {
-	this.handleArray[3] = new ED.Handle(null, true, ED.Mode.Arc, false);
+	this.handleArray[3] = new ED.Doodle.Handle(null, true, ED.Mode.Arc, false);
 }
 
 /**
@@ -23209,7 +23209,7 @@ ED.FibrovascularScar.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.FibrovascularScar.prototype.setHandles = function() {
-	this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, false);
+	this.handleArray[2] = new ED.Doodle.Handle(null, true, ED.Mode.Scale, false);
 }
 
 /**
@@ -33980,7 +33980,7 @@ ED.RPEAtrophy.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.RPEAtrophy.prototype.setHandles = function() {
-	this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, false);
+	this.handleArray[2] = new ED.Doodle.Handle(null, true, ED.Mode.Scale, false);
 }
 
 /**
@@ -34269,7 +34269,7 @@ ED.RPEHypertrophy.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.RPEHypertrophy.prototype.setHandles = function() {
-	this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, false);
+	this.handleArray[2] = new ED.Doodle.Handle(null, true, ED.Mode.Scale, false);
 }
 
 /**
@@ -35430,7 +35430,7 @@ ED.RetinalHaemorrhage.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.RetinalHaemorrhage.prototype.setHandles = function() {
-	this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, false);
+	this.handleArray[2] = new ED.Doodle.Handle(null, true, ED.Mode.Scale, false);
 }
 
 /**
@@ -35951,7 +35951,7 @@ ED.RingSegment.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.RingSegment.prototype.setHandles = function() {
-	this.handleArray[3] = new ED.Handle(null, true, ED.Mode.Arc, false);
+	this.handleArray[3] = new ED.Doodle.Handle(null, true, ED.Mode.Arc, false);
 }
 
 /**
@@ -39254,7 +39254,7 @@ ED.TrabyConjIncision.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.TrabyConjIncision.prototype.setHandles = function() {
-	this.handleArray[0] = new ED.Handle(null, true, ED.Mode.Arc, false);
+	this.handleArray[0] = new ED.Doodle.Handle(null, true, ED.Mode.Arc, false);
 }
 
 /**
@@ -39887,7 +39887,7 @@ ED.TrabySuture.prototype.draw = function(_point) {
 					
 				// Array of handles for releasable suture
 				for (var i = 0; i < this.numberOfHandles; i++) {
-					this.handleArray[i] = new ED.Handle(null, true, ED.Mode.Handles, false);
+					this.handleArray[i] = new ED.Doodle.Handle(null, true, ED.Mode.Handles, false);
 					this.handleArray[i].location = this.transform.transformPoint(this.squiggleArray[0].pointsArray[i]);
 				}
 				break;
@@ -39904,7 +39904,7 @@ ED.TrabySuture.prototype.draw = function(_point) {
 				ctx.bezierCurveTo(32, 74, 34, 100, 34, 100);
 				
 				this.handleArray.length = 1;
-				this.handleArray[0] = new ED.Handle(null, true, ED.Mode.Rotate, false);
+				this.handleArray[0] = new ED.Doodle.Handle(null, true, ED.Mode.Rotate, false);
 				this.handleArray[0].location = this.transform.transformPoint(new ED.Point(40, -70));
 				break;
 
@@ -39917,7 +39917,7 @@ ED.TrabySuture.prototype.draw = function(_point) {
 				ctx.lineTo(5, 50);
 				
 				this.handleArray.length = 1;
-				this.handleArray[0] = new ED.Handle(null, true, ED.Mode.Rotate, false);
+				this.handleArray[0] = new ED.Doodle.Handle(null, true, ED.Mode.Rotate, false);
 				this.handleArray[0].location = this.transform.transformPoint(new ED.Point(40, -70));
 				break;
 		}
