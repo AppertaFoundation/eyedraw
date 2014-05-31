@@ -6594,6 +6594,50 @@ ED.Colour.prototype.json = function() {
  * along with OpenEyes.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+ /**
+ * Represents a control handle on the doodle
+ *
+ * @class Handle
+ * @property {Point} location Location in doodle plane
+ * @property {Bool} isVisible Flag indicating whether handle should be shown
+ * @property {Enum} mode The drawing mode that selection of the handle triggers
+ * @property {Bool} isRotatable Flag indicating whether the handle shows an outer ring used for rotation
+ * @param {Point} _location
+ * @param {Bool} _isVisible
+ * @param {Enum} _mode
+ * @param {Bool} _isRotatable
+ */
+ED.Handle = function(_location, _isVisible, _mode, _isRotatable) {
+	// Properties
+	if (_location == null) {
+		this.location = new ED.Point(0, 0);
+	} else {
+		this.location = _location;
+	}
+	this.isVisible = _isVisible;
+	this.mode = _mode;
+	this.isRotatable = _isRotatable;
+}
+
+/**
+ * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
+ * (C) OpenEyes Foundation, 2011-2014
+ * This file is part of OpenEyes.
+ *
+ * OpenEyes is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * OpenEyes is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with OpenEyes.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 /**
  * Represents a point in two dimensional space
  * @class Point
@@ -39770,6 +39814,48 @@ ED.TrabySuture.prototype.setParameterDefaults = function() {
 	this.apexY = +70;
 	this.material = 'Nylon';
 	this.size = '10/0';
+	
+	// Suture position depends on presence of a trabeculectomy flap
+	var trabyFlap = this.drawing.lastDoodleOfClass('TrabyFlap');
+	if (trabyFlap) {
+		var number = this.drawing.numberOfDoodlesOfClass("TrabySuture");
+		var gsf = this.drawing.globalScaleFactor;
+		var p;
+		
+		switch (number) {
+			// First suture is top left
+			case 0:
+				p = new ED.Point(-1 * trabyFlap.right.x * gsf, (trabyFlap.height + 0 * (trabyFlap.right.y - trabyFlap.height)) * gsf);
+				p.setWithPolars(p.length(), p.direction() + trabyFlap.rotation);
+				this.originX = p.x;
+				this.originY = p.y;
+				this.rotation = trabyFlap.rotation;
+				this.scaleX = this.scaleX * -1;
+				break;
+			// Second suture is top right
+			case 1:
+				p = new ED.Point(+1 * trabyFlap.right.x * gsf, (trabyFlap.height + 0 * (trabyFlap.right.y - trabyFlap.height)) * gsf);
+				p.setWithPolars(p.length(), p.direction() + trabyFlap.rotation);
+				this.originX = p.x;
+				this.originY = p.y;
+				this.rotation = trabyFlap.rotation;
+				break;
+			case 2:
+				var doodle1 = this.drawing.firstDoodleOfClass("TrabySuture");
+				var doodle2 = this.drawing.lastDoodleOfClass("TrabySuture");
+				this.originX = doodle1.originX + (doodle2.originX - doodle1.originX)/2;
+				this.originY = doodle1.originY + (doodle2.originY - doodle1.originY)/2;
+				this.rotation = doodle2.rotation;
+				break;
+			default:
+				this.setOriginWithDisplacements(0, -40);
+				break;
+		}
+		
+	}
+	else {
+		this.setOriginWithDisplacements(0, -40);
+	}
 
 	// Make type same as last one
 	var doodle = this.drawing.lastDoodleOfClass("TrabySuture");
@@ -39778,18 +39864,6 @@ ED.TrabySuture.prototype.setParameterDefaults = function() {
 	}
 	else {
 		this.type = 'Releasable';
-	}
-	
-	// If two sutures, place in between
-	if (this.drawing.numberOfDoodlesOfClass("TrabySuture") == 2) {
-		var doodle1 = this.drawing.firstDoodleOfClass("TrabySuture");
-		var doodle2 = this.drawing.lastDoodleOfClass("TrabySuture");
-		this.originX = doodle1.originX + (doodle2.originX - doodle1.originX)/2;
-		this.originY = doodle1.originY + (doodle2.originY - doodle1.originY)/2;
-	}
-	else {
-		// Additional doodles displaced to left
-		this.setOriginWithDisplacements(0, -40);
 	}
 	
 	// Create a squiggle to store the handles points

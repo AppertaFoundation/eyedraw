@@ -98,6 +98,48 @@ ED.TrabySuture.prototype.setParameterDefaults = function() {
 	this.apexY = +70;
 	this.material = 'Nylon';
 	this.size = '10/0';
+	
+	// Suture position depends on presence of a trabeculectomy flap
+	var trabyFlap = this.drawing.lastDoodleOfClass('TrabyFlap');
+	if (trabyFlap) {
+		var number = this.drawing.numberOfDoodlesOfClass("TrabySuture");
+		var gsf = this.drawing.globalScaleFactor;
+		var p;
+		
+		switch (number) {
+			// First suture is top left
+			case 0:
+				p = new ED.Point(-1 * trabyFlap.right.x * gsf, (trabyFlap.height + 0 * (trabyFlap.right.y - trabyFlap.height)) * gsf);
+				p.setWithPolars(p.length(), p.direction() + trabyFlap.rotation);
+				this.originX = p.x;
+				this.originY = p.y;
+				this.rotation = trabyFlap.rotation;
+				this.scaleX = this.scaleX * -1;
+				break;
+			// Second suture is top right
+			case 1:
+				p = new ED.Point(+1 * trabyFlap.right.x * gsf, (trabyFlap.height + 0 * (trabyFlap.right.y - trabyFlap.height)) * gsf);
+				p.setWithPolars(p.length(), p.direction() + trabyFlap.rotation);
+				this.originX = p.x;
+				this.originY = p.y;
+				this.rotation = trabyFlap.rotation;
+				break;
+			case 2:
+				var doodle1 = this.drawing.firstDoodleOfClass("TrabySuture");
+				var doodle2 = this.drawing.lastDoodleOfClass("TrabySuture");
+				this.originX = doodle1.originX + (doodle2.originX - doodle1.originX)/2;
+				this.originY = doodle1.originY + (doodle2.originY - doodle1.originY)/2;
+				this.rotation = doodle2.rotation;
+				break;
+			default:
+				this.setOriginWithDisplacements(0, -40);
+				break;
+		}
+		
+	}
+	else {
+		this.setOriginWithDisplacements(0, -40);
+	}
 
 	// Make type same as last one
 	var doodle = this.drawing.lastDoodleOfClass("TrabySuture");
@@ -106,18 +148,6 @@ ED.TrabySuture.prototype.setParameterDefaults = function() {
 	}
 	else {
 		this.type = 'Releasable';
-	}
-	
-	// If two sutures, place in between
-	if (this.drawing.numberOfDoodlesOfClass("TrabySuture") == 2) {
-		var doodle1 = this.drawing.firstDoodleOfClass("TrabySuture");
-		var doodle2 = this.drawing.lastDoodleOfClass("TrabySuture");
-		this.originX = doodle1.originX + (doodle2.originX - doodle1.originX)/2;
-		this.originY = doodle1.originY + (doodle2.originY - doodle1.originY)/2;
-	}
-	else {
-		// Additional doodles displaced to left
-		this.setOriginWithDisplacements(0, -40);
 	}
 	
 	// Create a squiggle to store the handles points
