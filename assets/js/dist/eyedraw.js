@@ -7787,7 +7787,7 @@ ED.Views.Toolbar = (function() {
 
 	return Toolbar;
 }());
-/*! Generated on 28/5/2014 */
+/*! Generated on 29/5/2014 */
 ED.scriptTemplates = {
   "doodle-popup": "\n\n\n\n{{#doodle}}\n\t<ul class=\"ed-toolbar-panel ed-doodle-popup-toolbar\">\n\t\t<li>\n\t\t\t<a class=\"ed-button ed-doodle-help{{lockedButtonClass}}\" href=\"#\" data-function=\"toggleHelp\">\n\t\t\t\t<span class=\"icon-ed-help\"></span>\n\t\t\t</a>\n\t\t</li>\n\t\t{{#doodle.isLocked}}\n\t\t\t<li>\n\t\t\t\t<a class=\"ed-button\" href=\"#\" data-function=\"unlock\">\n\t\t\t\t\t<span class=\"icon-ed-unlock\"></span>\n\t\t\t\t\t<span class=\"label\">Unlock</span>\n\t\t\t\t</a>\n\t\t\t</li>\n\t\t{{/doodle.isLocked}}\n\t\t{{^doodle.isLocked}}\n\t\t\t<li>\n\t\t\t\t<a class=\"ed-button\" href=\"#\" data-function=\"lock\">\n\t\t\t\t\t<span class=\"icon-ed-lock\"></span>\n\t\t\t\t\t<span class=\"label\">Lock</span>\n\t\t\t\t</a>\n\t\t\t</li>\n\t\t{{/doodle.isLocked}}\n\t\t<li>\n\t\t\t<a class=\"ed-button{{lockedButtonClass}}\" href=\"#\" data-function=\"moveToBack\">\n\t\t\t\t<span class=\"icon-ed-move-to-back\"></span>\n\t\t\t\t<span class=\"label\">Move to back</span>\n\t\t\t</a>\n\t\t</li>\n\t\t<li>\n\t\t\t<a class=\"ed-button{{lockedButtonClass}}\" href=\"#\" data-function=\"moveToFront\">\n\t\t\t\t<span class=\"icon-ed-move-to-front\"></span>\n\t\t\t\t<span class=\"label\">Move to front</span>\n\t\t\t</a>\n\t\t</li>\n\t\t{{#doodle.isDeletable}}\n\t\t\t<li>\n\t\t\t\t<a class=\"ed-button{{lockedButtonClass}}\" href=\"#\" data-function=\"deleteSelectedDoodle\">\n\t\t\t\t\t<span class=\"icon-ed-delete\"></span>\n\t\t\t\t\t<span class=\"label\">Delete</span>\n\t\t\t\t</a>\n\t\t\t</li>\n\t\t{{/doodle.isDeletable}}\n\t</ul>\n\t<div class=\"ed-doodle-info hide\">\n\t\t{{#doodle.isLocked}}\n\t\t\t<div class=\"ed-doodle-description\">\n\t\t\t\t<strong>This doodle is locked and cannot be edited.</strong>\n\t\t\t</div>\n\t\t{{/doodle.isLocked}}\n\t\t{{^doodle.isLocked}}\n\t\t\t{{#desc}}\n\t\t\t\t<div class=\"ed-doodle-description\">{{{desc}}}</div>\n\t\t\t{{/desc}}\n\t\t{{/doodle.isLocked}}\n\t</div>\n\t<div class=\"ed-doodle-controls{{#doodle.isLocked}} hide{{/doodle.isLocked}}\" id=\"{{drawing.canvas.id}}_controls\">\n\t</div>\n{{/doodle}}"
 };
@@ -16688,7 +16688,7 @@ ED.Bleb.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.Bleb.prototype.setHandles = function() {
-	this.handleArray[3] = new ED.Handle(null, true, ED.Mode.Arc, false);
+	this.handleArray[3] = new ED.Doodle.Handle(null, true, ED.Mode.Arc, false);
 }
 
 /**
@@ -23253,7 +23253,7 @@ ED.FibrovascularScar.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.FibrovascularScar.prototype.setHandles = function() {
-	this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, false);
+	this.handleArray[2] = new ED.Doodle.Handle(null, true, ED.Mode.Scale, false);
 }
 
 /**
@@ -34024,7 +34024,7 @@ ED.RPEAtrophy.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.RPEAtrophy.prototype.setHandles = function() {
-	this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, false);
+	this.handleArray[2] = new ED.Doodle.Handle(null, true, ED.Mode.Scale, false);
 }
 
 /**
@@ -34313,7 +34313,7 @@ ED.RPEHypertrophy.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.RPEHypertrophy.prototype.setHandles = function() {
-	this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, false);
+	this.handleArray[2] = new ED.Doodle.Handle(null, true, ED.Mode.Scale, false);
 }
 
 /**
@@ -35474,7 +35474,7 @@ ED.RetinalHaemorrhage.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.RetinalHaemorrhage.prototype.setHandles = function() {
-	this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, false);
+	this.handleArray[2] = new ED.Doodle.Handle(null, true, ED.Mode.Scale, false);
 }
 
 /**
@@ -35995,7 +35995,7 @@ ED.RingSegment.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.RingSegment.prototype.setHandles = function() {
-	this.handleArray[3] = new ED.Handle(null, true, ED.Mode.Arc, false);
+	this.handleArray[3] = new ED.Doodle.Handle(null, true, ED.Mode.Arc, false);
 }
 
 /**
@@ -39298,7 +39298,7 @@ ED.TrabyConjIncision.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.TrabyConjIncision.prototype.setHandles = function() {
-	this.handleArray[0] = new ED.Handle(null, true, ED.Mode.Arc, false);
+	this.handleArray[0] = new ED.Doodle.Handle(null, true, ED.Mode.Arc, false);
 }
 
 /**
@@ -39961,7 +39961,7 @@ ED.TrabySuture.prototype.draw = function(_point) {
 					
 				// Array of handles for releasable suture
 				for (var i = 0; i < this.numberOfHandles; i++) {
-					this.handleArray[i] = new ED.Handle(null, true, ED.Mode.Handles, false);
+					this.handleArray[i] = new ED.Doodle.Handle(null, true, ED.Mode.Handles, false);
 					this.handleArray[i].location = this.transform.transformPoint(this.squiggleArray[0].pointsArray[i]);
 				}
 				break;
@@ -39978,7 +39978,7 @@ ED.TrabySuture.prototype.draw = function(_point) {
 				ctx.bezierCurveTo(32, 74, 34, 100, 34, 100);
 				
 				this.handleArray.length = 1;
-				this.handleArray[0] = new ED.Handle(null, true, ED.Mode.Rotate, false);
+				this.handleArray[0] = new ED.Doodle.Handle(null, true, ED.Mode.Rotate, false);
 				this.handleArray[0].location = this.transform.transformPoint(new ED.Point(40, -70));
 				break;
 
@@ -39991,7 +39991,7 @@ ED.TrabySuture.prototype.draw = function(_point) {
 				ctx.lineTo(5, 50);
 				
 				this.handleArray.length = 1;
-				this.handleArray[0] = new ED.Handle(null, true, ED.Mode.Rotate, false);
+				this.handleArray[0] = new ED.Doodle.Handle(null, true, ED.Mode.Rotate, false);
 				this.handleArray[0].location = this.transform.transformPoint(new ED.Point(40, -70));
 				break;
 		}
