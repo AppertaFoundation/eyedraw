@@ -98,11 +98,9 @@
 		tabindex="1" data-drawing-name="<?php echo $drawingName ?>"
 		<?php if ($canvasStyle) { ?> style="<?php echo $canvasStyle ?>"<?php } ?>>
 	</canvas>
-	<?php if ($inputId) { ?>
-	<input type="hidden" id="<?php echo $inputId ?>"
-		name="<?php echo $inputName ?>"
-		value='<?php echo $this->model[$this->attribute] ?>' />
-	<?php } ?>
+	<?php if ($inputId) {?>
+		<?php echo CHtml::hiddenField($inputName,$this->model[$this->attribute])?>
+	<?php }?>
 </div>
 
 <script type="text/javascript">
