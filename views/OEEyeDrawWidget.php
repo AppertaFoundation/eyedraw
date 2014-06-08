@@ -41,7 +41,6 @@
 		<div class="ed-editor-container">
 
 			<div class="ed-editor">
-
 				<?php if ($showDrawingControls && $mode !== 'view') {?>
 					<div class="ed-drawing-controls">
 						<!-- DRAWING TOOLBAR -->
