@@ -59,13 +59,13 @@ ED.RecordReading.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'int',
 		range: new ED.Range(0, 240),
-		animate: true
+		animate: false
 	};
 	this.parameterValidationArray['type'] = {
 		kind: 'derived',
 		type: 'string',
 		list: ['sys', 'dia', 'pul', 'res', 'oxi'],
-		animate: true
+		animate: false
 	};
 }
 

@@ -76,7 +76,7 @@ ED.CornealOedema.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'string',
 		list: ['Mild', 'Moderate', 'Severe'],
-		animate: true
+		animate: false
 	};
 
 	/*

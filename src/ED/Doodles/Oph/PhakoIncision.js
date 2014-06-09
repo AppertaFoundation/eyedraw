@@ -101,7 +101,7 @@ ED.PhakoIncision.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'string',
 		list: ['Pocket', 'Section'],
-		animate: true
+		animate: false
 	};
 }
 

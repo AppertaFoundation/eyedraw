@@ -10344,13 +10344,13 @@ ED.RecordReading.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'int',
 		range: new ED.Range(0, 240),
-		animate: true
+		animate: false
 	};
 	this.parameterValidationArray['type'] = {
 		kind: 'derived',
 		type: 'string',
 		list: ['sys', 'dia', 'pul', 'res', 'oxi'],
-		animate: true
+		animate: false
 	};
 }
 
@@ -16379,7 +16379,7 @@ ED.AxialLengthGraph.prototype.setPropertyDefaults = function() {
 		type: 'float',
 		precision: 2,
 		range: new ED.Range(14, 38),
-		animate: true
+		animate: false
 	};
 }
 
@@ -20178,7 +20178,7 @@ ED.CornealOedema.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'string',
 		list: ['Mild', 'Moderate', 'Severe'],
-		animate: true
+		animate: false
 	};
 
 	/*
@@ -26076,7 +26076,7 @@ ED.InjectionSite.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'string',
 		list: ['4.5', '4.0', '3.5', '3.0', '2.5'],
-		animate: true
+		animate: false
 	};
 }
 
@@ -32126,7 +32126,7 @@ ED.PhakoIncision.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'string',
 		list: ['Pocket', 'Section'],
-		animate: true
+		animate: false
 	};
 }
 
@@ -33012,13 +33012,13 @@ ED.PosteriorCapsule.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'string',
 		list: ['None', 'Mild', 'Moderate', 'Dense'],
-		animate: true
+		animate: false
 	};
 	this.parameterValidationArray['capsulotomy'] = {
 		kind: 'derived',
 		type: 'string',
 		list: ['None', 'Diamond', 'Circle'],
-		animate: true
+		animate: false
 	};
 }
 
@@ -36771,13 +36771,13 @@ ED.Sclerostomy.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'string',
 		list: ['20g', '23g', '25g', '27g'],
-		animate: true
+		animate: false
 	};
 	this.parameterValidationArray['gauge'] = {
 		kind: 'derived',
 		type: 'string',
 		list: ['20g', '23g', '25g', '27g'],
-		animate: true
+		animate: false
 	};
 	this.parameterValidationArray['isSutured'] = {
 		kind: 'derived',

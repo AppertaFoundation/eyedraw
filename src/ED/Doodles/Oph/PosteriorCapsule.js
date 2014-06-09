@@ -67,13 +67,13 @@ ED.PosteriorCapsule.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'string',
 		list: ['None', 'Mild', 'Moderate', 'Dense'],
-		animate: true
+		animate: false
 	};
 	this.parameterValidationArray['capsulotomy'] = {
 		kind: 'derived',
 		type: 'string',
 		list: ['None', 'Diamond', 'Circle'],
-		animate: true
+		animate: false
 	};
 }
 

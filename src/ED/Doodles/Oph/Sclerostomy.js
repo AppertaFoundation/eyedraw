@@ -75,13 +75,13 @@ ED.Sclerostomy.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'string',
 		list: ['20g', '23g', '25g', '27g'],
-		animate: true
+		animate: false
 	};
 	this.parameterValidationArray['gauge'] = {
 		kind: 'derived',
 		type: 'string',
 		list: ['20g', '23g', '25g', '27g'],
-		animate: true
+		animate: false
 	};
 	this.parameterValidationArray['isSutured'] = {
 		kind: 'derived',
