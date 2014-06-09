@@ -24,9 +24,6 @@
 	position: absolute;
 	top: 0;
 	z-index: 100;
-	-webkit-transform: translate3d(0, 0, 0);
-	-webkit-backface-visibility: hidden;
-	-webkit-perspective: 1000;
 	opacity: 1;
 	// default width, override in the module
 	width: 188px;
