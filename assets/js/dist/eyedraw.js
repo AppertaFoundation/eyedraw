@@ -492,12 +492,9 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 			].join(')|(') + ')';
 
 			do {
-				if (new RegExp(ignore).test(elem.className)) {
-					isEyeDrawElement = true;
-					break;
-				}
+				isEyeDrawElement = new RegExp(ignore).test(elem.className);
 			} while (
-				(elem = elem.parentNode) && (elem !== document.body)
+				(elem = elem.parentNode) && (elem !== document.body) && (!isEyeDrawElement)
 			);
 
 			if (!isEyeDrawElement) {
@@ -6594,50 +6591,6 @@ ED.Colour.prototype.json = function() {
  * along with OpenEyes.  If not, see <http://www.gnu.org/licenses/>.
  */
 
- /**
- * Represents a control handle on the doodle
- *
- * @class Handle
- * @property {Point} location Location in doodle plane
- * @property {Bool} isVisible Flag indicating whether handle should be shown
- * @property {Enum} mode The drawing mode that selection of the handle triggers
- * @property {Bool} isRotatable Flag indicating whether the handle shows an outer ring used for rotation
- * @param {Point} _location
- * @param {Bool} _isVisible
- * @param {Enum} _mode
- * @param {Bool} _isRotatable
- */
-ED.Handle = function(_location, _isVisible, _mode, _isRotatable) {
-	// Properties
-	if (_location == null) {
-		this.location = new ED.Point(0, 0);
-	} else {
-		this.location = _location;
-	}
-	this.isVisible = _isVisible;
-	this.mode = _mode;
-	this.isRotatable = _isRotatable;
-}
-
-/**
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2014
- * This file is part of OpenEyes.
- *
- * OpenEyes is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * OpenEyes is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with OpenEyes.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 /**
  * Represents a point in two dimensional space
  * @class Point
@@ -7672,10 +7625,14 @@ ED.Views.Toolbar = (function() {
 	 * Bind UI events.
 	 */
 	Toolbar.prototype.bindEvents = function() {
+
+		$(document).click(this.hideDrawers.bind(this));
+
 		this.container
-			.on('click.' + EVENT_NAMESPACE, '.ed-button', this.onButtonClick.bind(this))
-			.on('mouseenter.' + EVENT_NAMESPACE, '.ed-button', this.onButtonMouseEnter.bind(this))
-			.on('mouseleave.' + EVENT_NAMESPACE, '.ed-button', this.onButtonMouseLeave.bind(this));
+		.on('click.' + EVENT_NAMESPACE, '.ed-button-more', this.onMoreButtonClick.bind(this))
+		.on('click.' + EVENT_NAMESPACE, '.ed-button', this.onButtonClick.bind(this))
+		.on('mouseenter.' + EVENT_NAMESPACE, '.ed-button', this.onButtonMouseEnter.bind(this))
+		.on('mouseleave.' + EVENT_NAMESPACE, '.ed-button', this.onButtonMouseLeave.bind(this))
 	};
 
 	Toolbar.prototype.enableButton = function(button) {
@@ -7747,6 +7704,11 @@ ED.Views.Toolbar = (function() {
 		});
 	};
 
+	Toolbar.prototype.hideDrawers = function() {
+		var openDrawers = this.container.find('.ed-drawer-open');
+		openDrawers.removeClass('ed-drawer-open');
+	}
+
 	/*********************
 	 * EVENT HANDLERS
 	 *********************/
@@ -7756,13 +7718,27 @@ ED.Views.Toolbar = (function() {
 	 * @param  {Object} e Event object.
 	 */
 	Toolbar.prototype.onButtonClick = function(e) {
-
 		e.preventDefault();
 		e.stopImmediatePropagation();
 
-		var button = $(e.currentTarget);
+		this.hideDrawers();
 
+		var button = $(e.currentTarget);
 		this.execButtonFunction(button);
+	};
+
+	/**
+	 * Show the hidden toolbar when clicking on a more button.
+	 * @param  {Object} e Event object.
+	 */
+	Toolbar.prototype.onMoreButtonClick = function(e) {
+		e.preventDefault();
+		e.stopImmediatePropagation();
+
+		this.hideDrawers();
+
+		var button = $(e.currentTarget);
+		button.closest('li').addClass('ed-drawer-open');
 	};
 
 	/**
@@ -7787,7 +7763,7 @@ ED.Views.Toolbar = (function() {
 
 	return Toolbar;
 }());
-/*! Generated on 2/6/2014 */
+/*! Generated on 9/6/2014 */
 ED.scriptTemplates = {
   "doodle-popup": "\n\n\n\n{{#doodle}}\n\t<ul class=\"ed-toolbar-panel ed-doodle-popup-toolbar\">\n\t\t<li>\n\t\t\t<a class=\"ed-button ed-doodle-help{{lockedButtonClass}}\" href=\"#\" data-function=\"toggleHelp\">\n\t\t\t\t<span class=\"icon-ed-help\"></span>\n\t\t\t</a>\n\t\t</li>\n\t\t{{#doodle.isLocked}}\n\t\t\t<li>\n\t\t\t\t<a class=\"ed-button\" href=\"#\" data-function=\"unlock\">\n\t\t\t\t\t<span class=\"icon-ed-unlock\"></span>\n\t\t\t\t\t<span class=\"label\">Unlock</span>\n\t\t\t\t</a>\n\t\t\t</li>\n\t\t{{/doodle.isLocked}}\n\t\t{{^doodle.isLocked}}\n\t\t\t<li>\n\t\t\t\t<a class=\"ed-button\" href=\"#\" data-function=\"lock\">\n\t\t\t\t\t<span class=\"icon-ed-lock\"></span>\n\t\t\t\t\t<span class=\"label\">Lock</span>\n\t\t\t\t</a>\n\t\t\t</li>\n\t\t{{/doodle.isLocked}}\n\t\t<li>\n\t\t\t<a class=\"ed-button{{lockedButtonClass}}\" href=\"#\" data-function=\"moveToBack\">\n\t\t\t\t<span class=\"icon-ed-move-to-back\"></span>\n\t\t\t\t<span class=\"label\">Move to back</span>\n\t\t\t</a>\n\t\t</li>\n\t\t<li>\n\t\t\t<a class=\"ed-button{{lockedButtonClass}}\" href=\"#\" data-function=\"moveToFront\">\n\t\t\t\t<span class=\"icon-ed-move-to-front\"></span>\n\t\t\t\t<span class=\"label\">Move to front</span>\n\t\t\t</a>\n\t\t</li>\n\t\t{{#doodle.isDeletable}}\n\t\t\t<li>\n\t\t\t\t<a class=\"ed-button{{lockedButtonClass}}\" href=\"#\" data-function=\"deleteSelectedDoodle\">\n\t\t\t\t\t<span class=\"icon-ed-delete\"></span>\n\t\t\t\t\t<span class=\"label\">Delete</span>\n\t\t\t\t</a>\n\t\t\t</li>\n\t\t{{/doodle.isDeletable}}\n\t</ul>\n\t<div class=\"ed-doodle-info hide\">\n\t\t{{#doodle.isLocked}}\n\t\t\t<div class=\"ed-doodle-description\">\n\t\t\t\t<strong>This doodle is locked and cannot be edited.</strong>\n\t\t\t</div>\n\t\t{{/doodle.isLocked}}\n\t\t{{^doodle.isLocked}}\n\t\t\t{{#desc}}\n\t\t\t\t<div class=\"ed-doodle-description\">{{{desc}}}</div>\n\t\t\t{{/desc}}\n\t\t{{/doodle.isLocked}}\n\t</div>\n\t<div class=\"ed-doodle-controls{{#doodle.isLocked}} hide{{/doodle.isLocked}}\" id=\"{{drawing.canvas.id}}_controls\">\n\t</div>\n{{/doodle}}"
 };

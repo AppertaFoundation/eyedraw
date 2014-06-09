@@ -65,6 +65,12 @@ class OEEyeDrawWidget extends CWidget
 	public $showDoodlePopup = true;
 
 	/**
+	 * Maximum amount of toolbar buttons to display in a panel.
+	 * @var integer Set to -1 to show all buttons.
+	 */
+	public $maxToolbarButtons = -1;
+
+	/**
 	 * Array of EyeDraw script files required (defaults to all available files)
 	 * @todo Search model attribute and contents of doodleToolBarArray to determine subset of files to register
 	 * @var array
@@ -329,8 +335,13 @@ class OEEyeDrawWidget extends CWidget
 		// Register inline scripts
 		$this->registerScripts();
 
+		// As the view might use partials, and there's no way to define global view vars,
+		// we store a reference to the data array, so we can pass-through to the partials.
+		$data = get_object_vars($this);
+		$data['data'] = $data;
+
 		// Render the widget
-		$this->render($this->template, get_object_vars($this));
+		$this->render($this->template, $data);
 	}
 
 	/**

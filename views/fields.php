@@ -17,13 +17,9 @@
  * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
  */
 ?>
-<div class="EyeDrawWidget ed-widget <?php echo ($isEditable) ? ' edit' : ' display';?>" id="eyedrawwidget_<?php echo $idSuffix ?>">
-	<div class="ed-body">
-		<div class="ed-editor-container">
-			<?php $this->render('toolbar', $data);?>
-			<?php $this->render('editor', $data);?>
-		</div>
-		<?php $this->render('fields', $data);?>
-	</div>
-</div>
 
+<?php if ($isEditable) {?>
+	<div class="ed-fields-container">
+		<?php echo $fields;?>
+	</div>
+<?php }?>
