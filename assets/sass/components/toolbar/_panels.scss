@@ -26,20 +26,6 @@
 		float: left;
 		margin: 0 3px 3px 0;
 		position: relative;
-		// Drop-menu
-		ul {
-			@include box-shadow(1px 3px 8px 1px rgba(0, 0, 0, 0.3));
-			background: #fff;
-			border: 1px solid #ccc;
-			display: none;
-			left: 3px;
-			margin: 0;
-			padding: 3px 0 0 3px;
-			position: absolute;
-			top: 36px;
-			width: 148px;
-			z-index: 99;
-		}
 		&.active {
 			ul {
 				display: block;
@@ -56,6 +42,25 @@
 		.ed-button {
 			background: none;
 			border: 0;
+		}
+	}
+	// Drop-menu
+	.ed-toolbar-panel-drawer {
+		@include box-shadow(1px 3px 8px 1px rgba(0, 0, 0, 0.3));
+		background: #fff;
+		border: 1px solid #ccc;
+		display: none;
+		left: 3px;
+		margin: 0;
+		padding: 3px 0 0 3px;
+		position: absolute;
+		top: 36px;
+		width: 148px;
+		z-index: 102;
+	}
+	.ed-drawer-open {
+		.ed-toolbar-panel-drawer {
+			display: block;
 		}
 	}
 }

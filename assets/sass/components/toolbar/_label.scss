@@ -25,17 +25,18 @@
 		position: absolute;
 		top: 32px;
 		white-space: nowrap;
-		z-index: 102;
-	}
-	&:active {
-		.label {
-			left: -9999px;
-		}
+		z-index: 103;
 	}
 	&:hover {
 		.label {
 			@include transition-delay(0.25s);
 			left: -1px;
+		}
+	}
+	&:active, .ed-drawer-open > & {
+		.label {
+			@include transition-delay(0s);
+			left: -9999px;
 		}
 	}
 	&.disabled {

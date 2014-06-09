@@ -67,10 +67,14 @@ ED.Views.Toolbar = (function() {
 	 * Bind UI events.
 	 */
 	Toolbar.prototype.bindEvents = function() {
+
+		$(document).click(this.hideDrawers.bind(this));
+
 		this.container
-			.on('click.' + EVENT_NAMESPACE, '.ed-button', this.onButtonClick.bind(this))
-			.on('mouseenter.' + EVENT_NAMESPACE, '.ed-button', this.onButtonMouseEnter.bind(this))
-			.on('mouseleave.' + EVENT_NAMESPACE, '.ed-button', this.onButtonMouseLeave.bind(this));
+		.on('click.' + EVENT_NAMESPACE, '.ed-button-more', this.onMoreButtonClick.bind(this))
+		.on('click.' + EVENT_NAMESPACE, '.ed-button', this.onButtonClick.bind(this))
+		.on('mouseenter.' + EVENT_NAMESPACE, '.ed-button', this.onButtonMouseEnter.bind(this))
+		.on('mouseleave.' + EVENT_NAMESPACE, '.ed-button', this.onButtonMouseLeave.bind(this))
 	};
 
 	Toolbar.prototype.enableButton = function(button) {
@@ -142,6 +146,11 @@ ED.Views.Toolbar = (function() {
 		});
 	};
 
+	Toolbar.prototype.hideDrawers = function() {
+		var openDrawers = this.container.find('.ed-drawer-open');
+		openDrawers.removeClass('ed-drawer-open');
+	}
+
 	/*********************
 	 * EVENT HANDLERS
 	 *********************/
@@ -151,13 +160,27 @@ ED.Views.Toolbar = (function() {
 	 * @param  {Object} e Event object.
 	 */
 	Toolbar.prototype.onButtonClick = function(e) {
-
 		e.preventDefault();
 		e.stopImmediatePropagation();
 
-		var button = $(e.currentTarget);
+		this.hideDrawers();
 
+		var button = $(e.currentTarget);
 		this.execButtonFunction(button);
+	};
+
+	/**
+	 * Show the hidden toolbar when clicking on a more button.
+	 * @param  {Object} e Event object.
+	 */
+	Toolbar.prototype.onMoreButtonClick = function(e) {
+		e.preventDefault();
+		e.stopImmediatePropagation();
+
+		this.hideDrawers();
+
+		var button = $(e.currentTarget);
+		button.closest('li').addClass('ed-drawer-open');
 	};
 
 	/**

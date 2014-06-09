@@ -232,12 +232,9 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 			].join(')|(') + ')';
 
 			do {
-				if (new RegExp(ignore).test(elem.className)) {
-					isEyeDrawElement = true;
-					break;
-				}
+				isEyeDrawElement = new RegExp(ignore).test(elem.className);
 			} while (
-				(elem = elem.parentNode) && (elem !== document.body)
+				(elem = elem.parentNode) && (elem !== document.body) && (!isEyeDrawElement)
 			);
 
 			if (!isEyeDrawElement) {

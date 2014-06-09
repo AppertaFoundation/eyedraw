@@ -54,7 +54,7 @@
 						</ul>
 						<!-- SELECTED DOODLE -->
 						<div class="ed-selected-doodle">
-							<select class="ed-selected-doodle-select" id="ed_example_selected_doodle">>
+							<select class="ed-selected-doodle-select" id="ed_example_selected_doodle" class="ed-selected-doodle-select">
 							</select>
 						</div>
 					</div>
