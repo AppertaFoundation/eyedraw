@@ -29,8 +29,8 @@ ED.Supramid = function(_drawing, _parameterJSON) {
 	this.className = "Supramid";
 
 	// Saved parameters
-	this.savedParameterArray = ['apexY', 'rotation'];
-	
+	this.savedParameterArray = ['apexX', 'apexY', 'rotation'];
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
@@ -86,7 +86,7 @@ ED.Supramid.prototype.draw = function(_point) {
 
 	// Call draw method in superclass
 	ED.Supramid.superclass.draw.call(this, _point);
-	
+
 	// Get tube doodle
 	var doodle = this.drawing.lastDoodleOfClass("Tube");
 	if (doodle) {
