@@ -1,17 +1,4 @@
-scriptsLoadCallback({
-  "files": [
-    "ED.js",
-    "ED/Drawing.js",
-    "ED/Drawing/AffineTransform.js",
-    "ED/Drawing/Colour.js",
-    "ED/Drawing/Point.js",
-    "ED/Drawing/Range.js",
-    "ED/Drawing/Squiggle.js",
-    "ED/Checker.js",
-    "ED/Controller.js",
-    "ED/Doodle.js",
-    "ED/Report.js",
-    "ED/View.js",
+window.eyedrawDoodleScripts = [
     "ED/Doodles/An/AgentDose.js",
     "ED/Doodles/An/AgentDuration.js",
     "ED/Doodles/An/RecordGrid.js",
@@ -201,23 +188,5 @@ scriptsLoadCallback({
     "ED/Doodles/Oph/ViewObscured.js",
     "ED/Doodles/Oph/VisualField.js",
     "ED/Doodles/Oph/VisualFieldChart.js",
-    "ED/Doodles/Oph/VitreousOpacity.js",
-    "ED/Misc/Categories.js",
-    "ED/Misc/FamilyMember.js",
-    "ED/Misc/Freehand.js",
-    "ED/Misc/General.js",
-    "ED/Misc/GraphAxes.js",
-    "ED/Misc/Label.js",
-    "ED/Misc/MemberConnector.js",
-    "ED/Misc/OperatingTable.js",
-    "ED/Misc/Slider2D.js",
-    "ED/Misc/Surgeon.js",
-    "ED/Misc/Tooltips.js",
-    "ED/Views/DoodlePopup.js",
-    "ED/Views/SelectedDoodle.js",
-    "ED/Views/Toolbar.js",
-    "ED/Views/templates.js",
-    "ED/Views/DoodlePopup/Help.js",
-    "OEEyeDraw.js"
-  ]
-});
+    "ED/Doodles/Oph/VitreousOpacity.js"
+];
