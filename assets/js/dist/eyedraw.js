@@ -7763,7 +7763,7 @@ ED.Views.Toolbar = (function() {
 
 	return Toolbar;
 }());
-/*! Generated on 12/6/2014 */
+/*! Generated on 13/6/2014 */
 ED.scriptTemplates = {
   "doodle-popup": "\n\n\n\n{{#doodle}}\n\t<ul class=\"ed-toolbar-panel ed-doodle-popup-toolbar\">\n\t\t<li>\n\t\t\t<a class=\"ed-button ed-doodle-help{{lockedButtonClass}}\" href=\"#\" data-function=\"toggleHelp\">\n\t\t\t\t<span class=\"icon-ed-help\"></span>\n\t\t\t</a>\n\t\t</li>\n\t\t{{#doodle.isLocked}}\n\t\t\t<li>\n\t\t\t\t<a class=\"ed-button\" href=\"#\" data-function=\"unlock\">\n\t\t\t\t\t<span class=\"icon-ed-unlock\"></span>\n\t\t\t\t\t<span class=\"label\">Unlock</span>\n\t\t\t\t</a>\n\t\t\t</li>\n\t\t{{/doodle.isLocked}}\n\t\t{{^doodle.isLocked}}\n\t\t\t<li>\n\t\t\t\t<a class=\"ed-button\" href=\"#\" data-function=\"lock\">\n\t\t\t\t\t<span class=\"icon-ed-lock\"></span>\n\t\t\t\t\t<span class=\"label\">Lock</span>\n\t\t\t\t</a>\n\t\t\t</li>\n\t\t{{/doodle.isLocked}}\n\t\t<li>\n\t\t\t<a class=\"ed-button{{lockedButtonClass}}\" href=\"#\" data-function=\"moveToBack\">\n\t\t\t\t<span class=\"icon-ed-move-to-back\"></span>\n\t\t\t\t<span class=\"label\">Move to back</span>\n\t\t\t</a>\n\t\t</li>\n\t\t<li>\n\t\t\t<a class=\"ed-button{{lockedButtonClass}}\" href=\"#\" data-function=\"moveToFront\">\n\t\t\t\t<span class=\"icon-ed-move-to-front\"></span>\n\t\t\t\t<span class=\"label\">Move to front</span>\n\t\t\t</a>\n\t\t</li>\n\t\t{{#doodle.isDeletable}}\n\t\t\t<li>\n\t\t\t\t<a class=\"ed-button{{lockedButtonClass}}\" href=\"#\" data-function=\"deleteSelectedDoodle\">\n\t\t\t\t\t<span class=\"icon-ed-delete\"></span>\n\t\t\t\t\t<span class=\"label\">Delete</span>\n\t\t\t\t</a>\n\t\t\t</li>\n\t\t{{/doodle.isDeletable}}\n\t</ul>\n\t<div class=\"ed-doodle-info hide\">\n\t\t{{#doodle.isLocked}}\n\t\t\t<div class=\"ed-doodle-description\">\n\t\t\t\t<strong>This doodle is locked and cannot be edited.</strong>\n\t\t\t</div>\n\t\t{{/doodle.isLocked}}\n\t\t{{^doodle.isLocked}}\n\t\t\t{{#desc}}\n\t\t\t\t<div class=\"ed-doodle-description\">{{{desc}}}</div>\n\t\t\t{{/desc}}\n\t\t{{/doodle.isLocked}}\n\t</div>\n\t<div class=\"ed-doodle-controls{{#doodle.isLocked}} hide{{/doodle.isLocked}}\" id=\"{{drawing.canvas.id}}_controls\">\n\t</div>\n{{/doodle}}"
 };
@@ -10344,13 +10344,13 @@ ED.RecordReading.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'int',
 		range: new ED.Range(0, 240),
-		animate: true
+		animate: false
 	};
 	this.parameterValidationArray['type'] = {
 		kind: 'derived',
 		type: 'string',
 		list: ['sys', 'dia', 'pul', 'res', 'oxi'],
-		animate: true
+		animate: false
 	};
 }
 
@@ -16379,7 +16379,7 @@ ED.AxialLengthGraph.prototype.setPropertyDefaults = function() {
 		type: 'float',
 		precision: 2,
 		range: new ED.Range(14, 38),
-		animate: true
+		animate: false
 	};
 }
 
@@ -20178,7 +20178,7 @@ ED.CornealOedema.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'string',
 		list: ['Mild', 'Moderate', 'Severe'],
-		animate: true
+		animate: false
 	};
 
 	/*
@@ -26076,7 +26076,7 @@ ED.InjectionSite.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'string',
 		list: ['4.5', '4.0', '3.5', '3.0', '2.5'],
-		animate: true
+		animate: false
 	};
 }
 
@@ -32126,7 +32126,7 @@ ED.PhakoIncision.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'string',
 		list: ['Pocket', 'Section'],
-		animate: true
+		animate: false
 	};
 }
 
@@ -33012,13 +33012,13 @@ ED.PosteriorCapsule.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'string',
 		list: ['None', 'Mild', 'Moderate', 'Dense'],
-		animate: true
+		animate: false
 	};
 	this.parameterValidationArray['capsulotomy'] = {
 		kind: 'derived',
 		type: 'string',
 		list: ['None', 'Diamond', 'Circle'],
-		animate: true
+		animate: false
 	};
 }
 
@@ -36771,13 +36771,13 @@ ED.Sclerostomy.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'string',
 		list: ['20g', '23g', '25g', '27g'],
-		animate: true
+		animate: false
 	};
 	this.parameterValidationArray['gauge'] = {
 		kind: 'derived',
 		type: 'string',
 		list: ['20g', '23g', '25g', '27g'],
-		animate: true
+		animate: false
 	};
 	this.parameterValidationArray['isSutured'] = {
 		kind: 'derived',
@@ -38418,8 +38418,8 @@ ED.Supramid = function(_drawing, _parameterJSON) {
 	this.className = "Supramid";
 
 	// Saved parameters
-	this.savedParameterArray = ['apexY', 'rotation'];
-	
+	this.savedParameterArray = ['apexX', 'apexY', 'rotation'];
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
@@ -38475,7 +38475,7 @@ ED.Supramid.prototype.draw = function(_point) {
 
 	// Call draw method in superclass
 	ED.Supramid.superclass.draw.call(this, _point);
-	
+
 	// Get tube doodle
 	var doodle = this.drawing.lastDoodleOfClass("Tube");
 	if (doodle) {

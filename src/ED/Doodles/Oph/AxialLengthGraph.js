@@ -70,7 +70,7 @@ ED.AxialLengthGraph.prototype.setPropertyDefaults = function() {
 		type: 'float',
 		precision: 2,
 		range: new ED.Range(14, 38),
-		animate: true
+		animate: false
 	};
 }
 

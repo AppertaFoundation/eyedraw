@@ -70,7 +70,7 @@ ED.InjectionSite.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'string',
 		list: ['4.5', '4.0', '3.5', '3.0', '2.5'],
-		animate: true
+		animate: false
 	};
 }
 
