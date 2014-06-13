@@ -355,6 +355,11 @@ ED.Doodle = function(_drawing, _parameterJSON) {
 			this.isSelected = false;
 			this.isForDrawing = false;
 		}
+
+		// Store original scaleX and scaleY so we can restore the scaling when
+		// zoom the drawing.
+		this.origScaleX = this.scaleX;
+		this.origScaleY = this.scaleY;
 	}
 }
 
@@ -2184,7 +2189,34 @@ ED.Doodle.prototype.addEllipseToPath = function(_ctx, _x, _y, _w, _h) {
  */
 ED.Doodle.prototype.xForY = function(_r, _y) {
 	return Math.sqrt(_r * _r - _y * _y);
-}
+};
+
+/**
+ * Set the scale level.
+ * @param {Number} _level The scaling level.
+ */
+ED.Doodle.prototype.setScaleLevel = function(_level) {
+
+	var diffX = 1;
+	var diffY = 1;
+
+	// Check if the scaling has since been changed. This happens when a
+	// doodle changes the scaling.
+	if (this.scaleLevel) {
+		var scaleX = this.scaleX / this.scaleLevel;
+		if (scaleX !== this.origScaleX) {
+			diffX = scaleX / this.origScaleX;
+		}
+		var scaleY = this.scaleY / this.scaleLevel;
+		if (scaleY !== this.origScaleY) {
+			diffY = scaleY / this.origScaleY;
+		}
+	}
+
+	this.scaleX = this.origScaleX * _level * diffX;
+	this.scaleY = this.origScaleY * _level * diffY;
+	this.scaleLevel = _level;
+};
 
 /**
  * Outputs doodle information to the console
@@ -2219,4 +2251,4 @@ ED.Doodle.Handle = function(_location, _isVisible, _mode, _isRotatable) {
 	this.isVisible = _isVisible;
 	this.mode = _mode;
 	this.isRotatable = _isRotatable;
-}
+};

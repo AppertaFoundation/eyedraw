@@ -26,7 +26,7 @@ ED.Views.Toolbar.Drawing = (function() {
 
 	function DrawingToolbar(drawing, container) {
 		ED.Views.Toolbar.apply(this, arguments);
-		this.zoomIcon = this.container.find('.icon-ed-zoom-in');
+		this.zoomIcon = this.container.find('[class^=icon-ed-zoom]');
 	}
 
 	DrawingToolbar.prototype = Object.create(ED.Views.Toolbar.prototype);

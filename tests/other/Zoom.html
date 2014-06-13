@@ -15,19 +15,14 @@
 	<script type="text/javascript" src="../../assets/components/eventemitter2/lib/eventemitter2.js"></script>
 
 	<!-- Load in the eyedraw scripts -->
+	<script type="text/javascript" src="./js/scripts.js"></script>
+	<script type="text/javascript" src="./js/doodleTitles.js"></script>
 	<script>
-	(function() {
-		// We have to use 'jsonp' here so that we can run this test document on the
-		// file:// protocol (ie, without the use of a webserver)
-		this.scriptsLoadCallback = function(obj) {
-			obj.files.forEach(function(file) {
-				// We use document.write to force the files to be loaded synchronously.
-				document.write('<script src="../../src/' + file + '"><\/script>');
-			});
-		};
-	}.call(this));
+		this.eyedrawScripts.forEach(function(file) {
+			// We use document.write to force the files to be loaded synchronously.
+			document.write('<script src="../../src/' + file + '"><\/script>');
+		});
 	</script>
-	<script type="text/javascript" src="./doodle-popup/js/scripts.jsonp"></script>
 	<!-- End loading in eyedraw scripts -->
 
 	<style type="text/css">
@@ -40,8 +35,6 @@
 </head>
 <body>
 	<div class="container main" role="main">
-
-		<p>This example shows how to init an eyedraw.</p>
 
 		<!-- EYEDRAW WIDGET START -->
 		<div class="ed-widget" id="eyedrawwidget_example">
@@ -129,6 +122,12 @@
 							<span class="label">Posterior synechia</span>
 						</a>
 					</li>
+					<li>
+						<a class="ed-button" href="#" data-function="addDoodle" data-arg="PhakoIncision">
+							<span class="icon-ed-PhakoIncision"></span>
+							<span class="label">PhakoIncision</span>
+						</a>
+					</li>
 				</ul>
 				<!-- PANEL END -->
 			</div>
@@ -149,8 +148,8 @@
 									</a>
 								</li>
 								<li>
-									<a class="ed-button" href="#" data-function="toogleZoom">
-										<span class="icon-ed-zoom-in"></span>
+									<a class="ed-button" href="#" data-function="toggleZoom">
+										<span class="icon-ed-zoom-out"></span>
 										<span class="label">Toogle Zoom</span>
 									</a>
 								</li>
@@ -189,191 +188,21 @@
 		</div>
 	</div>
 
-
 	<script>
 	(function() {
-		ED.setTitles({
-			"NONE": "No description available for this doodle",
-			"ACIOL": "Anterior chamber IOL",
-			"AdnexalEye": "Adnexal eye template",
-			"Ahmed": "Ahmed tube",
-			"AngleGrade": "Angle grade",
-			"AngleNV": "Angle new vessels",
-			"AngleRecession": "Angle recession",
-			"AntPVR": "Anterior PVR",
-			"AntSeg": "Anterior segment",
-			"AntSynech": "Anterior synechiae",
-			"APattern": "A pattern",
-			"ArcuateScotoma": "Arcuate scotoma",
-			"Arrow": "Arrow",
-			"Baerveldt": "Baerveld tube",
-			"BiopsySite": "Biopsy site",
-			"Bleb": "Trabeculectomy bleb",
-			"BlotHaemorrhage": "Blot haemorrhage",
-			"Buckle": "Buckle",
-			"BuckleOperation": "Buckle operation",
-			"BuckleSuture": "Buckle suture",
-			"BusaccaNodule": "Busacca nodule",
-			"CapsularTensionRing": "Capsular Tension Ring",
-			"ChandelierDouble": "Double chandelier",
-			"ChandelierSingle": "Chandelier",
-			"ChoroidalHaemorrhage": "Choroidal haemorrhage",
-			"ChoroidalNaevus": "Choroidal naevus",
-			"CiliaryInjection": "Cilary injection",
-			"Circinate": "Circinate retinopathy",
-			"CircumferentialBuckle": "Circumferential buckle",
-			"CNV": "Choroidal new vessels",
-			"ConjunctivalFlap": "Conjunctival flap",
-			"CornealAbrasion": "Corneal abrasion",
-			"CornealErosion": "Removal of corneal epithelium",
-			"CornealGraft": "Corneal graft",
-			"CornealOedema": "Corneal oedema",
-			"CornealScar": "Corneal scar",
-			"CornealStriae": "Corneal striae",
-			"CornealSuture": "Corneal suture",
-			"CorticalCataract": "Cortical cataract",
-			"CottonWoolSpot": "Cotton wool spot",
-			"Cryo": "Cryotherapy scar",
-			"CutterPI": "Cutter iridectomy",
-			"CystoidMacularOedema": "Cystoid macular oedema",
-			"DiabeticNV": "Diabetic new vessels",
-			"Dialysis": "Dialysis",
-			"DiscHaemorrhage": "Disc haemorrhage",
-			"DiscPallor": "Disc pallor",
-			"DrainageRetinotomy": "Drainage retinotomy",
-			"DrainageSite": "Drainage site",
-			"EncirclingBand": "Encircling band",
-			"EntrySiteBreak": "Entry site break",
-			"EpiretinalMembrane": "Epiretinal membrane",
-			"FibrousProliferation": "Fibrous proliferation",
-			"FocalLaser": "Focal laser",
-			"Freehand": "Freehand drawing",
-			"Fuchs": "Fuchs endothelial dystrophy",
-			"Fundus": "Fundus",
-			"Geographic": "Geographic atrophy",
-			"Gonioscopy": "Gonioscopy",
-			"GRT": "Giant retinal tear",
-			"HardDrusen": "Hard drusen",
-			"HardExudate": "Hard exudate",
-			"Hyphaema": "Hyphaema",
-			"Hypopyon": "Hypopyon",
-			"IatrogenicBreak": "IatrogenicBreak",
-			"ILMPeel": "ILM peel",
-			"InjectionSite": "Injection site",
-			"InnerLeafBreak": "Inner leaf break",
-			"Iris": "Iris",
-			"IrisHook": "Iris hook",
-			"IrisNaevus": "Iris naevus",
-			"IRMA": "Intraretinal microvascular abnormalities",
-			"KeraticPrecipitates": "Keratic precipitates",
-			"KoeppeNodule": "Koeppe nodule",
-			"KrukenbergSpindle": "Krukenberg spindle",
-			"Label": "Label",
-			"LaserCircle": "Circle of laser photocoagulation",
-			"LaserDemarcation": "Laser demarcation",
-			"LasikFlap": "LASIK flap",
-			"LaserSpot": "Laser spot",
-			"Lattice": "Lattice",
-			"Lens": "Lens",
-			"LimbalRelaxingIncision": "Limbal relaxing incision",
-			"Macroaneurysm": "Macroaneurysm",
-			"MacularDystrophy": "Macular dystrophy",
-			"MacularGrid": "Macular grid laser",
-			"MacularHole": "Macular hole",
-			"MacularThickening": "Macular thickening",
-			"MattressSuture": "Mattress suture",
-			"Microaneurysm": "Microaneurysm",
-			"Molteno": "Molteno tube",
-			"NerveFibreDefect": "Nerve fibre defect",
-			"NuclearCataract": "Nuclear cataract",
-			"OpticCup": "Optic cup",
-			"OpticDisc": "Optic disc",
-			"OpticDiscPit": "Optic disc pit",
-			"OrthopticEye": "Orthoptic eye",
-			"OuterLeafBreak": "Outer leaf break",
-			"Papilloedema": "Papilloedema",
-			"Patch": "Tube patch",
-			"PCIOL": "Posterior chamber IOL",
-			"PeripapillaryAtrophy": "Peripapillary atrophy",
-			"PeripheralRetinectomy": "Peripheral retinectomy",
-			"PhakoIncision": "Phako incision",
-			"PI": "Peripheral iridectomy",
-			"PointInLine": "Point in line",
-			"PosteriorCapsule": "Posterior capsule",
-			"PosteriorEmbryotoxon": "Posterior embryotoxon",
-			"PostPole": "Posterior pole",
-			"PostSubcapCataract": "Posterior subcapsular cataract",
-			"PosteriorRetinectomy": "Posterior retinectomy",
-			"PosteriorSynechia": "Posterior synechia",
-			"PreRetinalHaemorrhage": "Pre-retinal haemorrhage",
-			"PRP": "Panretinal photocoagulation",
-			"PRPPostPole": "Panretinal photocoagulation (posterior pole)",
-			"Pupil": "Pupil",
-			"RadialSponge": "Radial sponge",
-			"RetinalArteryOcclusionPostPole": "Retinal artery occlusion",
-			"RetinalTouch": "Retinal touch",
-			"RetinalVeinOcclusionPostPole": "Retinal vein occluson",
-			"Retinoschisis": "Retinoschisis",
-			"RK": "Radial keratotomy",
-			"RoundHole": "Round hole",
-			"RPEDetachment": "RPE detachment",
-			"RPERip": "RPE rip",
-			"RRD": "Rhegmatogenous retinal detachment",
-			"Rubeosis": "Rubeosis iridis",
-			"SectorPRP": "Sector PRP",
-			"SectorPRPPostPole": "Sector PRP (posterior pole)",
-			"ScleralIncision": "Scleral Incision",
-			"Sclerostomy": "Sclerostomy",
-			"SectorIridectomy": "Sector iridectomy",
-			"Shading": "Shading",
-			"SidePort": "Side port",
-			"Slider": "Slider",
-			"StarFold": "Star fold",
-			"SubretinalFluid": "Subretinal fluid",
-			"SubretinalPFCL": "Subretinal PFCL",
-			"Supramid": "Supramid suture",
-			"SwollenDisc": "Swollen disc",
-			"Telangiectasis": "Parafoveal telangiectasia",
-			"Trabectome": "Trabectome",
-			"TrabyFlap": "Trabeculectomy flap",
-			"TrabySuture": "Trabeculectomy suture",
-			"ToricPCIOL": "Toric posterior chamber IOL",
-			"TractionRetinalDetachment": "Traction retinal detachment",
-			"TransilluminationDefect": "Transillumination defect",
-			"UpDrift": "Up drift",
-			"UpShoot": "Up shoot",
-			"UTear": "Traction ‘U’ tear",
-			"Vicryl": "Vicryl suture",
-			"ViewObscured": "View obscured",
-			"VitreousOpacity": "Vitreous opacity",
-			"VPattern": "V pattern",
-			"Crepitations": "Crepitations",
-			"Stenosis": "Stenosis",
-			"Wheeze": "Wheeze",
-			"Effusion": "Pleural effusion",
-			"LeftCoronaryArtery": "Left coronary artery",
-			"DrugStent": "Drug eluting stent",
-			"MetalStent": "Metal stent",
-			"Bypass": "Coronary artery bypass",
-			"Bruit": "Bruit",
-			"Bruising": "Bruising",
-			"Haematoma": "Haematoma"
-		});
-	}());
-	</script>
 
-	<script>
-	(function() {
+		ED.setTitles(window.eyedrawDoodleTitles );
+
 		// Anterior segment edit
 		ED.init({
 			canvasId: "ed_example",
 			eye: 0,
-			scale: 1,
 			idSuffix: "AntSeg",
 			isEditable: true,
 			focus: false,
 			graphicsPath: "../../../assets/img/",
 			inputId: "ed_example_data",
+			scale: 1,
 			onReadyCommandArray: [
 				[
 					"addDoodle",
@@ -386,18 +215,6 @@
 					[]
 				]
 			],
-			onDoodlesLoadedCommandArray: [],
-			bindingArray: {
-				AntSeg: {
-					pupilSize: {
-						id: "ed-field-1",
-						attribute: "data-value"
-					},
-					pxe: {
-						id: "field-option-1"
-					}
-				}
-			},
 			syncArray: {},
 			listenerArray: [],
 			offsetX: 0,

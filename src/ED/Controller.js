@@ -75,6 +75,7 @@ ED.Controller = (function() {
 			offsetY: this.properties.offsetY,
 			toImage: this.properties.toImage,
 			graphicsPath: this.properties.graphicsPath,
+			scale: this.properties.scale
 		};
 
 		var drawing = new ED.Drawing(
@@ -387,9 +388,6 @@ ED.Controller = (function() {
 	 * On drawing ready.
 	 */
 	Controller.prototype.onReady = function() {
-
-		// Set scale of drawing
-		this.drawing.globalScaleFactor = this.properties.scale;
 
 		// If input exists and contains data, load it into the drawing.
 		if (this.hasInputFieldData()) {
