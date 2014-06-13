@@ -1,0 +1,137 @@
+<!doctype html>
+<html>
+<head>
+	<title>Eyedraw doodle popup menu prototype</title>
+
+	<!-- This is the main OpenEyes stylesheet -->
+	<link rel="stylesheet" type="text/css" href="css/style.css" />
+
+	<!-- The eyedraw stylesheet -->
+	<link rel="stylesheet" type="text/css" href="../../../assets/css/oe-eyedraw.css" />
+
+	<!-- Other dependent scripts -->
+	<script type="text/javascript" src="../../assets/components/jquery/jquery.min.js"></script>
+	<script type="text/javascript" src="../../assets/components/mustache/mustache.js"></script>
+	<script type="text/javascript" src="../../assets/components/eventemitter2/lib/eventemitter2.js"></script>
+
+	<!-- Eyedraw -->
+	<script type="text/javascript" src="../../assets/js/dist/eyedraw.js"></script>
+	<script type="text/javascript" src="../../assets/js/dist/oe-eyedraw.js"></script>
+
+	<!-- Lists of scripts -->
+	<script src="js/doodles.js"></script>
+	<script src="js/images.js"></script>
+	<script src="js/doodleTitles.js"></script>
+
+	<style type="text/css">
+	.container.main {
+		width: 848px;
+		margin-top: 40px;
+		padding: 15px;
+	}
+	#doodles-list {
+		max-height: 300px;
+		overflow: auto;
+	}
+	</style>
+</head>
+<body>
+	<div class="container main" role="main">
+		<div class="ed-widget" id="eyedrawwidget_example">
+			<div class="ed-toolbar">
+				<ul class="ed-toolbar-panel ed-main-toolbar" id="toolbar">
+				</ul>
+			</div>
+			<div class="ed-body">
+				<div class="ed-editor-container">
+					<div class="ed-editor">
+						<div class="ed-drawing-controls">
+							<ul class="ed-toolbar-panel ed-drawing-toolbar">
+								<li>
+									<a class="ed-button" href="#" data-function="resetEyedraw">
+										<span class="icon-ed-reset"></span>
+										<span class="label">Reset eyedraw</span>
+									</a>
+								</li>
+							</ul>
+							<div class="ed-selected-doodle">
+								<select id="ed_example_selected_doodle" class="ed-selected-doodle-select">
+								</select>
+							</div>
+						</div>
+						<div class="ed-doodle-popup closed">
+						</div>
+						<canvas
+						id="ed_example"
+						class="ed-canvas-edit"
+						width="300"
+						height="300"
+						tabindex="1">
+						</canvas>
+						<input
+							type="hidden"
+							id="ed_example_data"
+							value='' />
+					</div>
+				</div>
+				<div class="ed-fields-container">
+					<p>Doodles:</p>
+					<div id="doodles-list"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script>
+	(function() {
+
+		var titles = window.eyedrawDoodleTitles;
+
+		ED.setTitles(window.eyedrawDoodleTitles);
+
+		var doodles = window.eyedrawDoodleScripts.map(function(file) {
+			return file.replace(/.*\/|\..*/g, '');
+		});
+		doodles.sort();
+
+		var images = window.eyedrawImages.map(function(image) {
+			return image.replace(/.*\/|\..*/g, '');
+		});
+
+		var validDoodles = doodles.filter(function(doodle) {
+			return (images.indexOf(doodle) >= 0);
+		});
+
+		var toolbar = validDoodles.map(function(doodle) {
+			return [
+				'<li>',
+				'	<a class="ed-button" href="#" data-function="addDoodle" data-arg="' + doodle + '">',
+				'		<span class="icon-ed-' + doodle + '"></span>',
+				'		<span class="label">' + (titles[doodle] || '') + ' (' + doodle + ')</span>',
+				'	</a>',
+				'</li>'
+			].join('');
+		}).join('');
+
+		var doodlesList = '<ul>' + validDoodles.map(function(doodle) {
+			return '<li>' + doodle + '</li>';
+		}).join('') + '</ul>';
+
+		$('#toolbar').html(toolbar);
+		$('#doodles-list').html(doodlesList);
+
+		ED.init({
+			canvasId: "ed_example",
+			eye: 0,
+			scale: 1,
+			idSuffix: "test",
+			isEditable: true,
+			focus: false,
+			graphicsPath: "../../../assets/img/",
+			inputId: "ed_example_data",
+		});
+
+	}.call(this));
+	</script>
+</body>
+</html>

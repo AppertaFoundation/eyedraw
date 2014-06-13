@@ -25,7 +25,7 @@
  * @param {Drawing} _drawing
  * @param {Object} _parameterJSON
  */
-ED.AntSegCrossSection = function(_drawing, _parameterJSON) {debugger;
+ED.AntSegCrossSection = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "AntSegCrossSection";
 
