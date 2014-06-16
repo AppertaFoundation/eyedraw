@@ -751,6 +751,7 @@ ED.Drawing.prototype.mousemove = function(_point) {
 
 	// Only drag if mouse already down and a doodle selected
 	if (this.mouseDown && doodle != null) {
+
 		// Dragging not started
 		if (!doodle.isBeingDragged) {
 			// Flag start of dragging manoeuvre
@@ -789,14 +790,13 @@ ED.Drawing.prototype.mousemove = function(_point) {
 					// console.log('move');
 					// If isMoveable is true, move doodle
 					if (doodle.isMoveable) {
-						// console.log('is movable');
+						console.log('moving');
 						// Initialise new values to stop doodle getting 'trapped' at origin due to failure of non-zero test in snapToQuadrant
 						var newOriginX = doodle.originX;
 						var newOriginY = doodle.originY;
 
 						// Enforce snap to grid
 						if (doodle.snapToGrid) {
-							console.log('snap to grud');
 							// Calculate mouse position and work out nearest position of a grid line
 							var testX = mousePosDoodlePlane.x - doodle.gridDisplacementX;
 							var gridSquaresX = Math.floor(testX / doodle.gridSpacing);
@@ -814,7 +814,6 @@ ED.Drawing.prototype.mousemove = function(_point) {
 						}
 						// Enforce snap to quadrant
 						else if (doodle.snapToQuadrant) {
-							console.log('snap to quad');
 							if (mousePosDoodlePlane.x != 0) {
 								newOriginX = doodle.quadrantPoint.x * mousePosDoodlePlane.x / Math.abs(mousePosDoodlePlane.x);
 							}
@@ -827,7 +826,6 @@ ED.Drawing.prototype.mousemove = function(_point) {
 						}
 						// Enforce snap to points
 						else if (doodle.snapToPoints) {
-							console.log('snap to point');
 							newOriginX = doodle.nearestPointTo(mousePosDoodlePlane).x;
 							newOriginY = doodle.nearestPointTo(mousePosDoodlePlane).y;
 
@@ -836,7 +834,6 @@ ED.Drawing.prototype.mousemove = function(_point) {
 						}
 						// Normal move
 						else {
-							console.log('normal move');
 							doodle.move(mousePosDoodlePlane.x - lastMousePosDoodlePlane.x, mousePosDoodlePlane.y - lastMousePosDoodlePlane.y);
 						}
 
@@ -881,6 +878,7 @@ ED.Drawing.prototype.mousemove = function(_point) {
 					break;
 				case ED.Mode.Scale:
 					if (doodle.isScaleable) {
+						console.log('is scalable');
 						// Get sign of scale (negative scales create horizontal and vertical flips)
 						var signX = doodle.scaleX / Math.abs(doodle.scaleX);
 						var signY = doodle.scaleY / Math.abs(doodle.scaleY);
@@ -905,6 +903,9 @@ ED.Drawing.prototype.mousemove = function(_point) {
 							newScaleX = doodle.parameterValidationArray['scaleX']['range'].constrain(Math.abs(newScaleX), this.globalScaleFactor);
 							newScaleY = doodle.parameterValidationArray['scaleY']['range'].constrain(Math.abs(newScaleY), this.globalScaleFactor);
 
+							console.log('scale', this.globalScaleFactor);
+							console.log(newScaleX, newScaleY);
+
 							doodle.setSimpleParameter('scaleX', newScaleX * signX);
 							doodle.setSimpleParameter('scaleY', newScaleY * signY);
 
@@ -919,7 +920,7 @@ ED.Drawing.prototype.mousemove = function(_point) {
 
 				case ED.Mode.Arc:
 
-					console.log('arc');
+					console.log('ED.Mode.Arc');
 
 					// Calculate angles from centre to mouse positions relative to north
 					var newAngle = this.innerAngle(doodleTop, doodleOrigin, mousePosSelectedDoodlePlane);
@@ -976,7 +977,9 @@ ED.Drawing.prototype.mousemove = function(_point) {
 					break;
 
 				case ED.Mode.Rotate:
+
 					if (doodle.isRotatable) {
+						console.log('ED.Mode.Rotate');
 						// Calculate angles from centre to mouse positions relative to north
 						var oldAngle = this.innerAngle(doodleTop, doodleOrigin, lastMousePosDoodlePlane);
 						var newAngle = this.innerAngle(doodleTop, doodleOrigin, mousePosDoodlePlane);
@@ -996,6 +999,7 @@ ED.Drawing.prototype.mousemove = function(_point) {
 					break;
 
 				case ED.Mode.Apex:
+					console.log('ED.Mode.Apex');
 					// Move apex to new position
 					var newApexX = doodle.apexX + (mousePosSelectedDoodlePlane.x - lastMousePosSelectedDoodlePlane.x);
 					var newApexY = doodle.apexY + (mousePosSelectedDoodlePlane.y - lastMousePosSelectedDoodlePlane.y);
@@ -1010,6 +1014,7 @@ ED.Drawing.prototype.mousemove = function(_point) {
 					break;
 
 				case ED.Mode.Size:
+					console.log('ED.Mode.size');
 					// Alter width and height accordingly
 					var newWidth = doodle.width + 2 * (mousePosSelectedDoodlePlane.x - lastMousePosSelectedDoodlePlane.x);
 					var newHeight = doodle.height - 2 * (mousePosSelectedDoodlePlane.y - lastMousePosSelectedDoodlePlane.y);
@@ -1024,6 +1029,8 @@ ED.Drawing.prototype.mousemove = function(_point) {
 					break;
 
 				case ED.Mode.Handles:
+
+					console.log('ED.Mode.Handles');
 					// Move handles to new position (Stored in a squiggle)
 					var index = doodle.draggingHandleIndex;
 

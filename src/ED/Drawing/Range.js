@@ -95,6 +95,8 @@ ED.Range.prototype.includes = function(_num) {
  */
 ED.Range.prototype.constrain = function(_num, _scaleLevel) {
 
+	_scaleLevel = _scaleLevel === undefined ? 1 : _scaleLevel
+
 	var min = this.min * _scaleLevel;
 	var max = this.max * _scaleLevel;
 

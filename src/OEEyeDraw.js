@@ -77,9 +77,10 @@ ED.init = (function() {
 	 *     @property graphicsPath Path to folder containing EyeDraw graphics
 	 *     @property onReadyCommandArray Array of commands and arguments to be run when images are loaded
 	 */
-	return function init(properties) {
+	return function init(properties, done) {
+		done = $.isFunction(done) ? done : $.noop;
 		waitForStyleSheet('oe-eyedraw', 5000, function() {
-			new ED.Controller(properties);
+			done(new ED.Controller(properties));
 		});
 	};
 }());

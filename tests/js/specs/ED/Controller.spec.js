@@ -6,50 +6,6 @@
 	'use strict';
 
 	/**
-	 * Creates a DOM fragment
-	 */
-	function createDOM() {
-
-		var container = $('<div />', {
-			'class': 'ed-widget'
-		}).appendTo(document.body);
-
-		var canvas = $('<canvas />', {
-			id: 'canvasID',
-			tabindex: 1
-		}).appendTo(container);
-
-		var input = $('<input />', {
-			type: 'hidden',
-			id: 'inputID',
-			value: JSON.stringify({ test: 'testing' })
-		}).appendTo(container);
-
-		var mainToolbar = $('<div />', {
-			'class': 'ed-toolbar-panel ed-main-toolbar'
-		}).appendTo(container);
-
-		var canvasToolbar = $('<div />', {
-			'class': 'ed-toolbar-panel ed-canvas-toolbar'
-		}).appendTo(container);
-
-		var doodlePopup = $('<div />', {
-			'class': 'ed-doodle-popup'
-		}).appendTo(container);
-
-		return {
-			container: container,
-			canvas: canvas,
-			input: input,
-			mainToolbar: mainToolbar,
-			canvasToolbar: canvasToolbar,
-			destroy: function destroy() {
-				container.empty().remove();
-			}
-		};
-	}
-
-	/**
 	 * Default ED.Drawing properties
 	 * @type {Object}
 	 */
@@ -592,11 +548,7 @@
 
 				expect(spy1.withArgs('AntSeg').calledOnce).to.be.true;
 
-				// NOTE: the reason 'deselectDoodles' is called twice is because
-				// we're notifying the 'doodleSelected' event on doodle add, which in turn
-				// deselects other doodles.
-				// See: https://github.com/openeyes/eyedraw/commit/8dd09115d3327bca942cf88f414f7cfd943b9cff
-				expect(spy2.calledTwice).to.be.true;
+				expect(spy2.called).to.be.true;
 				spy1.reset();
 				spy2.reset();
 				dom.destroy();
@@ -630,11 +582,7 @@
 
 				expect(spy1.withArgs('AntSeg').calledOnce).to.be.true;
 
-				// NOTE: the reason 'deselectDoodles' is called twice is because
-				// we're notifying the 'doodleSelected' event on doodle add, which in turn
-				// deselects other doodles.
-				// See: https://github.com/openeyes/eyedraw/commit/8dd09115d3327bca942cf88f414f7cfd943b9cff
-				expect(spy2.calledTwice).to.be.true;
+				expect(spy2.called).to.be.true;
 
 				spy1.reset();
 				spy2.reset();

@@ -33,12 +33,16 @@
 		<script src="../../../../../assets/components/jquery/jquery.min.js"></script>
 		<script src="../../../../../assets/components/eventemitter2/lib/eventemitter2.js"></script>
 		<script src="../../../../../assets/components/mustache/mustache.js"></script>
-		<script src="../../../../../src/OEEyeDraw.js"></script>
-		<script src="../../../../../src/ED/Drawing.js"></script>
-		<script src="../../../../../src/ED/Controller.js"></script>
-		<script src="../../../../../src/ED/View.js"></script>
-		<script data-cover src="../../../../../src/ED/Views/Toolbar.js"></script>
-		<script src="../../../../../src/ED/Views/DoodlePopup.js"></script>
+		<!-- Load in the eyedraw scripts -->
+		<script type="text/javascript" src="../../../../other/js/scripts.js"></script>
+		<script>
+			this.eyedrawScripts.forEach(function(file) {
+				var cover = (file.indexOf('Toolbar.js') >= 0) ? ' data-cover' : '';
+				// We use document.write to force the files to be loaded synchronously.
+				document.write('<script' + cover + ' src="../../../../../src/' + file + '"><\/script>');
+			});
+		</script>
+		<!-- End loading in eyedraw scripts -->
 
 		<!-- Add spec files here -->
 		<script src="../../../specs/ED/Views/Toolbar.spec.js"></script>

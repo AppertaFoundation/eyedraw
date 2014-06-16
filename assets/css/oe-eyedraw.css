@@ -1878,11 +1878,14 @@
 
 /* line 50, ../sass/components/_editor.scss */
 .ed-editor {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
   position: relative;
   margin-top: 4px;
 }
 
-/* line 57, ../sass/components/_editor.scss */
+/* line 58, ../sass/components/_editor.scss */
 canvas.ed-canvas-edit {
   background: #e4edf5;
   border: 1px solid #53a0c7;
@@ -1891,7 +1894,7 @@ canvas.ed-canvas-edit {
   z-index: 100;
   margin: 0 0 0 2px;
 }
-/* line 66, ../sass/components/_editor.scss */
+/* line 67, ../sass/components/_editor.scss */
 canvas.ed-canvas-display {
   border: none;
   cursor: auto;
@@ -1899,7 +1902,7 @@ canvas.ed-canvas-display {
   position: relative;
   z-index: 100;
 }
-/* line 75, ../sass/components/_editor.scss */
+/* line 76, ../sass/components/_editor.scss */
 canvas.ed-canvas-edit:focus, canvas.ed-canvas-display:focus {
   outline: none;
 }
@@ -1959,6 +1962,9 @@ span.squiggle {
   -webkit-box-shadow: 0 5px 14px -4px rgba(0, 0, 0, 0.5);
   -moz-box-shadow: 0 5px 14px -4px rgba(0, 0, 0, 0.5);
   box-shadow: 0 5px 14px -4px rgba(0, 0, 0, 0.5);
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  user-select: text;
   background: #c3def5;
   border: 1px solid #53a0c7;
   border-width: 1px 1px 1px 0;
@@ -1969,31 +1975,31 @@ span.squiggle {
   opacity: 1;
   width: 188px;
 }
-/* line 30, ../sass/components/_doodle-popup.scss */
+/* line 31, ../sass/components/_doodle-popup.scss */
 .ed-doodle-popup.closed {
   right: 0;
   opacity: 0;
 }
-/* line 34, ../sass/components/_doodle-popup.scss */
+/* line 35, ../sass/components/_doodle-popup.scss */
 .ed-doodle-popup.closed .ed-button .label {
   display: none;
 }
 
-/* line 42, ../sass/components/_doodle-popup.scss */
+/* line 43, ../sass/components/_doodle-popup.scss */
 .ed-doodle-popup-toolbar li {
   margin-bottom: 0;
   margin-right: 4px;
 }
-/* line 45, ../sass/components/_doodle-popup.scss */
+/* line 46, ../sass/components/_doodle-popup.scss */
 .sub-element .ed-doodle-popup-toolbar li {
   margin-right: 1px;
 }
-/* line 48, ../sass/components/_doodle-popup.scss */
+/* line 49, ../sass/components/_doodle-popup.scss */
 .ed-doodle-popup-toolbar li:last-child {
   margin-right: 0;
 }
 
-/* line 54, ../sass/components/_doodle-popup.scss */
+/* line 55, ../sass/components/_doodle-popup.scss */
 .ed-doodle-description {
   color: #444;
   font-size: 12px;
@@ -2002,32 +2008,32 @@ span.squiggle {
   padding: 12px 0 6px 0;
 }
 
-/* line 62, ../sass/components/_doodle-popup.scss */
+/* line 63, ../sass/components/_doodle-popup.scss */
 .ed-doodle-controls {
   max-height: 294px;
   overflow: auto;
 }
-/* line 65, ../sass/components/_doodle-popup.scss */
+/* line 66, ../sass/components/_doodle-popup.scss */
 .ed-doodle-controls > div {
   line-height: 12px;
   padding-bottom: 8px;
 }
-/* line 69, ../sass/components/_doodle-popup.scss */
+/* line 70, ../sass/components/_doodle-popup.scss */
 .ed-doodle-controls > div:first-child {
   margin-top: 14px;
 }
-/* line 73, ../sass/components/_doodle-popup.scss */
+/* line 74, ../sass/components/_doodle-popup.scss */
 .ed-doodle-controls label {
   color: #477792;
   float: left;
   font-size: 12px;
   margin: 0 6px 0 0;
 }
-/* line 78, ../sass/components/_doodle-popup.scss */
+/* line 79, ../sass/components/_doodle-popup.scss */
 .ed-doodle-controls label:after {
   content: ":";
 }
-/* line 82, ../sass/components/_doodle-popup.scss */
+/* line 83, ../sass/components/_doodle-popup.scss */
 .ed-doodle-controls select {
   width: auto;
 }

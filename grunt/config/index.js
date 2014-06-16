@@ -27,6 +27,7 @@ module.exports = function(grunt) {
 		watch: require('./watch')(grunt),
 		compass: require('./compass')(grunt),
 		connect: require('./connect')(grunt),
-		jst: require('./jst')(grunt)
+		jst: require('./jst')(grunt),
+		mocha: require('./mocha')(grunt)
 	};
 };
