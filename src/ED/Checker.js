@@ -30,7 +30,7 @@ ED.Checker = ED.Checker || (function() {
 	var callbacks = [];
 	var ids = [];
 	var readyIds = [];
-	var instances = [];
+	var instances = {};
 
 	function registerCanvasEyeDraws() {
 		$('canvas').each(function() {
@@ -60,14 +60,8 @@ ED.Checker = ED.Checker || (function() {
 	 * @param  {ED.Drawing}   instance A ED.Drawing instance.
 	 */
 	function register(instance) {
-
-		// Already registered this instance?
-		if (instances.indexOf(instance) !== -1) {
-			return;
-		}
-
 		// Store instance
-		instances.push(instance);
+		instances[instance.drawingName] = instance
 
 		// Register 'doodlesLoaded' event
 		instance.registerForNotifications({
@@ -111,9 +105,7 @@ ED.Checker = ED.Checker || (function() {
 	 * @return {ED.Drawing} An eyedraw instance.
 	 */
 	function getInstance(drawingName) {
-		return instances.filter(function(instance) {
-			return (instance.drawingName === drawingName);
-		})[0];
+		return instances[drawingName];
 	}
 
 	/**
@@ -122,8 +114,10 @@ ED.Checker = ED.Checker || (function() {
 	 * @return {ED.Drawing} An eyedraw instance.
 	 */
 	function getInstanceByIdSuffix(idSuffix) {
-		return instances.filter(function(instance) {
-			return (instance.idSuffix === idSuffix);
+		return Object.keys(instances).filter(function(key) {
+			return instances[key].idSuffix === idSuffix;
+		}).map(function(key) {
+			return instances[key];
 		})[0];
 	}
 
@@ -131,7 +125,7 @@ ED.Checker = ED.Checker || (function() {
 	 * Resets all eyedraw instances and registered callback functions.
 	 */
 	function reset() {
-		instances = [];
+		instances = {};
 		callbacks = [];
 		ids = [];
 	}
