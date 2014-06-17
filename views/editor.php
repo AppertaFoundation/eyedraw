@@ -29,6 +29,12 @@
 						<span class="label">Reset eyedraw</span>
 					</a>
 				</li>
+				<li>
+					<a class="ed-button" href="#" data-function="toggleZoom">
+						<span class="icon-ed-zoom-out"></span>
+						<span class="label">Toggle Zoom</span>
+					</a>
+				</li>
 			</ul>
 			<!-- SELECTED DOODLE -->
 			<div class="ed-selected-doodle">

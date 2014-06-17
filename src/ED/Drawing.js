@@ -929,14 +929,12 @@ ED.Drawing.prototype.mousemove = function(_point) {
 
 					// Handle snapping
 					if (doodle.snapToArc) {
-						// alert('snap to arc');
 						// Correct for negative handle
 						if (rotationCorrection < 0) {
 							newAngle = 2 * Math.PI - ED.positiveAngle(newAngle);
 						}
 						doodle.setSimpleParameter('arc', doodle.nearestArcTo(doodle.arc / 2 + newAngle));
 					} else {
-						// alert('no snap to ar');
 						// Check for permitted range and stop dragging if exceeded
 						if (doodle.parameterValidationArray['arc']['range'].isBelow(doodle.arc + deltaAngle)) {
 							deltaAngle = doodle.parameterValidationArray['arc']['range'].min - doodle.arc;

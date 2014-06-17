@@ -334,6 +334,7 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 	var offsetX = 0;
 	var offsetY = 0;
 	var toImage = false;
+	var globalScaleFactor = 1;
 	this.graphicsPath = 'assets/img';
 	this.scaleOn = 'height';
 
@@ -344,6 +345,7 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 		if (_options['toImage']) toImage = _options['toImage'];
 		if (_options['graphicsPath']) this.graphicsPath = _options['graphicsPath'];
 		if (_options['scaleOn']) this.scaleOn = _options['scaleOn'];
+		if (_options['scale']) globalScaleFactor = _options['scale'];
 	}
 
 	// Initialise properties
@@ -369,14 +371,14 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 	this.readyNotificationSent = false;
 	this.newPointOnClick = false;
 	this.completeLine = false;
-	this.globalScaleFactor = 1;
+	this.globalScaleFactor = globalScaleFactor;
+	this.origGlobalScaleFactor = this.globalScaleFactor;
 	this.scrollValue = 0;
 	this.lastDoodleId = 0;
 	this.isActive = false;
 	this.isNew = true;
 	this.isReady = false;
 	this.showDoodleControls = false;
-	this.isZoomed = false;
 
 	// Freehand drawing properties NB from November 2013 moved to Freehand doodle
 // 	this.squiggleColour = new ED.Colour(0, 255, 0, 1);
@@ -1008,6 +1010,7 @@ ED.Drawing.prototype.mousemove = function(_point) {
 
 	// Only drag if mouse already down and a doodle selected
 	if (this.mouseDown && doodle != null) {
+
 		// Dragging not started
 		if (!doodle.isBeingDragged) {
 			// Flag start of dragging manoeuvre
@@ -1152,8 +1155,8 @@ ED.Drawing.prototype.mousemove = function(_point) {
 							newScaleY = doodle.scaleY * changeY;
 
 							// Constrain scale
-							newScaleX = doodle.parameterValidationArray['scaleX']['range'].constrain(Math.abs(newScaleX));
-							newScaleY = doodle.parameterValidationArray['scaleY']['range'].constrain(Math.abs(newScaleY));
+							newScaleX = doodle.parameterValidationArray['scaleX']['range'].constrain(Math.abs(newScaleX), this.globalScaleFactor);
+							newScaleY = doodle.parameterValidationArray['scaleY']['range'].constrain(Math.abs(newScaleY), this.globalScaleFactor);
 
 							doodle.setSimpleParameter('scaleX', newScaleX * signX);
 							doodle.setSimpleParameter('scaleY', newScaleY * signY);
@@ -1222,6 +1225,7 @@ ED.Drawing.prototype.mousemove = function(_point) {
 					break;
 
 				case ED.Mode.Rotate:
+
 					if (doodle.isRotatable) {
 						// Calculate angles from centre to mouse positions relative to north
 						var oldAngle = this.innerAngle(doodleTop, doodleOrigin, lastMousePosDoodlePlane);
@@ -1270,6 +1274,7 @@ ED.Drawing.prototype.mousemove = function(_point) {
 					break;
 
 				case ED.Mode.Handles:
+
 					// Move handles to new position (Stored in a squiggle)
 					var index = doodle.draggingHandleIndex;
 
@@ -1306,7 +1311,7 @@ ED.Drawing.prototype.mousemove = function(_point) {
 
 				case ED.Mode.Select:
 					var p = new ED.Point(mousePosSelectedDoodlePlane.x, mousePosSelectedDoodlePlane.y);
-					console.log('Selecting ', p.x, p.y);
+					// console.log('Selecting ', p.x, p.y);
 					break;
 
 				default:
@@ -1950,17 +1955,36 @@ ED.Drawing.prototype.resetEyedraw = function() {
 }
 
 /**
- * Zooms the eydraw
+ * Set the scale level.
+ * @param  {Number} level     Scale level.
+ * @param  {String} eventName Event name to notify.
  */
-ED.Drawing.prototype.toogleZoom = function() {
-	if (this.isZoomed) {
-		// zoom out
-		this.notify("drawingZoomOut");
-	} else {
-		// zoom in
-		this.notify("drawingZoomIn");
+ED.Drawing.prototype.setScaleLevel = function(level, eventName) {
+
+	this.globalScaleFactor = level;
+
+	this.doodleArray.forEach(function(doodle) {
+		doodle.setScaleLevel(level);
+	});
+
+	this.repaint();
+
+	if (eventName) {
+		this.notify(eventName);
 	}
-	this.isZoomed = !this.isZoomed;
+};
+
+/**
+ * Toggles the zoom (scale) level of the drawing.
+ * We're only supporting two zoom levels: "in" and "out". By default, the eyedraw
+ * is zoomed in.
+ */
+ED.Drawing.prototype.toggleZoom = function() {
+	if (this.globalScaleFactor === this.origGlobalScaleFactor) {
+		this.setScaleLevel(this.origGlobalScaleFactor * .5, 'drawingZoomOut');
+	} else {
+		this.setScaleLevel(this.origGlobalScaleFactor, 'drawingZoomIn')
+	}
 };
 
 /**
@@ -1979,15 +2003,6 @@ ED.Drawing.prototype.setSelectedDoodle = function(_element, _property) {
 	} else {
 		ED.errorHandler('ED.Drawing', 'setSelectedDoodle', 'Attempt to set a property on the selected doodle, when none selected');
 	}
-
-	//    if (_element.checked)
-	//    {
-	//        console.log('YES');
-	//    }
-	//    else
-	//    {
-	//        console.log('NO');
-	//    }
 }
 
 /**
@@ -2223,8 +2238,9 @@ ED.Drawing.prototype.addDoodle = function(_className, _parameterDefaults, _param
 		this.selectedDoodle = newDoodle;
 
 		// Apply global scale factor
-		newDoodle.scaleX = newDoodle.scaleX * this.globalScaleFactor;
-		newDoodle.scaleY = newDoodle.scaleY * this.globalScaleFactor;
+		newDoodle.setScaleLevel(this.globalScaleFactor);
+		// newDoodle.scaleX = newDoodle.origScaleX * this.globalScaleFactor;
+		// newDoodle.scaleY = newDoodle.origScaleY * this.globalScaleFactor;
 
 		// If drawable, also go into drawing mode
 		if (newDoodle.isDrawable) {
@@ -3062,6 +3078,10 @@ ED.Drawing.prototype.nextDoodleId = function() {
 	return this.lastDoodleId++;
 }
 
+ED.Drawing.prototype.getScaleLevel = function() {
+	return this.globalScaleFactor;
+};
+
 /**
  * Changes the drawing colour of freehand drawing
  *
@@ -3569,14 +3589,15 @@ ED.Doodle.prototype.willDelete = function() {
  * @param {Float} _y Distance to move along y axis in doodle plane
  */
 ED.Doodle.prototype.move = function(_x, _y) {
+
 	// Ensure parameters are integers
 	var x = Math.round(+_x);
 	var y = Math.round(+_y);
 
 	if (this.isMoveable) {
 		// Enforce bounds
-		var newOriginX = this.parameterValidationArray['originX']['range'].constrain(this.originX + x);
-		var newOriginY = this.parameterValidationArray['originY']['range'].constrain(this.originY + y);
+		var newOriginX = this.parameterValidationArray['originX']['range'].constrain(this.originX + x, this.scaleLevel);
+		var newOriginY = this.parameterValidationArray['originY']['range'].constrain(this.originY + y, this.scaleLevel);
 
 		// Move doodle to new position
 		if (x != 0) this.setSimpleParameter('originX', newOriginX);
@@ -5133,6 +5154,7 @@ ED.Doodle.prototype.nearestArcTo = function(_arc) {
  * @returns {String} A JSON encoded string representing the variable properties of the doodle
  */
 ED.Doodle.prototype.json = function() {
+
 	// Start of JSON string
 	var s = '{';
 
@@ -5146,26 +5168,36 @@ ED.Doodle.prototype.json = function() {
 			for (var i = 0; i < this.savedParameterArray.length; i++) {
 				var p = this.savedParameterArray[i];
 
-				// String to output
-				var o;
+				// Value to output
+				var o = this[p];
+
+				// Offset the scale.
+				switch(p) {
+					case 'scaleX':
+					case 'scaleY':
+					case 'originX':
+					case 'originY':
+						o *= (1 / this.scaleLevel);
+					break;
+				}
 
 				// Special treatment according to parameter
 				if (p == 'scaleX' || p == 'scaleY') {
-					o = this[p].toFixed(2);
+					o = o.toFixed(2)
 				} else if (p == 'arc' || p == 'rotation') {
-					o = (this[p] * 180 / Math.PI).toFixed(0);
+					o = (o * 180 / Math.PI).toFixed(0);
 				} else if (p == 'originX' || p == 'originY' || p == 'radius' || p == 'apexX' || p == 'apexY' || p == 'width' || p == 'height') {
-					o = this[p].toFixed(0);
-				} else if (typeof(this[p]) == 'number') {
-					o = this[p].toFixed(2);
-				} else if (typeof(this[p]) == 'string') {
-					o = '"' + this[p] + '"';
-				} else if (typeof(this[p]) == 'boolean') {
-					o = this[p];
-				} else if (typeof(this[p]) == 'object') {
-					o = JSON.stringify(this[p]);
+					o = o.toFixed(0);
+				} else if (typeof(o) == 'number') {
+					o = o.toFixed(2);
+				} else if (typeof(o) == 'string') {
+					o = '"' + o + '"';
+				} else if (typeof(o) == 'boolean') {
+					o = o;
+				} else if (typeof(o) == 'object') {
+					o = JSON.stringify(o);
 				} else {
-					ED.errorHandler('ED.Doodle', 'json', 'Attempt to create json for an unhandled parameter type: ' + typeof(this[p]));
+					ED.errorHandler('ED.Doodle', 'json', 'Attempt to create json for an unhandled parameter type: ' + typeof(o));
 					o = "ERROR";
 				}
 
@@ -5337,7 +5369,29 @@ ED.Doodle.prototype.addEllipseToPath = function(_ctx, _x, _y, _w, _h) {
  */
 ED.Doodle.prototype.xForY = function(_r, _y) {
 	return Math.sqrt(_r * _r - _y * _y);
-}
+};
+
+/**
+ * Set the scale level.
+ * @param {Number} _level The scaling level.
+ */
+ED.Doodle.prototype.setScaleLevel = function(_newLevel) {
+
+	var diff = _newLevel;
+	if (_newLevel > this.scaleLevel) {
+		diff /= this.scaleLevel;
+	}
+
+	this.adjustScaleAndPosition(diff);
+	this.scaleLevel = _newLevel;
+};
+
+ED.Doodle.prototype.adjustScaleAndPosition = function(amount){
+	this.scaleX *= amount;
+	this.scaleY *= amount;
+	this.originX *= amount;
+	this.originY *= amount;
+};
 
 /**
  * Outputs doodle information to the console
@@ -5372,7 +5426,7 @@ ED.Doodle.Handle = function(_location, _isVisible, _mode, _isRotatable) {
 	this.isVisible = _isVisible;
 	this.mode = _mode;
 	this.isRotatable = _isRotatable;
-}
+};
 /**
  * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
  * (C) OpenEyes Foundation, 2011-2014
@@ -5843,6 +5897,7 @@ ED.Controller = (function() {
 			offsetY: this.properties.offsetY,
 			toImage: this.properties.toImage,
 			graphicsPath: this.properties.graphicsPath,
+			scale: this.properties.scale
 		};
 
 		var drawing = new ED.Drawing(
@@ -6155,9 +6210,6 @@ ED.Controller = (function() {
 	 * On drawing ready.
 	 */
 	Controller.prototype.onReady = function() {
-
-		// Set scale of drawing
-		this.drawing.globalScaleFactor = this.properties.scale;
 
 		// If input exists and contains data, load it into the drawing.
 		if (this.hasInputFieldData()) {
@@ -6892,13 +6944,20 @@ ED.Range.prototype.includes = function(_num) {
  * Constrains a value to the limits of the range
  *
  * @param {Float} _num
+ * @param {Float} _scaleLevel The drawing scale level.
  * @returns {Float} The constrained value
  */
-ED.Range.prototype.constrain = function(_num) {
-	if (_num < this.min) {
-		return this.min;
-	} else if (_num > this.max) {
-		return this.max;
+ED.Range.prototype.constrain = function(_num, _scaleLevel) {
+
+	_scaleLevel = _scaleLevel === undefined ? 1 : _scaleLevel
+
+	var min = this.min * _scaleLevel;
+	var max = this.max * _scaleLevel;
+
+	if (_num < min) {
+		return min;
+	} else if (_num > max) {
+		return max;
 	} else {
 		return _num;
 	}
@@ -7619,7 +7678,7 @@ ED.Views.Toolbar = (function() {
 		ED.View.apply(this, arguments);
 
 		this.drawing = drawing;
-		this.container = container;
+		this.container = $(container);
 		this.buttons = this.container.find('.ed-button');
 
 		this.registerForNotifications();
@@ -7810,7 +7869,7 @@ ED.Views.Toolbar.Drawing = (function() {
 
 	function DrawingToolbar(drawing, container) {
 		ED.Views.Toolbar.apply(this, arguments);
-		this.zoomIcon = this.container.find('.icon-ed-zoom-in');
+		this.zoomIcon = this.container.find('[class^=icon-ed-zoom]');
 	}
 
 	DrawingToolbar.prototype = Object.create(ED.Views.Toolbar.prototype);
@@ -7882,7 +7941,7 @@ ED.Views.Toolbar.Main = (function() {
 }());
 /*! Generated on 17/6/2014 */
 ED.scriptTemplates = {
-  "doodle-popup": "\n\n\n\n{{#doodle}}\n\t<ul class=\"ed-toolbar-panel ed-doodle-popup-toolbar\">\n\t\t<li>\n\t\t\t<a class=\"ed-button ed-doodle-help{{lockedButtonClass}}\" href=\"#\" data-function=\"toggleHelp\">\n\t\t\t\t<span class=\"icon-ed-help\"></span>\n\t\t\t</a>\n\t\t</li>\n\t\t{{#doodle.isLocked}}\n\t\t\t<li>\n\t\t\t\t<a class=\"ed-button\" href=\"#\" data-function=\"unlock\">\n\t\t\t\t\t<span class=\"icon-ed-unlock\"></span>\n\t\t\t\t\t<span class=\"label\">Unlock</span>\n\t\t\t\t</a>\n\t\t\t</li>\n\t\t{{/doodle.isLocked}}\n\t\t{{^doodle.isLocked}}\n\t\t\t<li>\n\t\t\t\t<a class=\"ed-button\" href=\"#\" data-function=\"lock\">\n\t\t\t\t\t<span class=\"icon-ed-lock\"></span>\n\t\t\t\t\t<span class=\"label\">Lock</span>\n\t\t\t\t</a>\n\t\t\t</li>\n\t\t{{/doodle.isLocked}}\n\t\t<li>\n\t\t\t<a class=\"ed-button{{lockedButtonClass}}\" href=\"#\" data-function=\"moveToBack\">\n\t\t\t\t<span class=\"icon-ed-move-to-back\"></span>\n\t\t\t\t<span class=\"label\">Move to back</span>\n\t\t\t</a>\n\t\t</li>\n\t\t<li>\n\t\t\t<a class=\"ed-button{{lockedButtonClass}}\" href=\"#\" data-function=\"moveToFront\">\n\t\t\t\t<span class=\"icon-ed-move-to-front\"></span>\n\t\t\t\t<span class=\"label\">Move to front</span>\n\t\t\t</a>\n\t\t</li>\n\t\t{{#doodle.isDeletable}}\n\t\t\t<li>\n\t\t\t\t<a class=\"ed-button{{lockedButtonClass}}\" href=\"#\" data-function=\"deleteSelectedDoodle\">\n\t\t\t\t\t<span class=\"icon-ed-delete\"></span>\n\t\t\t\t\t<span class=\"label\">Delete</span>\n\t\t\t\t</a>\n\t\t\t</li>\n\t\t{{/doodle.isDeletable}}\n\t</ul>\n\t<div class=\"ed-doodle-info hide\">\n\t\t{{#doodle.isLocked}}\n\t\t\t<div class=\"ed-doodle-description\">\n\t\t\t\t<strong>This doodle is locked and cannot be edited.</strong>\n\t\t\t</div>\n\t\t{{/doodle.isLocked}}\n\t\t{{^doodle.isLocked}}\n\t\t\t{{#desc}}\n\t\t\t\t<div class=\"ed-doodle-description\">{{{desc}}}</div>\n\t\t\t{{/desc}}\n\t\t{{/doodle.isLocked}}\n\t</div>\n\t<div class=\"ed-doodle-controls{{#doodle.isLocked}} hide{{/doodle.isLocked}}\" id=\"{{drawing.canvas.id}}_controls\">\n\t</div>\n{{/doodle}}"
+  "doodle-popup": "\n\n\n\n{{#doodle}}\n\t<ul class=\"ed-toolbar-panel ed-doodle-popup-toolbar\">\n\t\t{{#desc}}\n\t\t\t<li>\n\t\t\t\t<a class=\"ed-button ed-doodle-help{{lockedButtonClass}}\" href=\"#\" data-function=\"toggleHelp\">\n\t\t\t\t\t<span class=\"icon-ed-help\"></span>\n\t\t\t\t</a>\n\t\t\t</li>\n\t\t{{/desc}}\n\t\t{{#doodle.isLocked}}\n\t\t\t<li>\n\t\t\t\t<a class=\"ed-button\" href=\"#\" data-function=\"unlock\">\n\t\t\t\t\t<span class=\"icon-ed-unlock\"></span>\n\t\t\t\t\t<span class=\"label\">Unlock</span>\n\t\t\t\t</a>\n\t\t\t</li>\n\t\t{{/doodle.isLocked}}\n\t\t{{^doodle.isLocked}}\n\t\t\t<li>\n\t\t\t\t<a class=\"ed-button\" href=\"#\" data-function=\"lock\">\n\t\t\t\t\t<span class=\"icon-ed-lock\"></span>\n\t\t\t\t\t<span class=\"label\">Lock</span>\n\t\t\t\t</a>\n\t\t\t</li>\n\t\t{{/doodle.isLocked}}\n\t\t<li>\n\t\t\t<a class=\"ed-button{{lockedButtonClass}}\" href=\"#\" data-function=\"moveToBack\">\n\t\t\t\t<span class=\"icon-ed-move-to-back\"></span>\n\t\t\t\t<span class=\"label\">Move to back</span>\n\t\t\t</a>\n\t\t</li>\n\t\t<li>\n\t\t\t<a class=\"ed-button{{lockedButtonClass}}\" href=\"#\" data-function=\"moveToFront\">\n\t\t\t\t<span class=\"icon-ed-move-to-front\"></span>\n\t\t\t\t<span class=\"label\">Move to front</span>\n\t\t\t</a>\n\t\t</li>\n\t\t{{#doodle.isDeletable}}\n\t\t\t<li>\n\t\t\t\t<a class=\"ed-button{{lockedButtonClass}}\" href=\"#\" data-function=\"deleteSelectedDoodle\">\n\t\t\t\t\t<span class=\"icon-ed-delete\"></span>\n\t\t\t\t\t<span class=\"label\">Delete</span>\n\t\t\t\t</a>\n\t\t\t</li>\n\t\t{{/doodle.isDeletable}}\n\t</ul>\n\t<div class=\"ed-doodle-info hide\">\n\t\t{{^doodle.isLocked}}\n\t\t\t{{#desc}}\n\t\t\t\t<div class=\"ed-doodle-description\">{{{desc}}}</div>\n\t\t\t{{/desc}}\n\t\t{{/doodle.isLocked}}\n\t</div>\n\t<div class=\"ed-doodle-controls{{#doodle.isLocked}} hide{{/doodle.isLocked}}\" id=\"{{drawing.canvas.id}}_controls\">\n\t</div>\n\t{{#doodle.isLocked}}\n\t\t<div class=\"ed-doodle-description\">\n\t\t\t<strong>This doodle is locked and cannot be edited.</strong>\n\t\t</div>\n\t{{/doodle.isLocked}}\n{{/doodle}}"
 };
 /**
  * @fileOverview Contains doodle subclasses for the anterior segment
@@ -30200,9 +30259,8 @@ ED.OpticDisc.prototype.setPropertyDefaults = function() {
  * Sets default parameters
  */
 ED.OpticDisc.prototype.setParameterDefaults = function() {
+
 	this.apexY = -150;
-	this.setParameterFromString('mode', 'Basic');
-	this.setParameterFromString('cdRatio', '0.3');
 
 	// Create a squiggle to store the handles points
 	var squiggle = new ED.Squiggle(this, new ED.Colour(100, 100, 100, 1), 4, true);
@@ -30216,6 +30274,9 @@ ED.OpticDisc.prototype.setParameterDefaults = function() {
 		point.setWithPolars(-this.apexY, i * 2 * Math.PI / this.numberOfHandles);
 		this.addPointToSquiggle(point);
 	}
+
+	this.setParameterFromString('mode', 'Basic');
+	this.setParameterFromString('cdRatio', '0.3');
 }
 
 /**
@@ -30227,6 +30288,7 @@ ED.OpticDisc.prototype.setParameterDefaults = function() {
  * @returns {Array} Associative array of values of dependent parameters
  */
 ED.OpticDisc.prototype.dependentParameterValues = function(_parameter, _value) {
+
 	var returnArray = new Array();
 
 	switch (_parameter) {

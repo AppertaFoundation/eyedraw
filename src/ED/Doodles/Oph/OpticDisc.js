@@ -137,7 +137,6 @@ ED.OpticDisc.prototype.setParameterDefaults = function() {
  * @returns {Array} Associative array of values of dependent parameters
  */
 ED.OpticDisc.prototype.dependentParameterValues = function(_parameter, _value) {
-	console.log('dependentParameterValues');
 
 	var returnArray = new Array();
 

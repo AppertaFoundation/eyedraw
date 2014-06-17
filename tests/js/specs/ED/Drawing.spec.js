@@ -48,7 +48,7 @@
 					scaleY: data.scaleY
 				};
 
-				drawing.zoom(0.5);
+				drawing.setScaleLevel(0.5);
 
 				data = JSON.parse(drawing.save())[0];
 
@@ -86,7 +86,7 @@
 					var scaleX = data.scaleX;
 					var scaleY = data.scaleY;
 
-					drawing.zoom(0.5);
+					drawing.setScaleLevel(0.5);
 
 					// Scale the drawing again. This time, the points should be exceeding the
 					// allowed range when the scale has been adjusted.
@@ -124,7 +124,7 @@
 						scaleY: data.scaleY
 					};
 
-					drawing.zoom(0.5);
+					drawing.setScaleLevel(0.5);
 
 					data = JSON.parse(drawing.save())[0];
 
@@ -168,7 +168,7 @@
 				// The range object should constrain the move.
 				expect(testData.originX).to.equal(100);
 
-				drawing.zoom(0.5);
+				drawing.setScaleLevel(0.5);
 
 				drawing.mousemove(new ED.Point(0, 0));
 				drawing.mousemove(new ED.Point(110, 0)); // move more than 100
@@ -208,7 +208,7 @@
 					apexY: data.apexY
 				};
 
-				drawing.zoom(0.5);
+				drawing.setScaleLevel(0.5);
 
 				drawing.mousemove(new ED.Point(110, 0));
 
@@ -250,7 +250,7 @@
 					height: data.height
 				};
 
-				drawing.zoom(0.5);
+				drawing.setScaleLevel(0.5);
 
 				data = JSON.parse(drawing.save())[0];
 
