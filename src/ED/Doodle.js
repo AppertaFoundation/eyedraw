@@ -1982,7 +1982,6 @@ ED.Doodle.prototype.nearestArcTo = function(_arc) {
  */
 ED.Doodle.prototype.json = function() {
 
-	console.log('called json');
 	// Start of JSON string
 	var s = '{';
 

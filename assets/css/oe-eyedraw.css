@@ -58,38 +58,42 @@
   padding: 3px 0 0 3px;
 }
 
-/* line 20, ../sass/components/toolbar/_panels.scss */
+/* line 18, ../sass/components/toolbar/_panels.scss */
+.ed-toolbar-panel {
+  display: block;
+}
+/* line 21, ../sass/components/toolbar/_panels.scss */
 .ed-toolbar-panel, .ed-toolbar-panel ul {
   list-style-type: none;
   margin: 0;
   padding: 0;
 }
-/* line 25, ../sass/components/toolbar/_panels.scss */
+/* line 26, ../sass/components/toolbar/_panels.scss */
 .ed-toolbar-panel li {
   float: left;
   margin: 0 3px 3px 0;
   position: relative;
 }
-/* line 30, ../sass/components/toolbar/_panels.scss */
+/* line 31, ../sass/components/toolbar/_panels.scss */
 .ed-toolbar-panel li.active ul {
   display: block;
 }
-/* line 35, ../sass/components/toolbar/_panels.scss */
+/* line 36, ../sass/components/toolbar/_panels.scss */
 .ed-toolbar-panel.ed-drawing-toolbar {
   margin-top: -6px;
   margin-left: -5px;
   float: left;
 }
-/* line 39, ../sass/components/toolbar/_panels.scss */
+/* line 40, ../sass/components/toolbar/_panels.scss */
 .ed-toolbar-panel.ed-drawing-toolbar li {
   margin: 0;
 }
-/* line 42, ../sass/components/toolbar/_panels.scss */
+/* line 43, ../sass/components/toolbar/_panels.scss */
 .ed-toolbar-panel.ed-drawing-toolbar .ed-button {
   background: none;
   border: 0;
 }
-/* line 48, ../sass/components/toolbar/_panels.scss */
+/* line 49, ../sass/components/toolbar/_panels.scss */
 .ed-toolbar-panel .ed-toolbar-panel-drawer {
   -webkit-box-shadow: 1px 3px 8px 1px rgba(0, 0, 0, 0.3);
   -moz-box-shadow: 1px 3px 8px 1px rgba(0, 0, 0, 0.3);
@@ -105,7 +109,7 @@
   width: 148px;
   z-index: 102;
 }
-/* line 62, ../sass/components/toolbar/_panels.scss */
+/* line 63, ../sass/components/toolbar/_panels.scss */
 .ed-toolbar-panel .ed-drawer-open .ed-toolbar-panel-drawer {
   display: block;
 }
@@ -2004,7 +2008,7 @@ span.squiggle {
   color: #444;
   font-size: 12px;
   font-style: italic;
-  line-height: 12px;
+  line-height: 14px;
   padding: 12px 0 6px 0;
 }
 

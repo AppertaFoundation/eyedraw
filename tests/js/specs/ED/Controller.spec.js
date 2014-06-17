@@ -77,8 +77,6 @@
 				var properties = $.extend({}, defaultProperties);
 				var controller = new ED.Controller(properties);
 
-				console.log(controller);
-
 				expect(controller.mainToolbar instanceof ED.Views.Toolbar).to.be.true;
 				expect(controller.doodlePopup instanceof ED.Views.DoodlePopup).to.be.true;
 				expect(controller.mainToolbar.container[0]).to.equal(dom.mainToolbar[0]);
@@ -533,8 +531,6 @@
 						]
 					],
 				});
-
-				console.log(props);
 
 				var dom = createDOM();
 				var controller = new ED.Controller(props);

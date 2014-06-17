@@ -12,7 +12,7 @@ Things to consider when adjusting the scale of the canvas drawing:
       * doodle.snapToGrid UNCHANGED - might have to be adjusted
       * doodle.snapToQuadrant UNCHANGED - don't need to adjust
       * doodle.snapToPoints UNCHANGED - don't need to adjust
-      * Tested with NuclearCataract by changing the originX and originY to be something small.
+      * Bounds are enforced correctly by constraining the range within doodle.move.
   * ED.Mode.Scale:
     * (DONE): need to take into account scale level when constraining the scale range
   * Rotation:

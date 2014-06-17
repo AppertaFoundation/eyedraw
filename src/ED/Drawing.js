@@ -119,7 +119,6 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 	this.isNew = true;
 	this.isReady = false;
 	this.showDoodleControls = false;
-	this.isZoomedIn = true;
 
 	// Freehand drawing properties NB from November 2013 moved to Freehand doodle
 // 	this.squiggleColour = new ED.Colour(0, 255, 0, 1);
@@ -787,10 +786,8 @@ ED.Drawing.prototype.mousemove = function(_point) {
 					break;
 
 				case ED.Mode.Move:
-					// console.log('move');
 					// If isMoveable is true, move doodle
 					if (doodle.isMoveable) {
-						console.log('moving');
 						// Initialise new values to stop doodle getting 'trapped' at origin due to failure of non-zero test in snapToQuadrant
 						var newOriginX = doodle.originX;
 						var newOriginY = doodle.originY;
@@ -842,7 +839,6 @@ ED.Drawing.prototype.mousemove = function(_point) {
 					// Otherwise rotate it (if isRotatable)
 					else {
 						if (doodle.isRotatable) {
-							console.log('is rotatable');
 							// Calculate angles from centre to mouse positions relative to north
 							var oldAngle = this.innerAngle(canvasTop, canvasCentre, lastMousePosRelCanvasCentre);
 							var newAngle = this.innerAngle(canvasTop, canvasCentre, mousePosRelCanvasCentre);
@@ -878,7 +874,6 @@ ED.Drawing.prototype.mousemove = function(_point) {
 					break;
 				case ED.Mode.Scale:
 					if (doodle.isScaleable) {
-						console.log('is scalable');
 						// Get sign of scale (negative scales create horizontal and vertical flips)
 						var signX = doodle.scaleX / Math.abs(doodle.scaleX);
 						var signY = doodle.scaleY / Math.abs(doodle.scaleY);
@@ -903,9 +898,6 @@ ED.Drawing.prototype.mousemove = function(_point) {
 							newScaleX = doodle.parameterValidationArray['scaleX']['range'].constrain(Math.abs(newScaleX), this.globalScaleFactor);
 							newScaleY = doodle.parameterValidationArray['scaleY']['range'].constrain(Math.abs(newScaleY), this.globalScaleFactor);
 
-							console.log('scale', this.globalScaleFactor);
-							console.log(newScaleX, newScaleY);
-
 							doodle.setSimpleParameter('scaleX', newScaleX * signX);
 							doodle.setSimpleParameter('scaleY', newScaleY * signY);
 
@@ -919,8 +911,6 @@ ED.Drawing.prototype.mousemove = function(_point) {
 					break;
 
 				case ED.Mode.Arc:
-
-					console.log('ED.Mode.Arc');
 
 					// Calculate angles from centre to mouse positions relative to north
 					var newAngle = this.innerAngle(doodleTop, doodleOrigin, mousePosSelectedDoodlePlane);
@@ -979,7 +969,6 @@ ED.Drawing.prototype.mousemove = function(_point) {
 				case ED.Mode.Rotate:
 
 					if (doodle.isRotatable) {
-						console.log('ED.Mode.Rotate');
 						// Calculate angles from centre to mouse positions relative to north
 						var oldAngle = this.innerAngle(doodleTop, doodleOrigin, lastMousePosDoodlePlane);
 						var newAngle = this.innerAngle(doodleTop, doodleOrigin, mousePosDoodlePlane);
@@ -999,7 +988,6 @@ ED.Drawing.prototype.mousemove = function(_point) {
 					break;
 
 				case ED.Mode.Apex:
-					console.log('ED.Mode.Apex');
 					// Move apex to new position
 					var newApexX = doodle.apexX + (mousePosSelectedDoodlePlane.x - lastMousePosSelectedDoodlePlane.x);
 					var newApexY = doodle.apexY + (mousePosSelectedDoodlePlane.y - lastMousePosSelectedDoodlePlane.y);
@@ -1014,7 +1002,6 @@ ED.Drawing.prototype.mousemove = function(_point) {
 					break;
 
 				case ED.Mode.Size:
-					console.log('ED.Mode.size');
 					// Alter width and height accordingly
 					var newWidth = doodle.width + 2 * (mousePosSelectedDoodlePlane.x - lastMousePosSelectedDoodlePlane.x);
 					var newHeight = doodle.height - 2 * (mousePosSelectedDoodlePlane.y - lastMousePosSelectedDoodlePlane.y);
@@ -1030,7 +1017,6 @@ ED.Drawing.prototype.mousemove = function(_point) {
 
 				case ED.Mode.Handles:
 
-					console.log('ED.Mode.Handles');
 					// Move handles to new position (Stored in a squiggle)
 					var index = doodle.draggingHandleIndex;
 
@@ -1067,7 +1053,7 @@ ED.Drawing.prototype.mousemove = function(_point) {
 
 				case ED.Mode.Select:
 					var p = new ED.Point(mousePosSelectedDoodlePlane.x, mousePosSelectedDoodlePlane.y);
-					console.log('Selecting ', p.x, p.y);
+					// console.log('Selecting ', p.x, p.y);
 					break;
 
 				default:
@@ -1711,17 +1697,17 @@ ED.Drawing.prototype.resetEyedraw = function() {
 }
 
 /**
- * Zoom the drawing.
- * @param  {Number} level     Zoom level.
+ * Set the scale level.
+ * @param  {Number} level     Scale level.
  * @param  {String} eventName Event name to notify.
  */
-ED.Drawing.prototype.zoom = function(level, eventName) {
+ED.Drawing.prototype.setScaleLevel = function(level, eventName) {
 
 	this.globalScaleFactor = level;
 
 	this.doodleArray.forEach(function(doodle) {
-		doodle.setScaleLevel(this.globalScaleFactor);
-	}.bind(this));
+		doodle.setScaleLevel(level);
+	});
 
 	this.repaint();
 
@@ -1731,17 +1717,16 @@ ED.Drawing.prototype.zoom = function(level, eventName) {
 };
 
 /**
- * Toggles the zoom level of the drawing.
+ * Toggles the zoom (scale) level of the drawing.
  * We're only supporting two zoom levels: "in" and "out". By default, the eyedraw
  * is zoomed in.
  */
 ED.Drawing.prototype.toggleZoom = function() {
-	if (this.isZoomedIn) {
-		this.zoom(this.origGlobalScaleFactor * .5, 'drawingZoomOut');
+	if (this.globalScaleFactor === this.origGlobalScaleFactor) {
+		this.setScaleLevel(this.origGlobalScaleFactor * .5, 'drawingZoomOut');
 	} else {
-		this.zoom(this.origGlobalScaleFactor, 'drawingZoomIn')
+		this.setScaleLevel(this.origGlobalScaleFactor, 'drawingZoomIn')
 	}
-	this.isZoomedIn = !this.isZoomedIn;
 };
 
 /**
@@ -1760,15 +1745,6 @@ ED.Drawing.prototype.setSelectedDoodle = function(_element, _property) {
 	} else {
 		ED.errorHandler('ED.Drawing', 'setSelectedDoodle', 'Attempt to set a property on the selected doodle, when none selected');
 	}
-
-	//    if (_element.checked)
-	//    {
-	//        console.log('YES');
-	//    }
-	//    else
-	//    {
-	//        console.log('NO');
-	//    }
 }
 
 /**

@@ -108,9 +108,8 @@ ED.OpticDisc.prototype.setPropertyDefaults = function() {
  * Sets default parameters
  */
 ED.OpticDisc.prototype.setParameterDefaults = function() {
+
 	this.apexY = -150;
-	this.setParameterFromString('mode', 'Basic');
-	this.setParameterFromString('cdRatio', '0.3');
 
 	// Create a squiggle to store the handles points
 	var squiggle = new ED.Squiggle(this, new ED.Colour(100, 100, 100, 1), 4, true);
@@ -124,6 +123,9 @@ ED.OpticDisc.prototype.setParameterDefaults = function() {
 		point.setWithPolars(-this.apexY, i * 2 * Math.PI / this.numberOfHandles);
 		this.addPointToSquiggle(point);
 	}
+
+	this.setParameterFromString('mode', 'Basic');
+	this.setParameterFromString('cdRatio', '0.3');
 }
 
 /**
@@ -135,6 +137,8 @@ ED.OpticDisc.prototype.setParameterDefaults = function() {
  * @returns {Array} Associative array of values of dependent parameters
  */
 ED.OpticDisc.prototype.dependentParameterValues = function(_parameter, _value) {
+	console.log('dependentParameterValues');
+
 	var returnArray = new Array();
 
 	switch (_parameter) {
