@@ -54,7 +54,6 @@ ED.TubeLigation.superclass = ED.Doodle.prototype;
 ED.TubeLigation.prototype.setPropertyDefaults = function() {
 	this.isOrientated = true;
 	this.isRotatable = false;
-	this.isUnique = true;
 
 	// Add complete validation arrays for derived parameters
 	this.parameterValidationArray['material'] = {
@@ -123,6 +122,13 @@ ED.TubeLigation.prototype.setParameterDefaults = function() {
 				}
 				break;
 		}
+	}
+	
+	// If existing doodle, put in same meridian, but lower down
+	var doodle = this.drawing.lastDoodleOfClass(this.className);
+	if (doodle) {
+		this.originX = doodle.originX * 0.9;
+		this.originY = doodle.originY * 0.9;
 	}
 }
 
