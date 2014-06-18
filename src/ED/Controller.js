@@ -59,8 +59,6 @@ ED.Controller = (function() {
 		this.registerDrawing();
 		this.registerForNotifications();
 		this.initListeners();
-
-		// Initialize drawing.
 		this.drawing.init();
 	}
 
@@ -75,7 +73,7 @@ ED.Controller = (function() {
 			offsetY: this.properties.offsetY,
 			toImage: this.properties.toImage,
 			graphicsPath: this.properties.graphicsPath,
-			scale: this.properties.scale
+			toggleScale: this.properties.toggleScale
 		};
 
 		var drawing = new ED.Drawing(
@@ -401,6 +399,7 @@ ED.Controller = (function() {
 
 		this.addBindings();
 		this.addDeletedValues();
+		this.drawing.setScaleLevel(this.properties.scale);
 		this.saveDrawingToInputField(true);
 
 		// Optionally make canvas element focused

@@ -172,7 +172,7 @@
 
 					<div class="ed-editor">
 
-						<div class="ed-drawing-controls">
+						<div class="ed-drawing-controls ed-feature-zoom">
 							<ul class="ed-toolbar-panel ed-drawing-toolbar">
 								<li>
 									<a class="ed-button" href="#" data-function="resetEyedraw">
@@ -210,7 +210,7 @@
 						<input
 							type="hidden"
 							id="ed_example_data"
-							value='' />
+							value='[{"version":1.1,"subclass":"AntSeg","pupilSize":"Small","apexY":-60,"rotation":0,"pxe":false,"coloboma":false,"colour":"Blue","ectropion":false,"order":0},{"version":1.1,"subclass":"CiliaryInjection","arc":90,"rotation":270,"order":1}]' />
 					</div>
 				</div>
 
@@ -235,7 +235,8 @@
 			focus: false,
 			graphicsPath: "../../../assets/img/",
 			inputId: "ed_example_data",
-			scale: 1,
+			scale: .8,
+			toggleScale: 0.5,
 			onReadyCommandArray: [
 				[
 					"addDoodle",

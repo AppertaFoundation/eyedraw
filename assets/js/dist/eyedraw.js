@@ -335,6 +335,8 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 	var offsetY = 0;
 	var toImage = false;
 	var globalScaleFactor = 1;
+	var toggleScaleFactor = 0;
+
 	this.graphicsPath = 'assets/img';
 	this.scaleOn = 'height';
 
@@ -346,6 +348,7 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 		if (_options['graphicsPath']) this.graphicsPath = _options['graphicsPath'];
 		if (_options['scaleOn']) this.scaleOn = _options['scaleOn'];
 		if (_options['scale']) globalScaleFactor = _options['scale'];
+		if (_options['toggleScale'] !== undefined) toggleScaleFactor = _options['toggleScale'];
 	}
 
 	// Initialise properties
@@ -372,7 +375,7 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 	this.newPointOnClick = false;
 	this.completeLine = false;
 	this.globalScaleFactor = globalScaleFactor;
-	this.origGlobalScaleFactor = this.globalScaleFactor;
+	this.toggleScaleFactor = toggleScaleFactor;
 	this.scrollValue = 0;
 	this.lastDoodleId = 0;
 	this.isActive = false;
@@ -542,7 +545,6 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 		window.addEventListener('keydown', function(e) {
 			if (document.activeElement === _canvas) drawing.keydown(e);
 		}, true);
-
 
 		// Stop browser stealing double click to select text
 		this.canvas.onselectstart = function() {
@@ -1955,11 +1957,11 @@ ED.Drawing.prototype.resetEyedraw = function() {
 }
 
 /**
- * Set the scale level.
+ * Set the scale level for drawing and all doodles
  * @param  {Number} level     Scale level.
  * @param  {String} eventName Event name to notify.
  */
-ED.Drawing.prototype.setScaleLevel = function(level, eventName) {
+ED.Drawing.prototype.setScaleForDrawingAndDoodles = function(level, eventName) {
 
 	this.globalScaleFactor = level;
 
@@ -1975,16 +1977,21 @@ ED.Drawing.prototype.setScaleLevel = function(level, eventName) {
 };
 
 /**
- * Toggles the zoom (scale) level of the drawing.
- * We're only supporting two zoom levels: "in" and "out". By default, the eyedraw
- * is zoomed in.
+ * Toggles the scale level of the drawing.
+ * We're only supporting two zoom levels: "in" and "out".
  */
 ED.Drawing.prototype.toggleZoom = function() {
-	if (this.globalScaleFactor === this.origGlobalScaleFactor) {
-		this.setScaleLevel(this.origGlobalScaleFactor * .5, 'drawingZoomOut');
-	} else {
-		this.setScaleLevel(this.origGlobalScaleFactor, 'drawingZoomIn')
-	}
+	if (!this.toggleScaleFactor) return;
+	this.setScaleLevel(this.globalScaleFactor === this.toggleScaleFactor ? 1 : this.toggleScaleFactor);
+};
+
+/**
+ * This should be called only once the drawing is ready.
+ * @param {[type]} level [description]
+ */
+ED.Drawing.prototype.setScaleLevel = function(level) {
+	var evt = level < 1 ? 'drawingZoomOut' : 'drawingZoomIn';
+	this.setScaleForDrawingAndDoodles(level, evt);
 };
 
 /**
@@ -5378,7 +5385,7 @@ ED.Doodle.prototype.xForY = function(_r, _y) {
 ED.Doodle.prototype.setScaleLevel = function(_newLevel) {
 
 	var diff = _newLevel;
-	if (_newLevel > this.scaleLevel) {
+	if (_newLevel === 1 && this.scaleLevel !== undefined) {
 		diff /= this.scaleLevel;
 	}
 
@@ -5881,8 +5888,6 @@ ED.Controller = (function() {
 		this.registerDrawing();
 		this.registerForNotifications();
 		this.initListeners();
-
-		// Initialize drawing.
 		this.drawing.init();
 	}
 
@@ -5897,7 +5902,7 @@ ED.Controller = (function() {
 			offsetY: this.properties.offsetY,
 			toImage: this.properties.toImage,
 			graphicsPath: this.properties.graphicsPath,
-			scale: this.properties.scale
+			toggleScale: this.properties.toggleScale
 		};
 
 		var drawing = new ED.Drawing(
@@ -6223,6 +6228,7 @@ ED.Controller = (function() {
 
 		this.addBindings();
 		this.addDeletedValues();
+		this.drawing.setScaleLevel(this.properties.scale);
 		this.saveDrawingToInputField(true);
 
 		// Optionally make canvas element focused
@@ -7939,7 +7945,7 @@ ED.Views.Toolbar.Main = (function() {
 
 	return MainToolbar;
 }());
-/*! Generated on 17/6/2014 */
+/*! Generated on 18/6/2014 */
 ED.scriptTemplates = {
   "doodle-popup": "\n\n\n\n{{#doodle}}\n\t<ul class=\"ed-toolbar-panel ed-doodle-popup-toolbar\">\n\t\t{{#desc}}\n\t\t\t<li>\n\t\t\t\t<a class=\"ed-button ed-doodle-help{{lockedButtonClass}}\" href=\"#\" data-function=\"toggleHelp\">\n\t\t\t\t\t<span class=\"icon-ed-help\"></span>\n\t\t\t\t</a>\n\t\t\t</li>\n\t\t{{/desc}}\n\t\t{{#doodle.isLocked}}\n\t\t\t<li>\n\t\t\t\t<a class=\"ed-button\" href=\"#\" data-function=\"unlock\">\n\t\t\t\t\t<span class=\"icon-ed-unlock\"></span>\n\t\t\t\t\t<span class=\"label\">Unlock</span>\n\t\t\t\t</a>\n\t\t\t</li>\n\t\t{{/doodle.isLocked}}\n\t\t{{^doodle.isLocked}}\n\t\t\t<li>\n\t\t\t\t<a class=\"ed-button\" href=\"#\" data-function=\"lock\">\n\t\t\t\t\t<span class=\"icon-ed-lock\"></span>\n\t\t\t\t\t<span class=\"label\">Lock</span>\n\t\t\t\t</a>\n\t\t\t</li>\n\t\t{{/doodle.isLocked}}\n\t\t<li>\n\t\t\t<a class=\"ed-button{{lockedButtonClass}}\" href=\"#\" data-function=\"moveToBack\">\n\t\t\t\t<span class=\"icon-ed-move-to-back\"></span>\n\t\t\t\t<span class=\"label\">Move to back</span>\n\t\t\t</a>\n\t\t</li>\n\t\t<li>\n\t\t\t<a class=\"ed-button{{lockedButtonClass}}\" href=\"#\" data-function=\"moveToFront\">\n\t\t\t\t<span class=\"icon-ed-move-to-front\"></span>\n\t\t\t\t<span class=\"label\">Move to front</span>\n\t\t\t</a>\n\t\t</li>\n\t\t{{#doodle.isDeletable}}\n\t\t\t<li>\n\t\t\t\t<a class=\"ed-button{{lockedButtonClass}}\" href=\"#\" data-function=\"deleteSelectedDoodle\">\n\t\t\t\t\t<span class=\"icon-ed-delete\"></span>\n\t\t\t\t\t<span class=\"label\">Delete</span>\n\t\t\t\t</a>\n\t\t\t</li>\n\t\t{{/doodle.isDeletable}}\n\t</ul>\n\t<div class=\"ed-doodle-info hide\">\n\t\t{{^doodle.isLocked}}\n\t\t\t{{#desc}}\n\t\t\t\t<div class=\"ed-doodle-description\">{{{desc}}}</div>\n\t\t\t{{/desc}}\n\t\t{{/doodle.isLocked}}\n\t</div>\n\t<div class=\"ed-doodle-controls{{#doodle.isLocked}} hide{{/doodle.isLocked}}\" id=\"{{drawing.canvas.id}}_controls\">\n\t</div>\n\t{{#doodle.isLocked}}\n\t\t<div class=\"ed-doodle-description\">\n\t\t\t<strong>This doodle is locked and cannot be edited.</strong>\n\t\t</div>\n\t{{/doodle.isLocked}}\n{{/doodle}}"
 };

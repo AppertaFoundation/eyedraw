@@ -1954,6 +1954,10 @@ span.squiggle {
 }
 /* line 31, ../sass/components/_drawing-controls.scss */
 .ed-drawing-controls .ed-selected-doodle {
+  margin-left: 32px;
+}
+/* line 35, ../sass/components/_drawing-controls.scss */
+.ed-drawing-controls.ed-feature-zoom .ed-selected-doodle {
   margin-left: 66px;
 }
 

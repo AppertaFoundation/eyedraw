@@ -75,6 +75,8 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 	var offsetY = 0;
 	var toImage = false;
 	var globalScaleFactor = 1;
+	var toggleScaleFactor = 0;
+
 	this.graphicsPath = 'assets/img';
 	this.scaleOn = 'height';
 
@@ -86,6 +88,7 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 		if (_options['graphicsPath']) this.graphicsPath = _options['graphicsPath'];
 		if (_options['scaleOn']) this.scaleOn = _options['scaleOn'];
 		if (_options['scale']) globalScaleFactor = _options['scale'];
+		if (_options['toggleScale'] !== undefined) toggleScaleFactor = _options['toggleScale'];
 	}
 
 	// Initialise properties
@@ -112,7 +115,7 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 	this.newPointOnClick = false;
 	this.completeLine = false;
 	this.globalScaleFactor = globalScaleFactor;
-	this.origGlobalScaleFactor = this.globalScaleFactor;
+	this.toggleScaleFactor = toggleScaleFactor;
 	this.scrollValue = 0;
 	this.lastDoodleId = 0;
 	this.isActive = false;
@@ -282,7 +285,6 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 		window.addEventListener('keydown', function(e) {
 			if (document.activeElement === _canvas) drawing.keydown(e);
 		}, true);
-
 
 		// Stop browser stealing double click to select text
 		this.canvas.onselectstart = function() {
@@ -1695,11 +1697,11 @@ ED.Drawing.prototype.resetEyedraw = function() {
 }
 
 /**
- * Set the scale level.
+ * Set the scale level for drawing and all doodles
  * @param  {Number} level     Scale level.
  * @param  {String} eventName Event name to notify.
  */
-ED.Drawing.prototype.setScaleLevel = function(level, eventName) {
+ED.Drawing.prototype.setScaleForDrawingAndDoodles = function(level, eventName) {
 
 	this.globalScaleFactor = level;
 
@@ -1715,16 +1717,21 @@ ED.Drawing.prototype.setScaleLevel = function(level, eventName) {
 };
 
 /**
- * Toggles the zoom (scale) level of the drawing.
- * We're only supporting two zoom levels: "in" and "out". By default, the eyedraw
- * is zoomed in.
+ * Toggles the scale level of the drawing.
+ * We're only supporting two zoom levels: "in" and "out".
  */
 ED.Drawing.prototype.toggleZoom = function() {
-	if (this.globalScaleFactor === this.origGlobalScaleFactor) {
-		this.setScaleLevel(this.origGlobalScaleFactor * .5, 'drawingZoomOut');
-	} else {
-		this.setScaleLevel(this.origGlobalScaleFactor, 'drawingZoomIn')
-	}
+	if (!this.toggleScaleFactor) return;
+	this.setScaleLevel(this.globalScaleFactor === this.toggleScaleFactor ? 1 : this.toggleScaleFactor);
+};
+
+/**
+ * This should be called only once the drawing is ready.
+ * @param {[type]} level [description]
+ */
+ED.Drawing.prototype.setScaleLevel = function(level) {
+	var evt = level < 1 ? 'drawingZoomOut' : 'drawingZoomIn';
+	this.setScaleForDrawingAndDoodles(level, evt);
 };
 
 /**

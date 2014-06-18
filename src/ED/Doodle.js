@@ -2205,7 +2205,7 @@ ED.Doodle.prototype.xForY = function(_r, _y) {
 ED.Doodle.prototype.setScaleLevel = function(_newLevel) {
 
 	var diff = _newLevel;
-	if (_newLevel > this.scaleLevel) {
+	if (_newLevel === 1 && this.scaleLevel !== undefined) {
 		diff /= this.scaleLevel;
 	}
 
