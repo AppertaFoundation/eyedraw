@@ -49,8 +49,8 @@ ED.Controller = (function() {
 		this.drawing = drawing || this.createDrawing();
 
 		if (this.properties.isEditable) {
-			this.mainToolbar = mainToolbar || this.createToolbar('.ed-main-toolbar');
-			this.drawingToolbar = drawingToolbar || this.createToolbar('.ed-drawing-toolbar');
+			this.mainToolbar = mainToolbar || this.createMainToolbar();
+			this.drawingToolbar = drawingToolbar || this.createDrawingToolbar();
 			this.doodlePopup = doodlePopup || this.createDoodlePopup();
 			this.selectedDoodle = selectedDoodle || this.createSelectedDoodle();
 			this.bindEditEvents();
@@ -59,8 +59,6 @@ ED.Controller = (function() {
 		this.registerDrawing();
 		this.registerForNotifications();
 		this.initListeners();
-
-		// Initialize drawing.
 		this.drawing.init();
 	}
 
@@ -75,6 +73,7 @@ ED.Controller = (function() {
 			offsetY: this.properties.offsetY,
 			toImage: this.properties.toImage,
 			graphicsPath: this.properties.graphicsPath,
+			toggleScale: this.properties.toggleScale
 		};
 
 		var drawing = new ED.Drawing(
@@ -91,11 +90,21 @@ ED.Controller = (function() {
 	/**
 	 * Create a Toolbar view instance.
 	 */
-	Controller.prototype.createToolbar = function(selector) {
+	Controller.prototype.createMainToolbar = function() {
 
-		var container = this.container.find(selector);
+		var container = this.container.find('.ed-main-toolbar');
 
-		return container.length ? new ED.Views.Toolbar(
+		return container.length ? new ED.Views.Toolbar.Main(
+			this.drawing,
+			container
+		) : null;
+	};
+
+	Controller.prototype.createDrawingToolbar = function() {
+
+		var container = this.container.find('.ed-drawing-toolbar');
+
+		return container.length ? new ED.Views.Toolbar.Drawing(
 			this.drawing,
 			container
 		) : null;
@@ -378,9 +387,6 @@ ED.Controller = (function() {
 	 */
 	Controller.prototype.onReady = function() {
 
-		// Set scale of drawing
-		this.drawing.globalScaleFactor = this.properties.scale;
-
 		// If input exists and contains data, load it into the drawing.
 		if (this.hasInputFieldData()) {
 			this.loadInputFieldData();
@@ -393,6 +399,7 @@ ED.Controller = (function() {
 
 		this.addBindings();
 		this.addDeletedValues();
+		this.drawing.setScaleLevel(this.properties.scale);
 		this.saveDrawingToInputField(true);
 
 		// Optionally make canvas element focused

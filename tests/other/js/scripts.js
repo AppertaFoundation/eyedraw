@@ -218,5 +218,7 @@ window.eyedrawScripts = [
     "ED/Views/Toolbar.js",
     "ED/Views/templates.js",
     "ED/Views/DoodlePopup/Help.js",
+    "ED/Views/Toolbars/Drawing.js",
+    "ED/Views/Toolbars/Main.js",
     "OEEyeDraw.js"
 ];

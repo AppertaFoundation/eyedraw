@@ -48,6 +48,7 @@
 }
 
 .ed-editor  {
+	@include user-select(none);
 	position: relative;
 	margin-top: 4px;
 }

@@ -120,6 +120,12 @@ class OEEyeDrawWidget extends CWidget
 	public $scale = 1;
 
 	/**
+	 * Toggle scale factor. Set to 0 to disable zooming.
+	 * @var  int
+	 */
+	public $toggleScale = 0;
+
+	/**
 	 * The model possessing an attribute to store JSON data
 	 * @var CActiveRecord
 	 */
@@ -368,6 +374,7 @@ class OEEyeDrawWidget extends CWidget
 			'canvasId'=>$this->canvasId,
 			'eye'=>$this->eye,
 			'scale'=>$this->scale,
+			'toggleScale'=>$this->toggleScale,
 			'idSuffix'=>$this->idSuffix,
 			'isEditable'=>$this->isEditable,
 			'focus'=>$this->focus,

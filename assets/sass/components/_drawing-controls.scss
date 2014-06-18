@@ -31,4 +31,9 @@
 	.ed-selected-doodle {
 		margin-left: 32px;
 	}
+	&.ed-feature-zoom {
+		.ed-selected-doodle {
+			margin-left: 66px;
+		}
+	}
 }

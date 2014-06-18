@@ -20,7 +20,7 @@
 
 <div class="ed-editor">
 	<?php if ($showDrawingControls && $mode !== 'view') {?>
-		<div class="ed-drawing-controls">
+		<div class="ed-drawing-controls<?= $toggleScale ? ' ed-feature-zoom': '';?>">
 			<!-- DRAWING TOOLBAR -->
 			<ul class="ed-toolbar-panel ed-drawing-toolbar">
 				<li>
@@ -29,6 +29,14 @@
 						<span class="label">Reset eyedraw</span>
 					</a>
 				</li>
+				<?php if ($toggleScale) {?>
+					<li>
+						<a class="ed-button" href="#" data-function="toggleZoom">
+							<span class="icon-ed-zoom-out"></span>
+							<span class="label">Toggle Zoom</span>
+						</a>
+					</li>
+				<?php }?>
 			</ul>
 			<!-- SELECTED DOODLE -->
 			<div class="ed-selected-doodle">
