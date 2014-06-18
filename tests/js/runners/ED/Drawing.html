@@ -42,19 +42,18 @@
 		<script type="text/javascript" src="../../../other/js/scripts.js"></script>
 		<script>
 			this.eyedrawScripts.forEach(function(file) {
-				var cover = (file.indexOf('Controller.js') >= 0) ? ' data-cover' : '';
 				// We use document.write to force the files to be loaded synchronously.
-				document.write('<script' + cover + ' src="../../../../src/' + file + '"><\/script>');
+				document.write('<script src="../../../../src/' + file + '"><\/script>');
 			});
 		</script>
 		<!-- End loading in eyedraw scripts -->
 
 		<!-- Add spec files here -->
-		<script src="../../specs/ED/Controller.spec.js"></script>
+		<script src="../../specs/ED/Drawing.spec.js"></script>
 
 		<!-- Code coverage dependencies -->
-		<script src="../../../../assets/components/blanket/dist/qunit/blanket.min.js"
-			data-cover-adapter="../../adapters/mocha-blanket.js"></script>
+		<!-- <script src="../../../../assets/components/blanket/dist/qunit/blanket.min.js" -->
+			<!-- data-cover-adapter="../../adapters/mocha-blanket.js"></script> -->
 
 		<!-- Run the tests -->
 		<script>

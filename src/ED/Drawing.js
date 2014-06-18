@@ -74,6 +74,9 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 	var offsetX = 0;
 	var offsetY = 0;
 	var toImage = false;
+	var globalScaleFactor = 1;
+	var toggleScaleFactor = 0;
+
 	this.graphicsPath = 'assets/img';
 	this.scaleOn = 'height';
 
@@ -84,6 +87,8 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 		if (_options['toImage']) toImage = _options['toImage'];
 		if (_options['graphicsPath']) this.graphicsPath = _options['graphicsPath'];
 		if (_options['scaleOn']) this.scaleOn = _options['scaleOn'];
+		if (_options['scale']) globalScaleFactor = _options['scale'];
+		if (_options['toggleScale'] !== undefined) toggleScaleFactor = _options['toggleScale'];
 	}
 
 	// Initialise properties
@@ -109,7 +114,8 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 	this.readyNotificationSent = false;
 	this.newPointOnClick = false;
 	this.completeLine = false;
-	this.globalScaleFactor = 1;
+	this.globalScaleFactor = globalScaleFactor;
+	this.toggleScaleFactor = toggleScaleFactor;
 	this.scrollValue = 0;
 	this.lastDoodleId = 0;
 	this.isActive = false;
@@ -279,7 +285,6 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 		window.addEventListener('keydown', function(e) {
 			if (document.activeElement === _canvas) drawing.keydown(e);
 		}, true);
-
 
 		// Stop browser stealing double click to select text
 		this.canvas.onselectstart = function() {
@@ -747,6 +752,7 @@ ED.Drawing.prototype.mousemove = function(_point) {
 
 	// Only drag if mouse already down and a doodle selected
 	if (this.mouseDown && doodle != null) {
+
 		// Dragging not started
 		if (!doodle.isBeingDragged) {
 			// Flag start of dragging manoeuvre
@@ -891,8 +897,8 @@ ED.Drawing.prototype.mousemove = function(_point) {
 							newScaleY = doodle.scaleY * changeY;
 
 							// Constrain scale
-							newScaleX = doodle.parameterValidationArray['scaleX']['range'].constrain(Math.abs(newScaleX));
-							newScaleY = doodle.parameterValidationArray['scaleY']['range'].constrain(Math.abs(newScaleY));
+							newScaleX = doodle.parameterValidationArray['scaleX']['range'].constrain(Math.abs(newScaleX), this.globalScaleFactor);
+							newScaleY = doodle.parameterValidationArray['scaleY']['range'].constrain(Math.abs(newScaleY), this.globalScaleFactor);
 
 							doodle.setSimpleParameter('scaleX', newScaleX * signX);
 							doodle.setSimpleParameter('scaleY', newScaleY * signY);
@@ -961,6 +967,7 @@ ED.Drawing.prototype.mousemove = function(_point) {
 					break;
 
 				case ED.Mode.Rotate:
+
 					if (doodle.isRotatable) {
 						// Calculate angles from centre to mouse positions relative to north
 						var oldAngle = this.innerAngle(doodleTop, doodleOrigin, lastMousePosDoodlePlane);
@@ -1009,6 +1016,7 @@ ED.Drawing.prototype.mousemove = function(_point) {
 					break;
 
 				case ED.Mode.Handles:
+
 					// Move handles to new position (Stored in a squiggle)
 					var index = doodle.draggingHandleIndex;
 
@@ -1045,7 +1053,7 @@ ED.Drawing.prototype.mousemove = function(_point) {
 
 				case ED.Mode.Select:
 					var p = new ED.Point(mousePosSelectedDoodlePlane.x, mousePosSelectedDoodlePlane.y);
-					console.log('Selecting ', p.x, p.y);
+					// console.log('Selecting ', p.x, p.y);
 					break;
 
 				default:
@@ -1689,6 +1697,44 @@ ED.Drawing.prototype.resetEyedraw = function() {
 }
 
 /**
+ * Set the scale level for drawing and all doodles
+ * @param  {Number} level     Scale level.
+ * @param  {String} eventName Event name to notify.
+ */
+ED.Drawing.prototype.setScaleForDrawingAndDoodles = function(level, eventName) {
+
+	this.globalScaleFactor = level;
+
+	this.doodleArray.forEach(function(doodle) {
+		doodle.setScaleLevel(level);
+	});
+
+	this.repaint();
+
+	if (eventName) {
+		this.notify(eventName);
+	}
+};
+
+/**
+ * Toggles the scale level of the drawing.
+ * We're only supporting two zoom levels: "in" and "out".
+ */
+ED.Drawing.prototype.toggleZoom = function() {
+	if (!this.toggleScaleFactor) return;
+	this.setScaleLevel(this.globalScaleFactor === this.toggleScaleFactor ? 1 : this.toggleScaleFactor);
+};
+
+/**
+ * This should be called only once the drawing is ready.
+ * @param {[type]} level [description]
+ */
+ED.Drawing.prototype.setScaleLevel = function(level) {
+	var evt = level < 1 ? 'drawingZoomOut' : 'drawingZoomIn';
+	this.setScaleForDrawingAndDoodles(level, evt);
+};
+
+/**
  * Sets a property on currently selected doodle NB currently only supports boolean properties
  *
  * @param {Object} _element An HTML element which called this function
@@ -1704,15 +1750,6 @@ ED.Drawing.prototype.setSelectedDoodle = function(_element, _property) {
 	} else {
 		ED.errorHandler('ED.Drawing', 'setSelectedDoodle', 'Attempt to set a property on the selected doodle, when none selected');
 	}
-
-	//    if (_element.checked)
-	//    {
-	//        console.log('YES');
-	//    }
-	//    else
-	//    {
-	//        console.log('NO');
-	//    }
 }
 
 /**
@@ -1948,8 +1985,9 @@ ED.Drawing.prototype.addDoodle = function(_className, _parameterDefaults, _param
 		this.selectedDoodle = newDoodle;
 
 		// Apply global scale factor
-		newDoodle.scaleX = newDoodle.scaleX * this.globalScaleFactor;
-		newDoodle.scaleY = newDoodle.scaleY * this.globalScaleFactor;
+		newDoodle.setScaleLevel(this.globalScaleFactor);
+		// newDoodle.scaleX = newDoodle.origScaleX * this.globalScaleFactor;
+		// newDoodle.scaleY = newDoodle.origScaleY * this.globalScaleFactor;
 
 		// If drawable, also go into drawing mode
 		if (newDoodle.isDrawable) {
@@ -2786,6 +2824,10 @@ ED.Drawing.prototype.togglePointInLine = function() {
 ED.Drawing.prototype.nextDoodleId = function() {
 	return this.lastDoodleId++;
 }
+
+ED.Drawing.prototype.getScaleLevel = function() {
+	return this.globalScaleFactor;
+};
 
 /**
  * Changes the drawing colour of freehand drawing

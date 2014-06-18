@@ -24,11 +24,13 @@
 
 {{#doodle}}
 	<ul class="ed-toolbar-panel ed-doodle-popup-toolbar">
-		<li>
-			<a class="ed-button ed-doodle-help{{lockedButtonClass}}" href="#" data-function="toggleHelp">
-				<span class="icon-ed-help"></span>
-			</a>
-		</li>
+		{{#desc}}
+			<li>
+				<a class="ed-button ed-doodle-help{{lockedButtonClass}}" href="#" data-function="toggleHelp">
+					<span class="icon-ed-help"></span>
+				</a>
+			</li>
+		{{/desc}}
 		{{#doodle.isLocked}}
 			<li>
 				<a class="ed-button" href="#" data-function="unlock">
@@ -67,11 +69,6 @@
 		{{/doodle.isDeletable}}
 	</ul>
 	<div class="ed-doodle-info hide">
-		{{#doodle.isLocked}}
-			<div class="ed-doodle-description">
-				<strong>This doodle is locked and cannot be edited.</strong>
-			</div>
-		{{/doodle.isLocked}}
 		{{^doodle.isLocked}}
 			{{#desc}}
 				<div class="ed-doodle-description">{{{desc}}}</div>
@@ -80,4 +77,9 @@
 	</div>
 	<div class="ed-doodle-controls{{#doodle.isLocked}} hide{{/doodle.isLocked}}" id="{{drawing.canvas.id}}_controls">
 	</div>
+	{{#doodle.isLocked}}
+		<div class="ed-doodle-description">
+			<strong>This doodle is locked and cannot be edited.</strong>
+		</div>
+	{{/doodle.isLocked}}
 {{/doodle}}

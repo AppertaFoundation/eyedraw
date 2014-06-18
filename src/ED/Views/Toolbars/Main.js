@@ -17,17 +17,19 @@
  * along with OpenEyes.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-module.exports = function(grunt) {
-	return {
-		pkg: grunt.file.readJSON('package.json'),
-		concat: require('./concat')(grunt),
-		jshint: require('./jshint')(grunt),
-		qunit: require('./qunit')(grunt),
-		uglify: require('./uglify')(grunt),
-		watch: require('./watch')(grunt),
-		compass: require('./compass')(grunt),
-		connect: require('./connect')(grunt),
-		jst: require('./jst')(grunt),
-		mocha: require('./mocha')(grunt)
-	};
-};
+/* global $: false */
+
+/**
+ * This Toolbar view class manages the main toolbar.
+ */
+ED.Views.Toolbar.Main = (function() {
+
+	function MainToolbar(drawing, container) {
+		ED.Views.Toolbar.apply(this, arguments);
+	}
+
+	MainToolbar.prototype = Object.create(ED.Views.Toolbar.prototype);
+	MainToolbar.prototype.constructor = MainToolbar;
+
+	return MainToolbar;
+}());

@@ -42,7 +42,7 @@ ED.Views.Toolbar = (function() {
 		ED.View.apply(this, arguments);
 
 		this.drawing = drawing;
-		this.container = container;
+		this.container = $(container);
 		this.buttons = this.container.find('.ed-button');
 
 		this.registerForNotifications();

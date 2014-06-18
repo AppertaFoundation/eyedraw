@@ -416,14 +416,15 @@ ED.Doodle.prototype.willDelete = function() {
  * @param {Float} _y Distance to move along y axis in doodle plane
  */
 ED.Doodle.prototype.move = function(_x, _y) {
+
 	// Ensure parameters are integers
 	var x = Math.round(+_x);
 	var y = Math.round(+_y);
 
 	if (this.isMoveable) {
 		// Enforce bounds
-		var newOriginX = this.parameterValidationArray['originX']['range'].constrain(this.originX + x);
-		var newOriginY = this.parameterValidationArray['originY']['range'].constrain(this.originY + y);
+		var newOriginX = this.parameterValidationArray['originX']['range'].constrain(this.originX + x, this.scaleLevel);
+		var newOriginY = this.parameterValidationArray['originY']['range'].constrain(this.originY + y, this.scaleLevel);
 
 		// Move doodle to new position
 		if (x != 0) this.setSimpleParameter('originX', newOriginX);
@@ -1980,6 +1981,7 @@ ED.Doodle.prototype.nearestArcTo = function(_arc) {
  * @returns {String} A JSON encoded string representing the variable properties of the doodle
  */
 ED.Doodle.prototype.json = function() {
+
 	// Start of JSON string
 	var s = '{';
 
@@ -1993,26 +1995,36 @@ ED.Doodle.prototype.json = function() {
 			for (var i = 0; i < this.savedParameterArray.length; i++) {
 				var p = this.savedParameterArray[i];
 
-				// String to output
-				var o;
+				// Value to output
+				var o = this[p];
+
+				// Offset the scale.
+				switch(p) {
+					case 'scaleX':
+					case 'scaleY':
+					case 'originX':
+					case 'originY':
+						o *= (1 / this.scaleLevel);
+					break;
+				}
 
 				// Special treatment according to parameter
 				if (p == 'scaleX' || p == 'scaleY') {
-					o = this[p].toFixed(2);
+					o = o.toFixed(2)
 				} else if (p == 'arc' || p == 'rotation') {
-					o = (this[p] * 180 / Math.PI).toFixed(0);
+					o = (o * 180 / Math.PI).toFixed(0);
 				} else if (p == 'originX' || p == 'originY' || p == 'radius' || p == 'apexX' || p == 'apexY' || p == 'width' || p == 'height') {
-					o = this[p].toFixed(0);
-				} else if (typeof(this[p]) == 'number') {
-					o = this[p].toFixed(2);
-				} else if (typeof(this[p]) == 'string') {
-					o = '"' + this[p] + '"';
-				} else if (typeof(this[p]) == 'boolean') {
-					o = this[p];
-				} else if (typeof(this[p]) == 'object') {
-					o = JSON.stringify(this[p]);
+					o = o.toFixed(0);
+				} else if (typeof(o) == 'number') {
+					o = o.toFixed(2);
+				} else if (typeof(o) == 'string') {
+					o = '"' + o + '"';
+				} else if (typeof(o) == 'boolean') {
+					o = o;
+				} else if (typeof(o) == 'object') {
+					o = JSON.stringify(o);
 				} else {
-					ED.errorHandler('ED.Doodle', 'json', 'Attempt to create json for an unhandled parameter type: ' + typeof(this[p]));
+					ED.errorHandler('ED.Doodle', 'json', 'Attempt to create json for an unhandled parameter type: ' + typeof(o));
 					o = "ERROR";
 				}
 
@@ -2184,7 +2196,29 @@ ED.Doodle.prototype.addEllipseToPath = function(_ctx, _x, _y, _w, _h) {
  */
 ED.Doodle.prototype.xForY = function(_r, _y) {
 	return Math.sqrt(_r * _r - _y * _y);
-}
+};
+
+/**
+ * Set the scale level.
+ * @param {Number} _level The scaling level.
+ */
+ED.Doodle.prototype.setScaleLevel = function(_newLevel) {
+
+	var diff = _newLevel;
+	if (_newLevel === 1 && this.scaleLevel !== undefined) {
+		diff /= this.scaleLevel;
+	}
+
+	this.adjustScaleAndPosition(diff);
+	this.scaleLevel = _newLevel;
+};
+
+ED.Doodle.prototype.adjustScaleAndPosition = function(amount){
+	this.scaleX *= amount;
+	this.scaleY *= amount;
+	this.originX *= amount;
+	this.originY *= amount;
+};
 
 /**
  * Outputs doodle information to the console
@@ -2219,4 +2253,4 @@ ED.Doodle.Handle = function(_location, _isVisible, _mode, _isRotatable) {
 	this.isVisible = _isVisible;
 	this.mode = _mode;
 	this.isRotatable = _isRotatable;
-}
+};

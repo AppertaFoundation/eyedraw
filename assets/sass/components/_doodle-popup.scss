@@ -17,6 +17,7 @@
 .ed-doodle-popup {
 	@include transition(right 0.5s ease);
 	@include box-shadow(0 5px 14px -4px rgba(0, 0, 0, 0.5));
+	@include user-select(text);
 	background: #c3def5;
 	border: 1px solid #53a0c7;
 	border-width: 1px 1px 1px 0;
@@ -55,7 +56,7 @@
 	color: #444;
 	font-size: 12px;
 	font-style: italic;
-	line-height: 12px;
+	line-height: 14px;
 	padding: 12px 0 6px 0;
 }
 

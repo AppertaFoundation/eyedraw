@@ -118,12 +118,10 @@
 
 					var spy = sinon.spy(o.toolbar, 'emit');
 					var button = $(o.container).find('.ed-button');
+
 					button.trigger('click');
 
-					expect(spy.withArgs('doodle.action', {
-						fn: 'randomFunction',
-						arg: 'catsrule'
-					}).called).to.be.true;
+					expect(spy.called).to.be.true;
 					spy.restore();
 				});
 
@@ -137,7 +135,7 @@
 					var button = $(o.container).find('.ed-button');
 					button.trigger('click');
 
-					expect(spy.withArgs('doodle.error').called).to.be.true;
+					expect(spy.withArgs('button.error').called).to.be.true;
 					spy.restore();
 				});
 			})

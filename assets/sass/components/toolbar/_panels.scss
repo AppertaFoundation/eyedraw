@@ -17,6 +17,7 @@
 // Panels group buttons and other controls.
 .ed-toolbar-panel {
 	@extend %clearfix;
+	display: block;
 	&, ul {
 		list-style-type: none;
 		margin: 0;

@@ -90,13 +90,20 @@ ED.Range.prototype.includes = function(_num) {
  * Constrains a value to the limits of the range
  *
  * @param {Float} _num
+ * @param {Float} _scaleLevel The drawing scale level.
  * @returns {Float} The constrained value
  */
-ED.Range.prototype.constrain = function(_num) {
-	if (_num < this.min) {
-		return this.min;
-	} else if (_num > this.max) {
-		return this.max;
+ED.Range.prototype.constrain = function(_num, _scaleLevel) {
+
+	_scaleLevel = _scaleLevel === undefined ? 1 : _scaleLevel
+
+	var min = this.min * _scaleLevel;
+	var max = this.max * _scaleLevel;
+
+	if (_num < min) {
+		return min;
+	} else if (_num > max) {
+		return max;
 	} else {
 		return _num;
 	}
