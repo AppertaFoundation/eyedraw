@@ -31489,26 +31489,28 @@ ED.Patch.prototype.setParameterDefaults = function() {
 	// Position over tube if present
 	var doodle = this.drawing.lastDoodleOfClass("Tube");
 	if (doodle) {
+		var isRE = (this.drawing.eye == ED.eye.Right);
+		
 		switch (doodle.platePosition) {
 			case 'STQ':
-				this.originX = -250;
-				this.originY = -250;
-				this.rotation = 7 * Math.PI/4;
+				this.originX = isRE?-350:+350;
+				this.originY = -350;
+				this.rotation = (isRE?7:1) * Math.PI/4;
 				break;
 			case 'SNQ':
-				this.originX = +250;
-				this.originY = -250;
-				this.rotation = 1 * Math.PI/4;
+				this.originX = isRE?+350:-350;
+				this.originY = -350;
+				this.rotation = (isRE?1:7) * Math.PI/4;
 				break;
 			case 'INQ':
-				this.originX = +250;
-				this.originY = +250;
-				this.rotation = 3 * Math.PI/4;
+				this.originX = isRE?+350:-350;
+				this.originY = +350;
+				this.rotation = (isRE?3:5) * Math.PI/4;
 				break;
 			case 'ITQ':
-				this.originX = -250;
-				this.originY = +250;
-				this.rotation = 5 * Math.PI/4;
+				this.originX = isRE?-350:+350;
+				this.originY = +350;
+				this.rotation = (isRE?5:3) * Math.PI/4;
 				break;	
 		}
 	}
@@ -31527,7 +31529,7 @@ ED.Patch.prototype.setParameterDefaults = function() {
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.Patch.prototype.draw = function(_point) {
+ED.Patch.prototype.draw = function(_point) {console.log(this.originX, this.originY);
 	// Get context
 	var ctx = this.drawing.context;
 
@@ -41742,11 +41744,10 @@ ED.TubeLigation.prototype.setParameterDefaults = function() {
 		}
 	}
 	
-	// If existing doodle, put in same meridian, but lower down
+	// If existing doodle, put in same meridian, but higher up
 	var doodle = this.drawing.lastDoodleOfClass(this.className);
 	if (doodle) {
-		this.originX = doodle.originX * 0.9;
-		this.originY = doodle.originY * 0.9;
+		this.move(doodle.originX * 1.02, doodle.originY * 1.02);
 	}
 }
 
