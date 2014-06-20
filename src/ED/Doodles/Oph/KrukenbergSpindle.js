@@ -29,7 +29,7 @@ ED.KrukenbergSpindle = function(_drawing, _parameterJSON) {
 	this.className = "KrukenbergSpindle";
 
 	// Saved parameters
-	this.savedParameterArray = ['originX', 'originY', 'scaleX', 'scaleY'];
+	this.savedParameterArray = ['originX', 'originY', 'apexX', 'apexY'];
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
