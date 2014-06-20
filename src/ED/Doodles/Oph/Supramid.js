@@ -84,14 +84,14 @@ ED.Supramid.prototype.draw = function(_point) {
 	// Get context
 	var ctx = this.drawing.context;
 
-	// Call draw method in superclass
-	ED.Supramid.superclass.draw.call(this, _point);
-
 	// Get tube doodle
 	var doodle = this.drawing.lastDoodleOfClass("Tube");
 	if (doodle) {
 		this.rotation = doodle.rotation;
 	}
+
+	// Call draw method in superclass
+	ED.Supramid.superclass.draw.call(this, _point);
 
 	// Calculate key points for supramid bezier
 	var startPoint = new ED.Point(this.apexX, this.apexY);

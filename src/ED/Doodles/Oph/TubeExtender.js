@@ -27,10 +27,10 @@
 ED.TubeExtender = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "TubeExtender";
-	
+
 	// Derived parameters
 	this.platePosition = 'STQ';
-		
+
 	// Other Parameters
 	this.bezierArray = new Array();
 
@@ -66,7 +66,7 @@ ED.TubeExtender.prototype.setPropertyDefaults = function() {
 
 	// Update component of validation array for simple parameters
 	this.parameterValidationArray['apexY']['range'].setMinAndMax(-600, -100);
-	
+
 	// Add complete validation arrays for derived parameters
 	this.parameterValidationArray['platePosition'] = {
 		kind: 'derived',
@@ -74,7 +74,7 @@ ED.TubeExtender.prototype.setPropertyDefaults = function() {
 		list: ['STQ', 'SNQ', 'INQ', 'ITQ'],
 		animate: true
 	};
-	
+
 	// Array of angles to snap to
 	var phi = Math.PI / 4;
 	this.anglesArray = [phi, 3 * phi, 5 * phi, 7 * phi];
@@ -86,7 +86,7 @@ ED.TubeExtender.prototype.setPropertyDefaults = function() {
 ED.TubeExtender.prototype.setParameterDefaults = function() {
 	this.apexY = -300;
 	this.setParameterFromString('platePosition', 'STQ');
-	
+
 	// Make rotation same as tube
 	var doodle = this.drawing.lastDoodleOfClass("Tube");
 	if (doodle) {
@@ -167,6 +167,12 @@ ED.TubeExtender.prototype.draw = function(_point) {
 	// Get context
 	var ctx = this.drawing.context;
 
+	// If a tube doodle exists, then sync with its' rotation
+	var tubeDoodle = this.drawing.lastDoodleOfClass("Tube");
+	if (tubeDoodle) {
+		this.rotation = tubeDoodle.rotation;
+	}
+
 	// Call draw method in superclass
 	ED.TubeExtender.superclass.draw.call(this, _point);
 
@@ -175,7 +181,7 @@ ED.TubeExtender.prototype.draw = function(_point) {
 
 	// Scaling factor
 	var s = 0.41666667;
-	
+
 	// Vertical shift
 	var d = -660;
 
@@ -203,7 +209,7 @@ ED.TubeExtender.prototype.draw = function(_point) {
    		ctx.lineTo(-50 * s, 400 * s + d);
    		ctx.quadraticCurveTo(-50 * s, 420 * s + d, -30 * s, 420 * s + d);
    		ctx.lineTo(0 * s, 420 * s + d);
-   		
+
    		ctx.lineTo(30 * s, 420 * s + d);
   		ctx.quadraticCurveTo(50 * s, 420 * s + d, 50 * s, 400 * s + d);
   		ctx.lineTo(50 * s, 340 * s + d);
@@ -224,12 +230,12 @@ ED.TubeExtender.prototype.draw = function(_point) {
 		this.bezierArray['cp1'] = new ED.Point(0, 420 * s + d);
 		this.bezierArray['cp2'] = new ED.Point(this.apexX * 1.5, this.apexY + ((290 * s + d) - this.apexY) * 0.5);
 		this.bezierArray['ep'] = new ED.Point(this.apexX, this.apexY);
-		
+
 		ctx.beginPath();
 		ctx.moveTo(0, 290 * s + d);
-		ctx.lineTo(this.bezierArray['sp'].x, this.bezierArray['sp'].y);		
+		ctx.lineTo(this.bezierArray['sp'].x, this.bezierArray['sp'].y);
  		ctx.bezierCurveTo(this.bezierArray['cp1'].x, this.bezierArray['cp1'].y, this.bezierArray['cp2'].x, this.bezierArray['cp2'].y, this.bezierArray['ep'].x, this.bezierArray['ep'].y);
-		
+
 		// Simulate tube with gray line and white narrower line
 		ctx.strokeStyle = "rgba(150,150,150,0.5)";
 		ctx.lineWidth = 20;
@@ -237,7 +243,7 @@ ED.TubeExtender.prototype.draw = function(_point) {
 		ctx.strokeStyle = "white";
 		ctx.lineWidth = 8;
 		ctx.stroke();
-		
+
 
 	}
 
@@ -246,7 +252,7 @@ ED.TubeExtender.prototype.draw = function(_point) {
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
-	
+
 	// Return value indicating successful hittest
 	return this.isClicked;
 }
@@ -269,12 +275,12 @@ ED.TubeExtender.prototype.description = function() {
 
 /**
  * Draws a rounded rectangle using the current state of the canvas. ***TODO*** move to core
- * If you omit the last three params, it will draw a rectangle 
- * outline with a 5 pixel border radius 
+ * If you omit the last three params, it will draw a rectangle
+ * outline with a 5 pixel border radius
  * @param {CanvasRenderingContext2D} ctx
  * @param {Number} x The top left x coordinate
- * @param {Number} y The top left y coordinate 
- * @param {Number} width The width of the rectangle 
+ * @param {Number} y The top left y coordinate
+ * @param {Number} width The width of the rectangle
  * @param {Number} height The height of the rectangle
  * @param {Number} radius The corner radius. Defaults to 5;
  */
@@ -292,5 +298,5 @@ ED.TubeExtender.prototype.roundRect = function(ctx, x, y, width, height, radius)
   ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
   ctx.lineTo(x, y + radius);
   ctx.quadraticCurveTo(x, y, x + radius, y);
-  ctx.closePath();       
+  ctx.closePath();
 }
