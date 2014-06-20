@@ -54,11 +54,10 @@ ED.OpticDiscPit.prototype.setHandles = function() {
  */
 ED.OpticDiscPit.prototype.setPropertyDefaults = function() {
 	this.isSqueezable = true;
-	this.isUnique = true;
 
 	// Update component of validation array for simple parameters
-	this.parameterValidationArray['originX']['range'].setMinAndMax(-150, +150);
-	this.parameterValidationArray['originY']['range'].setMinAndMax(-150, +150);
+	this.parameterValidationArray['originX']['range'].setMinAndMax(-200, +200);
+	this.parameterValidationArray['originY']['range'].setMinAndMax(-240, +240);
 	this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.5, +3);
 	this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.5, +3);
 }
@@ -67,15 +66,20 @@ ED.OpticDiscPit.prototype.setPropertyDefaults = function() {
  * Sets default parameters
  */
 ED.OpticDiscPit.prototype.setParameterDefaults = function() {
-	this.originY = 130;
+	this.originX = 0;
+	this.originY = 220;
 	this.apexY = 0;
 	this.scaleX = 1.5;
 
-	// Pits are usually STQ
-	if (this.drawing.eye == ED.eye.Right) {
-		this.originX = -50;
-	} else {
-		this.originX = 50;
+	// First pit at 6, second at 12, others somewhere else (won't usually be more than 2)
+	var doodle = this.drawing.lastDoodleOfClass(this.className);
+	if (doodle) {
+		if (this.drawing.numberOfDoodlesOfClass(this.className) == 1) {
+			this.originY = -220;
+		}
+		else {
+			this.setOriginWithDisplacements(-60, -60);
+		}
 	}
 }
 

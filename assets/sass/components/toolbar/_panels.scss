@@ -15,9 +15,15 @@
 // * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
 
 // Panels group buttons and other controls.
+
+.ed-widget {
+	.ed-toolbar-panel {
+		display: block;
+	}
+}
+
 .ed-toolbar-panel {
 	@extend %clearfix;
-	display: block;
 	&, ul {
 		list-style-type: none;
 		margin: 0;

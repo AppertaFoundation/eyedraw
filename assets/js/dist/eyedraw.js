@@ -7945,7 +7945,7 @@ ED.Views.Toolbar.Main = (function() {
 
 	return MainToolbar;
 }());
-/*! Generated on 18/6/2014 */
+/*! Generated on 20/6/2014 */
 ED.scriptTemplates = {
   "doodle-popup": "\n\n\n\n{{#doodle}}\n\t<ul class=\"ed-toolbar-panel ed-doodle-popup-toolbar\">\n\t\t{{#desc}}\n\t\t\t<li>\n\t\t\t\t<a class=\"ed-button ed-doodle-help{{lockedButtonClass}}\" href=\"#\" data-function=\"toggleHelp\">\n\t\t\t\t\t<span class=\"icon-ed-help\"></span>\n\t\t\t\t</a>\n\t\t\t</li>\n\t\t{{/desc}}\n\t\t{{#doodle.isLocked}}\n\t\t\t<li>\n\t\t\t\t<a class=\"ed-button\" href=\"#\" data-function=\"unlock\">\n\t\t\t\t\t<span class=\"icon-ed-unlock\"></span>\n\t\t\t\t\t<span class=\"label\">Unlock</span>\n\t\t\t\t</a>\n\t\t\t</li>\n\t\t{{/doodle.isLocked}}\n\t\t{{^doodle.isLocked}}\n\t\t\t<li>\n\t\t\t\t<a class=\"ed-button\" href=\"#\" data-function=\"lock\">\n\t\t\t\t\t<span class=\"icon-ed-lock\"></span>\n\t\t\t\t\t<span class=\"label\">Lock</span>\n\t\t\t\t</a>\n\t\t\t</li>\n\t\t{{/doodle.isLocked}}\n\t\t<li>\n\t\t\t<a class=\"ed-button{{lockedButtonClass}}\" href=\"#\" data-function=\"moveToBack\">\n\t\t\t\t<span class=\"icon-ed-move-to-back\"></span>\n\t\t\t\t<span class=\"label\">Move to back</span>\n\t\t\t</a>\n\t\t</li>\n\t\t<li>\n\t\t\t<a class=\"ed-button{{lockedButtonClass}}\" href=\"#\" data-function=\"moveToFront\">\n\t\t\t\t<span class=\"icon-ed-move-to-front\"></span>\n\t\t\t\t<span class=\"label\">Move to front</span>\n\t\t\t</a>\n\t\t</li>\n\t\t{{#doodle.isDeletable}}\n\t\t\t<li>\n\t\t\t\t<a class=\"ed-button{{lockedButtonClass}}\" href=\"#\" data-function=\"deleteSelectedDoodle\">\n\t\t\t\t\t<span class=\"icon-ed-delete\"></span>\n\t\t\t\t\t<span class=\"label\">Delete</span>\n\t\t\t\t</a>\n\t\t\t</li>\n\t\t{{/doodle.isDeletable}}\n\t</ul>\n\t<div class=\"ed-doodle-info hide\">\n\t\t{{^doodle.isLocked}}\n\t\t\t{{#desc}}\n\t\t\t\t<div class=\"ed-doodle-description\">{{{desc}}}</div>\n\t\t\t{{/desc}}\n\t\t{{/doodle.isLocked}}\n\t</div>\n\t<div class=\"ed-doodle-controls{{#doodle.isLocked}} hide{{/doodle.isLocked}}\" id=\"{{drawing.canvas.id}}_controls\">\n\t</div>\n\t{{#doodle.isLocked}}\n\t\t<div class=\"ed-doodle-description\">\n\t\t\t<strong>This doodle is locked and cannot be edited.</strong>\n\t\t</div>\n\t{{/doodle.isLocked}}\n{{/doodle}}"
 };
@@ -30783,11 +30783,10 @@ ED.OpticDiscPit.prototype.setHandles = function() {
  */
 ED.OpticDiscPit.prototype.setPropertyDefaults = function() {
 	this.isSqueezable = true;
-	this.isUnique = true;
 
 	// Update component of validation array for simple parameters
-	this.parameterValidationArray['originX']['range'].setMinAndMax(-150, +150);
-	this.parameterValidationArray['originY']['range'].setMinAndMax(-150, +150);
+	this.parameterValidationArray['originX']['range'].setMinAndMax(-200, +200);
+	this.parameterValidationArray['originY']['range'].setMinAndMax(-240, +240);
 	this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.5, +3);
 	this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.5, +3);
 }
@@ -30796,15 +30795,20 @@ ED.OpticDiscPit.prototype.setPropertyDefaults = function() {
  * Sets default parameters
  */
 ED.OpticDiscPit.prototype.setParameterDefaults = function() {
-	this.originY = 130;
+	this.originX = 0;
+	this.originY = 220;
 	this.apexY = 0;
 	this.scaleX = 1.5;
 
-	// Pits are usually STQ
-	if (this.drawing.eye == ED.eye.Right) {
-		this.originX = -50;
-	} else {
-		this.originX = 50;
+	// First pit at 6, second at 12, others somewhere else (won't usually be more than 2)
+	var doodle = this.drawing.lastDoodleOfClass(this.className);
+	if (doodle) {
+		if (this.drawing.numberOfDoodlesOfClass(this.className) == 1) {
+			this.originY = -220;
+		}
+		else {
+			this.setOriginWithDisplacements(-60, -60);
+		}
 	}
 }
 
@@ -31485,26 +31489,28 @@ ED.Patch.prototype.setParameterDefaults = function() {
 	// Position over tube if present
 	var doodle = this.drawing.lastDoodleOfClass("Tube");
 	if (doodle) {
+		var isRE = (this.drawing.eye == ED.eye.Right);
+		
 		switch (doodle.platePosition) {
 			case 'STQ':
-				this.originX = -250;
-				this.originY = -250;
-				this.rotation = 7 * Math.PI/4;
+				this.originX = isRE?-350:+350;
+				this.originY = -350;
+				this.rotation = (isRE?7:1) * Math.PI/4;
 				break;
 			case 'SNQ':
-				this.originX = +250;
-				this.originY = -250;
-				this.rotation = 1 * Math.PI/4;
+				this.originX = isRE?+350:-350;
+				this.originY = -350;
+				this.rotation = (isRE?1:7) * Math.PI/4;
 				break;
 			case 'INQ':
-				this.originX = +250;
-				this.originY = +250;
-				this.rotation = 3 * Math.PI/4;
+				this.originX = isRE?+350:-350;
+				this.originY = +350;
+				this.rotation = (isRE?3:5) * Math.PI/4;
 				break;
 			case 'ITQ':
-				this.originX = -250;
-				this.originY = +250;
-				this.rotation = 5 * Math.PI/4;
+				this.originX = isRE?-350:+350;
+				this.originY = +350;
+				this.rotation = (isRE?5:3) * Math.PI/4;
 				break;	
 		}
 	}
@@ -31523,7 +31529,7 @@ ED.Patch.prototype.setParameterDefaults = function() {
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.Patch.prototype.draw = function(_point) {
+ED.Patch.prototype.draw = function(_point) {console.log(this.originX, this.originY);
 	// Get context
 	var ctx = this.drawing.context;
 
@@ -38658,14 +38664,14 @@ ED.Supramid.prototype.draw = function(_point) {
 	// Get context
 	var ctx = this.drawing.context;
 
-	// Call draw method in superclass
-	ED.Supramid.superclass.draw.call(this, _point);
-
 	// Get tube doodle
 	var doodle = this.drawing.lastDoodleOfClass("Tube");
 	if (doodle) {
 		this.rotation = doodle.rotation;
 	}
+
+	// Call draw method in superclass
+	ED.Supramid.superclass.draw.call(this, _point);
 
 	// Calculate key points for supramid bezier
 	var startPoint = new ED.Point(this.apexX, this.apexY);
@@ -41344,10 +41350,10 @@ ED.Tube.prototype.description = function() {
 ED.TubeExtender = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "TubeExtender";
-	
+
 	// Derived parameters
 	this.platePosition = 'STQ';
-		
+
 	// Other Parameters
 	this.bezierArray = new Array();
 
@@ -41383,7 +41389,7 @@ ED.TubeExtender.prototype.setPropertyDefaults = function() {
 
 	// Update component of validation array for simple parameters
 	this.parameterValidationArray['apexY']['range'].setMinAndMax(-600, -100);
-	
+
 	// Add complete validation arrays for derived parameters
 	this.parameterValidationArray['platePosition'] = {
 		kind: 'derived',
@@ -41391,7 +41397,7 @@ ED.TubeExtender.prototype.setPropertyDefaults = function() {
 		list: ['STQ', 'SNQ', 'INQ', 'ITQ'],
 		animate: true
 	};
-	
+
 	// Array of angles to snap to
 	var phi = Math.PI / 4;
 	this.anglesArray = [phi, 3 * phi, 5 * phi, 7 * phi];
@@ -41403,7 +41409,7 @@ ED.TubeExtender.prototype.setPropertyDefaults = function() {
 ED.TubeExtender.prototype.setParameterDefaults = function() {
 	this.apexY = -300;
 	this.setParameterFromString('platePosition', 'STQ');
-	
+
 	// Make rotation same as tube
 	var doodle = this.drawing.lastDoodleOfClass("Tube");
 	if (doodle) {
@@ -41484,6 +41490,12 @@ ED.TubeExtender.prototype.draw = function(_point) {
 	// Get context
 	var ctx = this.drawing.context;
 
+	// If a tube doodle exists, then sync with its' rotation
+	var tubeDoodle = this.drawing.lastDoodleOfClass("Tube");
+	if (tubeDoodle) {
+		this.rotation = tubeDoodle.rotation;
+	}
+
 	// Call draw method in superclass
 	ED.TubeExtender.superclass.draw.call(this, _point);
 
@@ -41492,7 +41504,7 @@ ED.TubeExtender.prototype.draw = function(_point) {
 
 	// Scaling factor
 	var s = 0.41666667;
-	
+
 	// Vertical shift
 	var d = -660;
 
@@ -41520,7 +41532,7 @@ ED.TubeExtender.prototype.draw = function(_point) {
    		ctx.lineTo(-50 * s, 400 * s + d);
    		ctx.quadraticCurveTo(-50 * s, 420 * s + d, -30 * s, 420 * s + d);
    		ctx.lineTo(0 * s, 420 * s + d);
-   		
+
    		ctx.lineTo(30 * s, 420 * s + d);
   		ctx.quadraticCurveTo(50 * s, 420 * s + d, 50 * s, 400 * s + d);
   		ctx.lineTo(50 * s, 340 * s + d);
@@ -41541,12 +41553,12 @@ ED.TubeExtender.prototype.draw = function(_point) {
 		this.bezierArray['cp1'] = new ED.Point(0, 420 * s + d);
 		this.bezierArray['cp2'] = new ED.Point(this.apexX * 1.5, this.apexY + ((290 * s + d) - this.apexY) * 0.5);
 		this.bezierArray['ep'] = new ED.Point(this.apexX, this.apexY);
-		
+
 		ctx.beginPath();
 		ctx.moveTo(0, 290 * s + d);
-		ctx.lineTo(this.bezierArray['sp'].x, this.bezierArray['sp'].y);		
+		ctx.lineTo(this.bezierArray['sp'].x, this.bezierArray['sp'].y);
  		ctx.bezierCurveTo(this.bezierArray['cp1'].x, this.bezierArray['cp1'].y, this.bezierArray['cp2'].x, this.bezierArray['cp2'].y, this.bezierArray['ep'].x, this.bezierArray['ep'].y);
-		
+
 		// Simulate tube with gray line and white narrower line
 		ctx.strokeStyle = "rgba(150,150,150,0.5)";
 		ctx.lineWidth = 20;
@@ -41554,7 +41566,7 @@ ED.TubeExtender.prototype.draw = function(_point) {
 		ctx.strokeStyle = "white";
 		ctx.lineWidth = 8;
 		ctx.stroke();
-		
+
 
 	}
 
@@ -41563,7 +41575,7 @@ ED.TubeExtender.prototype.draw = function(_point) {
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
-	
+
 	// Return value indicating successful hittest
 	return this.isClicked;
 }
@@ -41586,12 +41598,12 @@ ED.TubeExtender.prototype.description = function() {
 
 /**
  * Draws a rounded rectangle using the current state of the canvas. ***TODO*** move to core
- * If you omit the last three params, it will draw a rectangle 
- * outline with a 5 pixel border radius 
+ * If you omit the last three params, it will draw a rectangle
+ * outline with a 5 pixel border radius
  * @param {CanvasRenderingContext2D} ctx
  * @param {Number} x The top left x coordinate
- * @param {Number} y The top left y coordinate 
- * @param {Number} width The width of the rectangle 
+ * @param {Number} y The top left y coordinate
+ * @param {Number} width The width of the rectangle
  * @param {Number} height The height of the rectangle
  * @param {Number} radius The corner radius. Defaults to 5;
  */
@@ -41609,7 +41621,7 @@ ED.TubeExtender.prototype.roundRect = function(ctx, x, y, width, height, radius)
   ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
   ctx.lineTo(x, y + radius);
   ctx.quadraticCurveTo(x, y, x + radius, y);
-  ctx.closePath();       
+  ctx.closePath();
 }
 
 /**
@@ -41738,11 +41750,10 @@ ED.TubeLigation.prototype.setParameterDefaults = function() {
 		}
 	}
 	
-	// If existing doodle, put in same meridian, but lower down
+	// If existing doodle, put in same meridian, but higher up
 	var doodle = this.drawing.lastDoodleOfClass(this.className);
 	if (doodle) {
-		this.originX = doodle.originX * 0.9;
-		this.originY = doodle.originY * 0.9;
+		this.move(doodle.originX * 1.02, doodle.originY * 1.02);
 	}
 }
 

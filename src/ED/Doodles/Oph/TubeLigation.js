@@ -124,11 +124,10 @@ ED.TubeLigation.prototype.setParameterDefaults = function() {
 		}
 	}
 	
-	// If existing doodle, put in same meridian, but lower down
+	// If existing doodle, put in same meridian, but higher up
 	var doodle = this.drawing.lastDoodleOfClass(this.className);
 	if (doodle) {
-		this.originX = doodle.originX * 0.9;
-		this.originY = doodle.originY * 0.9;
+		this.move(doodle.originX * 1.02, doodle.originY * 1.02);
 	}
 }
 

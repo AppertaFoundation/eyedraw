@@ -47,7 +47,7 @@
                 var canvasEdit = document.getElementById('canvasEdit');
 
                 // Create a drawingEdit , {scaleOn:'width'}
-                drawingEdit = new ED.Drawing(canvasEdit, ED.eye.Left, 'RPS', true, {graphicsPath:'../../assets/img/'});
+                drawingEdit = new ED.Drawing(canvasEdit, ED.eye.Right, 'RPS', true, {graphicsPath:'../../assets/img/'});
                 
                 // Instantiate a controller object
                 controller = new eyeDrawController(drawingEdit);
@@ -100,7 +100,7 @@
 							//this.drawing.addDoodle('AxialLengthGraph', {'axialLength':'25'});
 							this.drawing.addDoodle('AntSeg');
 							this.drawing.addDoodle('Tube');
-							this.drawing.addDoodle('TubeLigation');
+							//this.drawing.addDoodle('Patch');
 							//this.drawing.addDoodle('TrabySuture');
 							//this.drawing.addDoodle('TubeExtender');
 							//this.drawing.addDoodle('Supramid');
@@ -397,7 +397,7 @@
  -->
             <button id="LensRPS" class="imgbutton" title="Freehand" onclick="drawingEdit.addDoodle('TrabySuture'); return false;" ><img src="../../assets/img/old/Freehand.gif" /></button>
             <button id="LensRPS" class="imgbutton" title="Perforation" onclick="drawingEdit.addDoodle('Supramid'); return false;" ><img src="../../assets/img/old/Supramid.gif" /></button>
-            <button id="LensRPS" class="imgbutton" title="TubeLigation" onclick="drawingEdit.addDoodle('TubeLigation'); return false;" ><img src="../../assets/img/old/TrabySuture.gif" /></button>
+            <button id="LensRPS" class="imgbutton" title="TubeLigation" onclick="drawingEdit.addDoodle('Patch'); return false;" ><img src="../../assets/img/old/Patch.gif" /></button>
             <br />
         </div>
 
