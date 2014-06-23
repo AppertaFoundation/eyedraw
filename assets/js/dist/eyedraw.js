@@ -16835,10 +16835,10 @@ ED.BiopsySite.prototype.description = function() {
 ED.Bleb = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "Bleb";
-	
+
 	// Saved parameters
-	this.savedParameterArray = ['rotation'];
-	
+	this.savedParameterArray = ['rotation','arc'];
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
@@ -16864,7 +16864,7 @@ ED.Bleb.prototype.setPropertyDefaults = function() {
 	this.isScaleable = false;
 	this.isMoveable = false;
 	this.isArcSymmetrical = true;
-	
+
 	// Update component of validation array for simple parameters
 	this.parameterValidationArray['arc']['range'].setMinAndMax(Math.PI / 12, Math.PI / 2);
 }
@@ -16894,7 +16894,7 @@ ED.Bleb.prototype.draw = function(_point) {
 
 	// Boundary path
 	ctx.beginPath();
-	
+
 	// Radii
 	var ro = 500;
 	var r = 470;
@@ -16924,22 +16924,22 @@ ED.Bleb.prototype.draw = function(_point) {
 	var bottomRightY = -ri * Math.cos(theta);
 	var bottomLeftX = -ri * Math.sin(theta);
 	var bottomLeftY = bottomRightY;
-	
+
 	// Boundary path
 	ctx.beginPath();
 
 	// Arc across
 	ctx.arc(0, 0, ro, -Math.PI / 2 + theta, -Math.PI / 2 - theta, true);
-	
+
 	// Curvy left hand edge
 	ctx.quadraticCurveTo(cpLeftX, cpLeftY, bottomLeftX, bottomLeftY);
 
 	// Arc back to mirror image point on the other side
 	ctx.arc(0, 0, ri, -Math.PI / 2 - theta, -Math.PI / 2 + theta, false);
-	
+
 	// Curvy right hand edge
 	ctx.quadraticCurveTo(cpRightX, cpRightY, topRightX, topRightY);
-	
+
 	// Close path
 	ctx.closePath();
 
@@ -16964,7 +16964,7 @@ ED.Bleb.prototype.draw = function(_point) {
 		ctx.lineTo(50, -ri);
 		ctx.stroke();
 	}
-	
+
 	// Coordinates of handles (in canvas plane)
 	this.handleArray[3].location = this.transform.transformPoint(new ED.Point(handleRightX, handleRightY));
 
