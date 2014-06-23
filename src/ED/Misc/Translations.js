@@ -31,11 +31,11 @@ if (ED == null || typeof(ED) != "object") {
 }
 
 /**
- * Language specific tooltips which appear over doodles on hover
+ * Language specific translations. Mostly used for doodle descriptions.
  *
  * In order to display UTF.8 characters, this file should be loaded with the 'charset="utf-8"' attribute.
  * This currently cannot be done with the Yii registerScriptFile method, so should be loaded using a tag in the view file;
- * <script src="js/ED_Tooltips.js" type="text/javascript" charset="utf-8"></script>
+ * <script src="js/Misc/Translations.js" type="text/javascript" charset="utf-8"></script>
  */
 ED.trans = new Object();
 
@@ -109,7 +109,7 @@ ED.trans['IRMA'] = 'Drag to move<br/>Drag inner handle to change size<br/>Drag o
 ED.trans['KeraticPrecipitates'] = 'Drag middle handle up and down to alter density<br/>Drag middle handle left and right to alter size<br/>Drag outside handle to scale';
 ED.trans['KoeppeNodule'] = 'Drag to move around the iris';
 ED.trans['KrukenbergSpindle'] = 'Drag to move</br>Drag outer handle to change shape';
-//ED.trans['Label'] = 'Drag to move label, type text to edit</br>Drag handle to move pointer';
+ED.trans['Label'] = 'Drag to move label, type text to edit<br/>Drag handle to move pointer';
 ED.trans['LaserCircle'] = 'Drag handle to change shape';
 ED.trans['LaserDemarcation'] = 'Drag to rotate<br/>Drag each end handle to increase extent<br/>Drag the middle handle to move line more posteriorly';
 ED.trans['LaserSpot'] = 'Drag to position<br/>Drag the handle to change size';

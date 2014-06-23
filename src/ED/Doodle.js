@@ -726,20 +726,6 @@ ED.Doodle.prototype.groupDescriptionEnd = function() {
 }
 
 /**
- * Returns a string containing a text description of the doodle. String taken from language specific ED_Tooltips.js
- *
- * @returns {String} Tool tip text
- */
-ED.Doodle.prototype.tooltip = function() {
-	var tip = ED.trans[this.className];
-	if (typeof(tip) != 'undefined') {
-		return tip;
-	} else {
-		return "";
-	}
-}
-
-/**
  * Returns the SnoMed code of the doodle (overridden by subclasses)
  *
  * @returns {Int} SnoMed code of entity representated by doodle
