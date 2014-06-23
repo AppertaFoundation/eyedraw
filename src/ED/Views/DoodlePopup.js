@@ -189,13 +189,20 @@ ED.Views.DoodlePopup = (function() {
 	};
 
 	DoodlePopup.prototype.onDoodleSelected = function() {
-		// We do this in the next event loop as the "doodleDeselect" event
-		// is triggered before the "doodleSelect" event.
-		setTimeout(this.update.bind(this, true));
+		this.update(true);
 	};
 
 	DoodlePopup.prototype.onDoodleDeselected = function() {
-		this.update(false);
+
+		// When clicking on the drawing canvas to select a doodle, the "doodleDeselect"
+		// event is fired after the "doodleSelect" event. This causes the popup to
+		// be hidden, when we want it open. We thus need to check if the selectDoodle
+		// is set, and if so, don't hide.
+		var hasSelectedDoodle = !!this.drawing.selectedDoodle;
+
+		if (!hasSelectedDoodle) {
+			this.update(false);
+		}
 	};
 
 	return DoodlePopup;

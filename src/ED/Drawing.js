@@ -2082,11 +2082,11 @@ ED.Drawing.prototype.addDoodle = function(_className, _parameterDefaults, _param
 			this.repaint();
 		}
 
-		// Run onSelection code
-		this.selectedDoodle.onSelection();
-
 		// Notify
 		this.notify("doodleAdded", newDoodle);
+
+		// Run onSelection code
+		this.selectedDoodle.onSelection();
 
 		// Return doodle
 		return newDoodle;

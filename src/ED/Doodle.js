@@ -996,6 +996,7 @@ ED.Doodle.prototype.showDoodleControls = function(controlDiv) {
 	this.getControlElements().forEach(function(element) {
 		controlDiv.appendChild(element);
 	});
+
 	// Add bindings
 	this.addControlBindings();
 };
