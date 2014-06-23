@@ -314,6 +314,9 @@ class OEEyeDrawWidget extends CWidget
 			if (!is_array($this->doodleToolBarArray[0])) {
 				$this->doodleToolBarArray = array($this->doodleToolBarArray);
 			}
+			// Add 'Label' doodle to the last set of doodles
+			$arr = &$this->doodleToolBarArray[count($this->doodleToolBarArray)-1];
+			array_push($arr, 'Label');
 		}
 
 		// Iterate through any button array
