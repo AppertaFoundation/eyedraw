@@ -15848,6 +15848,7 @@ ED.AntSeg.prototype.description = function() {
 	// Empty report so far
 	if (returnValue.length == 0) {
 		// Is lens present and normal?
+		/*
 		var doodle = this.drawing.lastDoodleOfClass('Lens');
 		if (doodle) {
 			var lensDescription = doodle.description();
@@ -15858,6 +15859,8 @@ ED.AntSeg.prototype.description = function() {
 		else {
 			returnValue = "Aphakic, ";
 		}
+		*/
+		returnValue = "Anterior segment normal, ";
 	}
 
 	// Remove final comma and space and capitalise first letter
