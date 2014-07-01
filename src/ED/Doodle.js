@@ -82,6 +82,9 @@ ED.Doodle = function(_drawing, _parameterJSON) {
 		// Store created time
 		this.createdTime = (new Date()).getTime();
 
+		// Set initial scale level
+		this.setScaleLevel(this.drawing.globalScaleFactor);
+
 		// Dragging defaults - set individual values in subclasses
 		this.isLocked = false;
 		this.isSelectable = true;
@@ -1973,6 +1976,7 @@ ED.Doodle.prototype.json = function() {
 	var s = '{';
 
 	// Version and doodle subclass
+	s = s + '"scaleLevel": ' + this.scaleLevel + ',';
 	s = s + '"version":' + this.version.toFixed(1) + ',';
 	s = s + '"subclass":' + '"' + this.className + '",';
 
@@ -2190,12 +2194,7 @@ ED.Doodle.prototype.xForY = function(_r, _y) {
  * @param {Number} _level The scaling level.
  */
 ED.Doodle.prototype.setScaleLevel = function(_newLevel) {
-
-	var diff = _newLevel;
-	if (_newLevel === 1 && this.scaleLevel !== undefined) {
-		diff /= this.scaleLevel;
-	}
-
+	var diff = (_newLevel / this.scaleLevel);
 	this.adjustScaleAndPosition(diff);
 	this.scaleLevel = _newLevel;
 };

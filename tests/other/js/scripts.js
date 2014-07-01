@@ -212,7 +212,7 @@ window.eyedrawScripts = [
     "ED/Misc/OperatingTable.js",
     "ED/Misc/Slider2D.js",
     "ED/Misc/Surgeon.js",
-    "ED/Misc/Tooltips.js",
+    "ED/Misc/Translations.js",
     "ED/Views/DoodlePopup.js",
     "ED/Views/SelectedDoodle.js",
     "ED/Views/Toolbar.js",

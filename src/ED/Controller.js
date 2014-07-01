@@ -73,6 +73,7 @@ ED.Controller = (function() {
 			offsetY: this.properties.offsetY,
 			toImage: this.properties.toImage,
 			graphicsPath: this.properties.graphicsPath,
+			scale: this.properties.scale,
 			toggleScale: this.properties.toggleScale
 		};
 
@@ -157,7 +158,8 @@ ED.Controller = (function() {
 			'doodleDeleted',
 			'doodleSelected',
 			'mousedragged',
-			'parameterChanged'
+			'parameterChanged',
+			'drawingZoom'
 		]);
 	};
 
@@ -399,7 +401,7 @@ ED.Controller = (function() {
 
 		this.addBindings();
 		this.addDeletedValues();
-		this.drawing.setScaleLevel(this.properties.scale);
+		this.drawing.notifyZoomLevel();
 		this.saveDrawingToInputField(true);
 
 		// Optionally make canvas element focused
@@ -454,6 +456,13 @@ ED.Controller = (function() {
 	 * On doodle mouse dragged.
 	 */
 	Controller.prototype.onMousedragged = function() {
+		this.saveDrawingToInputField();
+	};
+
+	/**
+	 * On drawing zoomed.
+	 */
+	Controller.prototype.onDrawingZoom = function() {
 		this.saveDrawingToInputField();
 	};
 

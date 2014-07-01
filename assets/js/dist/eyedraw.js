@@ -348,7 +348,7 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 		if (_options['graphicsPath']) this.graphicsPath = _options['graphicsPath'];
 		if (_options['scaleOn']) this.scaleOn = _options['scaleOn'];
 		if (_options['scale']) globalScaleFactor = _options['scale'];
-		if (_options['toggleScale'] !== undefined) toggleScaleFactor = _options['toggleScale'];
+		if (_options['toggleScale']) toggleScaleFactor = _options['toggleScale'];
 	}
 
 	// Initialise properties
@@ -376,6 +376,7 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 	this.completeLine = false;
 	this.globalScaleFactor = globalScaleFactor;
 	this.toggleScaleFactor = toggleScaleFactor;
+	this.origScaleLevel = globalScaleFactor;
 	this.scrollValue = 0;
 	this.lastDoodleId = 0;
 	this.isActive = false;
@@ -1961,7 +1962,7 @@ ED.Drawing.prototype.resetEyedraw = function() {
  * @param  {Number} level     Scale level.
  * @param  {String} eventName Event name to notify.
  */
-ED.Drawing.prototype.setScaleForDrawingAndDoodles = function(level, eventName) {
+ED.Drawing.prototype.setScaleForDrawingAndDoodles = function(level) {
 
 	this.globalScaleFactor = level;
 
@@ -1970,10 +1971,15 @@ ED.Drawing.prototype.setScaleForDrawingAndDoodles = function(level, eventName) {
 	});
 
 	this.repaint();
+};
 
-	if (eventName) {
-		this.notify(eventName);
-	}
+/**
+ * This should be called only once the drawing is ready.
+ * @param {[type]} level [description]
+ */
+ED.Drawing.prototype.setScaleLevel = function(level) {
+	this.setScaleForDrawingAndDoodles(level);
+	this.notifyZoomLevel();
 };
 
 /**
@@ -1982,16 +1988,24 @@ ED.Drawing.prototype.setScaleForDrawingAndDoodles = function(level, eventName) {
  */
 ED.Drawing.prototype.toggleZoom = function() {
 	if (!this.toggleScaleFactor) return;
-	this.setScaleLevel(this.globalScaleFactor === this.toggleScaleFactor ? 1 : this.toggleScaleFactor);
+	var scale = this.globalScaleFactor === this.toggleScaleFactor ? this.origScaleLevel : this.toggleScaleFactor;
+	this.setScaleLevel(scale);
 };
 
-/**
- * This should be called only once the drawing is ready.
- * @param {[type]} level [description]
- */
-ED.Drawing.prototype.setScaleLevel = function(level) {
-	var evt = level < 1 ? 'drawingZoomOut' : 'drawingZoomIn';
-	this.setScaleForDrawingAndDoodles(level, evt);
+ED.Drawing.prototype.notifyZoomLevel = function() {
+
+	var zoomIn = 'drawingZoomIn';
+	var zoomOut = 'drawingZoomOut';
+	var evt;
+
+	if (this.origScaleLevel < this.toggleScaleFactor) {
+		evt = (this.globalScaleFactor < this.toggleScaleFactor) ? zoomOut : zoomIn;
+	} else {
+		evt = (this.globalScaleFactor <= this.toggleScaleFactor) ? zoomIn : zoomOut;
+	}
+
+	this.notify('drawingZoom');
+	this.notify(evt);
 };
 
 /**
@@ -3261,6 +3275,9 @@ ED.Doodle = function(_drawing, _parameterJSON) {
 
 		// Store created time
 		this.createdTime = (new Date()).getTime();
+
+		// Set initial scale level
+		this.setScaleLevel(this.drawing.globalScaleFactor);
 
 		// Dragging defaults - set individual values in subclasses
 		this.isLocked = false;
@@ -5153,6 +5170,7 @@ ED.Doodle.prototype.json = function() {
 	var s = '{';
 
 	// Version and doodle subclass
+	s = s + '"scaleLevel": ' + this.scaleLevel + ',';
 	s = s + '"version":' + this.version.toFixed(1) + ',';
 	s = s + '"subclass":' + '"' + this.className + '",';
 
@@ -5370,12 +5388,7 @@ ED.Doodle.prototype.xForY = function(_r, _y) {
  * @param {Number} _level The scaling level.
  */
 ED.Doodle.prototype.setScaleLevel = function(_newLevel) {
-
-	var diff = _newLevel;
-	if (_newLevel === 1 && this.scaleLevel !== undefined) {
-		diff /= this.scaleLevel;
-	}
-
+	var diff = (_newLevel / this.scaleLevel);
 	this.adjustScaleAndPosition(diff);
 	this.scaleLevel = _newLevel;
 };
@@ -5889,6 +5902,7 @@ ED.Controller = (function() {
 			offsetY: this.properties.offsetY,
 			toImage: this.properties.toImage,
 			graphicsPath: this.properties.graphicsPath,
+			scale: this.properties.scale,
 			toggleScale: this.properties.toggleScale
 		};
 
@@ -5973,7 +5987,8 @@ ED.Controller = (function() {
 			'doodleDeleted',
 			'doodleSelected',
 			'mousedragged',
-			'parameterChanged'
+			'parameterChanged',
+			'drawingZoom'
 		]);
 	};
 
@@ -6215,7 +6230,7 @@ ED.Controller = (function() {
 
 		this.addBindings();
 		this.addDeletedValues();
-		this.drawing.setScaleLevel(this.properties.scale);
+		this.drawing.notifyZoomLevel();
 		this.saveDrawingToInputField(true);
 
 		// Optionally make canvas element focused
@@ -6270,6 +6285,13 @@ ED.Controller = (function() {
 	 * On doodle mouse dragged.
 	 */
 	Controller.prototype.onMousedragged = function() {
+		this.saveDrawingToInputField();
+	};
+
+	/**
+	 * On drawing zoomed.
+	 */
+	Controller.prototype.onDrawingZoom = function() {
 		this.saveDrawingToInputField();
 	};
 
@@ -7939,7 +7961,7 @@ ED.Views.Toolbar.Main = (function() {
 
 	return MainToolbar;
 }());
-/*! Generated on 30/6/2014 */
+/*! Generated on 1/7/2014 */
 ED.scriptTemplates = {
   "doodle-popup": "\n\n\n\n{{#doodle}}\n\t<ul class=\"ed-toolbar-panel ed-doodle-popup-toolbar\">\n\t\t{{#desc}}\n\t\t\t<li>\n\t\t\t\t<a class=\"ed-button ed-doodle-help{{lockedButtonClass}}\" href=\"#\" data-function=\"toggleHelp\">\n\t\t\t\t\t<span class=\"icon-ed-help\"></span>\n\t\t\t\t</a>\n\t\t\t</li>\n\t\t{{/desc}}\n\t\t{{#doodle.isLocked}}\n\t\t\t<li>\n\t\t\t\t<a class=\"ed-button\" href=\"#\" data-function=\"unlock\">\n\t\t\t\t\t<span class=\"icon-ed-unlock\"></span>\n\t\t\t\t\t<span class=\"label\">Unlock</span>\n\t\t\t\t</a>\n\t\t\t</li>\n\t\t{{/doodle.isLocked}}\n\t\t{{^doodle.isLocked}}\n\t\t\t<li>\n\t\t\t\t<a class=\"ed-button\" href=\"#\" data-function=\"lock\">\n\t\t\t\t\t<span class=\"icon-ed-lock\"></span>\n\t\t\t\t\t<span class=\"label\">Lock</span>\n\t\t\t\t</a>\n\t\t\t</li>\n\t\t{{/doodle.isLocked}}\n\t\t<li>\n\t\t\t<a class=\"ed-button{{lockedButtonClass}}\" href=\"#\" data-function=\"moveToBack\">\n\t\t\t\t<span class=\"icon-ed-move-to-back\"></span>\n\t\t\t\t<span class=\"label\">Move to back</span>\n\t\t\t</a>\n\t\t</li>\n\t\t<li>\n\t\t\t<a class=\"ed-button{{lockedButtonClass}}\" href=\"#\" data-function=\"moveToFront\">\n\t\t\t\t<span class=\"icon-ed-move-to-front\"></span>\n\t\t\t\t<span class=\"label\">Move to front</span>\n\t\t\t</a>\n\t\t</li>\n\t\t{{#doodle.isDeletable}}\n\t\t\t<li>\n\t\t\t\t<a class=\"ed-button{{lockedButtonClass}}\" href=\"#\" data-function=\"deleteSelectedDoodle\">\n\t\t\t\t\t<span class=\"icon-ed-delete\"></span>\n\t\t\t\t\t<span class=\"label\">Delete</span>\n\t\t\t\t</a>\n\t\t\t</li>\n\t\t{{/doodle.isDeletable}}\n\t</ul>\n\t<div class=\"ed-doodle-info hide\">\n\t\t{{^doodle.isLocked}}\n\t\t\t{{#desc}}\n\t\t\t\t<div class=\"ed-doodle-description\">{{{desc}}}</div>\n\t\t\t{{/desc}}\n\t\t{{/doodle.isLocked}}\n\t</div>\n\t<div class=\"ed-doodle-controls{{#doodle.isLocked}} hide{{/doodle.isLocked}}\" id=\"{{drawing.canvas.id}}_controls\">\n\t</div>\n\t{{#doodle.isLocked}}\n\t\t<div class=\"ed-doodle-description\">\n\t\t\t<strong>This doodle is locked and cannot be edited.</strong>\n\t\t</div>\n\t{{/doodle.isLocked}}\n{{/doodle}}"
 };
