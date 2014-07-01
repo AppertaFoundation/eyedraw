@@ -291,16 +291,32 @@ class OEEyeDrawWidget extends CWidget
 
 		// Create matching name and id in 'Yii' format for loading and saving using POST
 		if (isset($this->model) && isset($this->attribute)) {
-		  if ($this->mode == 'edit') {
-						$this->inputName = CHtml::modelName($this->model).'['. $this->attribute.']';
-			$this->inputId = CHtml::modelName($this->model).'_'. $this->attribute;
-		  } else {
-						$this->inputId = 'ed_input_'.$this->mode.'_'.$this->idSuffix;
-		  }
+			if ($this->mode == 'edit') {
+				$this->inputName = CHtml::modelName($this->model).'['. $this->attribute.']';
+				$this->inputId = CHtml::modelName($this->model).'_'. $this->attribute;
+			} else {
+				$this->inputId = 'ed_input_'.$this->mode.'_'.$this->idSuffix;
+			}
 
 			if (isset($_POST[CHtml::modelName($this->model)][$this->attribute])) {
 				$this->model->{$this->attribute} = $_POST[CHtml::modelName($this->model)][$this->attribute];
 			}
+		}
+
+		// Set the scale level
+		if (isset($this->model) && isset($this->attribute)) {
+			$data = json_decode($this->model[$this->attribute]);
+			$scale = 1;
+			// Get the saved scale level from the first doodle
+			if (count($data)) {
+				$doodle = $data[0];
+				$scale = property_exists($doodle, 'scaleLevel') && $doodle->scaleLevel ? $doodle->scaleLevel : 1;
+			}
+			// Switch the toggleScale value if the saved scale matches the toggleScale
+			if ($this->toggleScale && $scale === $this->toggleScale) {
+				$this->toggleScale = $this->scale;
+			}
+			$this->scale = $scale;
 		}
 
 		// Numeric flag corresponding to EyeDraw ED.eye  ***TODO*** may require additional options
@@ -407,198 +423,4 @@ class OEEyeDrawWidget extends CWidget
 	{
 		return $this->drawingName;
 	}
-}
-
-/**
- * Language specific doodle descriptions (used for title attributes of doodle toolbar buttons)
- *
- * @package EyeDraw
- * @author Bill Aylward <bill.aylward@openeyes.org>
- * @version 0.9
- */
-class DoodleInfo
-{
-	/**
-	 * @static array
-	 */
-	public static $titles = array (
-        "NONE" => "No description available for this doodle",
-        "ACIOL" => "Anterior chamber IOL",
-        "ACMaintainer" => "AC maintainer",
-        "AdnexalEye" => "Adnexal eye template",
-        "AngleGrade" => "Angle grade",
-        "AngleGradeEast" => "Angle Grade East",
-        "AngleGradeNorth" => "Angle Grade North",
-        "AngleGradeSouth" => "Angle Grade South",
-        "AngleGradeWest" => "Angle Grade West",
-        "AngleNV" => "Angle new vessels",
-        "AngleRecession" => "Angle recession",
-        "AntPVR" => "Anterior PVR",
-        "AntSeg" => "Anterior segment",
-        "AntSynech" => "Anterior synechiae",
-        "APattern" => "A pattern",
-        "ArcuateScotoma" => "Arcuate scotoma",
-        "Arrow" => "Arrow",
-        "BiopsySite" => "Biopsy site",
-        "Bleb" => "Trabeculectomy bleb",
-        "BlotHaemorrhage" => "Blot haemorrhage",
-        "Buckle" => "Buckle",
-        "BuckleOperation" => "Buckle operation",
-        "BuckleSuture" => "Buckle suture",
-        "BusaccaNodule" => "Busacca nodule",
-        "CapsularTensionRing" => "Capsular Tension Ring",
-        "ChandelierDouble" => "Double chandelier",
-        "ChandelierSingle" => "Chandelier",
-        "ChoroidalHaemorrhage" => "Choroidal haemorrhage",
-        "ChoroidalNaevus" => "Choroidal naevus",
-        "CiliaryInjection" => "Cilary injection",
-        "Circinate" => "Circinate retinopathy",
-        "CircumferentialBuckle" => "Circumferential buckle",
-        "CNV" => "Choroidal new vessels",
-        "ConjunctivalFlap" => "Conjunctival flap",
-        "ConjunctivalSuture" => "Conjunctival suture",
-        "CornealAbrasion" => "Corneal abrasion",
-        "CornealErosion" => "Removal of corneal epithelium",
-        "CornealGraft" => "Corneal graft",
-        "CornealInlay" => "Corneal inlay",
-        "CornealOedema" => "Corneal oedema",
-        "CornealScar" => "Corneal scar",
-        "CornealStriae" => "Corneal striae",
-        "CornealSuture" => "Corneal suture",
-        "CorticalCataract" => "Cortical cataract",
-        "CottonWoolSpot" => "Cotton wool spot",
-        "Cryo" => "Cryotherapy scar",
-        "CutterPI" => "Cutter iridectomy",
-        "CystoidMacularOedema" => "Cystoid macular oedema",
-        "DiabeticNV" => "Diabetic new vessels",
-        "Dialysis" => "Dialysis",
-        "DiscHaemorrhage" => "Disc haemorrhage",
-        "DiscPallor" => "Disc pallor",
-        "DrainageRetinotomy" => "Drainage retinotomy",
-        "DrainageSite" => "Drainage site",
-        "EncirclingBand" => "Encircling band",
-        "EntrySiteBreak" => "Entry site break",
-        "EpiretinalMembrane" => "Epiretinal membrane",
-        "FibrousProliferation" => "Fibrous proliferation",
-        "FibrovascularScar" => "Fibrovascular Scar",
-        "FocalLaser" => "Focal laser",
-        "Freehand" => "Freehand drawing",
-        "Fuchs" => "Fuchs endothelial dystrophy",
-        "Fundus" => "Fundus",
-        "Geographic" => "Geographic atrophy",
-        "Gonioscopy" => "Gonioscopy",
-        "GRT" => "Giant retinal tear",
-        "HardDrusen" => "Hard drusen",
-        "HardExudate" => "Hard exudate",
-        "Hyphaema" => "Hyphaema",
-        "Hypopyon" => "Hypopyon",
-        "IatrogenicBreak" => "IatrogenicBreak",
-        "ILMPeel" => "ILM peel",
-        "InjectionSite" => "Injection site",
-        "InnerLeafBreak" => "Inner leaf break",
-        "Iris" => "Iris",
-        "IrisHook" => "Iris hook",
-        "IrisNaevus" => "Iris naevus",
-        "IRMA" => "Intraretinal microvascular abnormalities",
-        "KeraticPrecipitates" => "Keratic precipitates",
-        "KoeppeNodule" => "Koeppe nodule",
-        "KrukenbergSpindle" => "Krukenberg spindle",
-        "Label" => "Label",
-        "LaserCircle" => "Circle of laser photocoagulation",
-        "LaserDemarcation" => "Laser demarcation",
-        "LasikFlap" => "LASIK flap",
-        "LaserSpot" => "Laser spot",
-        "Lattice" => "Lattice",
-        "Lens" => "Lens",
-        "LimbalRelaxingIncision" => "Limbal relaxing incision",
-        "Macroaneurysm" => "Macroaneurysm",
-        "MacularDystrophy" => "Macular dystrophy",
-        "MacularGrid" => "Macular grid laser",
-        "MacularHole" => "Macular hole",
-        "MacularThickening" => "Macular thickening",
-        "MattressSuture" => "Mattress suture",
-        "Microaneurysm" => "Microaneurysm",
-        "NerveFibreDefect" => "Nerve fibre defect",
-        "NuclearCataract" => "Nuclear cataract",
-        "OpticCup" => "Optic cup",
-        "OpticDisc" => "Optic disc",
-        "OpticDiscPit" => "Optic disc pit",
-        "OrthopticEye" => "Orthoptic eye",
-        "OuterLeafBreak" => "Outer leaf break",
-        "Papilloedema" => "Papilloedema",
-        "Patch" => "Tube patch",
-        "PCIOL" => "Posterior chamber IOL",
-        "PeripapillaryAtrophy" => "Peripapillary atrophy",
-        "PeripheralRetinectomy" => "Peripheral retinectomy",
-        "PhakoIncision" => "Phako incision",
-        "PI" => "Peripheral iridectomy",
-        "PointInLine" => "Point in line",
-        "PosteriorCapsule" => "Posterior capsule",
-        "PosteriorEmbryotoxon" => "Posterior embryotoxon",
-        "PostPole" => "Posterior pole",
-        "PostSubcapCataract" => "Posterior subcapsular cataract",
-        "PosteriorRetinectomy" => "Posterior retinectomy",
-        "PosteriorSynechia" => "Posterior synechia",
-        "PreRetinalHaemorrhage" => "Pre-retinal haemorrhage",
-        "PRP" => "Panretinal photocoagulation",
-        "PRPPostPole" => "Panretinal photocoagulation (posterior pole)",
-        "Pupil" => "Pupil",
-        "RadialSponge" => "Radial sponge",
-        "RetinalArteryOcclusionPostPole" => "Retinal artery occlusion",
-        "RetinalHaemorrhage" => "Retinal haemorrhage",
-        "RetinalTouch" => "Retinal touch",
-        "RetinalVeinOcclusionPostPole" => "Retinal vein occluson",
-        "Retinoschisis" => "Retinoschisis",
-        "RK" => "Radial keratotomy",
-        "RoundHole" => "Round hole",
-        "RPEAtrophy" => "RPE Atrophy",
-        "RPEDetachment" => "RPE detachment",
-        "RPEHypertrophy" => "RPE Hypertrophy",
-        "RPERip" => "RPE rip",
-        "RRD" => "Rhegmatogenous retinal detachment",
-        "Rubeosis" => "Rubeosis iridis",
-        "SectorPRP" => "Sector PRP",
-        "SectorPRPPostPole" => "Sector PRP (posterior pole)",
-        "ScleralIncision" => "Scleral Incision",
-        "Sclerostomy" => "Sclerostomy",
-        "SectorIridectomy" => "Sector iridectomy",
-        "Shading" => "Shading",
-        "SidePort" => "Side port",
-        "Slider" => "Slider",
-        "StarFold" => "Star fold",
-        "SubretinalFluid" => "Subretinal fluid",
-        "SubretinalPFCL" => "Subretinal PFCL",
-        "Supramid" => "Supramid suture",
-        "SwollenDisc" => "Swollen disc",
-        "Telangiectasis" => "Parafoveal telangiectasia",
-        "Trabectome" => "Trabectome",
-        "TrabyConjIncision" => "Trabeculectomy conjunctival incision",
-        "TrabyFlap" => "Trabeculectomy flap",
-        "TrabySuture" => "Trabeculectomy suture",
-        "ToricPCIOL" => "Toric posterior chamber IOL",
-        "TractionRetinalDetachment" => "Traction retinal detachment",
-        "TransilluminationDefect" =>"Transillumination defect",
-        "Tube" => "Drainage tube",
-        "TubeExtender" => "Tube extender",
-        "TubeLigation" => "Ligation suture",
-        "UpDrift" => "Up drift",
-        "UpShoot" => "Up shoot",
-        "UTear" => "Traction ‘U’ tear",
-        "Vicryl" => "Vicryl suture",
-        "ViewObscured" => "View obscured",
-        "VitreousOpacity" => "Vitreous opacity",
-        "VPattern" => "V pattern",
-
-        "Crepitations" => "Crepitations",
-        "Stenosis" => "Stenosis",
-        "Wheeze" => "Wheeze",
-        "Effusion" => "Pleural effusion",
-        "LeftCoronaryArtery" => "Left coronary artery",
-        "DrugStent" => "Drug eluting stent",
-        "MetalStent" => "Metal stent",
-        "Bypass" => "Coronary artery bypass",
-        "Bruit" => "Bruit",
-        "Bruising" => "Bruising",
-        "Haematoma" => "Haematoma",
-        );
 }
