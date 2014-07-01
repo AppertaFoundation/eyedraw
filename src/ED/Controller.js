@@ -150,15 +150,18 @@ ED.Controller = (function() {
 	 * Register drawing and DOM events.
 	 */
 	Controller.prototype.registerForNotifications = function() {
-		// Register controller for drawing notifications
+
 		this.drawing.registerForNotifications(this, 'notificationHandler', [
 			'ready',
 			'doodlesLoaded',
+			'parameterChanged'
+		]);
+
+		this.drawing.registerForNotifications(this, 'saveDrawingToInputField', [
 			'doodleAdded',
 			'doodleDeleted',
 			'doodleSelected',
 			'mousedragged',
-			'parameterChanged',
 			'drawingZoom'
 		]);
 	};
@@ -418,52 +421,6 @@ ED.Controller = (function() {
 	 */
 	Controller.prototype.onDoodlesLoaded = function() {
 		this.runOnDoodlesLoadedCommands();
-	};
-
-	/**
-	 * On doodle added.
-	 * @param  {Object} notification The notification object.
-	 */
-	Controller.prototype.onDoodleAdded = function() {
-
-		this.saveDrawingToInputField();
-
-		// Label doodle needs immediate keyboard input, so give canvas focus.
-		// NOTE: labels are deactivated from 1.6.
-		// var doodle = notification.object;
-		// if (typeof(doodle) != 'undefined') {
-		// 	if (doodle.className == 'Label') {
-		// 		this.canvas.focus();
-		// 	}
-		// }
-	};
-
-	/**
-	 * On doodle deleted.
-	 */
-	Controller.prototype.onDoodleDeleted = function() {
-		this.saveDrawingToInputField();
-	};
-
-	/**
-	 * On doodle selected.
-	 */
-	Controller.prototype.onDoodleSelected = function() {
-		this.deselectSyncedDoodles();
-	};
-
-	/**
-	 * On doodle mouse dragged.
-	 */
-	Controller.prototype.onMousedragged = function() {
-		this.saveDrawingToInputField();
-	};
-
-	/**
-	 * On drawing zoomed.
-	 */
-	Controller.prototype.onDrawingZoom = function() {
-		this.saveDrawingToInputField();
 	};
 
 	/**

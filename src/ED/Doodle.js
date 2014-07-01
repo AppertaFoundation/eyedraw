@@ -83,7 +83,7 @@ ED.Doodle = function(_drawing, _parameterJSON) {
 		this.createdTime = (new Date()).getTime();
 
 		// Set initial scale level
-		this.setScaleLevel(this.drawing.globalScaleFactor);
+		this.scaleLevel = 1;
 
 		// Dragging defaults - set individual values in subclasses
 		this.isLocked = false;
@@ -892,7 +892,7 @@ ED.Doodle.prototype.validateParameter = function(_parameter, _value) {
 				break;
 		}
 	} else {
-		ED.errorHandler('ED.Doodle', 'validateParameter', 'Unknown parameter name');
+		ED.errorHandler('ED.Doodle', 'validateParameter', 'Unknown parameter name: ' + _parameter + ' with value: ' + _value);
 	}
 
 	// If not valid, get current value of parameter

@@ -517,8 +517,7 @@ ED.Drawing.prototype.load = function(_doodleSet) {
 		this.doodleArray[i].id = i;
 
 		// Apply global scale factor
-		this.doodleArray[i].scaleX = this.doodleArray[i].scaleX * this.globalScaleFactor;
-		this.doodleArray[i].scaleY = this.doodleArray[i].scaleY * this.globalScaleFactor;
+		this.doodleArray[i].setScaleLevel(this.globalScaleFactor);
 	}
 
 	// Sort array by order (puts back doodle first)
