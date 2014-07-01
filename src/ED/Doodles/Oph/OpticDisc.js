@@ -465,7 +465,11 @@ ED.OpticDisc.prototype.description = function() {
 	}
 	// Basic mode
 	else {
-		returnString = this.drawing.doodleArray.length == 1 ? "No abnormality" : "";
+		if (this.cdRatio == "No view") {
+			returnString = "No view";
+		} else {
+			returnString = this.drawing.doodleArray.length == 1 ? "No abnormality" : "";
+		}
 	}
 
 	return returnString;
