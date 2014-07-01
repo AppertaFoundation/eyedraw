@@ -1741,7 +1741,7 @@ ED.Drawing.prototype.notifyZoomLevel = function() {
 	if (this.origScaleLevel < this.toggleScaleFactor) {
 		evt = (this.globalScaleFactor < this.toggleScaleFactor) ? zoomOut : zoomIn;
 	} else {
-		evt = (this.globalScaleFactor <= this.toggleScaleFactor) ? zoomIn : zoomOut;
+		evt = (this.globalScaleFactor <= this.toggleScaleFactor) ? zoomOut : zoomIn;
 	}
 
 	this.notify('drawingZoom');
