@@ -304,7 +304,7 @@ class OEEyeDrawWidget extends CWidget
 		}
 
 		// Set the scale level
-		if (isset($this->model) && isset($this->attribute)) {
+		if ($this->toggleScale && isset($this->model) && isset($this->attribute)) {
 			$data = json_decode($this->model[$this->attribute]);
 			$scale = 1;
 			// Get the saved scale level from the first doodle

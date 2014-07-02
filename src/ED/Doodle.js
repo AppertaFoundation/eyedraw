@@ -287,6 +287,11 @@ ED.Doodle = function(_drawing, _parameterJSON) {
 		else {
 			// Iterate array assigning values from passed array (arc and rotation are stored in degrees for legacy reasons)
 			for (var p in _parameterJSON) {
+
+				// Skip setting the scaleLevel. The initial scaleLevel should always be 1,
+				// and we should use the setScaleLevel() method for adjusting values based on scale.
+				if (p === 'scaleLevel') continue;
+
 				// Parameters arc and rotation are stored in degrees
 				if (p == 'arc' || p == 'rotation') {
 					this[p] = _parameterJSON[p] * Math.PI / 180;
