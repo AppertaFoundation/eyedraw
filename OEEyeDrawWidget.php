@@ -304,19 +304,18 @@ class OEEyeDrawWidget extends CWidget
 		}
 
 		// Set the scale level
-		if ($this->toggleScale && isset($this->model) && isset($this->attribute)) {
+		if (isset($this->model) && isset($this->attribute)) {
 			$data = json_decode($this->model[$this->attribute]);
-			$scale = 1;
 			// Get the saved scale level from the first doodle
 			if (count($data)) {
 				$doodle = $data[0];
-				$scale = property_exists($doodle, 'scaleLevel') && $doodle->scaleLevel ? $doodle->scaleLevel : 1;
+				$scale = isset($doodle->scaleLevel) ? $doodle->scaleLevel : $this->scale;
+				// Switch the toggleScale value if the saved scale matches the toggleScale
+				if ($this->toggleScale && $scale === $this->toggleScale) {
+					$this->toggleScale = $this->scale;
+				}
+				$this->scale = $scale;
 			}
-			// Switch the toggleScale value if the saved scale matches the toggleScale
-			if ($this->toggleScale && $scale === $this->toggleScale) {
-				$this->toggleScale = $this->scale;
-			}
-			$this->scale = $scale;
 		}
 
 		// Numeric flag corresponding to EyeDraw ED.eye  ***TODO*** may require additional options
