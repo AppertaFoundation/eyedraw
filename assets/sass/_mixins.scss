@@ -76,7 +76,8 @@
 			}
 			// State classes (pseudo).
 			@each $state in $imageStates {
-				.#{$prefixClass}-#{$i}:#{$state} {
+				.#{$prefixClass}-#{$i}:#{$state},
+				.#{$state} .#{$prefixClass}-#{$i} {
 					background-position: sprite-position($spriteMap, #{$i}_#{$state});
 				}
 				.disabled .#{$prefixClass}-#{$i}:#{$state} {
