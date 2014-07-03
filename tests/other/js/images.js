@@ -1,6 +1,7 @@
 window.eyedrawImages = [
     "new/ACIOL.png",
     "new/ACIOL_hover.png",
+    "new/ACMaintainer.png",
     "new/AngleNV.png",
     "new/AngleNV_hover.png",
     "new/AntSynech.png",
@@ -101,6 +102,7 @@ window.eyedrawImages = [
     "new/SwollenDisc_hover.png",
     "new/Telangiectasis.png",
     "new/Telangiectasis_hover.png",
+    "new/TrabyConjIncision.png",
     "new/TractionRetinalDetachment.png",
     "new/TractionRetinalDetachment_hover.png",
     "new/VitreousOpacity.png",

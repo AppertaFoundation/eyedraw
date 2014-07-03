@@ -82,6 +82,10 @@ ED.Doodle = function(_drawing, _parameterJSON) {
 		// Store created time
 		this.createdTime = (new Date()).getTime();
 
+		// Set initial scale level (the scale level will be adjusted later only once
+		// params have been set)
+		this.scaleLevel = 1;
+
 		// Dragging defaults - set individual values in subclasses
 		this.isLocked = false;
 		this.isSelectable = true;
@@ -277,6 +281,9 @@ ED.Doodle = function(_drawing, _parameterJSON) {
 			// Other initialisation
 			this.setParameterDefaults();
 
+			// Set the scale level and adjust params.
+			this.setScaleLevel(this.drawing.globalScaleFactor);
+
 			// Newly added doodles are selected
 			this.isSelected = true;
 		}
@@ -284,6 +291,11 @@ ED.Doodle = function(_drawing, _parameterJSON) {
 		else {
 			// Iterate array assigning values from passed array (arc and rotation are stored in degrees for legacy reasons)
 			for (var p in _parameterJSON) {
+
+				// Skip setting the scaleLevel. The initial scaleLevel should always be 1,
+				// and we should use the setScaleLevel() method for adjusting values based on scale.
+				if (p === 'scaleLevel') continue;
+
 				// Parameters arc and rotation are stored in degrees
 				if (p == 'arc' || p == 'rotation') {
 					this[p] = _parameterJSON[p] * Math.PI / 180;
@@ -347,6 +359,10 @@ ED.Doodle = function(_drawing, _parameterJSON) {
 			// 					this.updateDependentParameters(parameter);
 			// 				}
 			// 			}
+
+			// Set the scale level and adjust params.
+			this.setScaleLevel(this.drawing.globalScaleFactor);
+
 			for (var p in this.savedParameterArray) {
 				this.updateDependentParameters(this.savedParameterArray[p]);
 			}
@@ -889,7 +905,7 @@ ED.Doodle.prototype.validateParameter = function(_parameter, _value) {
 				break;
 		}
 	} else {
-		ED.errorHandler('ED.Doodle', 'validateParameter', 'Unknown parameter name');
+		ED.errorHandler('ED.Doodle', 'validateParameter', 'Unknown parameter name: ' + _parameter + ' with value: ' + _value);
 	}
 
 	// If not valid, get current value of parameter
@@ -1973,6 +1989,7 @@ ED.Doodle.prototype.json = function() {
 	var s = '{';
 
 	// Version and doodle subclass
+	s = s + '"scaleLevel": ' + this.scaleLevel + ',';
 	s = s + '"version":' + this.version.toFixed(1) + ',';
 	s = s + '"subclass":' + '"' + this.className + '",';
 
@@ -1991,6 +2008,8 @@ ED.Doodle.prototype.json = function() {
 					case 'scaleY':
 					case 'originX':
 					case 'originY':
+					case 'lastOriginX':
+					case 'lastOriginY':
 						o *= (1 / this.scaleLevel);
 					break;
 				}
@@ -2190,12 +2209,7 @@ ED.Doodle.prototype.xForY = function(_r, _y) {
  * @param {Number} _level The scaling level.
  */
 ED.Doodle.prototype.setScaleLevel = function(_newLevel) {
-
-	var diff = _newLevel;
-	if (_newLevel === 1 && this.scaleLevel !== undefined) {
-		diff /= this.scaleLevel;
-	}
-
+	var diff = (_newLevel / this.scaleLevel);
 	this.adjustScaleAndPosition(diff);
 	this.scaleLevel = _newLevel;
 };
@@ -2205,6 +2219,8 @@ ED.Doodle.prototype.adjustScaleAndPosition = function(amount){
 	this.scaleY *= amount;
 	this.originX *= amount;
 	this.originY *= amount;
+	if (this.lastOriginX) this.lastOriginX *= amount;
+	if (this.lastOriginY) this.lastOriginY *= amount;
 };
 
 /**

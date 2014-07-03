@@ -110,13 +110,14 @@ ED.Label.prototype.setParameterDefaults = function() {
 ED.Label.prototype.dependentParameterValues = function(_parameter, _value) {
 	var returnArray = new Array();
 
+	// This code is used to prevent the handle from moving.
 	switch (_parameter) {
 		case 'originX':
-			returnArray['apexX'] = this.apexX - (_value - this.lastOriginX) / this.drawing.globalScaleFactor;
+			returnArray['apexX'] = this.apexX - (_value - this.lastOriginX);
 			this.lastOriginX = _value;
 			break;
 		case 'originY':
-			returnArray['apexY'] = this.apexY - (_value - this.lastOriginY) / this.drawing.globalScaleFactor;
+			returnArray['apexY'] = this.apexY - (_value - this.lastOriginY);
 			this.lastOriginY = _value;
 			break;
 	}

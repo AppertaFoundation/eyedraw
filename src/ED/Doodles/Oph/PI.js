@@ -74,7 +74,7 @@ ED.PI.prototype.setPropertyDefaults = function() {
  * Sets default parameters
  */
 ED.PI.prototype.setParameterDefaults = function() {
-	this.setRotationWithDisplacements(30, 30);
+	this.setRotationWithDisplacements(60, -60);
 }
 
 /**

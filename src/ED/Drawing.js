@@ -88,7 +88,7 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 		if (_options['graphicsPath']) this.graphicsPath = _options['graphicsPath'];
 		if (_options['scaleOn']) this.scaleOn = _options['scaleOn'];
 		if (_options['scale']) globalScaleFactor = _options['scale'];
-		if (_options['toggleScale'] !== undefined) toggleScaleFactor = _options['toggleScale'];
+		if (_options['toggleScale']) toggleScaleFactor = _options['toggleScale'];
 	}
 
 	// Initialise properties
@@ -116,6 +116,7 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 	this.completeLine = false;
 	this.globalScaleFactor = globalScaleFactor;
 	this.toggleScaleFactor = toggleScaleFactor;
+	this.origScaleLevel = globalScaleFactor;
 	this.scrollValue = 0;
 	this.lastDoodleId = 0;
 	this.isActive = false;
@@ -514,10 +515,6 @@ ED.Drawing.prototype.load = function(_doodleSet) {
 		// Instantiate a new doodle object with parameters from doodle set
 		this.doodleArray[i] = new ED[_doodleSet[i].subclass](this, _doodleSet[i]);
 		this.doodleArray[i].id = i;
-
-		// Apply global scale factor
-		this.doodleArray[i].scaleX = this.doodleArray[i].scaleX * this.globalScaleFactor;
-		this.doodleArray[i].scaleY = this.doodleArray[i].scaleY * this.globalScaleFactor;
 	}
 
 	// Sort array by order (puts back doodle first)
@@ -1701,7 +1698,7 @@ ED.Drawing.prototype.resetEyedraw = function() {
  * @param  {Number} level     Scale level.
  * @param  {String} eventName Event name to notify.
  */
-ED.Drawing.prototype.setScaleForDrawingAndDoodles = function(level, eventName) {
+ED.Drawing.prototype.setScaleForDrawingAndDoodles = function(level) {
 
 	this.globalScaleFactor = level;
 
@@ -1710,10 +1707,15 @@ ED.Drawing.prototype.setScaleForDrawingAndDoodles = function(level, eventName) {
 	});
 
 	this.repaint();
+};
 
-	if (eventName) {
-		this.notify(eventName);
-	}
+/**
+ * This should be called only once the drawing is ready.
+ * @param {[type]} level [description]
+ */
+ED.Drawing.prototype.setScaleLevel = function(level) {
+	this.setScaleForDrawingAndDoodles(level);
+	this.notifyZoomLevel();
 };
 
 /**
@@ -1722,16 +1724,24 @@ ED.Drawing.prototype.setScaleForDrawingAndDoodles = function(level, eventName) {
  */
 ED.Drawing.prototype.toggleZoom = function() {
 	if (!this.toggleScaleFactor) return;
-	this.setScaleLevel(this.globalScaleFactor === this.toggleScaleFactor ? 1 : this.toggleScaleFactor);
+	var scale = this.globalScaleFactor === this.toggleScaleFactor ? this.origScaleLevel : this.toggleScaleFactor;
+	this.setScaleLevel(scale);
 };
 
-/**
- * This should be called only once the drawing is ready.
- * @param {[type]} level [description]
- */
-ED.Drawing.prototype.setScaleLevel = function(level) {
-	var evt = level < 1 ? 'drawingZoomOut' : 'drawingZoomIn';
-	this.setScaleForDrawingAndDoodles(level, evt);
+ED.Drawing.prototype.notifyZoomLevel = function() {
+
+	var zoomIn = 'drawingZoomIn';
+	var zoomOut = 'drawingZoomOut';
+	var evt;
+
+	if (this.origScaleLevel < this.toggleScaleFactor) {
+		evt = (this.globalScaleFactor < this.toggleScaleFactor) ? zoomOut : zoomIn;
+	} else {
+		evt = (this.globalScaleFactor <= this.toggleScaleFactor) ? zoomOut : zoomIn;
+	}
+
+	this.notify('drawingZoom');
+	this.notify(evt);
 };
 
 /**
@@ -1983,11 +1993,6 @@ ED.Drawing.prototype.addDoodle = function(_className, _parameterDefaults, _param
 
 		// New doodles are selected by default
 		this.selectedDoodle = newDoodle;
-
-		// Apply global scale factor
-		newDoodle.setScaleLevel(this.globalScaleFactor);
-		// newDoodle.scaleX = newDoodle.origScaleX * this.globalScaleFactor;
-		// newDoodle.scaleY = newDoodle.origScaleY * this.globalScaleFactor;
 
 		// If drawable, also go into drawing mode
 		if (newDoodle.isDrawable) {
