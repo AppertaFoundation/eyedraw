@@ -515,9 +515,6 @@ ED.Drawing.prototype.load = function(_doodleSet) {
 		// Instantiate a new doodle object with parameters from doodle set
 		this.doodleArray[i] = new ED[_doodleSet[i].subclass](this, _doodleSet[i]);
 		this.doodleArray[i].id = i;
-
-		// Apply global scale factor
-		this.doodleArray[i].setScaleLevel(this.globalScaleFactor);
 	}
 
 	// Sort array by order (puts back doodle first)
@@ -1996,11 +1993,6 @@ ED.Drawing.prototype.addDoodle = function(_className, _parameterDefaults, _param
 
 		// New doodles are selected by default
 		this.selectedDoodle = newDoodle;
-
-		// Apply global scale factor
-		newDoodle.setScaleLevel(this.globalScaleFactor);
-		// newDoodle.scaleX = newDoodle.origScaleX * this.globalScaleFactor;
-		// newDoodle.scaleY = newDoodle.origScaleY * this.globalScaleFactor;
 
 		// If drawable, also go into drawing mode
 		if (newDoodle.isDrawable) {
