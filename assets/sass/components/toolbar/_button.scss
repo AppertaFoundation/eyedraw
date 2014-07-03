@@ -38,4 +38,11 @@
 		background: #ddd;
 		opacity: 0.5;
 	}
+	.ed-doodle-popup-toolbar & {
+		border-color: #6db4dc;
+		&:hover, &.hover {
+			background: #118afb;
+			border-color: #0d6ac0;
+		}
+	}
 }

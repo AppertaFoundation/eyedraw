@@ -24,13 +24,13 @@
 
 {{#doodle}}
 	<ul class="ed-toolbar-panel ed-doodle-popup-toolbar">
-		{{#desc}}
-			<li>
+		<li>
+			{{#desc}}
 				<a class="ed-button ed-doodle-help{{lockedButtonClass}}" href="#" data-function="toggleHelp">
 					<span class="icon-ed-help"></span>
 				</a>
-			</li>
-		{{/desc}}
+			{{/desc}}
+		</li>
 		{{#doodle.isLocked}}
 			<li>
 				<a class="ed-button" href="#" data-function="unlock">
@@ -59,14 +59,14 @@
 				<span class="label">Move to front</span>
 			</a>
 		</li>
-		{{#doodle.isDeletable}}
-			<li>
+		<li>
+			{{#doodle.isDeletable}}
 				<a class="ed-button{{lockedButtonClass}}" href="#" data-function="deleteSelectedDoodle">
 					<span class="icon-ed-delete"></span>
 					<span class="label">Delete</span>
 				</a>
-			</li>
-		{{/doodle.isDeletable}}
+			{{/doodle.isDeletable}}
+		</li>
 	</ul>
 	<div class="ed-doodle-info hide">
 		{{^doodle.isLocked}}
