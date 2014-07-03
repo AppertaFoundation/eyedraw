@@ -51,6 +51,9 @@ module.exports = function(grunt) {
 		var jsString = util.format('/*! Generated on %s */\n', d);
 		jsString += this.options().varName + ' = ' + JSON.stringify(templates, null, 2) + ';';
 
+		//replace windows line endings
+		jsString = jsString.replace(/\\r\\n/g,'\\n');
+
 		grunt.file.write(this.options().dest, jsString);
 		grunt.log.ok('Saved to file %s', this.options().dest);
 	});

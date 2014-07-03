@@ -41582,7 +41582,7 @@ ED.TubeExtender.prototype.description = function() {
 		ITQ: 'inferotemporal'
 	};
 
-	return "TubeExtender in the " + descArray[this.platePosition] + " quadrant";
+	return "Tube extender in the " + descArray[this.platePosition] + " quadrant";
 }
 
 /**
