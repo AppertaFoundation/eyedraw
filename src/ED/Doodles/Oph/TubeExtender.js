@@ -35,7 +35,7 @@ ED.TubeExtender = function(_drawing, _parameterJSON) {
 	this.bezierArray = new Array();
 
 	// Saved parameters
-	this.savedParameterArray = ['rotation', 'apexY'];
+	this.savedParameterArray = ['apexX', 'apexY'];
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
