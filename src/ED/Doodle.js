@@ -797,9 +797,13 @@ ED.Doodle.prototype.updateDependentParameters = function(_parameter, _updateBind
  *
  * @param {String} _parameter Name of the parameter
  * @param {Undefined} _value Value of the parameter to validate
+ * @param {Boolean} _trim=true Trim the value prior to validation
  * @returns {Array} Array containing a bool indicating validity, and the correctly formatted value of the parameter
  */
-ED.Doodle.prototype.validateParameter = function(_parameter, _value) {
+ED.Doodle.prototype.validateParameter = function(_parameter, _value, _trim) {
+
+	_trim = _trim === undefined ? true : _trim;
+
 	// Retrieve validation object for this doodle
 	var validation = this.parameterValidationArray[_parameter];
 
@@ -810,8 +814,11 @@ ED.Doodle.prototype.validateParameter = function(_parameter, _value) {
 		// Validity flag
 		var valid = false;
 
-		// Enforce string type and trim it
-		value = _value.toString().trim();
+		// Enforce string type and optionally trim it
+		value = _value.toString();
+		if (_trim) {
+			value = value.trim();
+		}
 
 		switch (validation.type) {
 			case 'string':
@@ -896,8 +903,13 @@ ED.Doodle.prototype.validateParameter = function(_parameter, _value) {
 				break;
 
 			case 'freeText':
-				// ***TODO*** Add some actual validation here
 				valid = true;
+				if (validation.validate && typeof validation.validate === 'function') {
+					valid = validation.validate(_value);
+				}
+				else if (validation.maxLength !== undefined) {
+					valid = (_value.length <= validation.maxLength);
+				}
 				break;
 
 			default:
@@ -1586,8 +1598,15 @@ ED.Doodle.prototype.addBinding = function(_parameter, _fieldParameters) {
 						else {
 							this.drawing.updateBindings(this);
 						}
+
+						// Change event for input fields are only invoked when the input element is blurred.
 						element.addEventListener('change', listener = function(event) {
 							drawing.eventHandler('onchange', id, className, this.id, this.value);
+						}, false);
+
+						// We use the input event to allow us to validate values "in real time".
+						element.addEventListener('input', listener = function(event) {
+							drawing.eventHandler('oninput', id, className, this.id, this.value);
 						}, false);
 					}
 					break;

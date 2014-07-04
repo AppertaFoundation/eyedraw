@@ -2309,6 +2309,8 @@ ED.Drawing.prototype.addDoodle = function(_className, _parameterDefaults, _param
 				// Check validity of new value
 				var validityArray = newDoodle.validateParameter(parameter, value);
 
+				alert('validate param');
+
 				// If new value is valid, set it, otherwise use default value of doodle
 				if (validityArray.valid) {
 					newDoodle.setParameterFromString(parameter, validityArray.value);
@@ -2429,9 +2431,10 @@ ED.Drawing.prototype.addDeleteValues = function(_deleteValuesArray) {
 ED.Drawing.prototype.eventHandler = function(_type, _doodleId, _className, _elementId, _value) {
 	//console.log("Event: " + _type + " doodleId: " + _doodleId + " doodleClass: " + _className + " elementId: " + _elementId + " value: " + _value);
 
+
 	switch (_type) {
-		// Onchange event
 		case 'onchange':
+		case 'oninput':
 			// Get reference to associated doodle
 			var doodle = this.doodleOfId(_doodleId);
 
@@ -2452,8 +2455,8 @@ ED.Drawing.prototype.eventHandler = function(_type, _doodleId, _className, _elem
 						}
 					}
 
-					// Check validity of new value
-					var validityArray = doodle.validateParameter(parameter, _value);
+					// Check validity of new value, only trim the value if change event
+					var validityArray = doodle.validateParameter(parameter, _value, _type === 'onchange');
 
 					// If new value is valid, set it
 					if (validityArray.valid) {
@@ -2984,6 +2987,7 @@ ED.Drawing.prototype.clear = function() {
 
 	// Set context transform to map from doodle plane to canvas plane
 	this.context.translate(this.canvas.width / 2, this.canvas.height / 2);
+
 	this.context.scale(this.scale, this.scale);
 }
 
@@ -3982,9 +3986,13 @@ ED.Doodle.prototype.updateDependentParameters = function(_parameter, _updateBind
  *
  * @param {String} _parameter Name of the parameter
  * @param {Undefined} _value Value of the parameter to validate
+ * @param {Boolean} _trim=true Trim the value prior to validation
  * @returns {Array} Array containing a bool indicating validity, and the correctly formatted value of the parameter
  */
-ED.Doodle.prototype.validateParameter = function(_parameter, _value) {
+ED.Doodle.prototype.validateParameter = function(_parameter, _value, _trim) {
+
+	_trim = _trim === undefined ? true : _trim;
+
 	// Retrieve validation object for this doodle
 	var validation = this.parameterValidationArray[_parameter];
 
@@ -3995,8 +4003,11 @@ ED.Doodle.prototype.validateParameter = function(_parameter, _value) {
 		// Validity flag
 		var valid = false;
 
-		// Enforce string type and trim it
-		value = _value.toString().trim();
+		// Enforce string type and optionally trim it
+		value = _value.toString();
+		if (_trim) {
+			value = value.trim();
+		}
 
 		switch (validation.type) {
 			case 'string':
@@ -4081,8 +4092,13 @@ ED.Doodle.prototype.validateParameter = function(_parameter, _value) {
 				break;
 
 			case 'freeText':
-				// ***TODO*** Add some actual validation here
 				valid = true;
+				if (validation.validate && typeof validation.validate === 'function') {
+					valid = validation.validate(_value);
+				}
+				else if (validation.maxLength !== undefined) {
+					valid = (_value.length <= validation.maxLength);
+				}
 				break;
 
 			default:
@@ -4771,8 +4787,15 @@ ED.Doodle.prototype.addBinding = function(_parameter, _fieldParameters) {
 						else {
 							this.drawing.updateBindings(this);
 						}
+
+						// Change event for input fields are only invoked when the input element is blurred.
 						element.addEventListener('change', listener = function(event) {
 							drawing.eventHandler('onchange', id, className, this.id, this.value);
+						}, false);
+
+						// We use the input event to allow us to validate values "in real time".
+						element.addEventListener('input', listener = function(event) {
+							drawing.eventHandler('oninput', id, className, this.id, this.value);
 						}, false);
 					}
 					break;
@@ -8667,6 +8690,7 @@ ED.Label.prototype.setHandles = function() {
  * Sets default properties
  */
 ED.Label.prototype.setPropertyDefaults = function() {
+
 	this.parameterValidationArray['apexX']['range'].setMinAndMax(-1000, +1000);
 	this.parameterValidationArray['apexY']['range'].setMinAndMax(-1000, +1000);
 
@@ -8674,9 +8698,74 @@ ED.Label.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['labelText'] = {
 		kind: 'derived',
 		type: 'freeText',
-		animate: false
+		animate: false,
+		// We use a callback function because the validity of the input value is
+		// based on scaleLevel which can be changed at runtime.
+		validate: this.validateValue.bind(this)
 	};
-}
+
+	this.storeOriginalParams();
+};
+
+/**
+ * Ensure the input value's text length is not longer than the canvas width.
+ * @param  {String} _value The input value.
+ */
+ED.Label.prototype.validateValue = function(_value) {
+
+	// Allows allow small amounts of text. This accomodates a scenario where a user
+	// might have zoomed out, add a max label, then zoom in, then attempt to delete
+	// some text.
+	if (_value.length < this.labelText.length) return true;
+
+	var ctx = this.drawing.context;
+	ctx.font = this.labelFont;
+
+	// Calculate the text width
+	var width = ((ctx.measureText(_value).width + this.padding * 2) * this.drawing.scale) * this.scaleLevel;
+
+	return (width <= this.drawing.canvas.width)
+};
+
+
+/**
+ * Store the original param values.
+ * We store the original params values so we can re-set them when the scale level
+ * changes. Unlike other doodles, we want to set the bounds to be the same as
+ * the dimensions of the canvas element.
+ * @return {[type]} [description]
+ */
+ED.Label.prototype.storeOriginalParams = function() {
+	this.originalParams = {
+		originX: {
+			min: this.parameterValidationArray['originX'].range.min,
+			max: this.parameterValidationArray['originX'].range.max
+		},
+		originY: {
+			min: this.parameterValidationArray['originY'].range.min,
+			max: this.parameterValidationArray['originY'].range.max
+		}
+	};
+};
+
+/**
+ * Override the setScaleLevel method to adjust the origin ranges to allow
+ * the label to be dragged to the boundary of the canvas element.
+ * @param {Number} _newLevel The new scale level.
+ */
+ED.Label.prototype.setScaleLevel = function(_newLevel) {
+	// Call super method.
+	ED.Doodle.prototype.setScaleLevel.apply(this, arguments);
+
+	var minX = this.originalParams.originX.min / this.scaleLevel;
+	var maxX = this.originalParams.originX.max / this.scaleLevel;
+
+	var minY = this.originalParams.originY.min / this.scaleLevel;
+	var maxY = this.originalParams.originY.max / this.scaleLevel;
+
+	this.parameterValidationArray['originX']['range'].setMinAndMax(minX, maxX);
+	this.parameterValidationArray['originY']['range'].setMinAndMax(minY, maxY);
+};
 
 /**
  * Sets default parameters

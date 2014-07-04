@@ -2049,6 +2049,8 @@ ED.Drawing.prototype.addDoodle = function(_className, _parameterDefaults, _param
 				// Check validity of new value
 				var validityArray = newDoodle.validateParameter(parameter, value);
 
+				alert('validate param');
+
 				// If new value is valid, set it, otherwise use default value of doodle
 				if (validityArray.valid) {
 					newDoodle.setParameterFromString(parameter, validityArray.value);
@@ -2169,9 +2171,10 @@ ED.Drawing.prototype.addDeleteValues = function(_deleteValuesArray) {
 ED.Drawing.prototype.eventHandler = function(_type, _doodleId, _className, _elementId, _value) {
 	//console.log("Event: " + _type + " doodleId: " + _doodleId + " doodleClass: " + _className + " elementId: " + _elementId + " value: " + _value);
 
+
 	switch (_type) {
-		// Onchange event
 		case 'onchange':
+		case 'oninput':
 			// Get reference to associated doodle
 			var doodle = this.doodleOfId(_doodleId);
 
@@ -2192,8 +2195,8 @@ ED.Drawing.prototype.eventHandler = function(_type, _doodleId, _className, _elem
 						}
 					}
 
-					// Check validity of new value
-					var validityArray = doodle.validateParameter(parameter, _value);
+					// Check validity of new value, only trim the value if change event
+					var validityArray = doodle.validateParameter(parameter, _value, _type === 'onchange');
 
 					// If new value is valid, set it
 					if (validityArray.valid) {
@@ -2724,6 +2727,7 @@ ED.Drawing.prototype.clear = function() {
 
 	// Set context transform to map from doodle plane to canvas plane
 	this.context.translate(this.canvas.width / 2, this.canvas.height / 2);
+
 	this.context.scale(this.scale, this.scale);
 }
 
