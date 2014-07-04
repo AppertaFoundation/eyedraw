@@ -2037,9 +2037,9 @@ span.squiggle {
   -moz-transition: right 0.5s ease;
   -o-transition: right 0.5s ease;
   transition: right 0.5s ease;
-  -webkit-box-shadow: 0 5px 14px -4px rgba(0, 0, 0, 0.5);
-  -moz-box-shadow: 0 5px 14px -4px rgba(0, 0, 0, 0.5);
-  box-shadow: 0 5px 14px -4px rgba(0, 0, 0, 0.5);
+  -webkit-box-shadow: 2px 5px 14px -4px rgba(0, 0, 0, 0.7);
+  -moz-box-shadow: 2px 5px 14px -4px rgba(0, 0, 0, 0.7);
+  box-shadow: 2px 5px 14px -4px rgba(0, 0, 0, 0.7);
   -webkit-user-select: text;
   -moz-user-select: text;
   user-select: text;
