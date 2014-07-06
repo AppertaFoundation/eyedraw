@@ -324,7 +324,7 @@ ED.AntSeg.prototype.description = function() {
 			returnValue = "Aphakic, ";
 		}
 		*/
-		returnValue = "Anterior segment normal, ";
+		returnValue = "No abnormality";
 	}
 
 	// Remove final comma and space and capitalise first letter
