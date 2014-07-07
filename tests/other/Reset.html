@@ -1,0 +1,397 @@
+<!doctype html>
+<html>
+<head>
+	<title>Eyedraw doodle popup menu prototype</title>
+
+	<!-- This is the main OpenEyes stlesheet -->
+	<link rel="stylesheet" type="text/css" href="css/style.css" />
+
+	<!-- The eyedraw widget stylesheet -->
+	<!-- <link rel="stylesheet" type="text/css" href="../../../assets/css/oe-eyedraw.css" /> -->
+
+	<!-- Other dependent scripts -->
+	<script type="text/javascript" src="../../assets/components/jquery/jquery.min.js"></script>
+	<script type="text/javascript" src="../../assets/components/mustache/mustache.js"></script>
+	<script type="text/javascript" src="../../assets/components/eventemitter2/lib/eventemitter2.js"></script>
+
+<!-- Load in the eyedraw scripts -->
+	<script type="text/javascript" src="./js/scripts.js"></script>
+	<script type="text/javascript" src="./js/doodleTitles.js"></script>
+	<script>
+		this.eyedrawScripts.forEach(function(file) {
+			// We use document.write to force the files to be loaded synchronously.
+			document.write('<script src="../../src/' + file + '"><\/script>');
+		});
+	</script>
+	<!-- End loading in eyedraw scripts -->
+
+	<style type="text/css">
+	.container.main {
+		width: 338px;
+		margin-top: 50px;
+		padding: 15px;
+	}
+	</style>
+</head>
+<body>
+	<div class="container main" role="main">
+
+		<p>This example demonstrates the reset feature of the eyedraw.</p>
+
+		<!-- EYEDRAW WIDGET START -->
+		<div class="ed-widget" id="eyedrawwidget_example">
+
+			<!-- TOOLBAR START -->
+			<div class="ed-toolbar">
+
+				<!-- PANEL START -->
+				<ul class="ed-toolbar-panel ed-main-toolbar">
+					<li id="TrabySutureTrabeculectomy">
+						<a class="ed-button" href="#" data-function="addDoodle" data-arg="TrabySuture">
+							<span class="icon-ed-TrabySuture"></span>
+							<span class="label">Trabeculectomy suture</span>
+						</a>
+					</li>
+					<li id="PITrabeculectomy">
+						<a class="ed-button" href="#" data-function="addDoodle" data-arg="PI">
+							<span class="icon-ed-PI"></span>
+							<span class="label">Peripheral iridectomy</span>
+						</a>
+					</li>
+					<li id="SidePortTrabeculectomy">
+						<a class="ed-button" href="#" data-function="addDoodle" data-arg="SidePort">
+							<span class="icon-ed-SidePort"></span>
+							<span class="label">Side port</span>
+						</a>
+					</li>
+					<li id="PatchTrabeculectomy">
+						<a class="ed-button" href="#" data-function="addDoodle" data-arg="Patch">
+							<span class="icon-ed-Patch"></span>
+							<span class="label">Tube patch</span>
+						</a>
+					</li>
+					<li id="ConjunctivalSutureTrabeculectomy">
+						<a class="ed-button" href="#" data-function="addDoodle" data-arg="ConjunctivalSuture">
+							<span class="icon-ed-ConjunctivalSuture"></span>
+							<span class="label">Conjunctival suture</span>
+						</a>
+					</li>
+					<li id="ACMaintainerTrabeculectomy">
+						<a class="ed-button" href="#" data-function="addDoodle" data-arg="ACMaintainer">
+							<span class="icon-ed-ACMaintainer"></span>
+							<span class="label">AC maintainer</span>
+						</a>
+					</li>
+					<li id="CornealSutureTrabeculectomy">
+						<a class="ed-button" href="#" data-function="addDoodle" data-arg="CornealSuture">
+							<span class="icon-ed-CornealSuture"></span>
+							<span class="label">Corneal suture</span>
+						</a>
+					</li>
+					<li id="LabelTrabeculectomy">
+						<a class="ed-button" href="#" data-function="addDoodle" data-arg="Label">
+							<span class="icon-ed-Label"></span>
+							<span class="label">Label</span>
+						</a>
+					</li>
+				</ul>
+				<!-- PANEL END -->
+			</div>
+			<!-- TOOLBAR END -->
+
+			<div class="ed-body">
+
+				<div class="ed-editor-container">
+
+					<div class="ed-editor">
+
+						<div class="ed-drawing-controls">
+							<ul class="ed-toolbar-panel ed-drawing-toolbar">
+								<li>
+									<a class="ed-button" href="#" data-function="resetEyedraw">
+										<span class="icon-ed-reset"></span>
+										<span class="label">Reset eyedraw</span>
+									</a>
+								</li>
+							</ul>
+							<div class="ed-selected-doodle">
+								<select id="ed_example_selected_doodle" class="ed-selected-doodle-select">
+								</select>
+							</div>
+						</div>
+
+						<!-- DOODLE POPUP -->
+						<div class="ed-doodle-popup closed">
+						</div>
+
+						<!-- CANVAS -->
+						<canvas
+						id="ed_canvas_edit_Trabeculectomy"
+						class="ed-canvas-edit"
+						width="300"
+						height="300"
+						tabindex="1"
+						data-drawing-name="ed_drawing_edit_Trabeculectomy">
+						</canvas>
+
+						<!-- DATA FIELD -->
+						<input
+						type="hidden"
+						id="Element_OphTrOperationnote_Trabeculectomy_eyedraw"
+						name="Element_OphTrOperationnote_Trabeculectomy[eyedraw]"
+						value='' />
+					</div>
+				</div>
+
+				<div class="ed-fields-container">
+					<!-- fields here -->
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	<script>
+	(function() {
+		ED.setTitles({
+			"NONE": "No description available for this doodle",
+			"ACIOL": "Anterior chamber IOL",
+			"AdnexalEye": "Adnexal eye template",
+			"Ahmed": "Ahmed tube",
+			"AngleGrade": "Angle grade",
+			"AngleNV": "Angle new vessels",
+			"AngleRecession": "Angle recession",
+			"AntPVR": "Anterior PVR",
+			"AntSeg": "Anterior segment",
+			"AntSynech": "Anterior synechiae",
+			"APattern": "A pattern",
+			"ArcuateScotoma": "Arcuate scotoma",
+			"Arrow": "Arrow",
+			"Baerveldt": "Baerveld tube",
+			"BiopsySite": "Biopsy site",
+			"Bleb": "Trabeculectomy bleb",
+			"BlotHaemorrhage": "Blot haemorrhage",
+			"Buckle": "Buckle",
+			"BuckleOperation": "Buckle operation",
+			"BuckleSuture": "Buckle suture",
+			"BusaccaNodule": "Busacca nodule",
+			"CapsularTensionRing": "Capsular Tension Ring",
+			"ChandelierDouble": "Double chandelier",
+			"ChandelierSingle": "Chandelier",
+			"ChoroidalHaemorrhage": "Choroidal haemorrhage",
+			"ChoroidalNaevus": "Choroidal naevus",
+			"CiliaryInjection": "Cilary injection",
+			"Circinate": "Circinate retinopathy",
+			"CircumferentialBuckle": "Circumferential buckle",
+			"CNV": "Choroidal new vessels",
+			"ConjunctivalFlap": "Conjunctival flap",
+			"CornealAbrasion": "Corneal abrasion",
+			"CornealErosion": "Removal of corneal epithelium",
+			"CornealGraft": "Corneal graft",
+			"CornealOedema": "Corneal oedema",
+			"CornealScar": "Corneal scar",
+			"CornealStriae": "Corneal striae",
+			"CornealSuture": "Corneal suture",
+			"CorticalCataract": "Cortical cataract",
+			"CottonWoolSpot": "Cotton wool spot",
+			"Cryo": "Cryotherapy scar",
+			"CutterPI": "Cutter iridectomy",
+			"CystoidMacularOedema": "Cystoid macular oedema",
+			"DiabeticNV": "Diabetic new vessels",
+			"Dialysis": "Dialysis",
+			"DiscHaemorrhage": "Disc haemorrhage",
+			"DiscPallor": "Disc pallor",
+			"DrainageRetinotomy": "Drainage retinotomy",
+			"DrainageSite": "Drainage site",
+			"EncirclingBand": "Encircling band",
+			"EntrySiteBreak": "Entry site break",
+			"EpiretinalMembrane": "Epiretinal membrane",
+			"FibrousProliferation": "Fibrous proliferation",
+			"FocalLaser": "Focal laser",
+			"Freehand": "Freehand drawing",
+			"Fuchs": "Fuchs endothelial dystrophy",
+			"Fundus": "Fundus",
+			"Geographic": "Geographic atrophy",
+			"Gonioscopy": "Gonioscopy",
+			"GRT": "Giant retinal tear",
+			"HardDrusen": "Hard drusen",
+			"HardExudate": "Hard exudate",
+			"Hyphaema": "Hyphaema",
+			"Hypopyon": "Hypopyon",
+			"IatrogenicBreak": "IatrogenicBreak",
+			"ILMPeel": "ILM peel",
+			"InjectionSite": "Injection site",
+			"InnerLeafBreak": "Inner leaf break",
+			"Iris": "Iris",
+			"IrisHook": "Iris hook",
+			"IrisNaevus": "Iris naevus",
+			"IRMA": "Intraretinal microvascular abnormalities",
+			"KeraticPrecipitates": "Keratic precipitates",
+			"KoeppeNodule": "Koeppe nodule",
+			"KrukenbergSpindle": "Krukenberg spindle",
+			"Label": "Label",
+			"LaserCircle": "Circle of laser photocoagulation",
+			"LaserDemarcation": "Laser demarcation",
+			"LasikFlap": "LASIK flap",
+			"LaserSpot": "Laser spot",
+			"Lattice": "Lattice",
+			"Lens": "Lens",
+			"LimbalRelaxingIncision": "Limbal relaxing incision",
+			"Macroaneurysm": "Macroaneurysm",
+			"MacularDystrophy": "Macular dystrophy",
+			"MacularGrid": "Macular grid laser",
+			"MacularHole": "Macular hole",
+			"MacularThickening": "Macular thickening",
+			"MattressSuture": "Mattress suture",
+			"Microaneurysm": "Microaneurysm",
+			"Molteno": "Molteno tube",
+			"NerveFibreDefect": "Nerve fibre defect",
+			"NuclearCataract": "Nuclear cataract",
+			"OpticCup": "Optic cup",
+			"OpticDisc": "Optic disc",
+			"OpticDiscPit": "Optic disc pit",
+			"OrthopticEye": "Orthoptic eye",
+			"OuterLeafBreak": "Outer leaf break",
+			"Papilloedema": "Papilloedema",
+			"Patch": "Tube patch",
+			"PCIOL": "Posterior chamber IOL",
+			"PeripapillaryAtrophy": "Peripapillary atrophy",
+			"PeripheralRetinectomy": "Peripheral retinectomy",
+			"PhakoIncision": "Phako incision",
+			"PI": "Peripheral iridectomy",
+			"PointInLine": "Point in line",
+			"PosteriorCapsule": "Posterior capsule",
+			"PosteriorEmbryotoxon": "Posterior embryotoxon",
+			"PostPole": "Posterior pole",
+			"PostSubcapCataract": "Posterior subcapsular cataract",
+			"PosteriorRetinectomy": "Posterior retinectomy",
+			"PosteriorSynechia": "Posterior synechia",
+			"PreRetinalHaemorrhage": "Pre-retinal haemorrhage",
+			"PRP": "Panretinal photocoagulation",
+			"PRPPostPole": "Panretinal photocoagulation (posterior pole)",
+			"Pupil": "Pupil",
+			"RadialSponge": "Radial sponge",
+			"RetinalArteryOcclusionPostPole": "Retinal artery occlusion",
+			"RetinalTouch": "Retinal touch",
+			"RetinalVeinOcclusionPostPole": "Retinal vein occluson",
+			"Retinoschisis": "Retinoschisis",
+			"RK": "Radial keratotomy",
+			"RoundHole": "Round hole",
+			"RPEDetachment": "RPE detachment",
+			"RPERip": "RPE rip",
+			"RRD": "Rhegmatogenous retinal detachment",
+			"Rubeosis": "Rubeosis iridis",
+			"SectorPRP": "Sector PRP",
+			"SectorPRPPostPole": "Sector PRP (posterior pole)",
+			"ScleralIncision": "Scleral Incision",
+			"Sclerostomy": "Sclerostomy",
+			"SectorIridectomy": "Sector iridectomy",
+			"Shading": "Shading",
+			"SidePort": "Side port",
+			"Slider": "Slider",
+			"StarFold": "Star fold",
+			"SubretinalFluid": "Subretinal fluid",
+			"SubretinalPFCL": "Subretinal PFCL",
+			"Supramid": "Supramid suture",
+			"SwollenDisc": "Swollen disc",
+			"Telangiectasis": "Parafoveal telangiectasia",
+			"Trabectome": "Trabectome",
+			"TrabyFlap": "Trabeculectomy flap",
+			"TrabySuture": "Trabeculectomy suture",
+			"ToricPCIOL": "Toric posterior chamber IOL",
+			"TractionRetinalDetachment": "Traction retinal detachment",
+			"TransilluminationDefect": "Transillumination defect",
+			"UpDrift": "Up drift",
+			"UpShoot": "Up shoot",
+			"UTear": "Traction ‘U’ tear",
+			"Vicryl": "Vicryl suture",
+			"ViewObscured": "View obscured",
+			"VitreousOpacity": "Vitreous opacity",
+			"VPattern": "V pattern",
+			"Crepitations": "Crepitations",
+			"Stenosis": "Stenosis",
+			"Wheeze": "Wheeze",
+			"Effusion": "Pleural effusion",
+			"LeftCoronaryArtery": "Left coronary artery",
+			"DrugStent": "Drug eluting stent",
+			"MetalStent": "Metal stent",
+			"Bypass": "Coronary artery bypass",
+			"Bruit": "Bruit",
+			"Bruising": "Bruising",
+			"Haematoma": "Haematoma"
+		});
+	}());
+	</script>
+
+	<script>
+	(function() {
+		ED.init({
+			'drawingName': 'ed_drawing_edit_Trabeculectomy',
+			'canvasId': 'ed_canvas_edit_Trabeculectomy',
+			'eye': 1,
+			'scale': 0.72,
+			'toggleScale': 0,
+			'idSuffix': 'Trabeculectomy',
+			'isEditable': true,
+			'focus': false,
+			'graphicsPath': "../../../assets/img/",
+			'inputId': 'Element_OphTrOperationnote_Trabeculectomy_eyedraw',
+			'onReadyCommandArray': [
+				['addDoodle', ['AntSeg']],
+				['addDoodle', ['ConjunctivalFlap']],
+				['addDoodle', ['PI', {
+					'rotation': 0
+				}]],
+				['addDoodle', ['SidePort', {
+					'rotation': 2.3561944901923
+				}]],
+				['addDoodle', ['TrabyFlap']],
+				['addDoodle', ['TrabySuture']],
+				['addDoodle', ['TrabySuture']],
+				['addDoodle', ['TrabySuture']]
+			],
+			'onDoodlesLoadedCommandArray': [],
+			'bindingArray': {
+				// 'ConjunctivalFlap': {
+				// 	'method': {
+				// 		'id': 'Element_OphTrOperationnote_Trabeculectomy_conjunctival_flap_type_id',
+				// 		'attribute': 'data-value'
+				// 	}
+				// },
+				// 'TrabyFlap': {
+				// 	'site': {
+				// 		'id': 'Element_OphTrOperationnote_Trabeculectomy_site_id',
+				// 		'attribute': 'data-value'
+				// 	},
+				// 	'size': {
+				// 		'id': 'Element_OphTrOperationnote_Trabeculectomy_size_id',
+				// 		'attribute': 'data-value'
+				// 	},
+				// 	'sclerostomy': {
+				// 		'id': 'Element_OphTrOperationnote_Trabeculectomy_sclerostomy_type_id',
+				// 		'attribute': 'data-value'
+				// 	}
+				// }
+			},
+			'deleteValueArray': [],
+			'syncArray': [],
+			'listenerArray': [],
+			'offsetX': 0,
+			'offsetY': 0,
+			'toImage': false
+		});
+	}());
+	</script>
+
+	<!-- END EYEDRAW INIT -->
+	<script>
+	(function() {
+		$(function() {
+			// We're dynamically adding in this styelsheet to test if the eyedraw is
+			// initiated only after the dependent stylesheets are loaded.
+			$('<link rel="stylesheet" type="text/css" href="../../../assets/css/oe-eyedraw.css?cache=' + (new Date).getTime() + '" />').appendTo(document.body);
+		});
+	}());
+	</script>
+</body>
+</html>
