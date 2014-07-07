@@ -1637,7 +1637,7 @@ ED.Doodle.prototype.addBinding = function(_parameter, _fieldParameters) {
 						}, false);
 
 						// We use the input event to allow us to validate values "in real time".
-						element.addEventListener('input', listener = function(event) {
+						element.addEventListener('input', function(event) {
 							drawing.eventHandler('oninput', id, className, this.id, this.value);
 						}, false);
 					}
@@ -1674,6 +1674,7 @@ ED.Doodle.prototype.addBinding = function(_parameter, _fieldParameters) {
  * @param {String} _parameter Name of parameter whosse binding is to be removed
  */
 ED.Doodle.prototype.removeBinding = function(_parameter) {
+
 	// Get id of corresponding element
 	var elementId;
 	for (var parameter in this.bindingArray) {
@@ -1685,9 +1686,11 @@ ED.Doodle.prototype.removeBinding = function(_parameter) {
 	// Remove entry in binding array
 	delete this.bindingArray[_parameter];
 
-	// Remove event listener
 	var element = document.getElementById(elementId);
-	element.removeEventListener('change', this.drawing.listenerArray[this.id][_parameter], false);
+	if (element) {
+		// Attempt to remove the event listener.
+		element.removeEventListener('change', this.drawing.listenerArray[this.id][_parameter], false);
+	}
 
 	// Remove entry in listener array
 	delete this.drawing.listenerArray[this.id][_parameter];
