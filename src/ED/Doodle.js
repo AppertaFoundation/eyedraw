@@ -926,6 +926,9 @@ ED.Doodle.prototype.validateParameter = function(_parameter, _value, _trim) {
 		ED.errorHandler('ED.Doodle', 'validateParameter', 'Validation failure for parameter: ' + _parameter + ' with value: ' + _value);
 	}
 
+	// Show validation message/s
+	this.showControlValidationMsg(_parameter, valid);
+
 	// Return validity and value
 	var returnArray = new Array();
 	returnArray['valid'] = valid;
@@ -988,6 +991,33 @@ ED.Doodle.prototype.addControlBindings = function() {
 		});
 	}
 };
+
+/**
+ * Show a validation msg for a param that has a bound field control.
+ * @param  {String} _parameter Parameter name
+ * @param  {Boolean} _valid     Is the parameter value valid?
+ */
+ED.Doodle.prototype.showControlValidationMsg = function(_parameter, _valid) {
+
+	if (!(_parameter in this.controlParameterArray)) {
+		return;
+	}
+
+	var elementId = this.parameterControlElementId(_parameter);
+	var label = document.querySelector('[for='+elementId+']');
+	var msg = label.querySelector('.validation-msg');
+
+	if (_valid) {
+		if (msg) msg.parentNode.removeChild(msg);
+	} else {
+		if (!msg) {
+			msg = document.createElement('span');
+			label.appendChild(msg);
+			msg.classList.add('validation-msg');
+		}
+		msg.textContent = '*';
+	}
+}
 
 /**
  * Generate and append the control elements to the DOM.
@@ -1132,7 +1162,8 @@ ED.Doodle.prototype.parameterElement = function(_parameter) {
  *
  * @param {String} _parameter Name of parameter
  * @param {String} _value New value of parameter
- * @param {Boolean} _updateBindings Update the doodle form control bindings?
+ * @param {Boolean} _updateBindings Update the doodle form control bindings? We don't want to update the
+ * bindings if the new param values originated from the bound controls.
  */
 ED.Doodle.prototype.setParameterWithAnimation = function(_parameter, _value, _updateBindings) {
 
@@ -1196,7 +1227,7 @@ ED.Doodle.prototype.setParameterWithAnimation = function(_parameter, _value, _up
 	}
 	// Otherwise just set it directly
 	else {
-		this.setParameterFromString(_parameter, _value.toString());
+		this.setParameterFromString(_parameter, _value.toString(), _updateBindings);
 	}
 
 	this.drawing.notify("setParameterWithAnimationComplete");
@@ -1228,8 +1259,9 @@ ED.Doodle.prototype.setSimpleParameter = function(_parameter, _value) {
  *
  * @param {String} _parameter Name of parameter
  * @param {String} _value New value of parameter
+ * @param {Boolean} _updateBindings Update form element bindings?
  */
-ED.Doodle.prototype.setParameterFromString = function(_parameter, _value) {
+ED.Doodle.prototype.setParameterFromString = function(_parameter, _value, _updateBindings) {
 	// Check type of passed value variable
 	var type = typeof(_value);
 	if (type != 'string') {
@@ -1276,14 +1308,14 @@ ED.Doodle.prototype.setParameterFromString = function(_parameter, _value) {
 		}
 
 		// Update dependencies
-		this.updateDependentParameters(_parameter);
+		this.updateDependentParameters(_parameter, _updateBindings);
 
 		// Update child dependencies of any derived parameters
 		if (this.parameterValidationArray[_parameter]['kind'] == 'derived') {
 			var valueArray = this.dependentParameterValues(_parameter, _value);
 			for (var parameter in valueArray) {
 				// Update dependencies
-				this.updateDependentParameters(parameter);
+				this.updateDependentParameters(parameter, _updateBindings);
 			}
 		}
 

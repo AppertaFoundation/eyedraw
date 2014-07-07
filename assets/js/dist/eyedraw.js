@@ -2309,8 +2309,6 @@ ED.Drawing.prototype.addDoodle = function(_className, _parameterDefaults, _param
 				// Check validity of new value
 				var validityArray = newDoodle.validateParameter(parameter, value);
 
-				alert('validate param');
-
 				// If new value is valid, set it, otherwise use default value of doodle
 				if (validityArray.valid) {
 					newDoodle.setParameterFromString(parameter, validityArray.value);
@@ -4115,6 +4113,9 @@ ED.Doodle.prototype.validateParameter = function(_parameter, _value, _trim) {
 		ED.errorHandler('ED.Doodle', 'validateParameter', 'Validation failure for parameter: ' + _parameter + ' with value: ' + _value);
 	}
 
+	// Show validation message/s
+	this.showControlValidationMsg(_parameter, valid);
+
 	// Return validity and value
 	var returnArray = new Array();
 	returnArray['valid'] = valid;
@@ -4177,6 +4178,33 @@ ED.Doodle.prototype.addControlBindings = function() {
 		});
 	}
 };
+
+/**
+ * Show a validation msg for a param that has a bound field control.
+ * @param  {String} _parameter Parameter name
+ * @param  {Boolean} _valid     Is the parameter value valid?
+ */
+ED.Doodle.prototype.showControlValidationMsg = function(_parameter, _valid) {
+
+	if (!(_parameter in this.controlParameterArray)) {
+		return;
+	}
+
+	var elementId = this.parameterControlElementId(_parameter);
+	var label = document.querySelector('[for='+elementId+']');
+	var msg = label.querySelector('.validation-msg');
+
+	if (_valid) {
+		if (msg) msg.parentNode.removeChild(msg);
+	} else {
+		if (!msg) {
+			msg = document.createElement('span');
+			label.appendChild(msg);
+			msg.classList.add('validation-msg');
+		}
+		msg.textContent = '*';
+	}
+}
 
 /**
  * Generate and append the control elements to the DOM.
@@ -4321,7 +4349,8 @@ ED.Doodle.prototype.parameterElement = function(_parameter) {
  *
  * @param {String} _parameter Name of parameter
  * @param {String} _value New value of parameter
- * @param {Boolean} _updateBindings Update the doodle form control bindings?
+ * @param {Boolean} _updateBindings Update the doodle form control bindings? We don't want to update the
+ * bindings if the new param values originated from the bound controls.
  */
 ED.Doodle.prototype.setParameterWithAnimation = function(_parameter, _value, _updateBindings) {
 
@@ -4385,7 +4414,7 @@ ED.Doodle.prototype.setParameterWithAnimation = function(_parameter, _value, _up
 	}
 	// Otherwise just set it directly
 	else {
-		this.setParameterFromString(_parameter, _value.toString());
+		this.setParameterFromString(_parameter, _value.toString(), _updateBindings);
 	}
 
 	this.drawing.notify("setParameterWithAnimationComplete");
@@ -4417,8 +4446,9 @@ ED.Doodle.prototype.setSimpleParameter = function(_parameter, _value) {
  *
  * @param {String} _parameter Name of parameter
  * @param {String} _value New value of parameter
+ * @param {Boolean} _updateBindings Update form element bindings?
  */
-ED.Doodle.prototype.setParameterFromString = function(_parameter, _value) {
+ED.Doodle.prototype.setParameterFromString = function(_parameter, _value, _updateBindings) {
 	// Check type of passed value variable
 	var type = typeof(_value);
 	if (type != 'string') {
@@ -4465,14 +4495,14 @@ ED.Doodle.prototype.setParameterFromString = function(_parameter, _value) {
 		}
 
 		// Update dependencies
-		this.updateDependentParameters(_parameter);
+		this.updateDependentParameters(_parameter, _updateBindings);
 
 		// Update child dependencies of any derived parameters
 		if (this.parameterValidationArray[_parameter]['kind'] == 'derived') {
 			var valueArray = this.dependentParameterValues(_parameter, _value);
 			for (var parameter in valueArray) {
 				// Update dependencies
-				this.updateDependentParameters(parameter);
+				this.updateDependentParameters(parameter, _updateBindings);
 			}
 		}
 
@@ -7949,7 +7979,7 @@ ED.Views.Toolbar.Main = (function() {
 
 	return MainToolbar;
 }());
-/*! Generated on 4/7/2014 */
+/*! Generated on 7/7/2014 */
 ED.scriptTemplates = {
   "doodle-popup": "\n\n\n\n{{#doodle}}\n\t<ul class=\"ed-toolbar-panel ed-doodle-popup-toolbar\">\n\t\t<li>\n\t\t\t{{#desc}}\n\t\t\t\t<a class=\"ed-button ed-doodle-help{{lockedButtonClass}}\" href=\"#\" data-function=\"toggleHelp\">\n\t\t\t\t\t<span class=\"icon-ed-help\"></span>\n\t\t\t\t</a>\n\t\t\t{{/desc}}\n\t\t</li>\n\t\t{{#doodle.isLocked}}\n\t\t\t<li>\n\t\t\t\t<a class=\"ed-button\" href=\"#\" data-function=\"unlock\">\n\t\t\t\t\t<span class=\"icon-ed-unlock\"></span>\n\t\t\t\t\t<span class=\"label\">Unlock</span>\n\t\t\t\t</a>\n\t\t\t</li>\n\t\t{{/doodle.isLocked}}\n\t\t{{^doodle.isLocked}}\n\t\t\t<li>\n\t\t\t\t<a class=\"ed-button\" href=\"#\" data-function=\"lock\">\n\t\t\t\t\t<span class=\"icon-ed-lock\"></span>\n\t\t\t\t\t<span class=\"label\">Lock</span>\n\t\t\t\t</a>\n\t\t\t</li>\n\t\t{{/doodle.isLocked}}\n\t\t<li>\n\t\t\t<a class=\"ed-button{{lockedButtonClass}}\" href=\"#\" data-function=\"moveToBack\">\n\t\t\t\t<span class=\"icon-ed-move-to-back\"></span>\n\t\t\t\t<span class=\"label\">Move to back</span>\n\t\t\t</a>\n\t\t</li>\n\t\t<li>\n\t\t\t<a class=\"ed-button{{lockedButtonClass}}\" href=\"#\" data-function=\"moveToFront\">\n\t\t\t\t<span class=\"icon-ed-move-to-front\"></span>\n\t\t\t\t<span class=\"label\">Move to front</span>\n\t\t\t</a>\n\t\t</li>\n\t\t<li>\n\t\t\t{{#doodle.isDeletable}}\n\t\t\t\t<a class=\"ed-button{{lockedButtonClass}}\" href=\"#\" data-function=\"deleteSelectedDoodle\">\n\t\t\t\t\t<span class=\"icon-ed-delete\"></span>\n\t\t\t\t\t<span class=\"label\">Delete</span>\n\t\t\t\t</a>\n\t\t\t{{/doodle.isDeletable}}\n\t\t</li>\n\t</ul>\n\t<div class=\"ed-doodle-info hide\">\n\t\t{{^doodle.isLocked}}\n\t\t\t{{#desc}}\n\t\t\t\t<div class=\"ed-doodle-description\">{{{desc}}}</div>\n\t\t\t{{/desc}}\n\t\t{{/doodle.isLocked}}\n\t</div>\n\t<div class=\"ed-doodle-controls{{#doodle.isLocked}} hide{{/doodle.isLocked}}\" id=\"{{drawing.canvas.id}}_controls\">\n\t</div>\n\t{{#doodle.isLocked}}\n\t\t<div class=\"ed-doodle-description\">\n\t\t\t<strong>This doodle is locked and cannot be edited.</strong>\n\t\t</div>\n\t{{/doodle.isLocked}}\n{{/doodle}}"
 };
@@ -8713,16 +8743,19 @@ ED.Label.prototype.setPropertyDefaults = function() {
  */
 ED.Label.prototype.validateValue = function(_value) {
 
-	// Allows allow small amounts of text. This accomodates a scenario where a user
-	// might have zoomed out, add a max label, then zoom in, then attempt to delete
-	// some text.
+	// This accommodates a scenario where a user might zooms out, adds a
+	// max-length label, then zooms in, then attempt to delete some text.
 	if (_value.length < this.labelText.length) return true;
 
 	var ctx = this.drawing.context;
 	ctx.font = this.labelFont;
 
+	// NOTE: for now, we're restricting the max-length of the label to be at 1x scaleLevel.
+	// var scaleLevel = this.scaleLevel;
+	var scaleLevel = 1;
+
 	// Calculate the text width
-	var width = ((ctx.measureText(_value).width + this.padding * 2) * this.drawing.scale) * this.scaleLevel;
+	var width = ((ctx.measureText(_value).width + this.padding * 2) * this.drawing.scale) * scaleLevel;
 
 	return (width <= this.drawing.canvas.width)
 };
@@ -8730,7 +8763,7 @@ ED.Label.prototype.validateValue = function(_value) {
 
 /**
  * Store the original param values.
- * We store the original params values so we can re-set them when the scale level
+ * We store these values so we can re-set them when the scale level
  * changes. Unlike other doodles, we want to set the bounds to be the same as
  * the dimensions of the canvas element.
  * @return {[type]} [description]

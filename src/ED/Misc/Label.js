@@ -100,16 +100,19 @@ ED.Label.prototype.setPropertyDefaults = function() {
  */
 ED.Label.prototype.validateValue = function(_value) {
 
-	// Allows allow small amounts of text. This accomodates a scenario where a user
-	// might have zoomed out, add a max label, then zoom in, then attempt to delete
-	// some text.
+	// This accommodates a scenario where a user might zooms out, adds a
+	// max-length label, then zooms in, then attempt to delete some text.
 	if (_value.length < this.labelText.length) return true;
 
 	var ctx = this.drawing.context;
 	ctx.font = this.labelFont;
 
+	// NOTE: for now, we're restricting the max-length of the label to be at 1x scaleLevel.
+	// var scaleLevel = this.scaleLevel;
+	var scaleLevel = 1;
+
 	// Calculate the text width
-	var width = ((ctx.measureText(_value).width + this.padding * 2) * this.drawing.scale) * this.scaleLevel;
+	var width = ((ctx.measureText(_value).width + this.padding * 2) * this.drawing.scale) * scaleLevel;
 
 	return (width <= this.drawing.canvas.width)
 };
@@ -117,7 +120,7 @@ ED.Label.prototype.validateValue = function(_value) {
 
 /**
  * Store the original param values.
- * We store the original params values so we can re-set them when the scale level
+ * We store these values so we can re-set them when the scale level
  * changes. Unlike other doodles, we want to set the bounds to be the same as
  * the dimensions of the canvas element.
  * @return {[type]} [description]

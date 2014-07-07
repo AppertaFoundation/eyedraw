@@ -2049,8 +2049,6 @@ ED.Drawing.prototype.addDoodle = function(_className, _parameterDefaults, _param
 				// Check validity of new value
 				var validityArray = newDoodle.validateParameter(parameter, value);
 
-				alert('validate param');
-
 				// If new value is valid, set it, otherwise use default value of doodle
 				if (validityArray.valid) {
 					newDoodle.setParameterFromString(parameter, validityArray.value);
