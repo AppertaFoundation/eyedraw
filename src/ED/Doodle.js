@@ -797,9 +797,13 @@ ED.Doodle.prototype.updateDependentParameters = function(_parameter, _updateBind
  *
  * @param {String} _parameter Name of the parameter
  * @param {Undefined} _value Value of the parameter to validate
+ * @param {Boolean} _trim=true Trim the value prior to validation
  * @returns {Array} Array containing a bool indicating validity, and the correctly formatted value of the parameter
  */
-ED.Doodle.prototype.validateParameter = function(_parameter, _value) {
+ED.Doodle.prototype.validateParameter = function(_parameter, _value, _trim) {
+
+	_trim = _trim === undefined ? true : _trim;
+
 	// Retrieve validation object for this doodle
 	var validation = this.parameterValidationArray[_parameter];
 
@@ -810,8 +814,11 @@ ED.Doodle.prototype.validateParameter = function(_parameter, _value) {
 		// Validity flag
 		var valid = false;
 
-		// Enforce string type and trim it
-		value = _value.toString().trim();
+		// Enforce string type and optionally trim it
+		value = _value.toString();
+		if (_trim) {
+			value = value.trim();
+		}
 
 		switch (validation.type) {
 			case 'string':
@@ -896,8 +903,13 @@ ED.Doodle.prototype.validateParameter = function(_parameter, _value) {
 				break;
 
 			case 'freeText':
-				// ***TODO*** Add some actual validation here
 				valid = true;
+				if (validation.validate && typeof validation.validate === 'function') {
+					valid = validation.validate(_value);
+				}
+				else if (validation.maxLength !== undefined) {
+					valid = (_value.length <= validation.maxLength);
+				}
 				break;
 
 			default:
@@ -913,6 +925,9 @@ ED.Doodle.prototype.validateParameter = function(_parameter, _value) {
 		value = this.getParameter(_parameter);
 		ED.errorHandler('ED.Doodle', 'validateParameter', 'Validation failure for parameter: ' + _parameter + ' with value: ' + _value);
 	}
+
+	// Show validation message/s
+	this.showControlValidationMsg(_parameter, valid);
 
 	// Return validity and value
 	var returnArray = new Array();
@@ -976,6 +991,33 @@ ED.Doodle.prototype.addControlBindings = function() {
 		});
 	}
 };
+
+/**
+ * Show a validation msg for a param that has a bound field control.
+ * @param  {String} _parameter Parameter name
+ * @param  {Boolean} _valid     Is the parameter value valid?
+ */
+ED.Doodle.prototype.showControlValidationMsg = function(_parameter, _valid) {
+
+	if (!(_parameter in this.controlParameterArray)) {
+		return;
+	}
+
+	var elementId = this.parameterControlElementId(_parameter);
+	var label = document.querySelector('[for='+elementId+']');
+	var msg = label.querySelector('.validation-msg');
+
+	if (_valid) {
+		if (msg) msg.parentNode.removeChild(msg);
+	} else {
+		if (!msg) {
+			msg = document.createElement('span');
+			label.appendChild(msg);
+			msg.classList.add('validation-msg');
+		}
+		msg.textContent = '*';
+	}
+}
 
 /**
  * Generate and append the control elements to the DOM.
@@ -1120,7 +1162,8 @@ ED.Doodle.prototype.parameterElement = function(_parameter) {
  *
  * @param {String} _parameter Name of parameter
  * @param {String} _value New value of parameter
- * @param {Boolean} _updateBindings Update the doodle form control bindings?
+ * @param {Boolean} _updateBindings Update the doodle form control bindings? We don't want to update the
+ * bindings if the new param values originated from the bound controls.
  */
 ED.Doodle.prototype.setParameterWithAnimation = function(_parameter, _value, _updateBindings) {
 
@@ -1184,7 +1227,7 @@ ED.Doodle.prototype.setParameterWithAnimation = function(_parameter, _value, _up
 	}
 	// Otherwise just set it directly
 	else {
-		this.setParameterFromString(_parameter, _value.toString());
+		this.setParameterFromString(_parameter, _value.toString(), _updateBindings);
 	}
 
 	this.drawing.notify("setParameterWithAnimationComplete");
@@ -1216,8 +1259,9 @@ ED.Doodle.prototype.setSimpleParameter = function(_parameter, _value) {
  *
  * @param {String} _parameter Name of parameter
  * @param {String} _value New value of parameter
+ * @param {Boolean} _updateBindings Update form element bindings?
  */
-ED.Doodle.prototype.setParameterFromString = function(_parameter, _value) {
+ED.Doodle.prototype.setParameterFromString = function(_parameter, _value, _updateBindings) {
 	// Check type of passed value variable
 	var type = typeof(_value);
 	if (type != 'string') {
@@ -1264,14 +1308,14 @@ ED.Doodle.prototype.setParameterFromString = function(_parameter, _value) {
 		}
 
 		// Update dependencies
-		this.updateDependentParameters(_parameter);
+		this.updateDependentParameters(_parameter, _updateBindings);
 
 		// Update child dependencies of any derived parameters
 		if (this.parameterValidationArray[_parameter]['kind'] == 'derived') {
 			var valueArray = this.dependentParameterValues(_parameter, _value);
 			for (var parameter in valueArray) {
 				// Update dependencies
-				this.updateDependentParameters(parameter);
+				this.updateDependentParameters(parameter, _updateBindings);
 			}
 		}
 
@@ -1586,8 +1630,15 @@ ED.Doodle.prototype.addBinding = function(_parameter, _fieldParameters) {
 						else {
 							this.drawing.updateBindings(this);
 						}
+
+						// Change event for input fields are only invoked when the input element is blurred.
 						element.addEventListener('change', listener = function(event) {
 							drawing.eventHandler('onchange', id, className, this.id, this.value);
+						}, false);
+
+						// We use the input event to allow us to validate values "in real time".
+						element.addEventListener('input', listener = function(event) {
+							drawing.eventHandler('oninput', id, className, this.id, this.value);
 						}, false);
 					}
 					break;

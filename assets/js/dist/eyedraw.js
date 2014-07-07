@@ -2429,9 +2429,10 @@ ED.Drawing.prototype.addDeleteValues = function(_deleteValuesArray) {
 ED.Drawing.prototype.eventHandler = function(_type, _doodleId, _className, _elementId, _value) {
 	//console.log("Event: " + _type + " doodleId: " + _doodleId + " doodleClass: " + _className + " elementId: " + _elementId + " value: " + _value);
 
+
 	switch (_type) {
-		// Onchange event
 		case 'onchange':
+		case 'oninput':
 			// Get reference to associated doodle
 			var doodle = this.doodleOfId(_doodleId);
 
@@ -2452,8 +2453,8 @@ ED.Drawing.prototype.eventHandler = function(_type, _doodleId, _className, _elem
 						}
 					}
 
-					// Check validity of new value
-					var validityArray = doodle.validateParameter(parameter, _value);
+					// Check validity of new value, only trim the value if change event
+					var validityArray = doodle.validateParameter(parameter, _value, _type === 'onchange');
 
 					// If new value is valid, set it
 					if (validityArray.valid) {
@@ -2984,6 +2985,7 @@ ED.Drawing.prototype.clear = function() {
 
 	// Set context transform to map from doodle plane to canvas plane
 	this.context.translate(this.canvas.width / 2, this.canvas.height / 2);
+
 	this.context.scale(this.scale, this.scale);
 }
 
@@ -3982,9 +3984,13 @@ ED.Doodle.prototype.updateDependentParameters = function(_parameter, _updateBind
  *
  * @param {String} _parameter Name of the parameter
  * @param {Undefined} _value Value of the parameter to validate
+ * @param {Boolean} _trim=true Trim the value prior to validation
  * @returns {Array} Array containing a bool indicating validity, and the correctly formatted value of the parameter
  */
-ED.Doodle.prototype.validateParameter = function(_parameter, _value) {
+ED.Doodle.prototype.validateParameter = function(_parameter, _value, _trim) {
+
+	_trim = _trim === undefined ? true : _trim;
+
 	// Retrieve validation object for this doodle
 	var validation = this.parameterValidationArray[_parameter];
 
@@ -3995,8 +4001,11 @@ ED.Doodle.prototype.validateParameter = function(_parameter, _value) {
 		// Validity flag
 		var valid = false;
 
-		// Enforce string type and trim it
-		value = _value.toString().trim();
+		// Enforce string type and optionally trim it
+		value = _value.toString();
+		if (_trim) {
+			value = value.trim();
+		}
 
 		switch (validation.type) {
 			case 'string':
@@ -4081,8 +4090,13 @@ ED.Doodle.prototype.validateParameter = function(_parameter, _value) {
 				break;
 
 			case 'freeText':
-				// ***TODO*** Add some actual validation here
 				valid = true;
+				if (validation.validate && typeof validation.validate === 'function') {
+					valid = validation.validate(_value);
+				}
+				else if (validation.maxLength !== undefined) {
+					valid = (_value.length <= validation.maxLength);
+				}
 				break;
 
 			default:
@@ -4098,6 +4112,9 @@ ED.Doodle.prototype.validateParameter = function(_parameter, _value) {
 		value = this.getParameter(_parameter);
 		ED.errorHandler('ED.Doodle', 'validateParameter', 'Validation failure for parameter: ' + _parameter + ' with value: ' + _value);
 	}
+
+	// Show validation message/s
+	this.showControlValidationMsg(_parameter, valid);
 
 	// Return validity and value
 	var returnArray = new Array();
@@ -4161,6 +4178,33 @@ ED.Doodle.prototype.addControlBindings = function() {
 		});
 	}
 };
+
+/**
+ * Show a validation msg for a param that has a bound field control.
+ * @param  {String} _parameter Parameter name
+ * @param  {Boolean} _valid     Is the parameter value valid?
+ */
+ED.Doodle.prototype.showControlValidationMsg = function(_parameter, _valid) {
+
+	if (!(_parameter in this.controlParameterArray)) {
+		return;
+	}
+
+	var elementId = this.parameterControlElementId(_parameter);
+	var label = document.querySelector('[for='+elementId+']');
+	var msg = label.querySelector('.validation-msg');
+
+	if (_valid) {
+		if (msg) msg.parentNode.removeChild(msg);
+	} else {
+		if (!msg) {
+			msg = document.createElement('span');
+			label.appendChild(msg);
+			msg.classList.add('validation-msg');
+		}
+		msg.textContent = '*';
+	}
+}
 
 /**
  * Generate and append the control elements to the DOM.
@@ -4305,7 +4349,8 @@ ED.Doodle.prototype.parameterElement = function(_parameter) {
  *
  * @param {String} _parameter Name of parameter
  * @param {String} _value New value of parameter
- * @param {Boolean} _updateBindings Update the doodle form control bindings?
+ * @param {Boolean} _updateBindings Update the doodle form control bindings? We don't want to update the
+ * bindings if the new param values originated from the bound controls.
  */
 ED.Doodle.prototype.setParameterWithAnimation = function(_parameter, _value, _updateBindings) {
 
@@ -4369,7 +4414,7 @@ ED.Doodle.prototype.setParameterWithAnimation = function(_parameter, _value, _up
 	}
 	// Otherwise just set it directly
 	else {
-		this.setParameterFromString(_parameter, _value.toString());
+		this.setParameterFromString(_parameter, _value.toString(), _updateBindings);
 	}
 
 	this.drawing.notify("setParameterWithAnimationComplete");
@@ -4401,8 +4446,9 @@ ED.Doodle.prototype.setSimpleParameter = function(_parameter, _value) {
  *
  * @param {String} _parameter Name of parameter
  * @param {String} _value New value of parameter
+ * @param {Boolean} _updateBindings Update form element bindings?
  */
-ED.Doodle.prototype.setParameterFromString = function(_parameter, _value) {
+ED.Doodle.prototype.setParameterFromString = function(_parameter, _value, _updateBindings) {
 	// Check type of passed value variable
 	var type = typeof(_value);
 	if (type != 'string') {
@@ -4449,14 +4495,14 @@ ED.Doodle.prototype.setParameterFromString = function(_parameter, _value) {
 		}
 
 		// Update dependencies
-		this.updateDependentParameters(_parameter);
+		this.updateDependentParameters(_parameter, _updateBindings);
 
 		// Update child dependencies of any derived parameters
 		if (this.parameterValidationArray[_parameter]['kind'] == 'derived') {
 			var valueArray = this.dependentParameterValues(_parameter, _value);
 			for (var parameter in valueArray) {
 				// Update dependencies
-				this.updateDependentParameters(parameter);
+				this.updateDependentParameters(parameter, _updateBindings);
 			}
 		}
 
@@ -4771,8 +4817,15 @@ ED.Doodle.prototype.addBinding = function(_parameter, _fieldParameters) {
 						else {
 							this.drawing.updateBindings(this);
 						}
+
+						// Change event for input fields are only invoked when the input element is blurred.
 						element.addEventListener('change', listener = function(event) {
 							drawing.eventHandler('onchange', id, className, this.id, this.value);
+						}, false);
+
+						// We use the input event to allow us to validate values "in real time".
+						element.addEventListener('input', listener = function(event) {
+							drawing.eventHandler('oninput', id, className, this.id, this.value);
 						}, false);
 					}
 					break;
@@ -7926,7 +7979,7 @@ ED.Views.Toolbar.Main = (function() {
 
 	return MainToolbar;
 }());
-/*! Generated on 4/7/2014 */
+/*! Generated on 7/7/2014 */
 ED.scriptTemplates = {
   "doodle-popup": "\n\n\n\n{{#doodle}}\n\t<ul class=\"ed-toolbar-panel ed-doodle-popup-toolbar\">\n\t\t<li>\n\t\t\t{{#desc}}\n\t\t\t\t<a class=\"ed-button ed-doodle-help{{lockedButtonClass}}\" href=\"#\" data-function=\"toggleHelp\">\n\t\t\t\t\t<span class=\"icon-ed-help\"></span>\n\t\t\t\t</a>\n\t\t\t{{/desc}}\n\t\t</li>\n\t\t{{#doodle.isLocked}}\n\t\t\t<li>\n\t\t\t\t<a class=\"ed-button\" href=\"#\" data-function=\"unlock\">\n\t\t\t\t\t<span class=\"icon-ed-unlock\"></span>\n\t\t\t\t\t<span class=\"label\">Unlock</span>\n\t\t\t\t</a>\n\t\t\t</li>\n\t\t{{/doodle.isLocked}}\n\t\t{{^doodle.isLocked}}\n\t\t\t<li>\n\t\t\t\t<a class=\"ed-button\" href=\"#\" data-function=\"lock\">\n\t\t\t\t\t<span class=\"icon-ed-lock\"></span>\n\t\t\t\t\t<span class=\"label\">Lock</span>\n\t\t\t\t</a>\n\t\t\t</li>\n\t\t{{/doodle.isLocked}}\n\t\t<li>\n\t\t\t<a class=\"ed-button{{lockedButtonClass}}\" href=\"#\" data-function=\"moveToBack\">\n\t\t\t\t<span class=\"icon-ed-move-to-back\"></span>\n\t\t\t\t<span class=\"label\">Move to back</span>\n\t\t\t</a>\n\t\t</li>\n\t\t<li>\n\t\t\t<a class=\"ed-button{{lockedButtonClass}}\" href=\"#\" data-function=\"moveToFront\">\n\t\t\t\t<span class=\"icon-ed-move-to-front\"></span>\n\t\t\t\t<span class=\"label\">Move to front</span>\n\t\t\t</a>\n\t\t</li>\n\t\t<li>\n\t\t\t{{#doodle.isDeletable}}\n\t\t\t\t<a class=\"ed-button{{lockedButtonClass}}\" href=\"#\" data-function=\"deleteSelectedDoodle\">\n\t\t\t\t\t<span class=\"icon-ed-delete\"></span>\n\t\t\t\t\t<span class=\"label\">Delete</span>\n\t\t\t\t</a>\n\t\t\t{{/doodle.isDeletable}}\n\t\t</li>\n\t</ul>\n\t<div class=\"ed-doodle-info hide\">\n\t\t{{^doodle.isLocked}}\n\t\t\t{{#desc}}\n\t\t\t\t<div class=\"ed-doodle-description\">{{{desc}}}</div>\n\t\t\t{{/desc}}\n\t\t{{/doodle.isLocked}}\n\t</div>\n\t<div class=\"ed-doodle-controls{{#doodle.isLocked}} hide{{/doodle.isLocked}}\" id=\"{{drawing.canvas.id}}_controls\">\n\t</div>\n\t{{#doodle.isLocked}}\n\t\t<div class=\"ed-doodle-description\">\n\t\t\t<strong>This doodle is locked and cannot be edited.</strong>\n\t\t</div>\n\t{{/doodle.isLocked}}\n{{/doodle}}"
 };
@@ -8667,6 +8720,7 @@ ED.Label.prototype.setHandles = function() {
  * Sets default properties
  */
 ED.Label.prototype.setPropertyDefaults = function() {
+
 	this.parameterValidationArray['apexX']['range'].setMinAndMax(-1000, +1000);
 	this.parameterValidationArray['apexY']['range'].setMinAndMax(-1000, +1000);
 
@@ -8674,9 +8728,77 @@ ED.Label.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['labelText'] = {
 		kind: 'derived',
 		type: 'freeText',
-		animate: false
+		animate: false,
+		// We use a callback function because the validity of the input value is
+		// based on scaleLevel which can be changed at runtime.
+		validate: this.validateValue.bind(this)
 	};
-}
+
+	this.storeOriginalParams();
+};
+
+/**
+ * Ensure the input value's text length is not longer than the canvas width.
+ * @param  {String} _value The input value.
+ */
+ED.Label.prototype.validateValue = function(_value) {
+
+	// This accommodates a scenario where a user might zooms out, adds a
+	// max-length label, then zooms in, then attempt to delete some text.
+	if (_value.length < this.labelText.length) return true;
+
+	var ctx = this.drawing.context;
+	ctx.font = this.labelFont;
+
+	// NOTE: for now, we're restricting the max-length of the label to be at 1x scaleLevel.
+	// var scaleLevel = this.scaleLevel;
+	var scaleLevel = 1;
+
+	// Calculate the text width
+	var width = ((ctx.measureText(_value).width + this.padding * 2) * this.drawing.scale) * scaleLevel;
+
+	return (width <= this.drawing.canvas.width)
+};
+
+
+/**
+ * Store the original param values.
+ * We store these values so we can re-set them when the scale level
+ * changes. Unlike other doodles, we want to set the bounds to be the same as
+ * the dimensions of the canvas element.
+ * @return {[type]} [description]
+ */
+ED.Label.prototype.storeOriginalParams = function() {
+	this.originalParams = {
+		originX: {
+			min: this.parameterValidationArray['originX'].range.min,
+			max: this.parameterValidationArray['originX'].range.max
+		},
+		originY: {
+			min: this.parameterValidationArray['originY'].range.min,
+			max: this.parameterValidationArray['originY'].range.max
+		}
+	};
+};
+
+/**
+ * Override the setScaleLevel method to adjust the origin ranges to allow
+ * the label to be dragged to the boundary of the canvas element.
+ * @param {Number} _newLevel The new scale level.
+ */
+ED.Label.prototype.setScaleLevel = function(_newLevel) {
+	// Call super method.
+	ED.Doodle.prototype.setScaleLevel.apply(this, arguments);
+
+	var minX = this.originalParams.originX.min / this.scaleLevel;
+	var maxX = this.originalParams.originX.max / this.scaleLevel;
+
+	var minY = this.originalParams.originY.min / this.scaleLevel;
+	var maxY = this.originalParams.originY.max / this.scaleLevel;
+
+	this.parameterValidationArray['originX']['range'].setMinAndMax(minX, maxX);
+	this.parameterValidationArray['originY']['range'].setMinAndMax(minY, maxY);
+};
 
 /**
  * Sets default parameters
