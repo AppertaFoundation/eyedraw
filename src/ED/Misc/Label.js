@@ -37,8 +37,14 @@ ED.Label = function(_drawing, _parameterJSON) {
 	this.labelWidth = 0;
 	this.labelHeight = 80;
 
+	// attempt at scaling the font correctly:
+	var scale = 1;
+	if (_drawing.globalScaleFactor) {
+		scale = _drawing.globalScaleFactor;
+	}
+	var fontSize = 60 * (1/scale);
 	// Label font
-	this.labelFont = "60px sans-serif";
+	this.labelFont = fontSize.toString() + "px sans-serif";
 
 	// Horizontal padding between label and boundary path
 	this.padding = 10;
