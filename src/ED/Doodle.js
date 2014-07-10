@@ -1635,11 +1635,6 @@ ED.Doodle.prototype.addBinding = function(_parameter, _fieldParameters) {
 						element.addEventListener('change', listener = function(event) {
 							drawing.eventHandler('onchange', id, className, this.id, this.value);
 						}, false);
-
-						// We use the input event to allow us to validate values "in real time".
-						element.addEventListener('input', function(event) {
-							drawing.eventHandler('oninput', id, className, this.id, this.value);
-						}, false);
 					}
 					break;
 
