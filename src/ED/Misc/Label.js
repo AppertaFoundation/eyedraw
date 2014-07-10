@@ -201,6 +201,25 @@ ED.Label.prototype.dependentParameterValues = function(_parameter, _value) {
 }
 
 /**
+ * Override the addBinding method to validate the input value oninput.
+ */
+ED.Label.prototype.addBinding = function(_parameter, _fieldParameters) {
+
+	ED.Doodle.prototype.addBinding.apply(this, arguments);
+
+	var drawing = this.drawing;
+	var id = this.id;
+	var className = this.className;
+	var element = document.getElementById(_fieldParameters['id']);
+
+	if (_parameter === 'labelText') {
+		element.addEventListener('input', listener = function(event) {
+			drawing.eventHandler('onchange', id, className, this.id, this.value);
+		}, false);
+	}
+}
+
+/**
  * Draws doodle or performs a hit test if a Point parameter is passed
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test

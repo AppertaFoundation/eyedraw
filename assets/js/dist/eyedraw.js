@@ -2432,7 +2432,6 @@ ED.Drawing.prototype.eventHandler = function(_type, _doodleId, _className, _elem
 
 	switch (_type) {
 		case 'onchange':
-		case 'oninput':
 			// Get reference to associated doodle
 			var doodle = this.doodleOfId(_doodleId);
 
@@ -4821,11 +4820,6 @@ ED.Doodle.prototype.addBinding = function(_parameter, _fieldParameters) {
 						// Change event for input fields are only invoked when the input element is blurred.
 						element.addEventListener('change', listener = function(event) {
 							drawing.eventHandler('onchange', id, className, this.id, this.value);
-						}, false);
-
-						// We use the input event to allow us to validate values "in real time".
-						element.addEventListener('input', function(event) {
-							drawing.eventHandler('oninput', id, className, this.id, this.value);
 						}, false);
 					}
 					break;
@@ -8849,6 +8843,25 @@ ED.Label.prototype.dependentParameterValues = function(_parameter, _value) {
 	}
 
 	return returnArray;
+}
+
+/**
+ * Override the addBinding method to validate the input value oninput.
+ */
+ED.Label.prototype.addBinding = function(_parameter, _fieldParameters) {
+
+	ED.Doodle.prototype.addBinding.apply(this, arguments);
+
+	var drawing = this.drawing;
+	var id = this.id;
+	var className = this.className;
+	var element = document.getElementById(_fieldParameters['id']);
+
+	if (_parameter === 'labelText') {
+		element.addEventListener('input', listener = function(event) {
+			drawing.eventHandler('onchange', id, className, this.id, this.value);
+		}, false);
+	}
 }
 
 /**

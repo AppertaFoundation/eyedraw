@@ -2172,7 +2172,6 @@ ED.Drawing.prototype.eventHandler = function(_type, _doodleId, _className, _elem
 
 	switch (_type) {
 		case 'onchange':
-		case 'oninput':
 			// Get reference to associated doodle
 			var doodle = this.doodleOfId(_doodleId);
 
