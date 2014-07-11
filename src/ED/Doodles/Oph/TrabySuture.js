@@ -98,18 +98,17 @@ ED.TrabySuture.prototype.setParameterDefaults = function() {
 	this.apexY = +70;
 	this.material = 'Nylon';
 	this.size = '10/0';
-	
+
 	// Suture position depends on presence of a trabeculectomy flap
 	var trabyFlap = this.drawing.lastDoodleOfClass('TrabyFlap');
 	if (trabyFlap) {
 		var number = this.drawing.numberOfDoodlesOfClass("TrabySuture");
-		var gsf = this.drawing.globalScaleFactor;
 		var p;
-		
+
 		switch (number) {
 			// First suture is top left
 			case 0:
-				p = new ED.Point(-1 * trabyFlap.right.x * gsf, (trabyFlap.height + 0 * (trabyFlap.right.y - trabyFlap.height)) * gsf);
+				p = new ED.Point(-1 * trabyFlap.right.x, (trabyFlap.height + 0 * (trabyFlap.right.y - trabyFlap.height)));
 				p.setWithPolars(p.length(), p.direction() + trabyFlap.rotation);
 				this.originX = p.x;
 				this.originY = p.y;
@@ -118,7 +117,7 @@ ED.TrabySuture.prototype.setParameterDefaults = function() {
 				break;
 			// Second suture is top right
 			case 1:
-				p = new ED.Point(+1 * trabyFlap.right.x * gsf, (trabyFlap.height + 0 * (trabyFlap.right.y - trabyFlap.height)) * gsf);
+				p = new ED.Point(+1 * trabyFlap.right.x, (trabyFlap.height + 0 * (trabyFlap.right.y - trabyFlap.height)));
 				p.setWithPolars(p.length(), p.direction() + trabyFlap.rotation);
 				this.originX = p.x;
 				this.originY = p.y;
@@ -135,7 +134,7 @@ ED.TrabySuture.prototype.setParameterDefaults = function() {
 				this.setOriginWithDisplacements(0, -40);
 				break;
 		}
-		
+
 	}
 	else {
 		this.setOriginWithDisplacements(0, -40);
@@ -149,7 +148,7 @@ ED.TrabySuture.prototype.setParameterDefaults = function() {
 	else {
 		this.type = 'Releasable';
 	}
-	
+
 	// Create a squiggle to store the handles points
 	var squiggle = new ED.Squiggle(this, new ED.Colour(100, 100, 100, 1), 4, true);
 
@@ -213,13 +212,13 @@ ED.TrabySuture.prototype.draw = function(_point) {
 				var fp = this.squiggleArray[0].pointsArray[0];
 				ctx.moveTo(fp.x, fp.y);
 				var tp = this.squiggleArray[0].pointsArray[1];
-								
+
 				// ***TODO*** not sure this function is working as planned, but result here is OK
 				var cp1 = fp.pointAtAngleToLineToPointAtProportion(Math.PI/3, tp, 0.5);
 				var cp2 = fp.pointAtAngleToLineToPointAtProportion(-Math.PI/3, tp, 0.5);
 				ctx.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, tp.x, tp.y);
 
-				// First three segments are straight				
+				// First three segments are straight
 				var tp = this.squiggleArray[0].pointsArray[0];
 				ctx.moveTo(tp.x, tp.y);
 				for (var i = 1; i < 3; i++) {
@@ -233,16 +232,16 @@ ED.TrabySuture.prototype.draw = function(_point) {
 				var tp = this.squiggleArray[0].pointsArray[3];
 				var p = 2;
 				var cp1 = new ED.Point(fp.x, fp.y + (tp.y - fp.y)/p);
-				var cp2 = new ED.Point(tp.x - (tp.x - fp.x)/p, tp.y);				
+				var cp2 = new ED.Point(tp.x - (tp.x - fp.x)/p, tp.y);
 				ctx.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, tp.x, tp.y);
-				
+
 				fp = this.squiggleArray[0].pointsArray[3];
 				tp = this.squiggleArray[0].pointsArray[4];
 				p = 2;
 				cp1 = new ED.Point(fp.x + (tp.x - fp.x)/p, fp.y);
 				cp2 = new ED.Point(tp.x, tp.y - (tp.y - fp.y)/p);
 				ctx.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, tp.x, tp.y);
-					
+
 				// Array of handles for releasable suture
 				for (var i = 0; i < this.numberOfHandles; i++) {
 					this.handleArray[i] = new ED.Doodle.Handle(null, true, ED.Mode.Handles, false);
@@ -260,7 +259,7 @@ ED.TrabySuture.prototype.draw = function(_point) {
 				ctx.bezierCurveTo(2, 20, -4, 24, -3, 29);
 				ctx.bezierCurveTo(-3, 36, 14, 37, 23, 56);
 				ctx.bezierCurveTo(32, 74, 34, 100, 34, 100);
-				
+
 				this.handleArray.length = 1;
 				this.handleArray[0] = new ED.Doodle.Handle(null, true, ED.Mode.Rotate, false);
 				this.handleArray[0].location = this.transform.transformPoint(new ED.Point(40, -70));
@@ -273,7 +272,7 @@ ED.TrabySuture.prototype.draw = function(_point) {
 				ctx.moveTo(-5, 50);
 				ctx.lineTo(0, 30);
 				ctx.lineTo(5, 50);
-				
+
 				this.handleArray.length = 1;
 				this.handleArray[0] = new ED.Doodle.Handle(null, true, ED.Mode.Rotate, false);
 				this.handleArray[0].location = this.transform.transformPoint(new ED.Point(40, -70));

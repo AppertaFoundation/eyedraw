@@ -2113,7 +2113,12 @@ span.squiggle {
 .ed-doodle-controls label:after {
   content: ":";
 }
-/* line 85, ../sass/components/_doodle-popup.scss */
+/* line 84, ../sass/components/_doodle-popup.scss */
+.ed-doodle-controls label .validation-msg {
+  color: red;
+  padding-left: 5px;
+}
+/* line 89, ../sass/components/_doodle-popup.scss */
 .ed-doodle-controls select {
   width: auto;
 }

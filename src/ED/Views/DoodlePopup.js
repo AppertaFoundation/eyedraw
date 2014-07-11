@@ -116,6 +116,11 @@ ED.Views.DoodlePopup = (function() {
 
 		// Render the template
 		var html = Mustache.render(this.template, data);
+
+		// Forced GC. Remove data & event handlers from all child nodes.
+		this.container.empty();
+
+		// Now we can safely replace the html.
 		this.container.html(html);
 
 		// Add doodle controls

@@ -81,6 +81,10 @@
 		&:after {
 			content: ":";
 		}
+		.validation-msg {
+			color: red;
+			padding-left: 5px;
+		}
 	}
 	select {
 		width: auto;

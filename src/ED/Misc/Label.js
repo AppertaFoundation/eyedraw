@@ -37,8 +37,14 @@ ED.Label = function(_drawing, _parameterJSON) {
 	this.labelWidth = 0;
 	this.labelHeight = 80;
 
+	// attempt at scaling the font correctly:
+	var scale = 1;
+	if (_drawing.globalScaleFactor) {
+		scale = _drawing.globalScaleFactor;
+	}
+	var fontSize = 60 * (1/scale);
 	// Label font
-	this.labelFont = "60px sans-serif";
+	this.labelFont = fontSize.toString() + "px sans-serif";
 
 	// Horizontal padding between label and boundary path
 	this.padding = 10;
@@ -77,6 +83,7 @@ ED.Label.prototype.setHandles = function() {
  * Sets default properties
  */
 ED.Label.prototype.setPropertyDefaults = function() {
+
 	this.parameterValidationArray['apexX']['range'].setMinAndMax(-1000, +1000);
 	this.parameterValidationArray['apexY']['range'].setMinAndMax(-1000, +1000);
 
@@ -84,9 +91,77 @@ ED.Label.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['labelText'] = {
 		kind: 'derived',
 		type: 'freeText',
-		animate: false
+		animate: false,
+		// We use a callback function because the validity of the input value is
+		// based on scaleLevel which can be changed at runtime.
+		validate: this.validateValue.bind(this)
 	};
-}
+
+	this.storeOriginalParams();
+};
+
+/**
+ * Ensure the input value's text length is not longer than the canvas width.
+ * @param  {String} _value The input value.
+ */
+ED.Label.prototype.validateValue = function(_value) {
+
+	// This accommodates a scenario where a user might zooms out, adds a
+	// max-length label, then zooms in, then attempt to delete some text.
+	if (_value.length < this.labelText.length) return true;
+
+	var ctx = this.drawing.context;
+	ctx.font = this.labelFont;
+
+	// NOTE: for now, we're restricting the max-length of the label to be at 1x scaleLevel.
+	// var scaleLevel = this.scaleLevel;
+	var scaleLevel = 1;
+
+	// Calculate the text width
+	var width = ((ctx.measureText(_value).width + this.padding * 2) * this.drawing.scale) * scaleLevel;
+
+	return (width <= this.drawing.canvas.width)
+};
+
+
+/**
+ * Store the original param values.
+ * We store these values so we can re-set them when the scale level
+ * changes. Unlike other doodles, we want to set the bounds to be the same as
+ * the dimensions of the canvas element.
+ * @return {[type]} [description]
+ */
+ED.Label.prototype.storeOriginalParams = function() {
+	this.originalParams = {
+		originX: {
+			min: this.parameterValidationArray['originX'].range.min,
+			max: this.parameterValidationArray['originX'].range.max
+		},
+		originY: {
+			min: this.parameterValidationArray['originY'].range.min,
+			max: this.parameterValidationArray['originY'].range.max
+		}
+	};
+};
+
+/**
+ * Override the setScaleLevel method to adjust the origin ranges to allow
+ * the label to be dragged to the boundary of the canvas element.
+ * @param {Number} _newLevel The new scale level.
+ */
+ED.Label.prototype.setScaleLevel = function(_newLevel) {
+	// Call super method.
+	ED.Doodle.prototype.setScaleLevel.apply(this, arguments);
+
+	var minX = this.originalParams.originX.min / this.scaleLevel;
+	var maxX = this.originalParams.originX.max / this.scaleLevel;
+
+	var minY = this.originalParams.originY.min / this.scaleLevel;
+	var maxY = this.originalParams.originY.max / this.scaleLevel;
+
+	this.parameterValidationArray['originX']['range'].setMinAndMax(minX, maxX);
+	this.parameterValidationArray['originY']['range'].setMinAndMax(minY, maxY);
+};
 
 /**
  * Sets default parameters
@@ -123,6 +198,25 @@ ED.Label.prototype.dependentParameterValues = function(_parameter, _value) {
 	}
 
 	return returnArray;
+}
+
+/**
+ * Override the addBinding method to validate the input value oninput.
+ */
+ED.Label.prototype.addBinding = function(_parameter, _fieldParameters) {
+
+	ED.Doodle.prototype.addBinding.apply(this, arguments);
+
+	var drawing = this.drawing;
+	var id = this.id;
+	var className = this.className;
+	var element = document.getElementById(_fieldParameters['id']);
+
+	if (_parameter === 'labelText') {
+		element.addEventListener('input', listener = function(event) {
+			drawing.eventHandler('onchange', id, className, this.id, this.value);
+		}, false);
+	}
 }
 
 /**

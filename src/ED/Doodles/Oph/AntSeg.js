@@ -304,13 +304,13 @@ ED.AntSeg.prototype.description = function() {
 	if (this.coloboma) returnValue += "coloboma at " + this.clockHour(6) + " o'clock, ";
 
 	// Ectopion
-	if (this.ectropion) returnValue += "ectropion uvaee, ";
+	if (this.ectropion) returnValue += "ectropion uveae, ";
 
 	// PXE
 	if (this.pxe) returnValue += "pseudoexfoliation, ";
 	
 	// Empty report so far
-	if (returnValue.length == 0) {
+	if (returnValue.length == 0 && this.drawing.doodleArray.length == 1) {
 		// Is lens present and normal?
 		/*
 		var doodle = this.drawing.lastDoodleOfClass('Lens');
@@ -324,7 +324,7 @@ ED.AntSeg.prototype.description = function() {
 			returnValue = "Aphakic, ";
 		}
 		*/
-		returnValue = "Anterior segment normal, ";
+		returnValue = "No abnormality";
 	}
 
 	// Remove final comma and space and capitalise first letter

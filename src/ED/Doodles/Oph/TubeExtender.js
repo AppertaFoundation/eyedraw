@@ -35,7 +35,7 @@ ED.TubeExtender = function(_drawing, _parameterJSON) {
 	this.bezierArray = new Array();
 
 	// Saved parameters
-	this.savedParameterArray = ['rotation', 'apexY'];
+	this.savedParameterArray = ['apexX', 'apexY'];
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -270,7 +270,7 @@ ED.TubeExtender.prototype.description = function() {
 		ITQ: 'inferotemporal'
 	};
 
-	return "TubeExtender in the " + descArray[this.platePosition] + " quadrant";
+	return "Tube extender in the " + descArray[this.platePosition] + " quadrant";
 }
 
 /**
