@@ -2171,6 +2171,7 @@ ED.Drawing.prototype.eventHandler = function(_type, _doodleId, _className, _elem
 
 
 	switch (_type) {
+		case 'oninput':
 		case 'onchange':
 			// Get reference to associated doodle
 			var doodle = this.doodleOfId(_doodleId);
@@ -2193,7 +2194,7 @@ ED.Drawing.prototype.eventHandler = function(_type, _doodleId, _className, _elem
 					}
 
 					// Check validity of new value, only trim the value if change event
-					var validityArray = doodle.validateParameter(parameter, _value, _type === 'onchange');
+					var validityArray = doodle.validateParameter(parameter, _value, (_type === 'onchange'));
 
 					// If new value is valid, set it
 					if (validityArray.valid) {

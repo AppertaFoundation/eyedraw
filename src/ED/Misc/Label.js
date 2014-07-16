@@ -213,8 +213,8 @@ ED.Label.prototype.addBinding = function(_parameter, _fieldParameters) {
 	var element = document.getElementById(_fieldParameters['id']);
 
 	if (_parameter === 'labelText') {
-		element.addEventListener('input', listener = function(event) {
-			drawing.eventHandler('onchange', id, className, this.id, this.value);
+		element.addEventListener('input', function(event) {
+			drawing.eventHandler('oninput', id, className, this.id, this.value);
 		}, false);
 	}
 }
