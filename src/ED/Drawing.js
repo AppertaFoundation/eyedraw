@@ -235,6 +235,7 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 				'ed-doodle-popup',
 				'ed-button',
 				'ed-canvas',
+				'ed_canvas',
 				'ed-selected-doodle-select'
 			].join(')|(') + ')';
 
