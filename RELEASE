@@ -15,6 +15,7 @@ This document is intended to summarise the changes made for each release. It sho
 + Re-organisation of files into directories
 	- Moved images, css, sass and scripts into 'assets' directory
 	- Create 'tests' directory that is now consistent with other OpenEyes modules
++ Added numerous new doodles
 
 1.6.0
 -----
