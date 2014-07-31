@@ -131,6 +131,7 @@ ED.IrisHook.prototype.draw = function(_point) {
  */
 ED.IrisHook.prototype.groupDescription = function() {
 	return "Iris hooks used at ";
+	
 }
 
 /**

@@ -26713,6 +26713,7 @@ ED.IrisHook.prototype.draw = function(_point) {
  */
 ED.IrisHook.prototype.groupDescription = function() {
 	return "Iris hooks used at ";
+	
 }
 
 /**
@@ -40090,6 +40091,7 @@ ED.TrabySuture.prototype.setPropertyDefaults = function() {
 	// Update component of validation array for simple parameters
 	this.parameterValidationArray['apexX']['range'].setMinAndMax(-50, +50);
 	this.parameterValidationArray['apexY']['range'].setMinAndMax(+70, +70);
+	this.parameterValidationArray['originY']['range'].setMinAndMax(-625, +625);
 
 	// Add complete validation arrays for derived parameters
 	this.parameterValidationArray['type'] = {
@@ -40125,13 +40127,14 @@ ED.TrabySuture.prototype.setParameterDefaults = function() {
 	var trabyFlap = this.drawing.lastDoodleOfClass('TrabyFlap');
 	if (trabyFlap) {
 		var number = this.drawing.numberOfDoodlesOfClass("TrabySuture");
-		var p;
+		
+		// Get top of Traby suture
+		var p = new ED.Point(-1 * trabyFlap.right.x, (trabyFlap.height + 0 * (trabyFlap.right.y - trabyFlap.height)));
+		p.setWithPolars(p.length(), p.direction() + trabyFlap.rotation);
 
 		switch (number) {
 			// First suture is top left
 			case 0:
-				p = new ED.Point(-1 * trabyFlap.right.x, (trabyFlap.height + 0 * (trabyFlap.right.y - trabyFlap.height)));
-				p.setWithPolars(p.length(), p.direction() + trabyFlap.rotation);
 				this.originX = p.x;
 				this.originY = p.y;
 				this.rotation = trabyFlap.rotation;
@@ -40145,11 +40148,12 @@ ED.TrabySuture.prototype.setParameterDefaults = function() {
 				this.originY = p.y;
 				this.rotation = trabyFlap.rotation;
 				break;
+			// Third suture is between the first two
 			case 2:
 				var doodle1 = this.drawing.firstDoodleOfClass("TrabySuture");
 				var doodle2 = this.drawing.lastDoodleOfClass("TrabySuture");
 				this.originX = doodle1.originX + (doodle2.originX - doodle1.originX)/2;
-				this.originY = doodle1.originY + (doodle2.originY - doodle1.originY)/2;
+				this.originY = p.y;
 				this.rotation = doodle2.rotation;
 				break;
 			default:
@@ -41888,10 +41892,17 @@ ED.TubeLigation.prototype.setParameterDefaults = function() {
 		}
 	}
 	
-	// If existing doodle, put in same meridian, but higher up
-	var doodle = this.drawing.lastDoodleOfClass(this.className);
-	if (doodle) {
-		this.move(doodle.originX * 1.02, doodle.originY * 1.02);
+	// If existing doodles, put in same meridian, but higher up
+	var number = this.drawing.numberOfDoodlesOfClass(this.className);
+	var doodle = this.drawing.firstDoodleOfClass(this.className);
+	
+	switch (number) {
+		case 1:
+			this.move(doodle.originX * 1.02, doodle.originY * 1.02);
+			break;
+		case 2:
+			this.move(doodle.originX * 0.5, doodle.originY * 0.5);
+			break;
 	}
 }
 
@@ -41944,12 +41955,19 @@ ED.TubeLigation.prototype.draw = function(_point) {
 }
 
 /**
- * Returns a string containing a text description of the doodle
+ * Returns a String which, if not empty, determines the root descriptions of multiple instances of the doodle
  *
- * @returns {String} Description of doodle
+ * @returns {String} Group description
  */
-ED.TubeLigation.prototype.description = function() {
-	return "TubeLigation suture";
+ED.TubeLigation.prototype.groupDescription = function() {
+	var returnString = "";
+	
+	var number = this.drawing.numberOfDoodlesOfClass(this.className);
+	returnString = number + " ligation suture";
+	
+	if (number > 1) returnString += "s";
+	
+	return returnString;
 }
 
 /**
