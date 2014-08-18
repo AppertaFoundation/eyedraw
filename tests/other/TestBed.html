@@ -75,7 +75,7 @@
             {
                 this.drawing = _drawing;
                 this.gsf = 1;
-                this.gsf = 0.72;
+                //this.gsf = 0.72;
                 
                 // Specify call back function
                 this.callBack = callBack;
@@ -98,8 +98,8 @@
 							this.drawing.globalScaleFactor = this.gsf;
 
 							//this.drawing.addDoodle('AxialLengthGraph', {'axialLength':'25'});
-							this.drawing.addDoodle('AntSeg');
-							//this.drawing.addDoodle('Tube');
+							//this.drawing.addDoodle('AntSeg');
+							this.drawing.addDoodle('LasikFlap');
 							//this.drawing.addDoodle('Patch');
 							//this.drawing.addDoodle('TrabySuture');
 							//this.drawing.addDoodle('TubeExtender');
@@ -136,7 +136,7 @@
 // 					        leftEye.parameterValidationArray['originX']['range'] = new ED.Range(+150, +350);
 // 					        leftEye.originX = +250;
 
-					        this.drawing.deselectDoodles();
+					        //this.drawing.deselectDoodles();
 
 
 
@@ -341,13 +341,13 @@
 
         <!-- Doodle controls toolbar -->
         <div class="ed-toolbar">
-            <button class="imgbutton" class="imgbutton" disabled="disabled" id="moveToFrontRPS" title="Move to front" onclick="drawingEdit.moveToFront(); return false;" ><img src="../../assets/img/old/moveToFront.gif"/></button>
-            <button class="imgbutton" disabled="disabled" id="moveToBackRPS" title="Move to back" onclick="drawingEdit.moveToBack(); return false;" ><img src="../../assets/img/old/moveToBack.gif" /></button>
-            <button class="imgbutton" disabled="disabled" id="flipVerRPS" title="Flip around vertical axis" onclick="drawingEdit.flipVer(); return false;" ><img src="../../assets/img/old/flipVer.gif" /></button>
-            <button class="imgbutton" disabled="disabled" id="flipHorRPS" title="Flip around horizontal axis" onclick="drawingEdit.flipHor(); return false;" ><img src="../../assets/img/old/flipHor.gif" /></button>
-            <button class="imgbutton" disabled="disabled" id="deleteSelectedDoodleRPS" title="Delete" onclick="drawingEdit.deleteSelectedDoodle(); return false;" ><img src="../../assets/img/old/deleteSelectedDoodle.gif" /></button>
-            <button class="imgbutton" disabled="disabled" id="lockRPS" title="Lock" onclick="drawingEdit.lock(); return false;" ><img src="../../assets/img/old/lock.gif" /></button>
-            <button class="imgbutton" disabled="disabled" id="unlockRPS" title="Unlock" onclick="drawingEdit.unlock(); return false;" ><img src="../../assets/img/old/unlock.gif" /></button>
+            <button class="ed-button" id="moveToFrontRPS" title="Move to front" onclick="drawingEdit.moveToFront(); return false;" ><img src="../../assets/img/old/moveToFront.gif"/></button>
+            <button class="ed-button" id="moveToBackRPS" title="Move to back" onclick="drawingEdit.moveToBack(); return false;" ><img src="../../assets/img/old/moveToBack.gif" /></button>
+            <button class="ed-button" id="flipVerRPS" title="Flip around vertical axis" onclick="drawingEdit.flipVer(); return false;" ><img src="../../assets/img/old/flipVer.gif" /></button>
+            <button class="ed-button" id="flipHorRPS" title="Flip around horizontal axis" onclick="drawingEdit.flipHor(); return false;" ><img src="../../assets/img/old/flipHor.gif" /></button>
+            <button class="ed-button" id="deleteSelectedDoodleRPS" title="Delete" onclick="drawingEdit.deleteSelectedDoodle(); return false;" ><img src="../../assets/img/old/deleteSelectedDoodle.gif" /></button>
+            <button class="ed-button" id="lockRPS" title="Lock" onclick="drawingEdit.lock(); return false;" ><img src="../../assets/img/old/lock.gif" /></button>
+            <button class="ed-button" id="unlockRPS" title="Unlock" onclick="drawingEdit.unlock(); return false;" ><img src="../../assets/img/old/unlock.gif" /></button>
 
             <label style="display:none;" ><input class="checkbox" type="checkbox" id="isSuturedSclerostomyRPS" onchange="drawingEdit.setSelectedDoodle(this, 'isSutured');return false;" />Sutured</label>
 
@@ -407,10 +407,10 @@
         <span class="canvasTooltip" id="canvasEditTooltip"></span>
 
         <!-- Canvas element style="border: none;" style="background-color: #DAE6F1;"-->
-        <canvas id="canvasEdit" class="ed-canvas-edit ed-canvas-edit" width="300" height="300" tabindex="1" style="border: 1px solid gray; float:left;"></canvas>
+        <canvas id="canvasEdit" class="ed-canvas-edit" width="300" height="300" tabindex="1" style="border: 1px solid gray; float:left;"></canvas>
 
         <!-- Doodle control panel -->
-        <div id="canvasEdit_controls" style="background-color: #DAE6F1; float:left;">
+        <div id="canvasEdit_controls" class="ed-doodle-popup" style="background-color: #DAE6F1; float:left;">
         </div>
 
         <button class="actbutton" onclick="console.log(drawingEdit.report()); return false;">Report</button>

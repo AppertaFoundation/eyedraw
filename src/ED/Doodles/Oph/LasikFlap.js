@@ -28,14 +28,28 @@ ED.LasikFlap = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "LasikFlap";
 
+	// Derived parameters
+	this.diameter = 6;
+	
 	// Other parameters
-	this.gradeDLK = 'None';
+	this.femtoLaser = "";
+	this.depth = 80;
+	this.angle = 30;
+	this.spotSeparation = "";
+	this.lineSeparation = "";
 
 	// Saved parameters
-	this.savedParameterArray = ['scaleX', 'scaleY', 'rotation', 'gradeDLK'];
+	this.savedParameterArray = ['scaleX', 'scaleY', 'rotation', 'femtoLaser', 'diameter', 'depth', 'angle', 'spotSeparation', 'lineSeparation'];
 
 	// Parameters in doodle control bar (parameter name: parameter label)
-	this.controlParameterArray = {'gradeDLK':'DLK Grade'};
+	this.controlParameterArray = {
+		'femtoLaser':'Femto laser', 
+		'diameter':'Diameter', 
+		'depth':'Depth', 
+		'angle':'Sidecut angle', 
+		'spotSeparation':'Spot separation',
+		'lineSeparation':'Line separation',
+	};
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -60,16 +74,49 @@ ED.LasikFlap.prototype.setHandles = function() {
  */
 ED.LasikFlap.prototype.setPropertyDefaults = function() {
 	this.isMoveable = false;
+	this.isRotatable = false;
 	this.isUnique = true;
 
 	// Update component of validation array for simple parameters
-	this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.75, +1.00);
-	this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.75, +1.00);
+	this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.60, +1.00);
+	this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.60, +1.00);
 
-	this.parameterValidationArray['gradeDLK'] = {
-		kind: 'other',
+	// Derived parameters
+	this.parameterValidationArray['femtoLaser'] = {
+		kind: 'derived',
 		type: 'string',
-		list: ['None', 'Grade 1', 'Grade 2', 'Grade 3'],
+		list: ['DDL AMO iFS', 'Zeiss Visumax', 'Zeimer Z7'],
+		animate: true
+	};
+	this.parameterValidationArray['diameter'] = {
+		kind: 'derived',
+		type: 'float',
+		range: new ED.Range(6, 10),
+		precision: 1,
+		animate: true
+	};
+	this.parameterValidationArray['depth'] = {
+		kind: 'derived',
+		type: 'int',
+		range: new ED.Range(80, 200),
+		animate: false
+	};
+	this.parameterValidationArray['angle'] = {
+		kind: 'derived',
+		type: 'int',
+		range: new ED.Range(30, 150),
+		animate: false
+	};
+	this.parameterValidationArray['spotSeparation'] = {
+		kind: 'derived',
+		type: 'string',
+		list: ['0.5um', '0.6um', '0.7um', '0.8um', '0.9um', '1.0um'],
+		animate: false
+	};
+	this.parameterValidationArray['lineSeparation'] = {
+		kind: 'derived',
+		type: 'string',
+		list: ['0.5um', '0.6um', '0.7um', '0.8um', '0.9um', '1.0um'],
 		animate: false
 	};
 }
@@ -78,7 +125,36 @@ ED.LasikFlap.prototype.setPropertyDefaults = function() {
  * Sets default parameters
  */
 ED.LasikFlap.prototype.setParameterDefaults = function() {
-	this.apexY = -100;
+	this.setParameterFromString('femtoLaser', 'DDL AMO iFS');
+	this.setParameterFromString('diameter', '10.0');
+	this.setParameterFromString('depth', '100');
+	this.setParameterFromString('spotSeparation', '0.5um');
+	this.setParameterFromString('lineSeparation', '0.5um');
+}
+
+/**
+ * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
+ * The returned parameters are animated if their 'animate' property is set to true
+ *
+ * @param {String} _parameter Name of parameter that has changed
+ * @value {Undefined} _value Value of parameter to calculate
+ * @returns {Array} Associative array of values of dependent parameters
+ */
+ED.LasikFlap.prototype.dependentParameterValues = function(_parameter, _value) {
+	var returnArray = new Array();
+
+	switch (_parameter) {
+		case 'scaleX':
+			returnArray['diameter'] = _value * 10;
+			break;
+
+		case 'diameter':
+			returnArray['scaleX'] = parseFloat(_value)/10;
+			returnArray['scaleY'] = parseFloat(_value)/10;
+			break;
+	}
+
+	return returnArray;
 }
 
 /**

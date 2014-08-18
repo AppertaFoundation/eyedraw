@@ -2249,7 +2249,6 @@ ED.Drawing.prototype.eventHandler = function(_type, _doodleId, _className, _elem
 								if (attribute) {
 									ED.errorHandler('ED.Drawing', 'eventHandler', 'Binding to a textfield with a non-standard attribute not yet supported');
 								} else {
-									console.log('setting textfield - needs testing with a suitable doodle');
 									element.value = validityArray.value;
 								}
 								break;
