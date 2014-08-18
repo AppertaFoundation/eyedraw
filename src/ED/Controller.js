@@ -212,14 +212,22 @@ ED.Controller = (function() {
 	 * @return {Boolean}
 	 */
 	Controller.prototype.hasInputFieldData = function() {
-		return (this.input !== null && this.input.value.length > 0);
+		return (this.hasInputField() && this.input.value.length > 0);
+	};
+
+	/**
+	 * Do we have an associated input field.
+	 * @return {Boolean}
+	 */
+	Controller.prototype.hasInputField = function() {
+		return (this.input !== null);
 	};
 
 	/**
 	 * Save drawing data to the associated input field.
 	 */
 	Controller.prototype.saveDrawingToInputField = function(force) {
-		if (force || this.hasInputFieldData()) {
+		if ((force && this.hasInputField()) || this.hasInputFieldData()) {
 			this.input.value = this.drawing.save();
 		}
 	};
