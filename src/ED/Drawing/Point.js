@@ -200,6 +200,24 @@ ED.Point.prototype.tangentialControlPoint = function(_phi) {
 }
 
 /**
+ * Creates a new point on a straight line between two points at a proportional distance 
+ *
+ * @param {Float} _percent Percentage distance along line
+ * @param {Point} _ep End point
+ * @returns {Point} _point Point
+ */
+ED.Point.prototype.pointAtPercentageFromPointToPoint = function(_percent, _point) {
+	// Calculate distances (clockwise from north)
+	var xIncrement = (_point.x - this.x) * _percent/100;
+	var yIncrement = (_point.y - this.y) * _percent/100;
+
+	// Create point and set length and direction
+	var point = new ED.Point(this.x + xIncrement, this.y + yIncrement);
+
+	return point;
+}
+
+/**
  * Returns a point in JSON encoding
  *
  * @returns {String} point in JSON format

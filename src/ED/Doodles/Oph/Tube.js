@@ -453,6 +453,7 @@ ED.Tube.prototype.draw = function(_point) {
 				break;
 		}
 
+		/* Curvy tube abandoned, since Supramid needs adjusting along entire length and no function available to determine position on Bezier curve
 		// Bezier points for curve of tube in array to export to Supramid
 		this.bezierArray['sp'] = new ED.Point(0, 380 * s + d);
 		this.bezierArray['cp1'] = new ED.Point(0, 420 * s + d);
@@ -463,6 +464,23 @@ ED.Tube.prototype.draw = function(_point) {
 		ctx.moveTo(0, 290 * s + d);
 		ctx.lineTo(this.bezierArray['sp'].x, this.bezierArray['sp'].y);		
  		ctx.bezierCurveTo(this.bezierArray['cp1'].x, this.bezierArray['cp1'].y, this.bezierArray['cp2'].x, this.bezierArray['cp2'].y, this.bezierArray['ep'].x, this.bezierArray['ep'].y);
+ 		*/
+ 		
+ 		// Straight line points for curve of tube in array to export to Supramid
+ 		this.bezierArray['sp'] = new ED.Point(0, 380 * s + d);
+		this.bezierArray['cp1'] = new ED.Point(0, 420 * s + d);
+		var apexPoint = new ED.Point(this.apexX, this.apexY);
+		var entryPoint = new ED.Point(0,0);
+		entryPoint.setWithPolars(430, apexPoint.direction());
+		this.bezierArray['cp2'] = entryPoint;
+		this.bezierArray['ep'] = apexPoint;
+
+		ctx.beginPath();
+		ctx.moveTo(0, 290 * s + d);
+		ctx.lineTo(this.bezierArray['sp'].x, this.bezierArray['sp'].y);		
+ 		ctx.lineTo(this.bezierArray['cp1'].x, this.bezierArray['cp1'].y);
+ 		ctx.lineTo(this.bezierArray['cp2'].x, this.bezierArray['cp2'].y);
+ 		ctx.lineTo(this.bezierArray['ep'].x, this.bezierArray['ep'].y);
 		
 		// Simulate tube with gray line and white narrower line
 		ctx.strokeStyle = "rgba(150,150,150,0.5)";

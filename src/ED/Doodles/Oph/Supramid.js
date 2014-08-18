@@ -27,9 +27,15 @@
 ED.Supramid = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "Supramid";
+	
+	// Other parameters
+	this.percent = '50';
 
 	// Saved parameters
-	this.savedParameterArray = ['apexX', 'apexY', 'rotation'];
+	this.savedParameterArray = ['apexX', 'apexY', 'rotation', 'percent'];
+
+	// Parameters in doodle control bar (parameter name: parameter label)
+	this.controlParameterArray = {'percent':'Percentage of tube'};
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -59,6 +65,14 @@ ED.Supramid.prototype.setPropertyDefaults = function() {
 	// Update component of validation array for simple parameters
 	this.parameterValidationArray['apexX']['range'].setMinAndMax(-800, +800);
 	this.parameterValidationArray['apexY']['range'].setMinAndMax(-800, +800);
+	
+	// Add complete validation arrays for derived parameters
+	this.parameterValidationArray['percent'] = {
+		kind: 'other',
+		type: 'string',
+		list: ['0', '10', '20', '30', '40', '50', '60', '70', '80', '90', '100'],
+		animate: false
+	};
 }
 
 /**
@@ -67,6 +81,8 @@ ED.Supramid.prototype.setPropertyDefaults = function() {
 ED.Supramid.prototype.setParameterDefaults = function() {
 	this.apexX = -660;
 	this.apexY = 30;
+	
+	this.setParameterFromString('percent', '50');
 
 	// Make rotation same as tube
 	var doodle = this.drawing.lastDoodleOfClass("Tube");
@@ -122,9 +138,70 @@ ED.Supramid.prototype.draw = function(_point) {
 			var xDev = startPoint.x/Math.abs(startPoint.x) * 100;
 			ctx.beginPath()
 			ctx.moveTo(startPoint.x, startPoint.y);
+			/*
 			ctx.bezierCurveTo(startPoint.x + xDev, startPoint.y - 100, tubePoint.x + xDev, tubePoint.y, doodle.bezierArray['sp'].x, doodle.bezierArray['sp'].y);
 			ctx.bezierCurveTo(doodle.bezierArray['cp1'].x, doodle.bezierArray['cp1'].y, doodle.bezierArray['cp2'].x, doodle.bezierArray['cp2'].y, doodle.bezierArray['ep'].x, doodle.bezierArray['ep'].y);
+			*/
+			ctx.bezierCurveTo(startPoint.x + xDev, startPoint.y - 100, tubePoint.x + xDev, tubePoint.y, doodle.bezierArray['sp'].x, doodle.bezierArray['sp'].y);
 
+			// Calculate total length of path
+			var totalLength = 0;
+			totalLength += doodle.bezierArray['sp'].distanceTo(doodle.bezierArray['cp1']);
+			totalLength += doodle.bezierArray['cp1'].distanceTo(doodle.bezierArray['cp2']);
+			totalLength += doodle.bezierArray['cp2'].distanceTo(doodle.bezierArray['ep']);
+			
+			// Calculate desired length
+			var desiredLength = totalLength * parseFloat(this.percent)/100;
+			
+			// Create line segments appropriately
+			var keepGoing = true;
+			var remainingLength = desiredLength;
+			
+			var segmentLength = doodle.bezierArray['sp'].distanceTo(doodle.bezierArray['cp1']);
+			if (segmentLength < remainingLength) {
+				remainingLength -= segmentLength;
+				ctx.lineTo(doodle.bezierArray['cp1'].x, doodle.bezierArray['cp1'].y);
+			}
+			else {
+				var prop = remainingLength * 100/segmentLength;
+				var p = doodle.bezierArray['sp'].pointAtPercentageFromPointToPoint(prop, doodle.bezierArray['cp1']);
+				ctx.lineTo(p.x, p.y);
+				keepGoing = false;
+			}
+
+			if (keepGoing) {
+				segmentLength = doodle.bezierArray['cp1'].distanceTo(doodle.bezierArray['cp2']);
+				if (segmentLength < remainingLength) {
+					remainingLength -= segmentLength;
+					ctx.lineTo(doodle.bezierArray['cp2'].x, doodle.bezierArray['cp2'].y);
+				}
+				else {
+					var prop = remainingLength * 100/segmentLength;
+					var p = doodle.bezierArray['cp1'].pointAtPercentageFromPointToPoint(prop, doodle.bezierArray['cp2']);
+					ctx.lineTo(p.x, p.y);
+					keepGoing = false;
+				}
+			}
+
+			if (keepGoing) {						
+				segmentLength = doodle.bezierArray['cp2'].distanceTo(doodle.bezierArray['ep']);
+				if (segmentLength < remainingLength) {
+					remainingLength -= segmentLength;
+					ctx.lineTo(doodle.bezierArray['ep'].x, doodle.bezierArray['ep'].y);
+				}
+				else {
+					var prop = remainingLength * 100/segmentLength;
+					var p = doodle.bezierArray['cp2'].pointAtPercentageFromPointToPoint(prop, doodle.bezierArray['ep']);
+					ctx.lineTo(p.x, p.y);
+					keepGoing = false;
+				}
+			}
+						
+// 			ctx.lineTo(doodle.bezierArray['cp1'].x, doodle.bezierArray['cp1'].y);
+// 			ctx.lineTo(doodle.bezierArray['cp2'].x, doodle.bezierArray['cp2'].y);
+// 			ctx.lineTo(doodle.bezierArray['ep'].x, doodle.bezierArray['ep'].y);
+			
+			
 			ctx.lineWidth = 4;
 			ctx.strokeStyle = "purple";
 			ctx.stroke();

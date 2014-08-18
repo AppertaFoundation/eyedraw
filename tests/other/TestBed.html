@@ -104,7 +104,7 @@
 							//this.drawing.addDoodle('Patch');
 							//this.drawing.addDoodle('TrabySuture');
 							//this.drawing.addDoodle('TubeExtender');
-							//this.drawing.addDoodle('Supramid');
+							this.drawing.addDoodle('Supramid');
 							//this.drawing.addDoodle('ConjunctivalSuture');
 							//this.drawing.addDoodle('ACMaintainer');
 							//this.drawing.addDoodle('UTear');
@@ -342,13 +342,13 @@
 
         <!-- Doodle controls toolbar -->
         <div class="ed-toolbar">
-            <button class="imgbutton" class="imgbutton" disabled="disabled" id="moveToFrontRPS" title="Move to front" onclick="drawingEdit.moveToFront(); return false;" ><img src="../../assets/img/old/moveToFront.gif"/></button>
-            <button class="imgbutton" disabled="disabled" id="moveToBackRPS" title="Move to back" onclick="drawingEdit.moveToBack(); return false;" ><img src="../../assets/img/old/moveToBack.gif" /></button>
-            <button class="imgbutton" disabled="disabled" id="flipVerRPS" title="Flip around vertical axis" onclick="drawingEdit.flipVer(); return false;" ><img src="../../assets/img/old/flipVer.gif" /></button>
-            <button class="imgbutton" disabled="disabled" id="flipHorRPS" title="Flip around horizontal axis" onclick="drawingEdit.flipHor(); return false;" ><img src="../../assets/img/old/flipHor.gif" /></button>
-            <button class="imgbutton" disabled="disabled" id="deleteSelectedDoodleRPS" title="Delete" onclick="drawingEdit.deleteSelectedDoodle(); return false;" ><img src="../../assets/img/old/deleteSelectedDoodle.gif" /></button>
-            <button class="imgbutton" disabled="disabled" id="lockRPS" title="Lock" onclick="drawingEdit.lock(); return false;" ><img src="../../assets/img/old/lock.gif" /></button>
-            <button class="imgbutton" disabled="disabled" id="unlockRPS" title="Unlock" onclick="drawingEdit.unlock(); return false;" ><img src="../../assets/img/old/unlock.gif" /></button>
+            <button class="ed-button" id="moveToFrontRPS" title="Move to front" onclick="drawingEdit.moveToFront(); return false;" ><img src="../../assets/img/old/moveToFront.gif"/></button>
+            <button class="ed-button" id="moveToBackRPS" title="Move to back" onclick="drawingEdit.moveToBack(); return false;" ><img src="../../assets/img/old/moveToBack.gif" /></button>
+            <button class="ed-button" id="flipVerRPS" title="Flip around vertical axis" onclick="drawingEdit.flipVer(); return false;" ><img src="../../assets/img/old/flipVer.gif" /></button>
+            <button class="ed-button" id="flipHorRPS" title="Flip around horizontal axis" onclick="drawingEdit.flipHor(); return false;" ><img src="../../assets/img/old/flipHor.gif" /></button>
+            <button class="ed-button" id="deleteSelectedDoodleRPS" title="Delete" onclick="drawingEdit.deleteSelectedDoodle(); return false;" ><img src="../../assets/img/old/deleteSelectedDoodle.gif" /></button>
+            <button class="ed-button" id="lockRPS" title="Lock" onclick="drawingEdit.lock(); return false;" ><img src="../../assets/img/old/lock.gif" /></button>
+            <button class="ed-button" id="unlockRPS" title="Unlock" onclick="drawingEdit.unlock(); return false;" ><img src="../../assets/img/old/unlock.gif" /></button>
 
             <label style="display:none;" ><input class="checkbox" type="checkbox" id="isSuturedSclerostomyRPS" onchange="drawingEdit.setSelectedDoodle(this, 'isSutured');return false;" />Sutured</label>
 
@@ -396,9 +396,9 @@
 
             <button id="LensRPS" class="imgbutton" title="Lens" onclick="drawingEdit.addDoodle('PI'); return false;" ><img src="../../assets/img/old/PI.gif" /></button>
  -->
-            <button id="LensRPS" class="imgbutton" title="Freehand" onclick="drawingEdit.addDoodle('TubeLigation'); return false;" ><img src="../../assets/img/old/TubeLigation.gif" /></button>
-            <button id="LensRPS" class="imgbutton" title="Perforation" onclick="drawingEdit.addDoodle('Supramid'); return false;" ><img src="../../assets/img/old/Supramid.gif" /></button>
-            <button id="LensRPS" class="imgbutton" title="TubeLigation" onclick="drawingEdit.addDoodle('Patch'); return false;" ><img src="../../assets/img/old/Patch.gif" /></button>
+            <button id="LensRPS" class="ed-button" title="Freehand" onclick="drawingEdit.addDoodle('TubeLigation'); return false;" ><img src="../../assets/img/old/TubeLigation.gif" /></button>
+            <button id="LensRPS" class="ed-button" title="Perforation" onclick="drawingEdit.addDoodle('Supramid'); return false;" ><img src="../../assets/img/old/Supramid.gif" /></button>
+            <button id="LensRPS" class="ed-button" title="TubeLigation" onclick="drawingEdit.addDoodle('Patch'); return false;" ><img src="../../assets/img/old/Patch.gif" /></button>
             <br />
         </div>
 
@@ -408,10 +408,10 @@
         <span class="canvasTooltip" id="canvasEditTooltip"></span>
 
         <!-- Canvas element style="border: none;" style="background-color: #DAE6F1;"-->
-        <canvas id="canvasEdit" class="ed-canvas-edit ed-canvas-edit" width="300" height="300" tabindex="1" style="border: 1px solid gray; float:left;"></canvas>
+        <canvas id="canvasEdit" class="ed-canvas-edit" width="300" height="300" tabindex="1" style="border: 1px solid gray; float:left;"></canvas>
 
         <!-- Doodle control panel -->
-        <div id="canvasEdit_controls" style="background-color: #DAE6F1; float:left;">
+        <div id="canvasEdit_controls" class="ed-doodle-popup" style="background-color: #DAE6F1; float:left;">
         </div>
 
         <button class="actbutton" onclick="console.log(drawingEdit.report()); return false;">Report</button>
