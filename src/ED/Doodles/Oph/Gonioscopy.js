@@ -39,8 +39,10 @@ ED.Gonioscopy = function(_drawing, _parameterJSON) {
 	this.riri = 176;
 	this.rpu = 100;
 
+    this.mode = "Basic";
+
 	// Saved parameters
-	this.savedParameterArray = ['apexX', 'apexY'];
+	this.savedParameterArray = ['apexX', 'apexY', 'mode'];
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -73,6 +75,13 @@ ED.Gonioscopy.prototype.setPropertyDefaults = function() {
 	// Update component of validation array for simple parameters
 	this.parameterValidationArray['apexX']['range'].setMinAndMax(-460, -420);
 	this.parameterValidationArray['apexY']['range'].setMinAndMax(-460, -400);
+
+    this.parameterValidationArray['mode'] = {
+	kind: 'derived',
+	type: 'string',
+	list: ['Basic', 'Expert'],
+	animate: false
+    };
 }
 
 /**
@@ -81,6 +90,7 @@ ED.Gonioscopy.prototype.setPropertyDefaults = function() {
 ED.Gonioscopy.prototype.setParameterDefaults = function() {
 	this.apexX = -460;
 	this.apexY = -460;
+    this.setParameterFromString('mode', 'Basic');
 }
 
 /**
