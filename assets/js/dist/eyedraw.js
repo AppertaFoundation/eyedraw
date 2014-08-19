@@ -30201,7 +30201,7 @@ ED.Patch.prototype.setParameterDefaults = function() {
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.Patch.prototype.draw = function(_point) {console.log(this.originX, this.originY);
+ED.Patch.prototype.draw = function(_point) {
 	// Get context
 	var ctx = this.drawing.context;
 
