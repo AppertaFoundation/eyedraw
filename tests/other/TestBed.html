@@ -39,10 +39,6 @@
             // Runs on page load
             function init()
             {
-            	var d = new Date();
-            	//debugger;
-
-            	//console.log(d.toLocaleTimeString());
                 // Get reference to the drawingEdit canvas
                 var canvasEdit = document.getElementById('canvasEdit');
 
@@ -57,18 +53,8 @@
 
                 // Set focus to canvasEdit element
                 canvasEdit.focus();
-
-//                for (var propertyName in ED)
-//                {
-//                    var doodle = ED[propertyName];
-//
-//                    if (doodle.superclass == ED.Doodle.prototype)
-//                    {
-//                        var dood = new ED[propertyName];
-//                        console.log(dood.className);
-//                    }
-//                }
-            }
+            } 
+  				
 
             // Controller class
             function eyeDrawController(_drawing)
@@ -137,7 +123,7 @@
 // 					        leftEye.parameterValidationArray['originX']['range'] = new ED.Range(+150, +350);
 // 					        leftEye.originX = +250;
 
-					        this.drawing.deselectDoodles();
+					        //this.drawing.deselectDoodles();
 
 
 

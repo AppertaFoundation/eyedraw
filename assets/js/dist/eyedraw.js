@@ -6226,6 +6226,30 @@ ED.Point.prototype.pointAtPercentageFromPointToPoint = function(_percent, _point
 }
 
 /**
+ * Creates a new point on a cubic Bezier curve at parameter t along curve 
+ *
+ * @param {Float} _t Proportion along curve (0-1)
+ * @param {Point} _cp1 Control point 1
+ * @param {Point} _cp2 Control point 2
+ * @param {Point} _ep End point
+ * @returns {Point} _point Point
+ */
+ED.Point.prototype.bezierPointAtParameter = function(_t, _cp1, _cp2, _ep) {
+	// Calculate scalars
+	var t2 = _t * _t;
+	var t3 = t2 * _t;
+	var mt = 1 - _t;
+	var mt2 = mt * mt;
+	var mt3 = mt2 * mt;
+	
+	// Calculate x and y values of point
+	var x = this.x * mt3 + 3 * _cp1.x * mt2 * _t + 3 * _cp2.x * mt * t2 + _ep.x * t3;
+	var y = this.y * mt3 + 3 * _cp1.y * mt2 * _t + 3 * _cp2.y * mt * t2 + _ep.y * t3;
+	
+	// Return point
+	return new ED.Point(x, y);
+} 
+/**
  * Returns a point in JSON encoding
  *
  * @returns {String} point in JSON format
@@ -37257,14 +37281,29 @@ ED.Supramid = function(_drawing, _parameterJSON) {
 	this.className = "Supramid";
 	
 	// Other parameters
-	this.percent = '50';
+	this.percent = '80';
 
 	// Saved parameters
 	this.savedParameterArray = ['apexX', 'apexY', 'rotation', 'percent'];
 
 	// Parameters in doodle control bar (parameter name: parameter label)
 	this.controlParameterArray = {'percent':'Percentage of tube'};
-
+	
+	// Bezier segmentation is not linear, so can make fine adjustments here if required
+	this.adjustmentArray = {
+		'0':0, 
+		'10':10, 
+		'20':20, 
+		'30':30, 
+		'40':40, 
+		'50':50, 
+		'60':60, 
+		'70':70, 
+		'80':80, 
+		'90':90, 
+		'100':100
+	}
+	
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
@@ -37310,7 +37349,8 @@ ED.Supramid.prototype.setParameterDefaults = function() {
 	this.apexX = -660;
 	this.apexY = 30;
 	
-	this.setParameterFromString('percent', '50');
+	// Default value of insertion percentage
+	this.setParameterFromString('percent', '80');
 
 	// Make rotation same as tube
 	var doodle = this.drawing.lastDoodleOfClass("Tube");
@@ -37366,69 +37406,17 @@ ED.Supramid.prototype.draw = function(_point) {
 			var xDev = startPoint.x/Math.abs(startPoint.x) * 100;
 			ctx.beginPath()
 			ctx.moveTo(startPoint.x, startPoint.y);
-			/*
-			ctx.bezierCurveTo(startPoint.x + xDev, startPoint.y - 100, tubePoint.x + xDev, tubePoint.y, doodle.bezierArray['sp'].x, doodle.bezierArray['sp'].y);
-			ctx.bezierCurveTo(doodle.bezierArray['cp1'].x, doodle.bezierArray['cp1'].y, doodle.bezierArray['cp2'].x, doodle.bezierArray['cp2'].y, doodle.bezierArray['ep'].x, doodle.bezierArray['ep'].y);
-			*/
 			ctx.bezierCurveTo(startPoint.x + xDev, startPoint.y - 100, tubePoint.x + xDev, tubePoint.y, doodle.bezierArray['sp'].x, doodle.bezierArray['sp'].y);
 
-			// Calculate total length of path
-			var totalLength = 0;
-			totalLength += doodle.bezierArray['sp'].distanceTo(doodle.bezierArray['cp1']);
-			totalLength += doodle.bezierArray['cp1'].distanceTo(doodle.bezierArray['cp2']);
-			totalLength += doodle.bezierArray['cp2'].distanceTo(doodle.bezierArray['ep']);
+			// Number of bezier segments
+			var nb = 50;
 			
-			// Calculate desired length
-			var desiredLength = totalLength * parseFloat(this.percent)/100;
-			
-			// Create line segments appropriately
-			var keepGoing = true;
-			var remainingLength = desiredLength;
-			
-			var segmentLength = doodle.bezierArray['sp'].distanceTo(doodle.bezierArray['cp1']);
-			if (segmentLength < remainingLength) {
-				remainingLength -= segmentLength;
-				ctx.lineTo(doodle.bezierArray['cp1'].x, doodle.bezierArray['cp1'].y);
+			// Draw Bezier of appropriate length for corrected proportion along curve
+			var pc = this.adjustmentArray[this.percent];
+			for (var t = 0; t < 1/nb + pc/100; t = t + 1/nb) {
+				var nextPoint = doodle.bezierArray['sp'].bezierPointAtParameter(t, doodle.bezierArray['cp1'], doodle.bezierArray['cp2'], doodle.bezierArray['ep']);
+				ctx.lineTo(nextPoint.x, nextPoint.y);
 			}
-			else {
-				var prop = remainingLength * 100/segmentLength;
-				var p = doodle.bezierArray['sp'].pointAtPercentageFromPointToPoint(prop, doodle.bezierArray['cp1']);
-				ctx.lineTo(p.x, p.y);
-				keepGoing = false;
-			}
-
-			if (keepGoing) {
-				segmentLength = doodle.bezierArray['cp1'].distanceTo(doodle.bezierArray['cp2']);
-				if (segmentLength < remainingLength) {
-					remainingLength -= segmentLength;
-					ctx.lineTo(doodle.bezierArray['cp2'].x, doodle.bezierArray['cp2'].y);
-				}
-				else {
-					var prop = remainingLength * 100/segmentLength;
-					var p = doodle.bezierArray['cp1'].pointAtPercentageFromPointToPoint(prop, doodle.bezierArray['cp2']);
-					ctx.lineTo(p.x, p.y);
-					keepGoing = false;
-				}
-			}
-
-			if (keepGoing) {						
-				segmentLength = doodle.bezierArray['cp2'].distanceTo(doodle.bezierArray['ep']);
-				if (segmentLength < remainingLength) {
-					remainingLength -= segmentLength;
-					ctx.lineTo(doodle.bezierArray['ep'].x, doodle.bezierArray['ep'].y);
-				}
-				else {
-					var prop = remainingLength * 100/segmentLength;
-					var p = doodle.bezierArray['cp2'].pointAtPercentageFromPointToPoint(prop, doodle.bezierArray['ep']);
-					ctx.lineTo(p.x, p.y);
-					keepGoing = false;
-				}
-			}
-						
-// 			ctx.lineTo(doodle.bezierArray['cp1'].x, doodle.bezierArray['cp1'].y);
-// 			ctx.lineTo(doodle.bezierArray['cp2'].x, doodle.bezierArray['cp2'].y);
-// 			ctx.lineTo(doodle.bezierArray['ep'].x, doodle.bezierArray['ep'].y);
-			
 			
 			ctx.lineWidth = 4;
 			ctx.strokeStyle = "purple";
@@ -37447,39 +37435,12 @@ ED.Supramid.prototype.draw = function(_point) {
 }
 
 /**
- * Returns parameters
- *
- * @returns {String} value of parameter
- */
-// ED.Supramid.prototype.getParameter = function(_parameter)
-// {
-//     var returnValue;
-//
-//     switch (_parameter)
-//     {
-//         // Position of end of suture
-//         case 'endPosition':
-//             var r = Math.sqrt(this.apexX * this.apexX + this.apexY * this.apexY);
-//
-//             if (r < 280 ) returnValue = 'in the AC';
-//             else returnValue = ((r - 280)/14).toFixed(0) + 'mm from limbus';
-//             break;
-//
-//         default:
-//             returnValue = "";
-//             break;
-//     }
-//
-//     return returnValue;
-// }
-
-/**
  * Returns a string containing a text description of the doodle
  *
  * @returns {String} Description of doodle
  */
 ED.Supramid.prototype.description = function() {
-	return "Supramid suture";
+	return "Supramid suture " + this.percent + "% along tube";
 }
 
 /**
@@ -39875,7 +39836,6 @@ ED.Tube.prototype.draw = function(_point) {
 				ctx.lineTo(-40 * s, 0 * s + d);
 				ctx.lineTo(-200 * s, 0 * s + d);
 				ctx.closePath();
-
 				ctx.fillStyle = "rgba(250,250,250,0.7)";
 				ctx.fill();
 
@@ -40002,34 +39962,21 @@ ED.Tube.prototype.draw = function(_point) {
 				break;
 		}
 
-		/* Curvy tube abandoned, since Supramid needs adjusting along entire length and no function available to determine position on Bezier curve
 		// Bezier points for curve of tube in array to export to Supramid
 		this.bezierArray['sp'] = new ED.Point(0, 380 * s + d);
-		this.bezierArray['cp1'] = new ED.Point(0, 420 * s + d);
-		this.bezierArray['cp2'] = new ED.Point(this.apexX * 1.5, this.apexY + ((290 * s + d) - this.apexY) * 0.5);
+		this.bezierArray['cp1'] = new ED.Point(0, 460 * s + d);
 		this.bezierArray['ep'] = new ED.Point(this.apexX, this.apexY);
 		
+		// CP2 varies according to displacement from midline
+		var apexPoint = new ED.Point(this.apexX, this.apexY);
+		var angle = apexPoint.direction() < Math.PI?apexPoint.direction():(2 * Math.PI - apexPoint.direction());
+		this.bezierArray['cp2'] = apexPoint.pointAtRadiusAndClockwiseAngle(300 * (1 + 1.5 * angle), angle * 0.2);
+		
+		// Path of tube
 		ctx.beginPath();
 		ctx.moveTo(0, 290 * s + d);
 		ctx.lineTo(this.bezierArray['sp'].x, this.bezierArray['sp'].y);		
  		ctx.bezierCurveTo(this.bezierArray['cp1'].x, this.bezierArray['cp1'].y, this.bezierArray['cp2'].x, this.bezierArray['cp2'].y, this.bezierArray['ep'].x, this.bezierArray['ep'].y);
- 		*/
- 		
- 		// Straight line points for curve of tube in array to export to Supramid
- 		this.bezierArray['sp'] = new ED.Point(0, 380 * s + d);
-		this.bezierArray['cp1'] = new ED.Point(0, 420 * s + d);
-		var apexPoint = new ED.Point(this.apexX, this.apexY);
-		var entryPoint = new ED.Point(0,0);
-		entryPoint.setWithPolars(430, apexPoint.direction());
-		this.bezierArray['cp2'] = entryPoint;
-		this.bezierArray['ep'] = apexPoint;
-
-		ctx.beginPath();
-		ctx.moveTo(0, 290 * s + d);
-		ctx.lineTo(this.bezierArray['sp'].x, this.bezierArray['sp'].y);		
- 		ctx.lineTo(this.bezierArray['cp1'].x, this.bezierArray['cp1'].y);
- 		ctx.lineTo(this.bezierArray['cp2'].x, this.bezierArray['cp2'].y);
- 		ctx.lineTo(this.bezierArray['ep'].x, this.bezierArray['ep'].y);
 		
 		// Simulate tube with gray line and white narrower line
 		ctx.strokeStyle = "rgba(150,150,150,0.5)";
@@ -40277,7 +40224,6 @@ ED.TubeExtender.prototype.draw = function(_point) {
    		ctx.lineTo(-50 * s, 400 * s + d);
    		ctx.quadraticCurveTo(-50 * s, 420 * s + d, -30 * s, 420 * s + d);
    		ctx.lineTo(0 * s, 420 * s + d);
-
    		ctx.lineTo(30 * s, 420 * s + d);
   		ctx.quadraticCurveTo(50 * s, 420 * s + d, 50 * s, 400 * s + d);
   		ctx.lineTo(50 * s, 340 * s + d);
@@ -40285,23 +40231,26 @@ ED.TubeExtender.prototype.draw = function(_point) {
   		ctx.lineTo(50 * s, 200 * s + d);
   		ctx.quadraticCurveTo(50 * s, 180 * s + d, 30 * s, 180 * s + d);
   		ctx.closePath();
-
 		ctx.stroke();
-
 
 		// Spots
 		this.drawCircle(ctx, -120 * s, 300 * s + d, 20 * s, ctx.fillStyle, 4, ctx.strokeStyle);
 		this.drawCircle(ctx, 120 * s, 300 * s + d, 20 * s, ctx.fillStyle, 4, ctx.strokeStyle);
 
-		// Bezier points for curve of TubeExtender in array to export to Supramid
+		// Bezier points for curve of tube in array to export to Supramid
 		this.bezierArray['sp'] = new ED.Point(0, 380 * s + d);
-		this.bezierArray['cp1'] = new ED.Point(0, 420 * s + d);
-		this.bezierArray['cp2'] = new ED.Point(this.apexX * 1.5, this.apexY + ((290 * s + d) - this.apexY) * 0.5);
+		this.bezierArray['cp1'] = new ED.Point(0, 460 * s + d);
 		this.bezierArray['ep'] = new ED.Point(this.apexX, this.apexY);
-
+		
+		// CP2 varies according to displacement from midline
+		var apexPoint = new ED.Point(this.apexX, this.apexY);
+		var angle = apexPoint.direction() < Math.PI?apexPoint.direction():(2 * Math.PI - apexPoint.direction());
+		this.bezierArray['cp2'] = apexPoint.pointAtRadiusAndClockwiseAngle(300 * (1 + 1.5 * angle), angle * 0.2);
+		
+		// Path of tube
 		ctx.beginPath();
 		ctx.moveTo(0, 290 * s + d);
-		ctx.lineTo(this.bezierArray['sp'].x, this.bezierArray['sp'].y);
+		ctx.lineTo(this.bezierArray['sp'].x, this.bezierArray['sp'].y);		
  		ctx.bezierCurveTo(this.bezierArray['cp1'].x, this.bezierArray['cp1'].y, this.bezierArray['cp2'].x, this.bezierArray['cp2'].y, this.bezierArray['ep'].x, this.bezierArray['ep'].y);
 
 		// Simulate tube with gray line and white narrower line
@@ -40311,8 +40260,6 @@ ED.TubeExtender.prototype.draw = function(_point) {
 		ctx.strokeStyle = "white";
 		ctx.lineWidth = 8;
 		ctx.stroke();
-
-
 	}
 
 	// Coordinates of handles (in canvas plane)

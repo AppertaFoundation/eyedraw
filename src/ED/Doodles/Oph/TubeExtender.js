@@ -209,7 +209,6 @@ ED.TubeExtender.prototype.draw = function(_point) {
    		ctx.lineTo(-50 * s, 400 * s + d);
    		ctx.quadraticCurveTo(-50 * s, 420 * s + d, -30 * s, 420 * s + d);
    		ctx.lineTo(0 * s, 420 * s + d);
-
    		ctx.lineTo(30 * s, 420 * s + d);
   		ctx.quadraticCurveTo(50 * s, 420 * s + d, 50 * s, 400 * s + d);
   		ctx.lineTo(50 * s, 340 * s + d);
@@ -217,23 +216,26 @@ ED.TubeExtender.prototype.draw = function(_point) {
   		ctx.lineTo(50 * s, 200 * s + d);
   		ctx.quadraticCurveTo(50 * s, 180 * s + d, 30 * s, 180 * s + d);
   		ctx.closePath();
-
 		ctx.stroke();
-
 
 		// Spots
 		this.drawCircle(ctx, -120 * s, 300 * s + d, 20 * s, ctx.fillStyle, 4, ctx.strokeStyle);
 		this.drawCircle(ctx, 120 * s, 300 * s + d, 20 * s, ctx.fillStyle, 4, ctx.strokeStyle);
 
-		// Bezier points for curve of TubeExtender in array to export to Supramid
+		// Bezier points for curve of tube in array to export to Supramid
 		this.bezierArray['sp'] = new ED.Point(0, 380 * s + d);
-		this.bezierArray['cp1'] = new ED.Point(0, 420 * s + d);
-		this.bezierArray['cp2'] = new ED.Point(this.apexX * 1.5, this.apexY + ((290 * s + d) - this.apexY) * 0.5);
+		this.bezierArray['cp1'] = new ED.Point(0, 460 * s + d);
 		this.bezierArray['ep'] = new ED.Point(this.apexX, this.apexY);
-
+		
+		// CP2 varies according to displacement from midline
+		var apexPoint = new ED.Point(this.apexX, this.apexY);
+		var angle = apexPoint.direction() < Math.PI?apexPoint.direction():(2 * Math.PI - apexPoint.direction());
+		this.bezierArray['cp2'] = apexPoint.pointAtRadiusAndClockwiseAngle(300 * (1 + 1.5 * angle), angle * 0.2);
+		
+		// Path of tube
 		ctx.beginPath();
 		ctx.moveTo(0, 290 * s + d);
-		ctx.lineTo(this.bezierArray['sp'].x, this.bezierArray['sp'].y);
+		ctx.lineTo(this.bezierArray['sp'].x, this.bezierArray['sp'].y);		
  		ctx.bezierCurveTo(this.bezierArray['cp1'].x, this.bezierArray['cp1'].y, this.bezierArray['cp2'].x, this.bezierArray['cp2'].y, this.bezierArray['ep'].x, this.bezierArray['ep'].y);
 
 		// Simulate tube with gray line and white narrower line
@@ -243,8 +245,6 @@ ED.TubeExtender.prototype.draw = function(_point) {
 		ctx.strokeStyle = "white";
 		ctx.lineWidth = 8;
 		ctx.stroke();
-
-
 	}
 
 	// Coordinates of handles (in canvas plane)

@@ -326,7 +326,6 @@ ED.Tube.prototype.draw = function(_point) {
 				ctx.lineTo(-40 * s, 0 * s + d);
 				ctx.lineTo(-200 * s, 0 * s + d);
 				ctx.closePath();
-
 				ctx.fillStyle = "rgba(250,250,250,0.7)";
 				ctx.fill();
 
@@ -453,34 +452,21 @@ ED.Tube.prototype.draw = function(_point) {
 				break;
 		}
 
-		/* Curvy tube abandoned, since Supramid needs adjusting along entire length and no function available to determine position on Bezier curve
 		// Bezier points for curve of tube in array to export to Supramid
 		this.bezierArray['sp'] = new ED.Point(0, 380 * s + d);
-		this.bezierArray['cp1'] = new ED.Point(0, 420 * s + d);
-		this.bezierArray['cp2'] = new ED.Point(this.apexX * 1.5, this.apexY + ((290 * s + d) - this.apexY) * 0.5);
+		this.bezierArray['cp1'] = new ED.Point(0, 460 * s + d);
 		this.bezierArray['ep'] = new ED.Point(this.apexX, this.apexY);
 		
+		// CP2 varies according to displacement from midline
+		var apexPoint = new ED.Point(this.apexX, this.apexY);
+		var angle = apexPoint.direction() < Math.PI?apexPoint.direction():(2 * Math.PI - apexPoint.direction());
+		this.bezierArray['cp2'] = apexPoint.pointAtRadiusAndClockwiseAngle(300 * (1 + 1.5 * angle), angle * 0.2);
+		
+		// Path of tube
 		ctx.beginPath();
 		ctx.moveTo(0, 290 * s + d);
 		ctx.lineTo(this.bezierArray['sp'].x, this.bezierArray['sp'].y);		
  		ctx.bezierCurveTo(this.bezierArray['cp1'].x, this.bezierArray['cp1'].y, this.bezierArray['cp2'].x, this.bezierArray['cp2'].y, this.bezierArray['ep'].x, this.bezierArray['ep'].y);
- 		*/
- 		
- 		// Straight line points for curve of tube in array to export to Supramid
- 		this.bezierArray['sp'] = new ED.Point(0, 380 * s + d);
-		this.bezierArray['cp1'] = new ED.Point(0, 420 * s + d);
-		var apexPoint = new ED.Point(this.apexX, this.apexY);
-		var entryPoint = new ED.Point(0,0);
-		entryPoint.setWithPolars(430, apexPoint.direction());
-		this.bezierArray['cp2'] = entryPoint;
-		this.bezierArray['ep'] = apexPoint;
-
-		ctx.beginPath();
-		ctx.moveTo(0, 290 * s + d);
-		ctx.lineTo(this.bezierArray['sp'].x, this.bezierArray['sp'].y);		
- 		ctx.lineTo(this.bezierArray['cp1'].x, this.bezierArray['cp1'].y);
- 		ctx.lineTo(this.bezierArray['cp2'].x, this.bezierArray['cp2'].y);
- 		ctx.lineTo(this.bezierArray['ep'].x, this.bezierArray['ep'].y);
 		
 		// Simulate tube with gray line and white narrower line
 		ctx.strokeStyle = "rgba(150,150,150,0.5)";
