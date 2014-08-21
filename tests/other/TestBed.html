@@ -99,8 +99,9 @@
 
 							//this.drawing.addDoodle('AxialLengthGraph', {'axialLength':'25'});
 							//this.drawing.addDoodle('AntSeg');
-							this.drawing.addDoodle('LasikFlap');
-							//this.drawing.addDoodle('SMILE');
+							//this.drawing.addDoodle('LasikFlap');
+							//this.drawing.addDoodle('PTK')
+							this.drawing.addDoodle('LimbalRelaxingIncision');
 							//this.drawing.addDoodle('TrabySuture');
 							//this.drawing.addDoodle('TubeExtender');
 							//this.drawing.addDoodle('Supramid');
@@ -401,17 +402,14 @@
             <br />
         </div>
 
-        <!-- <input class="checkbox" type="checkbox" id="chk_phd"> -->
-
-        <!-- Canvas tooltip -->
-        <span class="canvasTooltip" id="canvasEditTooltip"></span>
-
-        <!-- Canvas element style="border: none;" style="background-color: #DAE6F1;"-->
-        <canvas id="canvasEdit" class="ed-canvas-edit" width="300" height="300" tabindex="1" style="border: 1px solid gray; float:left;"></canvas>
-
-        <!-- Doodle control panel -->
-        <div id="canvasEdit_controls" class="ed-doodle-popup" style="background-color: #DAE6F1; float:left;">
-        </div>
+		<!-- Canvas -->
+		<div style="position:relative;">
+			<span id="canvasTooltip"></span>
+			<canvas id="canvasEdit" class="ed-canvas" width="300" height="300" tabindex="1"></canvas>
+			<!-- Doodle control panel -->
+			<div id="canvasEdit_controls" class="ed-doodle-popup" style="background-color: #DAE6F1; float:left; position:absolute; top:20px; left:310px;">
+			</div>
+		</div>
 
         <button class="actbutton" onclick="console.log(drawingEdit.report()); return false;">Report</button>
 
