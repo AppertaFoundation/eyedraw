@@ -26320,6 +26320,7 @@ ED.LasikFlap = function(_drawing, _parameterJSON) {
 	this.className = "LasikFlap";
 
 	// Derived parameters
+	this.hinge = "";
 	this.diameter = 6;
 	
 	// Other parameters
@@ -26348,6 +26349,7 @@ ED.LasikFlap = function(_drawing, _parameterJSON) {
 
 	// Parameters in doodle control bar (parameter name: parameter label)
 	this.controlParameterArray = {
+		'hinge':'Hinge',
 		'femtoLaser':'Femto laser', 
 		'diameter':'Diameter', 
 		'depth':'Depth', 
@@ -26381,14 +26383,24 @@ ED.LasikFlap.prototype.setHandles = function() {
  */
 ED.LasikFlap.prototype.setPropertyDefaults = function() {
 	this.isMoveable = false;
-	this.isRotatable = false;
+	this.snapToAngles = true;
 	this.isUnique = true;
+	
+	// Array of angles to snap to
+	var phi = Math.PI / 4;
+	this.anglesArray = [0, (this.drawing.eye == ED.eye.Right)?(Math.PI/2):(3 * Math.PI/2)];
 
 	// Update component of validation array for simple parameters
 	this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.60, +1.00);
 	this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.60, +1.00);
 
-	// Derived parameters
+	// Derived parameters	
+	this.parameterValidationArray['hinge'] = {
+		kind: 'other',
+		type: 'string',
+		list: ['Superior', 'Nasal'],
+		animate: true
+	};
 	this.parameterValidationArray['diameter'] = {
 		kind: 'derived',
 		type: 'float',
@@ -26431,7 +26443,7 @@ ED.LasikFlap.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['energyLevel'] = {
 		kind: 'other',
 		type: 'string',
-		list: ['0.5uJ', '0.6uJ', '0.7uJ', '0.8uJ', '0.9uJ', '1.0uJ'],
+		list: ['0.50uJ', '0.55uJ', '0.60uJ', '0.65uJ', '0.70uJ', '0.75uJ', '0.80uJ', '0.85uJ', '0.90uJ', '0.95uJ', '1.00uJ'],
 		animate: false
 	};
 	this.parameterValidationArray['OBLGrade'] = {
@@ -26446,12 +26458,14 @@ ED.LasikFlap.prototype.setPropertyDefaults = function() {
  * Sets default parameters
  */
 ED.LasikFlap.prototype.setParameterDefaults = function() {
+	this.setParameterFromString('hinge', 'Superior');
 	this.setParameterFromString('femtoLaser', 'DDL AMO iFS');
-	this.setParameterFromString('diameter', '10.0');
-	this.setParameterFromString('depth', '100');
-	this.setParameterFromString('spotSeparation', '0.5um');
-	this.setParameterFromString('lineSeparation', '0.5um');
-	this.setParameterFromString('energyLevel', '0.5uJ');
+	this.setParameterFromString('diameter', '8.5');
+	this.setParameterFromString('depth', '110');
+	this.setParameterFromString('angle', '90');
+	this.setParameterFromString('spotSeparation', '0.6um');
+	this.setParameterFromString('lineSeparation', '0.6um');
+	this.setParameterFromString('energyLevel', '0.75uJ');
 	this.setParameterFromString('OBLGrade', 'None');
 }
 
@@ -26470,10 +26484,20 @@ ED.LasikFlap.prototype.dependentParameterValues = function(_parameter, _value) {
 		case 'scaleX':
 			returnArray['diameter'] = _value * 10;
 			break;
+			
+		case 'rotation':
+			if (_value == 0) returnArray['hinge'] = 'Superior';
+			else returnArray['hinge'] = 'Nasal';
+			break;
 
 		case 'diameter':
 			returnArray['scaleX'] = parseFloat(_value)/10;
 			returnArray['scaleY'] = parseFloat(_value)/10;
+			break;
+			
+		case 'hinge':
+			if (_value == 'Superior') returnArray['rotation'] = 0;
+			else returnArray['rotation'] = (this.drawing.eye == ED.eye.Right)?(Math.PI/2):(3 * Math.PI/2);
 			break;
 	}
 
@@ -26580,8 +26604,6 @@ ED.LasikFlap.prototype.description = function() {
 	if (s < c && as < ac) quadrant = "superior";
 
 	returnString = "LASIK flap with " + quadrant + " hinge";
-
-	if(this.gradeDLK != 'None') returnString += ", DLK " + this.gradeDLK;
 
 	return returnString;
 }
