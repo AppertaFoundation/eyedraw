@@ -993,7 +993,8 @@ ED.Doodle.prototype.addControlBindings = function() {
 };
 
 /**
- * Show a validation msg for a param that has a bound field control.
+ * Show a validation msg for a param that has a bound field control, only if the
+ * associated form elements exist.
  * @param  {String} _parameter Parameter name
  * @param  {Boolean} _valid     Is the parameter value valid?
  */
@@ -1004,8 +1005,12 @@ ED.Doodle.prototype.showControlValidationMsg = function(_parameter, _valid) {
 	}
 
 	var elementId = this.parameterControlElementId(_parameter);
+
 	var label = document.querySelector('[for='+elementId+']');
+	if (!label) return;
+
 	var msg = label.querySelector('.validation-msg');
+	if (!msg) return;
 
 	if (_valid) {
 		if (msg) msg.parentNode.removeChild(msg);
