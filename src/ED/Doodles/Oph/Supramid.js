@@ -116,14 +116,22 @@ ED.Supramid.prototype.draw = function(_point) {
 	// Get context
 	var ctx = this.drawing.context;
 
-	// Get tube doodle
-	var doodle = this.drawing.lastDoodleOfClass("Tube");
-	if (doodle) {
-		this.rotation = doodle.rotation;
-	}
-
 	// Call draw method in superclass
 	ED.Supramid.superclass.draw.call(this, _point);
+	
+	// Get Tube or TubeExtender doodle (Latter takes preference)
+	var doodle = this.drawing.lastDoodleOfClass("TubeExtender");
+
+	// Watch condition when Tube extender is added after, since doodle can exist with empty bezierArray
+	if (doodle && typeof(doodle.bezierArray['sp']) != 'undefined') {
+		this.rotation = doodle.rotation;
+	}
+	else {
+		doodle = this.drawing.lastDoodleOfClass("Tube");
+		if (doodle) {
+			this.rotation = doodle.rotation;
+		}
+	}
 
 	// Calculate key points for supramid bezier
 	var startPoint = new ED.Point(this.apexX, this.apexY);
