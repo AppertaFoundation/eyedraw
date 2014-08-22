@@ -165,6 +165,7 @@ ED.trans['ScleralIncision'] = 'Drag to move around the sclera';
 ED.trans['SectorIridectomy'] = 'Drag to position<br/>Drag handles to adjust extent';
 ED.trans['Sclerostomy'] = 'Drag to rotate around centre<br/>Drag each handle to alter gauge<br/>Click suture button to toggle suture';
 ED.trans['SidePort'] = 'Drag to move';
+ED.trans['SMILE'] = 'Drag to handle to change size';
 ED.trans['SubretinalFluid'] = 'Drag to position<br/>Drag handles to change shape<br/>Drag to position<br/>Drag outer ring of top handles to rotate';
 ED.trans['SubretinalPFCL'] = 'Drag to position<br/>Drag handle to change size';
 ED.trans['Supramid'] = 'Drag handle to move conjunctival end of suture';

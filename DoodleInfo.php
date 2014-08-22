@@ -174,6 +174,7 @@ class DoodleInfo
 		"Shading" => "Shading",
 		"SidePort" => "Side port",
 		"Slider" => "Slider",
+		"SMILE" => "Small incision lenticule extraction",
 		"StarFold" => "Star fold",
 		"SubretinalFluid" => "Subretinal fluid",
 		"SubretinalPFCL" => "Subretinal PFCL",

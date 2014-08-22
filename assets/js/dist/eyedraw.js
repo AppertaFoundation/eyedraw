@@ -8440,6 +8440,7 @@ ED.trans['ScleralIncision'] = 'Drag to move around the sclera';
 ED.trans['SectorIridectomy'] = 'Drag to position<br/>Drag handles to adjust extent';
 ED.trans['Sclerostomy'] = 'Drag to rotate around centre<br/>Drag each handle to alter gauge<br/>Click suture button to toggle suture';
 ED.trans['SidePort'] = 'Drag to move';
+ED.trans['SMILE'] = 'Drag to handle to change size';
 ED.trans['SubretinalFluid'] = 'Drag to position<br/>Drag handles to change shape<br/>Drag to position<br/>Drag outer ring of top handles to rotate';
 ED.trans['SubretinalPFCL'] = 'Drag to position<br/>Drag handle to change size';
 ED.trans['Supramid'] = 'Drag handle to move conjunctival end of suture';
@@ -36085,7 +36086,7 @@ ED.SMILE = function(_drawing, _parameterJSON) {
 	this.className = "SMILE";
 
 	// Derived parameters
-	this.diameter = 6;
+	this.diameter = 8;
 	
 	// Other parameters
 	this.thickness = 15;
@@ -36131,14 +36132,14 @@ ED.SMILE.prototype.setPropertyDefaults = function() {
 	this.isUnique = true;
 
 	// Update component of validation array for simple parameters
-	this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.10, +1.00);
-	this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.10, +1.00);
+	this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.7, +0.9);
+	this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.7, +0.9);
 
 	// Derived parameters
 	this.parameterValidationArray['diameter'] = {
 		kind: 'derived',
 		type: 'float',
-		range: new ED.Range(1, 10),
+		range: new ED.Range(7, 9),
 		precision: 1,
 		animate: true
 	};
@@ -36156,7 +36157,7 @@ ED.SMILE.prototype.setPropertyDefaults = function() {
  * Sets default parameters
  */
 ED.SMILE.prototype.setParameterDefaults = function() {
-	this.setParameterFromString('diameter', '10.0');
+	this.setParameterFromString('diameter', '8.0');
 	this.setParameterFromString('thickness', '15');
 }
 
