@@ -103,6 +103,8 @@ class DoodleInfo
 		"Hypopyon" => "Hypopyon",
 		"IatrogenicBreak" => "IatrogenicBreak",
 		"ILMPeel" => "ILM peel",
+		"ICL" => "Implantable Collamer Lens",
+		"IOL" => "Intraocular lens",
 		"InjectionSite" => "Injection site",
 		"InnerLeafBreak" => "Inner leaf break",
 		"Iris" => "Iris",
