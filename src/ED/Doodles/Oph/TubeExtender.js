@@ -182,11 +182,10 @@ ED.TubeExtender.prototype.draw = function(_point) {
 	// Scaling factor
 	var s = 0.41666667;
 
-	// Vertical shift
-	var d = -660;
+	// Vertical shift (adjust to come up close to anterior edge of tube)
+	var d = -680;
 
 	// Plate
-	//ctx.rect(-160 * s, 200 * s + d, 320 * s, 200 * s);
 	this.roundRect(ctx, -160 * s, 200 * s + d, 320 * s, 200 * s, 40 * s);
 
 	// Set Attributes
@@ -209,7 +208,6 @@ ED.TubeExtender.prototype.draw = function(_point) {
    		ctx.lineTo(-50 * s, 400 * s + d);
    		ctx.quadraticCurveTo(-50 * s, 420 * s + d, -30 * s, 420 * s + d);
    		ctx.lineTo(0 * s, 420 * s + d);
-
    		ctx.lineTo(30 * s, 420 * s + d);
   		ctx.quadraticCurveTo(50 * s, 420 * s + d, 50 * s, 400 * s + d);
   		ctx.lineTo(50 * s, 340 * s + d);
@@ -217,25 +215,28 @@ ED.TubeExtender.prototype.draw = function(_point) {
   		ctx.lineTo(50 * s, 200 * s + d);
   		ctx.quadraticCurveTo(50 * s, 180 * s + d, 30 * s, 180 * s + d);
   		ctx.closePath();
-
 		ctx.stroke();
-
 
 		// Spots
 		this.drawCircle(ctx, -120 * s, 300 * s + d, 20 * s, ctx.fillStyle, 4, ctx.strokeStyle);
 		this.drawCircle(ctx, 120 * s, 300 * s + d, 20 * s, ctx.fillStyle, 4, ctx.strokeStyle);
 
-		// Bezier points for curve of TubeExtender in array to export to Supramid
+		// Bezier points for curve of tube in array to export to Supramid
 		this.bezierArray['sp'] = new ED.Point(0, 380 * s + d);
-		this.bezierArray['cp1'] = new ED.Point(0, 420 * s + d);
-		this.bezierArray['cp2'] = new ED.Point(this.apexX * 1.5, this.apexY + ((290 * s + d) - this.apexY) * 0.5);
+		this.bezierArray['cp1'] = new ED.Point(0, 460 * s + d);
 		this.bezierArray['ep'] = new ED.Point(this.apexX, this.apexY);
-
+	
+		// CP2 varies according to displacement from midline
+		var apexPoint = new ED.Point(this.apexX, this.apexY);
+		var angle = apexPoint.direction() < Math.PI?apexPoint.direction():(2 * Math.PI - apexPoint.direction());
+		this.bezierArray['cp2'] = apexPoint.pointAtRadiusAndClockwiseAngle(300 * (1 + 1.5 * angle), angle * 0.2);
+	
+		// Path of tube
 		ctx.beginPath();
 		ctx.moveTo(0, 290 * s + d);
-		ctx.lineTo(this.bezierArray['sp'].x, this.bezierArray['sp'].y);
- 		ctx.bezierCurveTo(this.bezierArray['cp1'].x, this.bezierArray['cp1'].y, this.bezierArray['cp2'].x, this.bezierArray['cp2'].y, this.bezierArray['ep'].x, this.bezierArray['ep'].y);
-
+		ctx.lineTo(this.bezierArray['sp'].x, this.bezierArray['sp'].y);		
+		ctx.bezierCurveTo(this.bezierArray['cp1'].x, this.bezierArray['cp1'].y, this.bezierArray['cp2'].x, this.bezierArray['cp2'].y, this.bezierArray['ep'].x, this.bezierArray['ep'].y);
+			
 		// Simulate tube with gray line and white narrower line
 		ctx.strokeStyle = "rgba(150,150,150,0.5)";
 		ctx.lineWidth = 20;
@@ -243,8 +244,6 @@ ED.TubeExtender.prototype.draw = function(_point) {
 		ctx.strokeStyle = "white";
 		ctx.lineWidth = 8;
 		ctx.stroke();
-
-
 	}
 
 	// Coordinates of handles (in canvas plane)
@@ -263,14 +262,7 @@ ED.TubeExtender.prototype.draw = function(_point) {
  * @returns {String} Description of doodle
  */
 ED.TubeExtender.prototype.description = function() {
-	var descArray = {
-		STQ: 'superotemporal',
-		SNQ: 'superonasal',
-		INQ: 'inferonasal',
-		ITQ: 'inferotemporal'
-	};
-
-	return "Tube extender in the " + descArray[this.platePosition] + " quadrant";
+	return "Tube extender present";
 }
 
 /**
@@ -285,18 +277,18 @@ ED.TubeExtender.prototype.description = function() {
  * @param {Number} radius The corner radius. Defaults to 5;
  */
 ED.TubeExtender.prototype.roundRect = function(ctx, x, y, width, height, radius) {
-  if (typeof radius === "undefined") {
-    radius = 5;
-  }
-  ctx.beginPath();
-  ctx.moveTo(x + radius, y);
-  ctx.lineTo(x + width - radius, y);
-  ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
-  ctx.lineTo(x + width, y + height - radius);
-  ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
-  ctx.lineTo(x + radius, y + height);
-  ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
-  ctx.lineTo(x, y + radius);
-  ctx.quadraticCurveTo(x, y, x + radius, y);
-  ctx.closePath();
+	if (typeof radius === "undefined") {
+	radius = 5;
+	}
+	ctx.beginPath();
+	ctx.moveTo(x + radius, y);
+	ctx.lineTo(x + width - radius, y);
+	ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+	ctx.lineTo(x + width, y + height - radius);
+	ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+	ctx.lineTo(x + radius, y + height);
+	ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+	ctx.lineTo(x, y + radius);
+	ctx.quadraticCurveTo(x, y, x + radius, y);
+	ctx.closePath();
 }

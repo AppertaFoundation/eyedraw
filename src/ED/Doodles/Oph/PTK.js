@@ -170,7 +170,8 @@ ED.PTK.prototype.draw = function(_point) {
 	ctx.closePath();
 
 	// Create transparent fill pattern
-	ctx.fillStyle = "rgba(155,255,255,0)";
+	//ctx.fillStyle = "rgba(155,255,255,0)";
+ctx.fillStyle = ctx.createPattern(this.drawing.imageArray['OedemaPattern'], 'repeat');
 
 	// Transparent stroke
 	ctx.lineWidth = 2;

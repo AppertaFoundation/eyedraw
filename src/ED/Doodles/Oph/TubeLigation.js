@@ -124,10 +124,17 @@ ED.TubeLigation.prototype.setParameterDefaults = function() {
 		}
 	}
 	
-	// If existing doodle, put in same meridian, but higher up
-	var doodle = this.drawing.lastDoodleOfClass(this.className);
-	if (doodle) {
-		this.move(doodle.originX * 1.02, doodle.originY * 1.02);
+	// If existing doodles, put in same meridian, but higher up
+	var number = this.drawing.numberOfDoodlesOfClass(this.className);
+	var doodle = this.drawing.firstDoodleOfClass(this.className);
+	
+	switch (number) {
+		case 1:
+			this.move(doodle.originX * 1.02, doodle.originY * 1.02);
+			break;
+		case 2:
+			this.move(doodle.originX * 0.5, doodle.originY * 0.5);
+			break;
 	}
 }
 
@@ -180,10 +187,17 @@ ED.TubeLigation.prototype.draw = function(_point) {
 }
 
 /**
- * Returns a string containing a text description of the doodle
+ * Returns a String which, if not empty, determines the root descriptions of multiple instances of the doodle
  *
- * @returns {String} Description of doodle
+ * @returns {String} Group description
  */
-ED.TubeLigation.prototype.description = function() {
-	return "TubeLigation suture";
+ED.TubeLigation.prototype.groupDescription = function() {
+	var returnString = "";
+	
+	var number = this.drawing.numberOfDoodlesOfClass(this.className);
+	returnString = number + " ligation suture";
+	
+	if (number > 1) returnString += "s";
+	
+	return returnString;
 }

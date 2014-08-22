@@ -39,10 +39,6 @@
             // Runs on page load
             function init()
             {
-            	var d = new Date();
-            	//debugger;
-
-            	//console.log(d.toLocaleTimeString());
                 // Get reference to the drawingEdit canvas
                 var canvasEdit = document.getElementById('canvasEdit');
 
@@ -57,18 +53,8 @@
 
                 // Set focus to canvasEdit element
                 canvasEdit.focus();
-
-//                for (var propertyName in ED)
-//                {
-//                    var doodle = ED[propertyName];
-//
-//                    if (doodle.superclass == ED.Doodle.prototype)
-//                    {
-//                        var dood = new ED[propertyName];
-//                        console.log(dood.className);
-//                    }
-//                }
-            }
+            } 
+  				
 
             // Controller class
             function eyeDrawController(_drawing)
@@ -98,10 +84,14 @@
 							this.drawing.globalScaleFactor = this.gsf;
 
 							//this.drawing.addDoodle('AxialLengthGraph', {'axialLength':'25'});
-							//this.drawing.addDoodle('AntSeg');
+							this.drawing.addDoodle('AntSeg', {'pupilSize':'Small'});
 							//this.drawing.addDoodle('LasikFlap');
-							//this.drawing.addDoodle('PTK')
-							this.drawing.addDoodle('LimbalRelaxingIncision');
+							this.drawing.addDoodle('PTK')
+							//this.drawing.addDoodle('LimbalRelaxingIncision');
+							//this.drawing.addDoodle('TrabyFlap');
+							//this.drawing.addDoodle('Tube');
+							//this.drawing.addDoodle('TubeLigation');
+							//this.drawing.addDoodle('Patch');
 							//this.drawing.addDoodle('TrabySuture');
 							//this.drawing.addDoodle('TubeExtender');
 							//this.drawing.addDoodle('Supramid');
@@ -396,9 +386,10 @@
 
             <button id="LensRPS" class="imgbutton" title="Lens" onclick="drawingEdit.addDoodle('PI'); return false;" ><img src="../../assets/img/old/PI.gif" /></button>
  -->
-            <button id="LensRPS" class="imgbutton" title="Freehand" onclick="drawingEdit.addDoodle('TrabySuture'); return false;" ><img src="../../assets/img/old/Freehand.gif" /></button>
-            <button id="LensRPS" class="imgbutton" title="Perforation" onclick="drawingEdit.addDoodle('Supramid'); return false;" ><img src="../../assets/img/old/Supramid.gif" /></button>
-            <button id="LensRPS" class="imgbutton" title="TubeLigation" onclick="drawingEdit.addDoodle('Patch'); return false;" ><img src="../../assets/img/old/Patch.gif" /></button>
+            <button id="LensRPS" class="ed-button" title="IOL" onclick="drawingEdit.addDoodle('IOL'); return false;" ><img src="../../assets/img/old/IOL.gif" /></button>
+            <button id="LensRPS" class="ed-button" title="TubeLigation" onclick="drawingEdit.addDoodle('TubeLigation'); return false;" ><img src="../../assets/img/old/TubeLigation.gif" /></button>
+            <button id="LensRPS" class="ed-button" title="Supramid" onclick="drawingEdit.addDoodle('Supramid'); return false;" ><img src="../../assets/img/old/Supramid.gif" /></button>
+            <button id="LensRPS" class="ed-button" title="TubeExtender" onclick="drawingEdit.addDoodle('TubeExtender'); return false;" ><img src="../../assets/img/old/TubeExtender.gif" /></button>
             <br />
         </div>
 
@@ -410,6 +401,7 @@
 			<div id="canvasEdit_controls" class="ed-doodle-popup" style="background-color: #DAE6F1; float:left; position:absolute; top:20px; left:310px;">
 			</div>
 		</div>
+
 
         <button class="actbutton" onclick="console.log(drawingEdit.report()); return false;">Report</button>
 

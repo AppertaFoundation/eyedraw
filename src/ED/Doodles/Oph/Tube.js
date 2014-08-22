@@ -35,6 +35,9 @@ ED.Tube = function(_drawing, _parameterJSON) {
 	// Other Parameters
 	this.bezierArray = new Array();
 
+	// Private parameters
+	this.tubeExtender = false;
+
 	// Saved parameters
 	this.savedParameterArray = ['rotation', 'apexY', 'type'];
 	
@@ -176,6 +179,9 @@ ED.Tube.prototype.draw = function(_point) {
 
 	// Call draw method in superclass
 	ED.Tube.superclass.draw.call(this, _point);
+	
+	// Determine if a TubeExtender is present
+	this.tubeExtender = this.drawing.hasDoodleOfClass("TubeExtender");
 
 	// Boundary path
 	ctx.beginPath();
@@ -326,7 +332,6 @@ ED.Tube.prototype.draw = function(_point) {
 				ctx.lineTo(-40 * s, 0 * s + d);
 				ctx.lineTo(-200 * s, 0 * s + d);
 				ctx.closePath();
-
 				ctx.fillStyle = "rgba(250,250,250,0.7)";
 				ctx.fill();
 
@@ -453,16 +458,28 @@ ED.Tube.prototype.draw = function(_point) {
 				break;
 		}
 
-		// Bezier points for curve of tube in array to export to Supramid
-		this.bezierArray['sp'] = new ED.Point(0, 380 * s + d);
-		this.bezierArray['cp1'] = new ED.Point(0, 420 * s + d);
-		this.bezierArray['cp2'] = new ED.Point(this.apexX * 1.5, this.apexY + ((290 * s + d) - this.apexY) * 0.5);
-		this.bezierArray['ep'] = new ED.Point(this.apexX, this.apexY);
+		if (!this.tubeExtender) {
+			// Bezier points for curve of tube in array to export to Supramid
+			this.bezierArray['sp'] = new ED.Point(0, 380 * s + d);
+			this.bezierArray['cp1'] = new ED.Point(0, 460 * s + d);
+			this.bezierArray['ep'] = new ED.Point(this.apexX, this.apexY);
 		
-		ctx.beginPath();
-		ctx.moveTo(0, 290 * s + d);
-		ctx.lineTo(this.bezierArray['sp'].x, this.bezierArray['sp'].y);		
- 		ctx.bezierCurveTo(this.bezierArray['cp1'].x, this.bezierArray['cp1'].y, this.bezierArray['cp2'].x, this.bezierArray['cp2'].y, this.bezierArray['ep'].x, this.bezierArray['ep'].y);
+			// CP2 varies according to displacement from midline
+			var apexPoint = new ED.Point(this.apexX, this.apexY);
+			var angle = apexPoint.direction() < Math.PI?apexPoint.direction():(2 * Math.PI - apexPoint.direction());
+			this.bezierArray['cp2'] = apexPoint.pointAtRadiusAndClockwiseAngle(300 * (1 + 1.5 * angle), angle * 0.2);
+		
+			// Path of tube
+			ctx.beginPath();
+			ctx.moveTo(0, 290 * s + d);
+			ctx.lineTo(this.bezierArray['sp'].x, this.bezierArray['sp'].y);		
+			ctx.bezierCurveTo(this.bezierArray['cp1'].x, this.bezierArray['cp1'].y, this.bezierArray['cp2'].x, this.bezierArray['cp2'].y, this.bezierArray['ep'].x, this.bezierArray['ep'].y);
+		}
+		else {
+			ctx.beginPath();
+			ctx.moveTo(0, 290 * s + d);
+			ctx.lineTo(0, 480 * s + d);
+		}
 		
 		// Simulate tube with gray line and white narrower line
 		ctx.strokeStyle = "rgba(150,150,150,0.5)";
@@ -473,11 +490,13 @@ ED.Tube.prototype.draw = function(_point) {
 		ctx.stroke();
 	}
 
-	// Coordinates of handles (in canvas plane)
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
+	if (!this.tubeExtender) {
+		// Coordinates of handles (in canvas plane)
+		this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
-	// Draw handles if selected
-	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+		// Draw handles if selected
+		if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+	}
 	
 	// Return value indicating successful hittest
 	return this.isClicked;
