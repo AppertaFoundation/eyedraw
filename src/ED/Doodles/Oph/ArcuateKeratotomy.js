@@ -152,13 +152,6 @@ ED.ArcuateKeratotomy.prototype.setParameterDefaults = function() {
 	if (doodle) {
 		this.rotation = doodle.rotation + Math.PI/2;
 		this.arc = doodle.arc;
-	} else {
-		// LRIs are usually temporal
-		if (this.drawing.eye == ED.eye.Right) {
-			this.rotation = -Math.PI / 2;
-		} else {
-			this.rotation = Math.PI / 2;
-		}
 	}
 }
 
