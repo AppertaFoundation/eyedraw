@@ -51,6 +51,7 @@ ED.trans['AngleRecession'] = 'Drag to move around angle<br/>Drag handles to chan
 ED.trans['AntSeg'] = 'Drag the handle to resize the pupil<br/><br/>The iris is semi-transparent so that IOLs, and<br/>other structures can be seen behind it';
 ED.trans['AntSegCrossSection'] = '';
 ED.trans['AntSynech'] = 'Drag to move around angle<br/>Drag handles to change extent';
+ED.trans['ArcuateKeratotomy'] = 'Drag to rotate<br/>Drag end handle to increase extent<br/>Drag middle handle to change radius';
 ED.trans['ArcuateScotoma'] = 'Drag handle to change size';
 ED.trans['BiopsySite'] = 'Drag to position';
 ED.trans['Bleb'] = 'Drag to move around the limbus<br/>Drag handle to change size';

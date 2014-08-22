@@ -4331,6 +4331,13 @@ ED.Doodle.prototype.parameterElement = function(_parameter) {
     		element.type = 'text';
     		element.setAttribute('id', this.parameterControlElementId(_parameter));
     		break;
+    		
+		case 'mod':
+			// Create a text input element
+			element = document.createElement('input');
+    		element.type = 'text';
+    		element.setAttribute('id', this.parameterControlElementId(_parameter));
+    		break;
     		    		
 		case 'freeText':
 			// Create a text input element
@@ -8326,6 +8333,7 @@ ED.trans['AngleRecession'] = 'Drag to move around angle<br/>Drag handles to chan
 ED.trans['AntSeg'] = 'Drag the handle to resize the pupil<br/><br/>The iris is semi-transparent so that IOLs, and<br/>other structures can be seen behind it';
 ED.trans['AntSegCrossSection'] = '';
 ED.trans['AntSynech'] = 'Drag to move around angle<br/>Drag handles to change extent';
+ED.trans['ArcuateKeratotomy'] = 'Drag to rotate<br/>Drag end handle to increase extent<br/>Drag middle handle to change radius';
 ED.trans['ArcuateScotoma'] = 'Drag handle to change size';
 ED.trans['BiopsySite'] = 'Drag to position';
 ED.trans['Bleb'] = 'Drag to move around the limbus<br/>Drag handle to change size';
@@ -15033,6 +15041,295 @@ ED.AnteriorCapsulotomy.prototype.draw = function(_point) {
 	// Return value indicating successful hittest
 	return this.isClicked;
 }
+
+/**
+ * OpenEyes
+ *
+ * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
+ * (C) OpenEyes Foundation, 2011-2013
+ * This file is part of OpenEyes.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package OpenEyes
+ * @link http://www.openeyes.org.uk
+ * @author OpenEyes <info@openeyes.org.uk>
+ * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
+ * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ */
+
+/**
+ * ArcuateKeratotomy
+ *
+ * @class ArcuateKeratotomy
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Object} _parameterJSON
+ */
+ED.ArcuateKeratotomy = function(_drawing, _parameterJSON) {
+	// Set classname
+	this.className = "ArcuateKeratotomy";
+
+	// Derived parameters
+	this.diameter = 8;
+	this.arcLength = 0;
+	this.axis = 0;
+	
+	// Other parameters
+	this.anteriorDepth = 0;
+	this.posteriorDepth = 0;
+	this.angle = 0;
+	
+	// Saved parameters
+	this.savedParameterArray = ['arc', 'rotation', 'apexY', 'diameter', 'arcLength', 'axis', 'anteriorDepth', 'posteriorDepth', 'angle'];
+
+	// Parameters in doodle control bar (parameter name: parameter label)
+	this.controlParameterArray = {
+		'diameter':'Diameter',
+		'arcLength':'Arc length',
+		'axis':'Axis',
+		'anteriorDepth':'Anterior depth',
+		'posteriorDepth':'Posterior depth',
+		'angle':'Cut angle'
+	};
+	
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _parameterJSON);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.ArcuateKeratotomy.prototype = new ED.Doodle;
+ED.ArcuateKeratotomy.prototype.constructor = ED.ArcuateKeratotomy;
+ED.ArcuateKeratotomy.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.ArcuateKeratotomy.prototype.setHandles = function() {
+	this.handleArray[3] = new ED.Doodle.Handle(null, true, ED.Mode.Arc, false);
+	this.handleArray[4] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
+}
+
+/**
+ * Sets default dragging attributes
+ */
+ED.ArcuateKeratotomy.prototype.setPropertyDefaults = function() {
+	this.isScaleable = false;
+	this.isMoveable = false;
+	this.isRotatable = true;
+	this.isArcSymmetrical = true;
+
+	// Update component of validation array for simple parameters
+	this.parameterValidationArray['arc']['range'].setMinAndMax(10 * Math.PI / 180, 2 * Math.PI / 3);
+	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
+	this.parameterValidationArray['apexY']['range'].setMinAndMax(-320, -96);
+	
+	// Derived parameters
+	this.parameterValidationArray['diameter'] = {
+		kind: 'derived',
+		type: 'float',
+		range: new ED.Range(3, 10),
+		precision: 1,
+		animate: true
+	};
+	this.parameterValidationArray['arcLength'] = {
+		kind: 'derived',
+		type: 'int',
+		range: new ED.Range(10, 120),
+		precision: 1,
+		animate: true
+	};
+	this.parameterValidationArray['axis'] = {
+		kind: 'derived',
+		type: 'mod',
+		range: new ED.Range(0, 360),
+		clock: 'bottom',
+		animate: true
+	};
+	this.parameterValidationArray['diameter'] = {
+		kind: 'derived',
+		type: 'float',
+		range: new ED.Range(3, 10),
+		precision: 1,
+		animate: true
+	};
+	this.parameterValidationArray['anteriorDepth'] = {
+		kind: 'other',
+		type: 'float',
+		range: new ED.Range(-50, 100),
+		precision: 0,
+		animate: false
+	};
+	this.parameterValidationArray['posteriorDepth'] = {
+		kind: 'other',
+		type: 'float',
+		range: new ED.Range(300, 800),
+		precision: 0,
+		animate: false
+	};
+	this.parameterValidationArray['angle'] = {
+		kind: 'other',
+		type: 'int',
+		range: new ED.Range(30, 150),
+		precision: 1,
+		animate: false
+	};
+}
+
+/**
+ * Sets default parameters
+ */
+ED.ArcuateKeratotomy.prototype.setParameterDefaults = function() {
+	this.setParameterFromString('diameter', '8.0');
+	this.setParameterFromString('arcLength', '60');
+	this.setParameterFromString('axis', '90');
+	this.setParameterFromString('anteriorDepth', '50');
+	this.setParameterFromString('posteriorDepth', '100');
+	this.setParameterFromString('angle', '90');
+
+	// Make it 90 degrees to last one of same class
+	var doodle = this.drawing.lastDoodleOfClass(this.className);
+	if (doodle) {
+		this.rotation = doodle.rotation + Math.PI/2;
+		this.arc = doodle.arc;
+	} else {
+		// LRIs are usually temporal
+		if (this.drawing.eye == ED.eye.Right) {
+			this.rotation = -Math.PI / 2;
+		} else {
+			this.rotation = Math.PI / 2;
+		}
+	}
+}
+
+/**
+ * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
+ * The returned parameters are animated if their 'animate' property is set to true
+ *
+ * @param {String} _parameter Name of parameter that has changed
+ * @value {Undefined} _value Value of parameter to calculate
+ * @returns {Array} Associative array of values of dependent parameters
+ */
+ED.ArcuateKeratotomy.prototype.dependentParameterValues = function(_parameter, _value) {
+	var returnArray = new Array();
+
+	switch (_parameter) {
+
+		case 'apexY':
+			returnArray['diameter'] = -10 * _value/320;
+			break;
+
+		case 'diameter':
+			returnArray['apexY'] = -320 * parseFloat(_value)/10;
+			break;
+			
+		case 'arc':
+			returnArray['arcLength'] = 180 * _value/Math.PI;
+			break;
+
+		case 'arcLength':
+			returnArray['arc'] = parseInt(_value) * Math.PI / 180;
+			break;
+			
+		case 'rotation':
+			var angle = (((Math.PI * 2 - _value + Math.PI / 2) * 180 / Math.PI) + 360) % 360;
+			if (angle == 360) angle = 0;
+			returnArray['axis'] = angle;
+			break;
+
+		case 'axis':
+			returnArray['rotation'] = (((90 - _value) + 360) % 360) * Math.PI / 180;
+			break;			
+	}
+
+	return returnArray;
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.ArcuateKeratotomy.prototype.draw = function(_point) {
+	// Get context
+	var ctx = this.drawing.context;
+
+	// Call draw method in superclass
+	ED.ArcuateKeratotomy.superclass.draw.call(this, _point);
+
+	// Radius
+	var r = -this.apexY;
+	var d = 12;
+	var ro = r + d;
+	var ri = r - d;
+
+	// Boundary path
+	ctx.beginPath();
+
+	// Half angle of arc
+	var theta = this.arc / 2;
+	var offsetAngle = -Math.PI / 2;
+
+	// Arc across
+	ctx.arc(0, 0, ro, offsetAngle + theta, offsetAngle - theta, true);
+
+	// Arc back to mirror image point on the other side
+	ctx.arc(0, 0, ri, offsetAngle - theta, offsetAngle + theta, false);
+
+	// Close path
+	ctx.closePath();
+
+	// Colour of fill
+	ctx.fillStyle = "rgba(100,100,200,0.5)";
+
+	// Set line attributes
+	ctx.lineWidth = 4;
+
+	// Colour of outer line is dark gray
+	ctx.strokeStyle = "rgba(120,120,120,0.75)";
+
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+
+	// Coordinates of handles (in canvas plane)
+	var point = new ED.Point(0, 0);
+	point.setWithPolars(r, theta);
+	this.handleArray[3].location = this.transform.transformPoint(point);
+	var point = new ED.Point(this.apexX, this.apexY);
+	this.handleArray[4].location = this.transform.transformPoint(point);
+
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * Returns a String which, if not empty, determines the root descriptions of multiple instances of the doodle
+ *
+ * @returns {String} Group description
+ */
+ED.ArcuateKeratotomy.prototype.groupDescription = function() {
+	return "Arcuate Keratotomy";
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.ArcuateKeratotomy.prototype.description = function() {
+	var returnString = "";
+
+	return returnString;
+}
+
+
 
 /**
  * OpenEyes

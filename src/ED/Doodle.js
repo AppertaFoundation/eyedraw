@@ -1143,6 +1143,13 @@ ED.Doodle.prototype.parameterElement = function(_parameter) {
     		element.type = 'text';
     		element.setAttribute('id', this.parameterControlElementId(_parameter));
     		break;
+    		
+		case 'mod':
+			// Create a text input element
+			element = document.createElement('input');
+    		element.type = 'text';
+    		element.setAttribute('id', this.parameterControlElementId(_parameter));
+    		break;
     		    		
 		case 'freeText':
 			// Create a text input element

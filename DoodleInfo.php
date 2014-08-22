@@ -45,6 +45,7 @@ class DoodleInfo
 		"AntSeg" => "Anterior segment",
 		"AntSynech" => "Anterior synechiae",
 		"APattern" => "A pattern",
+		"ArcuateKeratotomy" => "Arcuate keratotomy",
 		"ArcuateScotoma" => "Arcuate scotoma",
 		"Arrow" => "Arrow",
 		"BiopsySite" => "Biopsy site",
