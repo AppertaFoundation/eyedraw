@@ -172,6 +172,7 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 	this.imageArray['OedemaPattern'] = new Image();
 	this.imageArray['OedemaPatternBullous'] = new Image();
 	this.imageArray['BrownSpotPattern'] = new Image();
+	this.imageArray['TranslucentPattern'] = new Image();
 
 	// Set transform to map from doodle to canvas plane
 	this.transform.translate(this.canvas.width / 2, this.canvas.height / 2);

@@ -150,6 +150,7 @@ class DoodleInfo
 		"PreRetinalHaemorrhage" => "Pre-retinal haemorrhage",
 		"PRP" => "Panretinal photocoagulation",
 		"PRPPostPole" => "Panretinal photocoagulation (posterior pole)",
+		"PTK" => "Phototherapeutic keratectomy",
 		"Pupil" => "Pupil",
 		"RadialSponge" => "Radial sponge",
 		"RetinalArteryOcclusionPostPole" => "Retinal artery occlusion",

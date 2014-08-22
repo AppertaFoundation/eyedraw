@@ -145,6 +145,7 @@ ED.trans['PostPole'] = 'The disc cup can be edited by clicking on the disc, and 
 ED.trans['PostSubcapCataract'] = 'Drag handle to change size';
 ED.trans['PreRetinalHaemorrhage'] = 'Drag to position<br/>Drag handles to change shape and size';
 ED.trans['PRPPostPole'] = '';
+ED.trans['PTK'] = 'Drag handle to change size';
 ED.trans['RadialSponge'] = 'Drag to change position';
 ED.trans['RetinalArteryOcclusionPostPole'] = 'Drag to position<br/>Drag handles to change extent<br/>Drag central handle to alter macular involvement';
 ED.trans['RetinalTouch'] = 'Drag to change position';

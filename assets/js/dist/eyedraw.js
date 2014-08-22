@@ -432,6 +432,7 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 	this.imageArray['OedemaPattern'] = new Image();
 	this.imageArray['OedemaPatternBullous'] = new Image();
 	this.imageArray['BrownSpotPattern'] = new Image();
+	this.imageArray['TranslucentPattern'] = new Image();
 
 	// Set transform to map from doodle to canvas plane
 	this.transform.translate(this.canvas.width / 2, this.canvas.height / 2);
@@ -8419,6 +8420,7 @@ ED.trans['PostPole'] = 'The disc cup can be edited by clicking on the disc, and 
 ED.trans['PostSubcapCataract'] = 'Drag handle to change size';
 ED.trans['PreRetinalHaemorrhage'] = 'Drag to position<br/>Drag handles to change shape and size';
 ED.trans['PRPPostPole'] = '';
+ED.trans['PTK'] = 'Drag handle to change size';
 ED.trans['RadialSponge'] = 'Drag to change position';
 ED.trans['RetinalArteryOcclusionPostPole'] = 'Drag to position<br/>Drag handles to change extent<br/>Drag central handle to alter macular involvement';
 ED.trans['RetinalTouch'] = 'Drag to change position';
@@ -30479,7 +30481,7 @@ ED.PTK = function(_drawing, _parameterJSON) {
 	this.className = "PTK";
 
 	// Derived parameters
-	this.diameter = 6;
+	this.diameter = 8;
 	
 	// Other parameters
 	this.depth = 80;
@@ -30488,8 +30490,8 @@ ED.PTK = function(_drawing, _parameterJSON) {
 
 	// Saved parameters
 	this.savedParameterArray = [
-		'scaleX', 
-		'scaleY', 
+		'apexX', 
+		'apexY', 
 		'diameter', 
 		'depth',
 		'transepithelialTreatment',
@@ -30519,7 +30521,7 @@ ED.PTK.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.PTK.prototype.setHandles = function() {
-	this.handleArray[2] = new ED.Doodle.Handle(null, true, ED.Mode.Scale, false);
+	this.handleArray[4] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
 }
 
 /**
@@ -30531,8 +30533,8 @@ ED.PTK.prototype.setPropertyDefaults = function() {
 	this.isUnique = true;
 
 	// Update component of validation array for simple parameters
-	this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.10, +1.00);
-	this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.10, +1.00);
+	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
+	this.parameterValidationArray['apexY']['range'].setMinAndMax(-320, -32);
 
 	// Derived parameters
 	this.parameterValidationArray['diameter'] = {
@@ -30566,7 +30568,8 @@ ED.PTK.prototype.setPropertyDefaults = function() {
  * Sets default parameters
  */
 ED.PTK.prototype.setParameterDefaults = function() {
-	this.setParameterFromString('diameter', '10.0');
+	this.rotation = Math.PI/4;
+	this.setParameterFromString('diameter', '8.0');
 	this.setParameterFromString('depth', '100');
 }
 
@@ -30582,13 +30585,13 @@ ED.PTK.prototype.dependentParameterValues = function(_parameter, _value) {
 	var returnArray = new Array();
 
 	switch (_parameter) {
-		case 'scaleX':
-			returnArray['diameter'] = _value * 10;
+
+		case 'apexY':
+			returnArray['diameter'] = -10 * _value/320;
 			break;
 
 		case 'diameter':
-			returnArray['scaleX'] = parseFloat(_value)/10;
-			returnArray['scaleY'] = parseFloat(_value)/10;
+			returnArray['apexY'] = -320 * parseFloat(_value)/10;
 			break;
 	}
 
@@ -30607,21 +30610,17 @@ ED.PTK.prototype.draw = function(_point) {
 	// Call draw method in superclass
 	ED.PTK.superclass.draw.call(this, _point);
 
-	// PTK
-	var r = 320;
-
 	// Boundary path
 	ctx.beginPath();
 
 	// Do an arc
-	ctx.arc(0, 0, r, 0, Math.PI * 2, true);
+	ctx.arc(0, 0, -this.apexY, 0, Math.PI * 2, true);
 
 	// Close path to produce straight line
 	ctx.closePath();
 
 	// Create transparent fill pattern
-	//ctx.fillStyle = "rgba(155,255,255,0)";
-ctx.fillStyle = ctx.createPattern(this.drawing.imageArray['OedemaPattern'], 'repeat');
+	ctx.fillStyle = ctx.createPattern(this.drawing.imageArray['TranslucentPattern'], 'repeat');
 
 	// Transparent stroke
 	ctx.lineWidth = 2;
@@ -30631,9 +30630,8 @@ ctx.fillStyle = ctx.createPattern(this.drawing.imageArray['OedemaPattern'], 'rep
 	this.drawBoundary(_point);
 
 	// Coordinates of handles (in canvas plane)
-	var point = new ED.Point(0, 0)
-	point.setWithPolars(r, Math.PI/4);
-	this.handleArray[2].location = this.transform.transformPoint(point);
+	var point = new ED.Point(this.apexX, this.apexY);
+	this.handleArray[4].location = this.transform.transformPoint(point);
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
