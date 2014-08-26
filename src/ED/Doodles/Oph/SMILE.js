@@ -33,6 +33,9 @@ ED.SMILE = function(_drawing, _parameterJSON) {
 	
 	// Other parameters
 	this.thickness = 15;
+	this.spotSeparation = "";
+	this.lineSeparation = "";
+	this.energyLevel = "";
 
 	// Saved parameters
 	this.savedParameterArray = [
@@ -40,12 +43,18 @@ ED.SMILE = function(_drawing, _parameterJSON) {
 		'scaleY', 
 		'diameter', 
 		'thickness',
+		'spotSeparation', 
+		'lineSeparation',
+		'energyLevel',
 	];
 
 	// Parameters in doodle control bar (parameter name: parameter label)
 	this.controlParameterArray = {
-		'diameter':'Diameter', 
-		'thickness':'Lenticule bed thickness'
+		'diameter':'lenticule diameter (mm)', 
+		'thickness':'Lenticule bed thickness (um)', 
+		'spotSeparation':'Spot separation',
+		'lineSeparation':'Line separation',
+		'energyLevel':'Energy level',
 	};
 
 	// Call superclass constructor
@@ -94,6 +103,24 @@ ED.SMILE.prototype.setPropertyDefaults = function() {
 		range: new ED.Range(10, 30),
 		animate: false
 	};
+	this.parameterValidationArray['spotSeparation'] = {
+		kind: 'other',
+		type: 'string',
+		list: ['0.5um', '0.6um', '0.7um', '0.8um', '0.9um', '1.0um'],
+		animate: false
+	};
+	this.parameterValidationArray['lineSeparation'] = {
+		kind: 'other',
+		type: 'string',
+		list: ['0.5um', '0.6um', '0.7um', '0.8um', '0.9um', '1.0um'],
+		animate: false
+	};
+	this.parameterValidationArray['energyLevel'] = {
+		kind: 'other',
+		type: 'string',
+		list: ['0.50uJ', '0.55uJ', '0.60uJ', '0.65uJ', '0.70uJ', '0.75uJ', '0.80uJ', '0.85uJ', '0.90uJ', '0.95uJ', '1.00uJ'],
+		animate: false
+	};
 }
 
 /**
@@ -102,6 +129,9 @@ ED.SMILE.prototype.setPropertyDefaults = function() {
 ED.SMILE.prototype.setParameterDefaults = function() {
 	this.setParameterFromString('diameter', '8.0');
 	this.setParameterFromString('thickness', '15');
+	this.setParameterFromString('spotSeparation', '0.6um');
+	this.setParameterFromString('lineSeparation', '0.6um');
+	this.setParameterFromString('energyLevel', '0.75uJ');
 }
 
 /**
