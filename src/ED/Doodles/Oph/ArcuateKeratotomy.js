@@ -43,12 +43,12 @@ ED.ArcuateKeratotomy = function(_drawing, _parameterJSON) {
 
 	// Parameters in doodle control bar (parameter name: parameter label)
 	this.controlParameterArray = {
-		'diameter':'Diameter',
-		'arcLength':'Arc length',
-		'axis':'Axis',
-		'anteriorDepth':'Anterior depth',
-		'posteriorDepth':'Posterior depth',
-		'angle':'Cut angle'
+		'diameter':'Diameter (mm)',
+		'arcLength':'Arc length (deg)',
+		'axis':'Axis (deg)',
+		'anteriorDepth':'Anterior depth (um)',
+		'posteriorDepth':'Posterior depth (um)',
+		'angle':'Cut angle (deg)'
 	};
 	
 	// Call superclass constructor
