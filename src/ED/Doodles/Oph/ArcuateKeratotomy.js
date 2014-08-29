@@ -37,9 +37,25 @@ ED.ArcuateKeratotomy = function(_drawing, _parameterJSON) {
 	this.anteriorDepth = 0;
 	this.posteriorDepth = 0;
 	this.angle = 0;
+	this.spotSeparation = "";
+	this.lineSeparation = "";
+	this.energyLevel = "";
 	
 	// Saved parameters
-	this.savedParameterArray = ['arc', 'rotation', 'apexY', 'diameter', 'arcLength', 'axis', 'anteriorDepth', 'posteriorDepth', 'angle'];
+	this.savedParameterArray = [
+		'arc', 
+		'rotation', 
+		'apexY', 
+		'diameter', 
+		'arcLength', 
+		'axis', 
+		'anteriorDepth', 
+		'posteriorDepth', 
+		'angle', 
+		'spotSeparation', 
+		'lineSeparation',
+		'energyLevel'
+		];
 
 	// Parameters in doodle control bar (parameter name: parameter label)
 	this.controlParameterArray = {
@@ -48,7 +64,10 @@ ED.ArcuateKeratotomy = function(_drawing, _parameterJSON) {
 		'axis':'Axis (deg)',
 		'anteriorDepth':'Anterior depth (um)',
 		'posteriorDepth':'Posterior depth (um)',
-		'angle':'Cut angle (deg)'
+		'angle':'Cut angle (deg)', 
+		'spotSeparation':'Spot separation',
+		'lineSeparation':'Line separation',
+		'energyLevel':'Energy level'
 	};
 	
 	// Call superclass constructor
@@ -134,18 +153,39 @@ ED.ArcuateKeratotomy.prototype.setPropertyDefaults = function() {
 		precision: 1,
 		animate: false
 	};
+	this.parameterValidationArray['spotSeparation'] = {
+		kind: 'other',
+		type: 'string',
+		list: ['0.5um', '0.6um', '0.7um', '0.8um', '0.9um', '1.0um'],
+		animate: false
+	};
+	this.parameterValidationArray['lineSeparation'] = {
+		kind: 'other',
+		type: 'string',
+		list: ['0.5um', '0.6um', '0.7um', '0.8um', '0.9um', '1.0um'],
+		animate: false
+	};
+	this.parameterValidationArray['energyLevel'] = {
+		kind: 'other',
+		type: 'string',
+		list: ['0.50uJ', '0.55uJ', '0.60uJ', '0.65uJ', '0.70uJ', '0.75uJ', '0.80uJ', '0.85uJ', '0.90uJ', '0.95uJ', '1.00uJ'],
+		animate: false
+	};
 }
 
 /**
  * Sets default parameters
  */
 ED.ArcuateKeratotomy.prototype.setParameterDefaults = function() {
-	this.setParameterFromString('diameter', '8.0');
+	this.setParameterFromString('diameter', '6.0');
 	this.setParameterFromString('arcLength', '60');
 	this.setParameterFromString('axis', '90');
-	this.setParameterFromString('anteriorDepth', '50');
-	this.setParameterFromString('posteriorDepth', '100');
+	this.setParameterFromString('anteriorDepth', '70');
+	this.setParameterFromString('posteriorDepth', '600');
 	this.setParameterFromString('angle', '90');
+	this.setParameterFromString('spotSeparation', '0.6um');
+	this.setParameterFromString('lineSeparation', '0.6um');
+	this.setParameterFromString('energyLevel', '0.75uJ');
 
 	// Make it 90 degrees to last one of same class
 	var doodle = this.drawing.lastDoodleOfClass(this.className);

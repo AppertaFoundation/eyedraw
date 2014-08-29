@@ -15083,9 +15083,25 @@ ED.ArcuateKeratotomy = function(_drawing, _parameterJSON) {
 	this.anteriorDepth = 0;
 	this.posteriorDepth = 0;
 	this.angle = 0;
+	this.spotSeparation = "";
+	this.lineSeparation = "";
+	this.energyLevel = "";
 	
 	// Saved parameters
-	this.savedParameterArray = ['arc', 'rotation', 'apexY', 'diameter', 'arcLength', 'axis', 'anteriorDepth', 'posteriorDepth', 'angle'];
+	this.savedParameterArray = [
+		'arc', 
+		'rotation', 
+		'apexY', 
+		'diameter', 
+		'arcLength', 
+		'axis', 
+		'anteriorDepth', 
+		'posteriorDepth', 
+		'angle', 
+		'spotSeparation', 
+		'lineSeparation',
+		'energyLevel'
+		];
 
 	// Parameters in doodle control bar (parameter name: parameter label)
 	this.controlParameterArray = {
@@ -15094,7 +15110,10 @@ ED.ArcuateKeratotomy = function(_drawing, _parameterJSON) {
 		'axis':'Axis (deg)',
 		'anteriorDepth':'Anterior depth (um)',
 		'posteriorDepth':'Posterior depth (um)',
-		'angle':'Cut angle (deg)'
+		'angle':'Cut angle (deg)', 
+		'spotSeparation':'Spot separation',
+		'lineSeparation':'Line separation',
+		'energyLevel':'Energy level'
 	};
 	
 	// Call superclass constructor
@@ -15180,18 +15199,39 @@ ED.ArcuateKeratotomy.prototype.setPropertyDefaults = function() {
 		precision: 1,
 		animate: false
 	};
+	this.parameterValidationArray['spotSeparation'] = {
+		kind: 'other',
+		type: 'string',
+		list: ['0.5um', '0.6um', '0.7um', '0.8um', '0.9um', '1.0um'],
+		animate: false
+	};
+	this.parameterValidationArray['lineSeparation'] = {
+		kind: 'other',
+		type: 'string',
+		list: ['0.5um', '0.6um', '0.7um', '0.8um', '0.9um', '1.0um'],
+		animate: false
+	};
+	this.parameterValidationArray['energyLevel'] = {
+		kind: 'other',
+		type: 'string',
+		list: ['0.50uJ', '0.55uJ', '0.60uJ', '0.65uJ', '0.70uJ', '0.75uJ', '0.80uJ', '0.85uJ', '0.90uJ', '0.95uJ', '1.00uJ'],
+		animate: false
+	};
 }
 
 /**
  * Sets default parameters
  */
 ED.ArcuateKeratotomy.prototype.setParameterDefaults = function() {
-	this.setParameterFromString('diameter', '8.0');
+	this.setParameterFromString('diameter', '6.0');
 	this.setParameterFromString('arcLength', '60');
 	this.setParameterFromString('axis', '90');
-	this.setParameterFromString('anteriorDepth', '50');
-	this.setParameterFromString('posteriorDepth', '100');
+	this.setParameterFromString('anteriorDepth', '70');
+	this.setParameterFromString('posteriorDepth', '600');
 	this.setParameterFromString('angle', '90');
+	this.setParameterFromString('spotSeparation', '0.6um');
+	this.setParameterFromString('lineSeparation', '0.6um');
+	this.setParameterFromString('energyLevel', '0.75uJ');
 
 	// Make it 90 degrees to last one of same class
 	var doodle = this.drawing.lastDoodleOfClass(this.className);
@@ -24894,9 +24934,11 @@ ED.ICL.prototype.setHandles = function() {
 ED.ICL.prototype.setPropertyDefaults = function() {
 	//this.addAtBack = true;
 	this.isUnique = true;
+	this.isMoveable = false;
 
 	// Adjust ranges for simple parameters
 	this.parameterValidationArray['rotation']['range'] = new ED.Range(340 * Math.PI / 180, 20 * Math.PI/180);
+	//this.parameterValidationArray['rotation']['range'] = new ED.Range(0.888 * Math.PI/180, 1.11 * Math.PI);
 	
 	// Derived parameters (NB cannot use numerical approach to this axis since 'double' range not currently handled in core)
 	this.parameterValidationArray['axis'] = {
@@ -24971,12 +25013,14 @@ ED.ICL.prototype.dependentParameterValues = function(_parameter, _value) {
 
 	switch (_parameter) {
 		case 'rotation':
-			returnArray['axis'] = ((360 - 180 * _value / Math.PI) % 180).toFixed(0);
+			var axis = ((360 - 180 * _value / Math.PI) % 180).toFixed(0);
+			if (axis == '180') axis = '0';
+			returnArray['axis'] = axis;
 			break;
 
-		case 'axis':
-			returnArray['rotation'] = (180 - parseFloat(_value)) * Math.PI / 180;
-			break;
+// 		case 'axis':
+// 			returnArray['rotation'] = (180 - parseFloat(_value)) * Math.PI / 180;
+// 			break;
 	}
 
 	return returnArray;
@@ -25060,6 +25104,7 @@ ED.ICL.prototype.draw = function(_point) {
 		this.drawCircle(ctx, 280, 160, 8, ctx.fillStyle, 4, ctx.strokeStyle);
 	}
 
+	/*
 	// Coordinates of handles (in canvas plane)
 	var point = new ED.Point(0, 0)
 	point.setWithPolars(r, Math.PI / 4);
@@ -25067,7 +25112,8 @@ ED.ICL.prototype.draw = function(_point) {
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
-
+	*/
+	
 	// Return value indicating successful hittest
 	return this.isClicked;
 }
