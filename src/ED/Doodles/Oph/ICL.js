@@ -108,28 +108,25 @@ ED.ICL.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['model'] = {
 		kind: 'other',
 		type: 'string',
-		list: ['v4C', 'v4B'],
+		list: ['V4b', 'V4c'],
 		animate: false
 	};
 	this.parameterValidationArray['lengthICL'] = {
 		kind: 'other',
-		type: 'float',
-		range: new ED.Range(11, 14),
-		precision: 1,
+		type: 'string',
+		list: ['11.7','12.2','12.7','13.2','13.7'],
 		animate: false
 	};
 	this.parameterValidationArray['sphere'] = {
 		kind: 'other',
-		type: 'float',
-		range: new ED.Range(-23, +10),
-		precision: 2,
+		type: 'string',
+		list: ['-18.0','-17.5','-17.0','-16.5','-16.0','-15.5','-15.0','-14.5','-14.0','-13.5','-13.0','-12.5','-12.0','-11.5','-11.0','-10.5','-10.0','-9.5','-9.0','-8.5','-8.0','-7.5','-7.0','-6.5','-6.0','-5.5','-5.0','-4.5','-4.0','-3.5','-3.0','-2.5','-2.0','-1.5','-1.0','-0.5',' 0.0','+0.5','+1.0','+1.5','+2.0','+2.5','+3.0','+3.5','+4.0','+4.5','+5.0','+5.5','+6.0','+6.5','+7.0','+7.5','+8.0'],
 		animate: false
 	};
 	this.parameterValidationArray['cylinder'] = {
 		kind: 'other',
-		type: 'float',
-		range: new ED.Range(+0, +6),
-		precision: 2,
+		type: 'string',
+		list: [' 0.0','+0.5','+1.0','+1.5','+2.0','+2.5','+3.0','+3.5','+4.0','+4.5','+5.0','+5.5','+6.0'],
 		animate: false
 	};
 	this.parameterValidationArray['opticalAxis'] = {
@@ -145,10 +142,10 @@ ED.ICL.prototype.setPropertyDefaults = function() {
  */
 ED.ICL.prototype.setParameterDefaults = function() {
 	this.setParameterFromString('axis', '180');
-	this.setParameterFromString('model', 'v4C');
-	this.setParameterFromString('lengthICL', '12');
-	this.setParameterFromString('sphere', '0.00');
-	this.setParameterFromString('cylinder', '0.00');
+	this.setParameterFromString('model', 'V4c');
+	this.setParameterFromString('lengthICL', '12.7');
+	this.setParameterFromString('sphere', '0.0');
+	this.setParameterFromString('cylinder', '0.0');
 	this.setParameterFromString('opticalAxis', '0');
 }
 
@@ -254,6 +251,29 @@ ED.ICL.prototype.draw = function(_point) {
 		this.drawCircle(ctx, 200, 0, 8, ctx.fillStyle, 4, ctx.strokeStyle);
 		this.drawCircle(ctx, -280, -160, 8, ctx.fillStyle, 4, ctx.strokeStyle);
 		this.drawCircle(ctx, 280, 160, 8, ctx.fillStyle, 4, ctx.strokeStyle);
+		if (this.model == 'V4c') {
+			this.drawCircle(ctx, 0, 0, 8, ctx.fillStyle, 4, ctx.strokeStyle);
+		}
+		
+		// Optical axis
+		var ra = 40;
+		var rb = 140;
+		var phi = Math.PI/2 - this.opticalAxis * Math.PI/180;
+		var theta = phi + Math.PI;
+		var p = new ED.Point(0,0);
+		
+		ctx.beginPath();
+		p.setWithPolars(ra, phi);
+		ctx.moveTo(p.x, p.y);
+		p.setWithPolars(rb, phi);
+		ctx.lineTo(p.x, p.y);
+		
+		p.setWithPolars(ra, theta);
+		ctx.moveTo(p.x, p.y);
+		p.setWithPolars(rb, theta);
+		ctx.lineTo(p.x, p.y);
+		
+		ctx.stroke();
 	}
 
 	/*
