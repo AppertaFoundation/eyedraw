@@ -187,11 +187,37 @@ ED.ArcuateKeratotomy.prototype.setParameterDefaults = function() {
 	this.setParameterFromString('lineSeparation', '0.6um');
 	this.setParameterFromString('energyLevel', '0.75uJ');
 
-	// Make it 90 degrees to last one of same class
-	var doodle = this.drawing.lastDoodleOfClass(this.className);
-	if (doodle) {
-		this.rotation = doodle.rotation + Math.PI/2;
-		this.arc = doodle.arc;
+	// Add others according to scheme
+	var n = this.drawing.numberOfDoodlesOfClass(this.className);
+
+	if (n > 0) {
+		var doodle = this.drawing.firstDoodleOfClass(this.className);
+		switch (n) {
+			// Second doodle is opposite first
+			case 1:
+				this.rotation = doodle.rotation + Math.PI;
+				this.arc = doodle.arc;
+				break;
+				
+			// Third doodle is inside first and smaller
+			case 2:
+				this.rotation = doodle.rotation;
+				var newDiameter = doodle.diameter * 0.8;
+				this.setParameterFromString('diameter', newDiameter.toString());
+				break;
+				
+			// Fourth doodle is inside second and smaller
+			case 3:
+				this.rotation = doodle.rotation + Math.PI;
+				var newDiameter = doodle.diameter * 0.8;
+				this.setParameterFromString('diameter', newDiameter.toString());
+				break;
+				
+			// Fifth doodle is somewhere else!
+			case 4:
+				this.rotation = doodle.rotation + Math.PI/2;
+				break;
+		}
 	}
 }
 
