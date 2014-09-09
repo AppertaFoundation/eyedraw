@@ -30,6 +30,7 @@ ED.SMILE = function(_drawing, _parameterJSON) {
 
 	// Derived parameters
 	this.diameter = 8;
+	this.incisionLength = 0;
 	
 	// Other parameters
 	this.thickness = 15;
@@ -40,8 +41,10 @@ ED.SMILE = function(_drawing, _parameterJSON) {
 	// Saved parameters
 	this.savedParameterArray = [
 		'scaleX', 
-		'scaleY', 
-		'diameter', 
+		'scaleY',
+		'arc', 
+		'diameter',
+		'incisionLength', 
 		'thickness',
 		'spotSeparation', 
 		'lineSeparation',
@@ -51,6 +54,7 @@ ED.SMILE = function(_drawing, _parameterJSON) {
 	// Parameters in doodle control bar (parameter name: parameter label)
 	this.controlParameterArray = {
 		'diameter':'lenticule diameter (mm)', 
+		'incisionLength':'Pocket length (mm)',
 		'thickness':'Lenticule bed thickness (um)', 
 		'spotSeparation':'Spot separation',
 		'lineSeparation':'Line separation',
@@ -72,6 +76,7 @@ ED.SMILE.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.SMILE.prototype.setHandles = function() {
+	this.handleArray[0] = new ED.Doodle.Handle(null, true, ED.Mode.Arc, false);
 	this.handleArray[2] = new ED.Doodle.Handle(null, true, ED.Mode.Scale, false);
 }
 
@@ -82,16 +87,25 @@ ED.SMILE.prototype.setPropertyDefaults = function() {
 	this.isMoveable = false;
 	this.isRotatable = false;
 	this.isUnique = true;
+	this.isArcSymmetrical = true;
 
 	// Update component of validation array for simple parameters
 	this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.7, +0.9);
 	this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.7, +0.9);
+	this.parameterValidationArray['arc']['range'].setMinAndMax(1/3, 2/3);
 
 	// Derived parameters
 	this.parameterValidationArray['diameter'] = {
 		kind: 'derived',
 		type: 'float',
 		range: new ED.Range(7, 9),
+		precision: 1,
+		animate: true
+	};
+	this.parameterValidationArray['incisionLength'] = {
+		kind: 'derived',
+		type: 'float',
+		range: new ED.Range(2, 4),
 		precision: 1,
 		animate: true
 	};
@@ -128,6 +142,7 @@ ED.SMILE.prototype.setPropertyDefaults = function() {
  */
 ED.SMILE.prototype.setParameterDefaults = function() {
 	this.setParameterFromString('diameter', '8.0');
+	this.setParameterFromString('incisionLength', '4.0');
 	this.setParameterFromString('thickness', '15');
 	this.setParameterFromString('spotSeparation', '0.6um');
 	this.setParameterFromString('lineSeparation', '0.6um');
@@ -150,9 +165,17 @@ ED.SMILE.prototype.dependentParameterValues = function(_parameter, _value) {
 			returnArray['diameter'] = _value * 10;
 			break;
 
+		case 'arc':
+			returnArray['incisionLength'] = _value * 6;
+			break;
+
 		case 'diameter':
 			returnArray['scaleX'] = parseFloat(_value)/10;
 			returnArray['scaleY'] = parseFloat(_value)/10;
+			break;
+			
+		case 'incisionLength':
+			returnArray['arc'] = _value / 6; console.log(returnArray['arc']);
 			break;
 	}
 
@@ -173,11 +196,12 @@ ED.SMILE.prototype.draw = function(_point) {
 
 	// SMILE
 	var r = 320;
+	var theta = this.arc / 2;		
 
 	// Boundary path
 	ctx.beginPath();
 
-	// Do an arc
+	// Do a circle
 	ctx.arc(0, 0, r, 0, Math.PI * 2, true);
 
 	// Close path to produce straight line
@@ -195,26 +219,31 @@ ED.SMILE.prototype.draw = function(_point) {
 
 	// Non boundary drawing
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+		// Flap
 		ctx.beginPath();
 		ctx.arc(0, 0, r * 0.8, 0, Math.PI * 2, true);
 		ctx.setLineDash([8,12]);
 		ctx.stroke();
 		ctx.setLineDash([]);
 		
+		// Incision
 		ctx.beginPath();
-		var theta = Math.PI/ 8;
-		ctx.arc(0, 0, r, -Math.PI / 2 + theta, -Math.PI / 2 - theta, true);
-		ctx.arc(0, 0, r - 30, -Math.PI / 2 - theta, -Math.PI / 2 + theta, false);
+		var arcStart = -Math.PI / 2 + theta;
+		var arcEnd = -Math.PI / 2 - theta;
+		ctx.arc(0, 0, r, arcStart, arcEnd, true);
+		ctx.arc(0, 0, r - 30, arcEnd, arcStart, false);
 		ctx.closePath();
 		ctx.fillStyle = "rgba(100,100,200,0.75)";
 		ctx.fill();
 	}
 	
 	// Coordinates of handles (in canvas plane)
+	var startHandle = new ED.Point(-r * Math.sin(theta), -r * Math.cos(theta));
+	this.handleArray[0].location = this.transform.transformPoint(startHandle);
 	var point = new ED.Point(0, 0)
 	point.setWithPolars(r, Math.PI/4);
 	this.handleArray[2].location = this.transform.transformPoint(point);
-
+	
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
 

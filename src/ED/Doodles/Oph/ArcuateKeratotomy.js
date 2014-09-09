@@ -197,6 +197,7 @@ ED.ArcuateKeratotomy.prototype.setParameterDefaults = function() {
 			case 1:
 				this.rotation = doodle.rotation + Math.PI;
 				this.arc = doodle.arc;
+				this.setParameterFromString('diameter', doodle.diameter.toString());
 				break;
 				
 			// Third doodle is inside first and smaller
@@ -216,6 +217,11 @@ ED.ArcuateKeratotomy.prototype.setParameterDefaults = function() {
 			// Fifth doodle is somewhere else!
 			case 4:
 				this.rotation = doodle.rotation + Math.PI/2;
+				break;
+				
+			default:
+				doodle = this.drawing.lastDoodleOfClass(this.className);
+				this.rotation = doodle.rotation + Math.PI/6;
 				break;
 		}
 	}
