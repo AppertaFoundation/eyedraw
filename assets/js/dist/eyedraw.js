@@ -25023,7 +25023,7 @@ ED.ICL.prototype.setPropertyDefaults = function() {
 ED.ICL.prototype.setParameterDefaults = function() {
 	this.setParameterFromString('axis', '180');
 	this.setParameterFromString('model', 'V4c');
-	this.setParameterFromString('lengthICL', '12.7');
+	this.setParameterFromString('lengthICL', '13.2');
 	this.setParameterFromString('sphere', '0.0');
 	this.setParameterFromString('cylinder', '0.0');
 	this.setParameterFromString('opticalAxis', '0');
@@ -36871,6 +36871,11 @@ ED.SMILE.prototype.setParameterDefaults = function() {
 	this.setParameterFromString('spotSeparation', '0.6um');
 	this.setParameterFromString('lineSeparation', '0.6um');
 	this.setParameterFromString('energyLevel', '0.75uJ');
+	
+	/*
+	a) what are the default laser energy (depends on the individual machine and user preference, recommended around 170nJ = energy setting 34), spot and line separations ( 4.5 µm in the lamellar interfaces, I believe 2µm in the sidecuts) for SMILE
+	b) what are the standard side pocket dimensions?  we call it access incision  Do these vary? Below 4mm length. Depending on surgeon preference and skills typically around 3 mm, a few surgeons go down to 2 mm. Donald and Jod are doing this in Singapore
+	*/
 }
 
 /**

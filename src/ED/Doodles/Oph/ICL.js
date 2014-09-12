@@ -143,7 +143,7 @@ ED.ICL.prototype.setPropertyDefaults = function() {
 ED.ICL.prototype.setParameterDefaults = function() {
 	this.setParameterFromString('axis', '180');
 	this.setParameterFromString('model', 'V4c');
-	this.setParameterFromString('lengthICL', '12.7');
+	this.setParameterFromString('lengthICL', '13.2');
 	this.setParameterFromString('sphere', '0.0');
 	this.setParameterFromString('cylinder', '0.0');
 	this.setParameterFromString('opticalAxis', '0');
