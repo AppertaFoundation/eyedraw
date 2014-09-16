@@ -24966,7 +24966,7 @@ ED.ICL.prototype.setHandles = function() {
  * Sets default properties
  */
 ED.ICL.prototype.setPropertyDefaults = function() {
-	//this.addAtBack = true;
+	this.addAtBack = true;
 	this.isUnique = true;
 	this.isMoveable = false;
 
@@ -36784,7 +36784,7 @@ ED.SMILE = function(_drawing, _parameterJSON) {
 		'thickness':'Lenticule bed thickness (um)', 
 		'spotSeparation':'Spot separation',
 		'lineSeparation':'Line separation',
-		'energyLevel':'Energy level',
+		'energyLevel':'Energy level (uJ)',
 	};
 
 	// Call superclass constructor
@@ -36857,8 +36857,9 @@ ED.SMILE.prototype.setPropertyDefaults = function() {
 	};
 	this.parameterValidationArray['energyLevel'] = {
 		kind: 'other',
-		type: 'string',
-		list: ['0.10uJ', '0.15uJ', '0.20uJ', '0.25uJ', '0.30uJ', '0.35uJ', '0.40uJ', '0.45uJ', '0.50uJ', '0.55uJ', '0.60uJ', '0.65uJ', '0.70uJ', '0.75uJ', '0.80uJ', '0.85uJ', '0.90uJ', '0.95uJ', '1.00uJ', '1.05uJ', '1.10uJ', '1.15uJ', '1.20uJ', '1.25uJ', '1.30uJ', '1.35uJ', '1.40uJ', '1.45uJ', '1.50uJ', '1.55uJ', '1.60uJ', '1.65uJ', '1.70uJ', '1.75uJ', '1.80uJ', '1.85uJ', '1.90uJ', '1.95uJ', '2.00uJ'],
+		type: 'float',
+		range: new ED.Range(0.1, 2),
+		precision: 2,
 		animate: false
 	};
 }
@@ -36872,7 +36873,7 @@ ED.SMILE.prototype.setParameterDefaults = function() {
 	this.setParameterFromString('thickness', '15');
 	this.setParameterFromString('spotSeparation', '0.6um');
 	this.setParameterFromString('lineSeparation', '0.6um');
-	this.setParameterFromString('energyLevel', '0.15uJ');
+	this.setParameterFromString('energyLevel', '0.17');
 	
 	/*
 	a) what are the default laser energy (depends on the individual machine and user preference, recommended around 170nJ = energy setting 34), spot and line separations ( 4.5 µm in the lamellar interfaces, I believe 2µm in the sidecuts) for SMILE
@@ -36906,7 +36907,7 @@ ED.SMILE.prototype.dependentParameterValues = function(_parameter, _value) {
 			break;
 			
 		case 'incisionLength':
-			returnArray['arc'] = _value / 6; console.log(returnArray['arc']);
+			returnArray['arc'] = _value / 6;
 			break;
 	}
 

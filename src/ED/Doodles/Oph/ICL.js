@@ -84,7 +84,7 @@ ED.ICL.prototype.setHandles = function() {
  * Sets default properties
  */
 ED.ICL.prototype.setPropertyDefaults = function() {
-	//this.addAtBack = true;
+	this.addAtBack = true;
 	this.isUnique = true;
 	this.isMoveable = false;
 
