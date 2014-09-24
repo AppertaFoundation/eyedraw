@@ -28,8 +28,16 @@ ED.CorneaCrossSection = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "CorneaCrossSection";
 
+	// Other parameters
+	this.shape = "";
+	
 	// Saved parameters
-	//this.savedParameterArray = ['apexY', 'apexX'];
+	this.savedParameterArray = ['shape'];
+	
+	// Parameters in doodle control bar (parameter name: parameter label)
+	this.controlParameterArray = {
+		'shape':'Shape',
+	};
 	
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -46,11 +54,18 @@ ED.CorneaCrossSection.superclass = ED.Doodle.prototype;
  * Sets default dragging attributes
  */
 ED.CorneaCrossSection.prototype.setPropertyDefaults = function() {
-	this.isSelectable = false;
 	this.isDeletable = false;
 	this.isMoveable = false;
 	this.isRotatable = false;
 	this.isUnique = true;
+	
+	// Other parameters
+	this.parameterValidationArray['shape'] = {
+		kind: 'other',
+		type: 'string',
+		list: ['Normal', 'Keratoconus', 'Keratoglobus'],
+		animate: false
+	};
 }
 
 /**
@@ -59,6 +74,7 @@ ED.CorneaCrossSection.prototype.setPropertyDefaults = function() {
  */
 ED.CorneaCrossSection.prototype.setParameterDefaults = function() {
 	this.originX = 44;
+	this.setParameterFromString('shape', 'Keratoglobus');
 }
 
 /**
@@ -79,20 +95,48 @@ ED.CorneaCrossSection.prototype.draw = function(_point) {
 	// Top cut away
 	ctx.moveTo(60, -480);
 	ctx.lineTo(-80, -480);
+	ctx.bezierCurveTo(-100, -440, -100, -440, -120, -380);
 
 	// Front of cornea
-	ctx.bezierCurveTo(-100, -440, -100, -440, -120, -380);
-	ctx.bezierCurveTo(-240, -260, -320, -160, -320, 0);
-	ctx.bezierCurveTo(-320, 160, -240, 260, -120, 380);
-	ctx.bezierCurveTo(-100, 440, -100, 440, -80, 480);
+	switch (this.shape) {
+		case "Normal":
+			ctx.bezierCurveTo(-240, -260, -320, -160, -320, 0);
+			ctx.bezierCurveTo(-320, 160, -240, 260, -120, 380);
+			break;
+		
+		case "Keratoconus":
+			ctx.bezierCurveTo(-240, -260, -380, -100, -380, 0);
+			ctx.bezierCurveTo(-380, 100, -240, 260, -120, 380);
+			break;
+			
+		case "Keratoglobus":
+			ctx.bezierCurveTo(-240, -260, -380, -100, -380, 100);
+			ctx.bezierCurveTo(-380, 200, -240, 360, -120, 380);
+			break;
+	}
 
 	// Bottom cut away
+	ctx.bezierCurveTo(-100, 440, -100, 440, -80, 480);
 	ctx.lineTo(60, 480);
 	ctx.lineTo(0, 380);
 
 	// Back of cornea
-	ctx.bezierCurveTo(-80, 260, -220, 180, -220, 0);
-	ctx.bezierCurveTo(-220, -180, -80, -260, 0, -380);
+	switch (this.shape) {
+		case "Normal":
+			ctx.bezierCurveTo(-80, 260, -220, 180, -220, 0);
+			ctx.bezierCurveTo(-220, -180, -80, -260, 0, -380);
+			break;
+		
+		case "Keratoconus":
+			ctx.bezierCurveTo(-80, 260, -280, 120, -280, 0);
+			ctx.bezierCurveTo(-280, -120, -80, -260, 0, -380);
+			break;
+			
+		case "Keratoglobus":
+			ctx.bezierCurveTo(-80, 260, -260, 220, -280, 100);
+			ctx.bezierCurveTo(-280, -140, -120, -200, 0, -380);
+			break;
+	}
 
 	// Close path
 	ctx.closePath();
