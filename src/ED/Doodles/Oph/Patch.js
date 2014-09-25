@@ -32,7 +32,7 @@ ED.Patch = function(_drawing, _parameterJSON) {
 	this.material = 'Sclera';
 
 	// Saved parameters
-	this.savedParameterArray = ['originX', 'originY', 'width', 'height', 'apexX'];
+	this.savedParameterArray = ['originX', 'originY', 'width', 'height', 'apexX', 'material'];
 
 	// Parameters in doodle control bar (parameter name: parameter label)
 	this.controlParameterArray = {'material':'Material'};
