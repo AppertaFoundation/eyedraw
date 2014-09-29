@@ -383,14 +383,16 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 	this.isNew = true;
 	this.isReady = false;
 	this.showDoodleControls = false;
+	this.onReadyCommands = [];
+	this.resetDoodleSet = false;
 
 	// Freehand drawing properties NB from November 2013 moved to Freehand doodle
-// 	this.squiggleColour = new ED.Colour(0, 255, 0, 1);
-// 	this.squiggleWidth = ED.squiggleWidth.Medium;
-// 	this.squiggleStyle = ED.squiggleStyle.Outline;
+//	this.squiggleColour = new ED.Colour(0, 255, 0, 1);
+//	this.squiggleWidth = ED.squiggleWidth.Medium;
+//	this.squiggleStyle = ED.squiggleStyle.Outline;
 
 	// Put settings into display canvas
-// 	this.refreshSquiggleSettings();
+//	this.refreshSquiggleSettings();
 
 	// Associative array of bound element no doodle values (ie value associated with deleted doodle)
 	this.boundElementDeleteValueArray = new Array();
@@ -509,38 +511,38 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 			}
 		}, false);
 
-		//        this.canvas.addEventListener('mousewheel', function(e) {
-		//                                     e.preventDefault();
-		//                                     drawing.selectNextDoodle(e.wheelDelta);
-		//                                     }, false);
+		//				this.canvas.addEventListener('mousewheel', function(e) {
+		//																		 e.preventDefault();
+		//																		 drawing.selectNextDoodle(e.wheelDelta);
+		//																		 }, false);
 
 		// iOS listeners
-    this.canvas.addEventListener('touchstart', function(e) {
-      if (e.targetTouches[0] !== undefined) {
-        var canvas_pos = drawing.getPositionOfElement(drawing.canvas);
-        var point = new ED.Point(e.targetTouches[0].pageX - canvas_pos[0] - this.offsetLeft, e.targetTouches[0].pageY - canvas_pos[1]);
-        e.preventDefault();
-      } else {
-        ED.errorHandler('ED.Drawing', 'Class', 'Touches undefined: ');
-      }
-      drawing.mousedown(point);
-    }, false);
+		this.canvas.addEventListener('touchstart', function(e) {
+			if (e.targetTouches[0] !== undefined) {
+				var canvas_pos = drawing.getPositionOfElement(drawing.canvas);
+				var point = new ED.Point(e.targetTouches[0].pageX - canvas_pos[0] - this.offsetLeft, e.targetTouches[0].pageY - canvas_pos[1]);
+				e.preventDefault();
+			} else {
+				ED.errorHandler('ED.Drawing', 'Class', 'Touches undefined: ');
+			}
+			drawing.mousedown(point);
+		}, false);
 
-    this.canvas.addEventListener('touchend', function(e) {
-      if (e.targetTouches[0] !== undefined) {
-        var canvas_pos = drawing.getPositionOfElement(drawing.canvas);
-        var point = new ED.Point(e.targetTouches[0].pageX - canvas_pos[0] - this.offsetLeft, e.targetTouches[0].pageY - canvas_pos[1]);
-        drawing.mouseup(point);
-      }
-    }, false);
+		this.canvas.addEventListener('touchend', function(e) {
+			if (e.targetTouches[0] !== undefined) {
+				var canvas_pos = drawing.getPositionOfElement(drawing.canvas);
+				var point = new ED.Point(e.targetTouches[0].pageX - canvas_pos[0] - this.offsetLeft, e.targetTouches[0].pageY - canvas_pos[1]);
+				drawing.mouseup(point);
+			}
+		}, false);
 
-    this.canvas.addEventListener('touchmove', function(e) {
-      if (e.targetTouches[0] !== undefined) {
-        var canvas_pos = drawing.getPositionOfElement(drawing.canvas);
-        var point = new ED.Point(e.targetTouches[0].pageX - canvas_pos[0] - this.offsetLeft, e.targetTouches[0].pageY - canvas_pos[1]);
-        drawing.mousemove(point);
-      }
-    }, false);
+		this.canvas.addEventListener('touchmove', function(e) {
+			if (e.targetTouches[0] !== undefined) {
+				var canvas_pos = drawing.getPositionOfElement(drawing.canvas);
+				var point = new ED.Point(e.targetTouches[0].pageX - canvas_pos[0] - this.offsetLeft, e.targetTouches[0].pageY - canvas_pos[1]);
+				drawing.mousemove(point);
+			}
+		}, false);
 
 		// Keyboard listener
 		window.addEventListener('keydown', function(e) {
@@ -555,17 +557,17 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 }
 
 ED.Drawing.prototype.getPositionOfElement = function(element) {
-    var x=0;
-    var y=0;
-    while(true){
-        x += element.offsetLeft;
-        y += element.offsetTop;
-        if(element.offsetParent === null){
-            break;
-        }
-        element = element.offsetParent;
-    }
-    return [x, y];
+		var x=0;
+		var y=0;
+		while(true){
+				x += element.offsetLeft;
+				y += element.offsetTop;
+				if(element.offsetParent === null){
+						break;
+				}
+				element = element.offsetParent;
+		}
+		return [x, y];
 }
 
 /**
@@ -679,7 +681,7 @@ ED.Drawing.prototype.registerForNotifications = function(_object, _methodName, _
 }
 
 /**
- * Unregisters an object for notifications  ***TODO*** Need method of identifying objects for this to work
+ * Unregisters an object for notifications	***TODO*** Need method of identifying objects for this to work
  *
  * @param {object} _object The object requesting notification
  */
@@ -700,18 +702,12 @@ ED.Drawing.prototype.unRegisterForNotifications = function(_object) {
  * @param {Object} _object An optional object which may accompany an event containing additional information
  */
 ED.Drawing.prototype.notify = function(_eventName, _object) {
-	//console.log("Notifying for event: " + _eventName);
-
 	// Create array containing useful information
 	var messageArray = {
 		eventName: _eventName,
 		selectedDoodle: this.selectedDoodle,
 		object: _object
 	};
-
-	// console.log(this.notificationArray);
-	//
-
 
 	// Call method on each registered object
 	for (var i = 0; i < this.notificationArray.length; i++) {
@@ -720,8 +716,6 @@ ED.Drawing.prototype.notify = function(_eventName, _object) {
 		var list = this.notificationArray[i]['notificationList'];
 		var object = this.notificationArray[i]['object'];
 		var methodName = this.notificationArray[i]['methodName'];
-
-		// console.log(_eventName);
 
 		// Check that event is in notification list for this object, or array is empty implying all notifications
 		if (list.length == 0 || list.indexOf(_eventName) >= 0) {
@@ -748,6 +742,7 @@ ED.Drawing.prototype.loadDoodles = function(_id) {
 	// If it exists and contains something, load it
 	if (sourceElement && sourceElement.value.length > 0) {
 		var doodleSet = window.JSON.parse(sourceElement.value);
+		this.resetDoodleSet = doodleSet;
 		this.load(doodleSet);
 
 		// Set isNew flag
@@ -950,12 +945,12 @@ ED.Drawing.prototype.mousedown = function(_point) {
 
 	// Multiple Selecting
 	/*
-    if (!found)
-    {
-        this.mode = ED.Mode.Select;
-        this.selectionRectangleStart = this.inverseTransform.transformPoint(_point);
-    }
-     */
+		if (!found)
+		{
+				this.mode = ED.Mode.Select;
+				this.selectionRectangleStart = this.inverseTransform.transformPoint(_point);
+		}
+		 */
 
 	// Repaint
 	this.repaint();
@@ -989,17 +984,17 @@ ED.Drawing.prototype.mousemove = function(_point) {
 
 	// Draw selection rectangle
 	/*
-    if (this.mode == ED.Mode.Select)
-    {
-        if (!this.selectionRectangleIsBeingDragged)
-        {
-            this.selectionRectangleIsBeingDragged = true;
-        }
+		if (this.mode == ED.Mode.Select)
+		{
+				if (!this.selectionRectangleIsBeingDragged)
+				{
+						this.selectionRectangleIsBeingDragged = true;
+				}
 
-        this.selectionRectangleEnd = this.inverseTransform.transformPoint(_point);
-        this.repaint();
-    }
-    */
+				this.selectionRectangleEnd = this.inverseTransform.transformPoint(_point);
+				this.repaint();
+		}
+		*/
 
 	// Store action for notification
 	var action = "";
@@ -1344,23 +1339,23 @@ ED.Drawing.prototype.mousemove = function(_point) {
 ED.Drawing.prototype.mouseup = function(_point) {
 	// Multiselect - Go through doodles seeing which are within dragging rectangle
 	/*
-    for (var i = 0; i < this.doodleArray.length; i++)
+		for (var i = 0; i < this.doodleArray.length; i++)
 	{
-        var doodle = this.doodleArray[i];
-        var origin = new ED.Point(doodle.originX, doodle.originY);
+				var doodle = this.doodleArray[i];
+				var origin = new ED.Point(doodle.originX, doodle.originY);
 
-        var p = this.transform.transformPoint(origin);
+				var p = this.transform.transformPoint(origin);
 
-        // If doodle origin is in selection rectangle, select it
-        if(this.selectionRectangleIsBeingDragged && this.context.isPointInPath(p.x, p.y))
-        {
-            doodle.isSelected = true;
-        }
+				// If doodle origin is in selection rectangle, select it
+				if(this.selectionRectangleIsBeingDragged && this.context.isPointInPath(p.x, p.y))
+				{
+						doodle.isSelected = true;
+				}
 	}
 
-    // TEMP - this is needed to ensure delete button is activated
-    if (doodle) this.selectedDoodle = doodle;
-     */
+		// TEMP - this is needed to ensure delete button is activated
+		if (doodle) this.selectedDoodle = doodle;
+		 */
 
 	// Reset flags and mode
 	this.mouseDown = false;
@@ -1820,18 +1815,18 @@ ED.Drawing.prototype.flipHor = function() {
  *
  * @param {Doodle} The doodle to be deleted
  */
-ED.Drawing.prototype.deleteDoodle = function(_doodle) {
+ED.Drawing.prototype.deleteDoodle = function(_doodle, really) {
 	// Class name and flag for successful deletion
 	var deletedClassName = false;
 
 	var errorMessage = 'Attempt to delete a doodle that does not exist';
 
 	// Check that doodle will delete
-	if (_doodle.willDelete()) {
+	if (really || _doodle.willDelete()) {
 		// Iterate through doodle array looking for doodle
 		for (var i = 0; i < this.doodleArray.length; i++) {
 			if (this.doodleArray[i].id == _doodle.id) {
-				if (this.doodleArray[i].isDeletable) {
+				if (really || this.doodleArray[i].isDeletable) {
 					deletedClassName = _doodle.className;
 
 					// If its selected, deselect it
@@ -1926,21 +1921,21 @@ ED.Drawing.prototype.deleteDoodle = function(_doodle) {
 ED.Drawing.prototype.deleteSelectedDoodle = function() {
 	// Should only be called if a doodle is selected, but check anyway
 	if (this.selectedDoodle != null) {
-		this.deleteDoodle(this.selectedDoodle);
+		this.deleteDoodle(this.selectedDoodle,false);
 	} else {
 		ED.errorHandler('ED.Drawing', 'deleteSelectedDoodle', 'Attempt to delete selected doodle, when none selected');
 	}
 
 	// Multiple select
 	/*
-    for (var i = 0; i < this.doodleArray.length; i++)
-    {
-        if (this.doodleArray[i].isSelected)
-        {
-            this.deleteDoodle(this.doodleArray[i]);
-        }
-    }
-     */
+		for (var i = 0; i < this.doodleArray.length; i++)
+		{
+				if (this.doodleArray[i].isSelected)
+				{
+						this.deleteDoodle(this.doodleArray[i]);
+				}
+		}
+		 */
 }
 
 /**
@@ -1948,14 +1943,45 @@ ED.Drawing.prototype.deleteSelectedDoodle = function() {
  */
 
 ED.Drawing.prototype.resetEyedraw = function() {
-	this.deleteAllDoodles();
+	this.notify("beforeReset");
+
+	this.deleteAllDoodles(true);
+
+	if (this.resetDoodleSet !== false) {
+		this.notify("resetEdit");
+	} else {
+		this.notify("reset");
+	}
+
+	if (this.resetDoodleSet !== false) {
+		this.load(this.resetDoodleSet);
+
+		// Set isNew flag
+		this.isNew = false;
+
+		// Notify
+		this.notify("doodlesLoaded");
+	} else {
+		for (var i = 0; i < this.onReadyCommands.length; i++) {
+			for (var j = 0; j < this.onReadyCommands[i].length; j++) {
+				var method = this.onReadyCommands[i][j][0];
+				var argumentArray = this.onReadyCommands[i][j][1];
+
+				this[method].apply(this, argumentArray);
+			}
+		}
+	}
+
 	this.deselectDoodles();
 	this.drawAllDoodles();
+	this.deselectDoodles();
+
+	this.addBindings(this.bindingArray);
 }
 
 /**
  * Set the scale level for drawing and all doodles
- * @param  {Number} level     Scale level.
+ * @param  {Number} level			Scale level.
  * @param  {String} eventName Event name to notify.
  */
 ED.Drawing.prototype.setScaleForDrawingAndDoodles = function(level) {
@@ -2029,7 +2055,7 @@ ED.Drawing.prototype.deleteDoodleOfId = function(_id) {
 	var doodle = this.doodleOfId(_id);
 
 	if (doodle) {
-		this.deleteDoodle(doodle);
+		this.deleteDoodle(doodle,false);
 	} else {
 		ED.errorHandler('ED.Drawing', 'deleteDoodleOfId', 'Attempt to delete doodle with invalid id');
 	}
@@ -2218,14 +2244,14 @@ ED.Drawing.prototype.addDoodle = function(_className, _parameterDefaults, _param
 
 		// Create an instance of the parent if it does not already exist
 		/*
-        if (newDoodle.parentClass.length > 0)
-        {
-            if (!this.hasDoodleOfClass(newDoodle.parentClass))
-            {
-                this.addDoodle(newDoodle.parentClass);
-            }
-        }
-        */
+				if (newDoodle.parentClass.length > 0)
+				{
+						if (!this.hasDoodleOfClass(newDoodle.parentClass))
+						{
+								this.addDoodle(newDoodle.parentClass);
+						}
+				}
+				*/
 	} else {
 		ED.errorHandler('ED.Drawing', 'addDoodle', 'Unable to find definition for subclass ' + _className);
 		return null;
@@ -2750,12 +2776,12 @@ ED.Drawing.prototype.doodleOfId = function(_id) {
 /**
  * Deletes all doodles that are deletable
  */
-ED.Drawing.prototype.deleteAllDoodles = function() {
+ED.Drawing.prototype.deleteAllDoodles = function(really_all) {
 	// Go through doodle array (backwards because of splice function)
 	for (var i = this.doodleArray.length - 1; i >= 0; i--) {
 		// Only delete deletable ones
-		if (this.doodleArray[i].isDeletable) {
-			this.deleteDoodle(this.doodleArray[i]);
+		if (really_all || this.doodleArray[i].isDeletable) {
+			this.deleteDoodle(this.doodleArray[i],really_all);
 		}
 	}
 }
@@ -2770,7 +2796,7 @@ ED.Drawing.prototype.deleteDoodlesOfClass = function(_className) {
 	for (var i = this.doodleArray.length - 1; i >= 0; i--) {
 		// Find doodles of given class name
 		if (this.doodleArray[i].className == _className) {
-			this.deleteDoodle(this.doodleArray[i]);
+			this.deleteDoodle(this.doodleArray[i],false);
 		}
 	}
 }
@@ -3103,9 +3129,9 @@ ED.Drawing.prototype.getScaleLevel = function() {
  * @returns {String} _hexColour A string describing the colour to use for freehand drawing
  */
 // ED.Drawing.prototype.setSquiggleColour = function(_colour) {
-// 	this.squiggleColour = _colour;
+//	this.squiggleColour = _colour;
 //
-// 	this.refreshSquiggleSettings()
+//	this.refreshSquiggleSettings()
 // }
 
 /**
@@ -3114,9 +3140,9 @@ ED.Drawing.prototype.getScaleLevel = function() {
  * @returns {Int} _hexColour A number describing the width
  */
 // ED.Drawing.prototype.setSquiggleWidth = function(_width) {
-// 	this.squiggleWidth = _width;
+//	this.squiggleWidth = _width;
 //
-// 	this.refreshSquiggleSettings()
+//	this.refreshSquiggleSettings()
 // }
 
 /**
@@ -3125,9 +3151,9 @@ ED.Drawing.prototype.getScaleLevel = function() {
  * @returns {int} _style A string describing the style to use for freehand drawing
  */
 // ED.Drawing.prototype.setSquiggleStyle = function(_style) {
-// 	this.squiggleStyle = _style;
+//	this.squiggleStyle = _style;
 //
-// 	this.refreshSquiggleSettings()
+//	this.refreshSquiggleSettings()
 // }
 
 /**
@@ -3136,37 +3162,37 @@ ED.Drawing.prototype.getScaleLevel = function() {
  * @returns {String} _hexColour A string describing the colour to use for freehand drawing
  */
 // ED.Drawing.prototype.refreshSquiggleSettings = function() {
-// 	// Get reference to canvas
-// 	var displayCanvas = document.getElementById("squiggleSettings" + this.idSuffix);
+//	// Get reference to canvas
+//	var displayCanvas = document.getElementById("squiggleSettings" + this.idSuffix);
 //
-// 	if (displayCanvas) {
-// 		// Get context
-// 		var ctx = displayCanvas.getContext('2d');
+//	if (displayCanvas) {
+//		// Get context
+//		var ctx = displayCanvas.getContext('2d');
 //
-// 		// Reset canvas
-// 		displayCanvas.width = displayCanvas.width;
-// 		ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+//		// Reset canvas
+//		displayCanvas.width = displayCanvas.width;
+//		ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 //
-// 		// Set colours
-// 		ctx.strokeStyle = this.squiggleColour.rgba();
-// 		ctx.fillStyle = this.squiggleColour.rgba();;
+//		// Set colours
+//		ctx.strokeStyle = this.squiggleColour.rgba();
+//		ctx.fillStyle = this.squiggleColour.rgba();;
 //
-// 		// Line width
-// 		ctx.beginPath();
-// 		ctx.moveTo(3, 8);
-// 		ctx.lineTo(20, 8);
-// 		ctx.lineWidth = this.squiggleWidth / 2;
-// 		ctx.stroke();
+//		// Line width
+//		ctx.beginPath();
+//		ctx.moveTo(3, 8);
+//		ctx.lineTo(20, 8);
+//		ctx.lineWidth = this.squiggleWidth / 2;
+//		ctx.stroke();
 //
-// 		// Outline or solid
-// 		ctx.beginPath();
-// 		ctx.rect(5, 19, 13, 8);
-// 		ctx.lineWidth = 3;
-// 		ctx.stroke();
-// 		if (this.squiggleStyle == ED.squiggleStyle.Solid) {
-// 			ctx.fill();
-// 		}
-// 	}
+//		// Outline or solid
+//		ctx.beginPath();
+//		ctx.rect(5, 19, 13, 8);
+//		ctx.lineWidth = 3;
+//		ctx.stroke();
+//		if (this.squiggleStyle == ED.squiggleStyle.Solid) {
+//			ctx.fill();
+//		}
+//	}
 // }
 
 ///**
@@ -3176,11 +3202,11 @@ ED.Drawing.prototype.getScaleLevel = function() {
 // */
 //ED.DoodleGroups =
 //{
-//    bar: function (val)
-//    {
-//        console.log(val);
-//    },
-//    foo: 2
+//		bar: function (val)
+//		{
+//				console.log(val);
+//		},
+//		foo: 2
 //}
 //
 //ED.DoodleGroups.foo = 4;
@@ -6155,6 +6181,8 @@ ED.Controller = (function() {
 	Controller.prototype.runOnReadyCommands = function() {
 		var arr = (this.properties.onReadyCommandArray || []);
 		this.runCommands(arr);
+
+		this.drawing.onReadyCommands.push(arr);
 	};
 
 	/**
@@ -6325,6 +6353,7 @@ ED.Controller = (function() {
 
 	return Controller;
 }());
+
 /**
  * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
  * (C) OpenEyes Foundation, 2011-2014
@@ -7982,7 +8011,7 @@ ED.Views.Toolbar.Main = (function() {
 
 	return MainToolbar;
 }());
-/*! Generated on 16/7/2014 */
+/*! Generated on 29/9/2014 */
 ED.scriptTemplates = {
   "doodle-popup": "\n\n\n\n{{#doodle}}\n\t<ul class=\"ed-toolbar-panel ed-doodle-popup-toolbar\">\n\t\t<li>\n\t\t\t{{#desc}}\n\t\t\t\t<a class=\"ed-button ed-doodle-help{{lockedButtonClass}}\" href=\"#\" data-function=\"toggleHelp\">\n\t\t\t\t\t<span class=\"icon-ed-help\"></span>\n\t\t\t\t</a>\n\t\t\t{{/desc}}\n\t\t</li>\n\t\t{{#doodle.isLocked}}\n\t\t\t<li>\n\t\t\t\t<a class=\"ed-button\" href=\"#\" data-function=\"unlock\">\n\t\t\t\t\t<span class=\"icon-ed-unlock\"></span>\n\t\t\t\t\t<span class=\"label\">Unlock</span>\n\t\t\t\t</a>\n\t\t\t</li>\n\t\t{{/doodle.isLocked}}\n\t\t{{^doodle.isLocked}}\n\t\t\t<li>\n\t\t\t\t<a class=\"ed-button\" href=\"#\" data-function=\"lock\">\n\t\t\t\t\t<span class=\"icon-ed-lock\"></span>\n\t\t\t\t\t<span class=\"label\">Lock</span>\n\t\t\t\t</a>\n\t\t\t</li>\n\t\t{{/doodle.isLocked}}\n\t\t<li>\n\t\t\t<a class=\"ed-button{{lockedButtonClass}}\" href=\"#\" data-function=\"moveToBack\">\n\t\t\t\t<span class=\"icon-ed-move-to-back\"></span>\n\t\t\t\t<span class=\"label\">Move to back</span>\n\t\t\t</a>\n\t\t</li>\n\t\t<li>\n\t\t\t<a class=\"ed-button{{lockedButtonClass}}\" href=\"#\" data-function=\"moveToFront\">\n\t\t\t\t<span class=\"icon-ed-move-to-front\"></span>\n\t\t\t\t<span class=\"label\">Move to front</span>\n\t\t\t</a>\n\t\t</li>\n\t\t<li>\n\t\t\t{{#doodle.isDeletable}}\n\t\t\t\t<a class=\"ed-button{{lockedButtonClass}}\" href=\"#\" data-function=\"deleteSelectedDoodle\">\n\t\t\t\t\t<span class=\"icon-ed-delete\"></span>\n\t\t\t\t\t<span class=\"label\">Delete</span>\n\t\t\t\t</a>\n\t\t\t{{/doodle.isDeletable}}\n\t\t</li>\n\t</ul>\n\t<div class=\"ed-doodle-info hide\">\n\t\t{{^doodle.isLocked}}\n\t\t\t{{#desc}}\n\t\t\t\t<div class=\"ed-doodle-description\">{{{desc}}}</div>\n\t\t\t{{/desc}}\n\t\t{{/doodle.isLocked}}\n\t</div>\n\t<div class=\"ed-doodle-controls{{#doodle.isLocked}} hide{{/doodle.isLocked}}\" id=\"{{drawing.canvas.id}}_controls\">\n\t</div>\n\t{{#doodle.isLocked}}\n\t\t<div class=\"ed-doodle-description\">\n\t\t\t<strong>This doodle is locked and cannot be edited.</strong>\n\t\t</div>\n\t{{/doodle.isLocked}}\n{{/doodle}}"
 };
