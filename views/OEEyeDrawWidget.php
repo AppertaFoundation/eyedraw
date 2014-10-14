@@ -21,9 +21,12 @@
 	<?php $this->render('toolbar', $data);?>
 	<div class="ed-body">
 		<div class="ed-editor-container">
-			<?php $this->render('editor', $data);?>
+			<?php if (@$data['imageUrl']) {?>
+				<img src="<?php echo $data['imageUrl']?>" />
+			<?php }else{?>
+				<?php $this->render('editor', $data);?>
+			<?php }?>
 		</div>
 		<?php $this->render('fields', $data);?>
 	</div>
 </div>
-
