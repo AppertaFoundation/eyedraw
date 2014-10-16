@@ -43,7 +43,7 @@
                 var canvasEdit = document.getElementById('canvasEdit');
 
                 // Create a drawingEdit , {scaleOn:'width'}
-                drawingEdit = new ED.Drawing(canvasEdit, ED.eye.Right, 'RPS', true, {graphicsPath:'../../assets/img/'});
+                drawingEdit = new ED.Drawing(canvasEdit, ED.eye.Right, 'RPS', true, {graphicsPath:'../../assets/img/', toggleScale:0.72});
                 
                 // Instantiate a controller object
                 controller = new eyeDrawController(drawingEdit);
@@ -61,7 +61,7 @@
             {
                 this.drawing = _drawing;
                 this.gsf = 1;
-                this.gsf = 0.72;
+                //this.gsf = 0.72;
                 
                 // Specify call back function
                 this.callBack = callBack;
@@ -322,6 +322,10 @@
 
                     }
                 }
+            }
+            
+            function zoom() {
+				drawingEdit.toggleZoom();
             }
 
             </script>
@@ -614,7 +618,7 @@
         <button onclick="console.log(grid.getGridX()); return false;">Grid</button>
         <button onclick="console.log(drawingEdit.save()); return false;">Save</button>
  -->
-
+	<button onclick="zoom(); return false;">Toggle Zoom</button>
 
 
     </body>
