@@ -74,7 +74,6 @@ ED.Views.SelectedDoodle = (function() {
 
 	/**
 	 * Bind UI events
-	 * @return {[type]}
 	 */
 	SelectedDoodle.prototype.bindEvents = function() {
 		this.select.on('change.' + EVENT_NAMESPACE, this.onSelectChange.bind(this));
