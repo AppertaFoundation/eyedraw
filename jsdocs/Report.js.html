@@ -1,0 +1,1291 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>DocStrap Source: ED/Report.js</title>
+
+	<!--[if lt IE 9]>
+	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+	<link type="text/css" rel="stylesheet" href="styles/sunlight.default.css">
+
+	<link type="text/css" rel="stylesheet" href="styles/site.cosmo.css">
+
+</head>
+
+<body>
+<div class="container-fluid">
+	<div class="navbar navbar-fixed-top navbar-inverse">
+		<div class="navbar-inner">
+			<a class="brand" href="index.html">DocStrap</a>
+			<ul class="nav">
+				
+				<li class="dropdown">
+					<a href="namespaces.list.html" class="dropdown-toggle" data-toggle="dropdown">Namespaces<b
+						class="caret"></b></a>
+
+					<ul class="dropdown-menu ">
+						
+						<li>
+							<a href="classes.html">Namespace for all EyeDraw classes</a>
+						</li>
+						
+
+					</ul>
+				</li>
+				
+				<li class="dropdown">
+					<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b
+						class="caret"></b></a>
+
+					<ul class="dropdown-menu ">
+						
+						<li>
+							<a href="ACIOL.html">ACIOL</a>
+						</li>
+						
+						<li>
+							<a href="ACMaintainer.html">ACMaintainer</a>
+						</li>
+						
+						<li>
+							<a href="AffineTransform.html">AffineTransform</a>
+						</li>
+						
+						<li>
+							<a href="AgentDose.html">AgentDose</a>
+						</li>
+						
+						<li>
+							<a href="AgentDuration.html">AgentDuration</a>
+						</li>
+						
+						<li>
+							<a href="AngleGradeEast.html">AngleGradeEast</a>
+						</li>
+						
+						<li>
+							<a href="AngleGradeNorth.html">AngleGradeNorth</a>
+						</li>
+						
+						<li>
+							<a href="AngleGradeSouth.html">AngleGradeSouth</a>
+						</li>
+						
+						<li>
+							<a href="AngleGradeWest.html">AngleGradeWest</a>
+						</li>
+						
+						<li>
+							<a href="AngleNV.html">AngleNV</a>
+						</li>
+						
+						<li>
+							<a href="AngleRecession.html">AngleRecession</a>
+						</li>
+						
+						<li>
+							<a href="AnomalousVessels.html">AnomalousVessels</a>
+						</li>
+						
+						<li>
+							<a href="AnteriorCapsulotomy.html">AnteriorCapsulotomy</a>
+						</li>
+						
+						<li>
+							<a href="AntPVR.html">AntPVR</a>
+						</li>
+						
+						<li>
+							<a href="AntSeg.html">AntSeg</a>
+						</li>
+						
+						<li>
+							<a href="AntSegCrossSection.html">AntSegCrossSection</a>
+						</li>
+						
+						<li>
+							<a href="AntSynech.html">AntSynech</a>
+						</li>
+						
+						<li>
+							<a href="Aorta.html">Aorta</a>
+						</li>
+						
+						<li>
+							<a href="ArcuateScotoma.html">ArcuateScotoma</a>
+						</li>
+						
+						<li>
+							<a href="AxialLengthGraph.html">AxialLengthGraph</a>
+						</li>
+						
+						<li>
+							<a href="BiopsySite.html">BiopsySite</a>
+						</li>
+						
+						<li>
+							<a href="Bleb.html">Bleb</a>
+						</li>
+						
+						<li>
+							<a href="BlotHaemorrhage.html">BlotHaemorrhage</a>
+						</li>
+						
+						<li>
+							<a href="Bruising.html">Bruising</a>
+						</li>
+						
+						<li>
+							<a href="Bruit.html">Bruit</a>
+						</li>
+						
+						<li>
+							<a href="BuckleOperation.html">BuckleOperation</a>
+						</li>
+						
+						<li>
+							<a href="BuckleSuture.html">BuckleSuture</a>
+						</li>
+						
+						<li>
+							<a href="Bypass.html">Bypass</a>
+						</li>
+						
+						<li>
+							<a href="CapsularTensionRing.html">CapsularTensionRing</a>
+						</li>
+						
+						<li>
+							<a href="ChandelierDouble.html">ChandelierDouble</a>
+						</li>
+						
+						<li>
+							<a href="ChandelierSingle.html">ChandelierSingle</a>
+						</li>
+						
+						<li>
+							<a href="ChoroidalHaemorrhage.html">ChoroidalHaemorrhage</a>
+						</li>
+						
+						<li>
+							<a href="ChoroidalNaevus.html">ChoroidalNaevus</a>
+						</li>
+						
+						<li>
+							<a href="CiliaryInjection.html">CiliaryInjection</a>
+						</li>
+						
+						<li>
+							<a href="Circinate.html">Circinate</a>
+						</li>
+						
+						<li>
+							<a href="CircumferentialBuckle.html">CircumferentialBuckle</a>
+						</li>
+						
+						<li>
+							<a href="CNV.html">CNV</a>
+						</li>
+						
+						<li>
+							<a href="ConjunctivalFlap.html">ConjunctivalFlap</a>
+						</li>
+						
+						<li>
+							<a href="ConjunctivalSuture.html">ConjunctivalSuture</a>
+						</li>
+						
+						<li>
+							<a href="CorneaCrossSection.html">CorneaCrossSection</a>
+						</li>
+						
+						<li>
+							<a href="CornealAbrasion.html">CornealAbrasion</a>
+						</li>
+						
+						<li>
+							<a href="CornealErosion.html">CornealErosion</a>
+						</li>
+						
+						<li>
+							<a href="CornealGraft.html">CornealGraft</a>
+						</li>
+						
+						<li>
+							<a href="CornealInlay.html">CornealInlay</a>
+						</li>
+						
+						<li>
+							<a href="CornealOedema.html">CornealOedema</a>
+						</li>
+						
+						<li>
+							<a href="CornealScar.html">CornealScar</a>
+						</li>
+						
+						<li>
+							<a href="CornealStriae.html">CornealStriae</a>
+						</li>
+						
+						<li>
+							<a href="CornealSuture.html">CornealSuture</a>
+						</li>
+						
+						<li>
+							<a href="CorticalCataract.html">CorticalCataract</a>
+						</li>
+						
+						<li>
+							<a href="CorticalCataractCrossSection.html">CorticalCataractCrossSection</a>
+						</li>
+						
+						<li>
+							<a href="CottonWoolSpot.html">CottonWoolSpot</a>
+						</li>
+						
+						<li>
+							<a href="Crepitations.html">Crepitations</a>
+						</li>
+						
+						<li>
+							<a href="Cryo.html">Cryo</a>
+						</li>
+						
+						<li>
+							<a href="CutterPI.html">CutterPI</a>
+						</li>
+						
+						<li>
+							<a href="CystoidMacularOedema.html">CystoidMacularOedema</a>
+						</li>
+						
+						<li>
+							<a href="DiabeticNV.html">DiabeticNV</a>
+						</li>
+						
+						<li>
+							<a href="Dialysis.html">Dialysis</a>
+						</li>
+						
+						<li>
+							<a href="DiscHaemorrhage.html">DiscHaemorrhage</a>
+						</li>
+						
+						<li>
+							<a href="DiscPallor.html">DiscPallor</a>
+						</li>
+						
+						<li>
+							<a href="Doodle.html">Doodle</a>
+						</li>
+						
+						<li>
+							<a href="DrainageRetinotomy.html">DrainageRetinotomy</a>
+						</li>
+						
+						<li>
+							<a href="DrainageSite.html">DrainageSite</a>
+						</li>
+						
+						<li>
+							<a href="Drawing.html">Drawing</a>
+						</li>
+						
+						<li>
+							<a href="DrugStent.html">DrugStent</a>
+						</li>
+						
+						<li>
+							<a href="EarDrum.html">EarDrum</a>
+						</li>
+						
+						<li>
+							<a href="ED.HVT.html">ED.HVT</a>
+						</li>
+						
+						<li>
+							<a href="ED.HVTGrid.html">ED.HVTGrid</a>
+						</li>
+						
+						<li>
+							<a href="ED.ILMPeel.html">ED.ILMPeel</a>
+						</li>
+						
+						<li>
+							<a href="ED.Rectus.html">ED.Rectus</a>
+						</li>
+						
+						<li>
+							<a href="Effusion.html">Effusion</a>
+						</li>
+						
+						<li>
+							<a href="EncirclingBand.html">EncirclingBand</a>
+						</li>
+						
+						<li>
+							<a href="EntrySiteBreak.html">EntrySiteBreak</a>
+						</li>
+						
+						<li>
+							<a href="EpiretinalMembrane.html">EpiretinalMembrane</a>
+						</li>
+						
+						<li>
+							<a href="FamilyMember.html">FamilyMember</a>
+						</li>
+						
+						<li>
+							<a href="FibrousProliferation.html">FibrousProliferation</a>
+						</li>
+						
+						<li>
+							<a href="FibrovascularScar.html">FibrovascularScar</a>
+						</li>
+						
+						<li>
+							<a href="FieldCircle.html">FieldCircle</a>
+						</li>
+						
+						<li>
+							<a href="FocalChoroiditis.html">FocalChoroiditis</a>
+						</li>
+						
+						<li>
+							<a href="FocalLaser.html">FocalLaser</a>
+						</li>
+						
+						<li>
+							<a href="Freehand.html">Freehand</a>
+						</li>
+						
+						<li>
+							<a href="Fuchs.html">Fuchs</a>
+						</li>
+						
+						<li>
+							<a href="Fundus.html">Fundus</a>
+						</li>
+						
+						<li>
+							<a href="Geographic.html">Geographic</a>
+						</li>
+						
+						<li>
+							<a href="Gonioscopy.html">Gonioscopy</a>
+						</li>
+						
+						<li>
+							<a href="GraphAxes.html">GraphAxes</a>
+						</li>
+						
+						<li>
+							<a href="Groin.html">Groin</a>
+						</li>
+						
+						<li>
+							<a href="Grommet.html">Grommet</a>
+						</li>
+						
+						<li>
+							<a href="GRT.html">GRT</a>
+						</li>
+						
+						<li>
+							<a href="Haematoma.html">Haematoma</a>
+						</li>
+						
+						<li>
+							<a href="Handle.html">Handle</a>
+						</li>
+						
+						<li>
+							<a href="HardDrusen.html">HardDrusen</a>
+						</li>
+						
+						<li>
+							<a href="HardExudate.html">HardExudate</a>
+						</li>
+						
+						<li>
+							<a href="Heart.html">Heart</a>
+						</li>
+						
+						<li>
+							<a href="Hyphaema.html">Hyphaema</a>
+						</li>
+						
+						<li>
+							<a href="Hypopyon.html">Hypopyon</a>
+						</li>
+						
+						<li>
+							<a href="IatrogenicBreak.html">IatrogenicBreak</a>
+						</li>
+						
+						<li>
+							<a href="InjectionSite.html">InjectionSite</a>
+						</li>
+						
+						<li>
+							<a href="IrisHook.html">IrisHook</a>
+						</li>
+						
+						<li>
+							<a href="IrisNaevus.html">IrisNaevus</a>
+						</li>
+						
+						<li>
+							<a href="IRMA.html">IRMA</a>
+						</li>
+						
+						<li>
+							<a href="KeraticPrecipitates.html">KeraticPrecipitates</a>
+						</li>
+						
+						<li>
+							<a href="KrukenbergSpindle.html">KrukenbergSpindle</a>
+						</li>
+						
+						<li>
+							<a href="Label.html">Label</a>
+						</li>
+						
+						<li>
+							<a href="LaserCircle.html">LaserCircle</a>
+						</li>
+						
+						<li>
+							<a href="LaserDemarcation.html">LaserDemarcation</a>
+						</li>
+						
+						<li>
+							<a href="LaserSpot.html">LaserSpot</a>
+						</li>
+						
+						<li>
+							<a href="LasikFlap.html">LasikFlap</a>
+						</li>
+						
+						<li>
+							<a href="LeftCoronaryArtery.html">LeftCoronaryArtery</a>
+						</li>
+						
+						<li>
+							<a href="Lens.html">Lens</a>
+						</li>
+						
+						<li>
+							<a href="LensCrossSection.html">LensCrossSection</a>
+						</li>
+						
+						<li>
+							<a href="LimbalRelaxingIncision.html">LimbalRelaxingIncision</a>
+						</li>
+						
+						<li>
+							<a href="Lungs.html">Lungs</a>
+						</li>
+						
+						<li>
+							<a href="Macroaneurysm.html">Macroaneurysm</a>
+						</li>
+						
+						<li>
+							<a href="MacularDystrophy.html">MacularDystrophy</a>
+						</li>
+						
+						<li>
+							<a href="MacularGrid.html">MacularGrid</a>
+						</li>
+						
+						<li>
+							<a href="MacularHole.html">MacularHole</a>
+						</li>
+						
+						<li>
+							<a href="MacularThickening.html">MacularThickening</a>
+						</li>
+						
+						<li>
+							<a href="MattressSuture.html">MattressSuture</a>
+						</li>
+						
+						<li>
+							<a href="MemberConnector.html">MemberConnector</a>
+						</li>
+						
+						<li>
+							<a href="MetalStent.html">MetalStent</a>
+						</li>
+						
+						<li>
+							<a href="Microaneurysm.html">Microaneurysm</a>
+						</li>
+						
+						<li>
+							<a href="MouseTest.html">MouseTest</a>
+						</li>
+						
+						<li>
+							<a href="MultifocalChoroiditis.html">MultifocalChoroiditis</a>
+						</li>
+						
+						<li>
+							<a href="NerveFibreDefect.html">NerveFibreDefect</a>
+						</li>
+						
+						<li>
+							<a href="NuclearCataract.html">NuclearCataract</a>
+						</li>
+						
+						<li>
+							<a href="NuclearCataractCrossSection.html">NuclearCataractCrossSection</a>
+						</li>
+						
+						<li>
+							<a href="OperatingTable.html">OperatingTable</a>
+						</li>
+						
+						<li>
+							<a href="OpticDisc.html">OpticDisc</a>
+						</li>
+						
+						<li>
+							<a href="OpticDiscPit.html">OpticDiscPit</a>
+						</li>
+						
+						<li>
+							<a href="Papilloedema.html">Papilloedema</a>
+						</li>
+						
+						<li>
+							<a href="Patch.html">Patch</a>
+						</li>
+						
+						<li>
+							<a href="PCIOL.html">PCIOL</a>
+						</li>
+						
+						<li>
+							<a href="Perforation.html">Perforation</a>
+						</li>
+						
+						<li>
+							<a href="PeripapillaryAtrophy.html">PeripapillaryAtrophy</a>
+						</li>
+						
+						<li>
+							<a href="PeripheralRetinectomy.html">PeripheralRetinectomy</a>
+						</li>
+						
+						<li>
+							<a href="PeripheralRRD.html">PeripheralRRD</a>
+						</li>
+						
+						<li>
+							<a href="PhakoIncision.html">PhakoIncision</a>
+						</li>
+						
+						<li>
+							<a href="PI.html">PI</a>
+						</li>
+						
+						<li>
+							<a href="Point.html">Point</a>
+						</li>
+						
+						<li>
+							<a href="PosteriorCapsule.html">PosteriorCapsule</a>
+						</li>
+						
+						<li>
+							<a href="PosteriorEmbryotoxon.html">PosteriorEmbryotoxon</a>
+						</li>
+						
+						<li>
+							<a href="PosteriorRetinectomy.html">PosteriorRetinectomy</a>
+						</li>
+						
+						<li>
+							<a href="PosteriorSynechia.html">PosteriorSynechia</a>
+						</li>
+						
+						<li>
+							<a href="PostPole.html">PostPole</a>
+						</li>
+						
+						<li>
+							<a href="PostSubcapCataract.html">PostSubcapCataract</a>
+						</li>
+						
+						<li>
+							<a href="PostSubcapCataractCrossSection.html">PostSubcapCataractCrossSection</a>
+						</li>
+						
+						<li>
+							<a href="PreRetinalHaemorrhage.html">PreRetinalHaemorrhage</a>
+						</li>
+						
+						<li>
+							<a href="PRPPostPole.html">PRPPostPole</a>
+						</li>
+						
+						<li>
+							<a href="RadialSponge.html">RadialSponge</a>
+						</li>
+						
+						<li>
+							<a href="Range.html">Range</a>
+						</li>
+						
+						<li>
+							<a href="RecordGrid.html">RecordGrid</a>
+						</li>
+						
+						<li>
+							<a href="RecordReading.html">RecordReading</a>
+						</li>
+						
+						<li>
+							<a href="Report.html">Report</a>
+						</li>
+						
+						<li>
+							<a href="RetinalArteryOcclusionPostPole.html">RetinalArteryOcclusionPostPole</a>
+						</li>
+						
+						<li>
+							<a href="RetinalHaemorrhage.html">RetinalHaemorrhage</a>
+						</li>
+						
+						<li>
+							<a href="RetinalTouch.html">RetinalTouch</a>
+						</li>
+						
+						<li>
+							<a href="RetinalVeinOcclusionPostPole.html">RetinalVeinOcclusionPostPole</a>
+						</li>
+						
+						<li>
+							<a href="RightCoronaryArtery.html">RightCoronaryArtery</a>
+						</li>
+						
+						<li>
+							<a href="RingSegment.html">RingSegment</a>
+						</li>
+						
+						<li>
+							<a href="RK.html">RK</a>
+						</li>
+						
+						<li>
+							<a href="RoundHole.html">RoundHole</a>
+						</li>
+						
+						<li>
+							<a href="RPEAtrophy.html">RPEAtrophy</a>
+						</li>
+						
+						<li>
+							<a href="RPEDetachment.html">RPEDetachment</a>
+						</li>
+						
+						<li>
+							<a href="RPEHypertrophy.html">RPEHypertrophy</a>
+						</li>
+						
+						<li>
+							<a href="RPERip.html">RPERip</a>
+						</li>
+						
+						<li>
+							<a href="RRD.html">RRD</a>
+						</li>
+						
+						<li>
+							<a href="Rubeosis.html">Rubeosis</a>
+						</li>
+						
+						<li>
+							<a href="ScleralIncision.html">ScleralIncision</a>
+						</li>
+						
+						<li>
+							<a href="Sclerostomy.html">Sclerostomy</a>
+						</li>
+						
+						<li>
+							<a href="SectorIridectomy.html">SectorIridectomy</a>
+						</li>
+						
+						<li>
+							<a href="SectorPRP.html">SectorPRP</a>
+						</li>
+						
+						<li>
+							<a href="SectorPRPPostPole.html">SectorPRPPostPole</a>
+						</li>
+						
+						<li>
+							<a href="SidePort.html">SidePort</a>
+						</li>
+						
+						<li>
+							<a href="Slider2D.html">Slider2D</a>
+						</li>
+						
+						<li>
+							<a href="Squiggle.html">Squiggle</a>
+						</li>
+						
+						<li>
+							<a href="StarFold.html">StarFold</a>
+						</li>
+						
+						<li>
+							<a href="SteepAxis.html">SteepAxis</a>
+						</li>
+						
+						<li>
+							<a href="Stenosis.html">Stenosis</a>
+						</li>
+						
+						<li>
+							<a href="StrabOpTemplate.html">StrabOpTemplate</a>
+						</li>
+						
+						<li>
+							<a href="SubretinalFluid.html">SubretinalFluid</a>
+						</li>
+						
+						<li>
+							<a href="SubretinalPFCL.html">SubretinalPFCL</a>
+						</li>
+						
+						<li>
+							<a href="Supramid.html">Supramid</a>
+						</li>
+						
+						<li>
+							<a href="Surgeon.html">Surgeon</a>
+						</li>
+						
+						<li>
+							<a href="SwollenDisc.html">SwollenDisc</a>
+						</li>
+						
+						<li>
+							<a href="Telangiectasis.html">Telangiectasis</a>
+						</li>
+						
+						<li>
+							<a href="ToricPCIOL.html">ToricPCIOL</a>
+						</li>
+						
+						<li>
+							<a href="Trabectome.html">Trabectome</a>
+						</li>
+						
+						<li>
+							<a href="TrabyConjIncision.html">TrabyConjIncision</a>
+						</li>
+						
+						<li>
+							<a href="TrabyFlap.html">TrabyFlap</a>
+						</li>
+						
+						<li>
+							<a href="TrabySuture.html">TrabySuture</a>
+						</li>
+						
+						<li>
+							<a href="TractionRetinalDetachment.html">TractionRetinalDetachment</a>
+						</li>
+						
+						<li>
+							<a href="TransilluminationDefect.html">TransilluminationDefect</a>
+						</li>
+						
+						<li>
+							<a href="TrialFrame.html">TrialFrame</a>
+						</li>
+						
+						<li>
+							<a href="TrialLens.html">TrialLens</a>
+						</li>
+						
+						<li>
+							<a href="Tube.html">Tube</a>
+						</li>
+						
+						<li>
+							<a href="TubeExtender.html">TubeExtender</a>
+						</li>
+						
+						<li>
+							<a href="TubeLigation.html">TubeLigation</a>
+						</li>
+						
+						<li>
+							<a href="UTear.html">UTear</a>
+						</li>
+						
+						<li>
+							<a href="Vicryl.html">Vicryl</a>
+						</li>
+						
+						<li>
+							<a href="ViewObscured.html">ViewObscured</a>
+						</li>
+						
+						<li>
+							<a href="VisualField.html">VisualField</a>
+						</li>
+						
+						<li>
+							<a href="VisualFieldChart.html">VisualFieldChart</a>
+						</li>
+						
+						<li>
+							<a href="VitreousOpacity.html">VitreousOpacity</a>
+						</li>
+						
+						<li>
+							<a href="Wheeze.html">Wheeze</a>
+						</li>
+						
+
+					</ul>
+				</li>
+				
+				<li class="dropdown">
+					<a href="events.list.html" class="dropdown-toggle" data-toggle="dropdown">Events<b
+						class="caret"></b></a>
+
+					<ul class="dropdown-menu ">
+						
+						<li>
+							<a href="ED.Drawing.html#event:hideTooltip">ED.Drawing#event:hideTooltip</a>
+						</li>
+						
+						<li>
+							<a href="ED.Drawing.html#event:hover">ED.Drawing#event:hover</a>
+						</li>
+						
+						<li>
+							<a href="ED.Drawing.html#event:keydown">ED.Drawing#event:keydown</a>
+						</li>
+						
+						<li>
+							<a href="ED.Drawing.html#event:mousedown">ED.Drawing#event:mousedown</a>
+						</li>
+						
+						<li>
+							<a href="ED.Drawing.html#event:mousemove">ED.Drawing#event:mousemove</a>
+						</li>
+						
+						<li>
+							<a href="ED.Drawing.html#event:mouseout">ED.Drawing#event:mouseout</a>
+						</li>
+						
+						<li>
+							<a href="ED.Drawing.html#event:mouseup">ED.Drawing#event:mouseup</a>
+						</li>
+						
+						<li>
+							<a href="ED.Drawing.html#event:showTooltip">ED.Drawing#event:showTooltip</a>
+						</li>
+						
+						<li>
+							<a href="ED.Drawing.html#event:startHoverTimer">ED.Drawing#event:startHoverTimer</a>
+						</li>
+						
+						<li>
+							<a href="ED.Drawing.html#event:stopHoverTimer">ED.Drawing#event:stopHoverTimer</a>
+						</li>
+						
+
+					</ul>
+				</li>
+				
+				<li class="dropdown">
+					<a href="global.html" class="dropdown-toggle" data-toggle="dropdown">Global<b
+						class="caret"></b></a>
+
+					<ul class="dropdown-menu ">
+						
+						<li>
+							<a href="global.html#ED">ED</a>
+						</li>
+						
+						<li>
+							<a href="global.html#register">register</a>
+						</li>
+						
+						<li>
+							<a href="global.html#registerForReady">registerForReady</a>
+						</li>
+						
+
+					</ul>
+				</li>
+				
+			</ul>
+		</div>
+	</div>
+
+	<div class="row-fluid">
+
+		
+			<div class="span12">
+				
+				<div id="main">
+					
+
+
+		<h1 class="page-title">Source: ED/Report.js</h1>
+    
+<section>
+	<article>
+		<pre
+			class="sunlight-highlight-javascript linenums">/**
+ * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
+ * (C) OpenEyes Foundation, 2011-2014
+ * This file is part of OpenEyes.
+ *
+ * OpenEyes is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * OpenEyes is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with OpenEyes.  If not, see &lt;http://www.gnu.org/licenses/>.
+ */
+
+/**
+ * An object of the Report class is used to extract data for the Royal College of Ophthalmologists retinal detachment dataset.
+ * The object analyses an EyeDraw drawing, and sets the value of HTML elements on the page accordingly.
+ *
+ * @class Report
+ * @property {Canvas} canvas A canvas element used to edit and display the drawing
+ * @property {Int} breaksInAttached The number of retinal breaks in attached retina
+ * @property {Int} breaksInDetached The number of retinal breaks in detached retina
+ * @property {String} largestBreakType The type of the largest retinal break
+ * @property {Int} largestBreakSize The size in clock hours of the largest retinal break
+ * @property {Int} lowestBreakPosition The lowest position of any break in clock hours
+ * @property {String} pvrType The type of PVR
+ * @property {Int} pvrCClockHours The number of clock hours of posterior PVR type C
+ * @property {Int} antPvrClockHours The number of clock hours of anterior PVR
+ * @param Drawing _drawing The drawing object to be analysed
+ */
+ED.Report = function(_drawing) {
+	// Properties
+	this.drawing = _drawing;
+	this.breaksInAttached = 0;
+	this.breaksInDetached = 0;
+	this.largestBreakType = 'Not found';
+	this.largestBreakSize = 0;
+	this.lowestBreakPosition = 12;
+	this.pvrType = 'None';
+	this.pvrCClockHours = 0;
+	this.antPvrClockHours = 0;
+
+	// Variables
+	var pvrCDegrees = 0;
+	var AntPvrDegrees = 0;
+	var minDegreesFromSix = 180;
+
+	// Create array of doodle classes which are retinal breaks
+	var breakClassArray = new Array();
+	breakClassArray["UTear"] = "U tear";
+	breakClassArray["RoundHole"] = "Round hole";
+	breakClassArray["Dialysis"] = "Dialysis";
+	breakClassArray["GRT"] = "GRT";
+	breakClassArray["MacularHole"] = "Macular hole";
+	breakClassArray["OuterLeafBreak"] = "Outer Leaf Break";
+
+	// Array of RRD doodles
+	this.rrdArray = new Array();
+
+	// First iteration to create array of retinal detachments
+	var i, doodle;
+	for (i = 0; i &lt; this.drawing.doodleArray.length; i++) {
+		doodle = this.drawing.doodleArray[i];
+
+		// If its a RRD, add to RRD array
+		if (doodle.className == "RRD") {
+			this.rrdArray.push(doodle);
+		}
+	}
+
+	// Second iteration for other doodles
+	for (i = 0; i &lt; this.drawing.doodleArray.length; i++) {
+		doodle = this.drawing.doodleArray[i];
+
+		// Star fold - PVR C
+		if (doodle.className == "StarFold") {
+			this.pvrType = 'C';
+			pvrCDegrees += doodle.arc * 180 / Math.PI;
+		}
+		// Anterior PVR
+		else if (doodle.className == "AntPVR") {
+			this.pvrType = 'C';
+			AntPvrDegrees += doodle.arc * 180 / Math.PI;
+		}
+		// Retinal breaks
+		else if (doodle.className in breakClassArray) {
+			// Bearing of break is calculated in two different ways
+			var breakBearing = 0;
+			if (doodle.className == "UTear" || doodle.className == "RoundHole" || doodle.className == "OuterLeafBreak") {
+				breakBearing = (Math.round(Math.atan2(doodle.originX, -doodle.originY) * 180 / Math.PI) + 360) % 360;
+			} else {
+				breakBearing = (Math.round(doodle.rotation * 180 / Math.PI + 360)) % 360;
+			}
+
+			// Bool if break is in detached retina
+			var inDetached = this.inDetachment(breakBearing);
+
+			// Increment totals
+			if (inDetached) {
+				this.breaksInDetached++;
+			} else {
+				this.breaksInAttached++;
+			}
+
+			// Get largest break in radians
+			if (inDetached && doodle.arc > this.largestBreakSize) {
+				this.largestBreakSize = doodle.arc;
+				this.largestBreakType = breakClassArray[doodle.className];
+			}
+
+			// Get lowest break
+			var degreesFromSix = Math.abs(breakBearing - 180);
+
+			if (inDetached && degreesFromSix &lt; minDegreesFromSix) {
+				minDegreesFromSix = degreesFromSix;
+
+				// convert to clock hours
+				var bearing = breakBearing + 15;
+				remainder = bearing % 30;
+				this.lowestBreakPosition = Math.floor((bearing - remainder) / 30);
+				if (this.lowestBreakPosition == 0) this.lowestBreakPosition = 12;
+			}
+		}
+	}
+
+	// Star folds integer result (round up to one clock hour)
+	pvrCDegrees += 25;
+	var remainder = pvrCDegrees % 30;
+	this.pvrCClockHours = Math.floor((pvrCDegrees - remainder) / 30);
+
+	// Anterior PVR clock hours
+	AntPvrDegrees += 25;
+	remainder = AntPvrDegrees % 30;
+	this.antPvrClockHours = Math.floor((AntPvrDegrees - remainder) / 30);
+
+	// Convert largest break size to clockhours
+	var size = this.largestBreakSize * 180 / Math.PI + 25;
+	var remainder = size % 30;
+	this.largestBreakSize = Math.floor((size - remainder) / 30);
+}
+
+/**
+ * Accepts a bearing in degrees (0 is at 12 o'clock) and returns true if it is in an area of detachment
+ *
+ * @param {Float} _angle Bearing in degrees
+ * @returns {Bool} True is the bearing intersects with an area of retinal deatchment
+ */
+ED.Report.prototype.inDetachment = function(_angle) {
+	var returnValue = false;
+
+	// Iterate through retinal detachments
+	for (key in this.rrdArray) {
+		var rrd = this.rrdArray[key];
+
+		// Get start and finish bearings of detachment in degrees
+		var min = (rrd.rotation - rrd.arc / 2) * 180 / Math.PI;
+		var max = (rrd.rotation + rrd.arc / 2) * 180 / Math.PI;
+
+		// Convert to positive numbers
+		var min = (min + 360) % 360;
+		var max = (max + 360) % 360;
+
+		// Handle according to whether RRD straddles 12 o'clock
+		if (max &lt; min) {
+			if ((0 &lt;= _angle && _angle &lt;= max) || (min &lt;= _angle && _angle &lt;= 360)) {
+				returnValue = true;
+			}
+		} else if (max == min) // Case if detachment is total
+		{
+			return true;
+		} else {
+			if (min &lt;= _angle && _angle &lt;= max) {
+				returnValue = true;
+			}
+		}
+	}
+
+	return returnValue;
+}
+
+/**
+ * Extent of RRD in clock hours
+ *
+ * @returns {Array} An array of extents (1 to 3 clock hours) for each quadrant
+ */
+ED.Report.prototype.extent = function() {
+	// Array of extents by quadrant
+	var extentArray = new Array();
+	if (this.drawing.eye == ED.eye.Right) {
+		extentArray["SN"] = 0;
+		extentArray["IN"] = 0;
+		extentArray["IT"] = 0;
+		extentArray["ST"] = 0;
+	} else {
+		extentArray["ST"] = 0;
+		extentArray["IT"] = 0;
+		extentArray["IN"] = 0;
+		extentArray["SN"] = 0;
+	}
+
+	// get middle of first hour in degrees
+	var midHour = 15;
+
+	// Go through each quadrant counting extent of detachment
+	for (quadrant in extentArray) {
+		for (var i = 0; i &lt; 3; i++) {
+			var addition = this.inDetachment(midHour) ? 1 : 0;
+			extentArray[quadrant] = extentArray[quadrant] + addition;
+			midHour = midHour + 30;
+		}
+	}
+
+	return extentArray;
+}
+
+/**
+ * Returns true if the macular is off
+ *
+ * @returns {Bool} True if the macula is off
+ */
+ED.Report.prototype.isMacOff = function() {
+	var result = false;
+
+	// Iterate through each detachment, one macoff is enough
+	for (key in this.rrdArray) {
+		var rrd = this.rrdArray[key];
+		if (rrd.isMacOff()) result = true;
+	}
+
+	return result;
+}
+</pre>
+	</article>
+</section>
+
+
+
+
+
+				</div>
+
+				<div class="clearfix"></div>
+				<footer>
+					
+					
+		<span class="copyright">
+		DocStrap Copyright © 2012-2014 The contributors to the JSDoc3 and DocStrap projects.
+		</span>
+					<br />
+					
+		<span class="jsdoc-message">
+		Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a>
+		on Tue Oct 21st 2014 using the <a
+			href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
+		</span>
+				</footer>
+			</div>
+
+			
+			<br clear="both">
+		</div>
+
+	</div>
+	<!--<script src="scripts/sunlight.js"></script>-->
+	<script src="scripts/docstrap.lib.js"></script>
+	<script src="scripts/bootstrap-dropdown.js"></script>
+	<script src="scripts/toc.js"></script>
+
+	<script>
+		$( function () {
+			$( "[id*='$']" ).each( function () {
+				var $this = $( this );
+
+				$this.attr( "id", $this.attr( "id" ).replace( "$", "__" ) );
+			} );
+
+			$( "#toc" ).toc( {
+				anchorName  : function ( i, heading, prefix ) {
+					return $( heading ).attr( "id" ) || ( prefix + i );
+				},
+				selectors   : "h1,h2,h3,h4",
+				showAndHide : false,
+				scrollTo    : "100px"
+			} );
+
+			$( "#toc>ul" ).addClass( "nav nav-pills nav-stacked" );
+			$( "#main span[id^='toc']" ).addClass( "toc-shim" );
+			$( '.dropdown-toggle' ).dropdown();
+//			$( ".tutorial-section pre, .readme-section pre" ).addClass( "sunlight-highlight-javascript" ).addClass( "linenums" );
+
+			$( ".tutorial-section pre, .readme-section pre" ).each( function () {
+				var $this = $( this );
+
+				var example = $this.find( "code" );
+				exampleText = example.html();
+				var lang = /{@lang (.*?)}/.exec( exampleText );
+				if ( lang && lang[1] ) {
+					exampleText = exampleText.replace( lang[0], "" );
+					example.html( exampleText );
+					lang = lang[1];
+				} else {
+					lang = "javascript";
+				}
+
+				if ( lang ) {
+
+					$this
+						.addClass( "sunlight-highlight-" + lang )
+						.addClass( "linenums" )
+						.html( example.html() );
+
+				}
+			} );
+
+			Sunlight.highlightAll( {
+				lineNumbers : true,
+				showMenu : true,
+				enableDoclinks : true
+			} );
+		} );
+	 </script>
+
+
+
+	<!--Navigation and Symbol Display-->
+	
+
+
+	<!--Google Analytics-->
+	
+
+</body>
+</html>

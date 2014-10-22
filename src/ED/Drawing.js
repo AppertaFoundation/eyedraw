@@ -1737,7 +1737,7 @@ ED.Drawing.prototype.setScaleForDrawingAndDoodles = function(level) {
 
 /**
  * This should be called only once the drawing is ready.
- * @param {[type]} level [description]
+ * @param {Number} level [description]
  */
 ED.Drawing.prototype.setScaleLevel = function(level) {
 	this.setScaleForDrawingAndDoodles(level);
