@@ -29,6 +29,8 @@ module.exports = function(grunt) {
 		connect: require('./connect')(grunt),
 		jst: require('./jst')(grunt),
 		mocha: require('./mocha')(grunt),
-		jsdoc: require('./jsdoc')(grunt)
+		jsdoc: require('./jsdoc')(grunt),
+		list: require('./list')(grunt)
 	};
 };
+

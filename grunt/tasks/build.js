@@ -22,7 +22,6 @@ module.exports = function(grunt) {
 		'jst',
 		'concat',
 		'uglify',
-		'compile',
-		'jsdoc'
+		'compile'
 	]);
 };
