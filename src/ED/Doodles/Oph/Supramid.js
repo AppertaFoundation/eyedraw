@@ -27,7 +27,7 @@
 ED.Supramid = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "Supramid";
-	
+
 	// Other parameters
 	this.percent = '80';
 
@@ -36,22 +36,22 @@ ED.Supramid = function(_drawing, _parameterJSON) {
 
 	// Parameters in doodle control bar (parameter name: parameter label)
 	this.controlParameterArray = {'percent':'Percentage of tube'};
-	
+
 	// Bezier segmentation is not linear, so can make fine adjustments here if required
 	this.adjustmentArray = {
-		'0':0, 
-		'10':10, 
-		'20':20, 
-		'30':30, 
-		'40':40, 
-		'50':50, 
-		'60':60, 
-		'70':70, 
-		'80':80, 
-		'90':90, 
+		'0':0,
+		'10':10,
+		'20':20,
+		'30':30,
+		'40':40,
+		'50':50,
+		'60':60,
+		'70':70,
+		'80':80,
+		'90':90,
 		'100':100
 	}
-	
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
@@ -80,7 +80,7 @@ ED.Supramid.prototype.setPropertyDefaults = function() {
 	// Update component of validation array for simple parameters
 	this.parameterValidationArray['apexX']['range'].setMinAndMax(-800, +800);
 	this.parameterValidationArray['apexY']['range'].setMinAndMax(-800, +800);
-	
+
 	// Add complete validation arrays for derived parameters
 	this.parameterValidationArray['percent'] = {
 		kind: 'other',
@@ -96,7 +96,7 @@ ED.Supramid.prototype.setPropertyDefaults = function() {
 ED.Supramid.prototype.setParameterDefaults = function() {
 	this.apexX = -660;
 	this.apexY = 30;
-	
+
 	// Default value of insertion percentage
 	this.setParameterFromString('percent', '80');
 
@@ -118,7 +118,7 @@ ED.Supramid.prototype.draw = function(_point) {
 
 	// Call draw method in superclass
 	ED.Supramid.superclass.draw.call(this, _point);
-	
+
 	// Get Tube or TubeExtender doodle (Latter takes preference)
 	var doodle = this.drawing.lastDoodleOfClass("TubeExtender");
 
@@ -132,7 +132,7 @@ ED.Supramid.prototype.draw = function(_point) {
 			this.rotation = doodle.rotation;
 		}
 	}
-
+	
 	// Calculate key points for supramid bezier
 	var startPoint = new ED.Point(this.apexX, this.apexY);
 	var tubePoint = new ED.Point(0, -700);
@@ -157,7 +157,7 @@ ED.Supramid.prototype.draw = function(_point) {
 
 	// Non boundary paths
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
-		if (doodle) {
+		if (doodle && doodle.bezierArray['sp']) {
 			// Suture
 			var xDev = startPoint.x/Math.abs(startPoint.x) * 100;
 			ctx.beginPath()
@@ -166,14 +166,14 @@ ED.Supramid.prototype.draw = function(_point) {
 
 			// Number of bezier segments
 			var nb = 50;
-			
+
 			// Draw Bezier of appropriate length for corrected proportion along curve
 			var pc = this.adjustmentArray[this.percent];
 			for (var t = 0; t < 1/nb + pc/100; t = t + 1/nb) {
 				var nextPoint = doodle.bezierArray['sp'].bezierPointAtParameter(t, doodle.bezierArray['cp1'], doodle.bezierArray['cp2'], doodle.bezierArray['ep']);
 				ctx.lineTo(nextPoint.x, nextPoint.y);
 			}
-			
+
 			ctx.lineWidth = 4;
 			ctx.strokeStyle = "purple";
 			ctx.stroke();
