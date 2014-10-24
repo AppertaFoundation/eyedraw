@@ -17,11 +17,17 @@
  * along with OpenEyes.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @namespace ED
+ * @description Namespace for all EyeDraw classes
+ */
 var ED = ED || {};
 
 /**
  * ED.Checker is used to track when eyedraws are "ready" and execute callbacks
  * when ready. An eyedraw is ready when all doodles have been loaded.
+ * @namespace ED.Checker
+ * @memberOf ED
  */
 ED.Checker = ED.Checker || (function() {
 

@@ -19,6 +19,10 @@
 
 /* global $: false, ED: true */
 
+/**
+ * @namespace ED
+ * @description Namespace for all EyeDraw classes
+ */
 var ED = ED || {};
 ED.Views = ED.Views || {};
 

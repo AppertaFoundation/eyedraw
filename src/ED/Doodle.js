@@ -2,8 +2,8 @@
  * Doodles are components of drawings which have built in knowledge of what they represent, and how to behave when manipulated;
  * Doodles are drawn in the 'doodle plane' consisting of 1001 pixel square grid with central origin (ie -500 to 500) and
  * are rendered in a canvas element using a combination of the affine transform of the host drawing, and the doodle's own transform.
- *
- * @class Doodle
+ * @namespace ED.Doodle
+ * @memberOf ED
  * @property {Drawing} drawing Drawing to which this doodle belongs
  * @property {Int} originX X coordinate of origin in doodle plane
  * @property {Int} originY Y coordinate of origin in doodle plane

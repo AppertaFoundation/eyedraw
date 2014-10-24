@@ -25,6 +25,12 @@
  * @version 0.95
  */
 
+
+/**
+ * Defines the EyeDraw namespace
+ * @namespace ED
+ * @description Namespace for all EyeDraw classes
+ */
 var ED = ED || {};
 
 ED.init = (function() {

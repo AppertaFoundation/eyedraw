@@ -20,11 +20,11 @@
 module.exports = function(grunt) {
 	return {
     dist : {
-      src: ['src/**/*.js', 'test/**/*.js'], 
+      src: ['src/**/*.js', 'test/**/*.js',  'docs/README.md'], 
       options: {
         destination: 'jsdocs',
         template : "node_modules/grunt-jsdoc/node_modules/ink-docstrap/template",
-        configure : "node_modules/grunt-jsdoc/node_modules/ink-docstrap/template/jsdoc.conf.json"
+        configure : "grunt/config/jsdoc.conf.json"
       }
     }
 	};
