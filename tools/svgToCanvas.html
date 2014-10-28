@@ -1,0 +1,94 @@
+<html>
+		<head>
+			<title>Svg to Canvas - generate canvas draw commands</title>
+
+			<link rel="stylesheet" type="text/css" href="css/svgToCanvas.css" />
+		</head>
+		<body>
+
+			<div id="dropZone">Drop SVG file here</div>
+
+			<div class="module narrow bs-callout bs-callout-info">
+				<h2>Uploaded image</h2>
+				<output id="list"></output>
+			</div>
+			<div class="module bs-callout bs-callout-info">
+				<h2>Doodle draw commands</h2>
+				<div class="control cf">
+					<label for="x-offset">X Offset:</label><input type="text" name="x-offset" id="xOffset">
+				</div>
+				<div class="control cf">
+					<label for="y-offset">Y Offset:</label><input type="text" name="y-offset" id="yOffset">
+				</div>
+				<div class="control cf">
+					<label for="scale">Scale:</label><input type="text" name="scale" id="scale">
+				</div>
+				<pre id="commandView"></pre>
+			</div>
+			<div class="module narrow bs-callout bs-callout-info">
+				<h2>Canvas preview</h2>
+				<canvas id="canvasView" width="302" height="302"></canvas>
+			</div>
+			<script src="js/CommandGenerator.js"></script>
+			<script>
+
+				var CG = new app.CommandGenerator('canvasView', 'commandView', 'xOffset', 'yOffset', 'scale');
+
+				function getXMLFromFile(data){
+        	//	Remove uri declarations from string then decode base64
+					var decodedData = window.atob(data.replace('data:image/svg+xml;base64,', ''));
+        	var oParser = new DOMParser();
+        	//	Convert parsed string of xml in nodes
+					var oDOM = oParser.parseFromString(decodedData, "text/xml");
+					return oDOM;
+				}
+
+			  function handleFileSelect(evt) {
+				  	evt.stopPropagation();
+				    evt.preventDefault();
+
+				    dropZone.className = '';
+
+				    var files = evt.dataTransfer.files; // FileList object
+
+				    // Loop through the FileList and render image files as thumbnails.
+				    for (var i = 0, f; f = files[i]; i++) {
+				      // Only process svg files.
+				      if (!f.type.match('image*')) {
+				        continue;
+				      }
+
+				      var reader = new FileReader();
+
+				      // Closure to capture the file information.
+				      reader.onload = (function(theFile) {
+				        return function(e) {
+				        	var oDOM = getXMLFromFile(e.target.result);
+									CG.setSvg(oDOM);
+									CG.generateCanvasCommands();
+
+				          document.getElementById('list').innerHTML = ['<img class="thumb" src="', e.target.result, '" title="', escape(theFile.name), '"/>'].join('');
+				        };
+				      })(f);
+
+				      // Read in the image file as a data URL.
+				      reader.readAsDataURL(f);
+				    }
+				  }
+
+			  function handleDragOver(evt) {
+			    evt.stopPropagation();
+			    evt.preventDefault();
+			    evt.dataTransfer.dropEffect = 'copy'; // Explicitly show this is a copy.
+			    dropZone.className = 'active';
+			  }
+
+			  // Setup the dnd listeners.
+			  var dropZone = document.getElementById('dropZone');
+			  dropZone.addEventListener('dragover', handleDragOver, false);
+			  dropZone.addEventListener('drop', handleFileSelect, false);
+
+			</script>
+
+		</body>
+</html>
