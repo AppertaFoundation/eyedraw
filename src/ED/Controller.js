@@ -275,6 +275,8 @@ ED.Controller = (function() {
 	Controller.prototype.runOnReadyCommands = function() {
 		var arr = (this.properties.onReadyCommandArray || []);
 		this.runCommands(arr);
+
+		this.drawing.onReadyCommands.push(arr);
 	};
 
 	/**
