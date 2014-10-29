@@ -5,12 +5,7 @@
 			<link rel="stylesheet" type="text/css" href="css/svgToCanvas.css" />
 		</head>
 		<body>
-			<p>
-				<a href="#" id="replaceString">Replace</a> | 
-				<a href="#" id="updateString">Update</a> | 
-				<a href="filesystem:http://localhost:8000/persistent/scratchdoodle.js" target="_blank">View file generated</a> |
-				<a href="filesystem:http://localhost:8000/persistent/scratchdoodle.js" download="filesystem:http://localhost:8000/persistent/scratchdoodle.js">Download file generated</a>
-			</p>
+			
 
 			<div id="dropZone">Drop SVG file here</div>
 
@@ -36,7 +31,7 @@
 				<canvas id="canvasView" width="302" height="302"></canvas>
 			</div>
 			<script src="js/CommandGenerator.js"></script>
-			<script src="js/FileWriter.js"></script>
+			
 			<script>
 
 				var CG = new app.CommandGenerator('canvasView', 'commandView', 'xOffset', 'yOffset', 'scale');
