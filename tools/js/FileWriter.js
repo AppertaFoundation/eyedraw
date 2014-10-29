@@ -20,13 +20,9 @@ The FileWriter class is used to download a generated Doodle class javascript fil
 		Construtor: FileWriter,
 
 		init: function(){
-			console.log("init");
-
-				
-
 				function onInitFs(fs) {
-					console.log("writing");
-				  fs.root.getFile('log.txt', {create: true}, function(fileEntry) {
+
+				  fs.root.getFile('scratchdoodle.js', {create: true}, function(fileEntry) {
 
 				    // Create a FileWriter object for our FileEntry (log.txt).
 				    fileEntry.createWriter(function(fileWriter) {
@@ -40,7 +36,7 @@ The FileWriter class is used to download a generated Doodle class javascript fil
 				      };
 
 				      // Create a new Blob and write it to log.txt.
-				      var blob = new Blob(['Lorem Ipsum'], {type: 'text/plain'});
+				      var blob = new Blob(['Lorem Ipsum dolor'], {type: 'text/plain'});
 
 				      fileWriter.write(blob);
 
@@ -51,22 +47,92 @@ The FileWriter class is used to download a generated Doodle class javascript fil
 				}
 
 				function errorHandler(e){
-					console.log("this is errorrzzz", e)
+					console.log("this is errorrzzz", e);
 				}
 
 				// Request Quota (only for File System API)  
-				navigator.webkitPersistentStorage.requestQuota(1024*1024*280, function(grantedBytes){
+				navigator.webkitPersistentStorage.requestQuota(1024*1024, function(grantedBytes){
 				  window.webkitRequestFileSystem(PERSISTENT, grantedBytes, onInitFs, errorHandler);
 				}, function(e){
 				  console.log('Error', e);
 				})
-				
 
-				//window.requestFileSystem(window.TEMPORARY, 1024*1024, onInitFs, errorHandler);
+		},
+		update: function(){
+			console.log("updating existing");
+
+			function onUpdateFs(fs){
+				
+				fs.root.getFile('scratchdoodle.js', {create: false}, function(fileEntry) {
+			    // Create a FileWriter object for our FileEntry (log.txt).
+			    fileEntry.createWriter(function(fileWriter) {
+
+			      fileWriter.seek(fileWriter.length); // Start write position at EOF.
+
+			      // Create a new Blob and write it to log.txt.
+			      var blob = new Blob(['Hello World'], {type: 'text/plain'});
+
+			      fileWriter.write(blob);
+
+			    }, errorHandler);
+
+			  }, errorHandler);
+
+			}
+
+			function errorHandler(e){
+				console.log("this is errorr in update", e);
+			}
+
+			window.webkitRequestFileSystem(PERSISTENT, 1024*1024, onUpdateFs, errorHandler);
+		},
+		replace: function(){
+
+			function writeNew(fs){
+
+				console.log("replacing");
+
+				// Create a FileWriter object for our FileEntry (log.txt).
+				fs.root.getFile('scratchdoodle.js', {create: true}, function(fileEntry) {
+					fileEntry.createWriter(function(fileWriter) {
+
+			      fileWriter.seek(fileWriter.length); // Start write position at EOF.
+
+			      // Create a new Blob and write it to log.txt.
+			      var blob = new Blob(['this is whole new string'], {type: 'text/plain'});
+
+			      fileWriter.write(blob);
+
+			    }, errorHandler);
+
+				}, errorHandler);
+
+			}
+
+			
+			function onReplaceFs(fs){
+
+				console.log("removing");
+				
+				fs.root.getFile('scratchdoodle.js', {create: true}, function(fileEntry) {
+
+					fileEntry.remove(function(){
+						window.webkitRequestFileSystem(PERSISTENT, 1024*1024, writeNew, errorHandler);
+					});
+			    
+			  }, errorHandler);
+
+			}
+
+			function errorHandler(e){
+				console.log("this is errorr in replace", e)
+			}
+
+			window.webkitRequestFileSystem(PERSISTENT, 1024*1024, onReplaceFs, errorHandler);
+
 		}
 
-		
-
+	
 	}
 
 	window.app.FileWriter = FileWriter;
@@ -74,3 +140,22 @@ The FileWriter class is used to download a generated Doodle class javascript fil
 })();
 
 var writeJsFile = new app.FileWriter();
+
+var updateBtn = document.getElementById("updateString");
+
+updateBtn.addEventListener('click', updateAction, false);
+
+function updateAction(e){
+	writeJsFile.update();
+	e.preventDefault();
+}
+
+var replaceBtn = document.getElementById("replaceString");
+
+replaceBtn.addEventListener('click', replaceAction, false);
+
+function replaceAction(e){
+	writeJsFile.replace();
+	e.preventDefault();
+}
+
