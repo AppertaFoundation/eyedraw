@@ -383,14 +383,16 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 	this.isNew = true;
 	this.isReady = false;
 	this.showDoodleControls = false;
+	this.onReadyCommands = [];
+	this.resetDoodleSet = false;
 
 	// Freehand drawing properties NB from November 2013 moved to Freehand doodle
-// 	this.squiggleColour = new ED.Colour(0, 255, 0, 1);
-// 	this.squiggleWidth = ED.squiggleWidth.Medium;
-// 	this.squiggleStyle = ED.squiggleStyle.Outline;
+//	this.squiggleColour = new ED.Colour(0, 255, 0, 1);
+//	this.squiggleWidth = ED.squiggleWidth.Medium;
+//	this.squiggleStyle = ED.squiggleStyle.Outline;
 
 	// Put settings into display canvas
-// 	this.refreshSquiggleSettings();
+//	this.refreshSquiggleSettings();
 
 	// Associative array of bound element no doodle values (ie value associated with deleted doodle)
 	this.boundElementDeleteValueArray = new Array();
@@ -511,38 +513,38 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 			}
 		}, false);
 
-		//        this.canvas.addEventListener('mousewheel', function(e) {
-		//                                     e.preventDefault();
-		//                                     drawing.selectNextDoodle(e.wheelDelta);
-		//                                     }, false);
+		//				this.canvas.addEventListener('mousewheel', function(e) {
+		//																		 e.preventDefault();
+		//																		 drawing.selectNextDoodle(e.wheelDelta);
+		//																		 }, false);
 
 		// iOS listeners
-    this.canvas.addEventListener('touchstart', function(e) {
-      if (e.targetTouches[0] !== undefined) {
-        var canvas_pos = drawing.getPositionOfElement(drawing.canvas);
-        var point = new ED.Point(e.targetTouches[0].pageX - canvas_pos[0] - this.offsetLeft, e.targetTouches[0].pageY - canvas_pos[1]);
-        e.preventDefault();
-      } else {
-        ED.errorHandler('ED.Drawing', 'Class', 'Touches undefined: ');
-      }
-      drawing.mousedown(point);
-    }, false);
+		this.canvas.addEventListener('touchstart', function(e) {
+			if (e.targetTouches[0] !== undefined) {
+				var canvas_pos = drawing.getPositionOfElement(drawing.canvas);
+				var point = new ED.Point(e.targetTouches[0].pageX - canvas_pos[0] - this.offsetLeft, e.targetTouches[0].pageY - canvas_pos[1]);
+				e.preventDefault();
+			} else {
+				ED.errorHandler('ED.Drawing', 'Class', 'Touches undefined: ');
+			}
+			drawing.mousedown(point);
+		}, false);
 
-    this.canvas.addEventListener('touchend', function(e) {
-      if (e.targetTouches[0] !== undefined) {
-        var canvas_pos = drawing.getPositionOfElement(drawing.canvas);
-        var point = new ED.Point(e.targetTouches[0].pageX - canvas_pos[0] - this.offsetLeft, e.targetTouches[0].pageY - canvas_pos[1]);
-        drawing.mouseup(point);
-      }
-    }, false);
+		this.canvas.addEventListener('touchend', function(e) {
+			if (e.targetTouches[0] !== undefined) {
+				var canvas_pos = drawing.getPositionOfElement(drawing.canvas);
+				var point = new ED.Point(e.targetTouches[0].pageX - canvas_pos[0] - this.offsetLeft, e.targetTouches[0].pageY - canvas_pos[1]);
+				drawing.mouseup(point);
+			}
+		}, false);
 
-    this.canvas.addEventListener('touchmove', function(e) {
-      if (e.targetTouches[0] !== undefined) {
-        var canvas_pos = drawing.getPositionOfElement(drawing.canvas);
-        var point = new ED.Point(e.targetTouches[0].pageX - canvas_pos[0] - this.offsetLeft, e.targetTouches[0].pageY - canvas_pos[1]);
-        drawing.mousemove(point);
-      }
-    }, false);
+		this.canvas.addEventListener('touchmove', function(e) {
+			if (e.targetTouches[0] !== undefined) {
+				var canvas_pos = drawing.getPositionOfElement(drawing.canvas);
+				var point = new ED.Point(e.targetTouches[0].pageX - canvas_pos[0] - this.offsetLeft, e.targetTouches[0].pageY - canvas_pos[1]);
+				drawing.mousemove(point);
+			}
+		}, false);
 
 		// Keyboard listener
 		window.addEventListener('keydown', function(e) {
@@ -557,17 +559,17 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 }
 
 ED.Drawing.prototype.getPositionOfElement = function(element) {
-    var x=0;
-    var y=0;
-    while(true){
-        x += element.offsetLeft;
-        y += element.offsetTop;
-        if(element.offsetParent === null){
-            break;
-        }
-        element = element.offsetParent;
-    }
-    return [x, y];
+		var x=0;
+		var y=0;
+		while(true){
+				x += element.offsetLeft;
+				y += element.offsetTop;
+				if(element.offsetParent === null){
+						break;
+				}
+				element = element.offsetParent;
+		}
+		return [x, y];
 }
 
 /**
@@ -681,7 +683,7 @@ ED.Drawing.prototype.registerForNotifications = function(_object, _methodName, _
 }
 
 /**
- * Unregisters an object for notifications  ***TODO*** Need method of identifying objects for this to work
+ * Unregisters an object for notifications	***TODO*** Need method of identifying objects for this to work
  *
  * @param {object} _object The object requesting notification
  */
@@ -702,18 +704,12 @@ ED.Drawing.prototype.unRegisterForNotifications = function(_object) {
  * @param {Object} _object An optional object which may accompany an event containing additional information
  */
 ED.Drawing.prototype.notify = function(_eventName, _object) {
-	//console.log("Notifying for event: " + _eventName);
-
 	// Create array containing useful information
 	var messageArray = {
 		eventName: _eventName,
 		selectedDoodle: this.selectedDoodle,
 		object: _object
 	};
-
-	// console.log(this.notificationArray);
-	//
-
 
 	// Call method on each registered object
 	for (var i = 0; i < this.notificationArray.length; i++) {
@@ -722,8 +718,6 @@ ED.Drawing.prototype.notify = function(_eventName, _object) {
 		var list = this.notificationArray[i]['notificationList'];
 		var object = this.notificationArray[i]['object'];
 		var methodName = this.notificationArray[i]['methodName'];
-
-		// console.log(_eventName);
 
 		// Check that event is in notification list for this object, or array is empty implying all notifications
 		if (list.length == 0 || list.indexOf(_eventName) >= 0) {
@@ -750,6 +744,7 @@ ED.Drawing.prototype.loadDoodles = function(_id) {
 	// If it exists and contains something, load it
 	if (sourceElement && sourceElement.value.length > 0) {
 		var doodleSet = window.JSON.parse(sourceElement.value);
+		this.resetDoodleSet = doodleSet;
 		this.load(doodleSet);
 
 		// Set isNew flag
@@ -952,12 +947,12 @@ ED.Drawing.prototype.mousedown = function(_point) {
 
 	// Multiple Selecting
 	/*
-    if (!found)
-    {
-        this.mode = ED.Mode.Select;
-        this.selectionRectangleStart = this.inverseTransform.transformPoint(_point);
-    }
-     */
+		if (!found)
+		{
+				this.mode = ED.Mode.Select;
+				this.selectionRectangleStart = this.inverseTransform.transformPoint(_point);
+		}
+		 */
 
 	// Repaint
 	this.repaint();
@@ -991,17 +986,17 @@ ED.Drawing.prototype.mousemove = function(_point) {
 
 	// Draw selection rectangle
 	/*
-    if (this.mode == ED.Mode.Select)
-    {
-        if (!this.selectionRectangleIsBeingDragged)
-        {
-            this.selectionRectangleIsBeingDragged = true;
-        }
+		if (this.mode == ED.Mode.Select)
+		{
+				if (!this.selectionRectangleIsBeingDragged)
+				{
+						this.selectionRectangleIsBeingDragged = true;
+				}
 
-        this.selectionRectangleEnd = this.inverseTransform.transformPoint(_point);
-        this.repaint();
-    }
-    */
+				this.selectionRectangleEnd = this.inverseTransform.transformPoint(_point);
+				this.repaint();
+		}
+		*/
 
 	// Store action for notification
 	var action = "";
@@ -1346,23 +1341,23 @@ ED.Drawing.prototype.mousemove = function(_point) {
 ED.Drawing.prototype.mouseup = function(_point) {
 	// Multiselect - Go through doodles seeing which are within dragging rectangle
 	/*
-    for (var i = 0; i < this.doodleArray.length; i++)
+		for (var i = 0; i < this.doodleArray.length; i++)
 	{
-        var doodle = this.doodleArray[i];
-        var origin = new ED.Point(doodle.originX, doodle.originY);
+				var doodle = this.doodleArray[i];
+				var origin = new ED.Point(doodle.originX, doodle.originY);
 
-        var p = this.transform.transformPoint(origin);
+				var p = this.transform.transformPoint(origin);
 
-        // If doodle origin is in selection rectangle, select it
-        if(this.selectionRectangleIsBeingDragged && this.context.isPointInPath(p.x, p.y))
-        {
-            doodle.isSelected = true;
-        }
+				// If doodle origin is in selection rectangle, select it
+				if(this.selectionRectangleIsBeingDragged && this.context.isPointInPath(p.x, p.y))
+				{
+						doodle.isSelected = true;
+				}
 	}
 
-    // TEMP - this is needed to ensure delete button is activated
-    if (doodle) this.selectedDoodle = doodle;
-     */
+		// TEMP - this is needed to ensure delete button is activated
+		if (doodle) this.selectedDoodle = doodle;
+		 */
 
 	// Reset flags and mode
 	this.mouseDown = false;
@@ -1822,18 +1817,18 @@ ED.Drawing.prototype.flipHor = function() {
  *
  * @param {Doodle} The doodle to be deleted
  */
-ED.Drawing.prototype.deleteDoodle = function(_doodle) {
+ED.Drawing.prototype.deleteDoodle = function(_doodle, really) {
 	// Class name and flag for successful deletion
 	var deletedClassName = false;
 
 	var errorMessage = 'Attempt to delete a doodle that does not exist';
 
 	// Check that doodle will delete
-	if (_doodle.willDelete()) {
+	if (really || _doodle.willDelete()) {
 		// Iterate through doodle array looking for doodle
 		for (var i = 0; i < this.doodleArray.length; i++) {
 			if (this.doodleArray[i].id == _doodle.id) {
-				if (this.doodleArray[i].isDeletable) {
+				if (really || this.doodleArray[i].isDeletable) {
 					deletedClassName = _doodle.className;
 
 					// If its selected, deselect it
@@ -1928,21 +1923,21 @@ ED.Drawing.prototype.deleteDoodle = function(_doodle) {
 ED.Drawing.prototype.deleteSelectedDoodle = function() {
 	// Should only be called if a doodle is selected, but check anyway
 	if (this.selectedDoodle != null) {
-		this.deleteDoodle(this.selectedDoodle);
+		this.deleteDoodle(this.selectedDoodle,false);
 	} else {
 		ED.errorHandler('ED.Drawing', 'deleteSelectedDoodle', 'Attempt to delete selected doodle, when none selected');
 	}
 
 	// Multiple select
 	/*
-    for (var i = 0; i < this.doodleArray.length; i++)
-    {
-        if (this.doodleArray[i].isSelected)
-        {
-            this.deleteDoodle(this.doodleArray[i]);
-        }
-    }
-     */
+		for (var i = 0; i < this.doodleArray.length; i++)
+		{
+				if (this.doodleArray[i].isSelected)
+				{
+						this.deleteDoodle(this.doodleArray[i]);
+				}
+		}
+		 */
 }
 
 /**
@@ -1950,14 +1945,44 @@ ED.Drawing.prototype.deleteSelectedDoodle = function() {
  */
 
 ED.Drawing.prototype.resetEyedraw = function() {
-	this.deleteAllDoodles();
-	this.deselectDoodles();
+	this.notify("beforeReset");
+
+	this.deleteAllDoodles(true);
+
+	if (this.resetDoodleSet !== false) {
+		this.notify("resetEdit");
+	} else {
+		this.notify("reset");
+	}
+
+	if (this.resetDoodleSet !== false) {
+		this.load(this.resetDoodleSet);
+
+		// Set isNew flag
+		this.isNew = false;
+
+		// Notify
+		this.notify("doodlesLoaded");
+	} else {
+		for (var i = 0; i < this.onReadyCommands.length; i++) {
+			for (var j = 0; j < this.onReadyCommands[i].length; j++) {
+				var method = this.onReadyCommands[i][j][0];
+				var argumentArray = this.onReadyCommands[i][j][1];
+
+				this[method].apply(this, argumentArray);
+			}
+		}
+	}
+
 	this.drawAllDoodles();
+	this.deselectDoodles();
+
+	this.addBindings(this.bindingArray);
 }
 
 /**
  * Set the scale level for drawing and all doodles
- * @param  {Number} level     Scale level.
+ * @param  {Number} level			Scale level.
  * @param  {String} eventName Event name to notify.
  */
 ED.Drawing.prototype.setScaleForDrawingAndDoodles = function(level) {
@@ -2031,7 +2056,7 @@ ED.Drawing.prototype.deleteDoodleOfId = function(_id) {
 	var doodle = this.doodleOfId(_id);
 
 	if (doodle) {
-		this.deleteDoodle(doodle);
+		this.deleteDoodle(doodle,false);
 	} else {
 		ED.errorHandler('ED.Drawing', 'deleteDoodleOfId', 'Attempt to delete doodle with invalid id');
 	}
@@ -2220,14 +2245,14 @@ ED.Drawing.prototype.addDoodle = function(_className, _parameterDefaults, _param
 
 		// Create an instance of the parent if it does not already exist
 		/*
-        if (newDoodle.parentClass.length > 0)
-        {
-            if (!this.hasDoodleOfClass(newDoodle.parentClass))
-            {
-                this.addDoodle(newDoodle.parentClass);
-            }
-        }
-        */
+				if (newDoodle.parentClass.length > 0)
+				{
+						if (!this.hasDoodleOfClass(newDoodle.parentClass))
+						{
+								this.addDoodle(newDoodle.parentClass);
+						}
+				}
+				*/
 	} else {
 		ED.errorHandler('ED.Drawing', 'addDoodle', 'Unable to find definition for subclass ' + _className);
 		return null;
@@ -2751,12 +2776,12 @@ ED.Drawing.prototype.doodleOfId = function(_id) {
 /**
  * Deletes all doodles that are deletable
  */
-ED.Drawing.prototype.deleteAllDoodles = function() {
+ED.Drawing.prototype.deleteAllDoodles = function(really_all) {
 	// Go through doodle array (backwards because of splice function)
 	for (var i = this.doodleArray.length - 1; i >= 0; i--) {
 		// Only delete deletable ones
-		if (this.doodleArray[i].isDeletable) {
-			this.deleteDoodle(this.doodleArray[i]);
+		if (really_all || this.doodleArray[i].isDeletable) {
+			this.deleteDoodle(this.doodleArray[i],really_all);
 		}
 	}
 }
@@ -2771,7 +2796,7 @@ ED.Drawing.prototype.deleteDoodlesOfClass = function(_className) {
 	for (var i = this.doodleArray.length - 1; i >= 0; i--) {
 		// Find doodles of given class name
 		if (this.doodleArray[i].className == _className) {
-			this.deleteDoodle(this.doodleArray[i]);
+			this.deleteDoodle(this.doodleArray[i],false);
 		}
 	}
 }
@@ -3104,9 +3129,9 @@ ED.Drawing.prototype.getScaleLevel = function() {
  * @returns {String} _hexColour A string describing the colour to use for freehand drawing
  */
 // ED.Drawing.prototype.setSquiggleColour = function(_colour) {
-// 	this.squiggleColour = _colour;
+//	this.squiggleColour = _colour;
 //
-// 	this.refreshSquiggleSettings()
+//	this.refreshSquiggleSettings()
 // }
 
 /**
@@ -3115,9 +3140,9 @@ ED.Drawing.prototype.getScaleLevel = function() {
  * @returns {Int} _hexColour A number describing the width
  */
 // ED.Drawing.prototype.setSquiggleWidth = function(_width) {
-// 	this.squiggleWidth = _width;
+//	this.squiggleWidth = _width;
 //
-// 	this.refreshSquiggleSettings()
+//	this.refreshSquiggleSettings()
 // }
 
 /**
@@ -3126,9 +3151,9 @@ ED.Drawing.prototype.getScaleLevel = function() {
  * @returns {int} _style A string describing the style to use for freehand drawing
  */
 // ED.Drawing.prototype.setSquiggleStyle = function(_style) {
-// 	this.squiggleStyle = _style;
+//	this.squiggleStyle = _style;
 //
-// 	this.refreshSquiggleSettings()
+//	this.refreshSquiggleSettings()
 // }
 
 /**
@@ -3137,37 +3162,37 @@ ED.Drawing.prototype.getScaleLevel = function() {
  * @returns {String} _hexColour A string describing the colour to use for freehand drawing
  */
 // ED.Drawing.prototype.refreshSquiggleSettings = function() {
-// 	// Get reference to canvas
-// 	var displayCanvas = document.getElementById("squiggleSettings" + this.idSuffix);
+//	// Get reference to canvas
+//	var displayCanvas = document.getElementById("squiggleSettings" + this.idSuffix);
 //
-// 	if (displayCanvas) {
-// 		// Get context
-// 		var ctx = displayCanvas.getContext('2d');
+//	if (displayCanvas) {
+//		// Get context
+//		var ctx = displayCanvas.getContext('2d');
 //
-// 		// Reset canvas
-// 		displayCanvas.width = displayCanvas.width;
-// 		ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+//		// Reset canvas
+//		displayCanvas.width = displayCanvas.width;
+//		ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 //
-// 		// Set colours
-// 		ctx.strokeStyle = this.squiggleColour.rgba();
-// 		ctx.fillStyle = this.squiggleColour.rgba();;
+//		// Set colours
+//		ctx.strokeStyle = this.squiggleColour.rgba();
+//		ctx.fillStyle = this.squiggleColour.rgba();;
 //
-// 		// Line width
-// 		ctx.beginPath();
-// 		ctx.moveTo(3, 8);
-// 		ctx.lineTo(20, 8);
-// 		ctx.lineWidth = this.squiggleWidth / 2;
-// 		ctx.stroke();
+//		// Line width
+//		ctx.beginPath();
+//		ctx.moveTo(3, 8);
+//		ctx.lineTo(20, 8);
+//		ctx.lineWidth = this.squiggleWidth / 2;
+//		ctx.stroke();
 //
-// 		// Outline or solid
-// 		ctx.beginPath();
-// 		ctx.rect(5, 19, 13, 8);
-// 		ctx.lineWidth = 3;
-// 		ctx.stroke();
-// 		if (this.squiggleStyle == ED.squiggleStyle.Solid) {
-// 			ctx.fill();
-// 		}
-// 	}
+//		// Outline or solid
+//		ctx.beginPath();
+//		ctx.rect(5, 19, 13, 8);
+//		ctx.lineWidth = 3;
+//		ctx.stroke();
+//		if (this.squiggleStyle == ED.squiggleStyle.Solid) {
+//			ctx.fill();
+//		}
+//	}
 // }
 
 ///**
@@ -3177,11 +3202,11 @@ ED.Drawing.prototype.getScaleLevel = function() {
 // */
 //ED.DoodleGroups =
 //{
-//    bar: function (val)
-//    {
-//        console.log(val);
-//    },
-//    foo: 2
+//		bar: function (val)
+//		{
+//				console.log(val);
+//		},
+//		foo: 2
 //}
 //
 //ED.DoodleGroups.foo = 4;
@@ -19132,19 +19157,23 @@ ED.CornealGraft = function(_drawing, _parameterJSON) {
 	this.className = "CornealGraft";
 
 	// Private parameters
-	this.numberOfSutures = 16;
-	this.initialRadius = 320;
+	this.pixelsPerMillimetre = 63.3333;
 	this.sutureLength = 60;
 
 	// Derived parameters
+	this.diameter = 7.5;
+	
+	// Other parameters
+	this.showSutures = false;
 	this.sutureType = 'Interrupted';
+	this.numberOfSutures = 16;
 	this.opaque = false;
 
 	// Saved parameters
-	this.savedParameterArray = ['apexY', 'sutureType', 'opaque'];
+	this.savedParameterArray = ['originX', 'originY', 'apexY', 'showSutures', 'sutureType', 'numberOfSutures', 'opaque'];
 
 	// Parameters in doodle control bar (parameter name: parameter label)
-	this.controlParameterArray = {'sutureType':'Suture type', 'opaque':'Opaque'};
+	this.controlParameterArray = {'showSutures':'Show Sutures', 'sutureType':'Suture type', 'numberOfSutures':'Sutures', 'opaque':'Opaque'};
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -19169,16 +19198,34 @@ ED.CornealGraft.prototype.setHandles = function() {
  */
 ED.CornealGraft.prototype.setPropertyDefaults = function() {
 	this.isRotatable = false;
-	this.isMoveable = false;
+	this.isUnique = true;
 
 	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
-	this.parameterValidationArray['apexY']['range'].setMinAndMax(-380, -80);
+	this.parameterValidationArray['apexY']['range'].setMinAndMax(-8.5 * this.pixelsPerMillimetre/2, -6.5 * this.pixelsPerMillimetre/2);
 
 	// Add complete validation arrays for derived parameters
+	this.parameterValidationArray['showSutures'] = {
+		kind: 'derived',
+		type: 'bool',
+		display: true
+	};
+	this.parameterValidationArray['diameter'] = {
+		kind: 'derived',
+		type: 'float',
+		range: new ED.Range(6.5, 8.5),
+		precision: 1,
+		animate: true
+	};
 	this.parameterValidationArray['sutureType'] = {
 		kind: 'derived',
 		type: 'string',
 		list: ['Interrupted', 'Continuous', 'None'],
+		animate: false
+	};
+	this.parameterValidationArray['numberOfSutures'] = {
+		kind: 'other',
+		type: 'int',
+		range: new ED.Range(4, 32),
 		animate: false
 	};
 	this.parameterValidationArray['opaque'] = {
@@ -19192,7 +19239,31 @@ ED.CornealGraft.prototype.setPropertyDefaults = function() {
  * Sets default parameters
  */
 ED.CornealGraft.prototype.setParameterDefaults = function() {
-	this.apexY = -this.initialRadius;
+	this.setParameterFromString('diameter', '7.5');
+}
+
+/**
+ * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
+ * The returned parameters are animated if their 'animate' property is set to true
+ *
+ * @param {String} _parameter Name of parameter that has changed
+ * @value {Undefined} _value Value of parameter to calculate
+ * @returns {Array} Associative array of values of dependent parameters
+ */
+ED.CornealGraft.prototype.dependentParameterValues = function(_parameter, _value) {
+	var returnArray = new Array();
+
+	switch (_parameter) {
+		case 'apexY':
+			returnArray['diameter'] = -2 * _value/this.pixelsPerMillimetre;
+			break;
+
+		case 'diameter':
+			returnArray['apexY'] = -_value * this.pixelsPerMillimetre/2;
+			break;
+	}
+
+	return returnArray;
 }
 
 /**
@@ -19211,81 +19282,74 @@ ED.CornealGraft.prototype.draw = function(_point) {
 	ctx.beginPath();
 
 	// Circular graft
-	var ro = -this.apexY + this.sutureLength/2;
-	var ri = -this.apexY - this.sutureLength/2
+	var r = -this.apexY;
 
-	// Do a 360 arc
-	ctx.arc(0, 0, ro,  0, Math.PI * 2, true);
-
-	// Move to inner circle
-	ctx.moveTo(ri, 0);
-
-	// Arc round edge of pupil
-	ctx.arc(0, 0, ri, 0, Math.PI * 2, true);
+	// Outer 360 arc
+	ctx.arc(0, 0, r,  0, Math.PI * 2, true);
 
 	// Set attributes
 	ctx.lineWidth = 4;
+	ctx.strokeStyle = "gray";
 	ctx.fillStyle = "rgba(255, 255, 255, 0)";
-	ctx.strokeStyle = ctx.fillStyle
+	ctx.stroke();
+	if (this.opaque) {
+		ctx.fillStyle = "rgba(150, 150, 150, 0.8)";
+		ctx.fill();
+	}
 
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 
 	// Non boundary paths
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
-		// Graft
-		ctx.beginPath();
-		ctx.arc(0, 0, -this.apexY,  0, Math.PI * 2, true);
-		ctx.strokeStyle = "gray";
-		ctx.stroke();
-		if (this.opaque) {
-			ctx.fillStyle = "rgba(150, 150, 150, 0.8)";
-			ctx.fill();
-		}
+		if (this.showSutures) {
+			// Sutures
+			var ro = -this.apexY + this.sutureLength/2;
+			var ri = -this.apexY - this.sutureLength/2
+		
+			ctx.beginPath();
+			for (var i = 0; i < this.numberOfSutures; i++) {
+				// Suture points
+				var phi = i * 2 * Math.PI/this.numberOfSutures;
+				var p1 = new ED.Point(0,0);
+				p1.setWithPolars(ri, phi);
+				var p2 = new ED.Point(0,0);
+				p2.setWithPolars(ro, phi);
 
-		// Sutures
-		ctx.beginPath();
-		for (var i = 0; i < this.numberOfSutures; i++) {
-			// Suture points
-			var phi = i * 2 * Math.PI/this.numberOfSutures;
-			var p1 = new ED.Point(0,0);
-			p1.setWithPolars(ri, phi);
-			var p2 = new ED.Point(0,0);
-			p2.setWithPolars(ro, phi);
+				// No sutures
+				if (this.sutureType == 'None') {
+					this.drawSpot(ctx, p1.x, p1.y, 3, "gray");
+					this.drawSpot(ctx, p2.x, p2.y, 3, "gray");
+				}
 
-			// No sutures
-			if (this.sutureType == 'None') {
-				this.drawSpot(ctx, p1.x, p1.y, 3, "gray");
-				this.drawSpot(ctx, p2.x, p2.y, 3, "gray");
-			}
-
-			// Inner suture point
-			if (phi == 0) {
-				ctx.moveTo(p1.x, p1.y);
-			}
-			else {
-				if (this.sutureType == 'Interrupted') {
+				// Inner suture point
+				if (phi == 0) {
 					ctx.moveTo(p1.x, p1.y);
 				}
-				else if (this.sutureType == 'Continuous') {
-					ctx.lineTo(p1.x, p1.y);
+				else {
+					if (this.sutureType == 'Interrupted') {
+						ctx.moveTo(p1.x, p1.y);
+					}
+					else if (this.sutureType == 'Continuous') {
+						ctx.lineTo(p1.x, p1.y);
+					}
+				}
+
+				// Line to outer point
+				if (this.sutureType != 'None') {
+					ctx.lineTo(p2.x, p2.y);
 				}
 			}
 
-			// Line to outer point
-			if (this.sutureType != 'None') {
-				ctx.lineTo(p2.x, p2.y);
+			// Put in last link
+			if (this.sutureType == 'Continuous') {
+				ctx.closePath();
 			}
-		}
 
-		// Put in last link
-		if (this.sutureType == 'Continuous') {
-			ctx.closePath();
+			// Draw sutures
+			ctx.strokeStyle = "gray";
+			ctx.stroke();
 		}
-
-		// Draw sutures
-		ctx.strokeStyle = "gray";
-		ctx.stroke();
 	}
 
 	// Coordinates of handles (in canvas plane)
@@ -19305,6 +19369,182 @@ ED.CornealGraft.prototype.draw = function(_point) {
  */
 ED.CornealGraft.prototype.description = function() {
 	return "Corneal Graft";
+}
+
+/**
+ * OpenEyes
+ *
+ * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
+ * (C) OpenEyes Foundation, 2011-2013
+ * This file is part of OpenEyes.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package OpenEyes
+ * @link http://www.openeyes.org.uk
+ * @author OpenEyes <info@openeyes.org.uk>
+ * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
+ * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ */
+
+/**
+ * CornealGraftSuture
+ *
+ * @class CornealGraftSuture
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Object} _parameterJSON
+ */
+ED.CornealGraftSuture = function(_drawing, _parameterJSON) {
+	// Set classname
+	this.className = "CornealGraftSuture";
+
+	// Private parameters
+	this.pixelsPerMillimetre = 63.3333;
+	
+	// Other parameters
+	this.tension = 'Loose';
+	this.proudKnot = false;
+
+	// Saved parameters
+	this.savedParameterArray = ['radius', 'rotation', 'tension', 'proudKnot'];
+
+	// Parameters in doodle control bar (parameter name: parameter label)
+	this.controlParameterArray = {'tension':'Tension', 'proudKnot':'Proud Knot'};
+	
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _parameterJSON);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.CornealGraftSuture.prototype = new ED.Doodle;
+ED.CornealGraftSuture.prototype.constructor = ED.CornealGraftSuture;
+ED.CornealGraftSuture.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets default dragging attributes
+ */
+ED.CornealGraftSuture.prototype.setPropertyDefaults = function() {
+	this.isScaleable = false;
+	this.isMoveable = false;
+	
+	// Add complete validation arrays for derived parameters
+	this.parameterValidationArray['tension'] = {
+		kind: 'derived',
+		type: 'string',
+		list: ['Loose', 'Normal', 'Tight'],
+		animate: false
+	};
+	this.parameterValidationArray['proudKnot'] = {
+		kind: 'derived',
+		type: 'bool',
+		display: true
+	};
+}
+
+/**
+ * Sets default parameters
+ */
+ED.CornealGraftSuture.prototype.setParameterDefaults = function() {
+	this.setParameterFromString('tension', 'Normal');
+	this.setParameterFromString('proudKnot', 'False');
+	
+	var doodle = this.drawing.lastDoodleOfClass("CornealGraft");
+	if (doodle) {
+		this.radius = doodle.diameter * this.pixelsPerMillimetre/2;
+		var theta = 360/doodle.numberOfSutures;
+		this.setRotationWithDisplacements(0, -theta);
+	}
+	else {
+		this.radius = 374;
+		this.setRotationWithDisplacements(0, 30);
+	}
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.CornealGraftSuture.prototype.draw = function(_point) {
+	// Get context
+	var ctx = this.drawing.context;
+
+	// Call draw method in superclass
+	ED.CornealGraftSuture.superclass.draw.call(this, _point);
+	
+	// Move according to graft diameter
+	var doodle = this.drawing.lastDoodleOfClass("CornealGraft");
+	if (doodle) {
+		this.radius = doodle.diameter * this.pixelsPerMillimetre/2;
+	}
+
+	// Boundary path
+	ctx.beginPath();
+
+	var r = this.radius;
+	ctx.rect(-20, -(r + 40), 40, 80);
+
+	ctx.closePath();
+
+	// Colour of fill
+	ctx.fillStyle = "rgba(255,255,255,0.0)";
+
+	// Set line attributes
+	ctx.lineWidth = 6;
+
+	// Colour of outer line is dark gray
+	ctx.strokeStyle = this.isSelected?"rgba(120,120,120,0.5)":"rgba(120,120,120,0)";
+
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+
+	// Non boundary paths
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+		ctx.beginPath();
+		if (this.tension == "Loose") {
+			ctx.moveTo(0, -r - 40);
+			ctx.bezierCurveTo(-20, -r - 20, +20, -r + 20, 0, -r + 40);
+		}
+		else
+		{
+			ctx.moveTo(0, -r - 40);
+			ctx.lineTo(0, -r + 40);
+		}
+		ctx.moveTo(-10, -r + 10);
+		ctx.lineTo(0, -r + 20);
+		ctx.lineTo(-10, -r + 30);
+
+		ctx.lineWidth = 2;
+		var colour = "rgba(0,0,120,0.7)"
+		ctx.strokeStyle = colour;
+
+		ctx.stroke();
+
+		// Knot
+		var d = this.proudKnot?8:4;
+		this.drawSpot(ctx, 0, -r + 20, d, colour);
+	}
+
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.CornealGraftSuture.prototype.description = function() {
+	var returnString = "Corneal suture at ";
+
+	returnString += this.clockHour() + " o'clock";
+
+	return returnString;
 }
 
 /**
