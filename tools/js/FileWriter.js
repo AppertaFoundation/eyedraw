@@ -35,8 +35,17 @@ The FileWriter class is used to download a generated Doodle class javascript fil
 				        console.log('Write failed: ' + e.toString());
 				      };
 
+				      //Get initial string from template
+				      tmplData = {
+				      	param: "Mr.temp"
+				      }
+
+						  var template = document.getElementById("template").innerHTML;
+						  Mustache.parse(template);   // optional, speeds up future uses
+						  var rendered = Mustache.render(template, tmplData);
+
 				      // Create a new Blob and write it to log.txt.
-				      var blob = new Blob(['Lorem Ipsum dolor'], {type: 'text/plain'});
+				      var blob = new Blob([rendered], {type: 'text/plain'});
 
 				      fileWriter.write(blob);
 
@@ -99,7 +108,7 @@ The FileWriter class is used to download a generated Doodle class javascript fil
 			      fileWriter.seek(fileWriter.length); // Start write position at EOF.
 
 			      // Create a new Blob and write it to log.txt.
-			      var blob = new Blob(['this is whole new string'], {type: 'text/plain'});
+			      var blob = new Blob(['this is whole'], {type: 'text/plain'});
 
 			      fileWriter.write(blob);
 
@@ -135,7 +144,11 @@ The FileWriter class is used to download a generated Doodle class javascript fil
 	
 	}
 
-	window.app.FileWriter = FileWriter;
+	var App = {};
+	App.FileWriter = FileWriter;
+	window.app = App;
+
+	// window.app.FileWriter = FileWriter;
 	
 })();
 
