@@ -36,16 +36,17 @@ ED.CornealGraft = function(_drawing, _parameterJSON) {
 	this.diameter = 7.5;
 	
 	// Other parameters
-	this.showSutures = false;
+	this.type = 'Penetrating';
+	this.showSutures = true;
 	this.sutureType = 'Interrupted';
 	this.numberOfSutures = 16;
 	this.opaque = false;
 
 	// Saved parameters
-	this.savedParameterArray = ['originX', 'originY', 'apexY', 'showSutures', 'sutureType', 'numberOfSutures', 'opaque'];
+	this.savedParameterArray = ['originX', 'originY', 'apexY', 'type', 'showSutures', 'sutureType', 'numberOfSutures', 'opaque'];
 
 	// Parameters in doodle control bar (parameter name: parameter label)
-	this.controlParameterArray = {'showSutures':'Show Sutures', 'sutureType':'Suture type', 'numberOfSutures':'Sutures', 'opaque':'Opaque'};
+	this.controlParameterArray = {'type':'Type', 'showSutures':'Show Sutures', 'sutureType':'Suture type', 'numberOfSutures':'Sutures', 'opaque':'Opaque'};
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -76,6 +77,12 @@ ED.CornealGraft.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['apexY']['range'].setMinAndMax(-8.5 * this.pixelsPerMillimetre/2, -6.5 * this.pixelsPerMillimetre/2);
 
 	// Add complete validation arrays for derived parameters
+	this.parameterValidationArray['type'] = {
+		kind: 'derived',
+		type: 'string',
+		list: ['Penetrating', 'DMEK', 'DSEAK'],
+		animate: false
+	};
 	this.parameterValidationArray['showSutures'] = {
 		kind: 'derived',
 		type: 'bool',
@@ -112,6 +119,7 @@ ED.CornealGraft.prototype.setPropertyDefaults = function() {
  */
 ED.CornealGraft.prototype.setParameterDefaults = function() {
 	this.setParameterFromString('diameter', '7.5');
+	this.setParameterFromString('sutureType', 'Continuous');
 }
 
 /**

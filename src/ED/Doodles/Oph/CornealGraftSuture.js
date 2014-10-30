@@ -63,7 +63,7 @@ ED.CornealGraftSuture.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['tension'] = {
 		kind: 'derived',
 		type: 'string',
-		list: ['Loose', 'Normal', 'Tight'],
+		list: ['Loose', 'Tight'],
 		animate: false
 	};
 	this.parameterValidationArray['proudKnot'] = {
@@ -77,7 +77,7 @@ ED.CornealGraftSuture.prototype.setPropertyDefaults = function() {
  * Sets default parameters
  */
 ED.CornealGraftSuture.prototype.setParameterDefaults = function() {
-	this.setParameterFromString('tension', 'Normal');
+	this.setParameterFromString('tension', 'Tight');
 	this.setParameterFromString('proudKnot', 'False');
 	
 	var doodle = this.drawing.lastDoodleOfClass("CornealGraft");
