@@ -36,12 +36,13 @@ ED.AntSeg = function(_drawing, _parameterJSON) {
 	this.coloboma = false;
 	this.colour = 'Blue';
 	this.ectropion = false;
+	this.cornealSize = 'Normal';
 
 	// Saved parameters
-	this.savedParameterArray = ['pupilSize', 'apexY', 'rotation', 'pxe', 'coloboma', 'colour', 'ectropion'];
+	this.savedParameterArray = ['pupilSize', 'apexY', 'rotation', 'pxe', 'coloboma', 'colour', 'ectropion', 'cornealSize'];
 
 	// Parameters in doodle control bar (parameter name: parameter label)
-	this.controlParameterArray = {'pupilSize':'Pupil size', 'pxe':'PXE', 'coloboma':'Coloboma', 'colour':'Colour', 'ectropion':'Ectropion uveae'};
+	this.controlParameterArray = {'pupilSize':'Pupil size', 'pxe':'PXE', 'coloboma':'Coloboma', 'colour':'Colour', 'ectropion':'Ectropion uveae', 'cornealSize':'Corneal size'};
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -103,6 +104,12 @@ ED.AntSeg.prototype.setPropertyDefaults = function() {
 		type: 'bool',
 		display: true
 	};
+	this.parameterValidationArray['cornealSize'] = {
+		kind: 'other',
+		type: 'string',
+		list: ['Micro', 'Normal', 'Macro'],
+		animate: false
+	};
 }
 
 /**
@@ -112,6 +119,7 @@ ED.AntSeg.prototype.setPropertyDefaults = function() {
 ED.AntSeg.prototype.setParameterDefaults = function() {
 	this.setParameterFromString('pupilSize', 'Large');
 	this.setParameterFromString('pxe', 'false');
+	this.setParameterFromString('cornealSize', 'Normal');
 }
 
 /**
