@@ -8,6 +8,7 @@ You can also generate JSDocs and a full list of Doodles and their associated Ico
 
 This README file should be contained in a folder containing javascript and other files required for running EyeDraw, the OpenEyes medical drawing packages.
 
+
 The enclosing folder should contain the following files and folders:
 
 ED_Drawing.js		Required for all EyeDraw functions
