@@ -33,7 +33,7 @@ CG.generateCanvasCommands();
 * @param {String} scaleInput ID of dom element to be used as input for SCALE
 
 */
-(function(){
+(function(App){
 
 	var CommandGenerator = function(canvasElement, viewElement, xInput, yInput, scaleInput){
 		this.init(canvasElement, viewElement, xInput, yInput, scaleInput);
@@ -255,8 +255,8 @@ CG.generateCanvasCommands();
 
 	};
 
-	var App = {};
-	App.CommandGenerator = CommandGenerator;
-	window.app = App;
+	var app = App || {};
+	app.CommandGenerator = CommandGenerator;
+	window.App = app;
 
-})();
+})(window.App);
