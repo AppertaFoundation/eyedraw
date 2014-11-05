@@ -1977,10 +1977,6 @@ ED.Drawing.prototype.resetEyedraw = function() {
 	this.deselectDoodles();
 
 	this.addBindings(this.bindingArray);
-
-	if (this.globalScaleFactor != this.origScaleLevel) {
-		this.setScaleLevel(this.origScaleLevel);
-	}
 }
 
 /**
