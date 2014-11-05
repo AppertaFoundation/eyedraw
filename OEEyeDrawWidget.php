@@ -368,7 +368,7 @@ class OEEyeDrawWidget extends CWidget
 			// Register inline scripts
 			$this->registerScripts();
 		} else {
-			$data['data']['imageUrl'] = Yii::app()->baseUrl."/assets/events/event_".$this->model->event->id."_".strtotime($this->model->event->last_modified_date)."/".$this->drawingName.".png";
+			$data['data']['imageUrl'] = Yii::app()->baseUrl."/".Yii::app()->getController()->module->id."/default/eventImage?event_id=".$this->model->event->id."&image_name=".$this->drawingName;
 		}
 
 		// Render the widget
