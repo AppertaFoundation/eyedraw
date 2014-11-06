@@ -19725,12 +19725,16 @@ ED.CornealOedema = function(_drawing, _parameterJSON) {
 
 	// Derived parameters
 	this.intensity = 'Mild';
+	
+	// Other parameters
+	this.stromal = false;
+	this.epithelial = false;
 
 	// Saved parameters
-	this.savedParameterArray = ['originX', 'originY', 'apexX', 'apexY', 'rotation', 'intensity'];
+	this.savedParameterArray = ['originX', 'originY', 'apexX', 'apexY', 'rotation', 'intensity', 'stromal', 'epithelial'];
 
 	// Parameters in doodle control bar (parameter name: parameter label)
-	this.controlParameterArray = {'intensity':'Intensity'};
+	this.controlParameterArray = {'intensity':'Intensity', 'stromal':'Stromal', 'epithelial':'Epithelial'};
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -19769,6 +19773,16 @@ ED.CornealOedema.prototype.setPropertyDefaults = function() {
 		list: ['Mild', 'Moderate', 'Severe'],
 		animate: false
 	};
+	this.parameterValidationArray['stromal'] = {
+		kind: 'derived',
+		type: 'bool',
+		display: true
+	};
+	this.parameterValidationArray['epithelial'] = {
+		kind: 'derived',
+		type: 'bool',
+		display: true
+	};
 
 	/*
 	// Create ranges to constrain handles
@@ -19792,6 +19806,11 @@ ED.CornealOedema.prototype.setPropertyDefaults = function() {
  */
 ED.CornealOedema.prototype.setParameterDefaults = function() {
 	this.apexY = -this.initialRadius;
+	this.setParameterFromString('stromal', 'false');
+	this.setParameterFromString('epithelial', 'false');
+
+	// Put control handle at 45 degrees
+	this.rotation = Math.PI / 4;
 
 /*
 	// Create a squiggle to store the handles points
@@ -19944,7 +19963,7 @@ ED.CornealPigmentation = function(_drawing, _parameterJSON) {
 	this.type = 'Iron';
 
 	// Saved parameters
-	this.savedParameterArray = ['originX', 'originY', 'apexY', 'level', 'type'];
+	this.savedParameterArray = ['originX', 'originY', 'apexY', 'rotation', 'level', 'type'];
 
 	// Parameters in doodle control bar (parameter name: parameter label)
 	this.controlParameterArray = {'level':'Level', 'type':'Type'};

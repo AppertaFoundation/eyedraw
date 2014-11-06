@@ -33,7 +33,7 @@ ED.CornealPigmentation = function(_drawing, _parameterJSON) {
 	this.type = 'Iron';
 
 	// Saved parameters
-	this.savedParameterArray = ['originX', 'originY', 'apexY', 'level', 'type'];
+	this.savedParameterArray = ['originX', 'originY', 'apexY', 'rotation', 'level', 'type'];
 
 	// Parameters in doodle control bar (parameter name: parameter label)
 	this.controlParameterArray = {'level':'Level', 'type':'Type'};
