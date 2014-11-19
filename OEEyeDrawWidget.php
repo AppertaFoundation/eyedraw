@@ -356,16 +356,20 @@ class OEEyeDrawWidget extends CWidget
 		}
 		$this->doodleToolBarArray = $finalToolBar;
 
-		// Register package (dependent scripts and stylesheets)
-		Yii::app()->clientScript->registerPackage('eyedraw');
-
-		// Register inline scripts
-		$this->registerScripts();
-
 		// As the view might use partials, and there's no way to define global view vars,
 		// we store a reference to the data array, so we can pass-through to the partials.
 		$data = get_object_vars($this);
 		$data['data'] = $data;
+
+		if (!$this->model->event || !$this->model->event->hasEventImage($this->drawingName)) {
+			// Register package (dependent scripts and stylesheets)
+			Yii::app()->clientScript->registerPackage('eyedraw');
+
+			// Register inline scripts
+			$this->registerScripts();
+		} else {
+			$data['data']['imageUrl'] = Yii::app()->baseUrl."/".Yii::app()->getController()->module->id."/default/eventImage?event_id=".$this->model->event->id."&image_name=".$this->drawingName;
+		}
 
 		// Render the widget
 		$this->render($this->template, $data);
