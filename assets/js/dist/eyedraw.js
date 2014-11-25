@@ -19729,12 +19729,13 @@ ED.CornealOedema = function(_drawing, _parameterJSON) {
 	// Other parameters
 	this.stromal = false;
 	this.epithelial = false;
+	this.endothelial = false;
 
 	// Saved parameters
-	this.savedParameterArray = ['originX', 'originY', 'apexX', 'apexY', 'rotation', 'intensity', 'stromal', 'epithelial'];
+	this.savedParameterArray = ['originX', 'originY', 'apexX', 'apexY', 'rotation', 'intensity', 'stromal', 'epithelial', 'endothelial'];
 
 	// Parameters in doodle control bar (parameter name: parameter label)
-	this.controlParameterArray = {'intensity':'Intensity', 'stromal':'Stromal', 'epithelial':'Epithelial'};
+	this.controlParameterArray = {'intensity':'Intensity', 'stromal':'Stromal', 'epithelial':'Epithelial', 'endothelial':'Endothelial'};
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -19783,6 +19784,11 @@ ED.CornealOedema.prototype.setPropertyDefaults = function() {
 		type: 'bool',
 		display: true
 	};
+	this.parameterValidationArray['endothelial'] = {
+		kind: 'derived',
+		type: 'bool',
+		display: true
+	};
 
 	/*
 	// Create ranges to constrain handles
@@ -19808,6 +19814,7 @@ ED.CornealOedema.prototype.setParameterDefaults = function() {
 	this.apexY = -this.initialRadius;
 	this.setParameterFromString('stromal', 'false');
 	this.setParameterFromString('epithelial', 'false');
+	this.setParameterFromString('endothelial', 'false');
 
 	// Put control handle at 45 degrees
 	this.rotation = Math.PI / 4;
