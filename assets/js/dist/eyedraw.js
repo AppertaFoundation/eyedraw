@@ -37772,10 +37772,10 @@ ED.Supramid.prototype.draw = function(_point) {
 
 	// Non boundary paths
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+		ctx.beginPath();
 		if (doodle && doodle.bezierArray['sp']) {
 			// Suture
 			var xDev = startPoint.x/Math.abs(startPoint.x) * 100;
-			ctx.beginPath()
 			ctx.moveTo(startPoint.x, startPoint.y);
 			ctx.bezierCurveTo(startPoint.x + xDev, startPoint.y - 100, tubePoint.x + xDev, tubePoint.y, doodle.bezierArray['sp'].x, doodle.bezierArray['sp'].y);
 
@@ -37788,11 +37788,16 @@ ED.Supramid.prototype.draw = function(_point) {
 				var nextPoint = doodle.bezierArray['sp'].bezierPointAtParameter(t, doodle.bezierArray['cp1'], doodle.bezierArray['cp2'], doodle.bezierArray['ep']);
 				ctx.lineTo(nextPoint.x, nextPoint.y);
 			}
-
-			ctx.lineWidth = 4;
-			ctx.strokeStyle = "purple";
-			ctx.stroke();
+		} else {
+			// Just straight line to make it appear
+			ctx.moveTo(startPoint.x, startPoint.y);
+			ctx.lineTo(0, -400);
 		}
+
+		// Draw suture
+		ctx.lineWidth = 4;
+		ctx.strokeStyle = "purple";
+		ctx.stroke();
 	}
 
 	// Coordinates of handles (in canvas plane)
