@@ -44,7 +44,7 @@ ED.CornealOedema = function(_drawing, _parameterJSON) {
 	this.savedParameterArray = ['originX', 'originY', 'apexX', 'apexY', 'rotation', 'intensity', 'stromal', 'epithelial', 'endothelial'];
 
 	// Parameters in doodle control bar (parameter name: parameter label)
-	this.controlParameterArray = {'intensity':'Intensity', 'stromal':'Stromal', 'epithelial':'Epithelial', 'endothelial':'Endothelial'};
+	this.controlParameterArray = {'intensity':'Intensity',  'epithelial':'Epithelial', 'stromal':'Stromal','endothelial':'Endothelial'};
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
