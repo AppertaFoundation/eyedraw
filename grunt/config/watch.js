@@ -21,7 +21,7 @@ module.exports = function(grunt) {
 		concat: {
 			files : [ '<%= jshint.files %>' ],
 			//tasks : [ 'jshint', 'qunit' ]
-			tasks : [ 'concat' ]
+			tasks : [ 'build' ]
 		},
 		sass: {
 			files: 'assets/sass/**/*.scss',

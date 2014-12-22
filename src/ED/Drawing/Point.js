@@ -200,6 +200,48 @@ ED.Point.prototype.tangentialControlPoint = function(_phi) {
 }
 
 /**
+ * Creates a new point on a straight line between two points at a proportional distance 
+ *
+ * @param {Float} _percent Percentage distance along line
+ * @param {Point} _ep End point
+ * @returns {Point} _point Point
+ */
+ED.Point.prototype.pointAtPercentageFromPointToPoint = function(_percent, _point) {
+	// Calculate distances (clockwise from north)
+	var xIncrement = (_point.x - this.x) * _percent/100;
+	var yIncrement = (_point.y - this.y) * _percent/100;
+
+	// Create point and set length and direction
+	var point = new ED.Point(this.x + xIncrement, this.y + yIncrement);
+
+	return point;
+}
+
+/**
+ * Creates a new point on a cubic Bezier curve at parameter t along curve 
+ *
+ * @param {Float} _t Proportion along curve (0-1)
+ * @param {Point} _cp1 Control point 1
+ * @param {Point} _cp2 Control point 2
+ * @param {Point} _ep End point
+ * @returns {Point} _point Point
+ */
+ED.Point.prototype.bezierPointAtParameter = function(_t, _cp1, _cp2, _ep) {
+	// Calculate scalars
+	var t2 = _t * _t;
+	var t3 = t2 * _t;
+	var mt = 1 - _t;
+	var mt2 = mt * mt;
+	var mt3 = mt2 * mt;
+	
+	// Calculate x and y values of point
+	var x = this.x * mt3 + 3 * _cp1.x * mt2 * _t + 3 * _cp2.x * mt * t2 + _ep.x * t3;
+	var y = this.y * mt3 + 3 * _cp1.y * mt2 * _t + 3 * _cp2.y * mt * t2 + _ep.y * t3;
+	
+	// Return point
+	return new ED.Point(x, y);
+} 
+/**
  * Returns a point in JSON encoding
  *
  * @returns {String} point in JSON format

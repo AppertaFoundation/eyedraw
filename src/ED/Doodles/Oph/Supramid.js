@@ -28,8 +28,29 @@ ED.Supramid = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "Supramid";
 
+	// Other parameters
+	this.percent = '80';
+
 	// Saved parameters
-	this.savedParameterArray = ['apexX', 'apexY', 'rotation'];
+	this.savedParameterArray = ['apexX', 'apexY', 'rotation', 'percent'];
+
+	// Parameters in doodle control bar (parameter name: parameter label)
+	this.controlParameterArray = {'percent':'Percentage of tube'};
+
+	// Bezier segmentation is not linear, so can make fine adjustments here if required
+	this.adjustmentArray = {
+		'0':0,
+		'10':10,
+		'20':20,
+		'30':30,
+		'40':40,
+		'50':50,
+		'60':60,
+		'70':70,
+		'80':80,
+		'90':90,
+		'100':100
+	}
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -59,6 +80,14 @@ ED.Supramid.prototype.setPropertyDefaults = function() {
 	// Update component of validation array for simple parameters
 	this.parameterValidationArray['apexX']['range'].setMinAndMax(-800, +800);
 	this.parameterValidationArray['apexY']['range'].setMinAndMax(-800, +800);
+
+	// Add complete validation arrays for derived parameters
+	this.parameterValidationArray['percent'] = {
+		kind: 'other',
+		type: 'string',
+		list: ['0', '10', '20', '30', '40', '50', '60', '70', '80', '90', '100'],
+		animate: false
+	};
 }
 
 /**
@@ -67,6 +96,9 @@ ED.Supramid.prototype.setPropertyDefaults = function() {
 ED.Supramid.prototype.setParameterDefaults = function() {
 	this.apexX = -660;
 	this.apexY = 30;
+
+	// Default value of insertion percentage
+	this.setParameterFromString('percent', '80');
 
 	// Make rotation same as tube
 	var doodle = this.drawing.lastDoodleOfClass("Tube");
@@ -84,15 +116,23 @@ ED.Supramid.prototype.draw = function(_point) {
 	// Get context
 	var ctx = this.drawing.context;
 
-	// Get tube doodle
-	var doodle = this.drawing.lastDoodleOfClass("Tube");
-	if (doodle) {
-		this.rotation = doodle.rotation;
-	}
-
 	// Call draw method in superclass
 	ED.Supramid.superclass.draw.call(this, _point);
 
+	// Get Tube or TubeExtender doodle (Latter takes preference)
+	var doodle = this.drawing.lastDoodleOfClass("TubeExtender");
+
+	// Watch condition when Tube extender is added after, since doodle can exist with empty bezierArray
+	if (doodle && typeof(doodle.bezierArray['sp']) != 'undefined') {
+		this.rotation = doodle.rotation;
+	}
+	else {
+		doodle = this.drawing.lastDoodleOfClass("Tube");
+		if (doodle) {
+			this.rotation = doodle.rotation;
+		}
+	}
+	
 	// Calculate key points for supramid bezier
 	var startPoint = new ED.Point(this.apexX, this.apexY);
 	var tubePoint = new ED.Point(0, -700);
@@ -117,18 +157,32 @@ ED.Supramid.prototype.draw = function(_point) {
 
 	// Non boundary paths
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
-		if (doodle) {
+		ctx.beginPath();
+		if (doodle && doodle.bezierArray['sp']) {
 			// Suture
 			var xDev = startPoint.x/Math.abs(startPoint.x) * 100;
-			ctx.beginPath()
 			ctx.moveTo(startPoint.x, startPoint.y);
 			ctx.bezierCurveTo(startPoint.x + xDev, startPoint.y - 100, tubePoint.x + xDev, tubePoint.y, doodle.bezierArray['sp'].x, doodle.bezierArray['sp'].y);
-			ctx.bezierCurveTo(doodle.bezierArray['cp1'].x, doodle.bezierArray['cp1'].y, doodle.bezierArray['cp2'].x, doodle.bezierArray['cp2'].y, doodle.bezierArray['ep'].x, doodle.bezierArray['ep'].y);
 
-			ctx.lineWidth = 4;
-			ctx.strokeStyle = "purple";
-			ctx.stroke();
+			// Number of bezier segments
+			var nb = 50;
+
+			// Draw Bezier of appropriate length for corrected proportion along curve
+			var pc = this.adjustmentArray[this.percent];
+			for (var t = 0; t < 1/nb + pc/100; t = t + 1/nb) {
+				var nextPoint = doodle.bezierArray['sp'].bezierPointAtParameter(t, doodle.bezierArray['cp1'], doodle.bezierArray['cp2'], doodle.bezierArray['ep']);
+				ctx.lineTo(nextPoint.x, nextPoint.y);
+			}
+		} else {
+			// Just straight line to make it appear
+			ctx.moveTo(startPoint.x, startPoint.y);
+			ctx.lineTo(0, -400);
 		}
+
+		// Draw suture
+		ctx.lineWidth = 4;
+		ctx.strokeStyle = "purple";
+		ctx.stroke();
 	}
 
 	// Coordinates of handles (in canvas plane)
@@ -142,37 +196,10 @@ ED.Supramid.prototype.draw = function(_point) {
 }
 
 /**
- * Returns parameters
- *
- * @returns {String} value of parameter
- */
-// ED.Supramid.prototype.getParameter = function(_parameter)
-// {
-//     var returnValue;
-//
-//     switch (_parameter)
-//     {
-//         // Position of end of suture
-//         case 'endPosition':
-//             var r = Math.sqrt(this.apexX * this.apexX + this.apexY * this.apexY);
-//
-//             if (r < 280 ) returnValue = 'in the AC';
-//             else returnValue = ((r - 280)/14).toFixed(0) + 'mm from limbus';
-//             break;
-//
-//         default:
-//             returnValue = "";
-//             break;
-//     }
-//
-//     return returnValue;
-// }
-
-/**
  * Returns a string containing a text description of the doodle
  *
  * @returns {String} Description of doodle
  */
 ED.Supramid.prototype.description = function() {
-	return "Supramid suture";
+	return "Supramid suture " + this.percent + "% along tube";
 }

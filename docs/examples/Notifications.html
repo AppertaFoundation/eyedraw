@@ -2,25 +2,19 @@
 <html>
     <head>
         <!-- EyeDraw CSS style sheet -->
-        <link rel="stylesheet" href="../css/OEEyeDraw.css" type="text/css" media="screen" />
+        <link rel="stylesheet" href="../../assets/css/oe-eyedraw.css" type="text/css" media="screen" />
 
         <!-- Mandatory file containing key drawing classes -->
-        <script src="../js/ED_Drawing.js" type="text/javascript"></script>
-
-        <!-- Subclasses loaded according to need -->
-        <script src="../js/ED_AntSeg.js" type="text/javascript"></script>
+        <script src="../../assets/js/dist/eyedraw.js" type="text/javascript"></script>
 
         <!-- This script handles the drawings for the page -->
         <script type="text/javascript">
-
-            // Assign a global variable to the drawing
-            var drawingEdit;
 
             // Runs on page load
             function init()
             {
                 // Create a drawing linked to the canvas
-                drawingEdit = new ED.Drawing(document.getElementById('canvasEdit'), ED.eye.Right, 'RPS', true, {graphicsPath:"../graphics/"});
+                var drawingEdit = new ED.Drawing(document.getElementById('canvasEdit'), ED.eye.Right, 'RPS', true, {graphicsPath:'../../assets/img/'});
 
                 // Create a controller object for this drawing
                 var controller = new eyeDrawController(drawingEdit);
@@ -35,41 +29,56 @@
             // Controller class
             function eyeDrawController(_drawing)
             {
+                // Specify call back function
+                this.callBack = callBack;
+                    
                 // Register controller for notifications
-                _drawing.registerForNotifications(this, 'notificationHandler', ['ready']);
+                _drawing.registerForNotifications(this, 'callBack', ['ready']);
+
+                // Show doodle controls
+                _drawing.showDoodleControls = true;
 
                 // Method called for notification
-                this.notificationHandler = function(_messageArray)
+                function callBack(_messageArray)
                 {
                     switch (_messageArray['eventName'])
                     {
                         // Ready notification
                         case 'ready':
                             _drawing.addDoodle('AntSeg');
+                            _drawing.deselectDoodles();
                             break;
                     }
                 }
             }
 
-            // Listener or controller object
+            // Listener object
             function listener(_drawing)
             {
+                // Specify call back function
+                this.handler = handler;
+                
                 // Register this object for notifications
                 _drawing.registerForNotifications(this, 'handler', ['parameterChanged']);
 
                 // Function called for notification
-                this.handler = function(_messageArray)
+                function handler(_messageArray)
                 {
                     console.log(_messageArray);
                 }
             }
 
-            </script>
+		</script>
+
     </head>
+    
     <body onload="init();">
 
         <!-- Canvas element -->
-        <canvas id="canvasEdit" class="ed-canvas-edit" width="300" height="300" tabindex="1"></canvas>
+        <canvas id="canvasEdit" class="ed-canvas-edit" width="300" height="300"></canvas>
+
+        <!-- Doodle control panel -->
+        <div id="canvasEdit_controls" class="ed-doodle-popup" style="position:static;"></div>
 
     </body>
 </html>

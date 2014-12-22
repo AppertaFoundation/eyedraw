@@ -68,6 +68,7 @@ ED.TrabySuture.prototype.setPropertyDefaults = function() {
 	// Update component of validation array for simple parameters
 	this.parameterValidationArray['apexX']['range'].setMinAndMax(-50, +50);
 	this.parameterValidationArray['apexY']['range'].setMinAndMax(+70, +70);
+	this.parameterValidationArray['originY']['range'].setMinAndMax(-625, +625);
 
 	// Add complete validation arrays for derived parameters
 	this.parameterValidationArray['type'] = {
@@ -103,13 +104,14 @@ ED.TrabySuture.prototype.setParameterDefaults = function() {
 	var trabyFlap = this.drawing.lastDoodleOfClass('TrabyFlap');
 	if (trabyFlap) {
 		var number = this.drawing.numberOfDoodlesOfClass("TrabySuture");
-		var p;
+		
+		// Get top of Traby suture
+		var p = new ED.Point(-1 * trabyFlap.right.x, (trabyFlap.height + 0 * (trabyFlap.right.y - trabyFlap.height)));
+		p.setWithPolars(p.length(), p.direction() + trabyFlap.rotation);
 
 		switch (number) {
 			// First suture is top left
 			case 0:
-				p = new ED.Point(-1 * trabyFlap.right.x, (trabyFlap.height + 0 * (trabyFlap.right.y - trabyFlap.height)));
-				p.setWithPolars(p.length(), p.direction() + trabyFlap.rotation);
 				this.originX = p.x;
 				this.originY = p.y;
 				this.rotation = trabyFlap.rotation;
@@ -123,11 +125,12 @@ ED.TrabySuture.prototype.setParameterDefaults = function() {
 				this.originY = p.y;
 				this.rotation = trabyFlap.rotation;
 				break;
+			// Third suture is between the first two
 			case 2:
 				var doodle1 = this.drawing.firstDoodleOfClass("TrabySuture");
 				var doodle2 = this.drawing.lastDoodleOfClass("TrabySuture");
 				this.originX = doodle1.originX + (doodle2.originX - doodle1.originX)/2;
-				this.originY = doodle1.originY + (doodle2.originY - doodle1.originY)/2;
+				this.originY = p.y;
 				this.rotation = doodle2.rotation;
 				break;
 			default:
@@ -296,12 +299,28 @@ ED.TrabySuture.prototype.draw = function(_point) {
 }
 
 /**
+ * Returns a String which, if not empty, determines the root descriptions of multiple instances of the doodle
+ *
+ * @returns {String} Group description
+ */
+ED.TrabySuture.prototype.groupDescription = function() {
+	return "Flap sutures at ";
+}
+
+/**
  * Returns a string containing a text description of the doodle
  *
  * @returns {String} Description of doodle
  */
 ED.TrabySuture.prototype.description = function() {
-	var returnValue = this.size + " " + this.material + " " + this.type + " suture at " + this.clockHour() + " o'clock";
+	return this.clockHour();
+}
 
-	return returnValue;
+/**
+ * Returns a String which, if not empty, determines the root descriptions of multiple instances of the doodle
+ *
+ * @returns {String} Group description
+ */
+ED.TrabySuture.prototype.groupDescriptionEnd = function() {
+	return " o'clock";
 }

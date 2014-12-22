@@ -32,7 +32,7 @@ ED.Patch = function(_drawing, _parameterJSON) {
 	this.material = 'Sclera';
 
 	// Saved parameters
-	this.savedParameterArray = ['originX', 'originY', 'width', 'height', 'apexX'];
+	this.savedParameterArray = ['originX', 'originY', 'width', 'height', 'apexX', 'material'];
 
 	// Parameters in doodle control bar (parameter name: parameter label)
 	this.controlParameterArray = {'material':'Material'};
@@ -122,7 +122,7 @@ ED.Patch.prototype.setParameterDefaults = function() {
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.Patch.prototype.draw = function(_point) {console.log(this.originX, this.originY);
+ED.Patch.prototype.draw = function(_point) {
 	// Get context
 	var ctx = this.drawing.context;
 
