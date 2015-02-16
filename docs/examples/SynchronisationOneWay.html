@@ -2,46 +2,43 @@
 <html>
     <head>
         <!-- EyeDraw CSS style sheet -->
-        <link rel="stylesheet" href="../css/OEEyeDraw.css" type="text/css" media="screen" />
+        <link rel="stylesheet" href="../../assets/css/oe-eyedraw.css" type="text/css" media="screen" />
 
         <!-- Mandatory file containing key drawing classes -->
-        <script src="../js/ED_Drawing.js" type="text/javascript"></script>
-
-        <!-- Subclasses loaded according to need -->
-        <script src="../js/ED_AntSeg.js" type="text/javascript"></script>
-        <script src="../js/ED_General.js" type="text/javascript"></script>
+        <script src="../../assets/js/dist/eyedraw.js" type="text/javascript"></script>
 
         <!-- This script handles the drawings for the page -->
         <script type="text/javascript">
 
-            // Assign a global variable to the drawing
+            // Assign a global variable to each drawing
             var drawingEdit1;
             var drawingEdit2;
-
+            
             // Runs on page load
             function init()
             {
-                // Create two drawings linked to each canvas
-                drawingEdit1 = new ED.Drawing(document.getElementById('canvasEdit1'), ED.eye.Left, 'RPS', true, {graphicsPath:"../graphics/"});
-                drawingEdit2 = new ED.Drawing(document.getElementById('canvasEdit2'), ED.eye.Left, 'LPS', true, {graphicsPath:"../graphics/"});
+                // Create a drawing linked to the canvas
+                drawingEdit1 = new ED.Drawing(document.getElementById('canvasEdit1'), ED.eye.Right, 'RPS', true, {graphicsPath:'../../assets/img/'});
+                drawingEdit2 = new ED.Drawing(document.getElementById('canvasEdit2'), ED.eye.Right, 'LPS', true, {graphicsPath:'../../assets/img/'});
 
-                // Create a controller object for this drawing
+                // Create controller objects
                 var controller1 = new eyeDrawController(drawingEdit1);
                 var controller2 = new eyeDrawController(drawingEdit2);
-
-                // Create a controller to animate the sideports
-                var sideportController = new sidePortController(drawingEdit2);
 
                 // Initialise drawings
                 drawingEdit1.init();
                 drawingEdit2.init();
             }
 
+
             // Shared Controller class
             function eyeDrawController(_drawing)
             {
+                // Specify call back function
+                this.callBack = callBack;
+                
                 // Register controller for notifications
-                _drawing.registerForNotifications(this, 'notificationHandler', ['ready', 'doodleSelected', 'doodleAdded', 'doodleDeleted', 'mousedragged','parameterChanged']);
+                _drawing.registerForNotifications(this, 'callBack', ['ready', 'doodleSelected', 'doodleAdded', 'doodleDeleted', 'mousedragged','parameterChanged']);
 
                 // Create an array of synchronisations
                 var syncArray = new Array();
@@ -51,7 +48,7 @@
                 }
 
                 // Method called for notification
-                this.notificationHandler = function(_messageArray)
+                function callBack(_messageArray)
                 {
                     // Element used to display saved content for debugging purposes
                     var saveInput = document.getElementById('saveInput');
@@ -62,7 +59,6 @@
                         case 'ready':
                             if (_drawing.idSuffix == 'RPS')
                             {
-                                //_drawing.addDoodle('OperatingTable');
                                 _drawing.addDoodle('Surgeon');
                                 _drawing.deselectDoodles();
                             }
@@ -216,29 +212,6 @@
                                     sidePort2.setSimpleParameter('rotation', (surgeonRotation - Math.PI/2)%(2* Math.PI));
                                 }
                             }
-
-//                            var surgeonRotation = drawingEdit1.firstDoodleOfClass('Surgeon').rotation;
-//
-//                            var masterDoodle = _messageArray['object'].doodle;
-//
-//                            // Stop syncing if incision is changed
-//                            if (masterDoodle.drawing.isActive && masterDoodle.className == 'PhakoIncision')
-//                            {
-//                                masterDoodle.willSync = false;
-//                            }
-//
-//                            // Keep sideports in sync with PhakoIncision
-//                            if (masterDoodle.className == "PhakoIncision")
-//                            {
-//                                if (typeof(sidePort1) != 'undefined')
-//                                {
-//                                    sidePort1.setSimpleParameter('rotation', (surgeonRotation + Math.PI/2)%(2* Math.PI));
-//                                }
-//                                if (typeof(sidePort2) != 'undefined')
-//                                {
-//                                    sidePort2.setSimpleParameter('rotation', (surgeonRotation - Math.PI/2)%(2* Math.PI));
-//                                }
-//                            }
                             break;
                     }
                 }
@@ -263,8 +236,8 @@
     <body onload="init();">
 
         <!-- Canvas elements -->
-        <canvas id="canvasEdit1" class="ed-canvas-edit" width="300" height="300" tabindex="1"></canvas>
-        <canvas id="canvasEdit2" class="ed-canvas-edit" width="300" height="300" tabindex="2"></canvas>
+        <canvas id="canvasEdit1" class="ed-canvas-edit" width="300" height="300"></canvas>
+        <canvas id="canvasEdit2" class="ed-canvas-edit" width="300" height="300"></canvas>
 
         <button onclick="changeEye(); return false;" >Change eye</button>
 

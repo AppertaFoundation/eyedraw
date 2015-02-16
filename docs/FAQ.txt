@@ -46,3 +46,8 @@ Adding a binding
 Removing a binding
 
     1) doodle.removeBinding(parameter);
+
+Q: How to add a doodle icon?
+A: Generate PNGs of the icons in 32x32, from the original image in assets/img/old, and place it in assets/img/icons/32x32/draw/new.
+	Running grunt will regenarate the CSS and sprite image with the right reference to the new icon.
+	When testing the change disable caching to force the browser to reload the CSS

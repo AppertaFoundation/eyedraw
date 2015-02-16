@@ -39,7 +39,7 @@ ED.Tube = function(_drawing, _parameterJSON) {
 	this.tubeExtender = false;
 
 	// Saved parameters
-	this.savedParameterArray = ['rotation', 'apexY', 'type'];
+	this.savedParameterArray = ['rotation', 'apexX', 'apexY', 'type'];
 	
 	// Parameters in doodle control bar (parameter name: parameter label)
 	this.controlParameterArray = {'type':'Type'};

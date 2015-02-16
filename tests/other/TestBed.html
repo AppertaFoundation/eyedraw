@@ -44,7 +44,7 @@
                 var canvasEdit = document.getElementById('canvasEdit');
 
                 // Create a drawingEdit , {scaleOn:'width'}
-                drawingEdit = new ED.Drawing(canvasEdit, ED.eye.Right, 'RPS', true, {graphicsPath:'../../assets/img/'});
+                drawingEdit = new ED.Drawing(canvasEdit, ED.eye.Right, 'RPS', true, {graphicsPath:'../../assets/img/', toggleScale:0.72});
                 
                 // Instantiate a controller object
                 controller = new eyeDrawController(drawingEdit);
@@ -102,6 +102,7 @@
 							//this.drawing.addDoodle('TubeLigation');
 							//this.drawing.addDoodle('Patch');
 							//this.drawing.addDoodle('TrabySuture');
+							//this.drawing.addDoodle('TrabySuture')
 							//this.drawing.addDoodle('TubeExtender');
 							//this.drawing.addDoodle('Supramid');
 							//this.drawing.addDoodle('ConjunctivalSuture');
@@ -332,6 +333,10 @@
 
                     }
                 }
+            }
+            
+            function zoom() {
+				drawingEdit.toggleZoom();
             }
 
             </script>
@@ -624,7 +629,7 @@
         <button onclick="console.log(grid.getGridX()); return false;">Grid</button>
         <button onclick="console.log(drawingEdit.save()); return false;">Save</button>
  -->
-
+	<button onclick="zoom(); return false;">Toggle Zoom</button>
 
 
     </body>

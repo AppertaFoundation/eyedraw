@@ -299,12 +299,28 @@ ED.TrabySuture.prototype.draw = function(_point) {
 }
 
 /**
+ * Returns a String which, if not empty, determines the root descriptions of multiple instances of the doodle
+ *
+ * @returns {String} Group description
+ */
+ED.TrabySuture.prototype.groupDescription = function() {
+	return "Flap sutures at ";
+}
+
+/**
  * Returns a string containing a text description of the doodle
  *
  * @returns {String} Description of doodle
  */
 ED.TrabySuture.prototype.description = function() {
-	var returnValue = this.size + " " + this.material + " " + this.type + " suture at " + this.clockHour() + " o'clock";
+	return this.clockHour();
+}
 
-	return returnValue;
+/**
+ * Returns a String which, if not empty, determines the root descriptions of multiple instances of the doodle
+ *
+ * @returns {String} Group description
+ */
+ED.TrabySuture.prototype.groupDescriptionEnd = function() {
+	return " o'clock";
 }

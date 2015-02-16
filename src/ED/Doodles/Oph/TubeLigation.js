@@ -127,13 +127,17 @@ ED.TubeLigation.prototype.setParameterDefaults = function() {
 	// If existing doodles, put in same meridian, but higher up
 	var number = this.drawing.numberOfDoodlesOfClass(this.className);
 	var doodle = this.drawing.firstDoodleOfClass(this.className);
+	var xSign = doodle.originX > 0?1:-1;
+	var ySign = doodle.originY > 0?1:-1;
 	
 	switch (number) {
 		case 1:
-			this.move(doodle.originX * 1.02, doodle.originY * 1.02);
+			this.originX = 400 * xSign;
+			this.originY = 400 * ySign;
 			break;
 		case 2:
-			this.move(doodle.originX * 0.5, doodle.originY * 0.5);
+			this.originX = 320 * xSign;
+			this.originY = 320 * ySign;
 			break;
 	}
 }
