@@ -138,7 +138,7 @@
 			'idSuffix': 'right_461',
 			'isEditable': true,
 			'focus': false,
-			'graphicsPath': '/assets/img/',
+			'graphicsPath': '../assets/img/',
 			'inputId': 'preview_input',
 			'onReadyCommandArray': [
 				['addDoodle', [this.currentDoodleBackground]],
