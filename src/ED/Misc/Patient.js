@@ -27,9 +27,12 @@
 ED.Patient = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "Patient";
-
+	
+	// Derived parameters
+	this.recliningAngle = 0;
+	
 	// Saved parameters
-	this.savedParameterArray = ['originX', 'originY', 'scaleX', 'scaleY'];
+	this.savedParameterArray = ['rotation'];
 
 	// Call super-class constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -48,9 +51,27 @@ ED.Patient.superclass = ED.Doodle.prototype;
  */
 ED.Patient.prototype.setPropertyDefaults = function() {
 	// Update component of validation array for simple parameters
-		this.isScaleable = false;
-		this.isMoveable = false;
-		this.isDeletable = false;
+	this.isScaleable = false;
+	this.isMoveable = false;
+	this.isDeletable = false;
+	this.willStaySelected = false;
+	//this.snapToAngles = true
+	
+	// Adjust ranges for simple parameters
+	this.parameterValidationArray['rotation']['range'] = new ED.Range(270 * Math.PI / 180, 360 * Math.PI/180);
+	
+	// Add complete validation arrays for derived parameters
+	this.parameterValidationArray['recliningAngle'] = {
+		kind: 'derived',
+		type: 'mod',
+		range: new ED.Range(0, 91),
+		clock: 'bottom',
+		animate: true
+	};
+	
+	// Array of angles to snap to
+// 	var phi = Math.PI / 6;
+// 	this.anglesArray = [phi * 9, phi * 10, phi * 11, phi * 12];
 }
 
 /**
@@ -58,11 +79,40 @@ ED.Patient.prototype.setPropertyDefaults = function() {
  * Use the setParameter function for derived parameters, as this will also update dependent variables
  */
 ED.Patient.prototype.setParameterDefaults = function() {
-	this.scaleX = 0.75;
-	this.scaleY = 0.75;
-	this.setOriginWithDisplacements(100, 80);
-
+	this.scaleX = 0.65;
+	this.scaleY = 0.7;
+	this.recliningAngle = 0
 }
+
+/**
+ * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
+ * The returned parameters are animated if their 'animate' property is set to true
+ *
+ * @param {String} _parameter Name of parameter that has changed
+ * @value {Undefined} _value Value of parameter to calculate
+ * @returns {Array} Associative array of values of dependent parameters
+ */
+ED.Patient.prototype.dependentParameterValues = function(_parameter, _value) {
+	var returnArray = new Array();
+
+	switch (_parameter) {
+		case 'rotation':
+			// Watch for edge conditions from over-rotating
+			var angle = 360 - _value * 180/Math.PI;
+			if (angle > 300) { angle = 0; }
+			if (angle > 90) { angle = 90; }
+			returnArray['recliningAngle'] = angle;
+			break;
+
+		case 'recliningAngle':
+			var angle = (360 - _value) * Math.PI / 180;
+			returnArray['rotation'] = angle;
+			break;
+	}
+
+	return returnArray;
+}
+
 
 /**
  * Draws doodle or performs a hit test if a Point parameter is passed
@@ -78,50 +128,53 @@ ED.Patient.prototype.draw = function(_point) {
 
 	// Boundary path
 	ctx.beginPath();
-
-	ctx.moveTo(-522,141);
-	ctx.bezierCurveTo(-533,9,-402,-46,-376,-48);
-	ctx.bezierCurveTo(-350,-50,-101,-59,-79,-66);
-	ctx.bezierCurveTo(-57,-74,-48,-101,-6,-121);
-	ctx.bezierCurveTo(25,-132,49,-123,66,-114);
-	ctx.bezierCurveTo(82,-105,88,-70,104,-68);
-	ctx.bezierCurveTo(121,-66,141,-84,157,-66);
-	ctx.bezierCurveTo(174,-48,141,-37,156,-26);
-	ctx.bezierCurveTo(170,-15,178,-30,203,-22);
-	ctx.bezierCurveTo(229,-15,289,9,310,18);
-	ctx.bezierCurveTo(330,27,352,36,390,33);
-	ctx.bezierCurveTo(429,29,421,13,438,-6);
-	ctx.bezierCurveTo(454,-24,436,-30,463,-55);
-	ctx.bezierCurveTo(482,-70,515,-66,515,-66);
-	ctx.lineTo(526,-77);
-	ctx.lineTo(540,-68);
-	ctx.lineTo(561,-75);
-	ctx.bezierCurveTo(561,-75,561,-101,573,-103);
-	ctx.bezierCurveTo(586,-105,612,-70,630,-68);
-	ctx.bezierCurveTo(649,-66,628,-81,658,-81);
-	ctx.bezierCurveTo(687,-81,737,-50,760,-37);
-	ctx.bezierCurveTo(782,-8,771,-20,782,10);
-	ctx.bezierCurveTo(793,40,797,84,786,112);
-	ctx.bezierCurveTo(775,139,762,152,738,161);
-	ctx.bezierCurveTo(715,170,649,174,669,174);
-	ctx.bezierCurveTo(689,174,562,174,583,172);
-	ctx.bezierCurveTo(491,179,509,178,485,200);
-	ctx.bezierCurveTo(462,222,474,258,456,291);
-	ctx.bezierCurveTo(438,324,425,328,386,353);
-	ctx.bezierCurveTo(245,379,64,436,14,396);
-	ctx.bezierCurveTo(-2,370,2,366,-19,324);
-	ctx.bezierCurveTo(-55,321,-237,334,-326,336);
-	ctx.bezierCurveTo(-416,339,-511,273,-522,141);
-
+	
+	ctx.moveTo(-642,41);
+	ctx.bezierCurveTo(-653,-91,-522,-146,-496,-148);
+	ctx.bezierCurveTo(-470,-150,-221,-159,-199,-166);
+	ctx.bezierCurveTo(-177,-174,-168,-201,-126,-221);
+	ctx.bezierCurveTo(-95,-232,-71,-223,-54,-214);
+	ctx.bezierCurveTo(-38,-205,-32,-170,-16,-168);
+	ctx.bezierCurveTo(1,-166,21,-184,37,-166);
+	ctx.bezierCurveTo(54,-148,21,-137,36,-126);
+	ctx.bezierCurveTo(50,-115,58,-130,83,-122);
+	ctx.bezierCurveTo(109,-115,169,-91,190,-82);
+	ctx.bezierCurveTo(210,-73,232,-64,270,-67);
+	ctx.bezierCurveTo(309,-71,301,-87,318,-106);
+	ctx.bezierCurveTo(334,-124,316,-130,343,-155);
+	ctx.bezierCurveTo(362,-170,395,-166,395,-166);
+	ctx.lineTo(406,-177);
+	ctx.lineTo(420,-168);
+	ctx.lineTo(441,-175);
+	ctx.bezierCurveTo(441,-175,441,-201,453,-203);
+	ctx.bezierCurveTo(466,-205,492,-170,510,-168);
+	ctx.bezierCurveTo(529,-166,508,-181,538,-181);
+	ctx.bezierCurveTo(567,-181,617,-150,640,-137);
+	ctx.bezierCurveTo(662,-108,651,-120,662,-90);
+	ctx.bezierCurveTo(673,-60,677,-16,666,12);
+	ctx.bezierCurveTo(655,39,642,52,618,61);
+	ctx.bezierCurveTo(595,70,529,74,549,74);
+	ctx.bezierCurveTo(569,74,442,74,463,72);
+	ctx.bezierCurveTo(371,79,389,78,365,100);
+	ctx.bezierCurveTo(342,122,354,158,336,191);
+	ctx.bezierCurveTo(318,224,305,228,266,253);
+	ctx.bezierCurveTo(125,279,-56,336,-106,296);
+	ctx.bezierCurveTo(-122,270,-118,266,-139,224);
+	ctx.bezierCurveTo(-175,221,-357,234,-446,236);
+	ctx.bezierCurveTo(-536,239,-631,173,-642,41);
 
 	// Close path
 	ctx.closePath();
 
-	// Set line attributes
-	ctx.lineWidth = "";
-	ctx.fillStyle = "";
-	ctx.strokeStyle = "";
+	// Set Attributes
+	ctx.lineWidth = 4;
+	ctx.strokeStyle = "rgba(120,120,120,1)";
 
+	// Set light blue for surgeon's gown
+	var colour = new ED.Colour(0, 0, 0, 1);
+	colour.setWithHexString('3AFEFA');
+	ctx.fillStyle = colour.rgba();
+	
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 

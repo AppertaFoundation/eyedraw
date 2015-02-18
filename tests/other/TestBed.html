@@ -86,7 +86,7 @@
 
 							//this.drawing.addDoodle('AxialLengthGraph', {'axialLength':'25'});
 							//this.drawing.addDoodle('AntSeg', {'pupilSize':'Small'});
-							this.drawing.addDoodle('Patient');
+							this.drawing.addDoodle('Patient', {}, {recliningAngle:{id:'recliningAngleInput'}});
 							//this.drawing.addDoodle('RK');
 							//this.drawing.addDoodle('CornealPigmentation');
 							//this.drawing.addDoodle('CornealGraft', {}, {diameter:{id:'diameter'}});
@@ -418,7 +418,7 @@
 		</div>
 
         <!-- Input element -->
-        <input type="text" id="diameter" value="7.5" />
+        <input type="text" id="recliningAngleInput" value="0" />
         
         <button class="actbutton" onclick="console.log(drawingEdit.report()); return false;">Report</button>
 
