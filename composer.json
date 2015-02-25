@@ -2,6 +2,6 @@
   "name" : "openeyes/eyedraw",
   "description": "Electronic Patient Record system for use in Ophthalmology clinics",
   "require": {
-    "openeyes/openeyes": "1.8.*"
+    "openeyes/openeyes": "~1.8"
   }
 }
