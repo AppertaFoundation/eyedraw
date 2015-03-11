@@ -40152,7 +40152,7 @@ ED.ToricPCIOL = function(_drawing, _parameterJSON) {
 	this.className = "ToricPCIOL";
 	
 	// Derived parameters
-	this.axis = '0';
+	this.axis = 0;
 	
 	// Other parameters
 	this.model = 'Type 1';
@@ -40214,7 +40214,7 @@ ED.ToricPCIOL.prototype.setParameterDefaults = function() {
 	this.scaleX = 0.75;
 	this.scaleY = 0.75;
 	this.setParameterFromString('axis', '0');
-	this.setParameterFromString('model', 'Type 1');
+	this.setParameterFromString('model', 'AcrySof T3 (+1.50 D)');
 }
 
 /**
