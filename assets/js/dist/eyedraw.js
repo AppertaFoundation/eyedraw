@@ -40150,9 +40150,18 @@ ED.Telangiectasis.prototype.description = function() {
 ED.ToricPCIOL = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "ToricPCIOL";
+	
+	// Derived parameters
+	this.axis = '0';
+	
+	// Other parameters
+	this.model = 'Type 1';
 
 	// Saved parameters
-	this.savedParameterArray = ['originX', 'originY', 'rotation'];
+	this.savedParameterArray = ['originX', 'originY', 'rotation', 'model'];
+	
+	// Parameters in doodle control bar (parameter name: parameter label)
+	this.controlParameterArray = {'model':'Model'};
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -40180,6 +40189,22 @@ ED.ToricPCIOL.prototype.setPropertyDefaults = function() {
 	this.isOrientated = false;
 	this.isScaleable = false;
 	this.isUnique = true;
+	
+	// Add complete validation arrays for derived parameters
+	this.parameterValidationArray['axis'] = {
+		kind: 'derived',
+		type: 'mod',
+		range: new ED.Range(0, 180),
+		clock: 'bottom',
+		animate: true
+	};
+	
+	this.parameterValidationArray['model'] = {
+		kind: 'derived',
+		type: 'string',
+		list: ['Type 1', 'Type 2', 'Type 3'],
+		animate: false
+	}
 }
 
 /**
@@ -40188,6 +40213,33 @@ ED.ToricPCIOL.prototype.setPropertyDefaults = function() {
 ED.ToricPCIOL.prototype.setParameterDefaults = function() {
 	this.scaleX = 0.75;
 	this.scaleY = 0.75;
+	this.setParameterFromString('axis', '0');
+	this.setParameterFromString('model', 'Type 1');
+}
+
+/**
+ * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
+ * The returned parameters are animated if their 'animate' property is set to true
+ *
+ * @param {String} _parameter Name of parameter that has changed
+ * @value {Undefined} _value Value of parameter to calculate
+ * @returns {Array} Associative array of values of dependent parameters
+ */
+ED.ToricPCIOL.prototype.dependentParameterValues = function(_parameter, _value) {
+	var returnArray = new Array();
+
+	// Similar to TrialLens but with correction to line up haptics correctly
+	switch (_parameter) {
+		case 'rotation':
+			returnArray['axis'] = (-120 + 720 - 180 * _value / Math.PI) % 180;
+			break;
+
+		case 'axis':
+			returnArray['rotation'] = (60 + 180 - _value) * Math.PI / 180;
+			break;
+	}
+
+	return returnArray;
 }
 
 /**
@@ -40273,7 +40325,7 @@ ED.ToricPCIOL.prototype.draw = function(_point) {
 
 	// Coordinates of handles (in canvas plane)
 	var point = new ED.Point(0, 0)
-	point.setWithPolars(r, Math.PI / 4);
+	point.setWithPolars(r, 4 * Math.PI / 4);
 	this.handleArray[2].location = this.transform.transformPoint(point);
 
 	// Draw handles if selected
@@ -40289,7 +40341,7 @@ ED.ToricPCIOL.prototype.draw = function(_point) {
  * @returns {String} Description of doodle
  */
 ED.ToricPCIOL.prototype.description = function() {
-	var returnValue = "Toric posterior chamber IOL";
+	var returnValue = "Toric posterior chamber IOL " + this.model + " ";
 
 	// Displacement limit
 	var limit = 40;

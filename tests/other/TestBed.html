@@ -85,9 +85,10 @@
 							this.drawing.globalScaleFactor = this.gsf;
 
 							//this.drawing.addDoodle('AxialLengthGraph', {'axialLength':'25'});
-							//this.drawing.addDoodle('AntSeg', {'pupilSize':'Small'});
-							this.drawing.addDoodle('Patient', {}, {recliningAngle:{id:'recliningAngleInput'}});
-							//this.drawing.addDoodle('RK');
+							this.drawing.addDoodle('AntSeg', {'pupilSize':'Large'});
+							//this.drawing.addDoodle('Patient', {}, {recliningAngle:{id:'recliningAngleInput'}});
+							//this.drawing.addDoodle('TrialLens', {}, {axis:{id:'axis'}});
+							this.drawing.addDoodle('ToricPCIOL', {}, {axis:{id:'axis'}});
 							//this.drawing.addDoodle('CornealPigmentation');
 							//this.drawing.addDoodle('CornealGraft', {}, {diameter:{id:'diameter'}});
 							//this.drawing.addDoodle('LasikFlap');
@@ -418,7 +419,7 @@
 		</div>
 
         <!-- Input element -->
-        <input type="text" id="recliningAngleInput" value="0" />
+        <input type="text" id="axis" value="0" />
         
         <button class="actbutton" onclick="console.log(drawingEdit.report()); return false;">Report</button>
 
