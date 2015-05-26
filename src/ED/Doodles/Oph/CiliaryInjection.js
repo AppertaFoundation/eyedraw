@@ -203,6 +203,9 @@ ED.CiliaryInjection.prototype.draw = function(_point) {
 		}
 		
 		ctx.stroke();
+		
+		// Demonstration blurred line	
+		this.drawSoftLine(-200, -200, 200, 200, 40, 255, 0, 0, 1);
 	}
 
 	// Coordinates of handles (in canvas plane)
@@ -233,4 +236,30 @@ ED.CiliaryInjection.prototype.groupDescription = function() {
 		returnString += (Math.sin(this.rotation) > 0 ? (this.drawing.eye == ED.eye.Right ? "nasally" : "temporally") : (this.drawing.eye == ED.eye.Right ? "temporally" : "nasally"));
 	}
 	return returnString
+}
+
+ED.CiliaryInjection.prototype.drawSoftLine = function(x1, y1, x2, y2, lineWidth, r, g, b, a) {
+	// Get context
+	var ctx = this.drawing.context;
+	
+	var lx = x2 - x1;
+	var ly = y2 - y1;
+	var lineLength = Math.sqrt(lx*lx + ly*ly);
+	var wy = lx / lineLength * lineWidth;
+	var wx = ly / lineLength * lineWidth;
+	var gradient = ctx.createLinearGradient(x1-wx/2, y1+wy/2, x1+wx/2, y1-wy/2);
+	  // The gradient must be defined accross the line, 90° turned compared
+	  // to the line direction.
+	gradient.addColorStop(0,    "rgba("+r+","+g+","+b+",0)");
+	gradient.addColorStop(0.43, "rgba("+r+","+g+","+b+","+a+")");
+	gradient.addColorStop(0.57, "rgba("+r+","+g+","+b+","+a+")");
+	gradient.addColorStop(1,    "rgba("+r+","+g+","+b+",0)");
+	ctx.save();
+	ctx.beginPath();
+	ctx.lineWidth = lineWidth;
+	ctx.strokeStyle = gradient;
+	ctx.moveTo(x1, y1);
+	ctx.lineTo(x2, y2);
+	ctx.stroke();
+	ctx.restore();
 }

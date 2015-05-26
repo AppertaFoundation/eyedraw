@@ -88,10 +88,10 @@
 							this.drawing.addDoodle('AntSeg', {'pupilSize':'Large'});
 							//this.drawing.addDoodle('Patient', {}, {recliningAngle:{id:'recliningAngleInput'}});
 							//this.drawing.addDoodle('TrialLens', {}, {axis:{id:'axis'}});
-							this.drawing.addDoodle('ToricPCIOL', {}, {axis:{id:'axis'}});
-							//this.drawing.addDoodle('CornealPigmentation');
+							//this.drawing.addDoodle('ToricPCIOL', {}, {axis:{id:'axis'}});
+							//this.drawing.addDoodle('CiliaryInjection');
 							//this.drawing.addDoodle('CornealGraft', {}, {diameter:{id:'diameter'}});
-							//this.drawing.addDoodle('LasikFlap');
+							this.drawing.addDoodle('Pterygium');
 							//this.drawing.addDoodle('PTK');
 
 							//debugger;
@@ -405,7 +405,7 @@
             <button id="LensRPS" class="ed-button" title="IOL" onclick="drawingEdit.addDoodle('IOL'); return false;" ><img src="../../assets/img/old/IOL.gif" /></button>
             <button id="LensRPS" class="ed-button" title="ArcuateKeratotomy" onclick="drawingEdit.addDoodle('ArcuateKeratotomy'); return false;" ><img src="../../assets/img/old/ArcuateKeratotomy.gif" /></button>
             <button id="LensRPS" class="ed-button" title="Supramid" onclick="drawingEdit.addDoodle('CornealGraftSuture'); return false;" ><img src="../../assets/img/old/CornealSuture.gif" /></button>
-            <button id="LensRPS" class="ed-button" title="TubeExtender" onclick="drawingEdit.addDoodle('CiliaryInjection'); return false;" ><img src="../../assets/img/old/TubeExtender.gif" /></button>
+            <button id="LensRPS" class="ed-button" title="Pterygium" onclick="drawingEdit.addDoodle('Pterygium'); return false;" ><img src="../../assets/img/old/Pterygium.gif" /></button>
             <br />
         </div>
 
@@ -414,8 +414,10 @@
 			<span id="canvasTooltip"></span>
 			<canvas id="canvasEdit" class="ed-canvas" width="300" height="300" tabindex="1"></canvas>
 			<!-- Doodle control panel -->
+<!-- 
 			<div id="canvasEdit_controls" class="ed-doodle-popup" style="background-color: #DAE6F1; float:left; position:absolute; top:20px; left:310px;">
 			</div>
+ -->
 		</div>
 
         <!-- Input element -->
