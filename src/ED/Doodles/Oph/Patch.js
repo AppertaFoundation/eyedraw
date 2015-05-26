@@ -65,7 +65,7 @@ ED.Patch.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['material'] = {
 		kind: 'other',
 		type: 'string',
-		list: ['Sclera', 'Tenons', 'Tutoplast', 'Cornea'],
+		list: ['Sclera', 'Cornea', 'Tenons', 'Tutoplast', 'Cornea'],
 		animate: false
 	};
 }
@@ -139,6 +139,9 @@ ED.Patch.prototype.draw = function(_point) {
 		case 'Sclera':
 			ctx.fillStyle = "rgba(200,200,50,0.5)";
 			break;
+        case 'Cornea':
+        	ctx.fillStyle = "rgba(180,180,180,0.5)";
+        	break;
 		case 'Tenons':
 			ctx.fillStyle = "rgba(200,200,200,0.5)";
 			break;
