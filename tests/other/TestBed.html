@@ -45,7 +45,7 @@
 
                 // Create a drawingEdit , {scaleOn:'width'}
                 drawingEdit = new ED.Drawing(canvasEdit, ED.eye.Right, 'RPS', true, {graphicsPath:'../../assets/img/', toggleScale:0.72});
-                
+
                 // Instantiate a controller object
                 controller = new eyeDrawController(drawingEdit);
 
@@ -54,16 +54,16 @@
 
                 // Set focus to canvasEdit element
                 canvasEdit.focus();
-            } 
-  				
+            }
+
 
             // Controller class
             function eyeDrawController(_drawing)
             {
                 this.drawing = _drawing;
                 this.gsf = 1;
-                //this.gsf = 0.72;
-                
+                this.gsf = 0.72;
+
                 // Specify call back function
                 this.callBack = callBack;
 
@@ -91,7 +91,7 @@
 							//this.drawing.addDoodle('ToricPCIOL', {}, {axis:{id:'axis'}});
 							//this.drawing.addDoodle('CiliaryInjection');
 							//this.drawing.addDoodle('CornealGraft', {}, {diameter:{id:'diameter'}});
-							this.drawing.addDoodle('Pterygium');
+							this.drawing.addDoodle('Needle');
 							//this.drawing.addDoodle('PTK');
 
 							//debugger;
@@ -114,7 +114,7 @@
 							//this.drawing.addDoodle('Perforation');
 							//this.drawing.addDoodle('Fundus');
 							//this.drawing.addDoodle('PostSubcapCataract');
-							//this.drawing.addDoodle('Freehand', {}, {colour:{id:'colourSelect'}});				
+							//this.drawing.addDoodle('Freehand', {}, {colour:{id:'colourSelect'}});
 
 							// Grid , {type:{id:'piTypeSelect'}}  , {type:'Laser'}, {suture:{id:'Eyedraw_boolField'}}
 					    	//this.drawing.addDoodle('Lungs');
@@ -336,7 +336,7 @@
                     }
                 }
             }
-            
+
             function zoom() {
 				drawingEdit.toggleZoom();
             }
@@ -414,15 +414,14 @@
 			<span id="canvasTooltip"></span>
 			<canvas id="canvasEdit" class="ed-canvas" width="300" height="300" tabindex="1"></canvas>
 			<!-- Doodle control panel -->
-<!-- 
 			<div id="canvasEdit_controls" class="ed-doodle-popup" style="background-color: #DAE6F1; float:left; position:absolute; top:20px; left:310px;">
 			</div>
- -->
+
 		</div>
 
         <!-- Input element -->
         <input type="text" id="axis" value="0" />
-        
+
         <button class="actbutton" onclick="console.log(drawingEdit.report()); return false;">Report</button>
 
 <!--
