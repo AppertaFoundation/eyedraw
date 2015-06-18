@@ -22,7 +22,7 @@
 	<div class="ed-body">
 		<div class="ed-editor-container">
 			<?php if (@$data['imageUrl']) {?>
-				<img src="<?php echo $data['imageUrl']?>" style="height=<?=$height?>;width=<?=$width?>;" />
+				<img src="<?php echo $data['imageUrl']?>" height=<?=$height?> width=<?=$width?> />
 			<?php }else{?>
 				<?php $this->render('editor', $data);?>
 			<?php }?>
