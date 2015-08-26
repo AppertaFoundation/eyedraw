@@ -30247,10 +30247,6 @@ ED.Needle = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "Needle";
 
-	// Private parameters
-
-	// Derived parameters
-
 	// Saved parameters
 	this.savedParameterArray = ['originX', 'originY', 'rotation'];
 
@@ -30276,11 +30272,6 @@ ED.Needle.prototype.setHandles = function() {
  * Sets default dragging attributes
  */
 ED.Needle.prototype.setPropertyDefaults = function() {
-
-	// Update component of validation array for simple parameters
-// 	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
-// 	this.parameterValidationArray['apexY']['range'].setMinAndMax(-550, -470);
-
 }
 
 /**
@@ -30290,38 +30281,6 @@ ED.Needle.prototype.setParameterDefaults = function() {
 	this.scaleX = 0.5
 	this.scaleY = 0.5
 }
-
-/**
- * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
- * The returned parameters are animated if their 'animate' property is set to true
- *
- * @param {String} _parameter Name of parameter that has changed
- * @value {Undefined} _value Value of parameter to calculate
- * @returns {Array} Associative array of values of dependent parameters
- */
-// ED.Needle.prototype.dependentParameterValues = function(_parameter, _value) {
-// 	var returnArray = new Array();
-//
-// 	switch (_parameter) {
-// 		case 'apexY':
-// 			if (_value < -540) returnArray['distance'] = '4.5';
-// 			else if (_value < -520) returnArray['distance'] = '4.0';
-// 			else if (_value < -500) returnArray['distance'] = '3.5';
-// 			else if (_value < -480) returnArray['distance'] = '3.0';
-// 			else returnArray['distance'] = '2.5';
-// 			break;
-//
-// 		case 'distance':
-// 			if (_value == '4.5') returnArray['apexY'] = -550;
-// 			else if (_value == '4.0') returnArray['apexY'] = -530;
-// 			else if (_value == '3.5') returnArray['apexY'] = -510;
-// 			else if (_value == '3.0') returnArray['apexY'] = -490;
-// 			else returnArray['apexY'] = -470;
-// 			break;
-// 	}
-//
-// 	return returnArray;
-// }
 
 /**
  * Draws doodle or performs a hit test if a Point parameter is passed
