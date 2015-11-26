@@ -1,5 +1,5 @@
 /**
- * @fileOverview Contains doodle subclasses for the anterior segment
+ * 
  * @author <a href="mailto:bill.aylward@mac.com">Bill Aylward</a>
  * @version 0.9
  *
@@ -23,8 +23,8 @@
  */
 
 /**
- * Defines the EyeDraw namespace
- * @namespace Namespace for all EyeDraw classes
+ * @namespace ED
+ * @description Namespace for all EyeDraw classes
  */
 if (ED == null || typeof(ED) != "object") {
 	var ED = new Object();

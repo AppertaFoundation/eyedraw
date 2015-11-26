@@ -1,0 +1,22 @@
+<html>
+	<head>
+		<title>File download prototype</title>
+		<link rel="stylesheet" type="text/css" href="css/svgToCanvas.css" />
+	</head>
+	<body>
+		<p>
+			<a href="#" id="replaceString">Replace</a> | 
+			<a href="#" id="updateString">Update</a> | 
+			<a href="filesystem:http://localhost:8000/persistent/scratchdoodle.js" target="_blank">View file generated</a> |
+			<a href="filesystem:http://localhost:8000/persistent/scratchdoodle.js" download="filesystem:http://localhost:8000/persistent/scratchdoodle.js">Download file generated</a>
+		</p>
+
+		<script src="js/FileWriter.js"></script>
+		<script type="text/javascript" src="/assets/components/mustache/mustache.js"></script>
+
+
+		<script id="template" type="x-tmpl-mustache">
+			This is a javascript file template {{param}}
+		</script>
+	</body>
+</html>

@@ -129,7 +129,7 @@ ED.Label.prototype.validateValue = function(_value) {
  * We store these values so we can re-set them when the scale level
  * changes. Unlike other doodles, we want to set the bounds to be the same as
  * the dimensions of the canvas element.
- * @return {[type]} [description]
+ * @return {Object} [description]
  */
 ED.Label.prototype.storeOriginalParams = function() {
 	this.originalParams = {

@@ -1,8 +1,8 @@
 /* global jQuery:false */
 
 /**
- * Defines the EyeDraw namespace
- * @namespace Namespace for all EyeDraw classes
+ * Namespace for all EyeDraw classes
+ * @namespace ED
  */
 var ED = ED || {};
 
@@ -259,7 +259,7 @@ ED.setTitles = function(titles) {
  */
 ED.randomArray = [0.6570, 0.2886, 0.7388, 0.1621, 0.9896, 0.0434, 0.1695, 0.9099, 0.1948, 0.4433, 0.1580, 0.7392, 0.8730, 0.2165, 0.7138, 0.6316, 0.3425, 0.2838, 0.4551, 0.4153, 0.7421, 0.3364, 0.6087, 0.1986, 0.5764, 0.1952, 0.6179, 0.6699, 0.0903, 0.2968, 0.2684, 0.9383, 0.2488, 0.4579, 0.2921, 0.9085, 0.7951, 0.4500, 0.2255, 0.3366, 0.6670, 0.7300, 0.5511, 0.5623, 0.1376, 0.5553, 0.9898, 0.4317, 0.5922, 0.6452, 0.5008, 0.7077, 0.0704, 0.2293, 0.5697, 0.7415, 0.1557, 0.2944, 0.4566, 0.4129, 0.2449, 0.5620, 0.4105, 0.5486, 0.8917, 0.9346, 0.0921, 0.7998, 0.7717, 0.0357, 0.1179, 0.0168, 0.1520, 0.5187, 0.3466, 0.1663, 0.5935, 0.7524, 0.8410, 0.1859, 0.6012, 0.8171, 0.9272, 0.3367, 0.8133, 0.4868, 0.3665, 0.9625, 0.7839, 0.3052, 0.1651, 0.6414, 0.7361, 0.0065, 0.3267, 0.0554, 0.3389, 0.8967, 0.8777, 0.0557, 0.9201, 0.6015, 0.2676, 0.3365, 0.2606, 0.0989, 0.2085, 0.3526, 0.8476, 0.0146, 0.0190, 0.6896, 0.5198, 0.9871, 0.0288, 0.8037, 0.6741, 0.2148, 0.2584, 0.8447, 0.8480, 0.5557, 0.2480, 0.4736, 0.8869, 0.1867, 0.3869, 0.6871, 0.1011, 0.7561, 0.7340, 0.1525, 0.9968, 0.8179, 0.7103, 0.5462, 0.4150, 0.4187, 0.0478, 0.6511, 0.0386, 0.5243, 0.7271, 0.9093, 0.4461, 0.1264, 0.0756, 0.9405, 0.7287, 0.0684, 0.2820, 0.4059, 0.3694, 0.7641, 0.4188, 0.0498, 0.7841, 0.9136, 0.6210, 0.2249, 0.9935, 0.9709, 0.0741, 0.6218, 0.3166, 0.2237, 0.7754, 0.4191, 0.2195, 0.2935, 0.4529, 0.9112, 0.9183, 0.3275, 0.1856, 0.8345, 0.0442, 0.6297, 0.9030, 0.4689, 0.9512, 0.2219, 0.9993, 0.8981, 0.1018, 0.9362, 0.6426, 0.4563, 0.1267, 0.7889, 0.5057, 0.8588, 0.4669, 0.0687, 0.6623, 0.3681, 0.8152, 0.9004, 0.0822, 0.3652];
 /**
- * @fileOverview Contains the core classes for EyeDraw
+ * @summary Contains the core classes for EyeDraw
  * @author <a href="mailto:bill.aylward@mac.com">Bill Aylward</a>
  * @version 1.2
  *
@@ -282,6 +282,10 @@ ED.randomArray = [0.6570, 0.2886, 0.7388, 0.1621, 0.9896, 0.0434, 0.1695, 0.9099
  * along with OpenEyes.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @namespace ED
+ * @description Namespace for all EyeDraw classes
+ */
 var ED = ED || {};
 
 /**
@@ -289,8 +293,8 @@ var ED = ED || {};
  * Doodles are drawn in the 'doodle plane' consisting of a (nominal) 1001 pixel square grid -500 to 500) with central origin, and negative Y upwards
  * Affine transforms are used to convert points in the doodle plane to the canvas plane, the plane of the canvas element;
  * Each doodle contains additional transforms to handle individual position, rotation, and scale.
- *
- * @class Drawing
+ * @namespace ED.Drawing
+ * @memberOf ED
  * @property {Canvas} canvas A canvas element used to edit and display the drawing
  * @property {Eye} eye Right or left eye (some doodles display differently according to side)
  * @property {Bool} isEditable Flag indicating whether canvas is editable or not
@@ -865,7 +869,7 @@ ED.Drawing.prototype.drawAllDoodles = function() {
  * Selected doodle is first selectable doodle to have click within boundary path.
  * Double clicking on a selected doodle promotes it to drawing mode (if is drawable)
  *
- * @event
+ * @event Drawing#mousedown
  * @param {Point} _point Coordinates of mouse in canvas plane
  */
 ED.Drawing.prototype.mousedown = function(_point) {
@@ -967,7 +971,7 @@ ED.Drawing.prototype.mousedown = function(_point) {
 /**
  * Responds to mouse move event in canvas according to the drawing mode
  *
- * @event
+ * @event Drawing#mousemove
  * @param {Point} _point coordinates of mouse in canvas plane
  */
 ED.Drawing.prototype.mousemove = function(_point) {
@@ -1335,7 +1339,7 @@ ED.Drawing.prototype.mousemove = function(_point) {
 /**
  * Responds to mouse up event in canvas
  *
- * @event
+ * @event Drawing#mouseup
  * @param {Point} _point coordinates of mouse in canvas plane
  */
 ED.Drawing.prototype.mouseup = function(_point) {
@@ -1405,7 +1409,7 @@ ED.Drawing.prototype.mouseover = function(_point) {
 /**
  * Responds to mouse out event in canvas, stopping dragging operation
  *
- * @event
+ * @event Drawing#mouseout
  * @param {Point} _point coordinates of mouse in canvas plane
  */
 ED.Drawing.prototype.mouseout = function(_point) {
@@ -1437,7 +1441,7 @@ ED.Drawing.prototype.mouseout = function(_point) {
 /**
  * Responds to key down event in canvas
  *
- * @event
+ * @event Drawing#keydown
  * @param {event} e Keyboard event
  */
 ED.Drawing.prototype.keydown = function(e) {
@@ -1539,7 +1543,7 @@ ED.Drawing.prototype.keydown = function(e) {
 /**
  * Starts a timer to display a tooltip simulating hover. Called from the mousemove event
  *
- * @event
+ * @event Drawing#startHoverTimer
  * @param {Point} _point coordinates of mouse in canvas plane
  */
 ED.Drawing.prototype.startHoverTimer = function(_point) {
@@ -1559,7 +1563,7 @@ ED.Drawing.prototype.startHoverTimer = function(_point) {
 /**
  * Stops the timer. Called by the mouseout event, and from the start of the startHoverTimer method
  *
- * @event
+ * @event Drawing#stopHoverTimer
  */
 ED.Drawing.prototype.stopHoverTimer = function() {
 	if (this.canvasTooltip != null) {
@@ -1577,7 +1581,7 @@ ED.Drawing.prototype.stopHoverTimer = function() {
 /**
  * Triggered by the hover timer
  *
- * @event
+ * @event Drawing#hover
  * @param {Point} _point coordinates of mouse in canvas plane
  */
 ED.Drawing.prototype.hover = function(_point) {
@@ -1590,7 +1594,7 @@ ED.Drawing.prototype.hover = function(_point) {
 /**
  * Shows a tooltip if present
  *
- * @event
+ * @event Drawing#showTooltip
  * @param {Point} _point coordinates of mouse in canvas plane
  */
 ED.Drawing.prototype.showTooltip = function(_point) {
@@ -1663,7 +1667,7 @@ ED.Drawing.prototype.showTooltip = function(_point) {
 /**
  * Hides a tooltip
  *
- * @event
+ * @event Drawing#hideTooltip
  */
 ED.Drawing.prototype.hideTooltip = function() {
 	this.canvasTooltip.style.display = 'none';
@@ -1998,7 +2002,7 @@ ED.Drawing.prototype.setScaleForDrawingAndDoodles = function(level) {
 
 /**
  * This should be called only once the drawing is ready.
- * @param {[type]} level [description]
+ * @param {Number} level [description]
  */
 ED.Drawing.prototype.setScaleLevel = function(level) {
 	this.setScaleForDrawingAndDoodles(level);
@@ -3215,8 +3219,8 @@ ED.Drawing.prototype.getScaleLevel = function() {
  * Doodles are components of drawings which have built in knowledge of what they represent, and how to behave when manipulated;
  * Doodles are drawn in the 'doodle plane' consisting of 1001 pixel square grid with central origin (ie -500 to 500) and
  * are rendered in a canvas element using a combination of the affine transform of the host drawing, and the doodle's own transform.
- *
- * @class Doodle
+ * @namespace ED.Doodle
+ * @memberOf ED
  * @property {Drawing} drawing Drawing to which this doodle belongs
  * @property {Int} originX X coordinate of origin in doodle plane
  * @property {Int} originY Y coordinate of origin in doodle plane
@@ -5564,11 +5568,12 @@ ED.Doodle.Handle = function(_location, _isVisible, _mode, _isRotatable) {
  * along with OpenEyes.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+
 /**
  * An object of the Report class is used to extract data for the Royal College of Ophthalmologists retinal detachment dataset.
  * The object analyses an EyeDraw drawing, and sets the value of HTML elements on the page accordingly.
- *
- * @class Report
+ * @namespace ED.Report
+ * @memberOf ED
  * @property {Canvas} canvas A canvas element used to edit and display the drawing
  * @property {Int} breaksInAttached The number of retinal breaks in attached retina
  * @property {Int} breaksInDetached The number of retinal breaks in detached retina
@@ -6572,7 +6577,7 @@ ED.Squiggle.prototype.json = function() {
 	return s;
 }
 /**
- * @fileOverview Contains doodle subclasses for the anterior segment
+ * 
  * @author <a href="mailto:bill.aylward@mac.com">Bill Aylward</a>
  * @version 0.9
  *
@@ -6596,8 +6601,8 @@ ED.Squiggle.prototype.json = function() {
  */
 
 /**
- * Defines the EyeDraw namespace
- * @namespace Namespace for all EyeDraw classes
+ * @namespace ED
+ * @description Namespace for all EyeDraw classes
  */
 if (ED == null || typeof(ED) != "object") {
 	var ED = new Object();
@@ -7360,7 +7365,7 @@ ED.Label.prototype.validateValue = function(_value) {
  * We store these values so we can re-set them when the scale level
  * changes. Unlike other doodles, we want to set the bounds to be the same as
  * the dimensions of the canvas element.
- * @return {[type]} [description]
+ * @return {Object} [description]
  */
 ED.Label.prototype.storeOriginalParams = function() {
 	this.originalParams = {
@@ -8491,7 +8496,7 @@ ED.Surgeon.prototype.draw = function(_point) {
 	return this.isClicked;
 }
 /**
- * @fileOverview Contains doodle subclasses for the anterior segment
+ * 
  * @author <a href="mailto:bill.aylward@mac.com">Bill Aylward</a>
  * @version 0.9
  *
@@ -8515,8 +8520,8 @@ ED.Surgeon.prototype.draw = function(_point) {
  */
 
 /**
- * Defines the EyeDraw namespace
- * @namespace Namespace for all EyeDraw classes
+ * @namespace ED
+ * @description Namespace for all EyeDraw classes
  */
 if (ED == null || typeof(ED) != "object") {
 	var ED = new Object();
@@ -9666,7 +9671,7 @@ ED.RecordReading.prototype.drawHighlightExtras = function() {
  */
 
 /**
- * @fileOverview Contains doodle subclasses for glaucoma
+ *
  * @author <a href="mailto:bill.aylward@mac.com">Bill Aylward</a>
  * @version 0.8
  *
@@ -9690,8 +9695,8 @@ ED.RecordReading.prototype.drawHighlightExtras = function() {
  */
 
 /**
- * Defines the EyeDraw namespace
- * @namespace Namespace for all EyeDraw classes
+ * @namespace
+ * @borrows ED as ED
  */
 if (ED == null || typeof(ED) != "object") {
 	var ED = new Object();

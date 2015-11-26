@@ -1,0 +1,185 @@
+ED.{{className}} = function(_drawing, _parameterJSON) {
+	// Set classname
+	this.className = "{{className}}";
+
+	// Saved parameters
+	this.savedParameterArray = ['originX', 'originY', 'scaleX', 'scaleY'];
+
+	// Call super-class constructor
+	ED.Doodle.call(this, _drawing, _parameterJSON);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.{{className}}.prototype = new ED.Doodle;
+ED.{{className}}.prototype.constructor = ED.{{className}};
+ED.{{className}}.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.{{className}}.prototype.setHandles = function() {
+	{{#scalable}}
+  	this.handleArray[2] = new ED.Doodle.Handle(null, true, ED.Mode.Scale, false);
+	{{/scalable}}
+	{{#apex}}
+		this.handleArray[3] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
+	{{/apex}}
+	{{#rotatable}}
+		this.handleArray[4] = new ED.Doodle.Handle(null, true, ED.Mode.Rotate, false);
+	{{/rotatable}}
+}
+
+/**
+ * Sets default properties
+ */
+ED.{{className}}.prototype.setPropertyDefaults = function() {
+	// Update component of validation array for simple parameters
+	{{#reportable_override}}
+		this.willReport = {{reportable}};
+	{{/reportable_override}}
+	{{#orientated_override}}
+		this.isOrientated = {{orientated}};
+	{{/orientated_override}}
+	{{#highlight_override}}
+		this.isShowHighlight = {{highlight}};
+	{{/highlight_override}}
+	{{#locked_override}}
+		this.isLocked = {{locked}};
+	{{/locked_override}}
+	{{#selectable_override}}
+		this.isSelectable = {{selectable}};
+	{{/selectable_override}}
+	{{#stayselected_override}}
+		this.willStaySelected = {{stayselected}};
+	{{/stayselected_override}}
+	{{#squeezable_override}}
+		this.isSqueezable = {{squeezable}};
+	{{/squeezable_override}}
+	{{#rotatable_override}}
+		this.isRotatable = {{rotatable}};
+	{{/rotatable_override}}
+	{{#scalable_override}}
+		this.isScaleable = {{scalable}};
+	{{/scalable_override}}
+	{{#drawable_override}}
+		this.isDrawable = {{drawable}};
+	{{/drawable_override}}
+	{{#drawable_override}}
+		this.isDrawable = {{drawable}};
+	{{/drawable_override}}
+	{{#moveable_override}}
+		this.isMoveable = {{moveable}};
+	{{/moveable_override}}
+	{{#unique_override}}
+		this.isUnique = {{unique}};
+	{{/unique_override}}
+	{{#pointinline_override}}
+		this.isPointInLine = {{pointinline}};
+	{{/pointinline_override}}
+	{{#sync_override}}
+		this.willSync = {{sync}};
+	{{/sync_override}}
+	{{#sync_override}}
+		this.willSync = {{sync}};
+	{{/sync_override}}
+	{{#deletable_override}}
+		this.isDeletable = {{deletable}};
+	{{/deletable_override}}
+	{{#saveable_override}}
+		this.isSaveable = {{saveable}};
+	{{/saveable_override}}
+
+	{{#scalable}}
+		{{#scalexmin_override}}
+		this.parameterValidationArray['scaleX']['range'].setMinAndMax({{scalexmin}}, {{scalexmax}});
+		{{/scalexmin_override}}
+		{{#scaleymin_override}}
+		this.parameterValidationArray['scaleY']['range'].setMinAndMax({{scaleymin}}, {{scaleymax}});
+		{{/scaleymin_override}}
+	{{/scalable}}
+
+	{{#apex}}
+		{{#apexxmin_override}}
+		this.parameterValidationArray['apexX']['range'].setMinAndMax({{apexxmin}},{{apexxmax}});
+		{{/apexxmin_override}}
+		{{#apexymin_override}}
+		this.parameterValidationArray['apexY']['range'].setMinAndMax({{apexymin}},{{apexymax}});
+		{{/apexymin_override}}
+	{{/apex}}
+}
+
+/**
+ * Sets default parameters (Only called for new doodles)
+ * Use the setParameter function for derived parameters, as this will also update dependent variables
+ */
+ED.{{className}}.prototype.setParameterDefaults = function() {
+	this.scaleX = 0.75;
+	this.scaleY = 0.75;
+	this.setOriginWithDisplacements(100, 80);
+
+	{{#apex}}
+		this.apexY = 30;
+		this.apexX = 30;
+	{{/apex}}
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.{{className}}.prototype.draw = function(_point) {
+	// Get context
+	var ctx = this.drawing.context;
+
+	// Call draw method in superclass
+	ED.{{className}}.superclass.draw.call(this, _point);
+
+	// Boundary path
+	ctx.beginPath();
+
+	{{canvasCommands}}
+
+	// Close path
+	ctx.closePath();
+
+	// Set line attributes
+	ctx.lineWidth = "{{strokeWidth}}";
+	ctx.fillStyle = "{{fillColor}}";
+	ctx.strokeStyle = "{{strokeColor}}";
+
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+
+	// console.log(_point);
+
+	{{#scalable}}
+		var p1 = new ED.Point(0, 0);
+		this.handleArray[2].location = this.transform.transformPoint(p1);
+	{{/scalable}}
+	{{#apex}}
+		var p2 = new ED.Point(this.apexX, this.apexY);
+		this.handleArray[3].location = this.transform.transformPoint(p2);
+	{{/apex}}
+	{{#rotatable}}
+		var p3 = new ED.Point(60, 60);
+		this.handleArray[4].location = this.transform.transformPoint(p3);
+	{{/rotatable}}
+
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+
+	// Return value indicating successful hit test
+	return this.isClicked;
+}
+
+/**
+ * Returns a String which, if not empty, determines the root descriptions of multiple instances of the doodle
+ *
+ * @returns {String} Group description
+ */
+ED.{{className}}.prototype.groupDescription = function() {
+	return '{{description}}';
+}

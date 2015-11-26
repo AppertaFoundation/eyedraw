@@ -1,5 +1,5 @@
 /**
- * @fileOverview Contains the core classes for EyeDraw
+ * @summary Contains the core classes for EyeDraw
  * @author <a href="mailto:bill.aylward@mac.com">Bill Aylward</a>
  * @version 1.2
  *
@@ -22,6 +22,10 @@
  * along with OpenEyes.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @namespace ED
+ * @description Namespace for all EyeDraw classes
+ */
 var ED = ED || {};
 
 /**
@@ -29,8 +33,8 @@ var ED = ED || {};
  * Doodles are drawn in the 'doodle plane' consisting of a (nominal) 1001 pixel square grid -500 to 500) with central origin, and negative Y upwards
  * Affine transforms are used to convert points in the doodle plane to the canvas plane, the plane of the canvas element;
  * Each doodle contains additional transforms to handle individual position, rotation, and scale.
- *
- * @class Drawing
+ * @namespace ED.Drawing
+ * @memberOf ED
  * @property {Canvas} canvas A canvas element used to edit and display the drawing
  * @property {Eye} eye Right or left eye (some doodles display differently according to side)
  * @property {Bool} isEditable Flag indicating whether canvas is editable or not
@@ -605,7 +609,7 @@ ED.Drawing.prototype.drawAllDoodles = function() {
  * Selected doodle is first selectable doodle to have click within boundary path.
  * Double clicking on a selected doodle promotes it to drawing mode (if is drawable)
  *
- * @event
+ * @event Drawing#mousedown
  * @param {Point} _point Coordinates of mouse in canvas plane
  */
 ED.Drawing.prototype.mousedown = function(_point) {
@@ -707,7 +711,7 @@ ED.Drawing.prototype.mousedown = function(_point) {
 /**
  * Responds to mouse move event in canvas according to the drawing mode
  *
- * @event
+ * @event Drawing#mousemove
  * @param {Point} _point coordinates of mouse in canvas plane
  */
 ED.Drawing.prototype.mousemove = function(_point) {
@@ -1075,7 +1079,7 @@ ED.Drawing.prototype.mousemove = function(_point) {
 /**
  * Responds to mouse up event in canvas
  *
- * @event
+ * @event Drawing#mouseup
  * @param {Point} _point coordinates of mouse in canvas plane
  */
 ED.Drawing.prototype.mouseup = function(_point) {
@@ -1145,7 +1149,7 @@ ED.Drawing.prototype.mouseover = function(_point) {
 /**
  * Responds to mouse out event in canvas, stopping dragging operation
  *
- * @event
+ * @event Drawing#mouseout
  * @param {Point} _point coordinates of mouse in canvas plane
  */
 ED.Drawing.prototype.mouseout = function(_point) {
@@ -1177,7 +1181,7 @@ ED.Drawing.prototype.mouseout = function(_point) {
 /**
  * Responds to key down event in canvas
  *
- * @event
+ * @event Drawing#keydown
  * @param {event} e Keyboard event
  */
 ED.Drawing.prototype.keydown = function(e) {
@@ -1279,7 +1283,7 @@ ED.Drawing.prototype.keydown = function(e) {
 /**
  * Starts a timer to display a tooltip simulating hover. Called from the mousemove event
  *
- * @event
+ * @event Drawing#startHoverTimer
  * @param {Point} _point coordinates of mouse in canvas plane
  */
 ED.Drawing.prototype.startHoverTimer = function(_point) {
@@ -1299,7 +1303,7 @@ ED.Drawing.prototype.startHoverTimer = function(_point) {
 /**
  * Stops the timer. Called by the mouseout event, and from the start of the startHoverTimer method
  *
- * @event
+ * @event Drawing#stopHoverTimer
  */
 ED.Drawing.prototype.stopHoverTimer = function() {
 	if (this.canvasTooltip != null) {
@@ -1317,7 +1321,7 @@ ED.Drawing.prototype.stopHoverTimer = function() {
 /**
  * Triggered by the hover timer
  *
- * @event
+ * @event Drawing#hover
  * @param {Point} _point coordinates of mouse in canvas plane
  */
 ED.Drawing.prototype.hover = function(_point) {
@@ -1330,7 +1334,7 @@ ED.Drawing.prototype.hover = function(_point) {
 /**
  * Shows a tooltip if present
  *
- * @event
+ * @event Drawing#showTooltip
  * @param {Point} _point coordinates of mouse in canvas plane
  */
 ED.Drawing.prototype.showTooltip = function(_point) {
@@ -1403,7 +1407,7 @@ ED.Drawing.prototype.showTooltip = function(_point) {
 /**
  * Hides a tooltip
  *
- * @event
+ * @event Drawing#hideTooltip
  */
 ED.Drawing.prototype.hideTooltip = function() {
 	this.canvasTooltip.style.display = 'none';
@@ -1738,7 +1742,7 @@ ED.Drawing.prototype.setScaleForDrawingAndDoodles = function(level) {
 
 /**
  * This should be called only once the drawing is ready.
- * @param {[type]} level [description]
+ * @param {Number} level [description]
  */
 ED.Drawing.prototype.setScaleLevel = function(level) {
 	this.setScaleForDrawingAndDoodles(level);

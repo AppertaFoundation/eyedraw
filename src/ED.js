@@ -1,8 +1,8 @@
 /* global jQuery:false */
 
 /**
- * Defines the EyeDraw namespace
- * @namespace Namespace for all EyeDraw classes
+ * Namespace for all EyeDraw classes
+ * @namespace ED
  */
 var ED = ED || {};
 
