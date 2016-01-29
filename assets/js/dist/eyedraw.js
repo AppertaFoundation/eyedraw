@@ -4360,14 +4360,14 @@ ED.Doodle.prototype.parameterElement = function(_parameter) {
     		element.type = 'text';
     		element.setAttribute('id', this.parameterControlElementId(_parameter));
     		break;
-    		
+
 		case 'mod':
 			// Create a text input element
 			element = document.createElement('input');
     		element.type = 'text';
     		element.setAttribute('id', this.parameterControlElementId(_parameter));
     		break;
-    		    		
+
 		case 'freeText':
 			// Create a text input element
 			element = document.createElement('input');
@@ -4410,65 +4410,69 @@ ED.Doodle.prototype.parameterElement = function(_parameter) {
  */
 ED.Doodle.prototype.setParameterWithAnimation = function(_parameter, _value, _updateBindings) {
 
-	// Can doodle animate this parameter?
-	if (this.parameterValidationArray[_parameter]['animate']) {
-		var valueArray = this.dependentParameterValues(_parameter, _value);
-		for (var parameter in valueArray) {
-			// Read delta in units per frame
-			var delta = this.parameterValidationArray[parameter]['delta'];
+	// Attempt to get parameter value
+	var valueArray = this.dependentParameterValues(_parameter, _value);
 
-			// Calculate 'distance' to go
-			var distance = valueArray[parameter] - this[parameter];
+	// Check for animation flag and for valid result
+	if (this.parameterValidationArray[_parameter]['animate'] && !ED.objectIsEmpty(valueArray)) {
 
-			// Calculate sign and apply to delta
-			if (parameter == 'rotation') {
-				// This formula works out correct distance and direction on a radians 'clock face' (ie the shortest way round)
-				var sign = ((Math.PI - Math.abs(distance)) * distance) < 0 ? -1 : 1;
-				distance = distance * sign;
+			// Animate parameters
+			for (var parameter in valueArray) {
+				// Read delta in units per frame
+				var delta = this.parameterValidationArray[parameter]['delta'];
 
-				// Make distance positive
-				if (distance < 0) distance += 2 * Math.PI;
+				// Calculate 'distance' to go
+				var distance = valueArray[parameter] - this[parameter];
 
-				// Test for roughly half way
-				if (distance > 3.141) {
-					if (this.rotation < Math.PI) sign = -sign;
+				// Calculate sign and apply to delta
+				if (parameter == 'rotation') {
+					// This formula works out correct distance and direction on a radians 'clock face' (ie the shortest way round)
+					var sign = ((Math.PI - Math.abs(distance)) * distance) < 0 ? -1 : 1;
+					distance = distance * sign;
+
+					// Make distance positive
+					if (distance < 0) distance += 2 * Math.PI;
+
+					// Test for roughly half way
+					if (distance > 3.141) {
+						if (this.rotation < Math.PI) sign = -sign;
+					}
+				} else {
+					var sign = distance < 0 ? -1 : 1;
 				}
-			} else {
-				var sign = distance < 0 ? -1 : 1;
+				delta = delta * sign;
+
+				// Calculate number of frames to animate
+				var frames = Math.abs(Math.floor(distance / delta));
+
+				// Put results into an associative array for this parameter
+				var array = {
+					timer: null,
+					delta: delta,
+					frames: frames,
+					frameCounter: 0
+				};
+				this.animationDataArray[parameter] = array;
+
+				// Call animation method
+				if (frames > 0) {
+					this.increment(parameter, valueArray[parameter], _updateBindings);
+				}
+				// Increment may be too small to animate, but still needs setting
+				else {
+					// Set  parameter to exact value
+					this.setSimpleParameter(parameter, valueArray[parameter]);
+
+					// Update dependencies
+					this.updateDependentParameters(parameter, _updateBindings);
+
+					// Refresh drawing
+					this.drawing.repaint();
+				}
 			}
-			delta = delta * sign;
-
-			// Calculate number of frames to animate
-			var frames = Math.abs(Math.floor(distance / delta));
-
-			// Put results into an associative array for this parameter
-			var array = {
-				timer: null,
-				delta: delta,
-				frames: frames,
-				frameCounter: 0
-			};
-			this.animationDataArray[parameter] = array;
-
-			// Call animation method
-			if (frames > 0) {
-				this.increment(parameter, valueArray[parameter], _updateBindings);
-			}
-			// Increment may be too small to animate, but still needs setting
-			else {
-				// Set  parameter to exact value
-				this.setSimpleParameter(parameter, valueArray[parameter]);
-
-				// Update dependencies
-				this.updateDependentParameters(parameter, _updateBindings);
-
-				// Refresh drawing
-				this.drawing.repaint();
-			}
-		}
-
 	}
-	// Otherwise just set it directly
+
+	// Otherwise just set value directly
 	else {
 		this.setParameterFromString(_parameter, _value.toString(), _updateBindings);
 	}
@@ -43685,16 +43689,16 @@ ED.TubeExtender.prototype.roundRect = function(ctx, x, y, width, height, radius)
 ED.TubeLigation = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "TubeLigation";
-	
+
 	// Derived parameters
 	this.material = 'Vicryl';
-	
+
 	// Parameters in doodle control bar (parameter name: parameter label)
 	this.controlParameterArray = {'material':'Material'};
 
 	// Saved parameters
 	this.savedParameterArray = ['originX', 'originY', 'rotation', 'material'];
-	
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
@@ -43718,7 +43722,7 @@ ED.TubeLigation.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'string',
 		list: ['10/0 Nylon', 'Vicryl', 'Prolene'],
-		animate: true
+		animate: false
 	};
 }
 
@@ -43728,7 +43732,7 @@ ED.TubeLigation.prototype.setPropertyDefaults = function() {
 ED.TubeLigation.prototype.setParameterDefaults = function() {
 	this.originX = -240;
 	this.originY = -240;
-	
+
 	var isRE = (this.drawing.eye == ED.eye.Right);
 
 	// Make rotation same as tube
@@ -43781,13 +43785,13 @@ ED.TubeLigation.prototype.setParameterDefaults = function() {
 				break;
 		}
 	}
-	
+
 	// If existing doodles, put in same meridian, but higher up
 	var number = this.drawing.numberOfDoodlesOfClass(this.className);
 	var doodle = this.drawing.firstDoodleOfClass(this.className);
 	var xSign = doodle.originX > 0?1:-1;
 	var ySign = doodle.originY > 0?1:-1;
-	
+
 	switch (number) {
 		case 1:
 			this.originX = 400 * xSign;
@@ -43855,12 +43859,12 @@ ED.TubeLigation.prototype.draw = function(_point) {
  */
 ED.TubeLigation.prototype.groupDescription = function() {
 	var returnString = "";
-	
+
 	var number = this.drawing.numberOfDoodlesOfClass(this.className);
 	returnString = number + " ligation suture";
-	
+
 	if (number > 1) returnString += "s";
-	
+
 	return returnString;
 }
 
