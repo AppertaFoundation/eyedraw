@@ -88,6 +88,7 @@ class DoodleInfo
 		"EncirclingBand" => "Encircling band",
 		"EntrySiteBreak" => "Entry site break",
 		"EpiretinalMembrane" => "Epiretinal membrane",
+		"Episcleritis" => "Episcleritis",
 		"FibrousProliferation" => "Fibrous proliferation",
 		"FibrovascularScar" => "Fibrovascular Scar",
 		"FocalLaser" => "Focal laser",

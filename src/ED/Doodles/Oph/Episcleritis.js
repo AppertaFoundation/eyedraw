@@ -17,16 +17,16 @@
  */
 
 /**
- * CiliaryInjection
+ * Episcleritis
  *
- * @class CiliaryInjection
+ * @class Episcleritis
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
  * @param {Object} _parameterJSON
  */
-ED.CiliaryInjection = function(_drawing, _parameterJSON) {
+ED.Episcleritis = function(_drawing, _parameterJSON) {
 	// Set classname
-	this.className = "CiliaryInjection";
+	this.className = "Episcleritis";
 
 	// Other parameters
 	this.severity = 'Medium';
@@ -44,14 +44,14 @@ ED.CiliaryInjection = function(_drawing, _parameterJSON) {
 /**
  * Sets superclass and constructor
  */
-ED.CiliaryInjection.prototype = new ED.Doodle;
-ED.CiliaryInjection.prototype.constructor = ED.CiliaryInjection;
-ED.CiliaryInjection.superclass = ED.Doodle.prototype;
+ED.Episcleritis.prototype = new ED.Doodle;
+ED.Episcleritis.prototype.constructor = ED.Episcleritis;
+ED.Episcleritis.superclass = ED.Doodle.prototype;
 
 /**
  * Sets handle attributes
  */
-ED.CiliaryInjection.prototype.setHandles = function() {
+ED.Episcleritis.prototype.setHandles = function() {
 	this.handleArray[0] = new ED.Doodle.Handle(null, true, ED.Mode.Arc, false);
 	this.handleArray[3] = new ED.Doodle.Handle(null, true, ED.Mode.Arc, false);
 }
@@ -59,7 +59,7 @@ ED.CiliaryInjection.prototype.setHandles = function() {
 /**
  * Sets default dragging attributes
  */
-ED.CiliaryInjection.prototype.setPropertyDefaults = function() {
+ED.Episcleritis.prototype.setPropertyDefaults = function() {
 	this.isScaleable = false;
 	this.isMoveable = false;
 	this.isRotatable = true;
@@ -83,12 +83,12 @@ ED.CiliaryInjection.prototype.setPropertyDefaults = function() {
 /**
  * Sets default parameters
  */
-ED.CiliaryInjection.prototype.setParameterDefaults = function() {
+ED.Episcleritis.prototype.setParameterDefaults = function() {
 	// Default arc
-	this.arc = 60 * Math.PI / 180;
+	this.arc = 20 * Math.PI / 180;
 
-	// Make a second one 90 degress to last one of same class
-	this.setRotationWithDisplacements(45, -90);
+	// Make a subsequent one 90 degress to last one of same class
+	this.setRotationWithDisplacements(90, -90);
 
 	// Match subsequent properties
 	var doodle = this.drawing.lastDoodleOfClass(this.className);
@@ -103,16 +103,16 @@ ED.CiliaryInjection.prototype.setParameterDefaults = function() {
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.CiliaryInjection.prototype.draw = function(_point) {
+ED.Episcleritis.prototype.draw = function(_point) {
 	// Get context
 	var ctx = this.drawing.context;
 
 	// Call draw method in superclass
-	ED.CiliaryInjection.superclass.draw.call(this, _point);
+	ED.Episcleritis.superclass.draw.call(this, _point);
 
 	// Radii
-	var ro = 480;
-	var ri = 400;
+	var ro = 495;
+	var ri = 420;
 	var r = ri + (ro - ri) / 2;
 
 	// Calculate parameters for arcs
@@ -153,7 +153,7 @@ ED.CiliaryInjection.prototype.draw = function(_point) {
 	// Non-boundary paths
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
 		// Total number of vessels in a 360 arc
-		var t = 60;
+		var t = 120;
 
 		// Number in the current arc and angular separation
 		var phi = 2 * Math.PI / t;
@@ -165,22 +165,12 @@ ED.CiliaryInjection.prototype.draw = function(_point) {
 
 		ctx.beginPath();
 
-		// Radial lines - adjust length to indicate severity
-		var rc
-		switch (this.severity) {
-			case 'Severe':
-				rc = ro - 0;
-				break;
-			case 'Medium':
-				rc = ro - 20;
-				break;
-			case 'Mild':
-				rc = ro - 40;
-				break;
-		}
+		// Radial lines
+		var rc = ro;
+
 		for (var i = 0; i < n; i++) {
 			var theta = Math.PI / 2 + arcEnd + i * phi;
-			sp.setWithPolars(rc, theta);
+			sp.setWithPolars(ro, theta);
 			ep.setWithPolars(ri, theta);
 
 			ctx.moveTo(sp.x, sp.y);
@@ -203,6 +193,9 @@ ED.CiliaryInjection.prototype.draw = function(_point) {
 		}
 
 		ctx.stroke();
+
+		// Demonstration blurred line
+		//this.drawSoftLine(-200, -200, 200, 200, 40, 255, 0, 0, 1);
 	}
 
 	// Coordinates of handles (in canvas plane)
@@ -221,8 +214,8 @@ ED.CiliaryInjection.prototype.draw = function(_point) {
  *
  * @returns {String} Description of doodle
  */
-ED.CiliaryInjection.prototype.groupDescription = function() {
-	var returnString = this.severity + " ciliary injection";
+ED.Episcleritis.prototype.groupDescription = function() {
+	var returnString = this.severity + " episcleritis";
 
 	// Unless nearly complete, include quadrant
 	if (this.arc < 1.8 * Math.PI) {
@@ -235,7 +228,7 @@ ED.CiliaryInjection.prototype.groupDescription = function() {
 	return returnString
 }
 
-ED.CiliaryInjection.prototype.drawSoftLine = function(x1, y1, x2, y2, lineWidth, r, g, b, a) {
+ED.Episcleritis.prototype.drawSoftLine = function(x1, y1, x2, y2, lineWidth, r, g, b, a) {
 	// Get context
 	var ctx = this.drawing.context;
 
@@ -244,9 +237,8 @@ ED.CiliaryInjection.prototype.drawSoftLine = function(x1, y1, x2, y2, lineWidth,
 	var lineLength = Math.sqrt(lx*lx + ly*ly);
 	var wy = lx / lineLength * lineWidth;
 	var wx = ly / lineLength * lineWidth;
+	// The gradient must be defined across the line, 90° turned compared to the line direction.
 	var gradient = ctx.createLinearGradient(x1-wx/2, y1+wy/2, x1+wx/2, y1-wy/2);
-	  // The gradient must be defined accross the line, 90° turned compared
-	  // to the line direction.
 	gradient.addColorStop(0,    "rgba("+r+","+g+","+b+",0)");
 	gradient.addColorStop(0.43, "rgba("+r+","+g+","+b+","+a+")");
 	gradient.addColorStop(0.57, "rgba("+r+","+g+","+b+","+a+")");
