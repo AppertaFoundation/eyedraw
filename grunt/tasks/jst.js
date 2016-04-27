@@ -22,18 +22,19 @@
 'use strict';
 
 var path = require('path');
-var strip = require('strip-comments');
 var util = require('util');
+var decomment = require('decomment');
 
 module.exports = function(grunt) {
 	grunt.registerMultiTask('jst', 'Create a script file from javascript templates', function() {
 
 		var templates = {};
-
+		var decomment = require('decomment');
 		function getTemplate(filepath) {
 			var ext = '.' + filepath.split('.').pop();
 			var basename = path.basename(filepath, ext);
-			templates[basename] = strip(grunt.file.read(filepath));
+			var contents= grunt.file.read(filepath);
+			templates[basename] = decomment.text(contents);
 		}
 
 		this.files.forEach(function(file) {
