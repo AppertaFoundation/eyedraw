@@ -128,6 +128,7 @@ class DoodleInfo
 		"MacularGrid" => "Macular grid laser",
 		"MacularHole" => "Macular hole",
 		"MacularThickening" => "Macular thickening",
+		"Malyugin" => "Malyugin ring",
 		"MattressSuture" => "Mattress suture",
 		"Microaneurysm" => "Microaneurysm",
 		"NerveFibreDefect" => "Nerve fibre defect",
