@@ -27418,23 +27418,15 @@ ED.InjectionSite.prototype.description = function() {
  * @class InnerLeafBreak
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.InnerLeafBreak = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+ED.InnerLeafBreak = function(_drawing, _parameterJSON)
 {
-    // Call superclass constructor
-    ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
-
     // Set classname
     this.className = "InnerLeafBreak";
+
+    // Call superclass constructor
+    ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -27449,7 +27441,7 @@ ED.InnerLeafBreak.superclass = ED.Doodle.prototype;
  */
 ED.InnerLeafBreak.prototype.setHandles = function()
 {
-    this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, false);
+    this.handleArray[2] = new ED.Doodle.Handle(null, true, ED.Mode.Scale, false);
 }
 
 /**
@@ -29088,23 +29080,15 @@ ED.LasikFlap.prototype.description = function() {
  * @class Lattice
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param _parameterJSON
  */
-ED.Lattice = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+ED.Lattice = function(_drawing, _parameterJSON)
 {
-    // Call superclass constructor
-    ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
-
     // Set classname
     this.className = "Lattice";
+
+    // Call superclass constructor
+    ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -29119,8 +29103,8 @@ ED.Lattice.superclass = ED.Doodle.prototype;
  */
 ED.Lattice.prototype.setHandles = function()
 {
-    this.handleArray[0] = new ED.Handle(null, true, ED.Mode.Arc, false);
-    this.handleArray[3] = new ED.Handle(null, true, ED.Mode.Arc, false);
+    this.handleArray[0] = new ED.Doodle.Handle(null, true, ED.Mode.Arc, false);
+    this.handleArray[3] = new ED.Doodle.Handle(null, true, ED.Mode.Arc, false);
 }
 
 /**
@@ -29196,7 +29180,7 @@ ED.Lattice.prototype.draw = function(_point)
     ctx.lineWidth = 4;
 
     // create pattern
-    var ptrn = ctx.createPattern(this.drawing.imageArray['latticePattern'],'repeat');
+    var ptrn = ctx.createPattern(this.drawing.imageArray['LatticePattern'],'repeat');
     ctx.fillStyle = ptrn;
 
     ctx.strokeStyle = "lightgray";
@@ -32681,23 +32665,16 @@ ED.OpticDiscPit.prototype.description = function() {
  * @class OuterLeafBreak
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.OuterLeafBreak = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+ED.OuterLeafBreak = function(_drawing, _parameterJSON)
 {
-    // Call superclass constructor
-    ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
-
     // Set classname
     this.className = "OuterLeafBreak";
+
+    // Call superclass constructor
+    ED.Doodle.call(this, _drawing, _parameterJSON);
+
 }
 
 /**
@@ -32712,7 +32689,7 @@ ED.OuterLeafBreak.superclass = ED.Doodle.prototype;
  */
 ED.OuterLeafBreak.prototype.setHandles = function()
 {
-    this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Scale, false);
+    this.handleArray[2] = new ED.Doodle.Handle(null, true, ED.Mode.Scale, false);
 }
 
 /**
@@ -38740,23 +38717,15 @@ ED.RetinalVeinOcclusionPostPole.prototype.type = function() {
  * @class Retinoschisis
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
- * @param {Int} _originX
- * @param {Int} _originY
- * @param {Int} _apexX
- * @param {Int} _apexY
- * @param {Float} _scaleX
- * @param {Float} _scaleY
- * @param {Float} _arc
- * @param {Float} _rotation
- * @param {Int} _order
+ * @param {Object} _parameterJSON
  */
-ED.Retinoschisis = function(_drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order)
+ED.Retinoschisis = function(_drawing, _parameterJSON)
 {
-    // Call superclass constructor
-    ED.Doodle.call(this, _drawing, _originX, _originY, _radius, _apexX, _apexY, _scaleX, _scaleY, _arc, _rotation, _order);
-
     // Set classname
     this.className = "Retinoschisis";
+
+    // Call superclass constructor
+    ED.Doodle.call(this, _drawing, _parameterJSON);
 }
 
 /**
@@ -38771,9 +38740,9 @@ ED.Retinoschisis.superclass = ED.Doodle.prototype;
  */
 ED.Retinoschisis.prototype.setHandles = function()
 {
-    this.handleArray[1] = new ED.Handle(null, true, ED.Mode.Arc, false);
-    this.handleArray[2] = new ED.Handle(null, true, ED.Mode.Arc, false);
-    this.handleArray[4] = new ED.Handle(null, true, ED.Mode.Apex, false);
+    this.handleArray[1] = new ED.Doodle.Handle(null, true, ED.Mode.Arc, false);
+    this.handleArray[2] = new ED.Doodle.Handle(null, true, ED.Mode.Arc, false);
+    this.handleArray[4] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
 }
 
 /**
