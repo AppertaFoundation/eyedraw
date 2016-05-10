@@ -111,8 +111,11 @@ ED.Point.prototype.direction = function() {
  * @param {Point} _point
  * @returns {Float} The angle in radians
  */
-ED.Point.prototype.clockwiseAngleTo = function(_point) {
-	var angle = Math.acos(this.dotProduct(_point) / (this.length() * _point.length()));
+ED.Point.prototype.clockwiseAngleTo = function(_point) { //console.log("cat: ",(this.length() * _point.length()));
+	// Floating point errors occasionally produce a number for the acos function greater than 1, causing a NaN error
+	var num = this.dotProduct(_point) / (this.length() * _point.length());
+	if (num > 1) num = 1;
+	var angle = Math.acos(num);
 	if (this.crossProduct(_point) < 0) {
 		return 2 * Math.PI - angle;
 	} else {
@@ -161,7 +164,6 @@ ED.Point.prototype.pointAtAngleToLineToPointAtProportion = function(_phi, _point
 
 	return point;
 }
-
 
 /**
  * Clock hour of point on clock face centred on origin

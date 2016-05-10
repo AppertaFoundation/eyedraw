@@ -6,4 +6,5 @@
 .sass-cache
 .sublime-grunt.cache
 /bak
+/jsdocs
 .idea

@@ -29,19 +29,24 @@ ED.CornealGraft = function(_drawing, _parameterJSON) {
 	this.className = "CornealGraft";
 
 	// Private parameters
-	this.numberOfSutures = 16;
-	this.initialRadius = 320;
+	this.pixelsPerMillimetre = 63.3333;
 	this.sutureLength = 60;
 
 	// Derived parameters
+	this.diameter = 7.5;
+	
+	// Other parameters
+	this.type = 'Penetrating';
+	this.showSutures = true;
 	this.sutureType = 'Interrupted';
+	this.numberOfSutures = 16;
 	this.opaque = false;
 
 	// Saved parameters
-	this.savedParameterArray = ['apexY', 'sutureType', 'opaque'];
+	this.savedParameterArray = ['originX', 'originY', 'apexY', 'type', 'showSutures', 'sutureType', 'numberOfSutures', 'opaque'];
 
 	// Parameters in doodle control bar (parameter name: parameter label)
-	this.controlParameterArray = {'sutureType':'Suture type', 'opaque':'Opaque'};
+	this.controlParameterArray = {'type':'Type', 'showSutures':'Show Sutures', 'sutureType':'Suture type', 'numberOfSutures':'Sutures', 'opaque':'Opaque'};
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -66,16 +71,40 @@ ED.CornealGraft.prototype.setHandles = function() {
  */
 ED.CornealGraft.prototype.setPropertyDefaults = function() {
 	this.isRotatable = false;
-	this.isMoveable = false;
+	this.isUnique = true;
 
 	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
-	this.parameterValidationArray['apexY']['range'].setMinAndMax(-380, -80);
+	this.parameterValidationArray['apexY']['range'].setMinAndMax(-8.5 * this.pixelsPerMillimetre/2, -6.5 * this.pixelsPerMillimetre/2);
 
 	// Add complete validation arrays for derived parameters
+	this.parameterValidationArray['type'] = {
+		kind: 'derived',
+		type: 'string',
+		list: ['Penetrating', 'DMEK', 'DSEAK'],
+		animate: false
+	};
+	this.parameterValidationArray['showSutures'] = {
+		kind: 'derived',
+		type: 'bool',
+		display: true
+	};
+	this.parameterValidationArray['diameter'] = {
+		kind: 'derived',
+		type: 'float',
+		range: new ED.Range(6.5, 8.5),
+		precision: 1,
+		animate: true
+	};
 	this.parameterValidationArray['sutureType'] = {
 		kind: 'derived',
 		type: 'string',
 		list: ['Interrupted', 'Continuous', 'None'],
+		animate: false
+	};
+	this.parameterValidationArray['numberOfSutures'] = {
+		kind: 'other',
+		type: 'int',
+		range: new ED.Range(4, 32),
 		animate: false
 	};
 	this.parameterValidationArray['opaque'] = {
@@ -89,7 +118,32 @@ ED.CornealGraft.prototype.setPropertyDefaults = function() {
  * Sets default parameters
  */
 ED.CornealGraft.prototype.setParameterDefaults = function() {
-	this.apexY = -this.initialRadius;
+	this.setParameterFromString('diameter', '7.5');
+	this.setParameterFromString('sutureType', 'Continuous');
+}
+
+/**
+ * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
+ * The returned parameters are animated if their 'animate' property is set to true
+ *
+ * @param {String} _parameter Name of parameter that has changed
+ * @value {Undefined} _value Value of parameter to calculate
+ * @returns {Array} Associative array of values of dependent parameters
+ */
+ED.CornealGraft.prototype.dependentParameterValues = function(_parameter, _value) {
+	var returnArray = new Array();
+
+	switch (_parameter) {
+		case 'apexY':
+			returnArray['diameter'] = -2 * _value/this.pixelsPerMillimetre;
+			break;
+
+		case 'diameter':
+			returnArray['apexY'] = -_value * this.pixelsPerMillimetre/2;
+			break;
+	}
+
+	return returnArray;
 }
 
 /**
@@ -108,81 +162,74 @@ ED.CornealGraft.prototype.draw = function(_point) {
 	ctx.beginPath();
 
 	// Circular graft
-	var ro = -this.apexY + this.sutureLength/2;
-	var ri = -this.apexY - this.sutureLength/2
+	var r = -this.apexY;
 
-	// Do a 360 arc
-	ctx.arc(0, 0, ro,  0, Math.PI * 2, true);
-
-	// Move to inner circle
-	ctx.moveTo(ri, 0);
-
-	// Arc round edge of pupil
-	ctx.arc(0, 0, ri, 0, Math.PI * 2, true);
+	// Outer 360 arc
+	ctx.arc(0, 0, r,  0, Math.PI * 2, true);
 
 	// Set attributes
 	ctx.lineWidth = 4;
+	ctx.strokeStyle = "gray";
 	ctx.fillStyle = "rgba(255, 255, 255, 0)";
-	ctx.strokeStyle = ctx.fillStyle
+	ctx.stroke();
+	if (this.opaque) {
+		ctx.fillStyle = "rgba(150, 150, 150, 0.8)";
+		ctx.fill();
+	}
 
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 
 	// Non boundary paths
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
-		// Graft
-		ctx.beginPath();
-		ctx.arc(0, 0, -this.apexY,  0, Math.PI * 2, true);
-		ctx.strokeStyle = "gray";
-		ctx.stroke();
-		if (this.opaque) {
-			ctx.fillStyle = "rgba(150, 150, 150, 0.8)";
-			ctx.fill();
-		}
+		if (this.showSutures) {
+			// Sutures
+			var ro = -this.apexY + this.sutureLength/2;
+			var ri = -this.apexY - this.sutureLength/2
+		
+			ctx.beginPath();
+			for (var i = 0; i < this.numberOfSutures; i++) {
+				// Suture points
+				var phi = i * 2 * Math.PI/this.numberOfSutures;
+				var p1 = new ED.Point(0,0);
+				p1.setWithPolars(ri, phi);
+				var p2 = new ED.Point(0,0);
+				p2.setWithPolars(ro, phi);
 
-		// Sutures
-		ctx.beginPath();
-		for (var i = 0; i < this.numberOfSutures; i++) {
-			// Suture points
-			var phi = i * 2 * Math.PI/this.numberOfSutures;
-			var p1 = new ED.Point(0,0);
-			p1.setWithPolars(ri, phi);
-			var p2 = new ED.Point(0,0);
-			p2.setWithPolars(ro, phi);
+				// No sutures
+				if (this.sutureType == 'None') {
+					this.drawSpot(ctx, p1.x, p1.y, 3, "gray");
+					this.drawSpot(ctx, p2.x, p2.y, 3, "gray");
+				}
 
-			// No sutures
-			if (this.sutureType == 'None') {
-				this.drawSpot(ctx, p1.x, p1.y, 3, "gray");
-				this.drawSpot(ctx, p2.x, p2.y, 3, "gray");
-			}
-
-			// Inner suture point
-			if (phi == 0) {
-				ctx.moveTo(p1.x, p1.y);
-			}
-			else {
-				if (this.sutureType == 'Interrupted') {
+				// Inner suture point
+				if (phi == 0) {
 					ctx.moveTo(p1.x, p1.y);
 				}
-				else if (this.sutureType == 'Continuous') {
-					ctx.lineTo(p1.x, p1.y);
+				else {
+					if (this.sutureType == 'Interrupted') {
+						ctx.moveTo(p1.x, p1.y);
+					}
+					else if (this.sutureType == 'Continuous') {
+						ctx.lineTo(p1.x, p1.y);
+					}
+				}
+
+				// Line to outer point
+				if (this.sutureType != 'None') {
+					ctx.lineTo(p2.x, p2.y);
 				}
 			}
 
-			// Line to outer point
-			if (this.sutureType != 'None') {
-				ctx.lineTo(p2.x, p2.y);
+			// Put in last link
+			if (this.sutureType == 'Continuous') {
+				ctx.closePath();
 			}
-		}
 
-		// Put in last link
-		if (this.sutureType == 'Continuous') {
-			ctx.closePath();
+			// Draw sutures
+			ctx.strokeStyle = "gray";
+			ctx.stroke();
 		}
-
-		// Draw sutures
-		ctx.strokeStyle = "gray";
-		ctx.stroke();
 	}
 
 	// Coordinates of handles (in canvas plane)

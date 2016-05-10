@@ -19,10 +19,16 @@
 
 /* global EventEmitter2: false, $: false */
 
+/**
+ * @namespace ED
+ * @description Namespace for all EyeDraw classes
+ */
 var ED = ED || {};
 
 /**
  * Base view.
+ * @namespace ED.View
+ * @memberOf ED
  */
 ED.View = (function() {
 

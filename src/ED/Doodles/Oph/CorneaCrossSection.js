@@ -28,8 +28,18 @@ ED.CorneaCrossSection = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "CorneaCrossSection";
 
+	// Other parameters
+	this.shape = "";
+	this.pachymetry = 540;
+	
 	// Saved parameters
-	//this.savedParameterArray = ['apexY', 'apexX'];
+	this.savedParameterArray = ['shape', 'pachymetry', 'originX', 'apexX', 'apexY'];
+	
+	// Parameters in doodle control bar (parameter name: parameter label)
+	this.controlParameterArray = {
+		'shape':'Shape',
+		'pachymetry':'Pachymetry',
+	};
 	
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -43,14 +53,39 @@ ED.CorneaCrossSection.prototype.constructor = ED.CorneaCrossSection;
 ED.CorneaCrossSection.superclass = ED.Doodle.prototype;
 
 /**
+ * Sets handle attributes
+ */
+ED.CorneaCrossSection.prototype.setHandles = function() {
+	this.handleArray[4] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
+}
+
+/**
  * Sets default dragging attributes
  */
 ED.CorneaCrossSection.prototype.setPropertyDefaults = function() {
-	this.isSelectable = false;
 	this.isDeletable = false;
 	this.isMoveable = false;
 	this.isRotatable = false;
 	this.isUnique = true;
+	
+	// Update validation array for simple parameters
+	this.parameterValidationArray['apexX']['range'].setMinAndMax(-410, -300);
+	this.parameterValidationArray['apexY']['range'].setMinAndMax(-100, +100);
+	
+	// Other parameters
+	this.parameterValidationArray['shape'] = {
+		kind: 'other',
+		type: 'string',
+		list: ['Normal', 'Keratoconus', 'Keratoglobus'],
+		animate: false
+	};
+	this.parameterValidationArray['pachymetry'] = {
+		kind: 'other',
+		type: 'int',
+		range: new ED.Range(400, 700),
+		precision: 1,
+		animate: false
+	};
 }
 
 /**
@@ -58,7 +93,31 @@ ED.CorneaCrossSection.prototype.setPropertyDefaults = function() {
  * Use the setParameter function for derived parameters, as this will also update dependent variables
  */
 ED.CorneaCrossSection.prototype.setParameterDefaults = function() {
-	this.originX = 44;
+	this.originX = 140;
+	this.apexX = -380;
+	this.apexY = 0;
+	this.setParameterFromString('shape', 'Normal');
+	this.setParameterFromString('pachymetry', '540');
+}
+
+/**
+ * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
+ * The returned parameters are animated if their 'animate' property is set to true
+ *
+ * @param {String} _parameter Name of parameter that has changed
+ * @value {Undefined} _value Value of parameter to calculate
+ * @returns {Array} Associative array of values of dependent parameters
+ */
+ED.CorneaCrossSection.prototype.dependentParameterValues = function(_parameter, _value) {
+	var returnArray = new Array();
+
+	switch (_parameter) {
+		case 'pachymetry':
+			returnArray['pachymetry'] = _value;
+			break;
+	}
+
+	return returnArray;
 }
 
 /**
@@ -66,7 +125,7 @@ ED.CorneaCrossSection.prototype.setParameterDefaults = function() {
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.CorneaCrossSection.prototype.draw = function(_point) {
+ED.CorneaCrossSection.prototype.draw = function(_point) {console.log(this.apexX, this.apexY);
 	// Get context
 	var ctx = this.drawing.context;
 
@@ -79,20 +138,49 @@ ED.CorneaCrossSection.prototype.draw = function(_point) {
 	// Top cut away
 	ctx.moveTo(60, -480);
 	ctx.lineTo(-80, -480);
+	ctx.bezierCurveTo(-100, -440, -100, -440, -120, -380);
 
 	// Front of cornea
-	ctx.bezierCurveTo(-100, -440, -100, -440, -120, -380);
-	ctx.bezierCurveTo(-240, -260, -320, -160, -320, 0);
-	ctx.bezierCurveTo(-320, 160, -240, 260, -120, 380);
-	ctx.bezierCurveTo(-100, 440, -100, 440, -80, 480);
+	switch (this.shape) {
+		case "Normal":
+			ctx.bezierCurveTo(-240, -260, -320, -160, -320, 0);
+			ctx.bezierCurveTo(-320, 160, -240, 260, -120, 380);
+			break;
+		
+		case "Keratoconus":
+			ctx.bezierCurveTo(-240, -260, this.apexX, this.apexY - 100, this.apexX, this.apexY);
+			ctx.bezierCurveTo(this.apexX, this.apexY + 100, -240, 260, -120, 380);
+			break;
+			
+		case "Keratoglobus":
+			ctx.bezierCurveTo(-240, -260, -380, -100, -380, 100);
+			ctx.bezierCurveTo(-380, 200, -240, 360, -120, 380);
+			break;
+	}
 
 	// Bottom cut away
+	ctx.bezierCurveTo(-100, 440, -100, 440, -80, 480);
 	ctx.lineTo(60, 480);
 	ctx.lineTo(0, 380);
 
 	// Back of cornea
-	ctx.bezierCurveTo(-80, 260, -220, 180, -220, 0);
-	ctx.bezierCurveTo(-220, -180, -80, -260, 0, -380);
+	var thickness = this.pachymetry/5;
+	switch (this.shape) {
+		case "Normal":
+			ctx.bezierCurveTo(-80, 260, -220, 180, -220, 0);
+			ctx.bezierCurveTo(-220, -180, -80, -260, 0, -380);
+			break;
+		
+		case "Keratoconus":
+			ctx.bezierCurveTo(-80, 260, this.apexX + thickness, this.apexY + 120, this.apexX + thickness, this.apexY);
+			ctx.bezierCurveTo(this.apexX + thickness, this.apexY - 120, -80, -260, 0, -380);
+			break;
+			
+		case "Keratoglobus":
+			ctx.bezierCurveTo(-80, 260, -260, 220, -280, 100);
+			ctx.bezierCurveTo(-280, -140, -120, -200, 0, -380);
+			break;
+	}
 
 	// Close path
 	ctx.closePath();
@@ -124,6 +212,15 @@ ED.CorneaCrossSection.prototype.draw = function(_point) {
 
 		ctx.fillStyle = "rgba(255,255,185,1)";
 		ctx.fill();
+	}
+	
+	// Apex handle not present if normal
+	if (this.shape == "Keratoconus") {
+		// Coordinates of handles (in canvas plane)
+		this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
+
+		// Draw handles if selected
+		if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
 	}
 
 	// Return value indicating successful hittest

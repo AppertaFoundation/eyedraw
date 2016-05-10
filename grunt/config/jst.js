@@ -17,16 +17,16 @@
  * along with OpenEyes.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-module.exports = function(grunt) {
+module.exports=function(grunt){
 	return {
-		dist: {
-			src: [
+		dist:{
+			src:[
 				'views/script_templates/*.html'
 			],
-			options: {
-				dest: 'src/ED/Views/templates.js',
-				varName: 'ED.scriptTemplates'
+			options:{
+				dest:'src/ED/Views/templates.js',
+				varName:'ED.scriptTemplates'
 			}
-		},
+		}
 	};
 };

@@ -1,0 +1,548 @@
+<html>
+	<head>
+
+		<link rel="stylesheet" type="text/css" href="../assets/css/oe-eyedraw.css" />
+    <link rel="stylesheet" type="text/css" href="css/doodleBuilder.css" />
+    <script type="text/javascript" src="../assets/components/jquery/jquery.min.js"></script>
+    <script type="text/javascript" src="../assets/components/mustache/mustache.js"></script>
+    <script type="text/javascript" src="../assets/components/eventemitter2/lib/eventemitter2.js"></script>
+    <script type="text/javascript" src="../assets/js/dist/eyedraw.js"></script>
+    <script type="text/javascript" src="../assets/js/dist/oe-eyedraw.js"></script>
+
+	</head>
+	<body class="doodle-builder">
+
+    <div class="wrapper">
+      <h1>Doodle Builder</h1>
+
+      <p class="instructions">Please drag and drop an SVG file into the Dropzone and select a name for your doodle. All other form inputs are optional. <br />Click the download button below to generate and download a Javascript file for your newly created Doodle.</p>
+
+      <div class="ui-views">
+        <div class="col col1 dropCol">
+          <div id="dropZone">Drop SVG file here</div>
+        </div>
+        <div class="col col2 doodleCol">
+          <section class="sub-element" data-element-type-id="461" data-element-type-class="Element_OphTrLaser_AnteriorSegment" data-element-type-name="Anterior Segment" data-element-display-order="3">
+            <input class="sideField" type="hidden" value="3" name="Element_OphTrLaser_AnteriorSegment[eye_id]" id="Element_OphTrLaser_AnteriorSegment_eye_id" />
+            <div class="sub-element-fields element-eyes row">
+              <div class="element-eye right-eye column optional side left" data-side="right">
+                <div class="active-form">
+                  <div class="eyedraw-row">
+                    <div class="EyeDrawWidget ed-widget edit" id="eyedrawwidget_right_461">
+                      <div class="ed-body">
+                        <div class="ed-editor-container">
+                          <div class="ed-editor">
+                            <div class="ed-drawing-controls">
+                              <!-- DRAWING TOOLBAR -->
+                              <ul class="ed-toolbar-panel ed-drawing-toolbar">
+                                <li>
+                                  <a class="ed-button" href="#" data-function="resetEyedraw">
+                                    <span class="icon-ed-reset"></span>
+                                    <span class="label">Reset eyedraw</span>
+                                  </a>
+                                </li>
+                              </ul>
+                              <!-- SELECTED DOODLE -->
+                              <div class="ed-selected-doodle">
+                                <select class="ed-selected-doodle-select" id="ed_example_selected_doodle" class="ed-selected-doodle-select">
+                                </select>
+                              </div>
+                            </div>
+                            <!-- DOODLE POPUP -->
+                            <div class="ed-doodle-popup closed"></div>
+
+                            <!-- CANVAS -->
+                            <canvas id="preview_canvas" class="ed-canvas-edit" width="300" height="300" tabindex="1" data-drawing-name="preview_canvas">
+                            </canvas>
+                            <!-- DATA FIELD -->
+                            <input type="hidden" id="preview_input" name="Element_OphTrLaser_AnteriorSegment[right_eyedraw]" value='' />
+                          </div>
+                        </div>
+
+                        <div class="ed-fields-container"></div>
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+      <div class="controls-container">
+
+        <h2 id="naming" class='expanding expanding-header open'>Choose a name</h2>
+        <div id="naming-controls" class='expanding-container'>
+          <div class="control cf title-control">
+            <label for="class-name">Doodle name</label>
+            <input type="text" name="class-name" id="className" data-doodle-value="className">
+            <p id="validationMsg" class="errorMsg">Please enter a Doodle class name before downloading</p>
+          </div>
+        </div>
+
+        <h2 id="setup" class='expanding expanding-header'>Setup</h2>
+        <div id="setup-controls" class='expanding-container'>
+
+  				<div class="control cf">
+            <label for="background-doodle">Set background</label>
+            <select name="background-doodle" id="background-doodle" data-doodle-background>
+            	<option value="AntSeg">Anterior Segment</option>
+            	<option value="PostPole">Posterior Pole</option>
+            	<option value="Fundus">Fundus</option>
+            </select>
+          </div>
+          <div class="control cf">
+            <label for="scale">Scale</label><input type="text" name="scale" id="scale">
+          </div>
+          <div class="control cf">
+            <label for="x-offset">X Offset</label><input type="text" name="x-offset" id="xOffset">
+          </div>
+          <div class="control cf">
+            <label for="y-offset">Y Offset</label><input type="text" name="y-offset" id="yOffset">
+          </div>
+          <div class="control cf">
+            <label for="fill-color">Fill color</label>
+            <input type="color" name="fill-color" data-doodle-value="fillColor">
+          </div>
+          <div class="control cf">
+            <label for="stroke-color">Stroke color</label>
+            <input type="color" name="stroke-color" data-doodle-value="strokeColor">
+          </div>
+          <div class="control cf">
+            <label for="stroke-width">Stroke width</label><input type="text" name="stroke-width" data-doodle-value="strokeWidth">
+          </div>
+
+          <div class="control cf">
+            <label for="add-to-back">Add to back</label>
+            <input type="checkbox" name="add-to-back" id="add-to-back" data-doodle-value="addToBack">
+          </div>
+
+          <div class="control cf">
+            <label for="arc">Arc symmetrical</label>
+            <input type="checkbox" name="arc" id="arc" data-doodle-value="arc">
+          </div>
+
+          <div class="control cf">
+            <label for="highlight">Show Highlight</label>
+            <input type="checkbox" name="highlight" id="highlight"  data-doodle-value="highlight">
+          </div>
+        </div>
+
+        <h2 id="interactivity" class='expanding expanding-header'>Interactivity</h2>
+        <div id="interactivity-controls" class='expanding-container'>
+
+          <div class="form-cols">
+            <div class="col1 col">
+              <div class="control cf checkbox-control">
+                <label for="locked">Locked</label>
+                <input type="checkbox" name="locked" id="locked" data-doodle-value="locked">
+              </div>
+              <div class="control cf checkbox-control">
+                <label for="selectable">Selectable</label>
+                <input type="checkbox" name="selectable" id="selectable"  data-doodle-value="selectable">
+
+              </div>
+              <div class="control cf checkbox-control">
+                <label for="stayselected">Stay selected</label>
+                <input type="checkbox" name="stayselected" id="stayselected"  data-doodle-value="stayselected">
+              </div>
+
+              <div class="control cf checkbox-control">
+                <label for="squeezable">Squeezable</label>
+                <input type="checkbox" name="squeezable" id="squeezable" data-doodle-value="squeezable">
+              </div>
+
+              <div class="control cf checkbox-control">
+                <label for="drawable">Drawable</label>
+                <input type="checkbox" name="drawable" id="drawable" data-doodle-value="drawable">
+              </div>
+
+              <div class="control cf checkbox-control">
+                <label for="moveable">Moveable</label>
+                <input type="checkbox" name="moveable" id="moveable"  data-doodle-value="moveable">
+              </div>
+              <div class="control cf checkbox-control">
+                <label for="rotatable">Rotatable</label>
+                <input type="checkbox" name="rotatable" id="rotatable"  data-doodle-value="rotatable">
+              </div>
+
+              <div class="control cf checkbox-control no-border">
+                <label for="scalable">Scalable</label>
+                <input type="checkbox" name="scalable" id="scalable"  data-doodle-value="scalable">
+                <div class="range-inputs">
+                  <div class="range-group range-group-top">
+                    <div class="range-input">
+                      <label for="scalexmin">X Min</label>
+                      <input type="range" min="0.5" max="4.0" step="0.1" value="1" id="scalexmin" data-doodle-value="scalexmin" class="range" />
+                      <input type="text" id="scalexminVal" class="range-val" readonly/>
+                    </div>
+                    <div class="range-input">
+                      <label for="scalexmax">X Max</label>
+                      <input type="range" min="0.5" max="4.0" step="0.1" value="1" id="scalexmax" data-doodle-value="scalexmax" class="range" />
+                      <input type="text" id="scalexmaxVal" class="range-val" readonly/>
+                    </div>
+                  </div>
+                  <div class="range-group ">
+                    <div class="range-input">
+                      <label for="scaleymin">Y Min</label>
+                      <input type="range" min="0.5" max="4.0" step="0.1" value="1" id="scaleymin" data-doodle-value="scaleymin" class="range" />
+                      <input type="text" id="scaleyminVal" class="range-val" readonly/>
+                    </div>
+                    <div class="range-input">
+                      <label for="scaleymax">Y Max</label>
+                      <input type="range" min="0.5" max="4.0" step="0.1" value="1" id="scaleymax" data-doodle-value="scaleymax" class="range" />
+                      <input type="text" id="scaleymaxVal" class="range-val" readonly/>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col2 col">
+
+
+              <div class="control cf checkbox-control">
+                <label for="unique">Unique</label>
+                <input type="checkbox" name="unique" id="unique" data-doodle-value="unique">
+
+              </div>
+              <div class="control cf checkbox-control">
+                <label for="pointinline">Point in line</label>
+                <input type="checkbox" name="pointinline" id="pointinline" data-doodle-value="pointinline">
+
+              </div>
+              <div class="control cf checkbox-control">
+                <label for="sync">Sync</label>
+                <input type="checkbox" name="sync" id="sync"  data-doodle-value="sync">
+
+              </div>
+              <div class="control cf checkbox-control">
+                <label for="deletable">Deletable</label>
+                <input type="checkbox" name="deletable" id="deletable"  data-doodle-value="deletable">
+
+              </div>
+              <div class="control cf checkbox-control">
+                <label for="saveable">Saveable</label>
+                <input type="checkbox" name="saveable" id="saveable"  data-doodle-value="saveable">
+              </div>
+
+              <div class="control cf checkbox-control">
+                <label for="reportable">Reportable</label>
+                <input type="checkbox" name="reportable" id="reportable"  data-doodle-value="reportable">
+              </div>
+
+
+              <div class="control cf checkbox-control">
+                <label for="orientated">Orientated</label>
+                <input type="checkbox" name="orientated" id="orientated" data-doodle-value="orientated">
+              </div>
+
+              <div class="control cf checkbox-control no-border">
+                <label for="apex">Apex Handle</label>
+                <input type="checkbox" name="apex" id="apex" data-doodle-value="apex">
+
+                <div class="range-inputs">
+                  <div class="range-group range-group-top">
+                    <div class="range-input">
+                      <label for="apexxmin">X Min</label>
+                      <input type="range" min="-500" max="500" step="10" value="0" id="apexxmin" data-doodle-value="apexxmin" class="range" />
+                      <input type="text" id="apexxminVal" class="range-val" readonly/>
+                    </div>
+                    <div class="range-input">
+                      <label for="apexxmax">X Max</label>
+                      <input type="range" min="-500" max="500" step="10" value="0" id="apexxmax" data-doodle-value="apexxmax" class="range" />
+                      <input type="text" id="apexxmaxVal" class="range-val" readonly/>
+                    </div>
+                  </div>
+                  <div class="range-group">
+                    <div class="range-input">
+                      <label for="scaleymin">Y Min</label>
+                      <input type="range" min="-500" max="500" step="10" value="0" id="scaleymin" data-doodle-value="apexymin" class="range" />
+                      <input type="text" id="scaleyminVal" class="range-val" readonly/>
+                    </div>
+                    <div class="range-input">
+                      <label for="scaleymax">Y Max</label>
+                      <input type="range" min="-500" max="500" step="10" value="0" id="scaleymax" data-doodle-value="apexymax" class="range" />
+                      <input type="text" id="scaleymaxVal" class="range-val" readonly/>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="reset-checkboxes">
+            <button class="btn" id="resetBtn">Reset checkboxes</button>
+            <button class="btn" id="selectAllBtn">Select all checkboxes</button>
+          </div>
+        </div>
+
+        <input id="canvasOutput" type="hidden" value="" data-doodle-value="canvasCommands">
+        <div class="download-container">
+          <a href="#" class="download-btn" id="download-btn">Download Finished Doodle Class</a>
+        </div>
+
+      </div>
+
+  </div>
+
+
+        <script type="text/javascript">
+        /*<![CDATA[*/
+        ED.setTitles({
+            'NONE': 'No description available for this doodle',
+            'ACIOL': 'Anterior chamber IOL',
+            'ACMaintainer': 'AC maintainer',
+            'AdnexalEye': 'Adnexal eye template',
+            'AngleGrade': 'Angle grade',
+            'AngleGradeEast': 'Angle Grade East',
+            'AngleGradeNorth': 'Angle Grade North',
+            'AngleGradeSouth': 'Angle Grade South',
+            'AngleGradeWest': 'Angle Grade West',
+            'AngleNV': 'Angle new vessels',
+            'AngleRecession': 'Angle recession',
+            'AntPVR': 'Anterior PVR',
+            'AntSeg': 'Anterior segment',
+            'AntSynech': 'Anterior synechiae',
+            'APattern': 'A pattern',
+            'ArcuateScotoma': 'Arcuate scotoma',
+            'Arrow': 'Arrow',
+            'BiopsySite': 'Biopsy site',
+            'Bleb': 'Trabeculectomy bleb',
+            'BlotHaemorrhage': 'Blot haemorrhage',
+            'Buckle': 'Buckle',
+            'BuckleOperation': 'Buckle operation',
+            'BuckleSuture': 'Buckle suture',
+            'BusaccaNodule': 'Busacca nodule',
+            'CapsularTensionRing': 'Capsular Tension Ring',
+            'ChandelierDouble': 'Double chandelier',
+            'ChandelierSingle': 'Chandelier',
+            'ChoroidalHaemorrhage': 'Choroidal haemorrhage',
+            'ChoroidalNaevus': 'Choroidal naevus',
+            'CiliaryInjection': 'Cilary injection',
+            'Circinate': 'Circinate retinopathy',
+            'CircumferentialBuckle': 'Circumferential buckle',
+            'CNV': 'Choroidal new vessels',
+            'ConjunctivalFlap': 'Conjunctival flap',
+            'ConjunctivalSuture': 'Conjunctival suture',
+            'CornealAbrasion': 'Corneal abrasion',
+            'CornealErosion': 'Removal of corneal epithelium',
+            'CornealGraft': 'Corneal graft',
+            'CornealInlay': 'Corneal inlay',
+            'CornealOedema': 'Corneal oedema',
+            'CornealScar': 'Corneal scar',
+            'CornealStriae': 'Corneal striae',
+            'CornealSuture': 'Corneal suture',
+            'CorticalCataract': 'Cortical cataract',
+            'CottonWoolSpot': 'Cotton wool spot',
+            'Cryo': 'Cryotherapy scar',
+            'CutterPI': 'Cutter iridectomy',
+            'CystoidMacularOedema': 'Cystoid macular oedema',
+            'DiabeticNV': 'Diabetic new vessels',
+            'Dialysis': 'Dialysis',
+            'DiscHaemorrhage': 'Disc haemorrhage',
+            'DiscPallor': 'Disc pallor',
+            'DrainageRetinotomy': 'Drainage retinotomy',
+            'DrainageSite': 'Drainage site',
+            'EncirclingBand': 'Encircling band',
+            'EntrySiteBreak': 'Entry site break',
+            'EpiretinalMembrane': 'Epiretinal membrane',
+            'FibrousProliferation': 'Fibrous proliferation',
+            'FibrovascularScar': 'Fibrovascular Scar',
+            'FocalLaser': 'Focal laser',
+            'Freehand': 'Freehand drawing',
+            'Fuchs': 'Fuchs endothelial dystrophy',
+            'Fundus': 'Fundus',
+            'Geographic': 'Geographic atrophy',
+            'Gonioscopy': 'Gonioscopy',
+            'GRT': 'Giant retinal tear',
+            'HardDrusen': 'Hard drusen',
+            'HardExudate': 'Hard exudate',
+            'Hyphaema': 'Hyphaema',
+            'Hypopyon': 'Hypopyon',
+            'IatrogenicBreak': 'IatrogenicBreak',
+            'ILMPeel': 'ILM peel',
+            'InjectionSite': 'Injection site',
+            'InnerLeafBreak': 'Inner leaf break',
+            'Iris': 'Iris',
+            'IrisHook': 'Iris hook',
+            'IrisNaevus': 'Iris naevus',
+            'IRMA': 'Intraretinal microvascular abnormalities',
+            'KeraticPrecipitates': 'Keratic precipitates',
+            'KoeppeNodule': 'Koeppe nodule',
+            'KrukenbergSpindle': 'Krukenberg spindle',
+            'Label': 'Label',
+            'LaserCircle': 'Circle of laser photocoagulation',
+            'LaserDemarcation': 'Laser demarcation',
+            'LasikFlap': 'LASIK flap',
+            'LaserSpot': 'Laser spot',
+            'Lattice': 'Lattice',
+            'Lens': 'Lens',
+            'LimbalRelaxingIncision': 'Limbal relaxing incision',
+            'Macroaneurysm': 'Macroaneurysm',
+            'MacularDystrophy': 'Macular dystrophy',
+            'MacularGrid': 'Macular grid laser',
+            'MacularHole': 'Macular hole',
+            'MacularThickening': 'Macular thickening',
+            'MattressSuture': 'Mattress suture',
+            'Microaneurysm': 'Microaneurysm',
+            'NerveFibreDefect': 'Nerve fibre defect',
+            'NuclearCataract': 'Nuclear cataract',
+            'OpticCup': 'Optic cup',
+            'OpticDisc': 'Optic disc',
+            'OpticDiscPit': 'Optic disc pit',
+            'OrthopticEye': 'Orthoptic eye',
+            'OuterLeafBreak': 'Outer leaf break',
+            'Papilloedema': 'Papilloedema',
+            'Patch': 'Tube patch',
+            'PCIOL': 'Posterior chamber IOL',
+            'PeripapillaryAtrophy': 'Peripapillary atrophy',
+            'PeripheralRetinectomy': 'Peripheral retinectomy',
+            'PhakoIncision': 'Phako incision',
+            'PI': 'Peripheral iridectomy',
+            'PointInLine': 'Point in line',
+            'PosteriorCapsule': 'Posterior capsule',
+            'PosteriorEmbryotoxon': 'Posterior embryotoxon',
+            'PostPole': 'Posterior pole',
+            'PostSubcapCataract': 'Posterior subcapsular cataract',
+            'PosteriorRetinectomy': 'Posterior retinectomy',
+            'PosteriorSynechia': 'Posterior synechia',
+            'PreRetinalHaemorrhage': 'Pre-retinal haemorrhage',
+            'PRP': 'Panretinal photocoagulation',
+            'PRPPostPole': 'Panretinal photocoagulation (posterior pole)',
+            'Pupil': 'Pupil',
+            'RadialSponge': 'Radial sponge',
+            'RetinalArteryOcclusionPostPole': 'Retinal artery occlusion',
+            'RetinalHaemorrhage': 'Retinal haemorrhage',
+            'RetinalTouch': 'Retinal touch',
+            'RetinalVeinOcclusionPostPole': 'Retinal vein occluson',
+            'Retinoschisis': 'Retinoschisis',
+            'RK': 'Radial keratotomy',
+            'RoundHole': 'Round hole',
+            'RPEAtrophy': 'RPE Atrophy',
+            'RPEDetachment': 'RPE detachment',
+            'RPEHypertrophy': 'RPE Hypertrophy',
+            'RPERip': 'RPE rip',
+            'RRD': 'Rhegmatogenous retinal detachment',
+            'Rubeosis': 'Rubeosis iridis',
+            'SectorPRP': 'Sector PRP',
+            'SectorPRPPostPole': 'Sector PRP (posterior pole)',
+            'ScleralIncision': 'Scleral Incision',
+            'Sclerostomy': 'Sclerostomy',
+            'SectorIridectomy': 'Sector iridectomy',
+            'Shading': 'Shading',
+            'SidePort': 'Side port',
+            'Slider': 'Slider',
+            'StarFold': 'Star fold',
+            'SubretinalFluid': 'Subretinal fluid',
+            'SubretinalPFCL': 'Subretinal PFCL',
+            'Supramid': 'Supramid suture',
+            'SwollenDisc': 'Swollen disc',
+            'Telangiectasis': 'Parafoveal telangiectasia',
+            'Trabectome': 'Trabectome',
+            'TrabyConjIncision': 'Trabeculectomy conjunctival incision',
+            'TrabyFlap': 'Trabeculectomy flap',
+            'TrabySuture': 'Trabeculectomy suture',
+            'ToricPCIOL': 'Toric posterior chamber IOL',
+            'TractionRetinalDetachment': 'Traction retinal detachment',
+            'TransilluminationDefect': 'Transillumination defect',
+            'Tube': 'Drainage tube',
+            'TubeExtender': 'Tube extender',
+            'TubeLigation': 'Ligation suture',
+            'UpDrift': 'Up drift',
+            'UpShoot': 'Up shoot',
+            'UTear': 'Traction ‘U’ tear',
+            'Vicryl': 'Vicryl suture',
+            'ViewObscured': 'View obscured',
+            'VitreousOpacity': 'Vitreous opacity',
+            'VPattern': 'V pattern',
+            'Crepitations': 'Crepitations',
+            'Stenosis': 'Stenosis',
+            'Wheeze': 'Wheeze',
+            'Effusion': 'Pleural effusion',
+            'LeftCoronaryArtery': 'Left coronary artery',
+            'DrugStent': 'Drug eluting stent',
+            'MetalStent': 'Metal stent',
+            'Bypass': 'Coronary artery bypass',
+            'Bruit': 'Bruit',
+            'Bruising': 'Bruising',
+            'Haematoma': 'Haematoma'
+        });
+
+        /*]]>*/
+        </script>
+
+				<script src="js/CommandGenerator2.js"></script>
+				<script src="js/DoodleBuilder.js"></script>
+        <script src="js/writeFile.js"></script>
+        <script src="js/uiInteraction.js"></script>
+
+        <script>
+        	(function(App){
+
+        		var CG = new App.CommandGenerator('xOffset', 'yOffset', 'scale', 'canvasOutput');
+        		App.DoodleBuilder.init();
+
+        		function getXMLFromFile(data){
+		        	//	Remove uri declarations from string then decode base64
+							var decodedData = window.atob(data.replace('data:image/svg+xml;base64,', ''));
+		        	var oParser = new DOMParser();
+		        	//	Convert parsed string of xml in nodes
+							var oDOM = oParser.parseFromString(decodedData, "text/xml");
+							return oDOM;
+						}
+
+					  function handleFileSelect(evt) {
+						  	evt.stopPropagation();
+						    evt.preventDefault();
+
+						    dropZone.className = '';
+
+						    var files = evt.dataTransfer.files; // FileList object
+
+						    // Loop through the FileList and render image files as thumbnails.
+						    for (var i = 0, f; f = files[i]; i++) {
+						      // Only process svg files.
+						      if (!f.type.match('image*')) {
+						        continue;
+						      }
+
+						      var reader = new FileReader();
+
+						      // Closure to capture the file information.
+						      reader.onload = (function(theFile) {
+						        return function(e) {
+						        	var oDOM = getXMLFromFile(e.target.result);
+											CG.setSvg(oDOM);
+											var commands = CG.generateCanvasCommands();
+											App.DoodleBuilder.setClassData('canvasCommands', commands);
+											App.DoodleBuilder.writeClassFromTemplate();
+					        		App.DoodleBuilder.updateEyedraw();
+											// console.log(commands);
+						        };
+						      })(f);
+
+						      // Read in the image file as a data URL.
+						      reader.readAsDataURL(f);
+						    }
+						  }
+
+					  function handleDragOver(evt) {
+					    evt.stopPropagation();
+					    evt.preventDefault();
+					    evt.dataTransfer.dropEffect = 'copy'; // Explicitly show this is a copy.
+					    dropZone.className = 'active';
+					  }
+
+					  // Setup the dnd listeners.
+					  var dropZone = document.getElementById('dropZone');
+					  dropZone.addEventListener('dragover', handleDragOver, false);
+					  dropZone.addEventListener('drop', handleFileSelect, false);
+
+        	})(window.App);
+
+        </script>
+
+		<a id="downloadTrigger" href="" download="TempDoodle.js"><span>Test me<span></a>
+	</body>
+</html>

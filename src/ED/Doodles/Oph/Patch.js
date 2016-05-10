@@ -65,7 +65,8 @@ ED.Patch.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['material'] = {
 		kind: 'other',
 		type: 'string',
-		list: ['Sclera', 'Cornea', 'Tenons', 'Tutoplast', 'Cornea'],
+		list: ['Sclera', 'Tenons', 'Tutoplast', 'Cornea'],
+		list: ['Sclera', 'Tenons', 'Tutoplast', 'Cornea'],
 		animate: false
 	};
 }

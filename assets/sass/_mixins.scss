@@ -63,26 +63,25 @@
 				@if sprite-has-selector($spriteMap, $i, $state) {
 					// Build up list of states.
 					$imageStates: append($imageStates, $state);
-					// Add to ignore list to prevent the non-pseudo class from being generated.
-					$ignore: append($ignore, unquote("#{$i}_#{$state}"));
 				}
 			}
 		}
+
 		// Output the classes for this image.
-		@if index($ignore, #{$i}) == false {
-			// Default.
-			.#{$prefixClass}-#{$i} {
-				background-position: sprite-position($spriteMap, $i);
+
+		// Default.
+		.#{$prefixClass}-#{$i} {
+			background-position: sprite-position($spriteMap, $i);
+		}
+
+		// State classes (pseudo).
+		@each $state in $imageStates {
+			.#{$prefixClass}-#{$i}:#{$state},
+			.#{$state} .#{$prefixClass}-#{$i} {
+				background-position: sprite-position($spriteMap, #{$i}_#{$state});
 			}
-			// State classes (pseudo).
-			@each $state in $imageStates {
-				.#{$prefixClass}-#{$i}:#{$state},
-				.#{$state} .#{$prefixClass}-#{$i} {
-					background-position: sprite-position($spriteMap, #{$i}_#{$state});
-				}
-				.disabled .#{$prefixClass}-#{$i}:#{$state} {
-					background-position: sprite-position($spriteMap, $i);
-				}
+			.disabled .#{$prefixClass}-#{$i}:#{$state} {
+				background-position: sprite-position($spriteMap, $i);
 			}
 		}
 	}
