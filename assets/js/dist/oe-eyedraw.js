@@ -308,6 +308,7 @@ ED.Controller = (function() {
 		this.canvas = document.getElementById(properties.canvasId);
 		this.input = document.getElementById(properties.inputId);
 		this.container = $(this.canvas).closest('.ed-widget');
+		this.previousReport = '';
 
 		this.Checker = Checker || ED.Checker;
 		this.drawing = drawing || this.createDrawing();
@@ -686,6 +687,11 @@ ED.Controller = (function() {
 			this.canvas.focus();
 		}
 
+		if(this.properties.autoReport){
+			var outputElement = document.getElementById(this.properties.autoReport);
+			this.autoReport(outputElement);
+		}
+
 		// Mark drawing object as ready
 		this.drawing.isReady = true;
 	};
@@ -707,6 +713,34 @@ ED.Controller = (function() {
 		this.syncEyedraws(notification.object);
 		// Save drawing to hidden input.
 		this.saveDrawingToInputField();
+
+		if(this.properties.autoReport){
+			var outputElement = document.getElementById(this.properties.autoReport);
+			this.autoReport(outputElement);
+		}
+	};
+
+	/**
+	 * Automatically calls the drawins report
+	 */
+	Controller.prototype.autoReport = function(outputElement) {
+		var report = this.drawing.report();
+		if(report){
+			report = report.replace(/, /g,"\n");
+			var output = '';
+			var existing = outputElement.value;
+			if(this.previousReport){
+				output = existing.replace(this.previousReport, report);
+			} else {
+				if(!existing.match(/^[\n ]$/)){
+					existing += "\n";
+				}
+				output = existing + report;
+			}
+			outputElement.value = output;
+			outputElement.rows = (output.match(/\n/g) || []).length + 1;
+			this.previousReport = report;
+		}
 	};
 
 	return Controller;
@@ -1336,6 +1370,10 @@ ED.Views.SelectedDoodle = (function() {
 
 	return SelectedDoodle;
 }());
+/*! Generated on 10/6/2016 */
+ED.scriptTemplates = {
+  "doodle-popup": "\n\n{{#doodle}}\n\t<ul class=\"ed-toolbar-panel ed-doodle-popup-toolbar\">\n\t\t<li>\n\t\t\t{{#desc}}\n\t\t\t\t<a class=\"ed-button ed-doodle-help{{lockedButtonClass}}\" href=\"#\" data-function=\"toggleHelp\">\n\t\t\t\t\t<span class=\"icon-ed-help\"></span>\n\t\t\t\t</a>\n\t\t\t{{/desc}}\n\t\t</li>\n\t\t{{#doodle.isLocked}}\n\t\t\t<li>\n\t\t\t\t<a class=\"ed-button\" href=\"#\" data-function=\"unlock\">\n\t\t\t\t\t<span class=\"icon-ed-unlock\"></span>\n\t\t\t\t\t<span class=\"label\">Unlock</span>\n\t\t\t\t</a>\n\t\t\t</li>\n\t\t{{/doodle.isLocked}}\n\t\t{{^doodle.isLocked}}\n\t\t\t<li>\n\t\t\t\t<a class=\"ed-button\" href=\"#\" data-function=\"lock\">\n\t\t\t\t\t<span class=\"icon-ed-lock\"></span>\n\t\t\t\t\t<span class=\"label\">Lock</span>\n\t\t\t\t</a>\n\t\t\t</li>\n\t\t{{/doodle.isLocked}}\n\t\t<li>\n\t\t\t<a class=\"ed-button{{lockedButtonClass}}\" href=\"#\" data-function=\"moveToBack\">\n\t\t\t\t<span class=\"icon-ed-move-to-back\"></span>\n\t\t\t\t<span class=\"label\">Move to back</span>\n\t\t\t</a>\n\t\t</li>\n\t\t<li>\n\t\t\t<a class=\"ed-button{{lockedButtonClass}}\" href=\"#\" data-function=\"moveToFront\">\n\t\t\t\t<span class=\"icon-ed-move-to-front\"></span>\n\t\t\t\t<span class=\"label\">Move to front</span>\n\t\t\t</a>\n\t\t</li>\n\t\t<li>\n\t\t\t{{#doodle.isDeletable}}\n\t\t\t\t<a class=\"ed-button{{lockedButtonClass}}\" href=\"#\" data-function=\"deleteSelectedDoodle\">\n\t\t\t\t\t<span class=\"icon-ed-delete\"></span>\n\t\t\t\t\t<span class=\"label\">Delete</span>\n\t\t\t\t</a>\n\t\t\t{{/doodle.isDeletable}}\n\t\t</li>\n\t</ul>\n\t<div class=\"ed-doodle-info hide\">\n\t\t{{^doodle.isLocked}}\n\t\t\t{{#desc}}\n\t\t\t\t<div class=\"ed-doodle-description\">{{{desc}}}</div>\n\t\t\t{{/desc}}\n\t\t{{/doodle.isLocked}}\n\t</div>\n\t<div class=\"ed-doodle-controls{{#doodle.isLocked}} hide{{/doodle.isLocked}}\" id=\"{{drawing.canvas.id}}_controls\">\n\t</div>\n\t{{#doodle.isLocked}}\n\t\t<div class=\"ed-doodle-description\">\n\t\t\t<strong>This doodle is locked and cannot be edited.</strong>\n\t\t</div>\n\t{{/doodle.isLocked}}\n{{/doodle}}"
+};
 /**
  * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
  * (C) OpenEyes Foundation, 2011-2014
@@ -1645,7 +1683,3 @@ ED.Views.Toolbar.Main = (function() {
 
 	return MainToolbar;
 }());
-/*! Generated on 10/5/2016 */
-ED.scriptTemplates = {
-  "doodle-popup": "\n\n{{#doodle}}\n\t<ul class=\"ed-toolbar-panel ed-doodle-popup-toolbar\">\n\t\t<li>\n\t\t\t{{#desc}}\n\t\t\t\t<a class=\"ed-button ed-doodle-help{{lockedButtonClass}}\" href=\"#\" data-function=\"toggleHelp\">\n\t\t\t\t\t<span class=\"icon-ed-help\"></span>\n\t\t\t\t</a>\n\t\t\t{{/desc}}\n\t\t</li>\n\t\t{{#doodle.isLocked}}\n\t\t\t<li>\n\t\t\t\t<a class=\"ed-button\" href=\"#\" data-function=\"unlock\">\n\t\t\t\t\t<span class=\"icon-ed-unlock\"></span>\n\t\t\t\t\t<span class=\"label\">Unlock</span>\n\t\t\t\t</a>\n\t\t\t</li>\n\t\t{{/doodle.isLocked}}\n\t\t{{^doodle.isLocked}}\n\t\t\t<li>\n\t\t\t\t<a class=\"ed-button\" href=\"#\" data-function=\"lock\">\n\t\t\t\t\t<span class=\"icon-ed-lock\"></span>\n\t\t\t\t\t<span class=\"label\">Lock</span>\n\t\t\t\t</a>\n\t\t\t</li>\n\t\t{{/doodle.isLocked}}\n\t\t<li>\n\t\t\t<a class=\"ed-button{{lockedButtonClass}}\" href=\"#\" data-function=\"moveToBack\">\n\t\t\t\t<span class=\"icon-ed-move-to-back\"></span>\n\t\t\t\t<span class=\"label\">Move to back</span>\n\t\t\t</a>\n\t\t</li>\n\t\t<li>\n\t\t\t<a class=\"ed-button{{lockedButtonClass}}\" href=\"#\" data-function=\"moveToFront\">\n\t\t\t\t<span class=\"icon-ed-move-to-front\"></span>\n\t\t\t\t<span class=\"label\">Move to front</span>\n\t\t\t</a>\n\t\t</li>\n\t\t<li>\n\t\t\t{{#doodle.isDeletable}}\n\t\t\t\t<a class=\"ed-button{{lockedButtonClass}}\" href=\"#\" data-function=\"deleteSelectedDoodle\">\n\t\t\t\t\t<span class=\"icon-ed-delete\"></span>\n\t\t\t\t\t<span class=\"label\">Delete</span>\n\t\t\t\t</a>\n\t\t\t{{/doodle.isDeletable}}\n\t\t</li>\n\t</ul>\n\t<div class=\"ed-doodle-info hide\">\n\t\t{{^doodle.isLocked}}\n\t\t\t{{#desc}}\n\t\t\t\t<div class=\"ed-doodle-description\">{{{desc}}}</div>\n\t\t\t{{/desc}}\n\t\t{{/doodle.isLocked}}\n\t</div>\n\t<div class=\"ed-doodle-controls{{#doodle.isLocked}} hide{{/doodle.isLocked}}\" id=\"{{drawing.canvas.id}}_controls\">\n\t</div>\n\t{{#doodle.isLocked}}\n\t\t<div class=\"ed-doodle-description\">\n\t\t\t<strong>This doodle is locked and cannot be edited.</strong>\n\t\t</div>\n\t{{/doodle.isLocked}}\n{{/doodle}}"
-};
