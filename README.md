@@ -1,7 +1,13 @@
 Eyedraw
 =======
 
+You can find the most recent documentation relating to Eyedraw on the [Github pages site](http://openeyes.github.io/eyedraw/)
+
+You can also generate JSDocs and a full list of Doodles and their associated Iconography locally by running 'grunt docs'
+
+
 This README file should be contained in a folder containing javascript and other files required for running EyeDraw, the OpenEyes medical drawing packages.
+
 
 The enclosing folder should contain the following files and folders:
 

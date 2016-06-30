@@ -19,7 +19,17 @@
 
 /* global $:false */
 
+/**
+ * @namespace ED
+ * @description Namespace for all EyeDraw classes
+ */
 var ED = ED || {};
+
+/**
+ * @namespace ED.Controller
+ * @memberOf ED
+ * @description Namespace for EyeDraw Controller
+ */ 
 
 ED.Controller = (function() {
 

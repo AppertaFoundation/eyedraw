@@ -28,8 +28,14 @@ ED.CiliaryInjection = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "CiliaryInjection";
 
+	// Other parameters
+	this.severity = 'Medium';
+
 	// Saved parameters
-	this.savedParameterArray = ['arc', 'rotation'];
+	this.savedParameterArray = ['arc', 'rotation', 'severity'];
+
+	// Parameters in doodle control bar (parameter name: parameter label)
+	this.controlParameterArray = {'severity':'Severity'};
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -64,6 +70,14 @@ ED.CiliaryInjection.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
 	this.parameterValidationArray['apexY']['range'].setMinAndMax(-334, -300);
 	this.parameterValidationArray['radius']['range'].setMinAndMax(250, 450);
+
+	// Add complete validation arrays for other parameters
+	this.parameterValidationArray['severity'] = {
+		kind: 'other',
+		type: 'string',
+		list: ['Severe', 'Medium', 'Mild'],
+		animate: false
+	};
 }
 
 /**
@@ -71,10 +85,17 @@ ED.CiliaryInjection.prototype.setPropertyDefaults = function() {
  */
 ED.CiliaryInjection.prototype.setParameterDefaults = function() {
 	// Default arc
-	this.arc = 90 * Math.PI / 180;
+	this.arc = 60 * Math.PI / 180;
 
 	// Make a second one 90 degress to last one of same class
-	this.setRotationWithDisplacements(90, -120);
+	this.setRotationWithDisplacements(45, -90);
+
+	// Match subsequent properties
+	var doodle = this.drawing.lastDoodleOfClass(this.className);
+	if (doodle) {
+		this.arc = doodle.arc
+		this.severity = doodle.severity
+	}
 }
 
 /**
@@ -144,10 +165,22 @@ ED.CiliaryInjection.prototype.draw = function(_point) {
 
 		ctx.beginPath();
 
-		// Radial lines
+		// Radial lines - adjust length to indicate severity
+		var rc
+		switch (this.severity) {
+			case 'Severe':
+				rc = ro - 0;
+				break;
+			case 'Medium':
+				rc = ro - 20;
+				break;
+			case 'Mild':
+				rc = ro - 40;
+				break;
+		}
 		for (var i = 0; i < n; i++) {
 			var theta = Math.PI / 2 + arcEnd + i * phi;
-			sp.setWithPolars(ro, theta);
+			sp.setWithPolars(rc, theta);
 			ep.setWithPolars(ri, theta);
 
 			ctx.moveTo(sp.x, sp.y);
@@ -155,7 +188,20 @@ ED.CiliaryInjection.prototype.draw = function(_point) {
 		}
 
 		ctx.strokeStyle = "red";
-		ctx.lineWidth = 16;
+
+		// Adjust thickness of line for severity
+		switch (this.severity) {
+			case 'Severe':
+				ctx.lineWidth = 16;
+				break;
+			case 'Medium':
+				ctx.lineWidth = 12;
+				break;
+			case 'Mild':
+				ctx.lineWidth = 8;
+				break;
+		}
+
 		ctx.stroke();
 	}
 
@@ -176,5 +222,41 @@ ED.CiliaryInjection.prototype.draw = function(_point) {
  * @returns {String} Description of doodle
  */
 ED.CiliaryInjection.prototype.groupDescription = function() {
-	return "Ciliary injection ";
+	var returnString = this.severity + " ciliary injection";
+
+	// Unless nearly complete, include quadrant
+	if (this.arc < 1.8 * Math.PI) {
+		returnString += " centred "
+
+		// Use trigonometry on rotation field to determine quadrant
+		returnString += (Math.cos(this.rotation) > 0 ? "supero" : "infero");
+		returnString += (Math.sin(this.rotation) > 0 ? (this.drawing.eye == ED.eye.Right ? "nasally" : "temporally") : (this.drawing.eye == ED.eye.Right ? "temporally" : "nasally"));
+	}
+	return returnString
+}
+
+ED.CiliaryInjection.prototype.drawSoftLine = function(x1, y1, x2, y2, lineWidth, r, g, b, a) {
+	// Get context
+	var ctx = this.drawing.context;
+
+	var lx = x2 - x1;
+	var ly = y2 - y1;
+	var lineLength = Math.sqrt(lx*lx + ly*ly);
+	var wy = lx / lineLength * lineWidth;
+	var wx = ly / lineLength * lineWidth;
+	var gradient = ctx.createLinearGradient(x1-wx/2, y1+wy/2, x1+wx/2, y1-wy/2);
+	  // The gradient must be defined accross the line, 90° turned compared
+	  // to the line direction.
+	gradient.addColorStop(0,    "rgba("+r+","+g+","+b+",0)");
+	gradient.addColorStop(0.43, "rgba("+r+","+g+","+b+","+a+")");
+	gradient.addColorStop(0.57, "rgba("+r+","+g+","+b+","+a+")");
+	gradient.addColorStop(1,    "rgba("+r+","+g+","+b+",0)");
+	ctx.save();
+	ctx.beginPath();
+	ctx.lineWidth = lineWidth;
+	ctx.strokeStyle = gradient;
+	ctx.moveTo(x1, y1);
+	ctx.lineTo(x2, y2);
+	ctx.stroke();
+	ctx.restore();
 }

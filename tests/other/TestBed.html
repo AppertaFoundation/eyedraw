@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<meta charset="utf-8" />
 <html>
     <head>
         <title>EyeDraw</title>
@@ -44,7 +45,7 @@
 
                 // Create a drawingEdit , {scaleOn:'width'}
                 drawingEdit = new ED.Drawing(canvasEdit, ED.eye.Right, 'RPS', true, {graphicsPath:'../../assets/img/', toggleScale:0.72});
-                
+
                 // Instantiate a controller object
                 controller = new eyeDrawController(drawingEdit);
 
@@ -53,8 +54,10 @@
 
                 // Set focus to canvasEdit element
                 canvasEdit.focus();
-            } 
-  				
+
+
+            }
+
 
             // Controller class
             function eyeDrawController(_drawing)
@@ -62,7 +65,7 @@
                 this.drawing = _drawing;
                 this.gsf = 1;
                 //this.gsf = 0.72;
-                
+
                 // Specify call back function
                 this.callBack = callBack;
 
@@ -84,8 +87,22 @@
 							this.drawing.globalScaleFactor = this.gsf;
 
 							//this.drawing.addDoodle('AxialLengthGraph', {'axialLength':'25'});
-							this.drawing.addDoodle('AntSeg', {'pupilSize':'Small'});
-							//this.drawing.addDoodle('PTK');
+							this.drawing.addDoodle('AntSeg', {'pupilSize':'Medium'});
+							//this.drawing.addDoodle('Patient', {}, {recliningAngle:{id:'recliningAngleInput'}});
+							//this.drawing.addDoodle('TrialLens', {}, {axis:{id:'axis'}});
+							//this.drawing.addDoodle('ToricPCIOL', {}, {axis:{id:'axis'}});
+							//this.drawing.addDoodle('CiliaryInjection');
+							//this.drawing.addDoodle('CornealGraft', {}, {diameter:{id:'diameter'}});
+							//this.drawing.addDoodle('DrainageRetinotomy');
+							//this.drawing.addDoodle('DendriticUlcer');
+							this.drawing.addDoodle('Episcleritis');
+							//this.drawing.addDoodle('Patch');
+
+							//debugger;
+							//this.drawing.addDoodle('SMILE');
+							//this.drawing.addDoodle('ICL', {}, {axis:{id:'axisInput'}});
+							//this.drawing.addDoodle('ArcuateKeratotomy');
+							//this.drawing.addDoodle('LimbalRelaxingIncision');
 							//this.drawing.addDoodle('TrabyFlap');
 							//this.drawing.addDoodle('Tube');
 							//this.drawing.addDoodle('TubeLigation');
@@ -101,7 +118,7 @@
 							//this.drawing.addDoodle('Perforation');
 							//this.drawing.addDoodle('Fundus');
 							//this.drawing.addDoodle('PostSubcapCataract');
-							//this.drawing.addDoodle('Freehand', {}, {colour:{id:'colourSelect'}});				
+							//this.drawing.addDoodle('Freehand', {}, {colour:{id:'colourSelect'}});
 
 							// Grid , {type:{id:'piTypeSelect'}}  , {type:'Laser'}, {suture:{id:'Eyedraw_boolField'}}
 					    	//this.drawing.addDoodle('Lungs');
@@ -323,7 +340,7 @@
                     }
                 }
             }
-            
+
             function zoom() {
 				drawingEdit.toggleZoom();
             }
@@ -389,24 +406,25 @@
 
             <button id="LensRPS" class="imgbutton" title="Lens" onclick="drawingEdit.addDoodle('PI'); return false;" ><img src="../../assets/img/old/PI.gif" /></button>
  -->
-            <button id="LensRPS" class="ed-button" title="IOL" onclick="drawingEdit.addDoodle('TrabyFlap'); return false;" ><img src="../../assets/img/old/TrabyFlap.gif" /></button>
-            <button id="LensRPS" class="ed-button" title="TubeLigation" onclick="drawingEdit.addDoodle('TubeLigation'); return false;" ><img src="../../assets/img/old/TubeLigation.gif" /></button>
-            <button id="LensRPS" class="ed-button" title="Supramid" onclick="drawingEdit.addDoodle('Supramid'); return false;" ><img src="../../assets/img/old/Supramid.gif" /></button>
-            <button id="LensRPS" class="ed-button" title="TubeExtender" onclick="drawingEdit.addDoodle('TubeExtender'); return false;" ><img src="../../assets/img/old/TubeExtender.gif" /></button>
+            <button id="LensRPS" class="ed-button" title="IOL" onclick="drawingEdit.addDoodle('IOL'); return false;" ><img src="../../assets/img/old/IOL.gif" /></button>
+            <button id="LensRPS" class="ed-button" title="ArcuateKeratotomy" onclick="drawingEdit.addDoodle('ArcuateKeratotomy'); return false;" ><img src="../../assets/img/old/ArcuateKeratotomy.gif" /></button>
+            <button id="LensRPS" class="ed-button" title="Supramid" onclick="drawingEdit.addDoodle('CornealGraftSuture'); return false;" ><img src="../../assets/img/old/CornealSuture.gif" /></button>
+            <button id="LensRPS" class="ed-button" title="Pterygium" onclick="drawingEdit.addDoodle('Episcleritis'); return false;" ><img src="../../assets/img/old/Episcleritis.gif" /></button>
             <br />
         </div>
 
-        <!-- <input class="checkbox" type="checkbox" id="chk_phd"> -->
+		<!-- Canvas -->
+		<div style="position:relative;">
+			<span id="canvasTooltip"></span>
+			<canvas id="canvasEdit" class="ed-canvas" width="300" height="300" tabindex="1"></canvas>
+			<!-- Doodle control panel -->
+			<div id="canvasEdit_controls" class="ed-doodle-popup" style="background-color: #DAE6F1; float:left; position:absolute; top:20px; left:310px;">
+			</div>
 
-        <!-- Canvas tooltip -->
-        <span class="canvasTooltip" id="canvasEditTooltip"></span>
+		</div>
 
-        <!-- Canvas element style="border: none;" style="background-color: #DAE6F1;"-->
-        <canvas id="canvasEdit" class="ed-canvas-edit" width="300" height="300" tabindex="1" style="border: 1px solid gray; float:left;"></canvas>
-
-        <!-- Doodle control panel -->
-        <div id="canvasEdit_controls" class="ed-doodle-popup" style="background-color: #DAE6F1; float:left;">
-        </div>
+        <!-- Input element -->
+        <input type="text" id="axis" value="0" />
 
         <button class="actbutton" onclick="console.log(drawingEdit.report()); return false;">Report</button>
 

@@ -1,0 +1,250 @@
+.doodle-builder{
+	font-family: helvetica, arial, sans-serif;
+}
+
+.doodle-builder h1{
+	font-size: 28px;
+	background-color: #53a0c7;
+	color: #fff;
+	text-align: center;
+	padding: 10px;
+}
+
+.instructions{
+	line-height: 20px;
+	text-align: center;
+}
+
+h2{
+	font-size: 18px;
+	margin: 5px 0 ;
+}
+
+p, label{
+	font-size: 14px;
+	font-weight: bold;
+	color: #444;
+}
+
+.wrapper{
+	width: 1024px;
+	margin: 0 auto;
+}
+
+.controls-container {
+	clear: both;
+}
+
+.col{
+	width: 50%;
+	float:left;
+}
+
+.ui-views:after, .form-cols:after {
+  content:"";
+  display:table;
+  clear:both;
+}
+
+.dropCol{
+	width: 720px;
+}
+.doodleCol{
+	width: 302px;
+}
+
+#dropZone {
+	border: 5px dashed #53a0c7;
+	font-size: 18px;
+	font-weight: bold;
+	color: gray;
+	margin-bottom: 20px;
+	height: 345px;
+	width: 687px;
+	margin: 4px 0 0 0;
+	line-height: 345px;
+	text-align: center;
+}
+
+#dropZone.active {
+	border-color: #376b85;
+	color: #376b85;
+}
+
+.cf:after {
+  content: ' ';
+  display: block;
+  clear: both;
+}
+
+.control {
+	margin: 10px 0;
+	padding-bottom: 10px;
+	border-bottom: 1px solid #53a0c7;
+}
+
+.control label {
+	float: left;
+	display: block;
+	width: 150px;
+	padding: 5px 0;
+}
+
+.control input, .control select{
+	float: left;
+	margin-left: 20px;
+	padding: 5px 10px;
+}
+
+.title-control{
+	clear: both;
+/*	background: #53a0c7;*/
+/*	padding: 10px 10px 8px 10px;
+	margin: 20px 0 5px;*/
+	border: 0;
+}
+
+.title-control label{
+/*	color: #fff ;*/
+/*	width: 125px;*/
+/*	font-size: 18px;
+	font-weight: bold;*/
+/*	margin-top: -3px;*/
+}
+
+.title-control input{
+	width: 375px;
+	background: #fff;
+}
+
+.errorMsg{
+	color: #c75e53;
+	font-weight: bold;
+	clear: both;
+	margin-top: 0;
+	margin-left: 10px;
+	margin-bottom: 0;
+	display: inline-block;
+/*	background: #fff;*/
+/*	border-radius: 30px;*/
+	padding: 5px 15px;
+}
+
+.checkbox-control input{
+	margin-right: 5px;
+	margin-left: 2px;
+}
+
+.expanding-header{
+	background: #53a0c7 url(../img/arrow.png) 98% 50% no-repeat;
+	color: #fff;
+	padding: 10px;
+}
+
+.expanding-header:hover, .expanding-header:focus{
+	background: #376b85 url(../img/arrow.png) 98% 50% no-repeat;;
+}
+
+.expanding-header.open{
+	background: #53a0c7 url(../img/arrow_up.png) 98% 50% no-repeat;
+}
+
+.expanding-header.open:hover{
+	background: #376b85 url(../img/arrow_up.png) 98% 50% no-repeat;
+}
+
+.expanding-container{
+	overflow: hidden;
+}
+
+.range-inputs{
+	clear: both;
+	overflow: hidden;
+	padding: 5px 0;
+}
+.range-inputs label{
+	margin-left:20px;
+	font-weight: normal;
+}
+
+.range-group-top{
+	margin-bottom: 20px;
+}
+.range-group:after {
+  content:"";
+  display:table;
+  clear:both;
+}
+
+.range-inputs.disabled label, .range-inputs.disabled .range-val{
+	color: #ccc;
+}
+
+.range-val{
+	width: 50px;
+}
+
+.range-input{
+	clear: both;
+}
+
+.no-border{
+	border:0;
+}
+
+.download-container{
+	clear: both;
+	margin: 20px auto;
+	text-align: center;
+}
+
+.download-btn{
+	background: #c3def5;
+	border-radius: 30px;
+	padding: 15px 30px;
+	font-size: 18px;
+	display: inline-block;
+	color: #53a0c7;
+	font-weight: bold;
+	border: 0;
+	text-decoration: none;
+}
+
+.download-btn:hover, .download-btn:focus{
+	color: #fff;
+	background: #53a0c7;
+}
+
+#downloadTrigger {
+	display: none;
+}
+
+.reset-checkboxes{
+	background: #eee;
+	padding: 10px 5px;
+}
+
+.reset-checkboxes:after {
+  content:"";
+  display:table;
+  clear:both;
+}
+
+.btn{
+	float: right;
+	background: #fff;
+	border-radius: 30px;
+	padding: 5px 15px;
+	font-size: 14px;
+	display: inline-block;
+	color: #444;
+	font-weight: bold;
+	border: 0;
+	text-decoration: none;
+	margin: 0 5px;
+}
+
+.btn:hover, .btn:focus{
+	background: #999;
+	color: #fff;
+}

@@ -17,11 +17,12 @@
  * along with OpenEyes.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+
 /**
  * An object of the Report class is used to extract data for the Royal College of Ophthalmologists retinal detachment dataset.
  * The object analyses an EyeDraw drawing, and sets the value of HTML elements on the page accordingly.
- *
- * @class Report
+ * @namespace ED.Report
+ * @memberOf ED
  * @property {Canvas} canvas A canvas element used to edit and display the drawing
  * @property {Int} breaksInAttached The number of retinal breaks in attached retina
  * @property {Int} breaksInDetached The number of retinal breaks in detached retina

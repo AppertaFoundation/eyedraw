@@ -29,7 +29,7 @@ ED.PosteriorCapsule = function(_drawing, _parameterJSON) {
 	this.className = "PosteriorCapsule";
 
 	// Derived parameters
-	this.opacity = 'Mild';
+	this.opacity = '1';
 	this.capsulotomy = 'None';
 
 	// Saved parameters
@@ -66,7 +66,7 @@ ED.PosteriorCapsule.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['opacity'] = {
 		kind: 'derived',
 		type: 'string',
-		list: ['None', 'Mild', 'Moderate', 'Dense'],
+		list: ['1', '2', '3', '4'],
 		animate: false
 	};
 	this.parameterValidationArray['capsulotomy'] = {
@@ -117,7 +117,7 @@ ED.PosteriorCapsule.prototype.draw = function(_point) {
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
 
 		// Capsulotomy
-		if (this.capsulotomy != 'None') {
+		if (this.capsulotomy != '1') {
 			ctx.beginPath();
 			ctx.arc(0, 0, ro, 0, 2 * Math.PI, true);
 			var ri = 140;
@@ -138,7 +138,7 @@ ED.PosteriorCapsule.prototype.draw = function(_point) {
 		}
 
 		// Opacity
-		if (this.opacity != 'None') {
+		if (this.opacity != '1') {
 			// Pattern
 
 			var ptrn = ctx.createPattern(this.drawing.imageArray['PSCPattern'], 'repeat');
@@ -146,15 +146,14 @@ ED.PosteriorCapsule.prototype.draw = function(_point) {
 			ctx.fill();
 
 			// Opacity
-
 			switch (this.opacity) {
-				case 'Mild':
+				case '2':
 					ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
 					break;
-				case 'Moderate':
+				case '3':
 					ctx.fillStyle = "rgba(200, 200, 200, 0.5)";
 					break;
-				case 'Dense':
+				case '4':
 					ctx.fillStyle = "rgba(150, 150, 150, 0.5)";
 					break;
 			}
@@ -180,8 +179,20 @@ ED.PosteriorCapsule.prototype.draw = function(_point) {
 ED.PosteriorCapsule.prototype.description = function() {
 	var returnValue = "";
 
-	if (this.opacity != 'None') {
+	if (this.opacity != '1') {
 		returnValue += this.opacity + " posterior capsular opacity";
+	}
+
+	switch (this.opacity) {
+				case '2':
+					returnValue = "Mild PCO reducing the red reflex, Elschnig pearls to the IOL edge";
+					break;
+				case '3':
+					returnValue = "Moderate fibrosis or Elschnig pearls inside IOL edge, but with a clear visual axis";
+					break;
+				case '4':
+					returnValue = "Severe fibrosis or Elschnig pearls covering the visual axis and severely reducing the red reflex";
+					break;
 	}
 
 	if (this.capsulotomy != 'None') {

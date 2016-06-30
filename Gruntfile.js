@@ -23,7 +23,7 @@ module.exports = function(grunt) {
 	grunt.initConfig(require('./grunt/config')(grunt));
 
 	/* Load the npm grunt tasks */
-	require('load-grunt-tasks')(grunt, 'grunt-*');
+	require('load-grunt-tasks')(grunt);
 
 	/* Load our custom grunt tasks */
 	grunt.loadTasks('./grunt/tasks');

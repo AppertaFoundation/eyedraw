@@ -1,5 +1,5 @@
 /**
- * @fileOverview Contains doodle subclasses for the anterior segment
+ * 
  * @author <a href="mailto:bill.aylward@mac.com">Bill Aylward</a>
  * @version 0.9
  *
@@ -23,8 +23,8 @@
  */
 
 /**
- * Defines the EyeDraw namespace
- * @namespace Namespace for all EyeDraw classes
+ * @namespace ED
+ * @description Namespace for all EyeDraw classes
  */
 if (ED == null || typeof(ED) != "object") {
 	var ED = new Object();
@@ -51,6 +51,7 @@ ED.trans['AngleRecession'] = 'Drag to move around angle<br/>Drag handles to chan
 ED.trans['AntSeg'] = 'Drag the handle to resize the pupil<br/><br/>The iris is semi-transparent so that IOLs, and<br/>other structures can be seen behind it';
 ED.trans['AntSegCrossSection'] = '';
 ED.trans['AntSynech'] = 'Drag to move around angle<br/>Drag handles to change extent';
+ED.trans['ArcuateKeratotomy'] = 'Drag to rotate<br/>Drag end handle to increase extent<br/>Drag middle handle to change radius';
 ED.trans['ArcuateScotoma'] = 'Drag handle to change size';
 ED.trans['BiopsySite'] = 'Drag to position';
 ED.trans['Bleb'] = 'Drag to move around the limbus<br/>Drag handle to change size';
@@ -103,6 +104,8 @@ ED.trans['Hypopyon'] = 'Drag handle vertically to change size';
 ED.trans['IatrogenicBreak'] = 'Drag to position<br/>Drag inner handle to change size<br/>Drag outer handle to rotate';
 ED.trans['ILMPeel'] = 'Drag to position<br/>Drag handle to change size';
 ED.trans['InjectionSite'] = 'Drag to position<br/>Drag handle to adjust distance from limbus';
+ED.trans['ICL'] = 'Drag to move<br/>Drag handle to scale and rotate';
+ED.trans['IOL'] = 'Drag to move<br/>Drag handle to scale and rotate';
 ED.trans['IrisHook'] = 'Drag to move around the clock<br/><br/>The hook will match the size of the pupil as it changes<br/>Subsequent hooks are added to the next quadrant';
 ED.trans['IrisNaevus'] = 'Drag to move<br/>Drag handle to change size';
 ED.trans['IRMA'] = 'Drag to move<br/>Drag inner handle to change size<br/>Drag outer handle to rotate';
@@ -145,6 +148,7 @@ ED.trans['PostPole'] = 'The disc cup can be edited by clicking on the disc, and 
 ED.trans['PostSubcapCataract'] = 'Drag handle to change size';
 ED.trans['PreRetinalHaemorrhage'] = 'Drag to position<br/>Drag handles to change shape and size';
 ED.trans['PRPPostPole'] = '';
+ED.trans['PTK'] = 'Drag handle to change size';
 ED.trans['RadialSponge'] = 'Drag to change position';
 ED.trans['RetinalArteryOcclusionPostPole'] = 'Drag to position<br/>Drag handles to change extent<br/>Drag central handle to alter macular involvement';
 ED.trans['RetinalTouch'] = 'Drag to change position';
@@ -164,6 +168,7 @@ ED.trans['ScleralIncision'] = 'Drag to move around the sclera';
 ED.trans['SectorIridectomy'] = 'Drag to position<br/>Drag handles to adjust extent';
 ED.trans['Sclerostomy'] = 'Drag to rotate around centre<br/>Drag each handle to alter gauge<br/>Click suture button to toggle suture';
 ED.trans['SidePort'] = 'Drag to move';
+ED.trans['SMILE'] = 'Drag to handle to change size';
 ED.trans['SubretinalFluid'] = 'Drag to position<br/>Drag handles to change shape<br/>Drag to position<br/>Drag outer ring of top handles to rotate';
 ED.trans['SubretinalPFCL'] = 'Drag to position<br/>Drag handle to change size';
 ED.trans['Supramid'] = 'Drag handle to move conjunctival end of suture';

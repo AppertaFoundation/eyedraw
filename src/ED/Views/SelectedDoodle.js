@@ -19,6 +19,10 @@
 
 /* global $: false, ED: true */
 
+/**
+ * @namespace ED
+ * @description Namespace for all EyeDraw classes
+ */
 var ED = ED || {};
 ED.Views = ED.Views || {};
 
@@ -74,7 +78,6 @@ ED.Views.SelectedDoodle = (function() {
 
 	/**
 	 * Bind UI events
-	 * @return {[type]}
 	 */
 	SelectedDoodle.prototype.bindEvents = function() {
 		this.select.on('change.' + EVENT_NAMESPACE, this.onSelectChange.bind(this));
