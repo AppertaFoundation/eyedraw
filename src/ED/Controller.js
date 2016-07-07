@@ -241,6 +241,10 @@ ED.Controller = (function() {
 		if ((force && this.hasInputField()) || this.hasInputFieldData()) {
 			this.input.value = this.drawing.save();
 		}
+		if(this.properties.autoReport){
+			var outputElement = document.getElementById(this.properties.autoReport);
+			this.autoReport(outputElement);
+		}
 	};
 
 	/**
@@ -459,11 +463,6 @@ ED.Controller = (function() {
 		this.syncEyedraws(notification.object);
 		// Save drawing to hidden input.
 		this.saveDrawingToInputField();
-
-		if(this.properties.autoReport){
-			var outputElement = document.getElementById(this.properties.autoReport);
-			this.autoReport(outputElement);
-		}
 	};
 
 	/**
@@ -475,6 +474,13 @@ ED.Controller = (function() {
 			report = report.replace(/, /g,"\n");
 			var output = '';
 			var existing = outputElement.value;
+
+			if(existing.match(report)){
+				outputElement.rows = (existing.match(/\n/g) || []).length + 1;
+				this.previousReport = report;
+				return;
+			}
+
 			if(this.previousReport){
 				output = existing.replace(this.previousReport, report);
 			} else {
