@@ -108,7 +108,7 @@ ED.Views.DoodlePopup = (function() {
 		if (!doodle) {
 			return;
 		}
-
+		
 		// Template data
 		var data = {
 			doodle: doodle,
@@ -172,6 +172,7 @@ ED.Views.DoodlePopup = (function() {
 	DoodlePopup.prototype.show = function() {
 		this.delay(function() {
 
+/*
 			this.emit('show.before');
 
 			this.container.css({
@@ -181,6 +182,7 @@ ED.Views.DoodlePopup = (function() {
 			setTimeout(function() {
 				this.emit('show.after');
 			}.bind(this), animateTime);
+*/
 
 		}.bind(this));
 	};

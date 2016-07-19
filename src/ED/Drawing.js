@@ -234,6 +234,7 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 
 			// Deselect all doodles if the user clicks anywhere on the page that is
 			// not the canvas itself, nor the doodle popup, nor any toolbar buttons.
+			// MSC nor sidebar
 
 			var elem = e.target;
 			var isEyeDrawElement = false;
@@ -243,7 +244,8 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 				'ed-button',
 				'ed-canvas',
 				'ed_canvas',
-				'ed-selected-doodle-select'
+				'ed-selected-doodle-select',
+				'PD-sidebar-container' // MSC
 			].join(')|(') + ')';
 
 			do {
@@ -615,6 +617,33 @@ ED.Drawing.prototype.drawAllDoodles = function() {
 ED.Drawing.prototype.mousedown = function(_point) {
 	// Set flag to indicate dragging can now take place
 	this.mouseDown = true;
+	
+	var doodle = this.selectedDoodle;
+    
+    // MSC for pedigrees, node hover menu
+	if (doodle && doodle.hasHoverMenu) {
+        // Get coordinates of point relative to doodle origin
+		//// inverse transform not working for all scales?
+		var c = new ED.Point(doodle.originX, doodle.originY);
+		if (this.scaleOn == 'height') {
+			x = _point.x - ((c.x + 500) / 1001 * this.canvas.height + this.canvas.offsetLeft + 0.5*(this.canvas.width - this.canvas.height));
+			y = _point.y - ((c.y + 500) / 1001 * this.canvas.height + this.canvas.offsetTop);
+		}
+		else {
+			x = _point.x - ((c.x + 500) / 1001 * this.canvas.height + this.canvas.offsetLeft  - 0.5*(this.canvas.height - this.canvas.width));
+			y = _point.y - ((c.y + 500) / 1001 * this.canvas.height + this.canvas.offsetTop);
+		}
+		var D = doodle.dimension * this.scale;
+        
+        if (y < 0.25 * D && y > -0.25 * D && x < -D && x > -2 * D) addSpouse();
+        else if (y < 0.25 * D && y > -1.5 * D && x < 1.75 * D && x > 1.3 * D) addSibling('F', '<');
+        else if (y < 0.25 * D && y > -1.5 * D && x < 2.5 * D && x > 2 * D) addSibling('M', '<');
+        else if (doodle.orphan && y < -1.9 * D && y > -2.5 * D && x < 0.75 * D && x > -0.75 * D) addParents();
+        else if (y < 2.5 * D && y > 1.6 * D && x < -0.25 * D && x > -0.75 * D) addChild('F');
+        else if (y < 2.5 * D && y > 1.6 * D && x < 0.75 * D && x > 0.25 * D) addChild('M');
+        else if (y < 0.16 * D && y > -0.16 * D && x < 0.4 * D && x > -0.4 * D) redefineRship();
+        else if (y < 1.7 * D && y > 1.1 * D && x < 1.7 * D && x > 1.1 * D) this.deleteSelectedNode();
+    }
 
 	// Detect double click
 	if (ED.recentClick) this.doubleClick = true;
@@ -648,6 +677,16 @@ ED.Drawing.prototype.mousedown = function(_point) {
 						// Add new squiggle
 						this.doodleArray[i].addSquiggle();
 					}
+					
+					// MSC
+					// If linking nodes in pedigree drawing, mousedown links selected doodle and reveals menu to define relationship type
+					if (typeof(PD) == "object") {
+                        if (PD.LinkedNode1!==null) {
+	                        PD.LinkedNode2 = this.selectedDoodle;
+	                        PD.LinkedNode2.linked = true;
+	                        if (PD.LinkedNode1!==PD.LinkedNode2) showBlanket();
+	                    }
+                    }
 				}
 			}
 			// Ensure that unselected doodles are marked as such
@@ -670,6 +709,20 @@ ED.Drawing.prototype.mousedown = function(_point) {
 	// If no doodles selected, run onDeselection code for last doodle
 	if (!this.selectedDoodle) {
 		if (this.lastSelectedDoodle) this.lastSelectedDoodle.onDeselection();
+		
+		// MSC for pedigrees
+		if (typeof(PD)=='object') {
+			for (var i = 0; i < this.doodleArray.length; i++) {
+	            if (this.doodleArray[i].linked) {
+	                this.doodleArray[i].linked = false;
+	                PD.LinkedNode1 = null;
+	                for (var j = 0; j < this.doodleArray.length; j++) {
+	                    drawingEdit.doodleArray[j].hasHoverMenu = true;
+	                }
+	            }
+			}
+			createHTMLrow();
+		}
 	}
 
 	// Notify if doodle is deselected ***TODO*** move to onDeselection code for doodle to make this trigger for all deselections
@@ -707,6 +760,40 @@ ED.Drawing.prototype.mousedown = function(_point) {
 		point: _point
 	});
 }
+
+
+/**
+ * Responds to mouse down event in canvas, cycles through doodles from front to back.
+ * Selected doodle is first selectable doodle to have click within boundary path.
+ * Double clicking on a selected doodle promotes it to drawing mode (if is drawable)
+ *
+ * MSC FOR PEDIGREES
+ *
+ * @event
+ * @param {Point} _point Coordinates of mouse in canvas plane
+ */
+ED.Drawing.prototype.click = function(_point) {	
+	if (doodle && doodle.hasHoverMenu) {
+        // Get mouse position in doodle plane
+        var mousePosDoodlePlane = doodle.inverseTransform.transformPoint(_point);
+        
+        if (mousePosDoodlePlane.y < 0.25 * doodle.dimension && mousePosDoodlePlane.y > -0.25 * doodle.dimension && mousePosDoodlePlane.x < -doodle.dimension && mousePosDoodlePlane.x > -2 * doodle.dimension) alert('sps');
+        else if (mousePosDoodlePlane.y < 0.25 * doodle.dimension && mousePosDoodlePlane.y > -1.5 * doodle.dimension && mousePosDoodlePlane.x < 1.75 * doodle.dimension && mousePosDoodlePlane.x > 1.3 * doodle.dimension) doodle.sisterStyle="red";
+        else if (mousePosDoodlePlane.y < 0.25 * doodle.dimension && mousePosDoodlePlane.y > -1.5 * doodle.dimension && mousePosDoodlePlane.x < 2.5 * doodle.dimension && mousePosDoodlePlane.x > 2 * doodle.dimension) doodle.brotherStyle="red";
+        else if (doodle.orphan && mousePosDoodlePlane.y < -1.9 * doodle.dimension && mousePosDoodlePlane.y > -2.5 * doodle.dimension && mousePosDoodlePlane.x < 0.55 * doodle.dimension && mousePosDoodlePlane.x > -0.55 * doodle.dimension) doodle.parentsStyle="red";
+        else if (mousePosDoodlePlane.y < 2.5 * doodle.dimension && mousePosDoodlePlane.y > 1.6 * doodle.dimension && mousePosDoodlePlane.x < -0.25 * doodle.dimension && mousePosDoodlePlane.x > -0.75 * doodle.dimension) addChild('F');
+        else if (mousePosDoodlePlane.y < 2.5 * doodle.dimension && mousePosDoodlePlane.y > 1.6 * doodle.dimension && mousePosDoodlePlane.x < 0.75 * doodle.dimension && mousePosDoodlePlane.x > 0.25 * doodle.dimension) doodle.sonStyle = "red";
+        else if (mousePosDoodlePlane.y < 0.16 * doodle.dimension && mousePosDoodlePlane.y > -0.16 * doodle.dimension && mousePosDoodlePlane.x < 0.4 * doodle.dimension && mousePosDoodlePlane.x > -0.4 * doodle.dimension) doodle.overLink = true;
+        else return;
+    }
+
+	// Notify
+	this.notify("click", {
+		drawing: this,
+		point: _point
+	});
+}
+
 
 /**
  * Responds to mouse move event in canvas according to the drawing mode
@@ -1074,6 +1161,92 @@ ED.Drawing.prototype.mousemove = function(_point) {
 		// Refresh
 		this.repaint();
 	}
+	// MSC for pedigrees
+	else if (doodle && doodle.hasHoverMenu) {
+		// Get coordinates of point relative to doodle origin
+		//// inverse transform not working for all scales?
+		var c = new ED.Point(doodle.originX, doodle.originY);
+		if (this.scaleOn == 'height') {
+			x = _point.x - ((c.x + 500) / 1001 * this.canvas.height + this.canvas.offsetLeft + 0.5*(this.canvas.width - this.canvas.height));
+			y = _point.y - ((c.y + 500) / 1001 * this.canvas.height + this.canvas.offsetTop);
+		}
+		else {
+			x = _point.x - ((c.x + 500) / 1001 * this.canvas.height + this.canvas.offsetLeft  - 0.5*(this.canvas.height - this.canvas.width));
+			y = _point.y - ((c.y + 500) / 1001 * this.canvas.height + this.canvas.offsetTop);
+		}
+		var D = doodle.dimension * this.scale;
+        
+//         if (x < D && x > -D && y < D && y > - D) alert('in');
+        
+        if (y < 0.25 * D && y > -0.25 * D && x < -D && x > -2 * D) doodle.spouseStyle="red";
+        else if (y < 0.25 * D && y > -1.5 * D && x < 1.75 * D && x > 1.3 * D) doodle.sisterStyle="red";
+        else if (y < 0.25 * D && y > -1.5 * D && x < 2.5 * D && x > 2 * D) doodle.brotherStyle="red";
+        else if (doodle.orphan && y < -1.9 * D && y > -2.5 * D && x < 0.75 * D && x > -0.75 * D) doodle.parentsStyle="red";
+        else if (y < 2.5 * D && y > 1.6 * D && x < -0.25 * D && x > -0.75 * D) doodle.daughterStyle = "red";
+        else if (y < 2.5 * D && y > 1.6 * D && x < 0.75 * D && x > 0.25 * D) doodle.sonStyle = "red";
+        else if (y < 0.16 * D && y > -0.16 * D && x < 0.4 * D && x > -0.4 * D) doodle.overLink = true;
+        else if (y < 1.7 * D && y > 1.1 * D && x < 1.7 * D && x > 1.1 * D) doodle.deleteStyle = "red";
+        else {
+            doodle.parentsStyle = "black";
+            doodle.sisterStyle = "black";
+            doodle.brotherStyle = "black";
+            doodle.sonStyle = "black";
+            doodle.daughterStyle = "black";
+            doodle.spouseStyle = "black";
+            doodle.deleteStyle = "rgba(255,0,0,0.6)";
+            doodle.overLink = false;
+        }
+        
+		this.repaint();
+	}
+	else if (!doodle && typeof(PD)=='object') {
+		// MSC - for pedigrees, move canvas on drag...
+		if (this.mouseDown) { 
+			this.canvas.style.cursor = "-webkit-grabbing";
+			dragCanvas(_point);
+		}
+		
+		// else if hovering over a node change to pointer
+		else {
+			draggingCanvas = false;
+			
+			var nodes = this.allDoodlesOfClass('FamilyMember');
+			var z = 0;
+			var found = false;
+			while (!found && z<nodes.length) {
+				var member = nodes[z];
+				var c = new ED.Point(member.originX, member.originY);
+				
+				if (this.scaleOn == 'height') {
+					x = _point.x - ((c.x + 500) / 1001 * this.canvas.height + this.canvas.offsetLeft + 0.5*(this.canvas.width - this.canvas.height));
+					y = _point.y - ((c.y + 500) / 1001 * this.canvas.height + this.canvas.offsetTop);
+				}
+				else {
+					x = _point.x - ((c.x + 500) / 1001 * this.canvas.height + this.canvas.offsetLeft  - 0.5*(this.canvas.height - this.canvas.width));
+					y = _point.y - ((c.y + 500) / 1001 * this.canvas.height + this.canvas.offsetTop);
+				}
+				var D = member.dimension * this.scale;
+				
+				if (Math.abs(x) < D && Math.abs(y)< D) {
+					if (member.significant) {
+						this.canvas.style.cursor = "pointer";
+						member.moveMemberTableRow();
+						member.expandMemberTableRow();
+					}
+					found = true;
+				}
+				else {
+					this.canvas.style.cursor = "-webkit-grab";
+					member.highlight = false;
+					var row = document.getElementById(member.familyId + "Row");
+					row.style.background = "none";
+				}
+				z++;
+			}
+			if (!found) createHTMLrow();
+			this.repaint();
+		}
+	}
 }
 
 /**
@@ -1126,6 +1299,12 @@ ED.Drawing.prototype.mouseup = function(_point) {
 		}
 	}
 
+	// MSC
+	else if (typeof(PD)=='object') {
+		dragginCanvas = false;
+		this.canvas.style.cursor = "-webkit-grab";
+	}
+	
 	// Redraw to get rid of select rectangle
 	this.repaint();
 
@@ -1684,6 +1863,111 @@ ED.Drawing.prototype.deleteSelectedDoodle = function() {
 		 */
 }
 
+
+/**
+ * Deletes currently selected doodle from pedigree diagram
+ * MSC for pedigree drawing
+ */
+ED.Drawing.prototype.deleteSelectedNode = function() {
+	// Should only be called if a doodle is selected, but check anyway
+	if (this.selectedDoodle != null) {
+		var nodeId = this.selectedDoodle.familyId;
+        var node;
+        var found = false;
+        var i = 0;
+        while (!found && i<family.memberArray.length) {
+            node = family.memberArray[i];
+            if (node.index == nodeId) {
+	            var offspring = node.getChildren();
+	            if (offspring.length>0) {
+		            alert('Cannot delete a family member with children.');
+		            return;
+		        }
+	            else {
+		            var hasPartner = false;
+		            var mates = node.getMates();
+					if (mates.length>0) hasPartner = true;
+	                
+	                // remove any associated relationships
+	                for (var j=family.relationshipArray.length-1; j>-1; j--) {
+	                    var rShip = family.relationshipArray[j];
+	                    if (rShip.from == nodeId || rShip.to == nodeId) {
+		                    
+		                    // if node to be deleted has offspring but no coparent, set offspring to 'orphan's
+		                    if (rShip.from == nodeId && rShip.type == 'parentChild' && hasPartner==false) {
+			                    for (var n=0; n<family.memberArray.length; n++) {
+				                    if (family.memberArray[n].index == rShip.to) family.memberArray[n].orphan = true;
+			                    }
+		                    }
+		                    
+		                    // delete doodle
+		                    var p=0;
+		                    var foundRship = false;
+	                        while (!foundRship && p<this.doodleArray.length) {
+		                        if (this.doodleArray[p].familyIndex == rShip.index) {
+			                        this.deleteDoodle(this.doodleArray[p],false);
+									foundRship = true;
+								}
+								p++;
+	                        }
+	                        
+	                        family.relationshipArray.splice(j, 1);
+	                        
+	                        // if deleting a multiplet relationship
+	                        /// check multiplet has other wombmates, else set multipleBirth to false
+	                        if (rShip.type =='sibMZ' || rShip.type == 'sibDZ') {
+		                        var multiplet;
+		                        if (rShip.from == nodeId) {
+			                        for (var l=0; l<family.memberArray.length; l++) {
+					                    if (family.memberArray[l].index == rShip.to) multiplet = family.memberArray[l];
+				                    }
+		                        }
+		                        else {
+			                        for (var l=0; l<family.memberArray.length; l++) {
+					                    if (family.memberArray[l].index == rShip.from) multiplet = family.memberArray[l];
+				                    }
+		                        }
+		                        var wombMates = multiplet.getWombMates();
+		                        if (wombMates.length === 0) multiplet.multipleBirth = false;
+	                        }
+	                        // if deleting a sibling relationship
+	                        /// check sib has other sibs (including multiplets), else set to singleton
+	                        if (rShip.type == 'sib' || rShip.type =='sibMZ' || rShip.type == 'sibDZ') {
+		                        var sib;
+		                        if (rShip.from == nodeId) {
+			                        for (var m=0; m<family.memberArray.length; m++) {
+					                    if (family.memberArray[m].index == rShip.to) sib = family.memberArray[m];
+				                    }
+		                        }
+		                        else {
+			                        for (var m=0; m<family.memberArray.length; m++) {
+					                    if (family.memberArray[m].index == rShip.from) sib = family.memberArray[m];
+				                    }
+		                        }
+		                        var siblings = sib.getSiblings();
+		                        if (siblings.length === 0) sib.singleton = true;
+	                        }
+	                    }
+	                }
+	                // remove from family member array
+	                family.memberArray.splice(i, 1);
+	                // delete doodle
+	                this.deleteDoodle(this.selectedDoodle,false);
+	            }
+	            
+                // set found flag to true to exit while loop
+                found = true;
+            }
+            i++;
+	    }
+	    if (found) family.drawFamily();
+	}
+	else {
+		ED.errorHandler('ED.Drawing', 'deleteSelectedDoodle', 'Attempt to delete selected doodle, when none selected');
+	}
+}
+
+
 /**
  * Resets the eyedraw canvas completely including any related form inputs
  */
@@ -1852,6 +2136,12 @@ ED.Drawing.prototype.deselectDoodles = function() {
 		this.selectedDoodle.onDeselection();
 		this.selectedDoodle = null;
 	}
+	// MSC - if pedigrees
+	if (typeof(PD)=='object')  {
+		if (draggingCanvas) this.canvas.style.cursor = "-webkit-grabbing";
+		else this.canvas.style.cursor = "-webkit-grab";
+		createHTMLrow();
+	}
 
 	this.notify("doodleDeselected");
 
@@ -1947,7 +2237,7 @@ ED.Drawing.prototype.selectDoodle = function(doodle) {
 
 	doodle.isSelected = true;
 	this.selectedDoodle = doodle;
-
+	
 	// Run onDeselection code for last doodle
 	if (this.lastSelectedDoodle) this.lastSelectedDoodle.onDeselection();
 
@@ -1979,6 +2269,22 @@ ED.Drawing.prototype.isReady = function() {
  * @returns {Doodle} The newly added doodle
  */
 ED.Drawing.prototype.addDoodle = function(_className, _parameterDefaults, _parameterBindings) {
+	//  MSC for freehand sketch doodle
+	//  TODO URLs ?!
+	var cnvs = $(this.canvas);
+	if (cnvs.css('cursor') == 'url(http://localhost/eyedraw/assets/img/icons/Maria/pencil_cursor.cur), default') {
+	    // complete last Sketch doodle
+	    this.completeFreehand();
+	    
+	    //  If completion failed due to undefined/incomplete doodle, terminate function and prompt user to define.
+	    // ** TO DO ** ?isn't showing warning in pop-out
+	    if (this.selectedDoodle!==null && this.selectedDoodle.warning == true) { 
+	        alert('Error: Cannot insert an undefined drawing. Define your sketch using the dropdown menu or free text field in the pop-out below the drawing canvas, or delete or cancel the sketch.');
+	        return null;
+	    };
+	}
+	else if (_className=='Sketch') cnvs.css( 'cursor', 'url(/eyedraw/assets/img/icons/Maria/pencil_cursor.cur) 6 30, default');
+	
 	// Set flag to indicate whether a doodle of this className already exists
 	var doodleExists = this.hasDoodleOfClass(_className);
 
