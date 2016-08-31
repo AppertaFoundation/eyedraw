@@ -24501,7 +24501,7 @@ ED.Fundus = function(_drawing, _parameterJSON) {
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
-}
+};
 
 /**
  * Sets superclass and constructor
@@ -24518,7 +24518,7 @@ ED.Fundus.prototype.setPropertyDefaults = function() {
 	this.isDeletable = false;
 	this.isFilled = false;
 	this.showsToolTip = false;
-}
+};
 
 /**
  * Draws doodle or performs a hit test if a Point parameter is passed
@@ -24594,7 +24594,16 @@ ED.Fundus.prototype.draw = function(_point) {
 
 	// Return value indicating successful hittest
 	return this.isClicked;
-}
+};
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.Fundus.prototype.description = function() {
+	return this.drawing.doodleArray.length === 1 ? "No abnormality" : "";
+};
 
 /**
  * OpenEyes
