@@ -372,7 +372,7 @@ ED.Doodle = function(_drawing, _parameterJSON) {
 			this.isForDrawing = false;
 		}
 	}
-}
+};
 
 /**
  * Parses JSON string to reconstitute parameters which are entries in this.parameterObjectTypeArray
@@ -394,27 +394,27 @@ ED.Doodle.prototype.parseObjectString = function(_string, _type) {
 	}
 
 	return returnObject;
-}
+};
 
 /**
  * Sets default handle attributes (overridden by subclasses)
  */
-ED.Doodle.prototype.setHandles = function() {}
+ED.Doodle.prototype.setHandles = function() {};
 
 /**
  * Sets default properties (overridden by subclasses)
  */
-ED.Doodle.prototype.setPropertyDefaults = function() {}
+ED.Doodle.prototype.setPropertyDefaults = function() {};
 
 /**
  * Sets default parameters (overridden by subclasses)
  */
-ED.Doodle.prototype.setParameterDefaults = function() {}
+ED.Doodle.prototype.setParameterDefaults = function() {};
 
 /**
  * Sets position in array relative to other relevant doodles (overridden by subclasses)
  */
-ED.Doodle.prototype.position = function() {}
+ED.Doodle.prototype.position = function() {};
 
 /**
  * Called on attempt to delete doodle, and returns permission (overridden by subclasses)
@@ -423,7 +423,7 @@ ED.Doodle.prototype.position = function() {}
  */
 ED.Doodle.prototype.willDelete = function() {
 	return true;
-}
+};
 
 /**
  * Moves doodle and adjusts rotation as appropriate
@@ -468,7 +468,7 @@ ED.Doodle.prototype.move = function(_x, _y) {
 			doodle: this
 		});
 	}
-}
+};
 
 /**
  * Calculates orientation based on x and y coordinates of doodle
@@ -485,7 +485,7 @@ ED.Doodle.prototype.orientation = function() {
 
 	// Calculate angle to current position from centre relative to north
 	return this.drawing.innerAngle(canvasTop, canvasCentre, newDoodleOrigin);
-}
+};
 
 /**
  * Draws doodle or performs a hit test if a Point parameter is passed
@@ -519,7 +519,7 @@ ED.Doodle.prototype.draw = function(_point) {
 
 	// Reset hit test flag
 	this.isClicked = false;
-}
+};
 
 /**
  * Draws selection handles and sets dragging mode which is determined by which handle and part of handle is selected
@@ -597,7 +597,7 @@ ED.Doodle.prototype.drawHandles = function(_point) {
 
 	// Restore context
 	ctx.restore();
-}
+};
 
 /**
  * Draws the boundary path or performs a hit test if a Point parameter is passed
@@ -664,13 +664,13 @@ ED.Doodle.prototype.drawBoundary = function(_point) {
 			this.drawHighlightExtras();
 		}
 	}
-}
+};
 
 /**
  * Draws extra items if the doodle is highlighted
  */
 ED.Doodle.prototype.drawHighlightExtras = function() {
-}
+};
 
 /**
  * Shows doodle parameter controls. Doodle must set display:true in parameterValidationArray
@@ -700,7 +700,7 @@ ED.Doodle.prototype.setDisplayOfParameterControls = function(_flag) {
 			}
 		}
 	}
-}
+};
 
 /**
  * Returns a String which, if not empty, determines the root descriptions of multiple instances of the doodle
@@ -709,7 +709,7 @@ ED.Doodle.prototype.setDisplayOfParameterControls = function(_flag) {
  */
 ED.Doodle.prototype.groupDescription = function() {
 	return "";
-}
+};
 
 /**
  * Runs when doodle is selected by the user
@@ -730,7 +730,7 @@ ED.Doodle.prototype.groupDescription = function() {
  */
 ED.Doodle.prototype.description = function() {
 	return "";
-}
+};
 
 /**
  * Returns a String which, if not empty, determines the suffix following a group description
@@ -739,7 +739,7 @@ ED.Doodle.prototype.description = function() {
  */
 ED.Doodle.prototype.groupDescriptionEnd = function() {
 	return "";
-}
+};
 
 /**
  * Returns the SnoMed code of the doodle (overridden by subclasses)
@@ -748,7 +748,7 @@ ED.Doodle.prototype.groupDescriptionEnd = function() {
  */
 ED.Doodle.prototype.snomedCode = function() {
 	return 0;
-}
+};
 
 /**
  * Returns a number indicating position in a hierarchy of diagnoses from 0 to 9 (highest) (overridden by subclasses)
@@ -757,7 +757,7 @@ ED.Doodle.prototype.snomedCode = function() {
  */
 ED.Doodle.prototype.diagnosticHierarchy = function() {
 	return 0;
-}
+};
 
 /**
  * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
@@ -769,7 +769,7 @@ ED.Doodle.prototype.diagnosticHierarchy = function() {
  */
 ED.Doodle.prototype.dependentParameterValues = function(_parameter, _value) {
 	return new Array();
-}
+};
 
 /**
  * Updates dependent parameters
@@ -788,7 +788,7 @@ ED.Doodle.prototype.updateDependentParameters = function(_parameter, _updateBind
 	if (_updateBindings || _updateBindings === undefined) {
 		this.drawing.updateBindings(this);
 	}
-}
+};
 
 /**
  * Validates the value of a parameter, and returns it in appropriate format
@@ -934,7 +934,7 @@ ED.Doodle.prototype.validateParameter = function(_parameter, _value, _trim) {
 	returnArray['valid'] = valid;
 	returnArray['value'] = value;
 	return returnArray;
-}
+};
 
 /**
  * Generates a unique id for a control element bound to a parameter ***TODO*** improve this
@@ -944,7 +944,7 @@ ED.Doodle.prototype.validateParameter = function(_parameter, _value, _trim) {
  */
 ED.Doodle.prototype.parameterControlElementId = function(_parameter) {
 	return this.drawing.canvas.id + '_' + _parameter + '_control';
-}
+};
 
 /**
  * Runs when doodle is selected by the user
@@ -954,7 +954,7 @@ ED.Doodle.prototype.onSelection = function() {
 	if (this.drawing.showDoodleControls) {
 		this.showDoodleControls();
 	}
-}
+};
 
 /**
  * Runs when doodle is deselected by the user
@@ -964,7 +964,7 @@ ED.Doodle.prototype.onDeselection = function() {
 	if (this.drawing.showDoodleControls) {
 		this.removeDoodleControls();
 	}
-}
+};
 
 /**
  * Creates an array of control elements
@@ -1022,7 +1022,7 @@ ED.Doodle.prototype.showControlValidationMsg = function(_parameter, _valid) {
 		}
 		msg.textContent = '*';
 	}
-}
+};
 
 /**
  * Generate and append the control elements to the DOM.
@@ -1181,7 +1181,7 @@ ED.Doodle.prototype.parameterElement = function(_parameter) {
 	div.appendChild(element);
 
 	return div;
-}
+};
 
 /**
  * Attempts to animate a change in value of a parameter
@@ -1261,7 +1261,7 @@ ED.Doodle.prototype.setParameterWithAnimation = function(_parameter, _value, _up
 	}
 
 	this.drawing.notify("setParameterWithAnimationComplete");
-}
+};
 
 /**
  * Set the value of a doodle's parameter directly, and triggers a notification
@@ -1282,7 +1282,7 @@ ED.Doodle.prototype.setSimpleParameter = function(_parameter, _value) {
 
 	// Trigger notification
 	this.drawing.notify('parameterChanged', object);
-}
+};
 
 /**
  * Set the value of a doodle's parameter from a string format following validation
@@ -1364,7 +1364,7 @@ ED.Doodle.prototype.setParameterFromString = function(_parameter, _value, _updat
 
 	// Refresh drawing
 	this.drawing.repaint();
-}
+};
 
 /**
  * Set the value of a doodle's origin to avoid overlapping other doodles
@@ -1391,7 +1391,7 @@ ED.Doodle.prototype.setOriginWithDisplacements = function(_first, _next) {
 		this.originX = this.parameterValidationArray['originX']['range'].constrain(newOriginX);
 		this.originY = this.parameterValidationArray['originY']['range'].constrain(newOriginY);
 	}
-}
+};
 
 /**
  * Set the value of a doodle's origin as if rotating
@@ -1421,23 +1421,24 @@ ED.Doodle.prototype.setOriginWithRotations = function(_radius, _first, _next) {
 
 	this.originX = origin.x;
 	this.originY = origin.y;
-}
+};
 
 /**
  * Set the value of a doodle's rotation to avoid overlapping other doodles
  *
- * @param {Int} _first Rotation in degrees of first doodle anticlockwise right eye, clockwise left eye
- * @param {Int} _next Additional rotation of subsequent doodles
+ * @param {int} _first Rotation in degrees of first doodle anticlockwise right eye, clockwise left eye
+ * @param {int} _next Additional rotation of subsequent doodles
  */
 ED.Doodle.prototype.setRotationWithDisplacements = function(_first, _next) {
 	var direction = this.drawing.eye == ED.eye.Right ? -1 : 1;
 	var newRotation;
+	var doodle;
 
 	// Get last doodle to be added
 	if (this.addAtBack) {
-		var doodle = this.drawing.firstDoodleOfClass(this.className);
+		doodle = this.drawing.firstDoodleOfClass(this.className);
 	} else {
-		var doodle = this.drawing.lastDoodleOfClass(this.className);
+		doodle = this.drawing.lastDoodleOfClass(this.className);
 	}
 
 	// If there is one, make rotation relative to it
@@ -1448,7 +1449,7 @@ ED.Doodle.prototype.setRotationWithDisplacements = function(_first, _next) {
 	}
 
 	this.rotation = this.parameterValidationArray['rotation']['range'].constrain(newRotation);
-}
+};
 
 /**
  * Deselects doodle
@@ -1460,7 +1461,7 @@ ED.Doodle.prototype.deselect = function() {
 
 	// Refresh drawing
 	this.drawing.repaint();
-}
+};
 
 /**
  * Returns parameter values in validated string format
@@ -1528,7 +1529,7 @@ ED.Doodle.prototype.getParameter = function(_parameter) {
 
 	// Return value
 	return value;
-}
+};
 
 /**
  * Uses a timeout to call itself and produce the animation
@@ -1571,7 +1572,7 @@ ED.Doodle.prototype.increment = function(_parameter, _value, _updateBindings) {
 
 	// Refresh drawing
 	this.drawing.repaint();
-}
+};
 
 /**
  * Adds a binding to the doodle. Only derived parameters can be bound
@@ -1691,7 +1692,7 @@ ED.Doodle.prototype.addBinding = function(_parameter, _fieldParameters) {
 	} else {
 		ED.errorHandler('ED.Doodle', 'addBinding', 'Failed to add binding. Doodle of class: ' + this.className + ' has no parameter of name: ' + _parameter);
 	}
-}
+};
 
 /**
  * Removes a binding from a doodle
@@ -1719,7 +1720,7 @@ ED.Doodle.prototype.removeBinding = function(_parameter) {
 
 	// Remove entry in listener array
 	delete this.drawing.listenerArray[this.id][_parameter];
-}
+};
 
 /**
  * Returns the roation converted to clock hours
@@ -1745,7 +1746,7 @@ ED.Doodle.prototype.clockHour = function(_offset) {
 	clockHour = clockHour.toFixed(0);
 	if (clockHour == 0) clockHour = 12;
 	return clockHour
-}
+};
 
 /**
  * Returns the quadrant of a doodle based on origin coordinates
@@ -1766,7 +1767,7 @@ ED.Doodle.prototype.quadrant = function() {
 	returnString += " quadrant";
 
 	return returnString;
-}
+};
 
 /**
  * Returns the rotation converted to degrees
@@ -1787,7 +1788,7 @@ ED.Doodle.prototype.degrees = function() {
 	degrees = degrees.toFixed(0);
 	if (degrees == 0) degrees = 0;
 	return degrees;
-}
+};
 
 /**
  * Returns the extent converted to clock hours
@@ -1812,7 +1813,7 @@ ED.Doodle.prototype.clockHourExtent = function() {
 	clockHourEnd = clockHourEnd.toFixed(0);
 	if (clockHourEnd == 0) clockHourEnd = 12;
 	return "from " + clockHourStart + " to " + clockHourEnd;
-}
+};
 
 /**
  * Returns the extent converted to degrees
@@ -1823,7 +1824,7 @@ ED.Doodle.prototype.degreesExtent = function() {
 	var degrees = this.arc * 180 / Math.PI;
 	var intDegrees = Math.round(degrees);
 	return intDegrees;
-}
+};
 
 /**
  * Returns the location relative to the disc
@@ -1853,7 +1854,7 @@ ED.Doodle.prototype.locationRelativeToDisc = function() {
 	}
 
 	return locationString;
-}
+};
 
 /**
  * Returns the location relative to the fovea
@@ -1884,7 +1885,7 @@ ED.Doodle.prototype.locationRelativeToFovea = function() {
 		}
 	}
 	return locationString;
-}
+};
 
 /**
  * Adds a new squiggle to the doodle's squiggle array
@@ -1916,7 +1917,7 @@ ED.Doodle.prototype.addSquiggle = function() {
 
 	// Add it to squiggle array
 	this.squiggleArray.push(squiggle);
-}
+};
 
 
 /**
@@ -1931,7 +1932,7 @@ ED.Doodle.prototype.addPointToSquiggle = function(_point) {
 
 		squiggle.addPoint(_point);
 	}
-}
+};
 
 /**
  * Complete the active squiggle (last in the array)
@@ -1943,7 +1944,7 @@ ED.Doodle.prototype.completeSquiggle = function() {
 
 		squiggle.complete = true;
 	}
-}
+};
 
 /**
  * Calculates arc for doodles without a natural arc value
@@ -1957,7 +1958,7 @@ ED.Doodle.prototype.calculateArc = function() {
 
 	// Return angle between them
 	return left.clockwiseAngleTo(right);
-}
+};
 
 /**
  * Finds the nearest point in the doodle pointsArray
@@ -1989,7 +1990,7 @@ ED.Doodle.prototype.nearestPointTo = function(_point) {
 		ED.errorHandler('ED.Doodle', 'nearestPointTo', 'Attempt to calculate nearest points with an empty points array');
 		return _point;
 	}
-}
+};
 
 /**
  * Finds the nearest angle in the doodle anglesArray
@@ -2022,7 +2023,7 @@ ED.Doodle.prototype.nearestAngleTo = function(_angle) {
 		ED.errorHandler('ED.Doodle', 'nearestAngleTo', 'Attempt to calculate nearest angle with an empty angles array');
 		return _angle;
 	}
-}
+};
 
 /**
  * Finds the nearest arc in the doodle arcArray
@@ -2055,7 +2056,7 @@ ED.Doodle.prototype.nearestArcTo = function(_arc) {
 		ED.errorHandler('ED.Doodle', 'nearestArcTo', 'Attempt to calculate nearest arc with an empty arc array');
 		return _arc;
 	}
-}
+};
 
 /**
  * Returns a doodle in JSON format
@@ -2138,7 +2139,7 @@ ED.Doodle.prototype.json = function() {
 	s = s + '}';
 
 	return s;
-}
+};
 
 /**
  * Draws a circular spot with given parameters
@@ -2159,7 +2160,7 @@ ED.Doodle.prototype.drawSpot = function(_ctx, _x, _y, _r, _colour) {
 	_ctx.fill();
 	_ctx.stroke();
 	_ctx.restore();
-}
+};
 
 /**
  * Draws a circle with given parameters
@@ -2182,7 +2183,7 @@ ED.Doodle.prototype.drawCircle = function(_ctx, _x, _y, _r, _fillColour, _lineWi
 	_ctx.strokeStyle = _strokeColour;
 	_ctx.stroke();
 	_ctx.restore();
-}
+};
 
 /**
  * Draws a line with given parameters
@@ -2204,7 +2205,7 @@ ED.Doodle.prototype.drawLine = function(_ctx, _x1, _y1, _x2, _y2, _w, _colour) {
 	_ctx.strokeStyle = _colour;
 	_ctx.stroke();
 	_ctx.restore();
-}
+};
 
 /**
  * Draws a laser spot
@@ -2215,7 +2216,7 @@ ED.Doodle.prototype.drawLine = function(_ctx, _x1, _y1, _x2, _y2, _w, _colour) {
  */
 ED.Doodle.prototype.drawLaserSpot = function(_ctx, _x, _y) {
 	this.drawCircle(_ctx, _x, _y, 15, "Yellow", 10, "rgba(255, 128, 0, 1)");
-}
+};
 
 /**
  * Draws a haemorrhage orientated to be parallel to nerve fibre layer
@@ -2249,7 +2250,7 @@ ED.Doodle.prototype.drawNFLHaem = function(_ctx, _x, _y) {
 	_ctx.strokeStyle = "rgba(255,0,0,0.5)";
 
 	_ctx.stroke();
-}
+};
 
 /**
  * Adds an ellipse to a path
@@ -2270,7 +2271,7 @@ ED.Doodle.prototype.addEllipseToPath = function(_ctx, _x, _y, _w, _h) {
   _ctx.bezierCurveTo(_x + ox, _y - _h/2, _x + _w/2, _y - oy, _x + _w/2, _y);
   _ctx.bezierCurveTo(_x + _w/2, _y + oy, _x + ox, _y + _h/2, _x, _y + _h/2);
   _ctx.bezierCurveTo(_x - ox, _y + _h/2, _x - _w/2, _y + oy, _x - _w/2, _y);
-}
+};
 
 /**
  * Returns the x coordinate of a point given its y and the radius
@@ -2310,7 +2311,7 @@ ED.Doodle.prototype.debug = function() {
 	console.log('apx: ' + this.apexX + " : " + this.apexY);
 	console.log('rot: ' + this.rotation * 180 / Math.PI);
 	console.log('arc: ' + this.arc * 180 / Math.PI);
-}
+};
 
 /**
  * Represents a control handle on the doodle
