@@ -636,8 +636,7 @@ ED.Doodle.prototype.drawBoundary = function(_point) {
 	else {
 		// Specify highlight attributes
 		if (this.isSelected && this.isShowHighlight) {
-			if (this.highlight) ctx.shadowBlur = "rgba(0,0,255,0.2)" // MSC
-			else ctx.shadowColor = "gray";
+            ctx.shadowColor = "gray";
 			ctx.shadowOffsetX = 0;
 			ctx.shadowOffsetY = 0;
 			ctx.shadowBlur = 20;
@@ -912,10 +911,6 @@ ED.Doodle.prototype.validateParameter = function(_parameter, _value, _trim) {
 					valid = (_value.length <= validation.maxLength);
 				}
 				break;
-				
-			// MSC
-			case 'table':
-				break;
 
 			default:
 				ED.errorHandler('ED.Drawing', 'eventHandler', 'Illegal validation type');
@@ -958,18 +953,6 @@ ED.Doodle.prototype.onSelection = function() {
 	// Show control bar
 	if (this.drawing.showDoodleControls) {
 		this.showDoodleControls();
-	}
-	
-	// MSC
-	if (typeof(PD)=='object') {
-		if (this.highlight) this.highlight = false;
-		
-		if (this.className == "FamilyMember") {
-			if (!this.selectedInTable) this.moveMemberTableRow();
-			this.editMemberTableRow();
-			this.selectedInTable = false;
-		}
-		this.drawing.canvas.style.cursor = "pointer";
 	}
 }
 
@@ -1182,10 +1165,6 @@ ED.Doodle.prototype.parameterElement = function(_parameter) {
 //     		element.setAttribute('id', this.parameterControlElementId(_parameter));
 //     		break;
 
-		// MSC
-		case 'table':
-			break;
-
 		default:
 			ED.errorHandler('ED.Doodle', 'parameterElement', 'Unexpected type: ' + this.parameterValidationArray[_parameter].type + ' for parameter: ' + _parameter);
 			break;
@@ -1351,10 +1330,6 @@ ED.Doodle.prototype.setParameterFromString = function(_parameter, _value, _updat
 
 			case 'freeText':
 				this[_parameter] = _value;
-				break;
-			
-			// MSC
-			case 'table':
 				break;
 
 			default:
@@ -1541,10 +1516,6 @@ ED.Doodle.prototype.getParameter = function(_parameter) {
 
 			case 'freeText':
 				value = this[_parameter];
-				break;
-			
-			// MSC
-			case 'table':
 				break;
 
 			default:
