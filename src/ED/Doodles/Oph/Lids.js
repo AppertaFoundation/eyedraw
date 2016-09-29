@@ -69,7 +69,7 @@ ED.Lids.prototype.setPropertyDefaults = function() {
 	this.handleCoordinateRangeArray[1] = {
 		// upper lid
 		x: new ED.Range(-0, +0),
-		y: new ED.Range(-130, +100)
+		y: new ED.Range(-120, +110)
 	};
 }
 
@@ -98,7 +98,7 @@ ED.Lids.prototype.setParameterDefaults = function() {
 	var point1 = new ED.Point(0, 115);
 	this.squiggleArray[0].pointsArray.push(point1);
 	
-	var point2 = new ED.Point(0, -110);
+	var point2 = new ED.Point(0, -90);
 	this.squiggleArray[0].pointsArray.push(point2);	
 }
 
@@ -132,18 +132,19 @@ ED.Lids.prototype.draw = function(_point) {
 	
 	// Calculate control point positions for bezier curves
 	var bMP = this.squiggleArray[0].pointsArray[0];
-	var bStart = new ED.Point(d * this.dir, p);
+	var bStart = new ED.Point(d * this.dir, p + (bMP.y-115)/5);
 	var bEnd = new ED.Point(-d * this.dir, 0);
-	
+
+	if (bMP.x*this.dir > 20) bStart.x += (bMP.x-20)/5;
+		
 	var bCP1 = new ED.Point(bMP.x + 60*this.dir, bMP.y * 1.45);
 	var bCP2 = new ED.Point(bMP.x - 180*this.dir, bMP.y * 1.16);
 	
 	var tMP = this.squiggleArray[0].pointsArray[1];
-	var tEnd = new ED.Point(d * this.dir, 0);
-	
-	var tCP1 = new ED.Point(-85 * this.dir, tMP.y * 1.45);
-	var tCP2 = new ED.Point(105 * this.dir, tMP.y * 1.45);
-	
+	var tEnd = new ED.Point(d * this.dir, 0 + (tMP.y/5+19));
+
+	var tCP1 = new ED.Point(-85 * this.dir, tMP.y * 1.3);
+	var tCP2 = new ED.Point(85 * this.dir, tMP.y * 1.35);
 	
 	// Boundary path
 	ctx.beginPath();
@@ -163,7 +164,7 @@ ED.Lids.prototype.draw = function(_point) {
 	ctx.bezierCurveTo(tCP1.x, tCP1.y, tCP2.x, tCP2.y, tEnd.x, tEnd.y);
 	
 	// Punctum
-	ctx.bezierCurveTo( d * 1.2 * this.dir, p, d * 1.3 * this.dir,p*1.4,d * this.dir,p);
+		ctx.bezierCurveTo(d * 1.25 * this.dir, p*0.9, d * 1.2 * this.dir, p, bStart.x, bStart.y);
 	  
 	// Bottom lid
 	ctx.bezierCurveTo(bCP1.x, bCP1.y, bCP2.x, bCP2.y, bEnd.x, bEnd.y);
@@ -176,7 +177,7 @@ ED.Lids.prototype.draw = function(_point) {
 	ctx.fillStyle = "white"
 	ctx.strokeStyle = "rgba(0,0,0,0)";
 	ctx.shadowBlur = 15;
-	ctx.shadowColor = "rgba(0,0,0,0.8)"
+	ctx.shadowColor = "rgba(0,0,0,0.8)";
 
 
 	// Draw boundary path (also hit testing)
@@ -189,17 +190,17 @@ ED.Lids.prototype.draw = function(_point) {
 		ctx.beginPath();
 		ctx.moveTo(-d * this.dir,0);
 		ctx.bezierCurveTo(tCP1.x, tCP1.y, tCP2.x, tCP2.y, tEnd.x, tEnd.y);
-		ctx.bezierCurveTo(d * 1.2 * this.dir, p, d * 1.3 * this.dir, p * 1.4, d * this.dir, p);
+		ctx.bezierCurveTo(d * 1.25 * this.dir, p*0.9, d * 1.2 * this.dir, p, bStart.x, bStart.y);
 		ctx.bezierCurveTo(bCP1.x, bCP1.y, bCP2.x, bCP2.y, bEnd.x, bEnd.y);
 		ctx.moveTo(-d * this.dir,0);
 		ctx.strokeStyle = "black";
 		ctx.stroke();
 		ctx.closePath();
 		
-		// eye lashes
+		// top lashes (ish)
 		ctx.beginPath();
-		ctx.moveTo(-d * this.dir,0);
-		ctx.lineTo(-d * this.dir - p * 0.5 * this.dir,p*0.5);
+		ctx.moveTo(bEnd.x, bEnd.y);
+		ctx.lineTo(bEnd.x - p * 0.5 * this.dir,bEnd.y + p*0.5 - tMP.y/5-19);
 		ctx.stroke();
 		ctx.closePath();
 		
@@ -209,7 +210,7 @@ ED.Lids.prototype.draw = function(_point) {
 		var bRidgeCP2 = new ED.Point(bMP.x + 70*this.dir, bMP.y * 1.45);
 		ctx.beginPath();
 		ctx.moveTo(-d * this.dir,0);
-		ctx.bezierCurveTo(bRidgeCP1.x, bRidgeCP1.y, bRidgeCP2.x, bRidgeCP2.y, d * this.dir, p);
+		ctx.bezierCurveTo(bRidgeCP1.x, bRidgeCP1.y, bRidgeCP2.x, bRidgeCP2.y, bStart.x, bStart.y);
 	// 	ctx.strokeStyle = "gray";
 		ctx.lineWidth = 3;
 		ctx.stroke();
@@ -217,8 +218,8 @@ ED.Lids.prototype.draw = function(_point) {
 		
 		// top eye crease
 		ctx.beginPath();
-		ctx.moveTo(-d * this.dir - p*0.5 * this.dir, 0);
-		ctx.bezierCurveTo(-rP*1.2 * this.dir,-h*1.3,rP * this.dir,-h*1.4, d*this.dir + p*this.dir, p*0.1);
+		ctx.moveTo(-d * this.dir - p * 0.9 * this.dir, p * 0.1);
+		ctx.bezierCurveTo(-rP*1.3 * this.dir,-h*1.2,rP * this.dir,-h*1.2, d*this.dir + p*this.dir, 0);
 		// 	ctx.strokeStyle = "gray";
 		ctx.lineWidth = 3;
 		ctx.shadowBlur = 7;
@@ -253,13 +254,14 @@ ED.Lids.prototype.description = function() {
 	var returnString = "";
 	
 	var ptosis = "";
-	if (tMP.y>=-66 && tMP.y<-44) ptosis = "Mild ptosis";
-	else if (tMP.y>=-44 && tMP.y<-22) ptosis = "Moderate ptosis";
-	else if (tMP.y>=-22) ptosis = "Severe ptosis";
+	if (tMP.y>=-57 && tMP.y<-38) ptosis = "Mild ptosis";
+	else if (tMP.y>=-38 && tMP.y<-19) ptosis = "Moderate ptosis";
+	else if (tMP.y>=-19) ptosis = "Severe ptosis";
 	
+	// TODO: change to an arc tangent to define ectropion?
 	var ectropion = "";
-	if (bMP.y>132 && bMP.x*this.dir > 100) ectropion = "Lateral ectropion";
-	else if (bMP.y>132 && bMP.x*this.dir < -100) ectropion = "Medial ectropion";
+	if (bMP.y>132 && bMP.x*this.dir > 90) ectropion = "Medial ectropion";
+	else if (bMP.y>132 && bMP.x*this.dir < -90) ectropion = "Lateral ectropion";
 	else if (bMP.y>132) ectropion = "Ectropion";
 	
 	if (ptosis.length > 0) returnString += ptosis;

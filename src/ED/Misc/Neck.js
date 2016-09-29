@@ -17,19 +17,22 @@
  */
 
 /**
- * Eyeball
+ * Corneal Oedema
  *
- * @class Eyeball
+ * @class Neck
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
  * @param {Object} _parameterJSON
  */
-ED.Eyeball = function(_drawing, _parameterJSON) {
+ED.Neck = function(_drawing, _parameterJSON) {
 	// Set classname
-	this.className = "Eyeball";
+	this.className = "Neck";
 
-	// Saved parameters
-// 	this.savedParameterArray = [];
+		// Saved parameters
+// 	this.savedParameterArray = ['headTilt', 'headTurn', 'chinMovement', 'tiltSeverity', 'turnSeverity', 'chinMoveSeverity', 'rotation', 'intensity', 'stromal', 'epithelial', 'endothelial'];
+
+	// Parameters in doodle control bar (parameter name: parameter label)
+// 	this.controlParameterArray = {'intensity':'Intensity',  'epithelial':'Epithelial', 'stromal':'Stromal','endothelial':'Endothelial'};
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -38,28 +41,34 @@ ED.Eyeball = function(_drawing, _parameterJSON) {
 /**
  * Sets superclass and constructor
  */
-ED.Eyeball.prototype = new ED.Doodle;
-ED.Eyeball.prototype.constructor = ED.Eyeball;
-ED.Eyeball.superclass = ED.Doodle.prototype;
+ED.Neck.prototype = new ED.Doodle;
+ED.Neck.prototype.constructor = ED.Neck;
+ED.Neck.superclass = ED.Doodle.prototype;
 
 /**
  * Sets handle attributes
  */
-ED.Eyeball.prototype.setHandles = function() {
+ED.Neck.prototype.setHandles = function() {
+	this.handleArray[0] = new ED.Doodle.Handle(null, true, ED.Mode.Handles, true);
 }
 
 /**
- * Sets default dragging attributes
+ * Sets default properties
  */
-ED.Eyeball.prototype.setPropertyDefaults = function() {
+ED.Neck.prototype.setPropertyDefaults = function() {
+// 	this.isRotatable = true;
+// 	this.isSqueezable = true;
+	this.isMoveable = false;
+	this.isRotatable = false;
+	this.addAtBack = true;
 	this.isSelectable = false;
-	this.isFilled = false;
 }
 
 /**
  * Sets default parameters
  */
-ED.Eyeball.prototype.setParameterDefaults = function() {
+ED.Neck.prototype.setParameterDefaults = function() {
+	
 }
 
 /**
@@ -67,61 +76,49 @@ ED.Eyeball.prototype.setParameterDefaults = function() {
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.Eyeball.prototype.draw = function(_point) {
+ED.Neck.prototype.draw = function(_point) {
+	
 	// Get context
 	var ctx = this.drawing.context;
 
 	// Call draw method in superclass
-	ED.Eyeball.superclass.draw.call(this, _point);
-
-	// Radius
-	var r = 250;
+	ED.Neck.superclass.draw.call(this, _point);
 
 	// Boundary path
 	ctx.beginPath();
 
+	// R
+	ctx.moveTo(-140, -70);
+	ctx.bezierCurveTo(-75,-30,-75,270,-140,320);
+	// L
+	ctx.moveTo(140, -70);
+	ctx.bezierCurveTo(75,-30,75,270,140,320);
 	
-	// Boundary path
-	ctx.beginPath();
-
-	// Main eyeball
-	ctx.arc(0, 0, r, 0, 2*Math.PI, true);
-
-	// Close path
-	ctx.closePath();
-
-	// Set drawing attributes
+	
+	// Set attributes
 	ctx.lineWidth = 4;
+	ctx.fillStyle = "rgba(0,0,0,0)"
 	ctx.strokeStyle = "black";
-
+	
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 
-	// Non-boundary paths
-	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
-		
-		// iris
-		var rI = 120;
-		ctx.beginPath();
-		ctx.moveTo(0+rI, 0);
-		ctx.arc(0,0,rI, 0, 2*Math.PI);
-		ctx.fillStyle = "gray";
-		ctx.fill();
-		ctx.stroke();
-		ctx.closePath();
-		
-		// pupil
-		var rP = 45;
-		ctx.beginPath();
-		ctx.moveTo(0+rP, 0);
-		ctx.arc(0,0,rP, 0, 2*Math.PI);
-		ctx.fillStyle = "black";
-		ctx.stroke();
-		ctx.fill();
-		ctx.closePath();
-		
+	// Non boundary paths
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {		
 	}
+	
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
 
 	// Return value indicating successful hittest
 	return this.isClicked;
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.Neck.prototype.description = function() {
+// 	return "Corneal oedema";
 }
