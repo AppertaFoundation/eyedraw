@@ -474,7 +474,7 @@ ED.Drawing.prototype.notify = function(_eventName, _object) {
 			}
 		}
 	}
-}
+};
 
 /**
  * Loads doodles from an HTML element
@@ -497,7 +497,7 @@ ED.Drawing.prototype.loadDoodles = function(_id) {
 		// Notify
 		this.notify("doodlesLoaded");
 	}
-}
+};
 
 /**
  * Loads doodles from passed set in JSON format into doodleArray
@@ -522,7 +522,7 @@ ED.Drawing.prototype.load = function(_doodleSet) {
 	this.doodleArray.sort(function(a, b) {
 		return a.order - b.order
 	});
-}
+};
 
 /**
  * Creates string containing drawing data in JSON format with surrounding square brackets
@@ -617,7 +617,9 @@ ED.Drawing.prototype.mousedown = function(_point) {
 	this.mouseDown = true;
 
 	// Detect double click
-	if (ED.recentClick) this.doubleClick = true;
+	if (ED.recentClick) {
+		this.doubleClick = true;
+	}
 	ED.recentClick = true;
 	var t = setTimeout("ED.recentClick = false;", this.doubleClickMilliSeconds);
 
@@ -1278,7 +1280,7 @@ ED.Drawing.prototype.keydown = function(e) {
 
 		this.notify("keydown", e.keyCode);
 	}
-}
+};
 
 /**
  * Starts a timer to display a tooltip simulating hover. Called from the mousemove event
@@ -1298,7 +1300,7 @@ ED.Drawing.prototype.startHoverTimer = function(_point) {
 			drawing.hover(_point);
 		}, 1000);
 	}
-}
+};
 
 /**
  * Stops the timer. Called by the mouseout event, and from the start of the startHoverTimer method
@@ -1316,7 +1318,7 @@ ED.Drawing.prototype.stopHoverTimer = function() {
 		// Hide hover
 		this.hideTooltip();
 	}
-}
+};
 
 /**
  * Triggered by the hover timer
@@ -1329,7 +1331,7 @@ ED.Drawing.prototype.hover = function(_point) {
 
 	// Notify
 	this.notify("hover", _point);
-}
+};
 
 /**
  * Shows a tooltip if present
@@ -1402,7 +1404,7 @@ ED.Drawing.prototype.showTooltip = function(_point) {
 	if (this.canvasTooltip.innerHTML.length > 0) {
 		this.canvasTooltip.style.display = 'block';
 	}
-}
+};
 
 /**
  * Hides a tooltip
@@ -1411,7 +1413,7 @@ ED.Drawing.prototype.showTooltip = function(_point) {
  */
 ED.Drawing.prototype.hideTooltip = function() {
 	this.canvasTooltip.style.display = 'none';
-}
+};
 
 /**
  * Moves selected doodle to front

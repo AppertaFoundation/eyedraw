@@ -734,7 +734,7 @@ ED.Drawing.prototype.notify = function(_eventName, _object) {
 			}
 		}
 	}
-}
+};
 
 /**
  * Loads doodles from an HTML element
@@ -757,7 +757,7 @@ ED.Drawing.prototype.loadDoodles = function(_id) {
 		// Notify
 		this.notify("doodlesLoaded");
 	}
-}
+};
 
 /**
  * Loads doodles from passed set in JSON format into doodleArray
@@ -782,7 +782,7 @@ ED.Drawing.prototype.load = function(_doodleSet) {
 	this.doodleArray.sort(function(a, b) {
 		return a.order - b.order
 	});
-}
+};
 
 /**
  * Creates string containing drawing data in JSON format with surrounding square brackets
@@ -877,7 +877,9 @@ ED.Drawing.prototype.mousedown = function(_point) {
 	this.mouseDown = true;
 
 	// Detect double click
-	if (ED.recentClick) this.doubleClick = true;
+	if (ED.recentClick) {
+		this.doubleClick = true;
+	}
 	ED.recentClick = true;
 	var t = setTimeout("ED.recentClick = false;", this.doubleClickMilliSeconds);
 
@@ -1538,7 +1540,7 @@ ED.Drawing.prototype.keydown = function(e) {
 
 		this.notify("keydown", e.keyCode);
 	}
-}
+};
 
 /**
  * Starts a timer to display a tooltip simulating hover. Called from the mousemove event
@@ -1558,7 +1560,7 @@ ED.Drawing.prototype.startHoverTimer = function(_point) {
 			drawing.hover(_point);
 		}, 1000);
 	}
-}
+};
 
 /**
  * Stops the timer. Called by the mouseout event, and from the start of the startHoverTimer method
@@ -1576,7 +1578,7 @@ ED.Drawing.prototype.stopHoverTimer = function() {
 		// Hide hover
 		this.hideTooltip();
 	}
-}
+};
 
 /**
  * Triggered by the hover timer
@@ -1589,7 +1591,7 @@ ED.Drawing.prototype.hover = function(_point) {
 
 	// Notify
 	this.notify("hover", _point);
-}
+};
 
 /**
  * Shows a tooltip if present
@@ -1662,7 +1664,7 @@ ED.Drawing.prototype.showTooltip = function(_point) {
 	if (this.canvasTooltip.innerHTML.length > 0) {
 		this.canvasTooltip.style.display = 'block';
 	}
-}
+};
 
 /**
  * Hides a tooltip
@@ -1671,7 +1673,7 @@ ED.Drawing.prototype.showTooltip = function(_point) {
  */
 ED.Drawing.prototype.hideTooltip = function() {
 	this.canvasTooltip.style.display = 'none';
-}
+};
 
 /**
  * Moves selected doodle to front
@@ -8293,7 +8295,7 @@ ED.Surgeon = function(_drawing, _parameterJSON) {
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
-}
+};
 
 /**
  * Sets superclass and constructor
@@ -8328,7 +8330,7 @@ ED.Surgeon.prototype.setPropertyDefaults = function() {
 	// Array of angles to snap to
 	var phi = Math.PI / 4;
 	this.anglesArray = [0, phi, phi * 2, phi * 3, phi * 4, phi * 5, phi * 6, phi * 7];
-}
+};
 
 /**
  * Sets default parameters (Only called for new doodles)
@@ -8337,7 +8339,7 @@ ED.Surgeon.prototype.setPropertyDefaults = function() {
 ED.Surgeon.prototype.setParameterDefaults = function() {
 	this.rotation = 0;
 	this.setParameterFromString('surgeonPosition', 'Temporal');
-}
+};
 
 /**
  * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
@@ -8348,7 +8350,7 @@ ED.Surgeon.prototype.setParameterDefaults = function() {
  * @returns {Array} Associative array of values of dependent parameters
  */
 ED.Surgeon.prototype.dependentParameterValues = function(_parameter, _value) {
-	var returnArray = new Array();
+	var returnArray = {};
 
 	var isRE = (this.drawing.eye == ED.eye.Right);
 	var dial = 2 * Math.PI;
@@ -8357,25 +8359,45 @@ ED.Surgeon.prototype.dependentParameterValues = function(_parameter, _value) {
 		// Surgeon position
 		case 'rotation':
 			if (isRE) {
-				if (_value < dial / 16) returnArray['surgeonPosition'] = 'Superior';
-				else if (_value < 3 * dial / 16) returnArray['surgeonPosition'] = 'Supero-nasal';
-				else if (_value < 5 * dial / 16) returnArray['surgeonPosition'] = 'Nasal';
-				else if (_value < 7 * dial / 16) returnArray['surgeonPosition'] = 'Infero-nasal';
-				else if (_value < 9 * dial / 16) returnArray['surgeonPosition'] = 'Inferior';
-				else if (_value < 11 * dial / 16) returnArray['surgeonPosition'] = 'Infero-temporal';
-				else if (_value < 13 * dial / 16) returnArray['surgeonPosition'] = 'Temporal';
-				else if (_value < 15 * dial / 16) returnArray['surgeonPosition'] = 'Supero-temporal';
-				else returnArray['surgeonPosition'] = 'Superior';
+				if (_value < dial / 16) {
+					returnArray['surgeonPosition'] = 'Superior';
+				} else if (_value < 3 * dial / 16) {
+					returnArray['surgeonPosition'] = 'Supero-nasal';
+				} else if (_value < 5 * dial / 16) {
+					returnArray['surgeonPosition'] = 'Nasal';
+				} else if (_value < 7 * dial / 16) {
+					returnArray['surgeonPosition'] = 'Infero-nasal';
+				} else if (_value < 9 * dial / 16) {
+					returnArray['surgeonPosition'] = 'Inferior';
+				} else if (_value < 11 * dial / 16) {
+					returnArray['surgeonPosition'] = 'Infero-temporal';
+				} else if (_value < 13 * dial / 16) {
+					returnArray['surgeonPosition'] = 'Temporal';
+				} else if (_value < 15 * dial / 16) {
+					returnArray['surgeonPosition'] = 'Supero-temporal';
+				} else {
+					returnArray['surgeonPosition'] = 'Superior';
+				}
 			} else {
-				if (_value < dial / 16) returnArray['surgeonPosition'] = 'Superior';
-				else if (_value < 3 * dial / 16) returnArray['surgeonPosition'] = 'Supero-temporal';
-				else if (_value < 5 * dial / 16) returnArray['surgeonPosition'] = 'Temporal';
-				else if (_value < 7 * dial / 16) returnArray['surgeonPosition'] = 'Infero-temporal';
-				else if (_value < 9 * dial / 16) returnArray['surgeonPosition'] = 'Inferior';
-				else if (_value < 11 * dial / 16) returnArray['surgeonPosition'] = 'Infero-nasal';
-				else if (_value < 13 * dial / 16) returnArray['surgeonPosition'] = 'Nasal';
-				else if (_value < 15 * dial / 16) returnArray['surgeonPosition'] = 'Supero-nasal';
-				else returnArray['surgeonPosition'] = 'Superior';
+				if (_value < dial / 16) {
+					returnArray['surgeonPosition'] = 'Superior';
+				} else if (_value < 3 * dial / 16) {
+					returnArray['surgeonPosition'] = 'Supero-temporal';
+				} else if (_value < 5 * dial / 16) {
+					returnArray['surgeonPosition'] = 'Temporal';
+				} else if (_value < 7 * dial / 16) {
+					returnArray['surgeonPosition'] = 'Infero-temporal';
+				} else if (_value < 9 * dial / 16) {
+					returnArray['surgeonPosition'] = 'Inferior';
+				} else if (_value < 11 * dial / 16) {
+					returnArray['surgeonPosition'] = 'Infero-nasal';
+				} else if (_value < 13 * dial / 16) {
+					returnArray['surgeonPosition'] = 'Nasal';
+				} else if (_value < 15 * dial / 16) {
+					returnArray['surgeonPosition'] = 'Supero-nasal';
+				} else {
+					returnArray['surgeonPosition'] = 'Superior';
+				}
 			}
 			break;
 
@@ -8410,7 +8432,7 @@ ED.Surgeon.prototype.dependentParameterValues = function(_parameter, _value) {
 	}
 
 	return returnArray;
-}
+};
 
 /**
  * Draws doodle or performs a hit test if a Point parameter is passed
@@ -8499,7 +8521,7 @@ ED.Surgeon.prototype.draw = function(_point) {
 
 	// Return value indicating successful hittest
 	return this.isClicked;
-}
+};
 /**
  * 
  * @author <a href="mailto:bill.aylward@mac.com">Bill Aylward</a>
@@ -33927,6 +33949,7 @@ ED.PhakoIncision = function(_drawing, _parameterJSON) {
 	this.incisionSite = 'Corneal';
 	this.incisionType = 'Pocket';
 	this.incisionMeridian = 0;
+	//this.willSync = false;
 
 	// Saved parameters
 	this.savedParameterArray = ['apexY', 'arc', 'rotation', 'radius'];
