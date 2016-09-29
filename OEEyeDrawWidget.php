@@ -224,6 +224,13 @@ class OEEyeDrawWidget extends CWidget
 	public $toImage = false;
 
 	/**
+	 * Automatically report on changes to the drawing
+	 * 
+	 * @var string
+	 */
+	public $autoReport = '';
+
+	/**
 	 * Whether the eyedraw should be rendered with a div wrapper
 	 * @var boolean
 	 */
@@ -414,6 +421,7 @@ class OEEyeDrawWidget extends CWidget
 			'offsetX'=>$this->offsetX,
 			'offsetY'=>$this->offsetY,
 			'toImage'=>$this->toImage,
+			'autoReport'=>$this->autoReport,
 		);
 		// need to escape the listener names so that they are not treated as string vars in javascript
 		foreach ($this->listenerArray as $listener) {

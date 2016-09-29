@@ -33,7 +33,7 @@ ED.Fuchs = function(_drawing, _parameterJSON) {
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
-}
+};
 
 /**
  * Sets superclass and constructor
@@ -47,7 +47,7 @@ ED.Fuchs.superclass = ED.Doodle.prototype;
  */
 ED.Fuchs.prototype.setHandles = function() {
 	this.handleArray[2] = new ED.Doodle.Handle(null, true, ED.Mode.Scale, false);
-}
+};
 
 /**
  * Sets default properties
@@ -56,7 +56,7 @@ ED.Fuchs.prototype.setPropertyDefaults = function() {
 	this.isRotatable = false;
 	this.isSqueezable = true;
 	this.isUnique = true;
-}
+};
 
 /**
  * Draws doodle or performs a hit test if a Point parameter is passed
@@ -100,7 +100,7 @@ ED.Fuchs.prototype.draw = function(_point) {
 
 	// Return value indicating successful hittest
 	return this.isClicked;
-}
+};
 
 /**
  * Returns a string containing a text description of the doodle
@@ -108,8 +108,8 @@ ED.Fuchs.prototype.draw = function(_point) {
  * @returns {String} Description of doodle
  */
 ED.Fuchs.prototype.description = function() {
-	return "Fuch's Endothelial Dystrophy";
-}
+	return "Guttata";
+};
 
 /**
  * Returns the SnoMed code of the doodle
@@ -117,8 +117,8 @@ ED.Fuchs.prototype.description = function() {
  * @returns {Int} SnoMed code of entity representated by doodle
  */
 ED.Fuchs.prototype.snomedCode = function() {
-	return 193839007;
-}
+	return 0;
+};
 
 /**
  * Returns a number indicating position in a hierarchy of diagnoses from 0 to 9 (highest)
@@ -127,4 +127,4 @@ ED.Fuchs.prototype.snomedCode = function() {
  */
 ED.Fuchs.prototype.diagnosticHierarchy = function() {
 	return 2;
-}
+};
