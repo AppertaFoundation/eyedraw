@@ -358,7 +358,7 @@ ED.Controller = (function() {
 					var slaveDoodle = slaveDrawing.firstDoodleOfClass(slaveDoodleName);
 
 					// Check that doodles exist, className matches, and sync is allowed
-					if (!masterDoodle || masterDoodle.className !== masterDoodleName || !slaveDoodle && !slaveDoodle.willSync) {
+					if (!masterDoodle || masterDoodle.className !== masterDoodleName || !slaveDoodle || !slaveDoodle.willSync) {
 						continue;
 					}
 
