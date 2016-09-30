@@ -2886,8 +2886,11 @@ ED.Drawing.prototype.suppressReports = function() {
  */
 ED.Drawing.prototype.report = function() {
 	var returnString = "";
-	var groupArray = new Array();
-	var groupEndArray = new Array();
+	var groupArray = [];
+	var groupEndArray = [];
+	if(this.doodleArray.length === 3){
+		console.log(this.doodleArray[2]);
+	}
 
 	// Go through every doodle
 	for (var i = 0; i < this.doodleArray.length; i++) {
@@ -2959,7 +2962,7 @@ ED.Drawing.prototype.report = function() {
 
 	// Return result
 	return returnString;
-}
+};
 
 
 /**
@@ -33949,7 +33952,6 @@ ED.PhakoIncision = function(_drawing, _parameterJSON) {
 	this.incisionSite = 'Corneal';
 	this.incisionType = 'Pocket';
 	this.incisionMeridian = 0;
-	//this.willSync = false;
 
 	// Saved parameters
 	this.savedParameterArray = ['apexY', 'arc', 'rotation', 'radius'];
@@ -34251,12 +34253,21 @@ ED.PhakoIncision.prototype.description = function() {
 	var returnString = "";
 
 	// Incision site
-	if (this.radius > 428) returnString = 'Scleral ';
-	else if (this.radius > 344) returnString = 'Limbal ';
-	else returnString = 'Corneal ';
+	if (this.radius > 428) {
+		returnString = 'Scleral ';
+	} else if (this.radius > 344) {
+		returnString = 'Limbal ';
+	} else {
+		returnString = 'Corneal ';
+	}
 
 	// Incision type
-	returnString += this.apexY + this.radius == 0 ? "pocket " : "section "
+	if(this.incisionType){
+		returnString += this.incisionType.toLowerCase() + " ";
+	} else {
+		returnString += this.apexY + this.radius == 0 ? "pocket " : "section ";
+	}
+
 	returnString += "incision at ";
 	returnString += this.clockHour() + " o'clock";
 
