@@ -339,12 +339,21 @@ ED.PhakoIncision.prototype.description = function() {
 	var returnString = "";
 
 	// Incision site
-	if (this.radius > 428) returnString = 'Scleral ';
-	else if (this.radius > 344) returnString = 'Limbal ';
-	else returnString = 'Corneal ';
+	if (this.radius > 428) {
+		returnString = 'Scleral ';
+	} else if (this.radius > 344) {
+		returnString = 'Limbal ';
+	} else {
+		returnString = 'Corneal ';
+	}
 
 	// Incision type
-	returnString += this.apexY + this.radius == 0 ? "pocket " : "section "
+	if(this.incisionType){
+		returnString += this.incisionType.toLowerCase() + " ";
+	} else {
+		returnString += this.apexY + this.radius == 0 ? "pocket " : "section ";
+	}
+
 	returnString += "incision at ";
 	returnString += this.clockHour() + " o'clock";
 
