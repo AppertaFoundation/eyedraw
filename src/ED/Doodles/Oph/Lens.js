@@ -71,8 +71,8 @@ ED.Lens.prototype.setPropertyDefaults = function() {
 	this.addAtBack = true;
 
 	// Update component of validation array for simple parameters
-	this.parameterValidationArray['originX']['range'].setMinAndMax(-500, +500);
-	this.parameterValidationArray['originY']['range'].setMinAndMax(-500, +500);
+	this.parameterValidationArray['originX']['range'].setMinAndMax(-125, +125);
+	this.parameterValidationArray['originY']['range'].setMinAndMax(-125, +125);
 
 	this.parameterValidationArray['nuclearGrade'] = {
 		kind: 'derived',

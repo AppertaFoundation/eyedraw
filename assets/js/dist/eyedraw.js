@@ -29656,8 +29656,8 @@ ED.Lens.prototype.setPropertyDefaults = function() {
 	this.addAtBack = true;
 
 	// Update component of validation array for simple parameters
-	this.parameterValidationArray['originX']['range'].setMinAndMax(-500, +500);
-	this.parameterValidationArray['originY']['range'].setMinAndMax(-500, +500);
+	this.parameterValidationArray['originX']['range'].setMinAndMax(-125, +125);
+	this.parameterValidationArray['originY']['range'].setMinAndMax(-125, +125);
 
 	this.parameterValidationArray['nuclearGrade'] = {
 		kind: 'derived',
@@ -29976,7 +29976,7 @@ ED.LensCrossSection.prototype.setPropertyDefaults = function() {
 
 	// Update component of validation array for simple parameters
 	this.parameterValidationArray['originX']['range'].setMinAndMax(-150, +200);
-	this.parameterValidationArray['originY']['range'].setMinAndMax(-380, +380);
+	this.parameterValidationArray['originY']['range'].setMinAndMax(-140, +140);
 }
 
 /**

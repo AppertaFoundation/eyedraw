@@ -48,7 +48,7 @@ ED.LensCrossSection.prototype.setPropertyDefaults = function() {
 
 	// Update component of validation array for simple parameters
 	this.parameterValidationArray['originX']['range'].setMinAndMax(-150, +200);
-	this.parameterValidationArray['originY']['range'].setMinAndMax(-380, +380);
+	this.parameterValidationArray['originY']['range'].setMinAndMax(-140, +140);
 }
 
 /**
