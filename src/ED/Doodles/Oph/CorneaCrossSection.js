@@ -93,7 +93,7 @@ ED.CorneaCrossSection.prototype.setPropertyDefaults = function() {
  * Use the setParameter function for derived parameters, as this will also update dependent variables
  */
 ED.CorneaCrossSection.prototype.setParameterDefaults = function() {
-	this.originX = 140;
+	this.originX = 50;
 	this.apexX = -380;
 	this.apexY = 0;
 	this.setParameterFromString('shape', 'Normal');

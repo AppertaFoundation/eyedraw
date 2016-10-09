@@ -29,7 +29,7 @@ ED.IOL = function(_drawing, _parameterJSON) {
 	this.className = "IOL";
 
 	// Other parameters
-	this.type = "Iris Clip";
+	this.type = "PC";
 	
 	// Saved parameters
 	this.savedParameterArray = ['originX', 'originY', 'rotation', 'type'];
@@ -76,7 +76,7 @@ ED.IOL.prototype.setPropertyDefaults = function() {
  * Use the setParameter function for derived parameters, as this will also update dependent variables
  */
 ED.IOL.prototype.setParameterDefaults = function() {
-	this.setParameterFromString('type', 'Iris Clip');
+	this.setParameterFromString('type', 'PC');
 }
 
 /**

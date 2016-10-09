@@ -17,16 +17,16 @@
  */
 
 /**
- * Lens Cross Section ***TODO***
+ * IOL Cross Section ***TODO***
  *
- * @class LensCrossSection
+ * @class IOLCrossSection
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
  * @param {Object} _parameterJSON
  */
-ED.LensCrossSection = function(_drawing, _parameterJSON) {
+ED.IOLCrossSection = function(_drawing, _parameterJSON) {
 	// Set classname
-	this.className = "LensCrossSection";
+	this.className = "IOLCrossSection";
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -35,14 +35,14 @@ ED.LensCrossSection = function(_drawing, _parameterJSON) {
 /**
  * Sets superclass and constructor
  */
-ED.LensCrossSection.prototype = new ED.Doodle;
-ED.LensCrossSection.prototype.constructor = ED.LensCrossSection;
-ED.LensCrossSection.superclass = ED.Doodle.prototype;
+ED.IOLCrossSection.prototype = new ED.Doodle;
+ED.IOLCrossSection.prototype.constructor = ED.IOLCrossSection;
+ED.IOLCrossSection.superclass = ED.Doodle.prototype;
 
 /**
  * Sets default dragging attributes
  */
-ED.LensCrossSection.prototype.setPropertyDefaults = function() {
+ED.IOLCrossSection.prototype.setPropertyDefaults = function() {
 	this.isUnique = true;
 	this.addAtBack = true;
 
@@ -55,7 +55,7 @@ ED.LensCrossSection.prototype.setPropertyDefaults = function() {
  * Sets default parameters (Only called for new doodles)
  * Use the setParameter function for derived parameters, as this will also update dependent variables
  */
-ED.LensCrossSection.prototype.setParameterDefaults = function() {
+ED.IOLCrossSection.prototype.setParameterDefaults = function() {
 	this.originX = 44;
 }
 
@@ -64,12 +64,12 @@ ED.LensCrossSection.prototype.setParameterDefaults = function() {
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.LensCrossSection.prototype.draw = function(_point) {
+ED.IOLCrossSection.prototype.draw = function(_point) {
 	// Get context
 	var ctx = this.drawing.context;
 
 	// Call draw method in superclass
-	ED.LensCrossSection.superclass.draw.call(this, _point);
+	ED.IOLCrossSection.superclass.draw.call(this, _point);
 
 	// Height of cross section (half value of ro in AntSeg doodle)
 	var h = 240;
@@ -113,12 +113,14 @@ ED.LensCrossSection.prototype.draw = function(_point) {
 	// Non boundary drawing
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
 		// Nucleus
+/*
 		ctx.beginPath();
 		ctx.moveTo(ld, rn * Math.sin(phi));
 		ctx.arc(ld - x, 0, rn, phi, -phi, true);
 		ctx.arc(ld + x, 0, rn, Math.PI + phi, Math.PI - phi, true);
 		ctx.strokeStyle = "rgba(220, 220, 220, 0.75)";
 		ctx.stroke();
+*/
 
 		// Zonules
 		ctx.beginPath();
