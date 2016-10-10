@@ -46,7 +46,7 @@ ED.PhakoIncision = function(_drawing, _parameterJSON) {
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 
 	this.apexYDelta = this.radius + this.apexY;
-}
+};
 
 /**
  * Sets superclass and constructor
@@ -61,7 +61,7 @@ ED.PhakoIncision.superclass = ED.Doodle.prototype;
 ED.PhakoIncision.prototype.setHandles = function() {
 	this.handleArray[3] = new ED.Doodle.Handle(null, true, ED.Mode.Arc, false);
 	this.handleArray[4] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
-}
+};
 
 /**
  * Sets default properties
@@ -103,7 +103,7 @@ ED.PhakoIncision.prototype.setPropertyDefaults = function() {
 		list: ['Pocket', 'Section'],
 		animate: false
 	};
-}
+};
 
 /**
  * Sets default parameters (only called for new doodles)
@@ -116,23 +116,25 @@ ED.PhakoIncision.prototype.setParameterDefaults = function() {
 
 	// Default is temporal side, or 90 degrees to the last one
 	this.setRotationWithDisplacements(90, -90);
-}
+};
 
 /**
  * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
  * The returned parameters are animated if their 'animate' property is set to true
  *
  * @param {String} _parameter Name of parameter that has changed
- * @value {Undefined} _value Value of parameter to calculate
+ * @param {Undefined} _value Value of parameter to calculate
  * @returns {Array} Associative array of values of dependent parameters
  */
 ED.PhakoIncision.prototype.dependentParameterValues = function(_parameter, _value) {
-	var returnArray = new Array();
+	var returnArray = {};
 
 	switch (_parameter) {
 		case 'rotation':
 			var angle = (((Math.PI * 2 - _value + Math.PI / 2) * 180 / Math.PI) + 360) % 360;
-			if (angle == 360) angle = 0;
+			if (angle == 360) {
+				angle = 0;
+			}
 			returnArray['incisionMeridian'] = angle;
 			//  returnArray['arc'] = _value/2;
 			break;
@@ -142,9 +144,13 @@ ED.PhakoIncision.prototype.dependentParameterValues = function(_parameter, _valu
 			break;
 
 		case 'radius':
-			if (_value >= 428) returnArray['incisionSite'] = 'Scleral';
-			else if (_value >= 344) returnArray['incisionSite'] = 'Limbal';
-			else returnArray['incisionSite'] = 'Corneal';
+			if (_value >= 428) {
+			  returnArray['incisionSite'] = 'Scleral';
+      } else if (_value >= 344) {
+			  returnArray['incisionSite'] = 'Limbal';
+      } else {
+			  returnArray['incisionSite'] = 'Corneal';
+      }
 
 			// Incision length should remain constant despite changes in radius
 			returnArray['arc'] = this.incisionLength * this.defaultRadius / (6 * _value);
@@ -202,7 +208,7 @@ ED.PhakoIncision.prototype.dependentParameterValues = function(_parameter, _valu
 	}
 
 	return returnArray;
-}
+};
 
 /**
  * Private method to update range of arc parameter to account for values changing with radius and incisionSite
@@ -214,7 +220,7 @@ ED.PhakoIncision.prototype.updateArcRange = function() {
 	} else {
 		ED.errorHandler('ED.PhakoIncision', 'updateArcRange', 'Attempt to calculate a range of arc using an illegal value of radius: ' + this.radius);
 	}
-}
+};
 
 /**
  * Draws doodle or performs a hit test if a Point parameter is passed
@@ -322,7 +328,7 @@ ED.PhakoIncision.prototype.draw = function(_point) {
 
 	// Return value indicating successful hittest
 	return this.isClicked;
-}
+};
 
 /**
  * Returns a string containing a text description of the doodle
@@ -333,14 +339,23 @@ ED.PhakoIncision.prototype.description = function() {
 	var returnString = "";
 
 	// Incision site
-	if (this.radius > 428) returnString = 'Scleral ';
-	else if (this.radius > 344) returnString = 'Limbal ';
-	else returnString = 'Corneal ';
+	if (this.radius > 428) {
+		returnString = 'Scleral ';
+	} else if (this.radius > 344) {
+		returnString = 'Limbal ';
+	} else {
+		returnString = 'Corneal ';
+	}
 
 	// Incision type
-	returnString += this.apexY + this.radius == 0 ? "pocket " : "section "
+	if(this.incisionType){
+		returnString += this.incisionType.toLowerCase() + " ";
+	} else {
+		returnString += this.apexY + this.radius == 0 ? "pocket " : "section ";
+	}
+
 	returnString += "incision at ";
 	returnString += this.clockHour() + " o'clock";
 
 	return returnString;
-}
+};
