@@ -14625,21 +14625,43 @@ ED.AntSeg = function(_drawing, _parameterJSON) {
 	this.colour = 'Blue';
 	this.ectropion = false;
 	this.cornealSize = 'Normal';
+  this.cells = '+';
+  this.flare = '+';
 
 	// Saved parameters
-	this.savedParameterArray = ['pupilSize', 'apexY', 'rotation', 'pxe', 'coloboma', 'colour', 'ectropion', 'cornealSize'];
+	this.savedParameterArray = [
+		'pupilSize',
+		'apexY',
+		'rotation',
+		'pxe',
+		'coloboma',
+		'colour',
+		'ectropion',
+		'cornealSize',
+		'cells',
+		'flare'
+	];
 
 	// Parameters in doodle control bar (parameter name: parameter label)
-	this.controlParameterArray = {'pupilSize':'Pupil size', 'pxe':'PXE', 'coloboma':'Coloboma', 'colour':'Colour', 'ectropion':'Ectropion uveae', 'cornealSize':'Corneal size'};
+	this.controlParameterArray = {
+		'pupilSize':'Pupil size',
+		'pxe':'PXE',
+		'coloboma':'Coloboma',
+		'colour':'Colour',
+		'ectropion':'Ectropion uveae',
+		'cornealSize':'Corneal size',
+		'cells': 'Cells',
+		'flare': 'Flare'
+	};
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
-}
+};
 
 /**
  * Sets superclass and constructor
  */
-ED.AntSeg.prototype = new ED.Doodle;
+ED.AntSeg.prototype = new ED.Doodle();
 ED.AntSeg.prototype.constructor = ED.AntSeg;
 ED.AntSeg.superclass = ED.Doodle.prototype;
 
@@ -14648,7 +14670,7 @@ ED.AntSeg.superclass = ED.Doodle.prototype;
  */
 ED.AntSeg.prototype.setHandles = function() {
 	this.handleArray[4] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
-}
+};
 
 /**
  * Set default properties
@@ -14661,44 +14683,63 @@ ED.AntSeg.prototype.setPropertyDefaults = function() {
 	this.isUnique = true;
 
 	// Update component of validation array for simple parameters (enable 2D control by adding -50,+50 apexX range
-	this.parameterValidationArray['apexX']['range'].setMinAndMax(0, 0);
-	this.parameterValidationArray['apexY']['range'].setMinAndMax(-280, -60);
+	this.parameterValidationArray.apexX.range.setMinAndMax(0, 0);
+	this.parameterValidationArray.apexY.range.setMinAndMax(-280, -60);
 
 	// Add complete validation arrays for derived parameters
-	this.parameterValidationArray['pupilSize'] = {
+	this.parameterValidationArray.pupilSize = {
 		kind: 'derived',
 		type: 'string',
 		list: ['Large', 'Medium', 'Small'],
 		animate: true
 	};
-	this.parameterValidationArray['pxe'] = {
+
+	this.parameterValidationArray.pxe = {
 		kind: 'derived',
 		type: 'bool',
 		display: true
 	};
-	this.parameterValidationArray['coloboma'] = {
+
+	this.parameterValidationArray.coloboma = {
 		kind: 'derived',
 		type: 'bool',
 		display: true
 	};
-	this.parameterValidationArray['colour'] = {
+
+	this.parameterValidationArray.colour = {
 		kind: 'other',
 		type: 'string',
 		list: ['Blue', 'Brown', 'Gray', 'Green'],
 		animate: false
 	};
-	this.parameterValidationArray['ectropion'] = {
+
+	this.parameterValidationArray.ectropion = {
 		kind: 'derived',
 		type: 'bool',
 		display: true
 	};
-	this.parameterValidationArray['cornealSize'] = {
+
+	this.parameterValidationArray.cornealSize = {
 		kind: 'other',
 		type: 'string',
 		list: ['Micro', 'Normal', 'Macro'],
 		animate: false
 	};
-}
+
+  this.parameterValidationArray.cells = {
+    kind: 'other',
+    type: 'string',
+    list: ['+', '++', '+++'],
+    animate: false
+  };
+
+	this.parameterValidationArray.flare = {
+		kind: 'other',
+		type: 'string',
+		list: ['+', '++', '+++'],
+		animate: false
+	};
+};
 
 /**
  * Sets default parameters (Only called for new doodles)
@@ -14708,50 +14749,63 @@ ED.AntSeg.prototype.setParameterDefaults = function() {
 	this.setParameterFromString('pupilSize', 'Large');
 	this.setParameterFromString('pxe', 'false');
 	this.setParameterFromString('cornealSize', 'Normal');
-}
+};
 
 /**
  * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
  * The returned parameters are animated if the 'animate' property in the parameterValidationArray is set to true
  *
  * @param {String} _parameter Name of parameter that has changed
- * @value {Undefined} _value Value of parameter to calculate
+ * @param {Undefined} _value Value of parameter to calculate
  * @returns {Array} Associative array of values of dependent parameters
  */
 ED.AntSeg.prototype.dependentParameterValues = function(_parameter, _value) {
-	var returnArray = new Array();
+	var returnArray = {};
 
 	switch (_parameter) {
 		case 'apexY':
-			if (_value < -200) returnArray['pupilSize'] = 'Large';
-			else if (_value < -100) returnArray['pupilSize'] = 'Medium';
-			else returnArray['pupilSize'] = 'Small';
+			if (_value < -200) {
+			  returnArray['pupilSize'] = 'Large';
+      } else if (_value < -100) {
+			  returnArray['pupilSize'] = 'Medium';
+      } else {
+			  returnArray['pupilSize'] = 'Small';
+      }
 			break;
 
 		case 'pupilSize':
 			switch (_value) {
 				case 'Large':
-					if (this.apexY < -200) returnValue = this.apexY;
-					else returnArray['apexY'] = -260;
+					if (this.apexY < -200) {
+					  returnValue = this.apexY;
+          } else {
+					  returnArray['apexY'] = -260;
+          }
 					break;
 				case 'Medium':
-					if (this.apexY >= -200 && this.apexY < -100) returnValue = this.apexY;
-					else returnArray['apexY'] = -200;
+					if (this.apexY >= -200 && this.apexY < -100) {
+						returnValue = this.apexY;
+					} else {
+						returnArray['apexY'] = -200;
+					}
 					break;
 				case 'Small':
-					if (this.apexY >= -100) returnValue = this.apexY;
-					else returnArray['apexY'] = -100;
+					if (this.apexY >= -100) {
+						returnValue = this.apexY;
+					} else {
+						returnArray['apexY'] = -100;
+					}
 					break;
 			}
 			break;
 		case 'coloboma':
-			this.isRotatable = _value == "true"?true:false;
-			this.rotation = _value == "true"?this.rotation:0;
+			this.isRotatable = (_value === "true");
+			this.rotation = _value === "true" ? this.rotation : 0;
 			break;
 	}
 
 	return returnArray;
-}
+};
 
 /**
  * Draws doodle or performs a hit test if a Point parameter is passed
@@ -14883,7 +14937,7 @@ ED.AntSeg.prototype.draw = function(_point) {
 
 	// Return value indicating successful hit test
 	return this.isClicked;
-}
+};
 
 /**
  * Returns a string containing a text description of the doodle
@@ -14894,19 +14948,35 @@ ED.AntSeg.prototype.description = function() {
 	var returnValue = "";
 
 	// Pupil size and coloboma
-	if (this.pupilSize != 'Large') returnValue += this.pupilSize.toLowerCase() + " pupil, ";
+	if (this.pupilSize !== 'Large') {
+		returnValue += this.pupilSize.toLowerCase() + " pupil, ";
+	}
 
 	// Coloboma
-	if (this.coloboma) returnValue += "coloboma at " + this.clockHour(6) + " o'clock, ";
+	if (this.coloboma) {
+		returnValue += "coloboma at " + this.clockHour(6) + " o'clock, ";
+	}
 
 	// Ectopion
-	if (this.ectropion) returnValue += "ectropion uveae, ";
+	if (this.ectropion) {
+		returnValue += "ectropion uveae, ";
+	}
 
 	// PXE
-	if (this.pxe) returnValue += "pseudoexfoliation, ";
-	
+	if (this.pxe) {
+		returnValue += "pseudoexfoliation, ";
+	}
+
+	if (this.cells) {
+		returnValue += "cells: " + this.cells + ", ";
+	}
+
+	if (this.flare) {
+		returnValue += "flare: " + this.flare + ", ";
+	}
+
 	// Empty report so far
-	if (returnValue.length == 0 && this.drawing.doodleArray.length == 1) {
+	if (returnValue.length === 0 && this.drawing.doodleArray.length === 1) {
 		// Is lens present and normal?
 		/*
 		var doodle = this.drawing.lastDoodleOfClass('Lens');
@@ -14928,7 +14998,7 @@ ED.AntSeg.prototype.description = function() {
 	returnValue = returnValue.charAt(0).toUpperCase() + returnValue.slice(1);
 
 	return returnValue;
-}
+};
 
 /**
  * OpenEyes
