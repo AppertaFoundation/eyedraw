@@ -14760,16 +14760,17 @@ ED.AntSeg.prototype.setParameterDefaults = function() {
  * @returns {Array} Associative array of values of dependent parameters
  */
 ED.AntSeg.prototype.dependentParameterValues = function(_parameter, _value) {
-	var returnArray = {};
+	var returnArray = {},
+		returnValue;
 
 	switch (_parameter) {
 		case 'apexY':
 			if (_value < -200) {
-			  returnArray['pupilSize'] = 'Large';
+			  returnArray.pupilSize = 'Large';
       } else if (_value < -100) {
-			  returnArray['pupilSize'] = 'Medium';
+			  returnArray.pupilSize = 'Medium';
       } else {
-			  returnArray['pupilSize'] = 'Small';
+			  returnArray.pupilSize = 'Small';
       }
 			break;
 
@@ -14779,21 +14780,21 @@ ED.AntSeg.prototype.dependentParameterValues = function(_parameter, _value) {
 					if (this.apexY < -200) {
 					  returnValue = this.apexY;
           } else {
-					  returnArray['apexY'] = -260;
+					  returnArray.apexY = -260;
           }
 					break;
 				case 'Medium':
 					if (this.apexY >= -200 && this.apexY < -100) {
 						returnValue = this.apexY;
 					} else {
-						returnArray['apexY'] = -200;
+						returnArray.apexY = -200;
 					}
 					break;
 				case 'Small':
 					if (this.apexY >= -100) {
 						returnValue = this.apexY;
 					} else {
-						returnArray['apexY'] = -100;
+						returnArray.apexY = -100;
 					}
 					break;
 			}
@@ -14816,6 +14817,11 @@ ED.AntSeg.prototype.draw = function(_point) {
 
 	// Get context
 	var ctx = this.drawing.context;
+	var colAngle;
+	var colAngleOuter;
+	var rimSize;
+	var p1;
+	var p2;
 
 	// Call draw method in superclass
 	ED.AntSeg.superclass.draw.call(this, _point);
@@ -14843,13 +14849,13 @@ ED.AntSeg.prototype.draw = function(_point) {
 	}
 	else {
 		// Angular size of coloboma
-		var colAngle = (Math.PI/3) * 280/ri;
-		var colAngleOuter = Math.PI/6;
-		var rimSize = 20;
+		colAngle = (Math.PI/3) * 280/ri;
+		colAngleOuter = Math.PI/6;
+		rimSize = 20;
 
-		var p1 = new ED.Point(0,0);
+		p1 = new ED.Point(0,0);
 		p1.setWithPolars(ri, Math.PI + colAngle/2);
-		var p2 = new ED.Point(0,0);
+		p2 = new ED.Point(0,0);
 		p2.setWithPolars(ro - rimSize, Math.PI + colAngleOuter/2);
 
 		// Coloboma
@@ -14887,7 +14893,7 @@ ED.AntSeg.prototype.draw = function(_point) {
 	this.drawBoundary(_point);
 
 	// Other paths and drawing here
-	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+	if (this.drawFunctionMode === ED.drawFunctionMode.Draw) {
 		// Pseudo exfoliation
 		if (this.pxe) {
 			ctx.lineWidth = 8;
@@ -14933,7 +14939,9 @@ ED.AntSeg.prototype.draw = function(_point) {
 	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
-	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+	if (this.isSelected && !this.isForDrawing) {
+		this.drawHandles(_point);
+	}
 
 	// Return value indicating successful hit test
 	return this.isClicked;
