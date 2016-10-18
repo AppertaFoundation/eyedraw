@@ -560,7 +560,7 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 			return false;
 		}
 	}
-}
+};
 
 ED.Drawing.prototype.getPositionOfElement = function(element) {
 		var x=0;
@@ -574,7 +574,7 @@ ED.Drawing.prototype.getPositionOfElement = function(element) {
 				element = element.offsetParent;
 		}
 		return [x, y];
-}
+};
 
 /**
  * Carries out initialisation of drawing (called after a controller has been instantiated to ensure notification)
@@ -583,7 +583,7 @@ ED.Drawing.prototype.init = function() {
 	// Start loading of texture images (will send ready notification when ready)
 	/* FIXME */
 	this.preLoadImagesFrom(this.graphicsPath + '/' + 'patterns/');
-}
+};
 
 /**
  * Replaces the canvas element inline with a PNG image, useful for printing
@@ -603,7 +603,7 @@ ED.Drawing.prototype.replaceWithImage = function() {
 	}
 
 	this.canvasParent.appendChild(img);
-}
+};
 
 /**
  * Preloads image files
@@ -619,7 +619,7 @@ ED.Drawing.prototype.preLoadImagesFrom = function(_path) {
 		// This line picked up by javadoc toolkit - @ignore does not work
 		this.imageArray[key].onload = function() {
 			drawing.checkAllLoaded();
-		}
+		};
 
 		// Error handling
 		this.imageArray[key].onerror = (function(key){
@@ -631,7 +631,7 @@ ED.Drawing.prototype.preLoadImagesFrom = function(_path) {
 		// Attempt to load image file
 		this.imageArray[key].src = _path + key + '.gif';
 	}
-}
+};
 
 /**
  * Checks all images are loaded then sends a notification
@@ -659,7 +659,7 @@ ED.Drawing.prototype.checkAllLoaded = function() {
 			this.notify("ready");
 		}
 	}
-}
+};
 
 /**
  * Registers an object to receive notifications
@@ -684,7 +684,7 @@ ED.Drawing.prototype.registerForNotifications = function(_object, _methodName, _
 		methodName: _methodName,
 		notificationList: _notificationList
 	});
-}
+};
 
 /**
  * Unregisters an object for notifications	***TODO*** Need method of identifying objects for this to work
@@ -699,7 +699,7 @@ ED.Drawing.prototype.unRegisterForNotifications = function(_object) {
 	if (index >= 0) {
 		this.notificationArray.splice(index, 1);
 	}
-}
+};
 
 /**
  * Send notifications to all registered objects
@@ -792,7 +792,7 @@ ED.Drawing.prototype.load = function(_doodleSet) {
 ED.Drawing.prototype.save = function() {
 	// Store current data in textArea
 	return '[' + this.json() + ']';
-}
+};
 
 /**
  * Creates string containing drawing data in JSON format
@@ -814,7 +814,7 @@ ED.Drawing.prototype.json = function() {
 	s = s.substring(0, s.length - 1);
 
 	return s;
-}
+};
 
 /**
  * Draws all doodles for this drawing
@@ -862,7 +862,7 @@ ED.Drawing.prototype.drawAllDoodles = function() {
 		// Restore context
 		this.context.restore();
 	}
-}
+};
 
 /**
  * Responds to mouse down event in canvas, cycles through doodles from front to back.
@@ -968,7 +968,7 @@ ED.Drawing.prototype.mousedown = function(_point) {
 		drawing: this,
 		point: _point
 	});
-}
+};
 
 /**
  * Responds to mouse move event in canvas according to the drawing mode
@@ -1336,7 +1336,7 @@ ED.Drawing.prototype.mousemove = function(_point) {
 		// Refresh
 		this.repaint();
 	}
-}
+};
 
 /**
  * Responds to mouse up event in canvas
@@ -1393,7 +1393,7 @@ ED.Drawing.prototype.mouseup = function(_point) {
 
 	// Notify
 	this.notify("mouseup", _point);
-}
+};
 
 /**
  * Responds to mouse out event in canvas, stopping dragging operation
@@ -1406,7 +1406,7 @@ ED.Drawing.prototype.mouseover = function(_point) {
 
 	// Notify
 	this.notify("mouseover", _point);
-}
+};
 
 /**
  * Responds to mouse out event in canvas, stopping dragging operation
@@ -1438,7 +1438,7 @@ ED.Drawing.prototype.mouseout = function(_point) {
 
 	// Notify
 	this.notify("mouseout", _point);
-}
+};
 
 /**
  * Responds to key down event in canvas
@@ -1706,7 +1706,7 @@ ED.Drawing.prototype.moveToFront = function() {
 
 	// Notify
 	this.notify("moveToFront");
-}
+};
 
 /**
  * Moves selected doodle to back
@@ -1739,7 +1739,7 @@ ED.Drawing.prototype.moveToBack = function() {
 
 	// Notify
 	this.notify("moveToBack");
-}
+};
 
 /**
  * Moves a doodle next to the first doodle of the passed class name
@@ -1782,7 +1782,7 @@ ED.Drawing.prototype.moveNextTo = function(_doodle, _className, _inFront) {
 			return a.order - b.order
 		});
 	}
-}
+};
 
 /**
  * Flips the doodle around a vertical axis
@@ -1799,7 +1799,7 @@ ED.Drawing.prototype.flipVer = function() {
 
 	// Notify
 	this.notify("flipVer");
-}
+};
 
 /**
  * Flips the doodle around a horizontal axis
@@ -1816,7 +1816,7 @@ ED.Drawing.prototype.flipHor = function() {
 
 	// Notify
 	this.notify("flipHor");
-}
+};
 
 /**
  * Deletes a doodle
@@ -1920,7 +1920,7 @@ ED.Drawing.prototype.deleteDoodle = function(_doodle, really) {
 	} else {
 		ED.errorHandler('ED.Drawing', 'deleteDoodle', errorMessage);
 	}
-}
+};
 
 
 /**
@@ -1944,7 +1944,7 @@ ED.Drawing.prototype.deleteSelectedDoodle = function() {
 				}
 		}
 		 */
-}
+};
 
 /**
  * Resets the eyedraw canvas completely including any related form inputs
@@ -1984,7 +1984,7 @@ ED.Drawing.prototype.resetEyedraw = function() {
 	this.deselectDoodles();
 
 	this.addBindings(this.bindingArray);
-}
+};
 
 /**
  * Set the scale level for drawing and all doodles
@@ -2053,7 +2053,7 @@ ED.Drawing.prototype.setSelectedDoodle = function(_element, _property) {
 	} else {
 		ED.errorHandler('ED.Drawing', 'setSelectedDoodle', 'Attempt to set a property on the selected doodle, when none selected');
 	}
-}
+};
 
 /**
  * Deletes doodle with selected id
@@ -2066,7 +2066,7 @@ ED.Drawing.prototype.deleteDoodleOfId = function(_id) {
 	} else {
 		ED.errorHandler('ED.Drawing', 'deleteDoodleOfId', 'Attempt to delete doodle with invalid id');
 	}
-}
+};
 
 /**
  * Locks selected doodle
@@ -2078,7 +2078,7 @@ ED.Drawing.prototype.lock = function() {
 		this.notify("doodleLocked");
 		this.repaint();
 	}
-}
+};
 
 /**
  * Unlocks all doodles
@@ -2091,7 +2091,7 @@ ED.Drawing.prototype.unlock = function() {
 	this.notify("doodleUnlocked");
 	// Refresh canvas
 	this.repaint();
-}
+};
 
 /**
  * Toggle doodle help text
@@ -2119,7 +2119,7 @@ ED.Drawing.prototype.deselectDoodles = function() {
 
 	// Refresh drawing
 	this.repaint();
-}
+};
 
 /**
  * Use scroll to select next doodle in array (From an idea of Adrian Duke)
@@ -2176,7 +2176,7 @@ ED.Drawing.prototype.selectNextDoodle = function(_value) {
 		// Refresh drawing
 		this.repaint();
 	}
-}
+};
 
 /**
  * Sets a doodle as selected
@@ -2197,7 +2197,7 @@ ED.Drawing.prototype.setDoodleAsSelected = function(_doodleId) {
 		var doodle = this.doodleArray[selectedIndex];
 		this.selectDoodle(doodle);
 	}
-}
+};
 
 /**
  * Mark a doodle as selected
@@ -2230,7 +2230,7 @@ ED.Drawing.prototype.isReady = function() {
 	if (this.convertToImage) {
 		this.replaceWithImage();
 	}
-}
+};
 
 /**
  * Adds a doodle to the array
@@ -2392,7 +2392,7 @@ ED.Drawing.prototype.addDoodle = function(_className, _parameterDefaults, _param
 		ED.errorHandler('ED.Drawing', 'addDoodle', 'Attempt to add a second unique doodle of class ' + _className);
 		return null;
 	}
-}
+};
 
 /**
  * Takes array of bindings, and adds them to the corresponding doodles. Adds an event listener to create a doodle if it does not exist
@@ -2437,7 +2437,7 @@ ED.Drawing.prototype.addBindings = function(_bindingArray) {
 			}
 		}
 	}
-}
+};
 
 /**
  * Takes an array of key value pairs and adds them to the boundElementDeleteValueArray
@@ -2448,7 +2448,7 @@ ED.Drawing.prototype.addDeleteValues = function(_deleteValuesArray) {
 	for (elementId in _deleteValuesArray) {
 		this.boundElementDeleteValueArray[elementId] = _deleteValuesArray[elementId];
 	}
-}
+};
 
 /**
  * Called by events attached to HTML elements such as <input>
@@ -2566,7 +2566,7 @@ ED.Drawing.prototype.eventHandler = function(_type, _doodleId, _className, _elem
 		default:
 			break;
 	}
-}
+};
 
 /**
  * Updates value of bound elements to the selected doodle. Called by methods which change parameter values
@@ -2637,7 +2637,7 @@ ED.Drawing.prototype.updateBindings = function(_doodle) {
 		// Since moving updateBindings method, this is no longer an error
 		//ED.errorHandler('ED.Drawing', 'updateBindings', 'Attempt to update bindings on null doodle');
 	}
-}
+};
 
 /**
  * Test if doodle of a class exists in drawing
@@ -2656,7 +2656,7 @@ ED.Drawing.prototype.hasDoodleOfClass = function(_className) {
 	}
 
 	return returnValue;
-}
+};
 
 /** Counts number of doodles of passed class
  *
@@ -2674,7 +2674,7 @@ ED.Drawing.prototype.numberOfDoodlesOfClass = function(_className) {
 	}
 
 	return returnValue;
-}
+};
 
 /**
  * Returns first doodle of the passed className, or false if does not exist
@@ -2694,7 +2694,7 @@ ED.Drawing.prototype.firstDoodleOfClass = function(_className) {
 	}
 
 	return returnValue;
-}
+};
 
 
 /**
@@ -2715,7 +2715,7 @@ ED.Drawing.prototype.lastDoodleOfClass = function(_className) {
 	}
 
 	return returnValue;
-}
+};
 
 /**
  * Returns all doodles of the passed className
@@ -2734,7 +2734,7 @@ ED.Drawing.prototype.allDoodlesOfClass = function(_className) {
 	}
 
 	return returnValue;
-}
+};
 
 /**
  * Sets a parameter value for all doodles of this class
@@ -2757,7 +2757,7 @@ ED.Drawing.prototype.setParameterValueForClass = function(_parameter, _value, _c
 
 	// Refresh drawing
 	this.repaint();
-}
+};
 
 /**
  * Returns the doodle with the corresponding id
@@ -2777,7 +2777,7 @@ ED.Drawing.prototype.doodleOfId = function(_id) {
 	}
 
 	return doodle;
-}
+};
 
 /**
  * Deletes all doodles that are deletable
@@ -2790,7 +2790,7 @@ ED.Drawing.prototype.deleteAllDoodles = function(really_all) {
 			this.deleteDoodle(this.doodleArray[i],really_all);
 		}
 	}
-}
+};
 
 /**
  * Deletes doodles of one class from the drawing
@@ -2805,7 +2805,7 @@ ED.Drawing.prototype.deleteDoodlesOfClass = function(_className) {
 			this.deleteDoodle(this.doodleArray[i],false);
 		}
 	}
-}
+};
 
 /**
  * Updates a doodle with a new value of a parameter ***TODO** These two methods need updating with new notification system
@@ -2825,7 +2825,7 @@ ED.Drawing.prototype.setParameterForDoodle = function(_doodle, _parameter, _valu
 	// Save to hidden input, if exists, and refresh drawing
 	if (typeof(this.saveToInputElement) != 'undefined') this.saveToInputElement();
 	this.repaint();
-}
+};
 
 /**
  * Updates a doodle of class with a vew value of a parameter. Use if only one member of a class exists
@@ -2844,7 +2844,7 @@ ED.Drawing.prototype.setParameterForDoodleOfClass = function(_className, _parame
 	// Save to hidden input, if exists, and refresh drawing
 	if (typeof(this.saveToInputElement) != 'undefined') this.saveToInputElement();
 	this.repaint();
-}
+};
 
 /**
  * Returns the total extent in degrees covered by doodles of the passed class
@@ -2867,7 +2867,7 @@ ED.Drawing.prototype.totalDegreesExtent = function(_class) {
 	if (degrees > 360) degrees = 360;
 
 	return degrees;
-}
+};
 
 /**
  * Suppresses reporting for all doodles currently in drawing.
@@ -2877,7 +2877,7 @@ ED.Drawing.prototype.suppressReports = function() {
 	for (var i = 0; i < this.doodleArray.length; i++) {
 		this.doodleArray[i].willReport = false;
 	}
-}
+};
 
 /**
  * Returns a string containing a description of the drawing
@@ -2888,9 +2888,6 @@ ED.Drawing.prototype.report = function() {
 	var returnString = "";
 	var groupArray = [];
 	var groupEndArray = [];
-	if(this.doodleArray.length === 3){
-		console.log(this.doodleArray[2]);
-	}
 
 	// Go through every doodle
 	for (var i = 0; i < this.doodleArray.length; i++) {
@@ -2992,7 +2989,7 @@ ED.Drawing.prototype.diagnosis = function() {
 	}
 
 	return returnCodes;
-}
+};
 
 /**
  * Changes value of eye
@@ -3006,7 +3003,7 @@ ED.Drawing.prototype.setEye = function(_eye) {
 
 	// Refresh drawing
 	this.repaint();
-}
+};
 
 /**
  * Clears canvas and sets context
@@ -3022,7 +3019,7 @@ ED.Drawing.prototype.clear = function() {
 	this.context.translate(this.canvas.width / 2, this.canvas.height / 2);
 
 	this.context.scale(this.scale, this.scale);
-}
+};
 
 /**
  * Clears canvas and draws all doodles
@@ -3084,7 +3081,7 @@ ED.Drawing.prototype.repaint = function() {
 
 	// Notify
 	this.notify("drawingRepainted");
-}
+};
 
 /**
  * Calculates angle between three points (clockwise from _pointA to _pointB in radians)
@@ -3100,7 +3097,7 @@ ED.Drawing.prototype.innerAngle = function(_pointA, _pointM, _pointB) {
 	var b = new ED.Point(_pointB.x - _pointM.x, _pointB.y - _pointM.y);
 
 	return a.clockwiseAngleTo(b);
-}
+};
 
 /**
  * Toggles drawing state for drawing points in line
@@ -3115,7 +3112,7 @@ ED.Drawing.prototype.togglePointInLine = function() {
 		this.newPointOnClick = true;
 		this.completeLine = false;
 	}
-}
+};
 
 /**
  * Generates a numeric id guaranteed to be unique for the lifetime of the drawing object
@@ -3125,7 +3122,7 @@ ED.Drawing.prototype.togglePointInLine = function() {
  */
 ED.Drawing.prototype.nextDoodleId = function() {
 	return this.lastDoodleId++;
-}
+};
 
 ED.Drawing.prototype.getScaleLevel = function() {
 	return this.globalScaleFactor;
@@ -40581,12 +40578,12 @@ ED.SidePort = function(_drawing, _parameterJSON) {
 	
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
-}
+};
 
 /**
  * Sets superclass and constructor
  */
-ED.SidePort.prototype = new ED.Doodle;
+ED.SidePort.prototype = new ED.Doodle();
 ED.SidePort.prototype.constructor = ED.SidePort;
 ED.SidePort.superclass = ED.Doodle.prototype;
 
@@ -40598,14 +40595,14 @@ ED.SidePort.prototype.setPropertyDefaults = function() {
 	this.isMoveable = false;
 	this.isRotatable = true;
 	this.isArcSymmetrical = true;
-}
+};
 
 /**
  * Sets default parameters
  */
 ED.SidePort.prototype.setParameterDefaults = function() {
 	this.setRotationWithDisplacements(90, 180);
-}
+};
 
 /**
  * Draws doodle or performs a hit test if a Point parameter is passed
@@ -40654,7 +40651,7 @@ ED.SidePort.prototype.draw = function(_point) {
 
 	// Return value indicating successful hittest
 	return this.isClicked;
-}
+};
 
 /**
  * Returns a string containing a text description of the doodle
@@ -40663,7 +40660,7 @@ ED.SidePort.prototype.draw = function(_point) {
  */
 ED.SidePort.prototype.groupDescription = function() {
 	return "Sideport at ";
-}
+};
 
 /**
  * Returns a string containing a text description of the doodle
@@ -40672,7 +40669,7 @@ ED.SidePort.prototype.groupDescription = function() {
  */
 ED.SidePort.prototype.description = function() {
 	return this.clockHour();
-}
+};
 
 /**
  * Returns a string containing a text description of the doodle
@@ -40681,7 +40678,7 @@ ED.SidePort.prototype.description = function() {
  */
 ED.SidePort.prototype.groupDescriptionEnd = function() {
 	return " o'clock";
-}
+};
 
 /**
  * OpenEyes
