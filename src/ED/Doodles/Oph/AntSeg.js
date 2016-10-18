@@ -141,14 +141,14 @@ ED.AntSeg.prototype.setPropertyDefaults = function() {
   this.parameterValidationArray.cells = {
     kind: 'other',
     type: 'string',
-    list: ['+', '++', '+++'],
+    list: ['+', '++', '+++', '++++'],
     animate: false
   };
 
 	this.parameterValidationArray.flare = {
 		kind: 'other',
 		type: 'string',
-		list: ['+', '++', '+++'],
+		list: ['+', '++', '+++', '++++'],
 		animate: false
 	};
 };
