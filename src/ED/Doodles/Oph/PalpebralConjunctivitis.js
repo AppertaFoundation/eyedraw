@@ -56,6 +56,7 @@ ED.PalpebralConjunctivitis.prototype.setPropertyDefaults = function() {
 	this.isUnique = true;
 	this.isMoveable = false;
 	this.isRotatable = false;
+	this.addAtBack = true;
 	
 	// Validation arrays for other parameters
 	this.parameterValidationArray['type'] = {

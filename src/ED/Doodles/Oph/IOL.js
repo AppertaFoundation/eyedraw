@@ -62,6 +62,10 @@ ED.IOL.prototype.setPropertyDefaults = function() {
 	this.addAtBack = this.type == 'PC'?true:false;
 	this.isUnique = true;
 	
+	// Update component of validation array for simple parameters
+	this.parameterValidationArray['originX']['range'].setMinAndMax(-125, +125);
+	this.parameterValidationArray['originY']['range'].setMinAndMax(-125, +125);
+	
 	// Validation arrays for derived and other parameters
 	this.parameterValidationArray['type'] = {
 		kind: 'other',

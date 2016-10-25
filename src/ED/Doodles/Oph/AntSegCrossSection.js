@@ -102,7 +102,10 @@ ED.AntSegCrossSection.prototype.dependentParameterValues = function(_parameter, 
 		case 'apexY':
 			// ***TOSDP*** Putting this here will cancel out any saved value of apexX
 			// Set apexX and its limits for apexX according to value of apexY (prevents collisions with cornea and lens)
-			this.parameterValidationArray['apexX']['range'].setMinAndMax(-40 - (140 / 220) * (this.apexY + 280), 32 - (72 / 220) * (this.apexY + 280));
+				/// MSC: Max position dependent on lens type present
+			var biologicalLens = this.drawing.lastDoodleOfClass('LensCrossSection');
+			var maxApexX = (biologicalLens) ? 32 - (72 / 220) * (this.apexY + 280) : 25;
+			this.parameterValidationArray['apexX']['range'].setMinAndMax(-40 - (140 / 220) * (this.apexY + 280), maxApexX);
 
 			// If being synced, make sensible decision about x
 			if (!this.drawing.isActive) {

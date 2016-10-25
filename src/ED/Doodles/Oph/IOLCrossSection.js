@@ -75,7 +75,7 @@ ED.IOLCrossSection.prototype.draw = function(_point) {
 	var h = 240;
 
 	// Arbitrary radius of curvature
-	var r = 300;
+	var r = 420;
 
 	// Displacement of lens from centre
 	var ld = 100;
@@ -95,55 +95,68 @@ ED.IOLCrossSection.prototype.draw = function(_point) {
 	// Lens
 	ctx.beginPath();
 
-	// Draw lens with two sections of circumference of circle
+	// Draw invisible boundary around lens bag with two sections of circumference of circle
 	ctx.arc(ld - x, 0, r, theta, -theta, true);
 	ctx.arc(ld + x, 0, r, Math.PI + theta, Math.PI - theta, true);
-
-	// Draw it
-	ctx.stroke();
 
 	// Set line attributes
 	ctx.lineWidth = 4;
 	ctx.fillStyle = "rgba(255, 255, 255, 0)";
-	ctx.strokeStyle = "gray";
+	ctx.strokeStyle = "rgba(255, 255, 255, 0)";
 
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 
 	// Non boundary drawing
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
-		// Nucleus
-/*
+		// Lens bag
 		ctx.beginPath();
-		ctx.moveTo(ld, rn * Math.sin(phi));
-		ctx.arc(ld - x, 0, rn, phi, -phi, true);
-		ctx.arc(ld + x, 0, rn, Math.PI + phi, Math.PI - phi, true);
-		ctx.strokeStyle = "rgba(220, 220, 220, 0.75)";
+		ctx.arc(ld - x, 0, r, theta, -theta, true);
+		ctx.arc(ld + x, 0, r, Math.PI + theta, Math.PI + 0.6*theta, true);
+		ctx.moveTo(ld, 240);
+		ctx.arc(ld + x, 0, r, Math.PI - theta, Math.PI - 0.6*theta, false);
+		ctx.strokeStyle = "gray";
 		ctx.stroke();
-*/
 
+		// Lens
+		ctx.beginPath();
+		ctx.ellipse(100, 0, 160, 20, 0.5 * Math.PI, 0, 2 * Math.PI);
+		ctx.strokeStyle = "rgba(0, 0, 0, 0.7)";
+		ctx.lineWidth = 5;
+		ctx.stroke();
+		
+		// Loops
+		ctx.beginPath();
+// 		ctx.moveTo(80,0);
+		ctx.ellipse(100, 0, 227, 20, 0.5 * Math.PI, 0.5 * Math.PI, 1.2 * Math.PI);
+		ctx.moveTo(120,0);
+		ctx.ellipse(100, 0, 227, 20, 0.5 * Math.PI, 1.5 * Math.PI, 0.2 * Math.PI);
+		ctx.strokeStyle = "rgba(0, 0, 0, 0.6)";
+		ctx.stroke();
+		
+		
 		// Zonules
 		ctx.beginPath();
 
 		// Top zonules
 		ctx.moveTo(44 - this.originX + 80, -this.originY - 349);
-		ctx.lineTo(64, -207);
+		ctx.lineTo(80, -207);
 		ctx.moveTo(44 - this.originX + 80, -this.originY - 349);
-		ctx.lineTo(138, -207);
+		ctx.lineTo(120, -207);
 		ctx.moveTo(44 - this.originX + 120, -this.originY - 349);
-		ctx.lineTo(64, -207);
+		ctx.lineTo(80, -207);
 		ctx.moveTo(44 - this.originX + 120, -this.originY - 349);
-		ctx.lineTo(138, -207);
+		ctx.lineTo(120, -207);
 
 		// Bottom zonules
 		ctx.moveTo(44 - this.originX + 80, -this.originY + 349);
-		ctx.lineTo(64, 207);
+		ctx.lineTo(80, 207);
 		ctx.moveTo(44 - this.originX + 80, -this.originY + 349);
-		ctx.lineTo(138, 207);
+		ctx.lineTo(120, 207);
 		ctx.moveTo(44 - this.originX + 120, -this.originY + 349);
-		ctx.lineTo(64, 207);
+		ctx.lineTo(80, 207);
 		ctx.moveTo(44 - this.originX + 120, -this.originY + 349);
-		ctx.lineTo(138, 207);
+		ctx.lineTo(120, 207);
 
 		ctx.lineWidth = 2;
 		ctx.strokeStyle = "gray";

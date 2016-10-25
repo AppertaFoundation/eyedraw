@@ -28,9 +28,17 @@ ED.PCIOL = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "PCIOL";
 
+	// Other parameters
+	this.fixation = 'In-the-bag';
+	this.fx = 1;
+	
 	// Saved parameters
-	this.savedParameterArray = ['originX', 'originY', 'rotation'];
+	this.savedParameterArray = ['fixation', 'fx', 'originX', 'originY', 'rotation'];
 
+	// Parameters in doodle control bar
+	this.controlParameterArray = {'fixation':'Fixation'};
+
+	
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 
@@ -60,6 +68,56 @@ ED.PCIOL.prototype.setPropertyDefaults = function() {
 	this.addAtBack = true;
 	this.isScaleable = false;
 	this.isUnique = true;
+	
+	// Validation arrays for other parameters
+	this.parameterValidationArray['fixation'] = {
+		kind: 'derived',
+		type: 'string',
+		list: ['In-the-bag', 'Ciliary sulcus'],
+		animate: true
+	};
+	this.parameterValidationArray['fx'] = {
+		kind: 'other',
+		type: 'int',
+		range: [1, 2],
+		animate: false
+	};
+	
+	// Update component of validation array for simple parameters
+	this.parameterValidationArray['originX']['range'].setMinAndMax(-200, +200);
+	this.parameterValidationArray['originY']['range'].setMinAndMax(-200, +200);
+}
+
+/**
+ * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
+ * The returned parameters are animated if their 'animate' property is set to true
+ *
+ * @param {String} _parameter Name of parameter that has changed
+ * @value {Undefined} _value Value of parameter to calculate
+ * @returns {Array} Associative array of values of dependent parameters
+ */
+ED.PCIOL.prototype.dependentParameterValues = function(_parameter, _value) {
+	var returnArray = new Array();
+
+	switch (_parameter) {
+		case 'fx':
+			if (_value === 2) returnArray['fixation'] = 'Ciliary sulcus';
+			else returnArray['fixation'] = 'In-the-bag';
+			break;
+
+		case 'fixation':
+			switch (_value) {
+				case 'In-the-bag':
+					returnArray['fx'] = 1;
+					break;
+				case 'Ciliary sulcus':
+					returnArray['fx'] = 2;
+					break;
+			}
+			break;
+	}
+
+	return returnArray;
 }
 
 /**
@@ -130,6 +188,7 @@ ED.PCIOL.prototype.draw = function(_point) {
  */
 ED.PCIOL.prototype.description = function() {
 	var returnValue = "Posterior chamber IOL";
+	returnValue += " (" + this.fixation + " fixation)";
 
 	// Displacement limit
 	var limit = 40;

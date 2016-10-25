@@ -125,7 +125,8 @@ ED.CorneaCrossSection.prototype.dependentParameterValues = function(_parameter, 
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.CorneaCrossSection.prototype.draw = function(_point) {console.log(this.apexX, this.apexY);
+ED.CorneaCrossSection.prototype.draw = function(_point) {
+// 	console.log(this.apexX, this.apexY);
 	// Get context
 	var ctx = this.drawing.context;
 

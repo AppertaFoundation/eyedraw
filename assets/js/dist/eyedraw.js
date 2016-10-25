@@ -12898,6 +12898,10 @@ ED.ACIOL.prototype.setHandles = function() {
 ED.ACIOL.prototype.setPropertyDefaults = function() {
 	this.isScaleable = false;
 	this.isUnique = true;
+	
+	// Update component of validation array for simple parameters
+	this.parameterValidationArray['originX']['range'].setMinAndMax(-200, +200);
+	this.parameterValidationArray['originY']['range'].setMinAndMax(-200, +200);
 }
 
 /**
@@ -13015,6 +13019,119 @@ ED.ACIOL.prototype.description = function() {
 	if (displacementValue.length > 0) returnValue += " displaced" + displacementValue;
 
 	return returnValue;
+}
+
+/**
+ * OpenEyes
+ *
+ * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
+ * (C) OpenEyes Foundation, 2011-2013
+ * This file is part of OpenEyes.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package OpenEyes
+ * @link http://www.openeyes.org.uk
+ * @author OpenEyes <info@openeyes.org.uk>
+ * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
+ * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ */
+
+/**
+ * AC IOL Cross Section
+ *
+ * @class ACIOLCrossSection
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Object} _parameterJSON
+ */
+ED.ACIOLCrossSection = function(_drawing, _parameterJSON) {
+	// Set classname
+	this.className = "ACIOLCrossSection";
+	
+	// Saved parameters
+	this.savedParameterArray = [];
+
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _parameterJSON);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.ACIOLCrossSection.prototype = new ED.Doodle;
+ED.ACIOLCrossSection.prototype.constructor = ED.ACIOLCrossSection;
+ED.ACIOLCrossSection.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets default dragging attributes
+ */
+ED.ACIOLCrossSection.prototype.setPropertyDefaults = function() {
+	this.isUnique = true;
+	this.addAtBack = true;
+	
+	// Update component of validation array for simple parameters
+	this.parameterValidationArray['originX']['range'].setMinAndMax(-220, -100);
+	this.parameterValidationArray['originY']['range'].setMinAndMax(-140, +140);
+}
+
+/**
+ * Sets default parameters (Only called for new doodles)
+ * Use the setParameter function for derived parameters, as this will also update dependent variables
+ */
+ED.ACIOLCrossSection.prototype.setParameterDefaults = function() {
+	this.originX = -140;
+}
+
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.ACIOLCrossSection.prototype.draw = function(_point) {
+	// Get context
+	var ctx = this.drawing.context;
+
+	// Call draw method in superclass
+	ED.ACIOLCrossSection.superclass.draw.call(this, _point);
+
+	// Draw lens
+	ctx.beginPath();
+	ctx.ellipse(100, 0, 160, 20, 0.5 * Math.PI, 0, 2 * Math.PI);
+
+	// Set line attributes
+	ctx.lineWidth = 5;
+	ctx.fillStyle = "rgba(255, 255, 255, 0.75)";
+	ctx.strokeStyle = "#898989";
+
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+
+	// Non boundary drawing
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+
+		// Loops
+		ctx.beginPath();
+		ctx.arc(10 - this.originX, -310 - this.originY, 10, 0*Math.PI, 1*Math.PI, false);
+		ctx.moveTo(5 - this.originX, -310 - this.originY);
+		ctx.bezierCurveTo(80 - this.originX, -300 - this.originY, 70, -220, 100, -160);
+		ctx.moveTo(40 - this.originX, 300 - this.originY);
+		ctx.arc(10 - this.originX, 310 - this.originY, 10, 0, 1*Math.PI, true);
+		ctx.moveTo(5 - this.originX, 310 - this.originY);
+		ctx.bezierCurveTo(80 - this.originX, 300 - this.originY, 70, 220, 100, 160);
+		ctx.strokeStyle = "#898989";
+		ctx.stroke();
+
+	}
+
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+
+	// Return value indicating successful hittest
+	return this.isClicked;
 }
 
 /**
@@ -14925,7 +15042,10 @@ ED.AntSegCrossSection.prototype.dependentParameterValues = function(_parameter, 
 		case 'apexY':
 			// ***TOSDP*** Putting this here will cancel out any saved value of apexX
 			// Set apexX and its limits for apexX according to value of apexY (prevents collisions with cornea and lens)
-			this.parameterValidationArray['apexX']['range'].setMinAndMax(-40 - (140 / 220) * (this.apexY + 280), 32 - (72 / 220) * (this.apexY + 280));
+				/// MSC: Max position dependent on lens type present
+			var biologicalLens = this.drawing.lastDoodleOfClass('LensCrossSection');
+			var maxApexX = (biologicalLens) ? 32 - (72 / 220) * (this.apexY + 280) : 25;
+			this.parameterValidationArray['apexX']['range'].setMinAndMax(-40 - (140 / 220) * (this.apexY + 280), maxApexX);
 
 			// If being synced, make sensible decision about x
 			if (!this.drawing.isActive) {
@@ -19061,7 +19181,8 @@ ED.CorneaCrossSection.prototype.dependentParameterValues = function(_parameter, 
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.CorneaCrossSection.prototype.draw = function(_point) {console.log(this.apexX, this.apexY);
+ED.CorneaCrossSection.prototype.draw = function(_point) {
+// 	console.log(this.apexX, this.apexY);
 	// Get context
 	var ctx = this.drawing.context;
 
@@ -20252,7 +20373,7 @@ ED.CornealOedema.prototype.description = function() {
  */
 
 /**
- * The anterior segment
+ * TODO: infiltrate control point definitions 
  *
  * @class CornealOpacity
  * @property {String} className Name of doodle subclass
@@ -20264,11 +20385,29 @@ ED.CornealOpacity = function(_drawing, _parameterJSON) {
 	this.className = "CornealOpacity";
 
 	// Private parameters
-	this.numberOfHandles = 6;
-	this.initialRadius = 80;
+	this.numberOfHandles = 4;
+	this.initialRadius = 81;
+	this.resetWidth = true;
+	this.resetHeight = true;
+	this.resetInfiltrate = true;
+	this.yMidPoint = 0
+	
+	// Other parameters
+	this.height = Math.round(this.initialRadius * 2 / 54);
+	this.width = Math.round(this.initialRadius * 2 / 54);
+	this.depth = 33;
+	this.infiltrateWidth = 0;
+	
+	this.h = Math.round(this.initialRadius * 2 / 54);
+	this.w = Math.round(this.initialRadius * 2 / 54);
+	this.d = 33;
+	this.iW = 0;
 
 	// Saved parameters
-	this.savedParameterArray = ['originX', 'originY', 'rotation'];
+	this.savedParameterArray = ['originX', 'originY', 'rotation', 'height', 'width', 'depth', 'infiltrateWidth','h','w','d','iW','yMidPoint'];
+	
+	// Parameters in doodle control bar
+	this.controlParameterArray = {'height':'Height', 'width':'Width', 'depth':'Depth (%)', 'infiltrateWidth':'Infiltrate width'};
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -20289,9 +20428,15 @@ ED.CornealOpacity.prototype.setHandles = function() {
 	for (var i = 0; i < this.numberOfHandles; i++) {
 		this.handleArray[i] = new ED.Doodle.Handle(null, true, ED.Mode.Handles, false);
 	}
+/*
+	for (var i = 0; i < this.numberOfHandles; i++) {
+		this.handleArray[i+this.numberOfHandles] = new ED.Doodle.Handle(null, true, ED.Mode.Handles, false);
+	}
+*/
 
 	// Allow top handle to rotate doodle
-	this.handleArray[0].isRotatable = true;
+	/// ? Removed as need specific handles to be along X and Y axis - can change... **TODO**
+// 	this.handleArray[0].isRotatable = true;
 }
 
 /**
@@ -20305,15 +20450,156 @@ ED.CornealOpacity.prototype.setPropertyDefaults = function() {
 		var cir = 2 * Math.PI;
 
 		// Create a range object for each handle
-		/// **TODO: Ideally relative to canvas centre, not doodle - when update originX or originY
+		/// **TODO**: Ideally relative to canvas centre, not doodle - when update originX or originY
 		var n = this.numberOfHandles;
 		var range = new Object;
-		range.length = new ED.Range(+50, +290);
+		range.length = new ED.Range(+50, +380);
 		range.angle = new ED.Range((((2 * n - 1) * cir / (2 * n)) + i * cir / n) % cir, ((1 * cir / (2 * n)) + i * cir / n) % cir);
 		this.handleVectorRangeArray[i] = range;
 	}
+/*
+	for (var i = 0; i < this.numberOfHandles; i++) {
+		// Full circle in radians
+		var cir = 2 * Math.PI;
+
+		// Create a range object for each handle
+		/// **TODO**: Ideally relative to canvas centre, not doodle - when update originX or originY
+		var n = this.numberOfHandles;
+		var range = new Object;
+		range.length = new ED.Range(+50, +380);
+		range.angle = new ED.Range((((2 * n - 1) * cir / (2 * n)) + i * cir / n) % cir, ((1 * cir / (2 * n)) + i * cir / n) % cir);
+		this.handleVectorRangeArray[i+n] = range;
+	}
+*/
 	
-	// Create ranges to constrain origin
+	// Update component of validation array for simple parameters
+	this.parameterValidationArray['originX']['range'].setMinAndMax(-350, +350);
+	this.parameterValidationArray['originY']['range'].setMinAndMax(-350, +350);
+	
+	// Validation arrays for other parameters
+	this.parameterValidationArray['height'] = {
+		kind: 'other',
+		type: 'int',
+		range: new ED.Range(1, 14),
+		precision: 1,
+		animate: false
+	};
+	this.parameterValidationArray['width'] = {
+		kind: 'other',
+		type: 'int',
+		range: new ED.Range(1, 14),
+		precision: 1,
+		animate: false
+	};
+	this.parameterValidationArray['depth'] = {
+		kind: 'other',
+		type: 'int',
+		range: new ED.Range(1, 100),
+		precision: 1,
+		animate: false
+	};
+	this.parameterValidationArray['infiltrateWidth'] = {
+		kind: 'other',
+		type: 'int',
+		range: new ED.Range(0, 15),
+		precision: 1,
+		animate: false
+	};
+	this.parameterValidationArray['h'] = {
+		kind: 'other',
+		type: 'int',
+		range: [1, 14],
+		animate: false
+	};
+	this.parameterValidationArray['w'] = {
+		kind: 'other',
+		type: 'int',
+		range: [1, 14],
+		animate: false
+	};this.parameterValidationArray['iW'] = {
+		kind: 'other',
+		type: 'int',
+		range: [0, 15],
+		animate: false
+	};
+	this.parameterValidationArray['d'] = {
+		kind: 'other',
+		type: 'int',
+		range: [1, 100],
+		animate: false
+	};
+	this.parameterValidationArray['resetWidth'] = {
+		kind: 'derived',
+		type: 'bool',
+		display: false
+	};
+	this.parameterValidationArray['resetHeight'] = {
+		kind: 'derived',
+		type: 'bool',
+		display: false
+	};
+	this.parameterValidationArray['resetInfiltrate'] = {
+		kind: 'derived',
+		type: 'bool',
+		display: false
+	};
+	this.parameterValidationArray['yMidPoint'] = {
+		kind: 'simple',
+		type: 'int',
+		range: [-500, +500],
+		animate: false
+	};
+}
+
+/**
+ * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
+ * The returned parameters are animated if their 'animate' property is set to true
+ *
+ * @param {String} _parameter Name of parameter that has changed
+ * @value {Undefined} _value Value of parameter to calculate
+ * @returns {Array} Associative array of values of dependent parameters
+ */
+ED.CornealOpacity.prototype.dependentParameterValues = function(_parameter, _value) {
+	var returnArray = new Array();
+
+	switch (_parameter) {
+		case 'width':
+			returnArray['resetWidth'] = true;
+			returnArray['w'] = parseInt(_value);
+			break;
+
+		case 'height':
+			returnArray['resetHeight'] = true;
+			returnArray['h'] = parseInt(_value);
+			break;
+			
+		case 'infiltrateWidth':
+			returnArray['resetInfiltrate'] = true;
+			returnArray['iW'] = parseInt(_value);
+			break;
+		
+		case 'depth':
+			returnArray['d'] = parseInt(_value);
+			break;
+			
+		case 'h':
+			returnArray['height'] = _value;
+			break;
+		
+		case 'd':
+			returnArray['depth'] = _value;
+			break;
+			
+		case 'w':
+			returnArray['width'] = _value;
+			break;
+		
+		case 'iW':
+			returnArray['infiltrateWidth'] = _value;
+			break;
+	}
+
+	return returnArray;
 }
 
 /**
@@ -20322,10 +20608,10 @@ ED.CornealOpacity.prototype.setPropertyDefaults = function() {
 ED.CornealOpacity.prototype.setParameterDefaults = function() {
 	var doodle = this.drawing.lastDoodleOfClass(this.className);
 	if (doodle) {
-		var np = new ED.Point(doodle.originX + 100, 0);
+		var np = new ED.Point(doodle.originX + 100, 1);
 		this.move(np.x, np.y);
 	} else {
-		this.move(0, 0);
+		this.move(100, 1);
 	}
 
 	// Create a squiggle to store the handles points
@@ -20335,6 +20621,11 @@ ED.CornealOpacity.prototype.setParameterDefaults = function() {
 	this.squiggleArray.push(squiggle);
 
 	// Populate with handles at equidistant points around circumference
+	for (var i = 0; i < this.numberOfHandles; i++) {
+		var point = new ED.Point(0, 0);
+		point.setWithPolars(this.initialRadius, i * 2 * Math.PI / this.numberOfHandles);
+		this.addPointToSquiggle(point);
+	}
 	for (var i = 0; i < this.numberOfHandles; i++) {
 		var point = new ED.Point(0, 0);
 		point.setWithPolars(this.initialRadius, i * 2 * Math.PI / this.numberOfHandles);
@@ -20365,7 +20656,88 @@ ED.CornealOpacity.prototype.draw = function(_point) {
 
 	// Angle of control point from radius line to point (this value makes path a circle Math.PI/12 for 8 points
 	var phi = 2 * Math.PI / (3 * this.numberOfHandles);
+	
+	// Time intervals along bezier curve
+	var T = [0.0,0.125,0.25,0.375,0.50,0.625,0.75,0.875,1];
+	
+	// If inputted a dimension, reset pointsArray, 
+	// otherwise recalculate dimension
+	var minY = '';
+	var maxY = '';
+	if (this.resetWidth) {
+		this.squiggleArray[0].pointsArray[1].x = 0.5 * this.width * 54;
+		this.squiggleArray[0].pointsArray[3].x = 0.5 * this.width * -54;
 
+		this.resetWidth = false;
+	}
+	else {
+		/// solve bezier to find min and max point along axis
+		var maxX = '';
+        var minX = '';
+        var squiggle = this.squiggleArray[0];
+		for (var i=0; i<this.numberOfHandles; i++) {
+	        fp = this.squiggleArray[0].pointsArray[i];
+			var toIndex = (i < this.numberOfHandles - 1) ? i + 1 : 0;
+	        tp = this.squiggleArray[0].pointsArray[toIndex];
+	        var x1 = fp.x;
+			var x2 = fp.tangentialControlPoint(+phi).x;
+			var x3 = tp.tangentialControlPoint(-phi).x;
+			var x4 = tp.x;
+		            
+            for (var j=0; j<T.length; j++) {
+                var t = T[j];
+                var x = (1-t)*(1-t)*(1-t)*x1 + 3*(1-t)*(1-t)*t*x2 + 3*(1-t)*t*t*x3 + t*t*t*x4;
+                if (maxX == '' || x > maxX) {
+                    maxX = x;
+                }
+                if (minX == '' || x < minX) {
+                    minX = x;
+                }
+            }
+        }
+        this.width = Math.round((maxX - minX) / 54);
+        this.w = this.width;
+	}
+	
+	if (this.resetHeight) {
+		this.squiggleArray[0].pointsArray[0].y = 0.5 * this.height * -54;
+		this.squiggleArray[0].pointsArray[2].y = 0.5 * this.height * 54;
+
+		this.resetHeight = false;
+		minY = this.squiggleArray[0].pointsArray[0].y;
+		maxY = this.squiggleArray[0].pointsArray[2].y;
+	}
+	else {
+		// recalculate height/// solve bezier to find min and max point along axis
+        var squiggle = this.squiggleArray[0];
+		for (var i=0; i<this.numberOfHandles; i++) {
+	        fp = this.squiggleArray[0].pointsArray[i];
+			var toIndex = (i < this.numberOfHandles - 1) ? i + 1 : 0;
+	        tp = this.squiggleArray[0].pointsArray[toIndex];
+	        var y1 = fp.y;
+			var y2 = fp.tangentialControlPoint(+phi).y;
+			var y3 = tp.tangentialControlPoint(-phi).y;
+			var y4 = tp.y;
+		            
+            for (var j=0; j<T.length; j++) {
+                var t = T[j];
+                var y = (1-t)*(1-t)*(1-t)*y1 + 3*(1-t)*(1-t)*t*y2 + 3*(1-t)*t*t*y3 + t*t*t*y4;
+                if (maxY == '' || y > maxY) {
+                    maxY = y;
+                }
+                if (minY == '' || y < minY) {
+                    minY = y;
+                }
+            }
+        }
+				
+        this.height = Math.round((maxY - minY) / 54);
+        this.h = this.height;
+        		
+	}
+	
+	this.yMidPoint = minY + 0.5 * this.height * 54;
+	
 	// Start curve
 	ctx.moveTo(this.squiggleArray[0].pointsArray[0].x, this.squiggleArray[0].pointsArray[0].y);
 
@@ -20379,7 +20751,7 @@ ED.CornealOpacity.prototype.draw = function(_point) {
 		// Control points
 		cp1 = fp.tangentialControlPoint(+phi);
 		cp2 = tp.tangentialControlPoint(-phi);
-
+		
 		// Draw Bezier curve
 		ctx.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, tp.x, tp.y);
 	}
@@ -20389,17 +20761,103 @@ ED.CornealOpacity.prototype.draw = function(_point) {
 
 	// Set attributes
 	ctx.lineWidth = 4;
-	ctx.fillStyle = "rgba(0, 0, 255, 1)";
-	ctx.strokeStyle = "blue";
+	ctx.fillStyle = "gray";
+	ctx.strokeStyle = "gray";
 
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
-
+	
 	// Coordinates of expert handles (in canvas plane)
-	for (var i = 0; i < this.numberOfHandles; i++) {
+	for (var i = 0; i < this.numberOfHandles /* * 2 */; i++) {
 		this.handleArray[i].location = this.transform.transformPoint(this.squiggleArray[0].pointsArray[i]);
 	}
+			
 
+	// Non boundary drawing
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+		
+		// Infiltrate
+		if (this.infiltrateWidth > 0) {
+			// Convert infiltrate width to doodle scale
+			var iW = this.infiltrateWidth * 54;
+			var n = this.numberOfHandles;
+			
+			var infiltratePoints = [];
+
+			// If do not exist, create extra handles for infiltrate boundary
+// 			if (this.resetInfiltrate) {
+				// redefine infiltrate control points based on width
+				this.resetInfiltrate = false;
+				for (var i=0; i<this.numberOfHandles; i++) {
+					var handle = this.squiggleArray[0].pointsArray[i];
+					var x = Math.abs(handle.x);
+					var y = Math.abs(handle.y);
+					
+					// Length of new handle from origin
+					var h = Math.sqrt(x*x + y*y) + iW;
+					
+					// Angle of handle from origin
+					var theta = Math.atan(y/x);
+					
+					// Height of new point above origin
+					var o = h * Math.sin(theta);
+					// X displacement of new point from origin
+					var a = h * Math.cos(theta);
+					
+					// get sign of handle coordinates
+					var xS = (handle.x>=0) ? 1 : -1;
+					var yS = (handle.y>=0) ? 1 : -1;
+					
+					var p = new ED.Point(a * xS, o * yS);
+					infiltratePoints.push(p);
+					
+					this.squiggleArray[0].pointsArray[n+i] = p;				
+				}
+// 			}
+			
+			// Draw infiltrate
+			ctx.beginPath();
+			ctx.moveTo(this.squiggleArray[0].pointsArray[4].x, this.squiggleArray[0].pointsArray[4].y);
+			// Complete curve segments
+			for (var j=0; j< this.numberOfHandles; j++) {
+				// From and to points
+				fp = this.squiggleArray[0].pointsArray[j + n];
+				var toIndex = (j < this.numberOfHandles - 1) ? j + 1 + n : this.numberOfHandles;
+				tp = this.squiggleArray[0].pointsArray[toIndex];
+		
+				// Control points
+				cp1 = fp.tangentialControlPoint(+phi);
+				cp2 = tp.tangentialControlPoint(-phi);
+		
+				// Draw Bezier curve
+				ctx.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, tp.x, tp.y);
+			}
+			ctx.fillStyle = "rgba(0,0,0,0.2)";
+			ctx.fill();
+			
+			// Flood fill shape on ontop of gradient
+			ctx.beginPath();
+			ctx.moveTo(this.squiggleArray[0].pointsArray[0].x, this.squiggleArray[0].pointsArray[0].y);
+			// Complete curve segments
+			for (var i = 0; i < this.numberOfHandles; i++) {
+				// From and to points
+				fp = this.squiggleArray[0].pointsArray[i];
+				var toIndex = (i < this.numberOfHandles - 1) ? i + 1 : 0;
+				tp = this.squiggleArray[0].pointsArray[toIndex];
+		
+				// Control points
+				cp1 = fp.tangentialControlPoint(+phi);
+				cp2 = tp.tangentialControlPoint(-phi);
+		
+				// Draw Bezier curve
+				ctx.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, tp.x, tp.y);
+			}
+			ctx.fillStyle = "gray";
+			ctx.stroke();
+			ctx.fill();
+		}
+	}
+	
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
 
@@ -20414,6 +20872,811 @@ ED.CornealOpacity.prototype.draw = function(_point) {
  */
 ED.CornealOpacity.prototype.description = function() {
 	return 'Corneal opacity';
+}
+
+/**
+ * OpenEyes
+ * MSC
+ *
+ * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
+ * (C) OpenEyes Foundation, 2011-2013
+ * This file is part of OpenEyes.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package OpenEyes
+ * @link http://www.openeyes.org.uk
+ * @author OpenEyes <info@openeyes.org.uk>
+ * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
+ * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ */
+
+/**
+ * TODO: shape contour, infiltrate depth
+ *
+ * @class CornealOpacityCrossSection
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Object} _parameterJSON
+ */
+ED.CornealOpacityCrossSection = function(_drawing, _parameterJSON) {
+	// Set classname
+	this.className = "CornealOpacityCrossSection";
+
+	// Private parameters
+	this.initialRadius = 81;
+	this.resetWidth = false;
+	this.resetHeight = false;
+	this.resetInfiltrate = false;
+	
+	// Other parameters
+	this.height = Math.round(this.initialRadius * 2 / 54);
+	this.width = Math.round(this.initialRadius * 2 / 54);
+	this.depth = 33;
+	this.infiltrateWidth = 0;
+	
+	this.h = Math.round(this.initialRadius * 2 / 54);
+	this.w = Math.round(this.initialRadius * 2 / 54);
+	this.d = 33;
+	this.iW = 0;
+	
+	this.yMidPoint = 0;
+	
+	// Saved parameters
+	this.savedParameterArray = ['originX', 'originY', 'height', 'width', 'depth', 'infiltrateWidth','h','w','d','iW','yMidPoint'];
+	
+	// Parameters in doodle control bar
+	this.controlParameterArray = {'height':'Height', 'width':'Width', 'depth':'Depth (%)', 'infiltrateWidth':'Infiltrate width'};
+
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _parameterJSON);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.CornealOpacityCrossSection.prototype = new ED.Doodle;
+ED.CornealOpacityCrossSection.prototype.constructor = ED.CornealOpacityCrossSection;
+ED.CornealOpacityCrossSection.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.CornealOpacityCrossSection.prototype.setHandles = function() {
+}
+
+/**
+ * Sets default properties
+ */
+ED.CornealOpacityCrossSection.prototype.setPropertyDefaults = function() {
+// 	this.isSelectable = false;
+		
+	// Update component of validation array for simple parameters
+	this.parameterValidationArray['originX']['range'].setMinAndMax(+50, +50);
+	this.parameterValidationArray['originY']['range'].setMinAndMax(-500, +500);
+	
+	// Validation arrays for other parameters
+	this.parameterValidationArray['height'] = {
+		kind: 'other',
+		type: 'int',
+		range: new ED.Range(1, 14),
+		precision: 1,
+		animate: false
+	};
+	this.parameterValidationArray['width'] = {
+		kind: 'other',
+		type: 'int',
+		range: new ED.Range(1, 14),
+		precision: 1,
+		animate: false
+	};
+	this.parameterValidationArray['depth'] = {
+		kind: 'other',
+		type: 'int',
+		range: new ED.Range(1, 100),
+		precision: 1,
+		animate: false
+	};
+	this.parameterValidationArray['infiltrateWidth'] = {
+		kind: 'other',
+		type: 'int',
+		range: new ED.Range(0, 15),
+		precision: 1,
+		animate: false
+	};
+	this.parameterValidationArray['h'] = {
+		kind: 'other',
+		type: 'int',
+		range: [1, 14],
+		animate: false
+	};
+	this.parameterValidationArray['w'] = {
+		kind: 'other',
+		type: 'int',
+		range: [1, 14],
+		animate: false
+	};this.parameterValidationArray['iW'] = {
+		kind: 'other',
+		type: 'int',
+		range: [0, 15],
+		animate: false
+	};
+	this.parameterValidationArray['d'] = {
+		kind: 'other',
+		type: 'int',
+		range: [1, 100],
+		animate: false
+	};
+	this.parameterValidationArray['resetWidth'] = {
+		kind: 'derived',
+		type: 'bool',
+		display: false
+	};
+	this.parameterValidationArray['resetHeight'] = {
+		kind: 'derived',
+		type: 'bool',
+		display: false
+	};
+	this.parameterValidationArray['resetInfiltrate'] = {
+		kind: 'derived',
+		type: 'bool',
+		display: false
+	};
+	this.parameterValidationArray['yMidPoint'] = {
+		kind: 'other',
+		type: 'int',
+		range: [-500,500],
+		animate: false
+	};
+}
+
+/**
+ * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
+ * The returned parameters are animated if their 'animate' property is set to true
+ *
+ * @param {String} _parameter Name of parameter that has changed
+ * @value {Undefined} _value Value of parameter to calculate
+ * @returns {Array} Associative array of values of dependent parameters
+ */
+ED.CornealOpacityCrossSection.prototype.dependentParameterValues = function(_parameter, _value) {
+	var returnArray = new Array();
+
+	switch (_parameter) {
+		case 'width':
+			returnArray['resetWidth'] = true;
+			returnArray['w'] = parseInt(_value);
+			break;
+
+		case 'height':
+			returnArray['resetHeight'] = true;
+			returnArray['h'] = parseInt(_value);
+			break;
+			
+		case 'infiltrateWidth':
+			returnArray['resetInfiltrate'] = true;
+			returnArray['iW'] = parseInt(_value);
+			break;
+		
+		case 'depth':
+			returnArray['d'] = parseInt(_value);
+			break;
+			
+		case 'h':
+			returnArray['height'] = _value;
+			break;
+		
+		case 'd':
+			returnArray['depth'] = _value;
+			break;
+			
+		case 'w':
+			returnArray['width'] = _value;
+			break;
+		
+		case 'iW':
+			returnArray['infiltrateWidth'] = _value;
+			break;
+	}
+
+	return returnArray;
+}
+
+/**
+ * Sets default parameters
+ */
+ED.CornealOpacityCrossSection.prototype.setParameterDefaults = function() {
+
+	this.originX = 50; // as is in Cornea cross section doodle to dulicate bezier control points
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.CornealOpacityCrossSection.prototype.draw = function(_point) {
+	// Get context
+	var ctx = this.drawing.context;
+
+	// Call draw method in superclass
+	ED.CornealOpacityCrossSection.superclass.draw.call(this, _point);
+
+	// Boundary path
+	ctx.beginPath();
+	
+	// Calculate segment extent in terms of time along curve
+	var endY = this.yMidPoint + this.originY + 0.5 * this.height * 54;
+	var startY = this.yMidPoint + this.originY - 0.5 * this.height * 54;
+	
+	var startT = (startY + 380) / 760;
+	if (startT<0) startT = 0;
+	var endT = (endY + 380) / 760;
+	if (endT>1) endT = 1;
+		
+	if (startT < 0.5) {
+		
+		var superiorBezier = new Object;
+		var superiorBezierBack = new Object;
+
+		// define start and end time points
+		var tI0 = startT * 2;
+		var tI1 = (endT < 0.5) ? endT * 2 : 1;
+				
+		// default bezier points (as in cornea cross section)
+		superiorBezier.SP = new ED.Point(-120, -380 - this.originY);
+		superiorBezier.CP1 = new ED.Point(-240, -260 - this.originY);
+		superiorBezier.CP2 = new ED.Point(-320, -160 - this.originY);
+		superiorBezier.EP = new ED.Point(-320, 0 - this.originY);
+		
+		superiorBezierBack.SP = new ED.Point(-120 + 120*this.depth/100, -380 - this.originY);
+		superiorBezierBack.CP1 = new ED.Point(-240 + 160*this.depth/100, -260 - this.originY);
+		superiorBezierBack.CP2 = new ED.Point(-320 + 100*this.depth/100, -160 - this.originY);
+		superiorBezierBack.EP = new ED.Point(-320 + 100*this.depth/100, 0 - this.originY);
+		
+		if (tI0 > 0) {
+		// Trim start of curve			
+			
+			// front of cornea
+			var sq0 = new ED.Point(0,0);
+			sq0.y = (1-tI0)*(1-tI0)*(1-tI0)*superiorBezier.SP.y + 3*(1-tI0)*(1-tI0)*tI0*superiorBezier.CP1.y + 3*(1-tI0)*tI0*tI0*superiorBezier.CP2.y + tI0*tI0*tI0*superiorBezier.EP.y;
+			sq0.x = (1-tI0)*(1-tI0)*(1-tI0)*superiorBezier.SP.x + 3*(1-tI0)*(1-tI0)*tI0*superiorBezier.CP1.x + 3*(1-tI0)*tI0*tI0*superiorBezier.CP2.x + tI0*tI0*tI0*superiorBezier.EP.x;
+			
+			var iP23 = new ED.Point(0,0);
+			iP23.x = superiorBezier.CP1.x + tI0 * (superiorBezier.CP2.x - superiorBezier.CP1.x);
+			iP23.y = superiorBezier.CP1.y + tI0 * (superiorBezier.CP2.y - superiorBezier.CP1.y);
+			
+			var iP34 = new ED.Point(0,0);
+			iP34.x = superiorBezier.CP2.x + tI0 * (superiorBezier.EP.x - superiorBezier.CP2.x);
+			iP34.y = superiorBezier.CP2.y + tI0 * (superiorBezier.EP.y - superiorBezier.CP2.y);
+			
+			var iP2334 = new ED.Point(0,0);
+			iP2334.x = iP23.x + tI0 * (iP34.x - iP23.x);
+			iP2334.y = iP23.y + tI0 * (iP34.y - iP23.y);
+			
+			superiorBezier.SP = sq0;
+			superiorBezier.CP1 = iP2334;
+			superiorBezier.CP2 = iP34;
+			
+			
+			// back of cornea
+			var sq0b = new ED.Point(0,0);
+			sq0b.y = (1-tI0)*(1-tI0)*(1-tI0)*superiorBezierBack.SP.y + 3*(1-tI0)*(1-tI0)*tI0*superiorBezierBack.CP1.y + 3*(1-tI0)*tI0*tI0*superiorBezierBack.CP2.y + tI0*tI0*tI0*superiorBezierBack.EP.y;
+			sq0b.x = (1-tI0)*(1-tI0)*(1-tI0)*superiorBezierBack.SP.x + 3*(1-tI0)*(1-tI0)*tI0*superiorBezierBack.CP1.x + 3*(1-tI0)*tI0*tI0*superiorBezierBack.CP2.x + tI0*tI0*tI0*superiorBezierBack.EP.x;
+			
+			var iP23b = new ED.Point(0,0);
+			iP23b.x = superiorBezierBack.CP1.x + tI0 * (superiorBezierBack.CP2.x - superiorBezierBack.CP1.x);
+			iP23b.y = superiorBezierBack.CP1.y + tI0 * (superiorBezierBack.CP2.y - superiorBezierBack.CP1.y);
+			
+			var iP34b = new ED.Point(0,0);
+			iP34b.x = superiorBezierBack.CP2.x + tI0 * (superiorBezierBack.EP.x - superiorBezierBack.CP2.x);
+			iP34b.y = superiorBezierBack.CP2.y + tI0 * (superiorBezierBack.EP.y - superiorBezierBack.CP2.y);
+			
+			var iP2334b = new ED.Point(0,0);
+			iP2334b.x = iP23b.x + tI0 * (iP34b.x - iP23b.x);
+			iP2334b.y = iP23b.y + tI0 * (iP34b.y - iP23b.y);
+			
+			superiorBezierBack.SP = sq0b;
+			superiorBezierBack.CP1 = iP2334b;
+			superiorBezierBack.CP2 = iP34b;
+		}
+		
+		if (tI1 < 1) {
+		// Trim end of curve
+			
+			// front of cornea
+			var iq1 = new ED.Point(0,0);
+			iq1.y = (1-tI1)*(1-tI1)*(1-tI1)*superiorBezier.SP.y + 3*(1-tI1)*(1-tI1)*tI1*superiorBezier.CP1.y + 3*(1-tI1)*tI1*tI1*superiorBezier.CP2.y + tI1*tI1*tI1*superiorBezier.EP.y;
+			iq1.x = (1-tI1)*(1-tI1)*(1-tI1)*superiorBezier.SP.x + 3*(1-tI1)*(1-tI1)*tI1*superiorBezier.CP1.x + 3*(1-tI1)*tI1*tI1*superiorBezier.CP2.x + tI1*tI1*tI1*superiorBezier.EP.x;
+
+			var iP12 = new ED.Point(0,0);
+			iP12.x = superiorBezier.SP.x + tI1 * (superiorBezier.CP1.x - superiorBezier.SP.x);
+			iP12.y = superiorBezier.SP.y + tI1 * (superiorBezier.CP1.y - superiorBezier.SP.y);
+			
+			var iP23 = new ED.Point(0,0);
+			iP23.x = superiorBezier.CP1.x + tI1 * (superiorBezier.CP2.x - superiorBezier.CP1.x);
+			iP23.y = superiorBezier.CP1.y + tI1 * (superiorBezier.CP2.y - superiorBezier.CP1.y);
+			
+			var iP1223 = new ED.Point(0,0);
+			iP1223.x = iP12.x + tI1 * (iP23.x - iP12.x);
+			iP1223.y = iP12.y + tI1 * (iP23.y - iP12.y);
+			
+			superiorBezier.CP1 = iP12;
+			superiorBezier.CP2 = iP1223;
+			superiorBezier.EP = iq1;
+			
+			
+			// back of cornea
+			var iq1b = new ED.Point(0,0);
+			iq1b.y = (1-tI1)*(1-tI1)*(1-tI1)*superiorBezierBack.SP.y + 3*(1-tI1)*(1-tI1)*tI1*superiorBezierBack.CP1.y + 3*(1-tI1)*tI1*tI1*superiorBezierBack.CP2.y + tI1*tI1*tI1*superiorBezierBack.EP.y;
+			iq1b.x = (1-tI1)*(1-tI1)*(1-tI1)*superiorBezierBack.SP.x + 3*(1-tI1)*(1-tI1)*tI1*superiorBezierBack.CP1.x + 3*(1-tI1)*tI1*tI1*superiorBezierBack.CP2.x + tI1*tI1*tI1*superiorBezierBack.EP.x;
+
+			var iP12b = new ED.Point(0,0);
+			iP12b.x = superiorBezierBack.SP.x + tI1 * (superiorBezierBack.CP1.x - superiorBezierBack.SP.x);
+			iP12b.y = superiorBezierBack.SP.y + tI1 * (superiorBezierBack.CP1.y - superiorBezierBack.SP.y);
+			
+			var iP23b = new ED.Point(0,0);
+			iP23b.x = superiorBezierBack.CP1.x + tI1 * (superiorBezierBack.CP2.x - superiorBezierBack.CP1.x);
+			iP23b.y = superiorBezierBack.CP1.y + tI1 * (superiorBezierBack.CP2.y - superiorBezierBack.CP1.y);
+			
+			var iP1223b = new ED.Point(0,0);
+			iP1223b.x = iP12b.x + tI1 * (iP23b.x - iP12b.x);
+			iP1223b.y = iP12b.y + tI1 * (iP23b.y - iP12b.y);
+			
+			superiorBezierBack.CP1 = iP12b;
+			superiorBezierBack.CP2 = iP1223b;
+			superiorBezierBack.EP = iq1b;
+		}
+	}
+	
+	
+	if (endT > 0.5) {
+		
+		var inferiorBezier = new Object;
+		var inferiorBezierBack = new Object;
+		
+		// define start and end time points
+		var tS0 = (startT > 0.5) ? (startT - 0.5) * 2 : 0;
+		var tS1 = (endT - 0.5) * 2;
+		
+		// default bezier points (as in cornea cross section)
+		inferiorBezier.SP = new ED.Point(-320, -0 - this.originY);
+		inferiorBezier.CP1 = new ED.Point(-320, 160 - this.originY);
+		inferiorBezier.CP2 = new ED.Point(-240, 260 - this.originY);
+		inferiorBezier.EP = new ED.Point(-120, 380 - this.originY);
+		
+		inferiorBezierBack.SP = new ED.Point(-320 + 100*this.depth/100, -0 - this.originY);
+		inferiorBezierBack.CP1 = new ED.Point(-320 + 100*this.depth/100, 160 - this.originY);
+		inferiorBezierBack.CP2 = new ED.Point(-240 + 160*this.depth/100, 260 - this.originY);
+		inferiorBezierBack.EP = new ED.Point(-120 + 120*this.depth/100, 380 - this.originY);
+		
+		
+		if (tS0 > 0) {
+		// Trim start of curve
+		
+			// front of cornea			
+			var sq0 = new ED.Point(0,0);
+			sq0.y = (1-tS0)*(1-tS0)*(1-tS0)*inferiorBezier.SP.y + 3*(1-tS0)*(1-tS0)*tS0*inferiorBezier.CP1.y + 3*(1-tS0)*tS0*tS0*inferiorBezier.CP2.y + tS0*tS0*tS0*inferiorBezier.EP.y;
+			sq0.x = (1-tS0)*(1-tS0)*(1-tS0)*inferiorBezier.SP.x + 3*(1-tS0)*(1-tS0)*tS0*inferiorBezier.CP1.x + 3*(1-tS0)*tS0*tS0*inferiorBezier.CP2.x + tS0*tS0*tS0*inferiorBezier.EP.x;
+			
+			var sP23 = new ED.Point(0,0);
+			sP23.x = inferiorBezier.CP1.x + tS0 * (inferiorBezier.CP2.x - inferiorBezier.CP1.x);
+			sP23.y = inferiorBezier.CP1.y + tS0 * (inferiorBezier.CP2.y - inferiorBezier.CP1.y);
+			
+			var sP34 = new ED.Point(0,0);
+			sP34.x = inferiorBezier.CP2.x + tS0 * (inferiorBezier.EP.x - inferiorBezier.CP2.x);
+			sP34.y = inferiorBezier.CP2.y + tS0 * (inferiorBezier.EP.y - inferiorBezier.CP2.y);
+			
+			var sP2334 = new ED.Point(0,0);
+			sP2334.x = sP23.x + tS0 * (sP34.x - sP23.x);
+			sP2334.y = sP23.y + tS0 * (sP34.y - sP23.y);
+			
+			inferiorBezier.SP = sq0;
+			inferiorBezier.CP1 = sP2334;
+			inferiorBezier.CP2 = sP34;
+			
+			// back of cornea
+			var sq0b = new ED.Point(0,0);
+			sq0b.y = (1-tS0)*(1-tS0)*(1-tS0)*inferiorBezierBack.SP.y + 3*(1-tS0)*(1-tS0)*tS0*inferiorBezierBack.CP1.y + 3*(1-tS0)*tS0*tS0*inferiorBezierBack.CP2.y + tS0*tS0*tS0*inferiorBezierBack.EP.y;
+			sq0b.x = (1-tS0)*(1-tS0)*(1-tS0)*inferiorBezierBack.SP.x + 3*(1-tS0)*(1-tS0)*tS0*inferiorBezierBack.CP1.x + 3*(1-tS0)*tS0*tS0*inferiorBezierBack.CP2.x + tS0*tS0*tS0*inferiorBezierBack.EP.x;
+			
+			var sP23b = new ED.Point(0,0);
+			sP23b.x = inferiorBezierBack.CP1.x + tS0 * (inferiorBezierBack.CP2.x - inferiorBezierBack.CP1.x);
+			sP23b.y = inferiorBezierBack.CP1.y + tS0 * (inferiorBezierBack.CP2.y - inferiorBezierBack.CP1.y);
+			
+			var sP34b = new ED.Point(0,0);
+			sP34b.x = inferiorBezierBack.CP2.x + tS0 * (inferiorBezierBack.EP.x - inferiorBezierBack.CP2.x);
+			sP34b.y = inferiorBezierBack.CP2.y + tS0 * (inferiorBezierBack.EP.y - inferiorBezierBack.CP2.y);
+			
+			var sP2334b = new ED.Point(0,0);
+			sP2334b.x = sP23b.x + tS0 * (sP34b.x - sP23b.x);
+			sP2334b.y = sP23b.y + tS0 * (sP34b.y - sP23b.y);
+			
+			inferiorBezierBack.SP = sq0b;
+			inferiorBezierBack.CP1 = sP2334b;
+			inferiorBezierBack.CP2 = sP34b;
+		}
+		
+		if (tS1 < 1) {
+		// Trim end of curve
+		
+			// front of cornea
+			var sq1 = new ED.Point(0,0);
+			sq1.y = (1-tS1)*(1-tS1)*(1-tS1)*inferiorBezier.SP.y + 3*(1-tS1)*(1-tS1)*tS1*inferiorBezier.CP1.y + 3*(1-tS1)*tS1*tS1*inferiorBezier.CP2.y + tS1*tS1*tS1*inferiorBezier.EP.y;
+			sq1.x = (1-tS1)*(1-tS1)*(1-tS1)*inferiorBezier.SP.x + 3*(1-tS1)*(1-tS1)*tS1*inferiorBezier.CP1.x + 3*(1-tS1)*tS1*tS1*inferiorBezier.CP2.x + tS1*tS1*tS1*inferiorBezier.EP.x;
+
+			var sP12 = new ED.Point(0,0);
+			sP12.x = inferiorBezier.SP.x + tS1 * (inferiorBezier.CP1.x - inferiorBezier.SP.x);
+			sP12.y = inferiorBezier.SP.y + tS1 * (inferiorBezier.CP1.y - inferiorBezier.SP.y);
+			
+			var sP23 = new ED.Point(0,0);
+			sP23.x = inferiorBezier.CP1.x + tS1 * (inferiorBezier.CP2.x - inferiorBezier.CP1.x);
+			sP23.y = inferiorBezier.CP1.y + tS1 * (inferiorBezier.CP2.y - inferiorBezier.CP1.y);
+			
+			var sP1223 = new ED.Point(0,0);
+			sP1223.x = sP12.x + tS1 * (sP23.x - sP12.x);
+			sP1223.y = sP12.y + tS1 * (sP23.y - sP12.y);
+
+			inferiorBezier.CP1 = sP12;
+			inferiorBezier.CP2 = sP1223;
+			inferiorBezier.EP = sq1;
+			
+			
+			// back of cornea
+			var sq1b = new ED.Point(0,0);
+			sq1b.y = (1-tS1)*(1-tS1)*(1-tS1)*inferiorBezierBack.SP.y + 3*(1-tS1)*(1-tS1)*tS1*inferiorBezierBack.CP1.y + 3*(1-tS1)*tS1*tS1*inferiorBezierBack.CP2.y + tS1*tS1*tS1*inferiorBezierBack.EP.y;
+			sq1b.x = (1-tS1)*(1-tS1)*(1-tS1)*inferiorBezierBack.SP.x + 3*(1-tS1)*(1-tS1)*tS1*inferiorBezierBack.CP1.x + 3*(1-tS1)*tS1*tS1*inferiorBezierBack.CP2.x + tS1*tS1*tS1*inferiorBezierBack.EP.x;
+
+			var sP12b = new ED.Point(0,0);
+			sP12b.x = inferiorBezierBack.SP.x + tS1 * (inferiorBezierBack.CP1.x - inferiorBezierBack.SP.x);
+			sP12b.y = inferiorBezierBack.SP.y + tS1 * (inferiorBezierBack.CP1.y - inferiorBezierBack.SP.y);
+			
+			var sP23b = new ED.Point(0,0);
+			sP23b.x = inferiorBezierBack.CP1.x + tS1 * (inferiorBezierBack.CP2.x - inferiorBezierBack.CP1.x);
+			sP23b.y = inferiorBezierBack.CP1.y + tS1 * (inferiorBezierBack.CP2.y - inferiorBezierBack.CP1.y);
+			
+			var sP1223b = new ED.Point(0,0);
+			sP1223b.x = sP12b.x + tS1 * (sP23b.x - sP12b.x);
+			sP1223b.y = sP12b.y + tS1 * (sP23b.y - sP12b.y);
+
+			inferiorBezierBack.CP1 = sP12b;
+			inferiorBezierBack.CP2 = sP1223b;
+			inferiorBezierBack.EP = sq1b;
+		}
+	}
+	
+	if (inferiorBezier) {
+		ctx.moveTo(inferiorBezierBack.EP.x, inferiorBezierBack.EP.y);
+		ctx.bezierCurveTo(inferiorBezierBack.CP2.x, inferiorBezierBack.CP2.y, inferiorBezierBack.CP1.x, inferiorBezierBack.CP1.y, inferiorBezierBack.SP.x, inferiorBezierBack.SP.y);
+		ctx.lineTo(inferiorBezier.SP.x, inferiorBezier.SP.y);
+		ctx.bezierCurveTo(inferiorBezier.CP1.x, inferiorBezier.CP1.y, inferiorBezier.CP2.x, inferiorBezier.CP2.y, inferiorBezier.EP.x, inferiorBezier.EP.y);
+	}
+	if (superiorBezier) {
+		ctx.moveTo(superiorBezierBack.EP.x, superiorBezierBack.EP.y);
+		ctx.bezierCurveTo(superiorBezierBack.CP2.x, superiorBezierBack.CP2.y, superiorBezierBack.CP1.x, superiorBezierBack.CP1.y, superiorBezierBack.SP.x, superiorBezierBack.SP.y);
+		ctx.lineTo(superiorBezier.SP.x, superiorBezier.SP.y);
+		ctx.bezierCurveTo(superiorBezier.CP1.x, superiorBezier.CP1.y, superiorBezier.CP2.x, superiorBezier.CP2.y, superiorBezier.EP.x, superiorBezier.EP.y);
+	}
+	
+	
+	// Close path
+	ctx.closePath();
+
+	// Set attributes
+	ctx.lineWidth = 0;
+	ctx.fillStyle = "gray";
+	ctx.strokeStyle = "gray";
+
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+		
+	// Non boundary drawing
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+		
+		// Infiltrate
+		if (this.infiltrateWidth > 0) {
+			// Re do all calculations, with extra length and width proportional to infiltrate width
+			var iEndY = this.yMidPoint + this.originY + 0.5 * (this.height + this.infiltrateWidth * 2) * 54;
+			var iStartY = this.yMidPoint + this.originY - 0.5 * (this.height + this.infiltrateWidth * 2) * 54;
+			
+			var iStartT = (iStartY + 380) / 760;
+			if (iStartT<0) iStartT = 0;
+			var iEndT = (iEndY + 380) / 760;
+			if (iEndT>1) iEndT = 1;
+			
+			var averageDimension = (this.height + this.width) / 2;
+			var averageDimensionTotal = (this.height + this.width + 4*this.infiltrateWidth) / 2;
+			
+			var infiltrateScale = this.depth / averageDimension * averageDimensionTotal;
+			if (infiltrateScale > 100) infiltrateScale = 100;
+				
+			if (iStartT < 0.5) {
+				
+				var iSuperiorBezier = new Object;
+				var iSuperiorBezierBack = new Object;
+		
+				// define start and end time points
+				var itI0 = iStartT * 2;
+				var itI1 = (iEndT < 0.5) ? iEndT * 2 : 1;
+						
+				// default bezier points (as in cornea cross section)
+				iSuperiorBezier.SP = new ED.Point(-120, -380 - this.originY);
+				iSuperiorBezier.CP1 = new ED.Point(-240, -260 - this.originY);
+				iSuperiorBezier.CP2 = new ED.Point(-320, -160 - this.originY);
+				iSuperiorBezier.EP = new ED.Point(-320, 0 - this.originY);
+				
+				iSuperiorBezierBack.SP = new ED.Point(-120 + 120*infiltrateScale/100, -380 - this.originY);
+				iSuperiorBezierBack.CP1 = new ED.Point(-240 + 160*infiltrateScale/100, -260 - this.originY);
+				iSuperiorBezierBack.CP2 = new ED.Point(-320 + 100*infiltrateScale/100, -160 - this.originY);
+				iSuperiorBezierBack.EP = new ED.Point(-320 + 100*infiltrateScale/100, 0 - this.originY);
+				
+				if (itI0 > 0) {
+				// Trim start of curve
+				
+					// front of cornea			
+					var isq0 = new ED.Point(0,0);
+					isq0.y = (1-itI0)*(1-itI0)*(1-itI0)*iSuperiorBezier.SP.y + 3*(1-itI0)*(1-itI0)*itI0*iSuperiorBezier.CP1.y + 3*(1-itI0)*itI0*itI0*iSuperiorBezier.CP2.y + itI0*itI0*itI0*iSuperiorBezier.EP.y;
+					isq0.x = (1-itI0)*(1-itI0)*(1-itI0)*iSuperiorBezier.SP.x + 3*(1-itI0)*(1-itI0)*itI0*iSuperiorBezier.CP1.x + 3*(1-itI0)*itI0*itI0*iSuperiorBezier.CP2.x + itI0*itI0*itI0*iSuperiorBezier.EP.x;
+					
+					var iiP23 = new ED.Point(0,0);
+					iiP23.x = iSuperiorBezier.CP1.x + itI0 * (iSuperiorBezier.CP2.x - iSuperiorBezier.CP1.x);
+					iiP23.y = iSuperiorBezier.CP1.y + itI0 * (iSuperiorBezier.CP2.y - iSuperiorBezier.CP1.y);
+					
+					var iiP34 = new ED.Point(0,0);
+					iiP34.x = iSuperiorBezier.CP2.x + itI0 * (iSuperiorBezier.EP.x - iSuperiorBezier.CP2.x);
+					iiP34.y = iSuperiorBezier.CP2.y + itI0 * (iSuperiorBezier.EP.y - iSuperiorBezier.CP2.y);
+					
+					var iiP2334 = new ED.Point(0,0);
+					iiP2334.x = iiP23.x + itI0 * (iiP34.x - iiP23.x);
+					iiP2334.y = iiP23.y + itI0 * (iiP34.y - iiP23.y);
+					
+					iSuperiorBezier.SP = isq0;
+					iSuperiorBezier.CP1 = iiP2334;
+					iSuperiorBezier.CP2 = iiP34;
+					
+					
+					// back of cornea
+					var isq0b = new ED.Point(0,0);
+					isq0b.y = (1-itI0)*(1-itI0)*(1-itI0)*iSuperiorBezierBack.SP.y + 3*(1-itI0)*(1-itI0)*itI0*iSuperiorBezierBack.CP1.y + 3*(1-itI0)*itI0*itI0*iSuperiorBezierBack.CP2.y + itI0*itI0*itI0*iSuperiorBezierBack.EP.y;
+					isq0b.x = (1-itI0)*(1-itI0)*(1-itI0)*iSuperiorBezierBack.SP.x + 3*(1-itI0)*(1-itI0)*itI0*iSuperiorBezierBack.CP1.x + 3*(1-itI0)*itI0*itI0*iSuperiorBezierBack.CP2.x + itI0*itI0*itI0*iSuperiorBezierBack.EP.x;
+					
+					var iiP23b = new ED.Point(0,0);
+					iiP23b.x = iSuperiorBezierBack.CP1.x + itI0 * (iSuperiorBezierBack.CP2.x - iSuperiorBezierBack.CP1.x);
+					iiP23b.y = iSuperiorBezierBack.CP1.y + itI0 * (iSuperiorBezierBack.CP2.y - iSuperiorBezierBack.CP1.y);
+					
+					var iiP34b = new ED.Point(0,0);
+					iiP34b.x = iSuperiorBezierBack.CP2.x + itI0 * (iSuperiorBezierBack.EP.x - iSuperiorBezierBack.CP2.x);
+					iiP34b.y = iSuperiorBezierBack.CP2.y + itI0 * (iSuperiorBezierBack.EP.y - iSuperiorBezierBack.CP2.y);
+					
+					var iiP2334b = new ED.Point(0,0);
+					iiP2334b.x = iiP23b.x + itI0 * (iiP34b.x - iiP23b.x);
+					iiP2334b.y = iiP23b.y + itI0 * (iiP34b.y - iiP23b.y);
+					
+					iSuperiorBezierBack.SP = isq0b;
+					iSuperiorBezierBack.CP1 = iiP2334b;
+					iSuperiorBezierBack.CP2 = iiP34b;
+				}
+				
+				if (tI1 < 1) {
+				// Trim end of curve
+					
+					// front of cornea
+					var iiq1 = new ED.Point(0,0);
+					iiq1.y = (1-itI1)*(1-itI1)*(1-itI1)*iSuperiorBezier.SP.y + 3*(1-itI1)*(1-itI1)*itI1*iSuperiorBezier.CP1.y + 3*(1-itI1)*itI1*itI1*iSuperiorBezier.CP2.y + itI1*itI1*itI1*iSuperiorBezier.EP.y;
+					iiq1.x = (1-itI1)*(1-itI1)*(1-itI1)*iSuperiorBezier.SP.x + 3*(1-itI1)*(1-itI1)*itI1*iSuperiorBezier.CP1.x + 3*(1-itI1)*itI1*itI1*iSuperiorBezier.CP2.x + itI1*itI1*itI1*iSuperiorBezier.EP.x;
+		
+					var iiP12 = new ED.Point(0,0);
+					iiP12.x = iSuperiorBezier.SP.x + itI1 * (iSuperiorBezier.CP1.x - iSuperiorBezier.SP.x);
+					iiP12.y = iSuperiorBezier.SP.y + itI1 * (iSuperiorBezier.CP1.y - iSuperiorBezier.SP.y);
+					
+					var iiP23 = new ED.Point(0,0);
+					iiP23.x = iSuperiorBezier.CP1.x + itI1 * (iSuperiorBezier.CP2.x - iSuperiorBezier.CP1.x);
+					iiP23.y = iSuperiorBezier.CP1.y + itI1 * (iSuperiorBezier.CP2.y - iSuperiorBezier.CP1.y);
+					
+					var iiP1223 = new ED.Point(0,0);
+					iiP1223.x = iiP12.x + itI1 * (iiP23.x - iiP12.x);
+					iiP1223.y = iiP12.y + itI1 * (iiP23.y - iiP12.y);
+					
+					iSuperiorBezier.CP1 = iiP12;
+					iSuperiorBezier.CP2 = iiP1223;
+					iSuperiorBezier.EP = iiq1;
+					
+					// back of cornea
+					var iiq1b = new ED.Point(0,0);
+					iiq1b.y = (1-itI1)*(1-itI1)*(1-itI1)*iSuperiorBezierBack.SP.y + 3*(1-itI1)*(1-itI1)*itI1*iSuperiorBezierBack.CP1.y + 3*(1-itI1)*itI1*itI1*iSuperiorBezierBack.CP2.y + itI1*itI1*itI1*iSuperiorBezierBack.EP.y;
+					iiq1b.x = (1-itI1)*(1-itI1)*(1-itI1)*iSuperiorBezierBack.SP.x + 3*(1-itI1)*(1-itI1)*itI1*iSuperiorBezierBack.CP1.x + 3*(1-itI1)*itI1*itI1*iSuperiorBezierBack.CP2.x + itI1*itI1*itI1*iSuperiorBezierBack.EP.x;
+		
+					var iiP12b = new ED.Point(0,0);
+					iiP12b.x = iSuperiorBezierBack.SP.x + itI1 * (iSuperiorBezierBack.CP1.x - iSuperiorBezierBack.SP.x);
+					iiP12b.y = iSuperiorBezierBack.SP.y + itI1 * (iSuperiorBezierBack.CP1.y - iSuperiorBezierBack.SP.y);
+					
+					var iiP23b = new ED.Point(0,0);
+					iiP23b.x = iSuperiorBezierBack.CP1.x + itI1 * (iSuperiorBezierBack.CP2.x - iSuperiorBezierBack.CP1.x);
+					iiP23b.y = iSuperiorBezierBack.CP1.y + itI1 * (iSuperiorBezierBack.CP2.y - iSuperiorBezierBack.CP1.y);
+					
+					var iiP1223b = new ED.Point(0,0);
+					iiP1223b.x = iiP12b.x + itI1 * (iiP23b.x - iiP12b.x);
+					iiP1223b.y = iiP12b.y + itI1 * (iiP23b.y - iiP12b.y);
+					
+					iSuperiorBezierBack.CP1 = iiP12b;
+					iSuperiorBezierBack.CP2 = iiP1223b;
+					iSuperiorBezierBack.EP = iiq1b;
+				}
+			}
+			
+			
+			if (endT > 0.5) {
+				
+				var iInferiorBezier = new Object;
+				var iInferiorBezierBack = new Object;
+				
+				// define start and end time points
+				var itS0 = (iStartT > 0.5) ? (iStartT - 0.5) * 2 : 0;
+				var itS1 = (iEndT - 0.5) * 2;
+				
+				// default bezier points (as in cornea cross section)
+				iInferiorBezier.SP = new ED.Point(-320, -0 - this.originY);
+				iInferiorBezier.CP1 = new ED.Point(-320, 160 - this.originY);
+				iInferiorBezier.CP2 = new ED.Point(-240, 260 - this.originY);
+				iInferiorBezier.EP = new ED.Point(-120, 380 - this.originY);
+				
+				iInferiorBezierBack.SP = new ED.Point(-320 + 100*infiltrateScale/100, -0 - this.originY);
+				iInferiorBezierBack.CP1 = new ED.Point(-320 + 100*infiltrateScale/100, 160 - this.originY);
+				iInferiorBezierBack.CP2 = new ED.Point(-240 + 160*infiltrateScale/100, 260 - this.originY);
+				iInferiorBezierBack.EP = new ED.Point(-120 + 120*infiltrateScale/100, 380 - this.originY);
+				
+				
+				if (itS0 > 0) {
+				// Trim start of curve	
+				
+					// front of cornea		
+					var isq0 = new ED.Point(0,0);
+					isq0.y = (1-itS0)*(1-itS0)*(1-itS0)*iInferiorBezier.SP.y + 3*(1-itS0)*(1-itS0)*itS0*iInferiorBezier.CP1.y + 3*(1-itS0)*itS0*itS0*iInferiorBezier.CP2.y + itS0*itS0*itS0*iInferiorBezier.EP.y;
+					isq0.x = (1-itS0)*(1-itS0)*(1-itS0)*iInferiorBezier.SP.x + 3*(1-itS0)*(1-itS0)*itS0*iInferiorBezier.CP1.x + 3*(1-itS0)*itS0*itS0*iInferiorBezier.CP2.x + itS0*itS0*itS0*iInferiorBezier.EP.x;
+					
+					var isP23 = new ED.Point(0,0);
+					isP23.x = iInferiorBezier.CP1.x + itS0 * (iInferiorBezier.CP2.x - iInferiorBezier.CP1.x);
+					isP23.y = iInferiorBezier.CP1.y + itS0 * (iInferiorBezier.CP2.y - iInferiorBezier.CP1.y);
+					
+					var isP34 = new ED.Point(0,0);
+					isP34.x = iInferiorBezier.CP2.x + itS0 * (iInferiorBezier.EP.x - iInferiorBezier.CP2.x);
+					isP34.y = iInferiorBezier.CP2.y + itS0 * (iInferiorBezier.EP.y - iInferiorBezier.CP2.y);
+					
+					var isP2334 = new ED.Point(0,0);
+					isP2334.x = isP23.x + itS0 * (isP34.x - isP23.x);
+					isP2334.y = isP23.y + itS0 * (isP34.y - isP23.y);
+					
+					iInferiorBezier.SP = isq0;
+					iInferiorBezier.CP1 = isP2334;
+					iInferiorBezier.CP2 = isP34;
+					
+					
+					// back of cornea
+					var isq0b = new ED.Point(0,0);
+					isq0b.y = (1-itS0)*(1-itS0)*(1-itS0)*iInferiorBezierBack.SP.y + 3*(1-itS0)*(1-itS0)*itS0*iInferiorBezierBack.CP1.y + 3*(1-itS0)*itS0*itS0*iInferiorBezierBack.CP2.y + itS0*itS0*itS0*iInferiorBezierBack.EP.y;
+					isq0b.x = (1-itS0)*(1-itS0)*(1-itS0)*iInferiorBezierBack.SP.x + 3*(1-itS0)*(1-itS0)*itS0*iInferiorBezierBack.CP1.x + 3*(1-itS0)*itS0*itS0*iInferiorBezierBack.CP2.x + itS0*itS0*itS0*iInferiorBezierBack.EP.x;
+					
+					var isP23b = new ED.Point(0,0);
+					isP23b.x = iInferiorBezierBack.CP1.x + itS0 * (iInferiorBezierBack.CP2.x - iInferiorBezierBack.CP1.x);
+					isP23b.y = iInferiorBezierBack.CP1.y + itS0 * (iInferiorBezierBack.CP2.y - iInferiorBezierBack.CP1.y);
+					
+					var isP34b = new ED.Point(0,0);
+					isP34b.x = iInferiorBezierBack.CP2.x + itS0 * (iInferiorBezierBack.EP.x - iInferiorBezierBack.CP2.x);
+					isP34b.y = iInferiorBezierBack.CP2.y + itS0 * (iInferiorBezierBack.EP.y - iInferiorBezierBack.CP2.y);
+					
+					var isP2334b = new ED.Point(0,0);
+					isP2334b.x = isP23b.x + itS0 * (isP34b.x - isP23b.x);
+					isP2334b.y = isP23b.y + itS0 * (isP34b.y - isP23b.y);
+					
+					iInferiorBezierBack.SP = isq0b;
+					iInferiorBezierBack.CP1 = isP2334b;
+					iInferiorBezierBack.CP2 = isP34b;
+				}
+				
+				if (itS1 < 1) {
+				// Trim end of curve
+				
+					// front of cornea
+					var isq1 = new ED.Point(0,0);
+					isq1.y = (1-itS1)*(1-itS1)*(1-itS1)*iInferiorBezier.SP.y + 3*(1-itS1)*(1-itS1)*itS1*iInferiorBezier.CP1.y + 3*(1-itS1)*itS1*itS1*iInferiorBezier.CP2.y + itS1*itS1*itS1*iInferiorBezier.EP.y;
+					isq1.x = (1-itS1)*(1-itS1)*(1-itS1)*iInferiorBezier.SP.x + 3*(1-itS1)*(1-itS1)*itS1*iInferiorBezier.CP1.x + 3*(1-itS1)*itS1*itS1*iInferiorBezier.CP2.x + itS1*itS1*itS1*iInferiorBezier.EP.x;
+		
+					var isP12 = new ED.Point(0,0);
+					isP12.x = iInferiorBezier.SP.x + itS1 * (iInferiorBezier.CP1.x - iInferiorBezier.SP.x);
+					isP12.y = iInferiorBezier.SP.y + itS1 * (iInferiorBezier.CP1.y - iInferiorBezier.SP.y);
+					
+					var isP23 = new ED.Point(0,0);
+					isP23.x = iInferiorBezier.CP1.x + itS1 * (iInferiorBezier.CP2.x - iInferiorBezier.CP1.x);
+					isP23.y = iInferiorBezier.CP1.y + itS1 * (iInferiorBezier.CP2.y - iInferiorBezier.CP1.y);
+					
+					var isP1223 = new ED.Point(0,0);
+					isP1223.x = isP12.x + itS1 * (isP23.x - isP12.x);
+					isP1223.y = isP12.y + itS1 * (isP23.y - isP12.y);
+		
+					iInferiorBezier.CP1 = isP12;
+					iInferiorBezier.CP2 = isP1223;
+					iInferiorBezier.EP = isq1;
+					
+					// back of cornea
+					var isq1b = new ED.Point(0,0);
+					isq1b.y = (1-itS1)*(1-itS1)*(1-itS1)*iInferiorBezierBack.SP.y + 3*(1-itS1)*(1-itS1)*itS1*iInferiorBezierBack.CP1.y + 3*(1-itS1)*itS1*itS1*iInferiorBezierBack.CP2.y + itS1*itS1*itS1*iInferiorBezierBack.EP.y;
+					isq1b.x = (1-itS1)*(1-itS1)*(1-itS1)*iInferiorBezierBack.SP.x + 3*(1-itS1)*(1-itS1)*itS1*iInferiorBezierBack.CP1.x + 3*(1-itS1)*itS1*itS1*iInferiorBezierBack.CP2.x + itS1*itS1*itS1*iInferiorBezierBack.EP.x;
+		
+					var isP12b = new ED.Point(0,0);
+					isP12b.x = iInferiorBezierBack.SP.x + itS1 * (iInferiorBezierBack.CP1.x - iInferiorBezierBack.SP.x);
+					isP12b.y = iInferiorBezierBack.SP.y + itS1 * (iInferiorBezierBack.CP1.y - iInferiorBezierBack.SP.y);
+					
+					var isP23b = new ED.Point(0,0);
+					isP23b.x = iInferiorBezierBack.CP1.x + itS1 * (iInferiorBezierBack.CP2.x - iInferiorBezierBack.CP1.x);
+					isP23b.y = iInferiorBezierBack.CP1.y + itS1 * (iInferiorBezierBack.CP2.y - iInferiorBezierBack.CP1.y);
+					
+					var isP1223b = new ED.Point(0,0);
+					isP1223b.x = isP12b.x + itS1 * (isP23b.x - isP12b.x);
+					isP1223b.y = isP12b.y + itS1 * (isP23b.y - isP12b.y);
+		
+					iInferiorBezierBack.CP1 = isP12b;
+					iInferiorBezierBack.CP2 = isP1223b;
+					iInferiorBezierBack.EP = isq1b;
+				}
+			}
+
+			// Draw infiltrate
+			ctx.beginPath();
+			
+			if (iInferiorBezier) {
+				ctx.moveTo(iInferiorBezierBack.EP.x, iInferiorBezierBack.EP.y);
+				ctx.bezierCurveTo(iInferiorBezierBack.CP2.x, iInferiorBezierBack.CP2.y, iInferiorBezierBack.CP1.x, iInferiorBezierBack.CP1.y, iInferiorBezierBack.SP.x, iInferiorBezierBack.SP.y);
+				ctx.lineTo(iInferiorBezier.SP.x, iInferiorBezier.SP.y);
+				ctx.bezierCurveTo(iInferiorBezier.CP1.x, iInferiorBezier.CP1.y, iInferiorBezier.CP2.x, iInferiorBezier.CP2.y, iInferiorBezier.EP.x, iInferiorBezier.EP.y);
+			}
+			
+			if (iSuperiorBezier) {
+				ctx.moveTo(iSuperiorBezierBack.EP.x, iSuperiorBezierBack.EP.y);
+				ctx.bezierCurveTo(iSuperiorBezierBack.CP2.x, iSuperiorBezierBack.CP2.y, iSuperiorBezierBack.CP1.x, iSuperiorBezierBack.CP1.y, iSuperiorBezierBack.SP.x, iSuperiorBezierBack.SP.y);
+				ctx.lineTo(iSuperiorBezier.SP.x, iSuperiorBezier.SP.y);
+				ctx.bezierCurveTo(iSuperiorBezier.CP1.x, iSuperiorBezier.CP1.y, iSuperiorBezier.CP2.x, iSuperiorBezier.CP2.y, iSuperiorBezier.EP.x, iSuperiorBezier.EP.y);
+			}
+			
+			ctx.fillStyle = "rgba(0,0,0,0.2)";
+			ctx.fill();
+			
+			
+			// fill opacity on top of
+			ctx.beginPath();
+			if (inferiorBezier) {
+				ctx.moveTo(inferiorBezierBack.EP.x, inferiorBezierBack.EP.y);
+				ctx.bezierCurveTo(inferiorBezierBack.CP2.x, inferiorBezierBack.CP2.y, inferiorBezierBack.CP1.x, inferiorBezierBack.CP1.y, inferiorBezierBack.SP.x, inferiorBezierBack.SP.y);
+				ctx.lineTo(inferiorBezier.SP.x, inferiorBezier.SP.y);
+				ctx.bezierCurveTo(inferiorBezier.CP1.x, inferiorBezier.CP1.y, inferiorBezier.CP2.x, inferiorBezier.CP2.y, inferiorBezier.EP.x, inferiorBezier.EP.y);
+			}
+			if (superiorBezier) {
+				ctx.moveTo(superiorBezierBack.EP.x, superiorBezierBack.EP.y);
+				ctx.bezierCurveTo(superiorBezierBack.CP2.x, superiorBezierBack.CP2.y, superiorBezierBack.CP1.x, superiorBezierBack.CP1.y, superiorBezierBack.SP.x, superiorBezierBack.SP.y);
+				ctx.lineTo(superiorBezier.SP.x, superiorBezier.SP.y);
+				ctx.bezierCurveTo(superiorBezier.CP1.x, superiorBezier.CP1.y, superiorBezier.CP2.x, superiorBezier.CP2.y, superiorBezier.EP.x, superiorBezier.EP.y);
+			}
+			ctx.fillStyle = "gray";
+			ctx.fill();
+// 			ctx.stroke();
+		}
+	}
+	
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+
+	// Return value indicating successful hittest
+	return this.isClicked;
+	
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.CornealOpacityCrossSection.prototype.description = function() {
+// 	return 'Corneal opacity';
 }
 
 /**
@@ -20471,16 +21734,22 @@ ED.CornealPigmentation.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.CornealPigmentation.prototype.setHandles = function() {
-	this.handleArray[4] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
+	this.handleArray[4] = new ED.Doodle.Handle(null, true, ED.Mode.Scale, false);
+	this.handleArray[4].isRotatable = true;
 }
 
 /**
  * Sets default properties
  */
 ED.CornealPigmentation.prototype.setPropertyDefaults = function() {
+	this.isSqueezable = true;
+	
+	this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.2, +3);
+	this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.2, +3);
+	
 	// Update component of validation array for simple parameters
-	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
-	this.parameterValidationArray['apexY']['range'].setMinAndMax(-380, -40);
+// 	this.parameterValidationArray['scale']['range'].setMinAndMax(0.2, +5);
+// 	this.parameterValidationArray['apexY']['range'].setMinAndMax(-380, -40);
 	
 	// Add complete validation arrays for derived parameters
 	this.parameterValidationArray['level'] = {
@@ -20502,10 +21771,10 @@ ED.CornealPigmentation.prototype.setPropertyDefaults = function() {
  */
 ED.CornealPigmentation.prototype.setParameterDefaults = function() {
 	this.setParameterFromString('level', 'Epithelial');
-	this.apexY = -200;
+// 	this.apexY = -200;
 
 	// Put control handle at 45 degrees
-	this.rotation = Math.PI / 4;
+// 	this.rotation = Math.PI / 4;
 }
 
 /**
@@ -20524,22 +21793,23 @@ ED.CornealPigmentation.prototype.draw = function(_point) {
 	ctx.beginPath();
 
 	// Circular scar
-	var r = Math.sqrt(this.apexX * this.apexX + this.apexY * this.apexY);
+// 	var r = Math.sqrt(this.apexX * this.apexX + this.apexY * this.apexY);
 
 	// Circular scar
-	ctx.arc(0, 0, r, 0, 2 * Math.PI, true);
-
+// 	ctx.arc(0, 0, 200, 0, 2 * Math.PI, true);
+	ctx.ellipse(0, 0, 120, 40, 0.5 * Math.PI, 0, 2 * Math.PI);
+	
 	// Set line attributes  
 	ctx.lineWidth = 4;
 	var ptrn = ctx.createPattern(this.drawing.imageArray['BrownSpotPattern'], 'repeat');
 	ctx.fillStyle = ptrn;
-	ctx.strokeStyle = "rgba(200, 200, 200, 1)";
+	ctx.strokeStyle = "rgba(0, 0, 0, 0)";
 
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(40, 120));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -26971,6 +28241,10 @@ ED.IOL.prototype.setPropertyDefaults = function() {
 	this.addAtBack = this.type == 'PC'?true:false;
 	this.isUnique = true;
 	
+	// Update component of validation array for simple parameters
+	this.parameterValidationArray['originX']['range'].setMinAndMax(-125, +125);
+	this.parameterValidationArray['originY']['range'].setMinAndMax(-125, +125);
+	
 	// Validation arrays for derived and other parameters
 	this.parameterValidationArray['type'] = {
 		kind: 'other',
@@ -27307,7 +28581,7 @@ ED.IOLCrossSection.prototype.draw = function(_point) {
 	var h = 240;
 
 	// Arbitrary radius of curvature
-	var r = 300;
+	var r = 420;
 
 	// Displacement of lens from centre
 	var ld = 100;
@@ -27327,55 +28601,68 @@ ED.IOLCrossSection.prototype.draw = function(_point) {
 	// Lens
 	ctx.beginPath();
 
-	// Draw lens with two sections of circumference of circle
+	// Draw invisible boundary around lens bag with two sections of circumference of circle
 	ctx.arc(ld - x, 0, r, theta, -theta, true);
 	ctx.arc(ld + x, 0, r, Math.PI + theta, Math.PI - theta, true);
-
-	// Draw it
-	ctx.stroke();
 
 	// Set line attributes
 	ctx.lineWidth = 4;
 	ctx.fillStyle = "rgba(255, 255, 255, 0)";
-	ctx.strokeStyle = "gray";
+	ctx.strokeStyle = "rgba(255, 255, 255, 0)";
 
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 
 	// Non boundary drawing
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
-		// Nucleus
-/*
+		// Lens bag
 		ctx.beginPath();
-		ctx.moveTo(ld, rn * Math.sin(phi));
-		ctx.arc(ld - x, 0, rn, phi, -phi, true);
-		ctx.arc(ld + x, 0, rn, Math.PI + phi, Math.PI - phi, true);
-		ctx.strokeStyle = "rgba(220, 220, 220, 0.75)";
+		ctx.arc(ld - x, 0, r, theta, -theta, true);
+		ctx.arc(ld + x, 0, r, Math.PI + theta, Math.PI + 0.6*theta, true);
+		ctx.moveTo(ld, 240);
+		ctx.arc(ld + x, 0, r, Math.PI - theta, Math.PI - 0.6*theta, false);
+		ctx.strokeStyle = "gray";
 		ctx.stroke();
-*/
 
+		// Lens
+		ctx.beginPath();
+		ctx.ellipse(100, 0, 160, 20, 0.5 * Math.PI, 0, 2 * Math.PI);
+		ctx.strokeStyle = "rgba(0, 0, 0, 0.7)";
+		ctx.lineWidth = 5;
+		ctx.stroke();
+		
+		// Loops
+		ctx.beginPath();
+// 		ctx.moveTo(80,0);
+		ctx.ellipse(100, 0, 227, 20, 0.5 * Math.PI, 0.5 * Math.PI, 1.2 * Math.PI);
+		ctx.moveTo(120,0);
+		ctx.ellipse(100, 0, 227, 20, 0.5 * Math.PI, 1.5 * Math.PI, 0.2 * Math.PI);
+		ctx.strokeStyle = "rgba(0, 0, 0, 0.6)";
+		ctx.stroke();
+		
+		
 		// Zonules
 		ctx.beginPath();
 
 		// Top zonules
 		ctx.moveTo(44 - this.originX + 80, -this.originY - 349);
-		ctx.lineTo(64, -207);
+		ctx.lineTo(80, -207);
 		ctx.moveTo(44 - this.originX + 80, -this.originY - 349);
-		ctx.lineTo(138, -207);
+		ctx.lineTo(120, -207);
 		ctx.moveTo(44 - this.originX + 120, -this.originY - 349);
-		ctx.lineTo(64, -207);
+		ctx.lineTo(80, -207);
 		ctx.moveTo(44 - this.originX + 120, -this.originY - 349);
-		ctx.lineTo(138, -207);
+		ctx.lineTo(120, -207);
 
 		// Bottom zonules
 		ctx.moveTo(44 - this.originX + 80, -this.originY + 349);
-		ctx.lineTo(64, 207);
+		ctx.lineTo(80, 207);
 		ctx.moveTo(44 - this.originX + 80, -this.originY + 349);
-		ctx.lineTo(138, 207);
+		ctx.lineTo(120, 207);
 		ctx.moveTo(44 - this.originX + 120, -this.originY + 349);
-		ctx.lineTo(64, 207);
+		ctx.lineTo(80, 207);
 		ctx.moveTo(44 - this.originX + 120, -this.originY + 349);
-		ctx.lineTo(138, 207);
+		ctx.lineTo(120, 207);
 
 		ctx.lineWidth = 2;
 		ctx.strokeStyle = "gray";
@@ -29783,7 +31070,7 @@ ED.Lens = function(_drawing, _parameterJSON) {
 	this.phakodonesis = false;
 
 	// Saved parameters
-	this.savedParameterArray = ['originX', 'originY', 'nuclearGrade', 'corticalGrade', 'posteriorSubcapsularGrade', 'anteriorPolar', 'posteriorPolar', 'coronary', 'phakodonesis'];
+	this.savedParameterArray = ['rotation', 'originY', 'nuclearGrade', 'corticalGrade', 'posteriorSubcapsularGrade', 'anteriorPolar', 'posteriorPolar', 'coronary', 'phakodonesis'];
 
 	// Parameters in doodle control bar (parameter name: parameter label)
 	this.controlParameterArray = {
@@ -33600,9 +34887,17 @@ ED.PCIOL = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "PCIOL";
 
+	// Other parameters
+	this.fixation = 'In-the-bag';
+	this.fx = 1;
+	
 	// Saved parameters
-	this.savedParameterArray = ['originX', 'originY', 'rotation'];
+	this.savedParameterArray = ['fixation', 'fx', 'originX', 'originY', 'rotation'];
 
+	// Parameters in doodle control bar
+	this.controlParameterArray = {'fixation':'Fixation'};
+
+	
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 
@@ -33632,6 +34927,56 @@ ED.PCIOL.prototype.setPropertyDefaults = function() {
 	this.addAtBack = true;
 	this.isScaleable = false;
 	this.isUnique = true;
+	
+	// Validation arrays for other parameters
+	this.parameterValidationArray['fixation'] = {
+		kind: 'derived',
+		type: 'string',
+		list: ['In-the-bag', 'Ciliary sulcus'],
+		animate: true
+	};
+	this.parameterValidationArray['fx'] = {
+		kind: 'other',
+		type: 'int',
+		range: [1, 2],
+		animate: false
+	};
+	
+	// Update component of validation array for simple parameters
+	this.parameterValidationArray['originX']['range'].setMinAndMax(-200, +200);
+	this.parameterValidationArray['originY']['range'].setMinAndMax(-200, +200);
+}
+
+/**
+ * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
+ * The returned parameters are animated if their 'animate' property is set to true
+ *
+ * @param {String} _parameter Name of parameter that has changed
+ * @value {Undefined} _value Value of parameter to calculate
+ * @returns {Array} Associative array of values of dependent parameters
+ */
+ED.PCIOL.prototype.dependentParameterValues = function(_parameter, _value) {
+	var returnArray = new Array();
+
+	switch (_parameter) {
+		case 'fx':
+			if (_value === 2) returnArray['fixation'] = 'Ciliary sulcus';
+			else returnArray['fixation'] = 'In-the-bag';
+			break;
+
+		case 'fixation':
+			switch (_value) {
+				case 'In-the-bag':
+					returnArray['fx'] = 1;
+					break;
+				case 'Ciliary sulcus':
+					returnArray['fx'] = 2;
+					break;
+			}
+			break;
+	}
+
+	return returnArray;
 }
 
 /**
@@ -33702,6 +35047,7 @@ ED.PCIOL.prototype.draw = function(_point) {
  */
 ED.PCIOL.prototype.description = function() {
 	var returnValue = "Posterior chamber IOL";
+	returnValue += " (" + this.fixation + " fixation)";
 
 	// Displacement limit
 	var limit = 40;
@@ -33729,6 +35075,252 @@ ED.PCIOL.prototype.description = function() {
 	if (displacementValue.length > 0) returnValue += " displaced" + displacementValue;
 
 	return returnValue;
+}
+
+/**
+ * OpenEyes
+ *
+ * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
+ * (C) OpenEyes Foundation, 2011-2013
+ * This file is part of OpenEyes.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package OpenEyes
+ * @link http://www.openeyes.org.uk
+ * @author OpenEyes <info@openeyes.org.uk>
+ * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
+ * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ */
+
+/**
+ * PCIOL Cross Section ***TODO***
+ *
+ * @class PCIOLCrossSection
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Object} _parameterJSON
+ */
+ED.PCIOLCrossSection = function(_drawing, _parameterJSON) {
+	// Set classname
+	this.className = "PCIOLCrossSection";
+	
+	// Other parameters
+	this.fixation = 'In-the-bag';
+	this.fx = 1;
+	
+	// Saved parameters
+	this.savedParameterArray = ['fixation', 'fx'];
+	
+	// Parameters in doodle control bar
+	this.controlParameterArray = {'fixation':'Fixation'};
+
+
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _parameterJSON);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.PCIOLCrossSection.prototype = new ED.Doodle;
+ED.PCIOLCrossSection.prototype.constructor = ED.PCIOLCrossSection;
+ED.PCIOLCrossSection.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets default dragging attributes
+ */
+ED.PCIOLCrossSection.prototype.setPropertyDefaults = function() {
+	this.isUnique = true;
+	this.addAtBack = true;
+
+	// Validation arrays for other parameters
+	this.parameterValidationArray['fixation'] = {
+		kind: 'derived',
+		type: 'string',
+		list: ['In-the-bag', 'Ciliary sulcus'],
+		animate: true
+	};
+	this.parameterValidationArray['fx'] = {
+		kind: 'other',
+		type: 'int',
+		range: [1, 2],
+		animate: false
+	};
+	
+	// Update component of validation array for simple parameters
+	this.parameterValidationArray['originX']['range'].setMinAndMax(+44, +44);
+	this.parameterValidationArray['originY']['range'].setMinAndMax(-140, +140);
+}
+
+/**
+ * Sets default parameters (Only called for new doodles)
+ * Use the setParameter function for derived parameters, as this will also update dependent variables
+ */
+ED.PCIOLCrossSection.prototype.setParameterDefaults = function() {
+	this.originX = 44;
+}
+
+/**
+ * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
+ * The returned parameters are animated if their 'animate' property is set to true
+ *
+ * @param {String} _parameter Name of parameter that has changed
+ * @value {Undefined} _value Value of parameter to calculate
+ * @returns {Array} Associative array of values of dependent parameters
+ */
+ED.PCIOLCrossSection.prototype.dependentParameterValues = function(_parameter, _value) {
+	var returnArray = new Array();
+
+	switch (_parameter) {
+		case 'fx':
+			if (_value === 2) returnArray['fixation'] = 'Ciliary sulcus';
+			else returnArray['fixation'] = 'In-the-bag';
+			break;
+
+		case 'fixation':
+			switch (_value) {
+				case 'In-the-bag':
+					returnArray['fx'] = 1;
+					break;
+				case 'Ciliary sulcus':
+					returnArray['fx'] = 2;
+					break;
+			}
+			break;
+	}
+
+	return returnArray;
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.PCIOLCrossSection.prototype.draw = function(_point) {
+	// Get context
+	var ctx = this.drawing.context;
+
+	// Call draw method in superclass
+	ED.PCIOLCrossSection.superclass.draw.call(this, _point);
+
+	// Height of cross section (half value of ro in AntSeg doodle)
+	var h = 240;
+
+	// Arbitrary radius of curvature
+	var r = 450;
+
+	// Displacement of lens from centre
+	var ld = 100;
+
+	// Angle of arc
+	var theta = Math.asin(h / r);
+
+	// X coordinate of centre of circle
+	var x = r * Math.cos(theta);
+
+	// Measurements of nucleus
+	var rn = r - 60;
+
+	// Calculate nucleus angles
+	var phi = Math.acos(x / rn);
+
+	// Draw lens
+	ctx.beginPath();
+	
+	if (this.fixation == 'In-the-bag') {
+		ctx.ellipse(100, 0, 160, 20, 0.5 * Math.PI, 0, 2 * Math.PI);
+	}
+	else {
+		ctx.ellipse(50, 0, 160, 25, 0.5 * Math.PI, 0, 2 * Math.PI);
+	}
+
+
+	// Set line attributes
+	ctx.lineWidth = 5;
+	ctx.fillStyle = "rgba(255, 255, 255, 0.75)";
+	ctx.strokeStyle = "#898989";
+
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+
+	// Non boundary drawing
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+		
+		// Lens bag
+		ctx.beginPath();
+		ctx.arc(44 + ld - x - this.originX, 0 - this.originY, r, theta, -theta, true);
+		ctx.arc(44 + ld + x - this.originX, 0 - this.originY, r, Math.PI + theta, Math.PI + 0.75*theta, true);
+		ctx.moveTo(44 + ld - this.originX, 240 - this.originY);
+		ctx.arc(44 + ld + x - this.originX, 0 - this.originY, r, Math.PI - theta, Math.PI - 0.75*theta, false);
+		ctx.strokeStyle = "gray";
+		ctx.lineWidth = 3;
+		ctx.stroke();
+
+		// Loops
+		ctx.beginPath();
+		if (this.fixation == 'In-the-bag') {	
+/*
+			ctx.arc(30 + 115 - this.originX, -210 - this.originY, 10, 2.2*Math.PI, 1*Math.PI, true);
+			ctx.lineTo(85,-125);
+			ctx.moveTo(120 - this.originX, 210 - this.originY);
+			ctx.arc(25 + 115 - this.originX, 210 - this.originY, 13, 0, 1*Math.PI, false);
+			ctx.moveTo(100 - this.originX, 210 - this.originY);
+			ctx.lineTo(44 + 65,125);	
+*/	
+			ctx.ellipse(144 - this.originX, 0 - this.originY, 227, 20, 0.5 * Math.PI, 0.5 * Math.PI, 1.2 * Math.PI);
+			ctx.moveTo(164 - this.originX,0 - this.originY);
+			ctx.ellipse(144 - this.originX, 0 - this.originY, 227, 20, 0.5 * Math.PI, 1.5 * Math.PI, 0.2 * Math.PI);
+		}
+		else {
+			ctx.arc(115 - this.originX, -350 - this.originY, 15, 0*Math.PI, 1*Math.PI, true);
+			ctx.lineTo(35,-125);
+			ctx.moveTo(120 - this.originX, 350 - this.originY);
+			ctx.arc(115 - this.originX, 350 - this.originY, 15, 0, 1*Math.PI, false);
+			ctx.moveTo(100 - this.originX, 350 - this.originY);
+			ctx.lineTo(65,125);
+		}
+		ctx.strokeStyle = "#898989";
+		ctx.lineWidth = 5;
+		ctx.stroke();
+
+		
+		// Zonules
+		ctx.beginPath();
+
+		// Top zonules
+		ctx.moveTo(44 - this.originX + 80, - this.originY - 349);
+		ctx.lineTo(44 + 80 - this.originX, -207 - this.originY);
+		ctx.moveTo(44 - this.originX + 80, - this.originY - 349);
+		ctx.lineTo(44 + 120 - this.originX, -207 - this.originY);
+		ctx.moveTo(44  - this.originX + 120, - this.originY - 349);
+		ctx.lineTo(44 + 80 - this.originX, -207 - this.originY);
+		ctx.moveTo(44 - this.originX + 120, - this.originY - 349);
+		ctx.lineTo(44 + 120 - this.originX, -207 - this.originY);
+
+		// Bottom zonules
+		ctx.moveTo(44 - this.originX + 80, -this.originY + 349);
+		ctx.lineTo(44 + 80 - this.originX, 207 - this.originY);
+		ctx.moveTo(44 - this.originX + 80, -this.originY + 349);
+		ctx.lineTo(44 + 120 - this.originX, 207 - this.originY);
+		ctx.moveTo(44 - this.originX + 120, -this.originY + 349);
+		ctx.lineTo(44 + 80 - this.originX, 207 - this.originY);
+		ctx.moveTo(44 - this.originX + 120, -this.originY + 349);
+		ctx.lineTo(44 + 120 - this.originX, 207 - this.originY);
+
+		ctx.lineWidth = 2;
+		ctx.strokeStyle = "gray";
+		ctx.stroke();
+	}
+
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+
+	// Return value indicating successful hittest
+	return this.isClicked;
 }
 
 /**
@@ -34259,6 +35851,7 @@ ED.PalpebralConjunctivitis.prototype.setPropertyDefaults = function() {
 	this.isUnique = true;
 	this.isMoveable = false;
 	this.isRotatable = false;
+	this.addAtBack = true;
 	
 	// Validation arrays for other parameters
 	this.parameterValidationArray['type'] = {
@@ -39863,6 +41456,125 @@ ED.Retinoschisis.prototype.diagnosticHierarchy = function()
  */
 
 /**
+ *
+ *
+ * @class Retinoscopy
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Object} _parameterJSON
+ */
+ED.Retinoscopy = function(_drawing, _parameterJSON) {
+	// Set classname
+	this.className = "Retinoscopy";
+
+	this.angle1 = 180;
+	this.angle2 = 90;
+	this.powerSign1 = "+";
+	this.powerSign2 = "+";
+	this.powerInt1 = 0;
+	this.powerInt2 = 0;
+	this.powerDp1 = ".00";
+	this.powerDp2 = ".00";
+	
+	// Saved parameters
+	this.savedParameterArray = ['rotation'];
+	
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _parameterJSON);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.Retinoscopy.prototype = new ED.Doodle;
+ED.Retinoscopy.prototype.constructor = ED.Retinoscopy;
+ED.Retinoscopy.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets default dragging attributes
+ */
+ED.Retinoscopy.prototype.setPropertyDefaults = function() {
+	this.isScaleable = false;
+	this.isMoveable = false;
+}
+
+/**
+ * Sets default parameters (Only called for new doodles)
+ * Use the setParameter function for derived parameters, as this will also update dependent variables
+ */
+ED.Retinoscopy.prototype.setParameterDefaults = function() {
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.Retinoscopy.prototype.draw = function(_point) {
+	// Get context
+	var ctx = this.drawing.context;
+
+	// Call draw method in superclass
+	ED.Retinoscopy.superclass.draw.call(this, _point);
+	
+	// Draw invisible boundary box around axes
+	ctx.moveTo(-400,-400);
+	ctx.lineTo(-400,400);
+	ctx.lineTo(400,400);
+	ctx.lineTo(400,-400);
+	ctx.lineTo(-400,-400);
+	
+	ctx.fillStyle = "rgba(255, 255, 255, 0)";
+	ctx.strokeStyle = "rgba(0,0,0,0)"
+	
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+	
+	// Non boundary drawing
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+		ctx.beginPath();
+		
+		// Draw y axis
+		ctx.moveTo(0,-400);
+		ctx.lineTo(0,400);
+		
+		// Draw X axis
+		ctx.moveTo(400,0);
+		ctx.lineTo(-400,0);
+	
+		// Set line attributes
+		ctx.lineWidth = 7;
+		ctx.fillStyle = "rgba(255, 255, 255, 0)";
+		ctx.strokeStyle = "black";
+		
+		// Draw it
+		ctx.stroke();
+
+	}
+
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * OpenEyes
+ *
+ * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
+ * (C) OpenEyes Foundation, 2011-2013
+ * This file is part of OpenEyes.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package OpenEyes
+ * @link http://www.openeyes.org.uk
+ * @author OpenEyes <info@openeyes.org.uk>
+ * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
+ * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ */
+
+/**
  * RingSegment
  *
  * @class RingSegment
@@ -40697,6 +42409,141 @@ ED.SMILE.prototype.description = function() {
 
 	return returnString;
 }
+
+/**
+ * OpenEyes
+ *
+ * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
+ * (C) OpenEyes Foundation, 2011-2013
+ * This file is part of OpenEyes.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package OpenEyes
+ * @link http://www.openeyes.org.uk
+ * @author OpenEyes <info@openeyes.org.uk>
+ * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
+ * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ */
+
+/**
+ *
+ *
+ * @class STFB
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Object} _parameterJSON
+ */
+ED.STFB = function(_drawing, _parameterJSON) {
+	// Set classname
+	this.className = "STFB";
+
+	// Saved parameters
+	this.savedParameterArray = ['originX', 'originY', 'scaleX', 'scaleY', 'rotation'];
+	
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _parameterJSON);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.STFB.prototype = new ED.Doodle;
+ED.STFB.prototype.constructor = ED.STFB;
+ED.STFB.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.STFB.prototype.setHandles = function() {
+	this.handleArray[2] = new ED.Doodle.Handle(null, true, ED.Mode.Scale, false);
+	this.handleArray[2].isRotatable = true;
+}
+
+/**
+ * Sets default dragging attributes
+ */
+ED.STFB.prototype.setPropertyDefaults = function() {
+	this.isSqueezable = true;
+		
+	// Update component of validation array for simple parameters
+	this.parameterValidationArray['originX']['range'].setMinAndMax(-380, +380);
+	this.parameterValidationArray['originY']['range'].setMinAndMax(-370, +370);
+	this.parameterValidationArray['scaleX']['range'].setMinAndMax(0.5, 5);
+	this.parameterValidationArray['scaleY']['range'].setMinAndMax(0.5, 3);
+}
+
+/**
+ * Sets default parameters (Only called for new doodles)
+ * Use the setParameter function for derived parameters, as this will also update dependent variables
+ */
+ED.STFB.prototype.setParameterDefaults = function() {	
+	var doodle = this.drawing.lastDoodleOfClass(this.className);
+	if (doodle) {
+		var np = new ED.Point(doodle.originX, doodle.originY + 70);
+		this.move(np.x, np.y);
+	} else {
+		this.move(120, -200);
+	};
+	this.rotation = 0.25 * Math.PI;
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.STFB.prototype.draw = function(_point) {
+	// Get context
+	var ctx = this.drawing.context;
+
+	// Call draw method in superclass
+	ED.STFB.superclass.draw.call(this, _point);
+	
+	// Boundary path
+	ctx.beginPath();
+	
+	ctx.ellipse(0, 0, 15, 40, 0, 0, 2 * Math.PI);
+	
+	// Set line attributes
+	ctx.lineWidth = 3;
+	ctx.fillStyle = "#402A15";
+	ctx.strokeStyle = "#402A15";
+	
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+	
+	// Coordinates of handles (in canvas plane)
+	var point = new ED.Point(15, -40);
+	this.handleArray[2].location = this.transform.transformPoint(point);
+
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+	
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.STFB.prototype.description = function() {
+	var position = "";
+	var str = "Sub tarsal foreign body";
+	
+	if (this.originY < -110) position = "Upper lid ";
+	else if (this.originY > 110) position = "Lower lid ";
+	
+	var returnValue = (position.length>0) ? position + str.toLowerCase() : str;
+
+	return returnValue;
+}
+
 
 /**
  * OpenEyes

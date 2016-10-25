@@ -53,16 +53,22 @@ ED.CornealPigmentation.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.CornealPigmentation.prototype.setHandles = function() {
-	this.handleArray[4] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
+	this.handleArray[4] = new ED.Doodle.Handle(null, true, ED.Mode.Scale, false);
+	this.handleArray[4].isRotatable = true;
 }
 
 /**
  * Sets default properties
  */
 ED.CornealPigmentation.prototype.setPropertyDefaults = function() {
+	this.isSqueezable = true;
+	
+	this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.2, +3);
+	this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.2, +3);
+	
 	// Update component of validation array for simple parameters
-	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
-	this.parameterValidationArray['apexY']['range'].setMinAndMax(-380, -40);
+// 	this.parameterValidationArray['scale']['range'].setMinAndMax(0.2, +5);
+// 	this.parameterValidationArray['apexY']['range'].setMinAndMax(-380, -40);
 	
 	// Add complete validation arrays for derived parameters
 	this.parameterValidationArray['level'] = {
@@ -84,10 +90,10 @@ ED.CornealPigmentation.prototype.setPropertyDefaults = function() {
  */
 ED.CornealPigmentation.prototype.setParameterDefaults = function() {
 	this.setParameterFromString('level', 'Epithelial');
-	this.apexY = -200;
+// 	this.apexY = -200;
 
 	// Put control handle at 45 degrees
-	this.rotation = Math.PI / 4;
+// 	this.rotation = Math.PI / 4;
 }
 
 /**
@@ -106,22 +112,23 @@ ED.CornealPigmentation.prototype.draw = function(_point) {
 	ctx.beginPath();
 
 	// Circular scar
-	var r = Math.sqrt(this.apexX * this.apexX + this.apexY * this.apexY);
+// 	var r = Math.sqrt(this.apexX * this.apexX + this.apexY * this.apexY);
 
 	// Circular scar
-	ctx.arc(0, 0, r, 0, 2 * Math.PI, true);
-
+// 	ctx.arc(0, 0, 200, 0, 2 * Math.PI, true);
+	ctx.ellipse(0, 0, 120, 40, 0.5 * Math.PI, 0, 2 * Math.PI);
+	
 	// Set line attributes  
 	ctx.lineWidth = 4;
 	var ptrn = ctx.createPattern(this.drawing.imageArray['BrownSpotPattern'], 'repeat');
 	ctx.fillStyle = ptrn;
-	ctx.strokeStyle = "rgba(200, 200, 200, 1)";
+	ctx.strokeStyle = "rgba(0, 0, 0, 0)";
 
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(40, 120));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
