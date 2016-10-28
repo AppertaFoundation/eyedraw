@@ -18,7 +18,7 @@
  */
 
 /**
- * TODO: shape contour, infiltrate depth
+ * TODO: shape contour, fix length of line calculation for corneas where the apex is not alogn the origin
  *
  * @class CornealOpacityCrossSection
  * @property {String} className Name of doodle subclass
@@ -75,7 +75,7 @@ ED.CornealOpacityCrossSection.prototype.setHandles = function() {
  * Sets default properties
  */
 ED.CornealOpacityCrossSection.prototype.setPropertyDefaults = function() {
-// 	this.isSelectable = false;
+	this.isSelectable = false;
 		
 	// Update component of validation array for simple parameters
 	this.parameterValidationArray['originX']['range'].setMinAndMax(+50, +50);
@@ -224,6 +224,9 @@ ED.CornealOpacityCrossSection.prototype.draw = function(_point) {
 	// Get context
 	var ctx = this.drawing.context;
 
+	var cornea = this.drawing.lastDoodleOfClass('CorneaCrossSection');
+	var cornealThickness = cornea.pachymetry/5;
+
 	// Call draw method in superclass
 	ED.CornealOpacityCrossSection.superclass.draw.call(this, _point);
 
@@ -247,18 +250,43 @@ ED.CornealOpacityCrossSection.prototype.draw = function(_point) {
 		// define start and end time points
 		var tI0 = startT * 2;
 		var tI1 = (endT < 0.5) ? endT * 2 : 1;
-				
+		
 		// default bezier points (as in cornea cross section)
-		superiorBezier.SP = new ED.Point(-120, -380 - this.originY);
-		superiorBezier.CP1 = new ED.Point(-240, -260 - this.originY);
-		superiorBezier.CP2 = new ED.Point(-320, -160 - this.originY);
-		superiorBezier.EP = new ED.Point(-320, 0 - this.originY);
+		if (cornea && cornea.shape == "Keratoconus") {
+			superiorBezier.SP = new ED.Point(-120, -380 - this.originY);
+			superiorBezier.CP1 = new ED.Point(-240, -260 - this.originY);
+			superiorBezier.CP2 = new ED.Point(cornea.apexX, cornea.apexY - 100 - this.originY);
+			superiorBezier.EP = new ED.Point(cornea.apexX, cornea.apexY - this.originY);
+			
+			superiorBezierBack.SP = new ED.Point(-120 + 120*this.depth/100, -380 - this.originY);
+			superiorBezierBack.CP1 = new ED.Point(-240 + 160*this.depth/100, -260 - this.originY);
+			superiorBezierBack.CP2 = new ED.Point(cornea.apexX + cornealThickness*this.depth/100, cornea.apexY - 120 - this.originY);
+			superiorBezierBack.EP = new ED.Point(cornea.apexX + cornealThickness*this.depth/100, cornea.apexY - this.originY);
+		}
+		else if (cornea && cornea.shape == "Keratoglobus") {
+			superiorBezier.SP = new ED.Point(-120, -380 - this.originY);
+			superiorBezier.CP1 = new ED.Point(-240, -260 - this.originY);
+			superiorBezier.CP2 = new ED.Point(-380, -100 - this.originY);
+			superiorBezier.EP = new ED.Point(-380, 100 - this.originY);
+			
+			superiorBezierBack.SP = new ED.Point(-120 + 120*this.depth/100, -380 - this.originY);
+			superiorBezierBack.CP1 = new ED.Point(-240 + 120*this.depth/100, -200 - this.originY);
+			superiorBezierBack.CP2 = new ED.Point(-380 + 100*this.depth/100, -140 - this.originY);
+			superiorBezierBack.EP = new ED.Point(-380 + 100*this.depth/100, 100 - this.originY);
+		}
+		else {
+			superiorBezier.SP = new ED.Point(-120, -380 - this.originY);
+			superiorBezier.CP1 = new ED.Point(-240, -260 - this.originY);
+			superiorBezier.CP2 = new ED.Point(-320, -160 - this.originY);
+			superiorBezier.EP = new ED.Point(-320, 0 - this.originY);
+			
+			superiorBezierBack.SP = new ED.Point(-120 + 120*this.depth/100, -380 - this.originY);
+			superiorBezierBack.CP1 = new ED.Point(-240 + 160*this.depth/100, -260 - this.originY);
+			superiorBezierBack.CP2 = new ED.Point(-320 + 100*this.depth/100, -160 - this.originY);
+			superiorBezierBack.EP = new ED.Point(-320 + 100*this.depth/100, 0 - this.originY);
+		}
 		
-		superiorBezierBack.SP = new ED.Point(-120 + 120*this.depth/100, -380 - this.originY);
-		superiorBezierBack.CP1 = new ED.Point(-240 + 160*this.depth/100, -260 - this.originY);
-		superiorBezierBack.CP2 = new ED.Point(-320 + 100*this.depth/100, -160 - this.originY);
-		superiorBezierBack.EP = new ED.Point(-320 + 100*this.depth/100, 0 - this.originY);
-		
+			
 		if (tI0 > 0) {
 		// Trim start of curve			
 			
@@ -365,15 +393,39 @@ ED.CornealOpacityCrossSection.prototype.draw = function(_point) {
 		var tS1 = (endT - 0.5) * 2;
 		
 		// default bezier points (as in cornea cross section)
-		inferiorBezier.SP = new ED.Point(-320, -0 - this.originY);
-		inferiorBezier.CP1 = new ED.Point(-320, 160 - this.originY);
-		inferiorBezier.CP2 = new ED.Point(-240, 260 - this.originY);
-		inferiorBezier.EP = new ED.Point(-120, 380 - this.originY);
-		
-		inferiorBezierBack.SP = new ED.Point(-320 + 100*this.depth/100, -0 - this.originY);
-		inferiorBezierBack.CP1 = new ED.Point(-320 + 100*this.depth/100, 160 - this.originY);
-		inferiorBezierBack.CP2 = new ED.Point(-240 + 160*this.depth/100, 260 - this.originY);
-		inferiorBezierBack.EP = new ED.Point(-120 + 120*this.depth/100, 380 - this.originY);
+		if (cornea && cornea.shape == "Keratoconus") {
+			inferiorBezier.SP = new ED.Point(cornea.apexX, cornea.apexY - this.originY);
+			inferiorBezier.CP1 = new ED.Point(cornea.apexX, cornea.apexY + 100 - this.originY);
+			inferiorBezier.CP2 = new ED.Point(-240, 260 - this.originY);
+			inferiorBezier.EP = new ED.Point(-120, 380 - this.originY);
+			
+			inferiorBezierBack.SP = new ED.Point(cornea.apexX + cornealThickness*this.depth/100, cornea.apexY - this.originY);
+			inferiorBezierBack.CP1 = new ED.Point(cornea.apexX + cornealThickness*this.depth/100, cornea.apexY + 120 - this.originY);
+			inferiorBezierBack.CP2 = new ED.Point(-240 + 160*this.depth/100, 260 - this.originY);
+			inferiorBezierBack.EP = new ED.Point(-120 + 120*this.depth/100, 380 - this.originY);
+		}
+		else if (cornea && cornea.shape == "Keratoglobus") {
+			inferiorBezier.SP = new ED.Point(-380, 100 - this.originY);
+			inferiorBezier.CP1 = new ED.Point(-380, 200 - this.originY);
+			inferiorBezier.CP2 = new ED.Point(-240, 360 - this.originY);
+			inferiorBezier.EP = new ED.Point(-120, 380 - this.originY);
+			
+			inferiorBezierBack.SP = new ED.Point(-380 + 100*this.depth/100, 100 - this.originY);
+			inferiorBezierBack.CP1 = new ED.Point(-380 + 120*this.depth/100, 220 - this.originY);
+			inferiorBezierBack.CP2 = new ED.Point(-240 + 160*this.depth/100, 260 - this.originY);
+			inferiorBezierBack.EP = new ED.Point(-120 + 120*this.depth/100, 380 - this.originY);
+		}
+		else {
+			inferiorBezier.SP = new ED.Point(-320, -0 - this.originY);
+			inferiorBezier.CP1 = new ED.Point(-320, 160 - this.originY);
+			inferiorBezier.CP2 = new ED.Point(-240, 260 - this.originY);
+			inferiorBezier.EP = new ED.Point(-120, 380 - this.originY);
+			
+			inferiorBezierBack.SP = new ED.Point(-320 + 100*this.depth/100, -0 - this.originY);
+			inferiorBezierBack.CP1 = new ED.Point(-320 + 100*this.depth/100, 160 - this.originY);
+			inferiorBezierBack.CP2 = new ED.Point(-240 + 160*this.depth/100, 260 - this.originY);
+			inferiorBezierBack.EP = new ED.Point(-120 + 120*this.depth/100, 380 - this.originY);
+		}			
 		
 		
 		if (tS0 > 0) {
@@ -525,16 +577,41 @@ ED.CornealOpacityCrossSection.prototype.draw = function(_point) {
 				var itI1 = (iEndT < 0.5) ? iEndT * 2 : 1;
 						
 				// default bezier points (as in cornea cross section)
-				iSuperiorBezier.SP = new ED.Point(-120, -380 - this.originY);
-				iSuperiorBezier.CP1 = new ED.Point(-240, -260 - this.originY);
-				iSuperiorBezier.CP2 = new ED.Point(-320, -160 - this.originY);
-				iSuperiorBezier.EP = new ED.Point(-320, 0 - this.originY);
+				if (cornea && cornea.shape == "Keratoconus") {
+					iSuperiorBezier.SP = new ED.Point(-120, -380 - this.originY);
+					iSuperiorBezier.CP1 = new ED.Point(-240, -260 - this.originY);
+					iSuperiorBezier.CP2 = new ED.Point(cornea.apexX, cornea.apexY - 100 - this.originY);
+					iSuperiorBezier.EP = new ED.Point(cornea.apexX, cornea.apexY - this.originY);
+					
+					iSuperiorBezierBack.SP = new ED.Point(-120 + 120*infiltrateScale/100, -380 - this.originY);
+					iSuperiorBezierBack.CP1 = new ED.Point(-240 + 160*infiltrateScale/100, -260 - this.originY);
+					iSuperiorBezierBack.CP2 = new ED.Point(cornea.apexX + cornealThickness*infiltrateScale/100, cornea.apexY - 120 - this.originY);
+					iSuperiorBezierBack.EP = new ED.Point(cornea.apexX + cornealThickness*infiltrateScale/100, cornea.apexY - this.originY);
+				}
+				else if (cornea && cornea.shape == "Keratoglobus") {
+					iSuperiorBezier.SP = new ED.Point(-120, -380 - this.originY);
+					iSuperiorBezier.CP1 = new ED.Point(-240, -260 - this.originY);
+					iSuperiorBezier.CP2 = new ED.Point(-380, -100 - this.originY);
+					iSuperiorBezier.EP = new ED.Point(-380, 100 - this.originY);
+					
+					iSuperiorBezierBack.SP = new ED.Point(-120 + 120*infiltrateScale/100, -380 - this.originY);
+					iSuperiorBezierBack.CP1 = new ED.Point(-240 + 120*infiltrateScale/100, -200 - this.originY);
+					iSuperiorBezierBack.CP2 = new ED.Point(-380 + 100*infiltrateScale/100, -140 - this.originY);
+					iSuperiorBezierBack.EP = new ED.Point(-380 + 100*infiltrateScale/100, 100 - this.originY);
+				}
+				else {
+					iSuperiorBezier.SP = new ED.Point(-120, -380 - this.originY);
+					iSuperiorBezier.CP1 = new ED.Point(-240, -260 - this.originY);
+					iSuperiorBezier.CP2 = new ED.Point(-320, -160 - this.originY);
+					iSuperiorBezier.EP = new ED.Point(-320, 0 - this.originY);
+					
+					iSuperiorBezierBack.SP = new ED.Point(-120 + 120*infiltrateScale/100, -380 - this.originY);
+					iSuperiorBezierBack.CP1 = new ED.Point(-240 + 160*infiltrateScale/100, -260 - this.originY);
+					iSuperiorBezierBack.CP2 = new ED.Point(-320 + 100*infiltrateScale/100, -160 - this.originY);
+					iSuperiorBezierBack.EP = new ED.Point(-320 + 100*infiltrateScale/100, 0 - this.originY);
+				}
 				
-				iSuperiorBezierBack.SP = new ED.Point(-120 + 120*infiltrateScale/100, -380 - this.originY);
-				iSuperiorBezierBack.CP1 = new ED.Point(-240 + 160*infiltrateScale/100, -260 - this.originY);
-				iSuperiorBezierBack.CP2 = new ED.Point(-320 + 100*infiltrateScale/100, -160 - this.originY);
-				iSuperiorBezierBack.EP = new ED.Point(-320 + 100*infiltrateScale/100, 0 - this.originY);
-				
+					
 				if (itI0 > 0) {
 				// Trim start of curve
 				
@@ -640,16 +717,39 @@ ED.CornealOpacityCrossSection.prototype.draw = function(_point) {
 				var itS1 = (iEndT - 0.5) * 2;
 				
 				// default bezier points (as in cornea cross section)
-				iInferiorBezier.SP = new ED.Point(-320, -0 - this.originY);
-				iInferiorBezier.CP1 = new ED.Point(-320, 160 - this.originY);
-				iInferiorBezier.CP2 = new ED.Point(-240, 260 - this.originY);
-				iInferiorBezier.EP = new ED.Point(-120, 380 - this.originY);
-				
-				iInferiorBezierBack.SP = new ED.Point(-320 + 100*infiltrateScale/100, -0 - this.originY);
-				iInferiorBezierBack.CP1 = new ED.Point(-320 + 100*infiltrateScale/100, 160 - this.originY);
-				iInferiorBezierBack.CP2 = new ED.Point(-240 + 160*infiltrateScale/100, 260 - this.originY);
-				iInferiorBezierBack.EP = new ED.Point(-120 + 120*infiltrateScale/100, 380 - this.originY);
-				
+				if (cornea && cornea.shape == "Keratoconus") {
+					iInferiorBezier.SP = new ED.Point(cornea.apexX, cornea.apexY - this.originY);
+					iInferiorBezier.CP1 = new ED.Point(cornea.apexX, cornea.apexY + 100 - this.originY);
+					iInferiorBezier.CP2 = new ED.Point(-240, 260 - this.originY);
+					iInferiorBezier.EP = new ED.Point(-120, 380 - this.originY);
+					
+					iInferiorBezierBack.SP = new ED.Point(cornea.apexX + cornealThickness*infiltrateScale/100, cornea.apexY - this.originY);
+					iInferiorBezierBack.CP1 = new ED.Point(cornea.apexX + cornealThickness*infiltrateScale/100, cornea.apexY + 120 - this.originY);
+					iInferiorBezierBack.CP2 = new ED.Point(-240 + 160*infiltrateScale/100, 260 - this.originY);
+					iInferiorBezierBack.EP = new ED.Point(-120 + 120*infiltrateScale/100, 380 - this.originY);
+				}
+				else if (cornea && cornea.shape == "Keratoglobus") {
+					iInferiorBezier.SP = new ED.Point(-380, 100 - this.originY);
+					iInferiorBezier.CP1 = new ED.Point(-380, 200 - this.originY);
+					iInferiorBezier.CP2 = new ED.Point(-240, 360 - this.originY);
+					iInferiorBezier.EP = new ED.Point(-120, 380 - this.originY);
+					
+					iInferiorBezierBack.SP = new ED.Point(-380 + 100*infiltrateScale/100, 100 - this.originY);
+					iInferiorBezierBack.CP1 = new ED.Point(-380 + 120*infiltrateScale/100, 220 - this.originY);
+					iInferiorBezierBack.CP2 = new ED.Point(-240 + 160*infiltrateScale/100, 260 - this.originY);
+					iInferiorBezierBack.EP = new ED.Point(-120 + 120*infiltrateScale/100, 380 - this.originY);
+				}
+				else {
+					iInferiorBezier.SP = new ED.Point(-320, -0 - this.originY);
+					iInferiorBezier.CP1 = new ED.Point(-320, 160 - this.originY);
+					iInferiorBezier.CP2 = new ED.Point(-240, 260 - this.originY);
+					iInferiorBezier.EP = new ED.Point(-120, 380 - this.originY);
+					
+					iInferiorBezierBack.SP = new ED.Point(-320 + 100*infiltrateScale/100, -0 - this.originY);
+					iInferiorBezierBack.CP1 = new ED.Point(-320 + 100*infiltrateScale/100, 160 - this.originY);
+					iInferiorBezierBack.CP2 = new ED.Point(-240 + 160*infiltrateScale/100, 260 - this.originY);
+					iInferiorBezierBack.EP = new ED.Point(-120 + 120*infiltrateScale/100, 380 - this.originY);
+				}	
 				
 				if (itS0 > 0) {
 				// Trim start of curve	
@@ -782,7 +882,6 @@ ED.CornealOpacityCrossSection.prototype.draw = function(_point) {
 			}
 			ctx.fillStyle = "gray";
 			ctx.fill();
-// 			ctx.stroke();
 		}
 	}
 	
@@ -794,11 +893,4 @@ ED.CornealOpacityCrossSection.prototype.draw = function(_point) {
 	
 }
 
-/**
- * Returns a string containing a text description of the doodle
- *
- * @returns {String} Description of doodle
- */
-ED.CornealOpacityCrossSection.prototype.description = function() {
-// 	return 'Corneal opacity';
-}
+

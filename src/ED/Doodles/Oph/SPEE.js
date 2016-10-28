@@ -19,24 +19,17 @@
 /**
  * 
  *
- * @class CornealPigmentation
+ * @class SPEE
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
  * @param {Object} _parameterJSON
  */
-ED.CornealPigmentation = function(_drawing, _parameterJSON) {
+ED.SPEE = function(_drawing, _parameterJSON) {
 	// Set classname
-	this.className = "CornealPigmentation";
-	
-	// Other parameters
-	this.level = 'Epithelial';
-	this.type = 'Iron';
+	this.className = "SPEE";
 
 	// Saved parameters
-	this.savedParameterArray = ['originX', 'originY', 'apexY', 'apexX', 'scaleX','scaleY', 'rotation', 'level', 'type'];
-
-	// Parameters in doodle control bar (parameter name: parameter label)
-	this.controlParameterArray = {'level':'Level', 'type':'Type'};
+	this.savedParameterArray = ['originX', 'originY', 'apexY', 'apexX', 'scaleX','scaleY', 'rotation'];
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -45,14 +38,14 @@ ED.CornealPigmentation = function(_drawing, _parameterJSON) {
 /**
  * Sets superclass and constructor
  */
-ED.CornealPigmentation.prototype = new ED.Doodle;
-ED.CornealPigmentation.prototype.constructor = ED.CornealPigmentation;
-ED.CornealPigmentation.superclass = ED.Doodle.prototype;
+ED.SPEE.prototype = new ED.Doodle;
+ED.SPEE.prototype.constructor = ED.SPEE;
+ED.SPEE.superclass = ED.Doodle.prototype;
 
 /**
  * Sets handle attributes
  */
-ED.CornealPigmentation.prototype.setHandles = function() {
+ED.SPEE.prototype.setHandles = function() {
 	
 	// pigmentation density
 	this.handleArray[0] = new ED.Doodle.Handle(null, true, ED.Mode.Handles, false);
@@ -65,31 +58,13 @@ ED.CornealPigmentation.prototype.setHandles = function() {
 /**
  * Sets default properties
  */
-ED.CornealPigmentation.prototype.setPropertyDefaults = function() {
+ED.SPEE.prototype.setPropertyDefaults = function() {
 	this.isSqueezable = true;
 	
-/*
-	this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.2, +3);
-	this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.2, +3);
-	
-*/
 	// Update component of validation array for simple parameters
 	this.parameterValidationArray['apexX']['range'].setMinAndMax(-400, +400);
 	this.parameterValidationArray['apexY']['range'].setMinAndMax(-400, +400);
 	
-	// Add complete validation arrays for derived parameters
-	this.parameterValidationArray['level'] = {
-		kind: 'derived',
-		type: 'string',
-		list: ['Epithelial', 'Subepithelial', 'Anterior stromal', 'Mid stromal', 'Posterior stromal', 'Descemet\'s'],
-		animate: true
-	};
-	this.parameterValidationArray['type'] = {
-		kind: 'derived',
-		type: 'string',
-		list: ['Iron', 'Melanin', 'Blood', 'Copper', 'Lead', 'Organic', 'Unknown'],
-		animate: true
-	};
 	
 	this.handleVectorRangeArray = new Array();
 	var range = new Object;
@@ -101,10 +76,11 @@ ED.CornealPigmentation.prototype.setPropertyDefaults = function() {
 /**
  * Sets default parameters
  */
-ED.CornealPigmentation.prototype.setParameterDefaults = function() {
-	this.setParameterFromString('level', 'Epithelial');
-	this.apexY = -150;
-	this.apexX = 30;
+ED.SPEE.prototype.setParameterDefaults = function() {
+	this.originX = 150;
+	this.originY = 40;
+	this.apexY = -50;
+	this.apexX = 170;
 	
 	// Create a squiggle to store the handles points
 	var squiggle = new ED.Squiggle(this, new ED.Colour(100, 100, 100, 1), 4, true);
@@ -122,12 +98,12 @@ ED.CornealPigmentation.prototype.setParameterDefaults = function() {
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.CornealPigmentation.prototype.draw = function(_point) {
+ED.SPEE.prototype.draw = function(_point) {
 	// Get context
 	var ctx = this.drawing.context;
 
 	// Call draw method in superclass
-	ED.CornealPigmentation.superclass.draw.call(this, _point);
+	ED.SPEE.superclass.draw.call(this, _point);
 
 	// Boundary path
 	ctx.beginPath();
@@ -151,7 +127,7 @@ ED.CornealPigmentation.prototype.draw = function(_point) {
 		// Pigment dots
 		
 		// Colours
-		var fill = "brown";
+		var fill = "rgba(50,205,50,1)";
 		
 		// Pigmentation density
 		var pD = this.squiggleArray[0].pointsArray[0].x;
@@ -167,37 +143,23 @@ ED.CornealPigmentation.prototype.draw = function(_point) {
 		
 		var p = new ED.Point(0, 0);
 		
-		// Calculate random positions for dots
-/*
-		var xS;
-		var yS;
-		for (var z=1; z<5; z++) {
-			/// ED.randomArray is too short (length == 200)	, but using Math.random() means non reproducible, so do quarter at a time for more dots!
-			var xS = (z < 3) ? -1 : 1;
-			var yS = (z % 2 == 0) ? -1 : 1;
-*/
+		// Calculate random positions for dots			
+		for (var i = 0; i < n; i++) {
+			var j = (i < 150) ? i : (i < 199) ? i - 50 : (i < 249) ? i - 100 : (i < 299) ? i - 150 : (i < 349) ? i - 200 : i - 250;
+
+			var k = (i < 200) ? i : (i < 398) ? (i - 199) : (i < 397) ? (i - 298) : (i - 396);
+
+			var r = Math.sqrt(n * ED.randomArray[k]);
+			var rX = this.apexX * ED.randomArray[k];
+			var rY = this.apexY * ED.randomArray[j];
+			var theta = 2 * Math.PI * ED.randomArray[j + 50];
+							
+			p.x = rX * Math.cos(theta*r);
+			p.y = rY * Math.sin(theta*r);
 			
-			for (var i = 0; i < n; i++) {
-				var j = (i < 150) ? i : (i < 199) ? i - 50 : (i < 249) ? i - 100 : (i < 299) ? i - 150 : (i < 349) ? i - 200 : i - 250;
-
-				var k = (i < 200) ? i : (i < 398) ? (i - 199) : (i < 397) ? (i - 298) : (i - 396);
-
-				var r = Math.sqrt(n * ED.randomArray[k]);
-				var rX = this.apexX * ED.randomArray[k];
-				var rY = this.apexY * ED.randomArray[j];
-				var theta = 2 * Math.PI * ED.randomArray[j + 50];
-								
-/*
-				p.x = Math.abs(rX * Math.cos(theta*r)) * xS;
-				p.y = Math.abs(rY * Math.sin(theta*r)) * yS;
-*/
-				p.x = rX * Math.cos(theta*r);
-				p.y = rY * Math.sin(theta*r);
-				
-				// Draw dot
-				this.drawSpot(ctx, p.x, p.y, dr, fill);
-			}
-// 		}
+			// Draw dot
+			this.drawSpot(ctx, p.x, p.y, dr, fill);
+		}
 		
 		// Additionally draw spots at boundarys to ensure indicated
 		this.drawSpot(ctx, 0, Math.abs(this.apexY), dr, fill);
@@ -221,11 +183,6 @@ ED.CornealPigmentation.prototype.draw = function(_point) {
  *
  * @returns {String} Description of doodle
  */
-ED.CornealPigmentation.prototype.groupDescription = function() {
-	
-	var ratio = Math.abs(this.apexX / this.apexY);
-	
-	var str = (ratio<2.5 && ratio>0.3) ? "Corneal pigmentation" : "Krukenberg spindle";
-	
-	return str;
+ED.SPEE.prototype.groupDescription = function() {	
+	return "Superficial punctate epithelial erosions";
 }
