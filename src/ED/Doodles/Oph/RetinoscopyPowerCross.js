@@ -141,14 +141,14 @@ ED.RetinoscopyPowerCross.prototype.dependentParameterValues = function(_paramete
 
 	switch (_parameter) {
 		case 'angle1':
-			returnArray['rotation'] = parseFloat(_value*Math.PI/180);
+			returnArray['rotation'] = 2*Math.PI - parseFloat(_value*Math.PI/180);
 			returnArray['angle2'] = (parseInt(_value)>90) ? parseInt(_value) - 90 : parseInt(_value) + 90;
 			break;
 			
 		case 'rotation':
-			var degAngle = parseInt(_value * 180 / Math.PI);
-			returnArray['angle1'] = degAngle;
-			returnArray['angle2'] = (degAngle>90) ? degAngle - 90 : degAngle + 90;
+			var degAngle = Math.round(_value * 180 / Math.PI);
+			returnArray['angle1'] = 360 - degAngle;
+			returnArray['angle2'] = (360 - degAngle>90) ? 360 - degAngle - 90 : 360 - degAngle + 90;
 			break;
 	}
 
@@ -225,8 +225,8 @@ ED.RetinoscopyPowerCross.prototype.draw = function(_point) {
 		ctx.fillText(this.angle1 + "\xB0",x,y);
 		
 		// axis 2
-		x = sp * Math.sin(this.rotation);
-		y = -sp * Math.cos(this.rotation);
+		x = -sp * Math.sin(this.rotation);
+		y = sp * Math.cos(this.rotation);
 		ctx.fillText(this.angle2 + "\xB0",x,y);
 		
 		// power 1
@@ -235,8 +235,8 @@ ED.RetinoscopyPowerCross.prototype.draw = function(_point) {
 		ctx.fillText(this.powerSign2 + this.powerInt1 + this.powerDp1,x,y);
 		
 		// power 2
-		x = -sp * Math.sin(this.rotation);
-		y = sp * Math.cos(-this.rotation);
+		x = sp * Math.sin(this.rotation);
+		y = -sp * Math.cos(-this.rotation);
 		ctx.fillText(this.powerSign2 + this.powerInt2 + this.powerDp2,x,y);
 		
 		ctx.restore();
@@ -268,7 +268,7 @@ ED.RetinoscopyPowerCross.prototype.description = function() {
 	console.log(this.angle1 + ' ' + this.angle2 + ' ' + angle);
 	
 	var Rx = (pSphere >= 0 ) ? '+' + pSphere: pSphere;
-	Rx += (pCyl >= 0 ) ? ' / +' : ' / ';
+	Rx += (pCyl > 0 ) ? ' / +' : (pCyl == 0) ? ' / -' : ' / ';
 	Rx += pCyl + ' x ' + angle; 
 		
 	return Rx;
