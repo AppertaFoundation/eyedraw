@@ -20761,11 +20761,6 @@ ED.CornealOpacity.prototype.setHandles = function() {
 	for (var i = 0; i < this.numberOfHandles; i++) {
 		this.handleArray[i] = new ED.Doodle.Handle(null, true, ED.Mode.Handles, false);
 	}
-/*
-	for (var i = 0; i < this.numberOfHandles; i++) {
-		this.handleArray[i+this.numberOfHandles] = new ED.Doodle.Handle(null, true, ED.Mode.Handles, false);
-	}
-*/
 
 	// Allow top handle to rotate doodle
 	/// ? Removed as need specific handles to be along X and Y axis - can change... **TODO**
@@ -20790,20 +20785,6 @@ ED.CornealOpacity.prototype.setPropertyDefaults = function() {
 		range.angle = new ED.Range((((2 * n - 1) * cir / (2 * n)) + i * cir / n) % cir, ((1 * cir / (2 * n)) + i * cir / n) % cir);
 		this.handleVectorRangeArray[i] = range;
 	}
-/*
-	for (var i = 0; i < this.numberOfHandles; i++) {
-		// Full circle in radians
-		var cir = 2 * Math.PI;
-
-		// Create a range object for each handle
-		/// **TODO**: Ideally relative to canvas centre, not doodle - when update originX or originY
-		var n = this.numberOfHandles;
-		var range = new Object;
-		range.length = new ED.Range(+50, +380);
-		range.angle = new ED.Range((((2 * n - 1) * cir / (2 * n)) + i * cir / n) % cir, ((1 * cir / (2 * n)) + i * cir / n) % cir);
-		this.handleVectorRangeArray[i+n] = range;
-	}
-*/
 	
 	// Update component of validation array for simple parameters
 	this.parameterValidationArray['originX']['range'].setMinAndMax(-350, +350);
@@ -41969,21 +41950,22 @@ ED.Retinoschisis.prototype.diagnosticHierarchy = function()
 /**
  *
  *
- * @class Retinoscopy
+ * @class RetinoscopyPowerCross
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
  * @param {Object} _parameterJSON
  */
-ED.Retinoscopy = function(_drawing, _parameterJSON) {
+ED.RetinoscopyPowerCross = function(_drawing, _parameterJSON) {
 	// Set classname
-	this.className = "Retinoscopy";
+	this.className = "RetinoscopyPowerCross";
 
+	this.workingDistance = 0.5;
 	this.angle1 = 180;
 	this.angle2 = 90;
 	this.powerSign1 = "+";
 	this.powerSign2 = "+";
-	this.powerInt1 = 0;
-	this.powerInt2 = 0;
+	this.powerInt1 = "0";
+	this.powerInt2 = "0";
 	this.powerDp1 = ".00";
 	this.powerDp2 = ".00";
 	
@@ -41997,23 +41979,111 @@ ED.Retinoscopy = function(_drawing, _parameterJSON) {
 /**
  * Sets superclass and constructor
  */
-ED.Retinoscopy.prototype = new ED.Doodle;
-ED.Retinoscopy.prototype.constructor = ED.Retinoscopy;
-ED.Retinoscopy.superclass = ED.Doodle.prototype;
+ED.RetinoscopyPowerCross.prototype = new ED.Doodle;
+ED.RetinoscopyPowerCross.prototype.constructor = ED.RetinoscopyPowerCross;
+ED.RetinoscopyPowerCross.superclass = ED.Doodle.prototype;
 
 /**
  * Sets default dragging attributes
  */
-ED.Retinoscopy.prototype.setPropertyDefaults = function() {
+ED.RetinoscopyPowerCross.prototype.setPropertyDefaults = function() {
 	this.isScaleable = false;
 	this.isMoveable = false;
+	
+	// Update component of validation array for simple parameters
+// 	this.parameterValidationArray['rotation']['range'].setMinAndMax(0, Math.PI);
+
+	// Add complete validation arrays for derived parameters
+	this.parameterValidationArray['workingDistance'] = {
+		kind: 'derived',
+		type: 'string',
+		list: ['0.333','0.5','0.667','1.0','1.5'],
+		animate: true
+	};
+	this.parameterValidationArray['angle1'] = {
+		kind: 'derived',
+		type: 'int',
+		range: new ED.Range(0, 360),
+		animate: true
+	};
+	this.parameterValidationArray['powerSign1'] = {
+		kind: 'derived',
+		type: 'string',
+		list: ['+', '-'],
+		animate: true
+	};
+	this.parameterValidationArray['powerInt1'] = {
+		kind: 'derived',
+		type: 'int',
+		range: new ED.Range(0, 20),
+		animate: true
+	};
+	this.parameterValidationArray['powerDp1'] = {
+		kind: 'derived',
+		type: 'string',
+		list: ['.00', '.25','.50','.75'],
+		animate: true
+	};
+	this.parameterValidationArray['angle2'] = {
+		kind: 'derived',
+		type: 'int',
+		range: new ED.Range(0, 360),
+		animate: true
+	};
+	this.parameterValidationArray['powerSign2'] = {
+		kind: 'derived',
+		type: 'string',
+		list: ['+', '-'],
+		animate: true
+	};
+	this.parameterValidationArray['powerInt2'] = {
+		kind: 'derived',
+		type: 'int',
+		range: new ED.Range(0, 20),
+		animate: true
+	};
+	this.parameterValidationArray['powerDp2'] = {
+		kind: 'derived',
+		type: 'string',
+		list: ['.00', '.25','.50','.75'],
+		animate: true
+	};
+
 }
 
 /**
  * Sets default parameters (Only called for new doodles)
  * Use the setParameter function for derived parameters, as this will also update dependent variables
  */
-ED.Retinoscopy.prototype.setParameterDefaults = function() {
+ED.RetinoscopyPowerCross.prototype.setParameterDefaults = function() {
+	this.rotation = Math.PI;
+}
+
+/**
+ * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
+ * The returned parameters are animated if their 'animate' property is set to true
+ *
+ * @param {String} _parameter Name of parameter that has changed
+ * @value {Undefined} _value Value of parameter to calculate
+ * @returns {Array} Associative array of values of dependent parameters
+ */
+ED.RetinoscopyPowerCross.prototype.dependentParameterValues = function(_parameter, _value) {
+	var returnArray = new Array();
+
+	switch (_parameter) {
+		case 'angle1':
+			returnArray['rotation'] = parseFloat(_value*Math.PI/180);
+			returnArray['angle2'] = (parseInt(_value)>90) ? parseInt(_value) - 90 : parseInt(_value) + 90;
+			break;
+			
+		case 'rotation':
+			var degAngle = parseInt(_value * 180 / Math.PI);
+			returnArray['angle1'] = degAngle;
+			returnArray['angle2'] = (degAngle>90) ? degAngle - 90 : degAngle + 90;
+			break;
+	}
+
+	return returnArray;
 }
 
 /**
@@ -42021,19 +42091,23 @@ ED.Retinoscopy.prototype.setParameterDefaults = function() {
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.Retinoscopy.prototype.draw = function(_point) {
+ED.RetinoscopyPowerCross.prototype.draw = function(_point) {
+	
+	// Axis length
+	var l = 340;
+	
 	// Get context
 	var ctx = this.drawing.context;
 
 	// Call draw method in superclass
-	ED.Retinoscopy.superclass.draw.call(this, _point);
+	ED.RetinoscopyPowerCross.superclass.draw.call(this, _point);
 	
 	// Draw invisible boundary box around axes
-	ctx.moveTo(-400,-400);
-	ctx.lineTo(-400,400);
-	ctx.lineTo(400,400);
-	ctx.lineTo(400,-400);
-	ctx.lineTo(-400,-400);
+	ctx.moveTo(-l,-l);
+	ctx.lineTo(-l,l);
+	ctx.lineTo(l,l);
+	ctx.lineTo(l,-l);
+	ctx.lineTo(-l,-l);
 	
 	ctx.fillStyle = "rgba(255, 255, 255, 0)";
 	ctx.strokeStyle = "rgba(0,0,0,0)"
@@ -42046,12 +42120,12 @@ ED.Retinoscopy.prototype.draw = function(_point) {
 		ctx.beginPath();
 		
 		// Draw y axis
-		ctx.moveTo(0,-400);
-		ctx.lineTo(0,400);
+		ctx.moveTo(0,-l);
+		ctx.lineTo(0,l);
 		
 		// Draw X axis
-		ctx.moveTo(400,0);
-		ctx.lineTo(-400,0);
+		ctx.moveTo(l,0);
+		ctx.lineTo(-l,0);
 	
 		// Set line attributes
 		ctx.lineWidth = 7;
@@ -42060,12 +42134,77 @@ ED.Retinoscopy.prototype.draw = function(_point) {
 		
 		// Draw it
 		ctx.stroke();
+		
+		// Text labels
+		ctx.save();
+		ctx.rotate(-this.rotation);
+		var x;
+		var y;
+
+		ctx.font="48px Arial";
+		ctx.fillStyle="black";
+		ctx.textAlign="center"; 
+		ctx.textBaseline = "middle";
+	
+		ctx.beginPath();
+
+		var sp = l + 70;
+		
+		// axis 1		
+		x = sp * Math.cos(this.rotation);
+		y = -sp*Math.sin(-this.rotation);
+		ctx.fillText(this.angle1 + "\xB0",x,y);
+		
+		// axis 2
+		x = sp * Math.sin(this.rotation);
+		y = -sp * Math.cos(this.rotation);
+		ctx.fillText(this.angle2 + "\xB0",x,y);
+		
+		// power 1
+		x = -sp * Math.cos(this.rotation);
+		y = sp*Math.sin(-this.rotation);
+		ctx.fillText(this.powerSign2 + this.powerInt1 + this.powerDp1,x,y);
+		
+		// power 2
+		x = -sp * Math.sin(this.rotation);
+		y = sp * Math.cos(-this.rotation);
+		ctx.fillText(this.powerSign2 + this.powerInt2 + this.powerDp2,x,y);
+		
+		ctx.restore();
 
 	}
 
 	// Return value indicating successful hittest
 	return this.isClicked;
 }
+
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.RetinoscopyPowerCross.prototype.description = function() {
+	
+	// Calculate working distance compensation in diopters
+	var wdCompensation = (1 / this.workingDistance).toFixed(2);
+	
+	// Calculate minus cyl form
+	var power1 = parseFloat(this.powerSign1 + this.powerInt1 + this.powerDp1);
+	var power2 = parseFloat(this.powerSign2 + this.powerInt2 + this.powerDp2);
+	var pSphere = (power1 >= power2) ? (power1 - wdCompensation).toFixed(2) : (power2 - wdCompensation).toFixed(2);
+	var pCyl = (power1 - power2).toFixed(2);
+	var angle = (power1>=power2) ? this.angle1 : this.angle2;
+	
+	console.log(this.angle1 + ' ' + this.angle2 + ' ' + angle);
+	
+	var Rx = (pSphere >= 0 ) ? '+' + pSphere: pSphere;
+	Rx += (pCyl >= 0 ) ? ' / +' : ' / ';
+	Rx += pCyl + ' x ' + angle; 
+		
+	return Rx;
+}
+
 
 /**
  * OpenEyes

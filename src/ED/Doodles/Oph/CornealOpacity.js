@@ -73,11 +73,6 @@ ED.CornealOpacity.prototype.setHandles = function() {
 	for (var i = 0; i < this.numberOfHandles; i++) {
 		this.handleArray[i] = new ED.Doodle.Handle(null, true, ED.Mode.Handles, false);
 	}
-/*
-	for (var i = 0; i < this.numberOfHandles; i++) {
-		this.handleArray[i+this.numberOfHandles] = new ED.Doodle.Handle(null, true, ED.Mode.Handles, false);
-	}
-*/
 
 	// Allow top handle to rotate doodle
 	/// ? Removed as need specific handles to be along X and Y axis - can change... **TODO**
@@ -102,20 +97,6 @@ ED.CornealOpacity.prototype.setPropertyDefaults = function() {
 		range.angle = new ED.Range((((2 * n - 1) * cir / (2 * n)) + i * cir / n) % cir, ((1 * cir / (2 * n)) + i * cir / n) % cir);
 		this.handleVectorRangeArray[i] = range;
 	}
-/*
-	for (var i = 0; i < this.numberOfHandles; i++) {
-		// Full circle in radians
-		var cir = 2 * Math.PI;
-
-		// Create a range object for each handle
-		/// **TODO**: Ideally relative to canvas centre, not doodle - when update originX or originY
-		var n = this.numberOfHandles;
-		var range = new Object;
-		range.length = new ED.Range(+50, +380);
-		range.angle = new ED.Range((((2 * n - 1) * cir / (2 * n)) + i * cir / n) % cir, ((1 * cir / (2 * n)) + i * cir / n) % cir);
-		this.handleVectorRangeArray[i+n] = range;
-	}
-*/
 	
 	// Update component of validation array for simple parameters
 	this.parameterValidationArray['originX']['range'].setMinAndMax(-350, +350);
