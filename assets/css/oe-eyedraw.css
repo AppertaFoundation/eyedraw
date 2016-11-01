@@ -1600,7 +1600,11 @@ canvas.ed-canvas-edit {
   z-index: 100;
   margin: 0 0 0 2px;
 }
-/* line 67, ../sass/components/_editor.scss */
+/* line 65, ../sass/components/_editor.scss */
+canvas.ed-canvas-edit.secondary {
+  z-index: auto;
+}
+/* line 70, ../sass/components/_editor.scss */
 canvas.ed-canvas-display {
   border: none;
   cursor: auto;
@@ -1608,7 +1612,7 @@ canvas.ed-canvas-display {
   position: relative;
   z-index: 100;
 }
-/* line 76, ../sass/components/_editor.scss */
+/* line 79, ../sass/components/_editor.scss */
 canvas.ed-canvas-edit:focus, canvas.ed-canvas-display:focus {
   outline: none;
 }
