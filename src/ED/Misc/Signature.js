@@ -116,9 +116,9 @@ ED.Signature.prototype.draw = function(_point) {
 		ctx.lineTo(-halfWidth*0.85 + 50, halfHeight*0.75 - 40);
 		
 		// Draw dashed line
-		for (var j=2; j<n; j++) { // start at 2 to allow for space at beginning
-			ctx.moveTo(-halfWidth*0.85 + j*d, halfHeight*0.75);
-			ctx.lineTo(-halfWidth*0.85 + j*d + 0.5*d, halfHeight*0.75)
+		for (var h=2; h<n; h++) { // start at 2 to allow for space at beginning
+			ctx.moveTo(-halfWidth*0.85 + h*d, halfHeight*0.75);
+			ctx.lineTo(-halfWidth*0.85 + h*d + 0.5*d, halfHeight*0.75);
 		}
 		
 		ctx.lineWidth = 6;
@@ -136,7 +136,7 @@ ED.Signature.prototype.draw = function(_point) {
 			ctx.beginPath();
 
 			// Squiggle attributes
-			ctx.lineWidth = 5;
+			ctx.lineWidth = 6;
 			ctx.strokeStyle = "black";
 
 			// Iterate through squiggle points

@@ -8130,9 +8130,9 @@ ED.Signature.prototype.draw = function(_point) {
 		ctx.lineTo(-halfWidth*0.85 + 50, halfHeight*0.75 - 40);
 		
 		// Draw dashed line
-		for (var j=2; j<n; j++) { // start at 2 to allow for space at beginning
-			ctx.moveTo(-halfWidth*0.85 + j*d, halfHeight*0.75);
-			ctx.lineTo(-halfWidth*0.85 + j*d + 0.5*d, halfHeight*0.75)
+		for (var h=2; h<n; h++) { // start at 2 to allow for space at beginning
+			ctx.moveTo(-halfWidth*0.85 + h*d, halfHeight*0.75);
+			ctx.lineTo(-halfWidth*0.85 + h*d + 0.5*d, halfHeight*0.75);
 		}
 		
 		ctx.lineWidth = 6;
@@ -8150,7 +8150,7 @@ ED.Signature.prototype.draw = function(_point) {
 			ctx.beginPath();
 
 			// Squiggle attributes
-			ctx.lineWidth = 5;
+			ctx.lineWidth = 6;
 			ctx.strokeStyle = "black";
 
 			// Iterate through squiggle points
@@ -15111,6 +15111,187 @@ ED.AntSeg.prototype.description = function() {
  * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
  */
 
+/**
+ *
+ *
+ * @class AntSegAngleMarks
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Object} _parameterJSON
+ */
+ED.AntSegAngleMarks = function(_drawing, _parameterJSON) {
+	// Set classname
+	this.className = "AntSegAngleMarks";
+
+	
+	// Saved parameters
+	this.savedParameterArray = [];
+	
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _parameterJSON);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.AntSegAngleMarks.prototype = new ED.Doodle;
+ED.AntSegAngleMarks.prototype.constructor = ED.AntSegAngleMarks;
+ED.AntSegAngleMarks.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets default dragging attributes
+ */
+ED.AntSegAngleMarks.prototype.setPropertyDefaults = function() {
+	this.isSelectable = false;
+	this.addAtBack = true;
+}
+
+/**
+ * Sets default parameters (Only called for new doodles)
+ * Use the setParameter function for derived parameters, as this will also update dependent variables
+ */
+ED.AntSegAngleMarks.prototype.setParameterDefaults = function() {
+}
+
+/**
+ * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
+ * The returned parameters are animated if their 'animate' property is set to true
+ *
+ * @param {String} _parameter Name of parameter that has changed
+ * @value {Undefined} _value Value of parameter to calculate
+ * @returns {Array} Associative array of values of dependent parameters
+ */
+ED.AntSegAngleMarks.prototype.dependentParameterValues = function(_parameter, _value) {
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.AntSegAngleMarks.prototype.draw = function(_point) {
+	
+	// Axis length
+	var l = 499;
+	
+	// Get context
+	var ctx = this.drawing.context;
+
+	// Call draw method in superclass
+	ED.AntSegAngleMarks.superclass.draw.call(this, _point);
+	
+	// Draw invisible boundary box around canvas
+	ctx.moveTo(-l,-l);
+	ctx.lineTo(-l,l);
+	ctx.lineTo(l,l);
+	ctx.lineTo(l,-l);
+	ctx.lineTo(-l,-l);
+	
+	ctx.fillStyle = "rgba(255, 255, 255, 0)";
+	ctx.strokeStyle = "rgba(0,0,0,0)"
+	
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+	
+	// Non boundary drawing
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+		ctx.beginPath();
+		
+		// Set style defaults
+		ctx.font="36px Arial";
+		ctx.fillStyle="black";
+		ctx.textAlign="center"; 
+		ctx.textBaseline = "middle";
+		ctx.lineWidth = 3;
+		ctx.strokeStyle = "black";
+		
+		// Number of tick marks
+		var n = 8;
+		
+		// Distance of tick marks from origin
+		var r = 400;
+		
+		// Length of single tick mark
+		var d = 25;
+		
+		var point1 = new ED.Point(0,0);
+		var point2 = new ED.Point(0,0);
+		var point3 = new ED.Point(0,0);
+		for (var i=0; i<n; i++) {
+			var angleRad = 2*Math.PI / n * i;
+			var angleDeg = angleRad * 180 / Math.PI;
+			
+			point1.setWithPolars(r, 2 * Math.PI - angleRad + 0.5*Math.PI);
+			point2.setWithPolars(r+d, 2 * Math.PI - angleRad + 0.5*Math.PI);
+			point3.setWithPolars(r+d*2.5,2 * Math.PI - angleRad + 0.5*Math.PI);
+			
+			ctx.moveTo(point1.x, point1.y);
+			ctx.lineTo(point2.x, point2.y);
+			ctx.fillText(angleDeg + "\xB0",point3.x,point3.y);
+		}
+		
+/*
+		ctx.moveTo(-500,0);
+		ctx.lineTo(500,0);
+*/
+		
+		ctx.stroke();
+		
+		
+		
+		// If toric lens exists, draw flat axis
+		var toricLens = this.drawing.lastDoodleOfClass('ToricPCIOL');
+		if (toricLens) {
+			var phi = 0.7 * Math.PI / 4;
+			var axisRotation = toricLens.rotation + phi - 0.5 * Math.PI;
+			
+			ctx.beginPath();
+			ctx.save();
+			ctx.rotate(axisRotation);
+			
+			ctx.strokeStyle = "blue";
+			ctx.lineWidth = 8;
+			
+			var w = 420;
+			var z = Math.round(2 * w / (d*2));
+			for (var j=0; j<z; j++) {
+				ctx.moveTo(-w + j*d*2, 0);
+				ctx.lineTo(-w + j*d*2 + d, 0);
+			};
+/*
+			ctx.moveTo(-w, 0);
+			ctx.lineTo(w,0);
+*/
+			ctx.stroke();
+			ctx.restore();
+		}		
+		
+	}
+
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+
+
+/**
+ * OpenEyes
+ *
+ * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
+ * (C) OpenEyes Foundation, 2011-2013
+ * This file is part of OpenEyes.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package OpenEyes
+ * @link http://www.openeyes.org.uk
+ * @author OpenEyes <info@openeyes.org.uk>
+ * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
+ * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ */
+
 
 /**
  * Anterior Segment Cross Section ***TODO***
@@ -21984,20 +22165,20 @@ ED.CornealOpacityCrossSection.prototype.draw = function(_point) {
 					
 					// back of cornea
 					var isq0b = new ED.Point(0,0);
-					isq0b.y = (1-itI0)*(1-itI0)*(1-itI0)*iSuperiorBezierBack.SP.y + 3*(1-itI0)*(1-itI0)*itI0*iSuperiorBezierBack.CP1.y + 3*(1-itI0)*itI0*itI0*iSuperiorBezierBack.CP2.y + itI0*itI0*itI0*iSuperiorBezierBack.EP.y;
-					isq0b.x = (1-itI0)*(1-itI0)*(1-itI0)*iSuperiorBezierBack.SP.x + 3*(1-itI0)*(1-itI0)*itI0*iSuperiorBezierBack.CP1.x + 3*(1-itI0)*itI0*itI0*iSuperiorBezierBack.CP2.x + itI0*itI0*itI0*iSuperiorBezierBack.EP.x;
+					isq0b.y = (1-tI0)*(1-tI0)*(1-tI0)*iSuperiorBezierBack.SP.y + 3*(1-tI0)*(1-tI0)*tI0*iSuperiorBezierBack.CP1.y + 3*(1-tI0)*tI0*tI0*iSuperiorBezierBack.CP2.y + tI0*tI0*tI0*iSuperiorBezierBack.EP.y;
+					isq0b.x = (1-tI0)*(1-tI0)*(1-tI0)*iSuperiorBezierBack.SP.x + 3*(1-tI0)*(1-tI0)*tI0*iSuperiorBezierBack.CP1.x + 3*(1-tI0)*tI0*tI0*iSuperiorBezierBack.CP2.x + tI0*tI0*tI0*iSuperiorBezierBack.EP.x;
 					
 					var iiP23b = new ED.Point(0,0);
-					iiP23b.x = iSuperiorBezierBack.CP1.x + itI0 * (iSuperiorBezierBack.CP2.x - iSuperiorBezierBack.CP1.x);
-					iiP23b.y = iSuperiorBezierBack.CP1.y + itI0 * (iSuperiorBezierBack.CP2.y - iSuperiorBezierBack.CP1.y);
+					iiP23b.x = iSuperiorBezierBack.CP1.x + tI0 * (iSuperiorBezierBack.CP2.x - iSuperiorBezierBack.CP1.x);
+					iiP23b.y = iSuperiorBezierBack.CP1.y + tI0 * (iSuperiorBezierBack.CP2.y - iSuperiorBezierBack.CP1.y);
 					
 					var iiP34b = new ED.Point(0,0);
-					iiP34b.x = iSuperiorBezierBack.CP2.x + itI0 * (iSuperiorBezierBack.EP.x - iSuperiorBezierBack.CP2.x);
-					iiP34b.y = iSuperiorBezierBack.CP2.y + itI0 * (iSuperiorBezierBack.EP.y - iSuperiorBezierBack.CP2.y);
+					iiP34b.x = iSuperiorBezierBack.CP2.x + tI0 * (iSuperiorBezierBack.EP.x - iSuperiorBezierBack.CP2.x);
+					iiP34b.y = iSuperiorBezierBack.CP2.y + tI0 * (iSuperiorBezierBack.EP.y - iSuperiorBezierBack.CP2.y);
 					
 					var iiP2334b = new ED.Point(0,0);
-					iiP2334b.x = iiP23b.x + itI0 * (iiP34b.x - iiP23b.x);
-					iiP2334b.y = iiP23b.y + itI0 * (iiP34b.y - iiP23b.y);
+					iiP2334b.x = iiP23b.x + tI0 * (iiP34b.x - iiP23b.x);
+					iiP2334b.y = iiP23b.y + tI0 * (iiP34b.y - iiP23b.y);
 					
 					iSuperiorBezierBack.SP = isq0b;
 					iSuperiorBezierBack.CP1 = iiP2334b;
@@ -22030,20 +22211,20 @@ ED.CornealOpacityCrossSection.prototype.draw = function(_point) {
 					
 					// back of cornea
 					var iiq1b = new ED.Point(0,0);
-					iiq1b.y = (1-itI1)*(1-itI1)*(1-itI1)*iSuperiorBezierBack.SP.y + 3*(1-itI1)*(1-itI1)*itI1*iSuperiorBezierBack.CP1.y + 3*(1-itI1)*itI1*itI1*iSuperiorBezierBack.CP2.y + itI1*itI1*itI1*iSuperiorBezierBack.EP.y;
-					iiq1b.x = (1-itI1)*(1-itI1)*(1-itI1)*iSuperiorBezierBack.SP.x + 3*(1-itI1)*(1-itI1)*itI1*iSuperiorBezierBack.CP1.x + 3*(1-itI1)*itI1*itI1*iSuperiorBezierBack.CP2.x + itI1*itI1*itI1*iSuperiorBezierBack.EP.x;
+					iiq1b.y = (1-tI1)*(1-tI1)*(1-tI1)*iSuperiorBezierBack.SP.y + 3*(1-tI1)*(1-tI1)*tI1*iSuperiorBezierBack.CP1.y + 3*(1-tI1)*tI1*tI1*iSuperiorBezierBack.CP2.y + tI1*tI1*tI1*iSuperiorBezierBack.EP.y;
+					iiq1b.x = (1-tI1)*(1-tI1)*(1-tI1)*iSuperiorBezierBack.SP.x + 3*(1-tI1)*(1-tI1)*tI1*iSuperiorBezierBack.CP1.x + 3*(1-tI1)*tI1*tI1*iSuperiorBezierBack.CP2.x + tI1*tI1*tI1*iSuperiorBezierBack.EP.x;
 		
 					var iiP12b = new ED.Point(0,0);
-					iiP12b.x = iSuperiorBezierBack.SP.x + itI1 * (iSuperiorBezierBack.CP1.x - iSuperiorBezierBack.SP.x);
-					iiP12b.y = iSuperiorBezierBack.SP.y + itI1 * (iSuperiorBezierBack.CP1.y - iSuperiorBezierBack.SP.y);
+					iiP12b.x = iSuperiorBezierBack.SP.x + tI1 * (iSuperiorBezierBack.CP1.x - iSuperiorBezierBack.SP.x);
+					iiP12b.y = iSuperiorBezierBack.SP.y + tI1 * (iSuperiorBezierBack.CP1.y - iSuperiorBezierBack.SP.y);
 					
 					var iiP23b = new ED.Point(0,0);
-					iiP23b.x = iSuperiorBezierBack.CP1.x + itI1 * (iSuperiorBezierBack.CP2.x - iSuperiorBezierBack.CP1.x);
-					iiP23b.y = iSuperiorBezierBack.CP1.y + itI1 * (iSuperiorBezierBack.CP2.y - iSuperiorBezierBack.CP1.y);
+					iiP23b.x = iSuperiorBezierBack.CP1.x + tI1 * (iSuperiorBezierBack.CP2.x - iSuperiorBezierBack.CP1.x);
+					iiP23b.y = iSuperiorBezierBack.CP1.y + tI1 * (iSuperiorBezierBack.CP2.y - iSuperiorBezierBack.CP1.y);
 					
 					var iiP1223b = new ED.Point(0,0);
-					iiP1223b.x = iiP12b.x + itI1 * (iiP23b.x - iiP12b.x);
-					iiP1223b.y = iiP12b.y + itI1 * (iiP23b.y - iiP12b.y);
+					iiP1223b.x = iiP12b.x + tI1 * (iiP23b.x - iiP12b.x);
+					iiP1223b.y = iiP12b.y + tI1 * (iiP23b.y - iiP12b.y);
 					
 					iSuperiorBezierBack.CP1 = iiP12b;
 					iSuperiorBezierBack.CP2 = iiP1223b;
@@ -22123,20 +22304,20 @@ ED.CornealOpacityCrossSection.prototype.draw = function(_point) {
 					
 					// back of cornea
 					var isq0b = new ED.Point(0,0);
-					isq0b.y = (1-itS0)*(1-itS0)*(1-itS0)*iInferiorBezierBack.SP.y + 3*(1-itS0)*(1-itS0)*itS0*iInferiorBezierBack.CP1.y + 3*(1-itS0)*itS0*itS0*iInferiorBezierBack.CP2.y + itS0*itS0*itS0*iInferiorBezierBack.EP.y;
-					isq0b.x = (1-itS0)*(1-itS0)*(1-itS0)*iInferiorBezierBack.SP.x + 3*(1-itS0)*(1-itS0)*itS0*iInferiorBezierBack.CP1.x + 3*(1-itS0)*itS0*itS0*iInferiorBezierBack.CP2.x + itS0*itS0*itS0*iInferiorBezierBack.EP.x;
+					isq0b.y = (1-tS0)*(1-tS0)*(1-tS0)*iInferiorBezierBack.SP.y + 3*(1-tS0)*(1-tS0)*tS0*iInferiorBezierBack.CP1.y + 3*(1-tS0)*tS0*tS0*iInferiorBezierBack.CP2.y + tS0*tS0*tS0*iInferiorBezierBack.EP.y;
+					isq0b.x = (1-tS0)*(1-tS0)*(1-tS0)*iInferiorBezierBack.SP.x + 3*(1-tS0)*(1-tS0)*tS0*iInferiorBezierBack.CP1.x + 3*(1-tS0)*tS0*tS0*iInferiorBezierBack.CP2.x + tS0*tS0*tS0*iInferiorBezierBack.EP.x;
 					
 					var isP23b = new ED.Point(0,0);
-					isP23b.x = iInferiorBezierBack.CP1.x + itS0 * (iInferiorBezierBack.CP2.x - iInferiorBezierBack.CP1.x);
-					isP23b.y = iInferiorBezierBack.CP1.y + itS0 * (iInferiorBezierBack.CP2.y - iInferiorBezierBack.CP1.y);
+					isP23b.x = iInferiorBezierBack.CP1.x + tS0 * (iInferiorBezierBack.CP2.x - iInferiorBezierBack.CP1.x);
+					isP23b.y = iInferiorBezierBack.CP1.y + tS0 * (iInferiorBezierBack.CP2.y - iInferiorBezierBack.CP1.y);
 					
 					var isP34b = new ED.Point(0,0);
-					isP34b.x = iInferiorBezierBack.CP2.x + itS0 * (iInferiorBezierBack.EP.x - iInferiorBezierBack.CP2.x);
-					isP34b.y = iInferiorBezierBack.CP2.y + itS0 * (iInferiorBezierBack.EP.y - iInferiorBezierBack.CP2.y);
+					isP34b.x = iInferiorBezierBack.CP2.x + tS0 * (iInferiorBezierBack.EP.x - iInferiorBezierBack.CP2.x);
+					isP34b.y = iInferiorBezierBack.CP2.y + tS0 * (iInferiorBezierBack.EP.y - iInferiorBezierBack.CP2.y);
 					
 					var isP2334b = new ED.Point(0,0);
-					isP2334b.x = isP23b.x + itS0 * (isP34b.x - isP23b.x);
-					isP2334b.y = isP23b.y + itS0 * (isP34b.y - isP23b.y);
+					isP2334b.x = isP23b.x + tS0 * (isP34b.x - isP23b.x);
+					isP2334b.y = isP23b.y + tS0 * (isP34b.y - isP23b.y);
 					
 					iInferiorBezierBack.SP = isq0b;
 					iInferiorBezierBack.CP1 = isP2334b;
@@ -22169,20 +22350,20 @@ ED.CornealOpacityCrossSection.prototype.draw = function(_point) {
 					
 					// back of cornea
 					var isq1b = new ED.Point(0,0);
-					isq1b.y = (1-itS1)*(1-itS1)*(1-itS1)*iInferiorBezierBack.SP.y + 3*(1-itS1)*(1-itS1)*itS1*iInferiorBezierBack.CP1.y + 3*(1-itS1)*itS1*itS1*iInferiorBezierBack.CP2.y + itS1*itS1*itS1*iInferiorBezierBack.EP.y;
-					isq1b.x = (1-itS1)*(1-itS1)*(1-itS1)*iInferiorBezierBack.SP.x + 3*(1-itS1)*(1-itS1)*itS1*iInferiorBezierBack.CP1.x + 3*(1-itS1)*itS1*itS1*iInferiorBezierBack.CP2.x + itS1*itS1*itS1*iInferiorBezierBack.EP.x;
+					isq1b.y = (1-tS1)*(1-tS1)*(1-tS1)*iInferiorBezierBack.SP.y + 3*(1-tS1)*(1-tS1)*tS1*iInferiorBezierBack.CP1.y + 3*(1-tS1)*tS1*tS1*iInferiorBezierBack.CP2.y + tS1*tS1*tS1*iInferiorBezierBack.EP.y;
+					isq1b.x = (1-tS1)*(1-tS1)*(1-tS1)*iInferiorBezierBack.SP.x + 3*(1-tS1)*(1-tS1)*tS1*iInferiorBezierBack.CP1.x + 3*(1-tS1)*tS1*tS1*iInferiorBezierBack.CP2.x + tS1*tS1*tS1*iInferiorBezierBack.EP.x;
 		
 					var isP12b = new ED.Point(0,0);
-					isP12b.x = iInferiorBezierBack.SP.x + itS1 * (iInferiorBezierBack.CP1.x - iInferiorBezierBack.SP.x);
-					isP12b.y = iInferiorBezierBack.SP.y + itS1 * (iInferiorBezierBack.CP1.y - iInferiorBezierBack.SP.y);
+					isP12b.x = iInferiorBezierBack.SP.x + tS1 * (iInferiorBezierBack.CP1.x - iInferiorBezierBack.SP.x);
+					isP12b.y = iInferiorBezierBack.SP.y + tS1 * (iInferiorBezierBack.CP1.y - iInferiorBezierBack.SP.y);
 					
 					var isP23b = new ED.Point(0,0);
-					isP23b.x = iInferiorBezierBack.CP1.x + itS1 * (iInferiorBezierBack.CP2.x - iInferiorBezierBack.CP1.x);
-					isP23b.y = iInferiorBezierBack.CP1.y + itS1 * (iInferiorBezierBack.CP2.y - iInferiorBezierBack.CP1.y);
+					isP23b.x = iInferiorBezierBack.CP1.x + tS1 * (iInferiorBezierBack.CP2.x - iInferiorBezierBack.CP1.x);
+					isP23b.y = iInferiorBezierBack.CP1.y + tS1 * (iInferiorBezierBack.CP2.y - iInferiorBezierBack.CP1.y);
 					
 					var isP1223b = new ED.Point(0,0);
-					isP1223b.x = isP12b.x + itS1 * (isP23b.x - isP12b.x);
-					isP1223b.y = isP12b.y + itS1 * (isP23b.y - isP12b.y);
+					isP1223b.x = isP12b.x + tS1 * (isP23b.x - isP12b.x);
+					isP1223b.y = isP12b.y + tS1 * (isP23b.y - isP12b.y);
 		
 					iInferiorBezierBack.CP1 = isP12b;
 					iInferiorBezierBack.CP2 = isP1223b;
@@ -22195,14 +22376,17 @@ ED.CornealOpacityCrossSection.prototype.draw = function(_point) {
 			
 			if (iInferiorBezier) {
 				ctx.moveTo(iInferiorBezierBack.EP.x, iInferiorBezierBack.EP.y);
-				ctx.bezierCurveTo(iInferiorBezierBack.CP2.x, iInferiorBezierBack.CP2.y, iInferiorBezierBack.CP1.x, iInferiorBezierBack.CP1.y, iInferiorBezierBack.SP.x, iInferiorBezierBack.SP.y);
+				ctx.bezierCurveTo(iInferiorBezierBack.CP2.x, iInferiorBezierBack.CP2.y, iInferiorBezierBack.CP1.x, iInferiorBezierBack.CP1.y, iInferiorBezierBack.SP.x, iInferiorBezierBack.SP.y);				
 				ctx.lineTo(iInferiorBezier.SP.x, iInferiorBezier.SP.y);
+// 				ctx.bezierCurveTo(iInferiorBezierBack.SP.x, iInferiorBezier.SP.y,iInferiorBezier.SP.x, iInferiorBezier.SP.y,iInferiorBezier.SP.x, iInferiorBezier.SP.y)
 				ctx.bezierCurveTo(iInferiorBezier.CP1.x, iInferiorBezier.CP1.y, iInferiorBezier.CP2.x, iInferiorBezier.CP2.y, iInferiorBezier.EP.x, iInferiorBezier.EP.y);
+			
 			}
 			
 			if (iSuperiorBezier) {
 				ctx.moveTo(iSuperiorBezierBack.EP.x, iSuperiorBezierBack.EP.y);
 				ctx.bezierCurveTo(iSuperiorBezierBack.CP2.x, iSuperiorBezierBack.CP2.y, iSuperiorBezierBack.CP1.x, iSuperiorBezierBack.CP1.y, iSuperiorBezierBack.SP.x, iSuperiorBezierBack.SP.y);
+// 				ctx.bezierCurveTo(iSuperiorBezierBack.SP.x, iSuperiorBezier.SP.y, iSuperiorBezier.SP.x, iSuperiorBezier.SP.y, iSuperiorBezier.SP.x, iSuperiorBezier.SP.y)
 				ctx.lineTo(iSuperiorBezier.SP.x, iSuperiorBezier.SP.y);
 				ctx.bezierCurveTo(iSuperiorBezier.CP1.x, iSuperiorBezier.CP1.y, iSuperiorBezier.CP2.x, iSuperiorBezier.CP2.y, iSuperiorBezier.EP.x, iSuperiorBezier.EP.y);
 			}
@@ -32046,6 +32230,8 @@ ED.Lens.prototype.description = function() {
 ED.LensCrossSection = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "LensCrossSection";
+	this.nuclearGrade = 'None';
+	this.corticalGrade = 'None';
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -32064,6 +32250,20 @@ ED.LensCrossSection.superclass = ED.Doodle.prototype;
 ED.LensCrossSection.prototype.setPropertyDefaults = function() {
 	this.isUnique = true;
 	this.addAtBack = true;
+
+	this.parameterValidationArray['nuclearGrade'] = {
+		kind: 'derived',
+		type: 'string',
+		list: ['None', 'Mild', 'Moderate', 'Brunescent'],
+		animate: false
+	};
+
+	this.parameterValidationArray['corticalGrade'] = {
+		kind: 'derived',
+		type: 'string',
+		list: ['None', 'Mild', 'Moderate', 'White'],
+		animate: true
+	};
 
 	// Update component of validation array for simple parameters
 	this.parameterValidationArray['originX']['range'].setMinAndMax(-150, +200);
@@ -32138,6 +32338,82 @@ ED.LensCrossSection.prototype.draw = function(_point) {
 		ctx.arc(ld + x, 0, rn, Math.PI + phi, Math.PI - phi, true);
 		ctx.strokeStyle = "rgba(220, 220, 220, 0.75)";
 		ctx.stroke();
+
+		if (this.nuclearGrade != 'None') {
+			var col;
+			switch (this.nuclearGrade) {
+				case 'Mild':
+					col = -120;
+					break;
+				case 'Moderate':
+					col = -80;
+					break;
+				case 'Brunescent':
+					col = +0;
+					break;
+			}
+			yellowColour = "rgba(255, 255, 0, 0.75)";
+			var brownColour = "rgba(" + Math.round(120 - col) + ", " + Math.round(60 - col) + ", 0, 0.75)";
+			var gradient = ctx.createRadialGradient(0, 0, 210, 0, 0, 50);
+			gradient.addColorStop(0, yellowColour);
+			gradient.addColorStop(1, brownColour);
+			ctx.fillStyle = gradient;
+			ctx.fill();
+		}
+
+		// Cortical Cataract
+		if (this.corticalGrade != "None") {
+			var apexY;
+
+			switch (this.corticalGrade) {
+				case 'Mild':
+					apexY = -180;
+					break;
+				case 'Moderate':
+					apexY = -100;
+					break;
+				case 'White':
+					apexY = -20;
+					break;
+			}
+
+			// Angle of arc
+			var theta = Math.asin(h / r);
+
+			// X coordinate of centre of circle
+			var x = r * Math.cos(theta);
+
+			// Radius of cortical cataract (half way between capsule and nucleus)
+			var rco = r - 30;
+
+			// Calculate nucleus angles
+			theta = Math.acos(x / rco);
+
+			// Calculate cataract angles
+			var phi = Math.asin(-apexY / rco);
+
+			// Boundary path
+			ctx.beginPath();
+
+			// Draw cataract with two sections of circumference of circle
+			ctx.arc(ld - x, 0, rco, phi, theta, false);
+			ctx.arc(ld + x, 0, rco, Math.PI - theta, Math.PI - phi, false);
+
+			// Move to upper half and draw it
+			var l = rco * Math.cos(phi);
+			ctx.moveTo(ld - x + l, apexY);
+			ctx.arc(ld - x, 0, rco, -phi, -theta, true);
+			ctx.arc(ld + x, 0, rco, Math.PI + theta, Math.PI + phi, true);
+
+			// Set line attributes
+			ctx.lineWidth = 30;
+			ctx.lineCap = 'round';
+			ctx.lineJoin = 'round';
+			ctx.fillStyle = "rgba(0, 0, 0, 0)";
+			ctx.strokeStyle = "rgba(200,200,200,0.75)";
+			// Draw boundary path (also hit testing)
+			this.drawBoundary(_point);
+		}
 
 		// Zonules
 		ctx.beginPath();
@@ -34301,8 +34577,8 @@ ED.NuclearCataract.prototype.setPropertyDefaults = function() {
 	this.isScaleable = false;
 	this.isRotatable = false;
 	this.isUnique = true;
-	//this.parentClass = "Lens";
-	//this.inFrontOfClassArray = ["Lens", "PostSubcapCataract"];
+	this.parentClass = "Lens";
+	this.inFrontOfClassArray = ["Lens", "PostSubcapCataract" ];
 	this.addAtBack = true;
 
 	// Update validation array for simple parameters
@@ -46943,15 +47219,16 @@ ED.TrabySuture = function(_drawing, _parameterJSON) {
 	this.type = 'Fixed';
 	this.material = 'Nylon';
 	this.size = '10/0';
+	this.removed = false;
 
 	// Number of additional handles for releasable suture
 	this.numberOfHandles = 5;
 
 	// Saved parameters
-	this.savedParameterArray = ['originX', 'originY', 'apexX', 'apexY', 'arc', 'rotation', 'type', 'material', 'size'];
+	this.savedParameterArray = ['originX', 'originY', 'apexX', 'apexY', 'arc', 'rotation', 'type', 'material', 'size','removed'];
 
 	// Parameters in doodle control bar (parameter name: parameter label)
-	this.controlParameterArray = {'type':'Shape', 'material':'Material', 'size':'Size'};
+	this.controlParameterArray = {'type':'Shape', 'material':'Material', 'size':'Size','removed':'Removed'};
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -46998,6 +47275,11 @@ ED.TrabySuture.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'string',
 		list: ['11/0', '10/0', '9/0', '8/0', '7/0', '6/0'],
+		animate: false
+	}
+	this.parameterValidationArray['removed'] = {
+		kind: 'derived',
+		type: 'bool',
 		animate: false
 	}
 }
@@ -47196,7 +47478,8 @@ ED.TrabySuture.prototype.draw = function(_point) {
 		// Set line attributes
 		ctx.lineWidth = 8;
 		ctx.fillStyle = "rgba(0, 0, 0, 0)";
-		ctx.strokeStyle = "purple";
+		if (this.removed) ctx.strokeStyle = "rgba(150,150,150,0.5)";
+		else ctx.strokeStyle = "purple";
 
 		// Draw line
 		ctx.stroke();

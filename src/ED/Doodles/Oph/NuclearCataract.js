@@ -59,8 +59,8 @@ ED.NuclearCataract.prototype.setPropertyDefaults = function() {
 	this.isScaleable = false;
 	this.isRotatable = false;
 	this.isUnique = true;
-	//this.parentClass = "Lens";
-	//this.inFrontOfClassArray = ["Lens", "PostSubcapCataract"];
+	this.parentClass = "Lens";
+	this.inFrontOfClassArray = ["Lens", "PostSubcapCataract" ];
 	this.addAtBack = true;
 
 	// Update validation array for simple parameters
