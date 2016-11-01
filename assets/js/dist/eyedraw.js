@@ -31891,6 +31891,8 @@ ED.Lens.prototype.description = function() {
 ED.LensCrossSection = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "LensCrossSection";
+	this.nuclearGrade = 'None';
+	this.corticalGrade = 'None';
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -31909,6 +31911,20 @@ ED.LensCrossSection.superclass = ED.Doodle.prototype;
 ED.LensCrossSection.prototype.setPropertyDefaults = function() {
 	this.isUnique = true;
 	this.addAtBack = true;
+
+	this.parameterValidationArray['nuclearGrade'] = {
+		kind: 'derived',
+		type: 'string',
+		list: ['None', 'Mild', 'Moderate', 'Brunescent'],
+		animate: false
+	};
+
+	this.parameterValidationArray['corticalGrade'] = {
+		kind: 'derived',
+		type: 'string',
+		list: ['None', 'Mild', 'Moderate', 'White'],
+		animate: true
+	};
 
 	// Update component of validation array for simple parameters
 	this.parameterValidationArray['originX']['range'].setMinAndMax(-150, +200);
@@ -31983,6 +31999,82 @@ ED.LensCrossSection.prototype.draw = function(_point) {
 		ctx.arc(ld + x, 0, rn, Math.PI + phi, Math.PI - phi, true);
 		ctx.strokeStyle = "rgba(220, 220, 220, 0.75)";
 		ctx.stroke();
+
+		if (this.nuclearGrade != 'None') {
+			var col;
+			switch (this.nuclearGrade) {
+				case 'Mild':
+					col = -120;
+					break;
+				case 'Moderate':
+					col = -80;
+					break;
+				case 'Brunescent':
+					col = +0;
+					break;
+			}
+			yellowColour = "rgba(255, 255, 0, 0.75)";
+			var brownColour = "rgba(" + Math.round(120 - col) + ", " + Math.round(60 - col) + ", 0, 0.75)";
+			var gradient = ctx.createRadialGradient(0, 0, 210, 0, 0, 50);
+			gradient.addColorStop(0, yellowColour);
+			gradient.addColorStop(1, brownColour);
+			ctx.fillStyle = gradient;
+			ctx.fill();
+		}
+
+		// Cortical Cataract
+		if (this.corticalGrade != "None") {
+			var apexY;
+
+			switch (this.corticalGrade) {
+				case 'Mild':
+					apexY = -180;
+					break;
+				case 'Moderate':
+					apexY = -100;
+					break;
+				case 'White':
+					apexY = -20;
+					break;
+			}
+
+			// Angle of arc
+			var theta = Math.asin(h / r);
+
+			// X coordinate of centre of circle
+			var x = r * Math.cos(theta);
+
+			// Radius of cortical cataract (half way between capsule and nucleus)
+			var rco = r - 30;
+
+			// Calculate nucleus angles
+			theta = Math.acos(x / rco);
+
+			// Calculate cataract angles
+			var phi = Math.asin(-apexY / rco);
+
+			// Boundary path
+			ctx.beginPath();
+
+			// Draw cataract with two sections of circumference of circle
+			ctx.arc(ld - x, 0, rco, phi, theta, false);
+			ctx.arc(ld + x, 0, rco, Math.PI - theta, Math.PI - phi, false);
+
+			// Move to upper half and draw it
+			var l = rco * Math.cos(phi);
+			ctx.moveTo(ld - x + l, apexY);
+			ctx.arc(ld - x, 0, rco, -phi, -theta, true);
+			ctx.arc(ld + x, 0, rco, Math.PI + theta, Math.PI + phi, true);
+
+			// Set line attributes
+			ctx.lineWidth = 30;
+			ctx.lineCap = 'round';
+			ctx.lineJoin = 'round';
+			ctx.fillStyle = "rgba(0, 0, 0, 0)";
+			ctx.strokeStyle = "rgba(200,200,200,0.75)";
+			// Draw boundary path (also hit testing)
+			this.drawBoundary(_point);
+		}
 
 		// Zonules
 		ctx.beginPath();
@@ -34146,8 +34238,8 @@ ED.NuclearCataract.prototype.setPropertyDefaults = function() {
 	this.isScaleable = false;
 	this.isRotatable = false;
 	this.isUnique = true;
-	//this.parentClass = "Lens";
-	//this.inFrontOfClassArray = ["Lens", "PostSubcapCataract"];
+	this.parentClass = "Lens";
+	this.inFrontOfClassArray = ["Lens", "PostSubcapCataract" ];
 	this.addAtBack = true;
 
 	// Update validation array for simple parameters
