@@ -20725,7 +20725,10 @@ ED.CornealOpacity = function(_drawing, _parameterJSON) {
 	this.resetWidth = true;
 	this.resetHeight = true;
 	this.resetInfiltrate = true;
-	this.yMidPoint = 0
+	this.yMidPoint = 0;
+
+	this.bezierTimeIntervals = [0.0,0.125,0.25,0.375,0.50,0.625,0.75,0.875,1];
+	this.minX = this.maxX = this.minY = this.maxY = '';
 	
 	// Other parameters
 	this.height = Math.round(this.initialRadius * 2 / 54);
@@ -20899,7 +20902,7 @@ ED.CornealOpacity.prototype.dependentParameterValues = function(_parameter, _val
 			break;
 			
 		case 'h':
-			returnArray['height'] = _value;
+			returnArray['h'] = _value;
 			break;
 		
 		case 'd':
@@ -20907,11 +20910,15 @@ ED.CornealOpacity.prototype.dependentParameterValues = function(_parameter, _val
 			break;
 			
 		case 'w':
-			returnArray['width'] = _value;
+			returnArray['w'] = _value;
 			break;
 		
 		case 'iW':
 			returnArray['infiltrateWidth'] = _value;
+			break;
+		case 'handles':
+			returnArray['w'] = this.calculateWidth();
+			returnArray['h'] = this.calculateHeight();
 			break;
 	}
 
@@ -20947,7 +20954,81 @@ ED.CornealOpacity.prototype.setParameterDefaults = function() {
 		point.setWithPolars(this.initialRadius, i * 2 * Math.PI / this.numberOfHandles);
 		this.addPointToSquiggle(point);
 	}
-}
+};
+
+// Angle of control point from radius line to point (this value makes path a circle Math.PI/12 for 8 points
+ED.CornealOpacity.prototype.getPhi = function()
+{
+	return 2 * Math.PI / (3 * this.numberOfHandles);
+};
+
+ED.CornealOpacity.prototype.calculateWidth = function()
+{
+	/// solve bezier to find min and max point along axis
+	var maxX = '';
+	var minX = '';
+
+	var phi = this.getPhi();
+
+	var squiggle = this.squiggleArray[0];
+	for (var i=0; i<this.numberOfHandles; i++) {
+		fp = this.squiggleArray[0].pointsArray[i];
+		var toIndex = (i < this.numberOfHandles - 1) ? i + 1 : 0;
+		tp = this.squiggleArray[0].pointsArray[toIndex];
+		var x1 = fp.x;
+		var x2 = fp.tangentialControlPoint(+phi).x;
+		var x3 = tp.tangentialControlPoint(-phi).x;
+		var x4 = tp.x;
+
+		for (var j=0; j<this.bezierTimeIntervals.length; j++) {
+			var t = this.bezierTimeIntervals[j];
+			var x = (1-t)*(1-t)*(1-t)*x1 + 3*(1-t)*(1-t)*t*x2 + 3*(1-t)*t*t*x3 + t*t*t*x4;
+			if (maxX == '' || x > maxX) {
+				maxX = x;
+			}
+			if (minX == '' || x < minX) {
+				minX = x;
+			}
+		}
+	}
+	this.maxX = maxX;
+	this.minX = minX;
+	return Math.round((maxX - minX) / 54);
+};
+
+ED.CornealOpacity.prototype.calculateHeight = function()
+{
+	// recalculate height/// solve bezier to find min and max point along axis
+	var phi = this.getPhi();
+	var minY = '';
+	var maxY = '';
+
+	var squiggle = this.squiggleArray[0];
+	for (var i=0; i<this.numberOfHandles; i++) {
+		fp = this.squiggleArray[0].pointsArray[i];
+		var toIndex = (i < this.numberOfHandles - 1) ? i + 1 : 0;
+		tp = this.squiggleArray[0].pointsArray[toIndex];
+		var y1 = fp.y;
+		var y2 = fp.tangentialControlPoint(+phi).y;
+		var y3 = tp.tangentialControlPoint(-phi).y;
+		var y4 = tp.y;
+
+		for (var j=0; j<this.bezierTimeIntervals.length; j++) {
+			var t = this.bezierTimeIntervals[j];
+			var y = (1-t)*(1-t)*(1-t)*y1 + 3*(1-t)*(1-t)*t*y2 + 3*(1-t)*t*t*y3 + t*t*t*y4;
+			if (maxY == '' || y > maxY) {
+				maxY = y;
+			}
+			if (minY == '' || y < minY) {
+				minY = y;
+			}
+		}
+	}
+
+	this.maxY = maxY;
+	this.minY = minY;
+	return Math.round((maxY - minY) / 54);
+};
 
 /**
  * Draws doodle or performs a hit test if a Point parameter is passed
@@ -20970,16 +21051,10 @@ ED.CornealOpacity.prototype.draw = function(_point) {
 	var cp1;
 	var cp2;
 
-	// Angle of control point from radius line to point (this value makes path a circle Math.PI/12 for 8 points
-	var phi = 2 * Math.PI / (3 * this.numberOfHandles);
+	var phi = this.getPhi();
 	
-	// Time intervals along bezier curve
-	var T = [0.0,0.125,0.25,0.375,0.50,0.625,0.75,0.875,1];
-	
-	// If inputted a dimension, reset pointsArray, 
+	// If inputted a dimension, reset pointsArray,
 	// otherwise recalculate dimension
-	var minY = '';
-	var maxY = '';
 	if (this.resetWidth) {
 		this.squiggleArray[0].pointsArray[1].x = 0.5 * this.width * 54;
 		this.squiggleArray[0].pointsArray[3].x = 0.5 * this.width * -54;
@@ -20987,32 +21062,8 @@ ED.CornealOpacity.prototype.draw = function(_point) {
 		this.resetWidth = false;
 	}
 	else {
-		/// solve bezier to find min and max point along axis
-		var maxX = '';
-        var minX = '';
-        var squiggle = this.squiggleArray[0];
-		for (var i=0; i<this.numberOfHandles; i++) {
-	        fp = this.squiggleArray[0].pointsArray[i];
-			var toIndex = (i < this.numberOfHandles - 1) ? i + 1 : 0;
-	        tp = this.squiggleArray[0].pointsArray[toIndex];
-	        var x1 = fp.x;
-			var x2 = fp.tangentialControlPoint(+phi).x;
-			var x3 = tp.tangentialControlPoint(-phi).x;
-			var x4 = tp.x;
-		            
-            for (var j=0; j<T.length; j++) {
-                var t = T[j];
-                var x = (1-t)*(1-t)*(1-t)*x1 + 3*(1-t)*(1-t)*t*x2 + 3*(1-t)*t*t*x3 + t*t*t*x4;
-                if (maxX == '' || x > maxX) {
-                    maxX = x;
-                }
-                if (minX == '' || x < minX) {
-                    minX = x;
-                }
-            }
-        }
-        this.width = Math.round((maxX - minX) / 54);
-        this.w = this.width;
+		this.width = this.calculateWidth();
+		this.w = this.width;
 	}
 	
 	if (this.resetHeight) {
@@ -21020,39 +21071,15 @@ ED.CornealOpacity.prototype.draw = function(_point) {
 		this.squiggleArray[0].pointsArray[2].y = 0.5 * this.height * 54;
 
 		this.resetHeight = false;
-		minY = this.squiggleArray[0].pointsArray[0].y;
-		maxY = this.squiggleArray[0].pointsArray[2].y;
+		this.minY = this.squiggleArray[0].pointsArray[0].y;
+		this.maxY = this.squiggleArray[0].pointsArray[2].y;
 	}
 	else {
-		// recalculate height/// solve bezier to find min and max point along axis
-        var squiggle = this.squiggleArray[0];
-		for (var i=0; i<this.numberOfHandles; i++) {
-	        fp = this.squiggleArray[0].pointsArray[i];
-			var toIndex = (i < this.numberOfHandles - 1) ? i + 1 : 0;
-	        tp = this.squiggleArray[0].pointsArray[toIndex];
-	        var y1 = fp.y;
-			var y2 = fp.tangentialControlPoint(+phi).y;
-			var y3 = tp.tangentialControlPoint(-phi).y;
-			var y4 = tp.y;
-		            
-            for (var j=0; j<T.length; j++) {
-                var t = T[j];
-                var y = (1-t)*(1-t)*(1-t)*y1 + 3*(1-t)*(1-t)*t*y2 + 3*(1-t)*t*t*y3 + t*t*t*y4;
-                if (maxY == '' || y > maxY) {
-                    maxY = y;
-                }
-                if (minY == '' || y < minY) {
-                    minY = y;
-                }
-            }
-        }
-				
-        this.height = Math.round((maxY - minY) / 54);
-        this.h = this.height;
-        		
+		this.height = this.calculateHeight();
+		this.h = this.height;
 	}
 	
-	this.yMidPoint = minY + 0.5 * this.height * 54;
+	this.yMidPoint = this.minY + 0.5 * this.height * 54;
 	
 	// Start curve
 	ctx.moveTo(this.squiggleArray[0].pointsArray[0].x, this.squiggleArray[0].pointsArray[0].y);

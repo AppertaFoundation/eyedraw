@@ -339,8 +339,8 @@ ED.Controller = (function() {
 
 		// Iterate through sync array
 		for (var idSuffix in syncArray) {
-
 			// Get reference to slave drawing
+
 			var slaveDrawing = this.getEyeDrawInstance(idSuffix);
 
 			if (!slaveDrawing) {
@@ -351,6 +351,9 @@ ED.Controller = (function() {
 			// Iterate through master doodles to sync.
 			for (var masterDoodleName in syncArray[idSuffix]) {
 
+				if (!masterDoodle || masterDoodle.className !== masterDoodleName)
+					continue;
+
 				// Iterate through slave doodles to sync with master doodle.
 				for (var slaveDoodleName in syncArray[idSuffix][masterDoodleName]) {
 
@@ -358,7 +361,7 @@ ED.Controller = (function() {
 					var slaveDoodle = slaveDrawing.firstDoodleOfClass(slaveDoodleName);
 
 					// Check that doodles exist, className matches, and sync is allowed
-					if (!masterDoodle || masterDoodle.className !== masterDoodleName || !slaveDoodle && !slaveDoodle.willSync) {
+					if (!slaveDoodle && !slaveDoodle.willSync) {
 						continue;
 					}
 
@@ -383,7 +386,6 @@ ED.Controller = (function() {
 	 * @param  {ED.Drawing} slaveDrawing  The slave drawing instance.
 	 */
 	Controller.prototype.syncDoodleParameters = function(parameterArray, changedParam, masterDoodle, slaveDoodle, slaveDrawing) {
-
 		// Iterate through parameters to sync
 		for (var i = 0; i < (parameterArray || []).length; i++) {
 
