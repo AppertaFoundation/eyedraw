@@ -738,7 +738,7 @@ ED.Controller = (function() {
 			if(this.previousReport){
 				output = existing.replace(this.previousReport, report);
 			} else {
-				if(!existing.match(/^[\n ]$/)){
+				if(existing.length && !existing.match(/^[\n ]$/)){
 					existing += "\n";
 				}
 				output = existing + report;
