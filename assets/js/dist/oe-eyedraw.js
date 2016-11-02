@@ -649,13 +649,17 @@ ED.Controller = (function() {
 			if (masterDoodle[changedParam.parameter] === slaveDoodle[changedParam.parameter]) {
 				continue;
 			}
+			if (typeof(changedParam.value) == 'string') {
+				slaveDoodle.setParameterFromString(changedParam.parameter, changedParam.value, true);
+			}
+			else {
+				var increment = changedParam.value - changedParam.oldValue;
+				var newValue = slaveDoodle[changedParam.parameter] + increment;
 
-			var increment = changedParam.value - changedParam.oldValue;
-			var newValue = slaveDoodle[changedParam.parameter] + increment;
-
-			// Sync slave parameter to value of master
-			slaveDoodle.setSimpleParameter(changedParam.parameter, newValue);
-			slaveDoodle.updateDependentParameters(changedParam.parameter);
+				// Sync slave parameter to value of master
+				slaveDoodle.setSimpleParameter(changedParam.parameter, newValue);
+				slaveDoodle.updateDependentParameters(changedParam.parameter);
+			}
 
 			// Update any bindings associated with the slave doodle
 			slaveDrawing.updateBindings(slaveDoodle);

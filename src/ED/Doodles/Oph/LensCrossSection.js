@@ -31,6 +31,8 @@ ED.LensCrossSection = function(_drawing, _parameterJSON) {
 	this.corticalGrade = 'None';
 	this.posteriorSubcapsularGrade = 'None';
 
+	this.savedParameterArray = ['originX', 'originY', 'nuclearGrade', 'corticalGrade', 'posteriorSubcapsularGrade' ];
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 }

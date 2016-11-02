@@ -1665,14 +1665,10 @@ span.squiggle {
   z-index: 101;
 }
 /* line 28, ../sass/components/_drawing-controls.scss */
-.ed-state-doodle-popup-show .ed-drawing-controls {
-  border-right-color: transparent;
-}
-/* line 31, ../sass/components/_drawing-controls.scss */
 .ed-drawing-controls .ed-selected-doodle {
   margin-left: 32px;
 }
-/* line 35, ../sass/components/_drawing-controls.scss */
+/* line 32, ../sass/components/_drawing-controls.scss */
 .ed-drawing-controls.ed-feature-zoom .ed-selected-doodle {
   margin-left: 66px;
 }
