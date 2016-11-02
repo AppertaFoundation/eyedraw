@@ -31893,6 +31893,7 @@ ED.LensCrossSection = function(_drawing, _parameterJSON) {
 	this.className = "LensCrossSection";
 	this.nuclearGrade = 'None';
 	this.corticalGrade = 'None';
+	this.posteriorSubcapsularGrade = 'None';
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -31924,6 +31925,13 @@ ED.LensCrossSection.prototype.setPropertyDefaults = function() {
 		type: 'string',
 		list: ['None', 'Mild', 'Moderate', 'White'],
 		animate: true
+	};
+
+	this.parameterValidationArray['posteriorSubcapsularGrade'] = {
+		kind: 'derived',
+		type: 'string',
+		list: ['None', 'Small', 'Medium', 'Large'],
+		animate: false
 	};
 
 	// Update component of validation array for simple parameters
@@ -32075,6 +32083,51 @@ ED.LensCrossSection.prototype.draw = function(_point) {
 			// Draw boundary path (also hit testing)
 			this.drawBoundary(_point);
 		}
+
+		// Post SubCap Cataract
+		if (this.posteriorSubcapsularGrade != "None") {
+			var apexY;
+			switch (this.posteriorSubcapsularGrade) {
+				case 'Small':
+					apexY = 30;
+					break;
+				case 'Medium':
+					apexY = 60;
+					break;
+				case 'Large':
+					apexY = 90;
+					break;
+			}
+
+			// Angle of arc
+			var theta = Math.asin(h / r);
+
+			// X coordinate of centre of circle
+			var x = r * Math.cos(theta);
+
+			// Radius of cataract (Just inside capsule)
+			var rco = r - 10;
+
+			// Calculate cataract angles
+			var phi = Math.asin(apexY / rco);
+
+			// Boundary path
+			ctx.beginPath();
+
+			// Draw cataract with two sections of circumference of circle
+			ctx.arc(ld - x, 0, rco, -phi, phi, false);
+
+			// Set line attributes
+			ctx.lineWidth = 10;
+			ctx.lineCap = 'round';
+			ctx.lineJoin = 'round';
+			ctx.fillStyle = "rgba(0, 0, 0, 0)";
+			ctx.strokeStyle = "rgba(150,150,150,0.75)";
+
+			// Draw boundary path (also hit testing)
+			this.drawBoundary(_point);
+		}
+
 
 		// Zonules
 		ctx.beginPath();
