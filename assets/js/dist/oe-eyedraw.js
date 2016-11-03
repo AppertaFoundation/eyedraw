@@ -593,8 +593,8 @@ ED.Controller = (function() {
 
 		// Iterate through sync array
 		for (var idSuffix in syncArray) {
-
 			// Get reference to slave drawing
+
 			var slaveDrawing = this.getEyeDrawInstance(idSuffix);
 
 			if (!slaveDrawing) {
@@ -605,6 +605,9 @@ ED.Controller = (function() {
 			// Iterate through master doodles to sync.
 			for (var masterDoodleName in syncArray[idSuffix]) {
 
+				if (!masterDoodle || masterDoodle.className !== masterDoodleName)
+					continue;
+
 				// Iterate through slave doodles to sync with master doodle.
 				for (var slaveDoodleName in syncArray[idSuffix][masterDoodleName]) {
 
@@ -612,7 +615,7 @@ ED.Controller = (function() {
 					var slaveDoodle = slaveDrawing.firstDoodleOfClass(slaveDoodleName);
 
 					// Check that doodles exist, className matches, and sync is allowed
-					if (!masterDoodle || masterDoodle.className !== masterDoodleName || !slaveDoodle && !slaveDoodle.willSync) {
+					if (!slaveDoodle && !slaveDoodle.willSync) {
 						continue;
 					}
 
@@ -637,7 +640,6 @@ ED.Controller = (function() {
 	 * @param  {ED.Drawing} slaveDrawing  The slave drawing instance.
 	 */
 	Controller.prototype.syncDoodleParameters = function(parameterArray, changedParam, masterDoodle, slaveDoodle, slaveDrawing) {
-
 		// Iterate through parameters to sync
 		for (var i = 0; i < (parameterArray || []).length; i++) {
 
@@ -649,13 +651,17 @@ ED.Controller = (function() {
 			if (masterDoodle[changedParam.parameter] === slaveDoodle[changedParam.parameter]) {
 				continue;
 			}
+			if (typeof(changedParam.value) == 'string') {
+				slaveDoodle.setParameterFromString(changedParam.parameter, changedParam.value, true);
+			}
+			else {
+				var increment = changedParam.value - changedParam.oldValue;
+				var newValue = slaveDoodle[changedParam.parameter] + increment;
 
-			var increment = changedParam.value - changedParam.oldValue;
-			var newValue = slaveDoodle[changedParam.parameter] + increment;
-
-			// Sync slave parameter to value of master
-			slaveDoodle.setSimpleParameter(changedParam.parameter, newValue);
-			slaveDoodle.updateDependentParameters(changedParam.parameter);
+				// Sync slave parameter to value of master
+				slaveDoodle.setSimpleParameter(changedParam.parameter, newValue);
+				slaveDoodle.updateDependentParameters(changedParam.parameter);
+			}
 
 			// Update any bindings associated with the slave doodle
 			slaveDrawing.updateBindings(slaveDoodle);
@@ -738,7 +744,7 @@ ED.Controller = (function() {
 			if(this.previousReport){
 				output = existing.replace(this.previousReport, report);
 			} else {
-				if(!existing.match(/^[\n ]$/)){
+				if(existing.length && !existing.match(/^[\n ]$/)){
 					existing += "\n";
 				}
 				output = existing + report;
@@ -887,6 +893,13 @@ ED.Views.DoodlePopup = (function() {
 		this.container = container;
 		this.containerWidth = container.outerWidth();
 
+		if ($(this.container).data('display-side')) {
+			this.side = $(this.container).data('display-side');
+		}
+		else {
+			this.side = 'right';
+		}
+
 		this.registerForNotifications();
 		this.createToolbar();
 		this.createHelpButton();
@@ -1008,9 +1021,18 @@ ED.Views.DoodlePopup = (function() {
 
 			this.emit('show.before');
 
-			this.container.css({
-				right: -1 * (this.containerWidth - 1)
-			}).removeClass('closed');
+			if (this.side == 'left') {
+				this.container.css({
+					left: -1 * (this.containerWidth - 2)
+				}).find('.ed-button .label').addClass('left');
+				;
+			} else {
+				this.container.css({
+					right: -1 * (this.containerWidth - 1)
+				}).find('.ed-button .label').addClass('right');
+			}
+			this.container.removeClass('closed');
+
 
 			setTimeout(function() {
 				this.emit('show.after');

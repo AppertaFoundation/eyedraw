@@ -237,6 +237,13 @@ class OEEyeDrawWidget extends CWidget
 	public $divWrapper = true;
 
 	/**
+	 * The side the popup should display from the eyedraw
+	 *
+	 * @var string left|right
+	 */
+	public $popupDisplaySide = 'right';
+
+	/**
 	 * Paths for the subdirectories for javascript, css and images
 	 * @var string
 	 */

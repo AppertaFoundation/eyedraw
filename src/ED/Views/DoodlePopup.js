@@ -53,6 +53,13 @@ ED.Views.DoodlePopup = (function() {
 		this.container = container;
 		this.containerWidth = container.outerWidth();
 
+		if ($(this.container).data('display-side')) {
+			this.side = $(this.container).data('display-side');
+		}
+		else {
+			this.side = 'right';
+		}
+
 		this.registerForNotifications();
 		this.createToolbar();
 		this.createHelpButton();
@@ -174,9 +181,18 @@ ED.Views.DoodlePopup = (function() {
 
 			this.emit('show.before');
 
-			this.container.css({
-				right: -1 * (this.containerWidth - 1)
-			}).removeClass('closed');
+			if (this.side == 'left') {
+				this.container.css({
+					left: -1 * (this.containerWidth - 2)
+				}).find('.ed-button .label').addClass('left');
+				;
+			} else {
+				this.container.css({
+					right: -1 * (this.containerWidth - 1)
+				}).find('.ed-button .label').addClass('right');
+			}
+			this.container.removeClass('closed');
+
 
 			setTimeout(function() {
 				this.emit('show.after');

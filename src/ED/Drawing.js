@@ -2348,6 +2348,8 @@ ED.Drawing.prototype.updateBindings = function(_doodle) {
 		// Iterate through this doodle's bindings array and alter value of HTML element
 		for (var parameter in doodle.bindingArray) {
 			var element = document.getElementById(doodle.bindingArray[parameter]['id']);
+			if (!element)
+				continue;
 			var attribute = doodle.bindingArray[parameter]['attribute'];
 			var value = doodle.getParameter(parameter);
 
