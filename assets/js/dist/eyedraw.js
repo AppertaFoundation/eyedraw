@@ -42624,13 +42624,12 @@ ED.RetinoscopyPowerCross.prototype.description = function() {
 	var power1 = parseFloat(this.powerSign1 + this.powerInt1 + this.powerDp1);
 	var power2 = parseFloat(this.powerSign2 + this.powerInt2 + this.powerDp2);
 	var pSphere = (power1 >= power2) ? (power1 - wdCompensation).toFixed(2) : (power2 - wdCompensation).toFixed(2);
-	var pCyl = (power1 - power2).toFixed(2);
+	var pCyl = (Math.abs(power1 - power2) * -1).toFixed(2); // reports in minus cyl format
 	var angle = (power1>=power2) ? this.angle1 : this.angle2;
 	
-	console.log(this.angle1 + ' ' + this.angle2 + ' ' + angle);
 	
 	var Rx = (pSphere >= 0 ) ? '+' + pSphere: pSphere;
-	Rx += (pCyl > 0 ) ? ' / +' : (pCyl == 0) ? ' / -' : ' / ';
+	Rx += (pCyl == 0) ? ' / -' : ' / ';
 	Rx += pCyl + ' x ' + angle; 
 		
 	return Rx;
