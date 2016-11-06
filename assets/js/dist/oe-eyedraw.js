@@ -731,11 +731,14 @@ ED.Controller = (function() {
 	Controller.prototype.autoReport = function(outputElement) {
 		var report = this.drawing.report();
 		if(report){
+
 			report = report.replace(/, /g,"\n");
 			var output = '';
 			var existing = outputElement.value;
 
-			if(existing.match(report)){
+			var reportRegex = String(report).replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+
+			if(existing.match(reportRegex)){
 				outputElement.rows = (existing.match(/\n/g) || []).length + 1;
 				this.previousReport = report;
 				return;
