@@ -33,26 +33,25 @@ ED.CornealOpacity = function(_drawing, _parameterJSON) {
 	this.numberOfHandles = 4;
 	this.initialRadius = 81;
 	this.resetWidth = true;
-	this.resetHeight = true;
 	this.resetInfiltrate = true;
-	this.yMidPoint = 0;
 
 	this.bezierTimeIntervals = [0.0,0.125,0.25,0.375,0.50,0.625,0.75,0.875,1];
-	this.minX = this.maxX = this.minY = this.maxY = '';
+	this.minX = this.minY = this.initialRadius * -1;
+	this.maxX = this.maxY = this.initialRadius;
 	
 	// Other parameters
 	this.height = Math.round(this.initialRadius * 2 / 54);
 	this.width = Math.round(this.initialRadius * 2 / 54);
 	this.depth = 33;
 	this.infiltrateWidth = 0;
-	
+		
 	this.h = Math.round(this.initialRadius * 2 / 54);
 	this.w = Math.round(this.initialRadius * 2 / 54);
 	this.d = 33;
 	this.iW = 0;
 
 	// Saved parameters
-	this.savedParameterArray = ['originX', 'originY', 'rotation', 'height', 'width', 'depth', 'infiltrateWidth','h','w','d','iW','yMidPoint'];
+	this.savedParameterArray = ['originX', 'originY', 'rotation', 'height', 'width', 'depth', 'infiltrateWidth','h','w','d','iW','minY','maxY'];
 	
 	// Parameters in doodle control bar
 	this.controlParameterArray = {'height':'Height', 'width':'Width', 'depth':'Depth (%)', 'infiltrateWidth':'Infiltrate width'};
@@ -145,7 +144,8 @@ ED.CornealOpacity.prototype.setPropertyDefaults = function() {
 		type: 'int',
 		range: [1, 14],
 		animate: false
-	};this.parameterValidationArray['iW'] = {
+	};
+	this.parameterValidationArray['iW'] = {
 		kind: 'other',
 		type: 'int',
 		range: [0, 15],
@@ -162,28 +162,24 @@ ED.CornealOpacity.prototype.setPropertyDefaults = function() {
 		type: 'bool',
 		display: false
 	};
-	this.parameterValidationArray['resetHeight'] = {
-		kind: 'derived',
-		type: 'bool',
-		display: false
-	};
 	this.parameterValidationArray['resetInfiltrate'] = {
 		kind: 'derived',
 		type: 'bool',
 		display: false
 	};
-	this.parameterValidationArray['yMidPoint'] = {
+	this.parameterValidationArray['minY'] = {
 		kind: 'other',
 		type: 'int',
-		range: [-500, +500],
+		range: [-500,500],
 		animate: false
 	};
-	this.parameterValidationArray['yMPPos'] = {
+	this.parameterValidationArray['maxY'] = {
 		kind: 'other',
 		type: 'int',
-		range: new ED.Range(0,1),
+		range: [-500,500],
 		animate: false
 	};
+	
 }
 
 /**
@@ -204,8 +200,11 @@ ED.CornealOpacity.prototype.dependentParameterValues = function(_parameter, _val
 			break;
 
 		case 'height':
-			returnArray['resetHeight'] = true;
+			this.squiggleArray[0].pointsArray[0].y = 0.5 * _value * -54;
+			this.squiggleArray[0].pointsArray[2].y = 0.5 * _value * 54;
 			returnArray['h'] = parseInt(_value);
+			returnArray['minY'] = this.calculateMinY();
+			returnArray['maxY'] = this.calculateMaxY();
 			break;
 			
 		case 'infiltrateWidth':
@@ -232,15 +231,21 @@ ED.CornealOpacity.prototype.dependentParameterValues = function(_parameter, _val
 		case 'iW':
 			returnArray['infiltrateWidth'] = _value;
 			break;
-		
-		case 'yMidPoint':
-			returnArray['yMidPoint'] = _value;
+			
+		case 'minY':
+			returnArray['minY'] = _value;
+			break;
+			
+		case 'maxY':
+			returnArray['maxY'] = _value;
 			break;
 			
 		case 'handles':
 			returnArray['w'] = this.calculateWidth();
 			returnArray['h'] = this.calculateHeight();
-			returnArray['yMidPoint'] = this.calculateYMidPoint();
+			returnArray['height'] = this.calculateHeight();
+			returnArray['minY'] = this.calculateMinY();
+			returnArray['maxY'] = this.calculateMaxY();
 			break;
 	}
 
@@ -320,6 +325,39 @@ ED.CornealOpacity.prototype.calculateWidth = function()
 
 ED.CornealOpacity.prototype.calculateHeight = function()
 {
+	// recalculate height /// solve bezier to find min and max point along axis
+	var minY = this.calculateMinY();
+	var maxY = this.calculateMaxY();
+
+	return Math.round((maxY - minY) / 54);
+};
+
+ED.CornealOpacity.prototype.calculateMinY = function() {
+	// recalculate height/// solve bezier to find min and max point along axis
+	var phi = this.getPhi();
+	var minY = '';
+
+	var squiggle = this.squiggleArray[0];
+	for (var i=0; i<this.numberOfHandles; i++) {
+		fp = this.squiggleArray[0].pointsArray[i];
+		var toIndex = (i < this.numberOfHandles - 1) ? i + 1 : 0;
+		tp = this.squiggleArray[0].pointsArray[toIndex];
+		var y1 = fp.y;
+		var y2 = fp.tangentialControlPoint(+phi).y;
+		var y3 = tp.tangentialControlPoint(-phi).y;
+		var y4 = tp.y;
+
+		for (var j=0; j<this.bezierTimeIntervals.length; j++) {
+			var t = this.bezierTimeIntervals[j];
+			var y = (1-t)*(1-t)*(1-t)*y1 + 3*(1-t)*(1-t)*t*y2 + 3*(1-t)*t*t*y3 + t*t*t*y4;
+			if (minY == '' || y <= minY) {
+				minY = y;
+			}
+		}
+	}
+	return minY;
+}
+ED.CornealOpacity.prototype.calculateMaxY = function() {
 	// recalculate height/// solve bezier to find min and max point along axis
 	var phi = this.getPhi();
 	var minY = '';
@@ -347,14 +385,9 @@ ED.CornealOpacity.prototype.calculateHeight = function()
 		}
 	}
 
-	this.maxY = maxY;
-	this.minY = minY;
-	return Math.round((maxY - minY) / 54);
-};
-
-ED.CornealOpacity.prototype.calculateYMidPoint = function() {
-	return this.minY + 0.5 * this.height * 54;
+	return maxY;
 }
+
 
 /**
  * Draws doodle or performs a hit test if a Point parameter is passed
@@ -362,6 +395,7 @@ ED.CornealOpacity.prototype.calculateYMidPoint = function() {
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
 ED.CornealOpacity.prototype.draw = function(_point) {
+	
 	// Get context
 	var ctx = this.drawing.context;
 
@@ -389,20 +423,6 @@ ED.CornealOpacity.prototype.draw = function(_point) {
 	}
 	else {
 		this.width = this.calculateWidth();
-	}
-	
-	if (this.resetHeight) {
-		this.squiggleArray[0].pointsArray[0].y = 0.5 * this.height * -54;
-		this.squiggleArray[0].pointsArray[2].y = 0.5 * this.height * 54;
-
-		this.resetHeight = false;
-		this.minY = this.squiggleArray[0].pointsArray[0].y;
-		this.maxY = this.squiggleArray[0].pointsArray[2].y;
-		
-		this.yMidPoint = this.calculateYMidPoint();
-	}
-	else {
-		this.height = this.calculateHeight();
 	}
 	
 	

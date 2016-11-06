@@ -31,9 +31,6 @@ ED.CornealOpacityCrossSection = function(_drawing, _parameterJSON) {
 
 	// Private parameters
 	this.initialRadius = 81;
-	this.resetWidth = false;
-	this.resetHeight = false;
-	this.resetInfiltrate = false;
 	
 	// Other parameters
 	this.height = Math.round(this.initialRadius * 2 / 54);
@@ -46,10 +43,11 @@ ED.CornealOpacityCrossSection = function(_drawing, _parameterJSON) {
 	this.d = 33;
 	this.iW = 0;
 	
-	this.yMidPoint = 0;
+	this.minY = this.initialRadius * -1;
+	this.maxY = this.initialRadius;
 	
 	// Saved parameters
-	this.savedParameterArray = ['originX', 'originY', 'height', 'width', 'depth', 'infiltrateWidth','h','w','d','iW','yMidPoint'];
+	this.savedParameterArray = ['originX', 'originY', 'height', 'width', 'depth', 'infiltrateWidth','h','w','d','iW','minY','maxY'];
 	
 	// Parameters in doodle control bar
 	this.controlParameterArray = {'height':'Height', 'width':'Width', 'depth':'Depth (%)', 'infiltrateWidth':'Infiltrate width'};
@@ -133,25 +131,16 @@ ED.CornealOpacityCrossSection.prototype.setPropertyDefaults = function() {
 		range: [1, 100],
 		animate: false
 	};
-	this.parameterValidationArray['resetWidth'] = {
-		kind: 'derived',
-		type: 'bool',
-		display: false
-	};
-	this.parameterValidationArray['resetHeight'] = {
-		kind: 'derived',
-		type: 'bool',
-		display: false
-	};
-	this.parameterValidationArray['resetInfiltrate'] = {
-		kind: 'derived',
-		type: 'bool',
-		display: false
-	};
-	this.parameterValidationArray['yMidPoint'] = {
+	this.parameterValidationArray['minY'] = {
 		kind: 'other',
 		type: 'int',
-		range: [-500,+500],
+		range: [-500,500],
+		animate: false
+	};
+	this.parameterValidationArray['maxY'] = {
+		kind: 'other',
+		type: 'int',
+		range: [-500,500],
 		animate: false
 	};
 }
@@ -169,17 +158,14 @@ ED.CornealOpacityCrossSection.prototype.dependentParameterValues = function(_par
 
 	switch (_parameter) {
 		case 'width':
-			returnArray['resetWidth'] = true;
 			returnArray['w'] = parseInt(_value);
 			break;
 
 		case 'height':
-			returnArray['resetHeight'] = true;
 			returnArray['h'] = parseInt(_value);
 			break;
 			
 		case 'infiltrateWidth':
-			returnArray['resetInfiltrate'] = true;
 			returnArray['iW'] = parseInt(_value);
 			break;
 		
@@ -236,8 +222,8 @@ ED.CornealOpacityCrossSection.prototype.draw = function(_point) {
 	ctx.beginPath();
 	
 	// Calculate segment extent in terms of time along curve
-	var endY = this.yMidPoint + this.originY + 0.5 * this.height * 54;
-	var startY = this.yMidPoint + this.originY - 0.5 * this.height * 54;
+	var startY = this.minY + this.originY;
+	var endY = this.maxY + this.originY;
 	
 	var startT = (startY + 380) / 760;
 	if (startT<0) startT = 0;
@@ -555,8 +541,8 @@ ED.CornealOpacityCrossSection.prototype.draw = function(_point) {
 		// Infiltrate
 		if (this.infiltrateWidth > 0) {
 			// Re do all calculations, with extra length and width proportional to infiltrate width
-			var iEndY = this.yMidPoint + this.originY + 0.5 * (this.height + this.infiltrateWidth * 2) * 54;
-			var iStartY = this.yMidPoint + this.originY - 0.5 * (this.height + this.infiltrateWidth * 2) * 54;
+			var iEndY = this.maxY + this.originY + 0.5 * this.infiltrateWidth * 2 * 54;
+			var iStartY = this.minY + this.originY - 0.5 * this.infiltrateWidth * 2 * 54;
 			
 			var iStartT = (iStartY + 380) / 760;
 			if (iStartT<0) iStartT = 0;
