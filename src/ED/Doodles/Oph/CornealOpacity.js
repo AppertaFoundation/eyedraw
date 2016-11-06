@@ -173,9 +173,15 @@ ED.CornealOpacity.prototype.setPropertyDefaults = function() {
 		display: false
 	};
 	this.parameterValidationArray['yMidPoint'] = {
-		kind: 'simple',
+		kind: 'other',
 		type: 'int',
 		range: [-500, +500],
+		animate: false
+	};
+	this.parameterValidationArray['yMPPos'] = {
+		kind: 'other',
+		type: 'int',
+		range: new ED.Range(0,1),
 		animate: false
 	};
 }
@@ -199,7 +205,7 @@ ED.CornealOpacity.prototype.dependentParameterValues = function(_parameter, _val
 
 		case 'height':
 			returnArray['resetHeight'] = true;
-			returnArray['h'] = parseInt(_value);			
+			returnArray['h'] = parseInt(_value);
 			break;
 			
 		case 'infiltrateWidth':
@@ -226,9 +232,15 @@ ED.CornealOpacity.prototype.dependentParameterValues = function(_parameter, _val
 		case 'iW':
 			returnArray['infiltrateWidth'] = _value;
 			break;
+		
+		case 'yMidPoint':
+			returnArray['yMidPoint'] = _value;
+			break;
+			
 		case 'handles':
 			returnArray['w'] = this.calculateWidth();
 			returnArray['h'] = this.calculateHeight();
+			returnArray['yMidPoint'] = this.calculateYMidPoint();
 			break;
 	}
 
@@ -340,6 +352,10 @@ ED.CornealOpacity.prototype.calculateHeight = function()
 	return Math.round((maxY - minY) / 54);
 };
 
+ED.CornealOpacity.prototype.calculateYMidPoint = function() {
+	return this.minY + 0.5 * this.height * 54;
+}
+
 /**
  * Draws doodle or performs a hit test if a Point parameter is passed
  *
@@ -373,7 +389,6 @@ ED.CornealOpacity.prototype.draw = function(_point) {
 	}
 	else {
 		this.width = this.calculateWidth();
-		this.w = this.width;
 	}
 	
 	if (this.resetHeight) {
@@ -383,13 +398,13 @@ ED.CornealOpacity.prototype.draw = function(_point) {
 		this.resetHeight = false;
 		this.minY = this.squiggleArray[0].pointsArray[0].y;
 		this.maxY = this.squiggleArray[0].pointsArray[2].y;
+		
+		this.yMidPoint = this.calculateYMidPoint();
 	}
 	else {
 		this.height = this.calculateHeight();
-		this.h = this.height;
 	}
 	
-	this.yMidPoint = this.minY + 0.5 * this.height * 54;
 	
 	// Start curve
 	ctx.moveTo(this.squiggleArray[0].pointsArray[0].x, this.squiggleArray[0].pointsArray[0].y);
