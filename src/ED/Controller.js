@@ -127,11 +127,14 @@ ED.Controller = (function() {
 	 */
 	Controller.prototype.createDoodlePopup = function() {
 
-		var container = this.container.find('.ed-doodle-popup');
+		var container = this.container.find('.ed-doodle-popup:first');
+
+		var popupDoodles = this.properties.showDoodlePopupForDoodles || [];
 
 		return container.length ? new ED.Views.DoodlePopup(
 			this.drawing,
-			container
+			container,
+			popupDoodles
 		) : null;
 	};
 

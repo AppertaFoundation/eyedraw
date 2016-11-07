@@ -381,11 +381,14 @@ ED.Controller = (function() {
 	 */
 	Controller.prototype.createDoodlePopup = function() {
 
-		var container = this.container.find('.ed-doodle-popup');
+		var container = this.container.find('.ed-doodle-popup:first');
+
+		var popupDoodles = this.properties.showDoodlePopupForDoodles || [];
 
 		return container.length ? new ED.Views.DoodlePopup(
 			this.drawing,
-			container
+			container,
+			popupDoodles
 		) : null;
 	};
 
@@ -889,12 +892,19 @@ ED.Views.DoodlePopup = (function() {
 	 * @param {HTMLElement} widgetContainer The widget container element
 	 * @extends {ED.View}
 	 */
-	function DoodlePopup(drawing, container) {
+	function DoodlePopup(drawing, container, popupDoodles) {
 		ED.View.apply(this, arguments);
 
+		// don't want to be checking against an empty array
+		if (popupDoodles !== undefined && !popupDoodles.length) {
+			popupDoodles = undefined;
+		}
+		
 		this.drawing = drawing;
 		this.container = container;
 		this.containerWidth = container.outerWidth();
+		this.popupDoodles = popupDoodles;
+
 
 		if ($(this.container).data('display-side')) {
 			this.side = $(this.container).data('display-side');
@@ -988,7 +998,12 @@ ED.Views.DoodlePopup = (function() {
 	 * @param  {Boolean} show   Show or hide the menu.
 	 */
 	DoodlePopup.prototype.update = function(show) {
-		if (show && this.drawing.selectedDoodle) {
+		var shouldDisplayForDoodle = true;
+		if (this.popupDoodles && this.drawing.selectedDoodle && this.popupDoodles.indexOf(this.drawing.selectedDoodle.className) == -1) {
+			console.log(this.popupDoodles);
+			shouldDisplayForDoodle = false;
+		}
+		if (show && this.drawing.selectedDoodle && shouldDisplayForDoodle) {
 			this.render();
 			this.show();
 		} else {
