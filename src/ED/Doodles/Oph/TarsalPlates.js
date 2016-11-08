@@ -45,6 +45,7 @@ ED.TarsalPlates.superclass = ED.Doodle.prototype;
 ED.TarsalPlates.prototype.setPropertyDefaults = function() {
 	this.isUnique = true;
 	this.isSelectable = false;
+	this.isDeletable = false;
 }
 
 /**
