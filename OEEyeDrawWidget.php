@@ -233,6 +233,13 @@ class OEEyeDrawWidget extends CWidget
 	public $autoReport = '';
 
 	/**
+	 * If autoReport is set, then this determines whether the controller will handle edits to the element containing
+	 * the auto reported text.
+	 * @var bool
+	 */
+	public $autoReportEditable = true;
+
+	/**
 	 * Whether the eyedraw should be rendered with a div wrapper
 	 * @var boolean
 	 */
@@ -431,6 +438,7 @@ class OEEyeDrawWidget extends CWidget
 			'offsetY'=>$this->offsetY,
 			'toImage'=>$this->toImage,
 			'autoReport'=>$this->autoReport,
+			'autoReportEditable' => $this->autoReportEditable,
 			'showDoodlePopupForDoodles' => $this->showDoodlePopupForDoodles
 		);
 		// need to escape the listener names so that they are not treated as string vars in javascript
