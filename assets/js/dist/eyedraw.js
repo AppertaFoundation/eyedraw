@@ -2984,6 +2984,10 @@ ED.Drawing.prototype.report = function() {
 		}
 	}
 
+	if (!returnString.length) {
+		returnString = 'No abnormality';
+	}
+
 	// Return result
 	return returnString;
 }
