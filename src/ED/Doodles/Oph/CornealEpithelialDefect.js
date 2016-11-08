@@ -327,5 +327,5 @@ ED.CornealEpithelialDefect.prototype.draw = function(_point) {
  * @returns {String} Description of doodle
  */
 ED.CornealEpithelialDefect.prototype.description = function() {
-	return 'Epithelial defect';
+	return 'Epithelial defect H-W: ' + this.height + 'x' + this.width + 'mm';
 }

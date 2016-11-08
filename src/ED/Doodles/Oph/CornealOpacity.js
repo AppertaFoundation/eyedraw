@@ -559,5 +559,5 @@ ED.CornealOpacity.prototype.draw = function(_point) {
  * @returns {String} Description of doodle
  */
 ED.CornealOpacity.prototype.description = function() {
-	return 'Corneal opacity';
+	return 'Corneal opacity: H-W: ' + this.height + 'x' + this.width + 'mm // Stromal depth: ' + this.depth + '% // Infiltrate width: ' + this.infiltrateWidth + 'mm';
 }

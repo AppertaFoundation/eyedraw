@@ -2406,7 +2406,10 @@ ED.Drawing.prototype.addDoodle = function(_className, _parameterDefaults, _param
 		this.notify("doodleAdded", newDoodle);
 
 		// Run onSelection code
-		this.selectedDoodle.onSelection();
+		if (this.selectedDoodle) {
+			// might already have been deselected depending on syncing rules
+			this.selectedDoodle.onSelection();
+		}
 
 		// Return doodle
 		return newDoodle;
@@ -20252,7 +20255,7 @@ ED.CornealEpithelialDefect.prototype.draw = function(_point) {
  * @returns {String} Description of doodle
  */
 ED.CornealEpithelialDefect.prototype.description = function() {
-	return 'Epithelial defect';
+	return 'Epithelial defect H-W: ' + this.height + 'x' + this.width + 'mm';
 }
 
 /**
@@ -21745,7 +21748,7 @@ ED.CornealOpacity.prototype.draw = function(_point) {
  * @returns {String} Description of doodle
  */
 ED.CornealOpacity.prototype.description = function() {
-	return 'Corneal opacity';
+	return 'Corneal opacity: H-W: ' + this.height + 'x' + this.width + 'mm // Stromal depth: ' + this.depth + '% // Infiltrate width: ' + this.infiltrateWidth + 'mm';
 }
 
 /**

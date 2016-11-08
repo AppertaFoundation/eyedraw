@@ -2146,7 +2146,10 @@ ED.Drawing.prototype.addDoodle = function(_className, _parameterDefaults, _param
 		this.notify("doodleAdded", newDoodle);
 
 		// Run onSelection code
-		this.selectedDoodle.onSelection();
+		if (this.selectedDoodle) {
+			// might already have been deselected depending on syncing rules
+			this.selectedDoodle.onSelection();
+		}
 
 		// Return doodle
 		return newDoodle;

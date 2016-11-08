@@ -53,7 +53,7 @@ ED.Views.DoodlePopup = (function() {
 		if (popupDoodles !== undefined && !popupDoodles.length) {
 			popupDoodles = undefined;
 		}
-		
+
 		this.drawing = drawing;
 		this.container = container;
 		this.containerWidth = container.outerWidth();
@@ -154,7 +154,6 @@ ED.Views.DoodlePopup = (function() {
 	DoodlePopup.prototype.update = function(show) {
 		var shouldDisplayForDoodle = true;
 		if (this.popupDoodles && this.drawing.selectedDoodle && this.popupDoodles.indexOf(this.drawing.selectedDoodle.className) == -1) {
-			console.log(this.popupDoodles);
 			shouldDisplayForDoodle = false;
 		}
 		if (show && this.drawing.selectedDoodle && shouldDisplayForDoodle) {
@@ -173,9 +172,9 @@ ED.Views.DoodlePopup = (function() {
 
 			this.emit('hide.before');
 
-			this.container.css({
-				right: 0
-			});
+			var css = {};
+			css[this.side] = 0;
+			this.container.css(css);
 
 			setTimeout(function() {
 				this.container.addClass('closed');
