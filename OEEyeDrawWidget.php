@@ -64,6 +64,8 @@ class OEEyeDrawWidget extends CWidget
 	 */
 	public $showDoodlePopup = true;
 
+	public $showDoodlePopupForDoodles = null;
+
 	/**
 	 * Maximum amount of toolbar buttons to display in a panel.
 	 * @var integer Set to -1 to show all buttons.
@@ -229,6 +231,13 @@ class OEEyeDrawWidget extends CWidget
 	 * @var string
 	 */
 	public $autoReport = '';
+
+	/**
+	 * If autoReport is set, then this determines whether the controller will handle edits to the element containing
+	 * the auto reported text.
+	 * @var bool
+	 */
+	public $autoReportEditable = true;
 
 	/**
 	 * Whether the eyedraw should be rendered with a div wrapper
@@ -429,6 +438,8 @@ class OEEyeDrawWidget extends CWidget
 			'offsetY'=>$this->offsetY,
 			'toImage'=>$this->toImage,
 			'autoReport'=>$this->autoReport,
+			'autoReportEditable' => $this->autoReportEditable,
+			'showDoodlePopupForDoodles' => $this->showDoodlePopupForDoodles
 		);
 		// need to escape the listener names so that they are not treated as string vars in javascript
 		foreach ($this->listenerArray as $listener) {
