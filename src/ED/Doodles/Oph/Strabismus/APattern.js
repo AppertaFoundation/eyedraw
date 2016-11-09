@@ -126,15 +126,3 @@ ED.APattern.prototype.draw = function(_point)
 	// Return value indicating successful hittest
 	return this.isClicked;
 }
-
-/**
- * Returns a string containing a text description of the doodle
- *
- * @returns {String} Description of doodle
- */
-ED.APattern.prototype.description = function()
-{
-    var returnString = "UpShoot";
-	
-	return returnString;
-}

@@ -17,40 +17,40 @@
  */
  
 /**
- * VPattern
+ * YPattern
  *
- * @class VPattern
+ * @class YPattern
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
  * @param {Object} _parameterJSON
  */
-ED.VPattern = function(_drawing, _parameterJSON)
+ED.YPattern = function(_drawing, _parameterJSON)
 {
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 	
 	// Set classname
-	this.className = "VPattern";
+	this.className = "YPattern";
 }
 
 /**
  * Sets superclass and constructor
  */
-ED.VPattern.prototype = new ED.Doodle;
-ED.VPattern.prototype.constructor = ED.VPattern;
-ED.VPattern.superclass = ED.Doodle.prototype;
+ED.YPattern.prototype = new ED.Doodle;
+ED.YPattern.prototype.constructor = ED.YPattern;
+ED.YPattern.superclass = ED.Doodle.prototype;
 
 /**
  * Sets handle attributes
  */
-ED.VPattern.prototype.setHandles = function()
+ED.YPattern.prototype.setHandles = function()
 {
 }
 
 /**
  * Sets default dragging attributes
  */
-ED.VPattern.prototype.setPropertyDefaults = function()
+ED.YPattern.prototype.setPropertyDefaults = function()
 {
 	this.isSelectable = false;
 	this.isOrientated = false;
@@ -58,20 +58,21 @@ ED.VPattern.prototype.setPropertyDefaults = function()
 	this.isSqueezable = false;
 	this.isMoveable = false;
 	this.isRotatable = false;
+	this.isUnique = true;
 }
 
 /**
  * Sets default parameters
  */
-ED.VPattern.prototype.setParameterDefaults = function()
+ED.YPattern.prototype.setParameterDefaults = function()
 {
     if(this.drawing.eye == ED.eye.Right)
     {
-        this.rotation = -Math.PI/8;
+        this.side = 1;
     }
     else
     {
-        this.rotation = Math.PI/8;        
+        this.side = -1;        
     }
 }
 
@@ -80,13 +81,13 @@ ED.VPattern.prototype.setParameterDefaults = function()
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.VPattern.prototype.draw = function(_point)
+ED.YPattern.prototype.draw = function(_point)
 {
 	// Get context
 	var ctx = this.drawing.context;
 	
 	// Call draw method in superclass
-	ED.VPattern.superclass.draw.call(this, _point);
+	ED.YPattern.superclass.draw.call(this, _point);
     
 	// Boundary path
 	ctx.beginPath();
@@ -95,14 +96,30 @@ ED.VPattern.prototype.draw = function(_point)
     var dash = 4;
     var gap = 4;
     var length = 0;
-    var startY = -500;
-    ctx.moveTo(0, startY)
-    while (length < -2*startY)
+    var depth = 0;
+    var startY = -450;
+        
+    ctx.moveTo(-350 * this.side, startY);
+    while (length < 185)
     {
-        length += dash;
-        ctx.lineTo(0, startY + length);
-        length += gap;            
-        ctx.moveTo(0, startY + length);
+        length += 2 * dash;
+        depth += dash;
+        ctx.lineTo((-350 + length) * this.side, startY + depth);
+        length += gap; 
+        depth += gap;           
+        ctx.moveTo((-350 + length) * this.side, startY + depth);
+    }
+    
+    length = 0;
+    depth = 0;
+    ctx.moveTo(0, 20+startY * -1);
+    while (length < 40)
+    {
+        depth += dash * 2;
+        ctx.lineTo(0, 20+startY*-1 - depth);
+        length += gap; 
+        depth += gap;             
+        ctx.moveTo(-0, 20+startY*-1 - depth);
     }
     
 	// Close path

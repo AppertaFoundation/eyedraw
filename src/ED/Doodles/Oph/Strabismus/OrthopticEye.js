@@ -92,12 +92,12 @@ ED.OrthopticEye.prototype.draw = function(_point) {
         
         // Upper Eye lid
         ctx.beginPath();
-        ctx.arc(0,100,500,-Math.PI*3/4,-Math.PI*1/4,false);
+        ctx.arc(0,150,500,-Math.PI*3/4,-Math.PI*1/4,false);
         ctx.stroke();
         
         // Lower Eye lid
         ctx.beginPath();
-        ctx.arc(0,-100,500,Math.PI*1/4,Math.PI*3/4,false);
+        ctx.arc(0,-150,500,Math.PI*1/4,Math.PI*3/4,false);
         ctx.stroke();
 	}
 	
