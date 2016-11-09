@@ -1769,3 +1769,8 @@ span.squiggle {
 .ed-doodle-controls select {
   width: auto;
 }
+
+/* line 97, ../sass/components/_doodle-popup.scss */
+.combo div {
+  float: left;
+}

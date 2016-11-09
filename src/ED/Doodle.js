@@ -986,9 +986,21 @@ ED.Doodle.prototype.getControlElements = function() {
  */
 ED.Doodle.prototype.addControlBindings = function() {
 	for (var parameter in this.controlParameterArray) {
-		this.addBinding(parameter, {
-			id: this.parameterControlElementId(parameter)
-		});
+		if (!parameter in this.parameterValidationArray) {
+			continue;
+		}
+		if (this.parameterValidationArray[parameter].type == 'combo') {
+			for (var i in this.parameterValidationArray[parameter].list) {
+				var childParam = this.parameterValidationArray[parameter].list[i];
+				this.addBinding(childParam, {
+					id: this.parameterControlElementId(childParam)
+				});
+			}
+		} else {
+			this.addBinding(parameter, {
+				id: this.parameterControlElementId(parameter)
+			});
+		}
 	}
 };
 
@@ -1083,9 +1095,19 @@ ED.Doodle.prototype.removeDoodleControls = function(controlDiv) {
  * @param {String} _parameter Name of the parameter
  * @returns {String} _id ID for a control element
  */
-ED.Doodle.prototype.parameterElement = function(_parameter) {
+ED.Doodle.prototype.parameterElement = function(_parameter, showLabel) {
+	if (showLabel === undefined)
+		showLabel = true;
+
 	var element;
 	switch (this.parameterValidationArray[_parameter].type) {
+		case 'combo':
+			element = document.createElement('span');
+			element.setAttribute('class', 'combo');
+			for (var i in this.parameterValidationArray[_parameter]['list']) {
+				element.appendChild(this.parameterElement(this.parameterValidationArray[_parameter]['list'][i], false));
+			}
+			break;
 		case 'string':
 			// Create a select element
 			element = document.createElement('select');
@@ -1170,14 +1192,15 @@ ED.Doodle.prototype.parameterElement = function(_parameter) {
 			break;
 	}
 
-	// Create label  ***TODO*** deal with optional label and language
-	var label = document.createElement('label');
-	label.innerText = this.controlParameterArray[_parameter];
-	label.setAttribute('for', this.parameterControlElementId(_parameter));
-
 	// Wrap in div to allow display in vertical block
 	var div = document.createElement('div');
-	div.appendChild(label);
+	if (showLabel) {
+		// Create label  ***TODO*** deal with optional label and language
+		var label = document.createElement('label');
+		label.innerText = this.controlParameterArray[_parameter];
+		label.setAttribute('for', this.parameterControlElementId(_parameter));
+		div.appendChild(label);
+	}
 	div.appendChild(element);
 
 	return div;
