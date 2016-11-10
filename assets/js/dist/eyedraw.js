@@ -41732,18 +41732,9 @@ ED.RetinoscopyPowerCross = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "RetinoscopyPowerCross";
 
-	this.workingDistance = '1/2 m';
-
-	this.workingDistanceLookup = {
-		'1/3 m': '0.333',
-		'1/2 m': '0.5',
-		'2/3 m': '0.667',
-		'1m': '1',
-		'1.5m': '1.5'
-	};
-
-	this.angle1 = "180";
-	this.angle2 = "90";
+	this.workingDistance = 0.5;
+	this.angle1 = 180;
+	this.angle2 = 90;
 	this.powerSign1 = "+";
 	this.powerSign2 = "+";
 	this.powerInt1 = "0";
@@ -41755,12 +41746,7 @@ ED.RetinoscopyPowerCross = function(_drawing, _parameterJSON) {
 	this.savedParameterArray = ['rotation', 'powerSign1', 'powerSign2', 'powerInt1', 'powerInt2', 'powerDp1', 'powerDp2'];
 
 	// Parameters in doodle control bar (parameter name: parameter label)
-	this.controlParameterArray = {
-		'workingDistance': 'Working Distance',
-		'angle1': 'Axis 1 angle',
-		'power1': 'Power 1',
-		'power2': 'Power 2'
-	};
+	this.controlParameterArray = {};
 	
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -41784,20 +41770,11 @@ ED.RetinoscopyPowerCross.prototype.setPropertyDefaults = function() {
 // 	this.parameterValidationArray['rotation']['range'].setMinAndMax(0, Math.PI);
 
 	// Add complete validation arrays for derived parameters
-	this.parameterValidationArray['power1'] = {
-		kind: 'other',
-		type: 'combo',
-		list: ['powerSign1', 'powerInt1', 'powerDp1']
-	};
-	this.parameterValidationArray['power2'] = {
-		kind: 'other',
-		type: 'combo',
-		list: ['powerSign2', 'powerInt2', 'powerDp2']
-	};
+
 	this.parameterValidationArray['workingDistance'] = {
 		kind: 'derived',
 		type: 'string',
-		list: ['1/3 m', '1/2 m', '2/3 m', '1m', '1.5m'],
+		list: ['0.333','0.5','0.667','1.0','1.5'],
 		animate: true
 	};
 	this.parameterValidationArray['angle1'] = {
@@ -41814,8 +41791,8 @@ ED.RetinoscopyPowerCross.prototype.setPropertyDefaults = function() {
 	};
 	this.parameterValidationArray['powerInt1'] = {
 		kind: 'derived',
-		type: 'string',
-		list: Array.apply(null, Array(21)).map(function(x, i) {return String(i)}),
+		type: 'int',
+		range: ED.Range(0,20),
 		animate: true
 	};
 	this.parameterValidationArray['powerDp1'] = {
@@ -41838,8 +41815,8 @@ ED.RetinoscopyPowerCross.prototype.setPropertyDefaults = function() {
 	};
 	this.parameterValidationArray['powerInt2'] = {
 		kind: 'derived',
-		type: 'string',
-		list: Array.apply(null, Array(21)).map(function(x, i) {return String(i)}),
+		type: 'int',
+		range: ED.Range(0,20),
 		animate: true
 	};
 	this.parameterValidationArray['powerDp2'] = {
@@ -41987,7 +41964,7 @@ ED.RetinoscopyPowerCross.prototype.draw = function(_point) {
 ED.RetinoscopyPowerCross.prototype.description = function() {
 	
 	// Calculate working distance compensation in diopters
-	var wdCompensation = (1 / this.workingDistanceLookup[this.workingDistance]).toFixed(2);
+	var wdCompensation = (1 / this.workingDistance).toFixed(2);
 	
 	// Calculate minus cyl form
 	var power1 = parseFloat(this.powerSign1 + parseInt(this.powerInt1) + this.powerDp1);
