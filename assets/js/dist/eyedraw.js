@@ -19654,7 +19654,7 @@ ED.CorneaCrossSection.prototype.setPropertyDefaults = function() {
 	this.isUnique = true;
 	
 	// Update validation array for simple parameters
-	this.parameterValidationArray['apexX']['range'].setMinAndMax(-410, -300);
+	this.parameterValidationArray['apexX']['range'].setMinAndMax(-365, -300);
 	this.parameterValidationArray['apexY']['range'].setMinAndMax(-100, +100);
 	
 	// Other parameters
@@ -19679,7 +19679,7 @@ ED.CorneaCrossSection.prototype.setPropertyDefaults = function() {
  */
 ED.CorneaCrossSection.prototype.setParameterDefaults = function() {
 	this.originX = 50;
-	this.apexX = -380;
+	this.apexX = -363;
 	this.apexY = 0;
 	this.setParameterFromString('shape', 'Normal');
 	this.setParameterFromString('pachymetry', '540');
