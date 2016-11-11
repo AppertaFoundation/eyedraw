@@ -33,8 +33,8 @@ ED.RetinoscopyPowerCross = function(_drawing, _parameterJSON) {
 	this.angle2 = 90;
 	this.powerSign1 = "+";
 	this.powerSign2 = "+";
-	this.powerInt1 = "0";
-	this.powerInt2 = "0";
+	this.powerInt1 = 0;
+	this.powerInt2 = 0;
 	this.powerDp1 = ".00";
 	this.powerDp2 = ".00";
 	
@@ -70,7 +70,7 @@ ED.RetinoscopyPowerCross.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['workingDistance'] = {
 		kind: 'derived',
 		type: 'string',
-		list: ['0.333','0.5','0.667','1.0','1.5'],
+		list: ['0.333','0.500','0.667','1.000','1.500'],
 		animate: true
 	};
 	this.parameterValidationArray['angle1'] = {
@@ -88,7 +88,7 @@ ED.RetinoscopyPowerCross.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['powerInt1'] = {
 		kind: 'derived',
 		type: 'int',
-		range: ED.Range(0,20),
+		range: new ED.Range(0,20),
 		animate: true
 	};
 	this.parameterValidationArray['powerDp1'] = {
@@ -112,7 +112,7 @@ ED.RetinoscopyPowerCross.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['powerInt2'] = {
 		kind: 'derived',
 		type: 'int',
-		range: ED.Range(0,20),
+		range: new ED.Range(0,20),
 		animate: true
 	};
 	this.parameterValidationArray['powerDp2'] = {

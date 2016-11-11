@@ -2198,7 +2198,7 @@ ED.Drawing.prototype.addBindings = function(_bindingArray) {
 					doodle.addBinding(parameter, _bindingArray[className][parameter]);
 				}
 			} else {
-				ED.errorHandler('ED.Drawing', 'addBindings', 'Attempt to add binding for an element that does not exist for parameter: ' + parameter);
+				ED.errorHandler('ED.Drawing', 'addBindings', 'Attempt to add binding for an element that does not exist for parameter: ' + parameter + ' with id ' + elementId);
 			}
 		}
 	}
