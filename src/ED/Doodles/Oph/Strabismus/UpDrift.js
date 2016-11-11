@@ -45,6 +45,7 @@ ED.UpDrift.superclass = ED.Doodle.prototype;
  */
 ED.UpDrift.prototype.setHandles = function()
 {
+	this.handleArray[0] = new ED.Doodle.Handle(null, true, ED.Mode.Handles, false);
 }
 
 /**
@@ -59,7 +60,13 @@ ED.UpDrift.prototype.setPropertyDefaults = function()
 	this.isMoveable = true;
 	this.isRotatable = false;
     this.snapToQuadrant = true;
-    this.quadrantPoint = new ED.Point(370, 250);
+    this.quadrantPoint = new ED.Point(335, 220);
+    
+    this.handleVectorRangeArray = new Array();
+	var range = new Object;
+	range.length = new ED.Range(+50, +320);
+	range.angle = new ED.Range(1.75*Math.PI, 1.75*Math.PI);
+	this.handleVectorRangeArray[0] = range;
 }
 
 /**
@@ -67,6 +74,15 @@ ED.UpDrift.prototype.setPropertyDefaults = function()
  */
 ED.UpDrift.prototype.setParameterDefaults = function()
 {
+	
+	// Create a squiggle to store handle points
+	var squiggle = new ED.Squiggle(this, new ED.Colour(100, 100, 100, 1), 4, true);
+
+	// Add it to squiggle array
+	this.squiggleArray.push(squiggle);
+
+	var point = new ED.Point(-125, -125);
+	this.addPointToSquiggle(point);
 }
 
 /**
@@ -80,6 +96,7 @@ ED.UpDrift.prototype.draw = function(_point)
     this.scaleX = this.originX/Math.abs(this.originX);
     this.scaleY = this.originY/Math.abs(this.originY);
     
+    
 	// Get context
 	var ctx = this.drawing.context;
 	
@@ -88,9 +105,12 @@ ED.UpDrift.prototype.draw = function(_point)
     
 	// Boundary path
 	ctx.beginPath();
+	
+	var c = Math.abs(this.squiggleArray[0].pointsArray[0].x);
+    var r = 100 + c;
     
 	// Rectangular area
-	ctx.rect(-100, -100, 200, 200);
+	ctx.rect(c * -1, c * -1, r, r);
     
 	// Close path
 	ctx.closePath();
@@ -104,27 +124,40 @@ ED.UpDrift.prototype.draw = function(_point)
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 	
+	// Coordinates of expert handles (in canvas plane)
+	this.handleArray[0].location = this.transform.transformPoint(this.squiggleArray[0].pointsArray[0]);
+	
 	// Other stuff here
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
 	{
         // Arrow body
         ctx.beginPath();
-        ctx.arc(-98, 100, 200, -Math.PI/2, -0.1, false);
+        ctx.arc(c * -1, 100, r, -Math.PI/2, -0.1, false);
         ctx.lineWidth = 6;
         ctx.lineJoin = 'miter';
         ctx.strokeStyle = "rgba(80, 80, 80, 1)";
         ctx.fillStyle = "rgba(0, 0, 0, 0)";
+        if (this.isSelected) {
+	        ctx.shadowBlur = 10;
+			ctx.shadowColor = "rgba(0,0,0,0.9)";
+        }
         ctx.stroke();
         
         // Arrow head
         ctx.beginPath();
         ctx.moveTo(100, 100);
-        ctx.lineTo(80, 70);
-        ctx.lineTo(120, 70);
+        ctx.lineTo(70, 60);
+        ctx.lineTo(130, 60);
         ctx.closePath();
         ctx.fillStyle = "rgba(80, 80, 80, 1)";
+        if (this.isSelected) {
+	        ctx.shadowBlur = 10;
+			ctx.shadowColor = "rgba(0,0,0,0.9)";
+        }
         ctx.fill();
 	}
+	
+// 	this.handleArray[0].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 	
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -140,7 +173,7 @@ ED.UpDrift.prototype.draw = function(_point)
  */
 ED.UpDrift.prototype.description = function()
 {
-    var returnString = "UpDrift";
+    var returnString = "Up drift";
 	
 	return returnString;
 }

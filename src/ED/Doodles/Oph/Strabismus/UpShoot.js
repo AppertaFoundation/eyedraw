@@ -45,6 +45,7 @@ ED.UpShoot.superclass = ED.Doodle.prototype;
  */
 ED.UpShoot.prototype.setHandles = function()
 {
+	this.handleArray[0] = new ED.Doodle.Handle(null, true, ED.Mode.Handles, false);
 }
 
 /**
@@ -59,7 +60,13 @@ ED.UpShoot.prototype.setPropertyDefaults = function()
 	this.isMoveable = true;
 	this.isRotatable = false;
     this.snapToQuadrant = true;
-    this.quadrantPoint = new ED.Point(370, 250);
+    this.quadrantPoint = new ED.Point(335, 220);
+    
+    this.handleVectorRangeArray = new Array();
+	var range = new Object;
+	range.length = new ED.Range(+50, +320);
+	range.angle = new ED.Range(1.75*Math.PI, 1.75*Math.PI);
+	this.handleVectorRangeArray[0] = range;
 }
 
 /**
@@ -67,6 +74,14 @@ ED.UpShoot.prototype.setPropertyDefaults = function()
  */
 ED.UpShoot.prototype.setParameterDefaults = function()
 {
+	// Create a squiggle to store handle points
+	var squiggle = new ED.Squiggle(this, new ED.Colour(100, 100, 100, 1), 4, true);
+
+	// Add it to squiggle array
+	this.squiggleArray.push(squiggle);
+
+	var point = new ED.Point(-125, -125);
+	this.addPointToSquiggle(point);
 }
 
 /**
@@ -89,8 +104,11 @@ ED.UpShoot.prototype.draw = function(_point)
 	// Boundary path
 	ctx.beginPath();
     
+	var c = Math.abs(this.squiggleArray[0].pointsArray[0].x);
+    var r = 100 + c;
+    
 	// Rectangular area
-	ctx.rect(-100, -100, 200, 200);
+	ctx.rect(c * -1, c * -1, r, r);
     
 	// Close path
 	ctx.closePath();
@@ -103,27 +121,37 @@ ED.UpShoot.prototype.draw = function(_point)
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 	
+	// Coordinates of expert handles (in canvas plane)
+	this.handleArray[0].location = this.transform.transformPoint(this.squiggleArray[0].pointsArray[0]);
+	
 	// Other stuff here
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
 	{
         // Arrow shaft
         ctx.beginPath();
-        ctx.moveTo(-100, -100);
-        ctx.lineTo(100, -100);
-        ctx.lineTo(100, 80);
+        ctx.moveTo(c * -1, c * -1);
+        ctx.lineTo(c * -1 + r, c * -1);
+        ctx.lineTo(c * -1 + r, c * -1 + r);
         
         ctx.lineWidth = 6;
         ctx.lineJoin = 'miter';
         ctx.strokeStyle = "rgba(80, 80, 80, 1)";
+        if (this.isSelected) {
+	        ctx.shadowBlur = 10;
+			ctx.shadowColor = "rgba(0,0,0,0.9)";
+        }
         ctx.stroke();
         
         // Arrow head
         ctx.beginPath();
         ctx.moveTo(100, 100);
-        ctx.lineTo(80, 70);
-        ctx.lineTo(120, 70);
+        ctx.lineTo(70, 60);
+        ctx.lineTo(130, 60);
         ctx.closePath();
-        
+        if (this.isSelected) {
+	        ctx.shadowBlur = 10;
+			ctx.shadowColor = "rgba(0,0,0,0.9)";
+        }
         ctx.fillStyle = "rgba(80, 80, 80, 1)";
         ctx.fill();
 	}
@@ -142,7 +170,7 @@ ED.UpShoot.prototype.draw = function(_point)
  */
 ED.UpShoot.prototype.description = function()
 {
-    var returnString = "UpShoot";
+    var returnString = "Up shoot";
 	
 	return returnString;
 }
