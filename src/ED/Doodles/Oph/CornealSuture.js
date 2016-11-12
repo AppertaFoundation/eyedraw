@@ -27,9 +27,14 @@
 ED.CornealSuture = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "CornealSuture";
-
+	
+	// Derived parameters
+	this.removed = false;
+	
 	// Saved parameters
-	this.savedParameterArray = ['radius', 'rotation'];
+	this.savedParameterArray = ['radius', 'rotation','removed'];
+	
+	this.controlParameterArray = {'removed':'Removed'};
 	
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -48,6 +53,12 @@ ED.CornealSuture.superclass = ED.Doodle.prototype;
 ED.CornealSuture.prototype.setPropertyDefaults = function() {
 	this.isScaleable = false;
 	this.isMoveable = false;
+	
+	this.parameterValidationArray['removed'] = {
+		kind: 'derived',
+		type: 'bool',
+		animate: false
+	}
 }
 
 /**
@@ -100,9 +111,12 @@ ED.CornealSuture.prototype.draw = function(_point) {
 		ctx.lineTo(-10, -r + 30);
 
 		ctx.lineWidth = 2;
-		var colour = "rgba(0,0,120,0.7)"
-		ctx.strokeStyle = colour;
-
+		if (this.removed) ctx.strokeStyle = "rgba(150,150,150,0.6)";
+		else {
+			var colour = "rgba(0,0,120,0.7)"
+			ctx.strokeStyle = colour;
+		}
+	
 		ctx.stroke();
 
 		// Knot
