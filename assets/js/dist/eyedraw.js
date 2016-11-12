@@ -15090,11 +15090,8 @@ ED.AntSeg.prototype.description = function() {
 
 	// Pupil size and coloboma
 	if (this.pupilSize != 'Large') {
-		-this.apexY
-		var pupilSize = Math.round(-this.apexY * 0.03);
-		
-		returnValue += this.pupilSize.toLowerCase() + " pupil (diameter:" + pupilSize + "mm), ";
-		
+		var pupilSize = Math.round(-this.apexY * 0.03);		
+		returnValue += this.pupilSize.toLowerCase() + " pupil (diameter: " + pupilSize + "mm), ";
 	}
 	// Coloboma
 	if (this.coloboma) returnValue += "coloboma at " + this.clockHour(6) + " o'clock, ";
@@ -15280,7 +15277,7 @@ ED.AntSegAngleMarks.prototype.draw = function(_point) {
 		var toricLens = this.drawing.lastDoodleOfClass('ToricPCIOL');
 		if (toricLens) {
 			var phi = 0.7 * Math.PI / 4;
-			var axisRotation = toricLens.rotation + phi - 0.5 * Math.PI;
+			var axisRotation = toricLens.rotation + phi - 0.5077 * Math.PI;
 			
 			ctx.beginPath();
 			ctx.save();

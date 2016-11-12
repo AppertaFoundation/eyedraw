@@ -307,11 +307,8 @@ ED.AntSeg.prototype.description = function() {
 
 	// Pupil size and coloboma
 	if (this.pupilSize != 'Large') {
-		-this.apexY
-		var pupilSize = Math.round(-this.apexY * 0.03);
-		
-		returnValue += this.pupilSize.toLowerCase() + " pupil (diameter:" + pupilSize + "mm), ";
-		
+		var pupilSize = Math.round(-this.apexY * 0.03);		
+		returnValue += this.pupilSize.toLowerCase() + " pupil (diameter: " + pupilSize + "mm), ";
 	}
 	// Coloboma
 	if (this.coloboma) returnValue += "coloboma at " + this.clockHour(6) + " o'clock, ";
