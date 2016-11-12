@@ -34,14 +34,15 @@ ED.CornealOedema = function(_drawing, _parameterJSON) {
 
 	// Derived parameters
 	this.intensity = 'Mild';
+	this.i = 1;
 	
 	// Other parameters
-	this.stromal = false;
+	this.stromal = true;
 	this.epithelial = false;
 	this.endothelial = false;
 
 	// Saved parameters
-	this.savedParameterArray = ['originX', 'originY', 'apexX', 'apexY', 'rotation', 'intensity', 'stromal', 'epithelial', 'endothelial'];
+	this.savedParameterArray = ['originX', 'originY', 'apexX', 'apexY', 'rotation', 'intensity', 'stromal', 'epithelial', 'endothelial','i'];
 
 	// Parameters in doodle control bar (parameter name: parameter label)
 	this.controlParameterArray = {'intensity':'Intensity',  'epithelial':'Epithelial', 'stromal':'Stromal','endothelial':'Endothelial'};
@@ -57,7 +58,7 @@ ED.CornealOedema.prototype = new ED.Doodle;
 ED.CornealOedema.prototype.constructor = ED.CornealOedema;
 ED.CornealOedema.superclass = ED.Doodle.prototype;
 
-/**
+/**=
  * Sets handle attributes
  */
 ED.CornealOedema.prototype.setHandles = function() {
@@ -98,6 +99,30 @@ ED.CornealOedema.prototype.setPropertyDefaults = function() {
 		type: 'bool',
 		display: true
 	};
+	this.parameterValidationArray['epi'] = {
+		kind: 'other',
+		type: 'int',
+		range: [0,1],
+		animate: false
+	};
+	this.parameterValidationArray['str'] = {
+		kind: 'other',
+		type: 'int',
+		range: [0,1],
+		animate: false
+	};
+	this.parameterValidationArray['endo'] = {
+		kind: 'other',
+		type: 'int',
+		range: [0,1],
+		animate: false
+	};
+	this.parameterValidationArray['i'] = {
+		kind: 'other',
+		type: 'int',
+		range: [1, 2, 3],
+		animate: false
+	};
 
 	/*
 	// Create ranges to constrain handles
@@ -121,7 +146,7 @@ ED.CornealOedema.prototype.setPropertyDefaults = function() {
  */
 ED.CornealOedema.prototype.setParameterDefaults = function() {
 	this.apexY = -this.initialRadius;
-	this.setParameterFromString('stromal', 'false');
+	this.setParameterFromString('stromal', 'true');
 	this.setParameterFromString('epithelial', 'false');
 	this.setParameterFromString('endothelial', 'false');
 
@@ -145,6 +170,51 @@ ED.CornealOedema.prototype.setParameterDefaults = function() {
 }
 
 /**
+ * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
+ * The returned parameters are animated if their 'animate' property is set to true
+ *
+ * @param {String} _parameter Name of parameter that has changed
+ * @value {Undefined} _value Value of parameter to calculate
+ * @returns {Array} Associative array of values of dependent parameters
+ */
+ED.CornealOedema.prototype.dependentParameterValues = function(_parameter, _value) {
+	var returnArray = new Array();
+
+	switch (_parameter) {
+		case 'intensity':
+			switch (_value) {
+				case 'Mild':
+					returnArray['i'] = 1;
+					break;
+				case 'Moderate':
+					returnArray['i'] = 2;
+					break;
+				case 'Severe':
+					returnArray['i'] = 3;
+					break;
+			}
+			break;
+			
+		case 'epithelial':
+			if (_value == true) returnArray['epi'] = 1;
+			else if (_value == false) returnArray['epi'] = 0;
+			break;
+		
+		case 'stromal':
+			if (_value == true) returnArray['str'] = 1;
+			else if (_value == false) returnArray['str'] = 0;
+			break;
+			
+		case 'endothelial':
+			if (_value == true) returnArray['endo'] = 1;
+			else if (_value == false) returnArray['endo'] = 0;
+			break;
+	}
+
+	return returnArray;
+}
+
+/**
  * Draws doodle or performs a hit test if a Point parameter is passed
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
@@ -158,7 +228,7 @@ ED.CornealOedema.prototype.draw = function(_point) {
 
 	// Boundary path
 	ctx.beginPath();
-
+	
 	/*
 	// Bezier points
 	var fp;
@@ -212,7 +282,7 @@ ED.CornealOedema.prototype.draw = function(_point) {
 
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
-
+	
 	// Non boundary paths
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
 		if (false) {
