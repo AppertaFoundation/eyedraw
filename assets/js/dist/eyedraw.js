@@ -44342,8 +44342,24 @@ ED.RetinoscopyPowerCross.prototype.draw = function(_point) {
 
 	// Return value indicating successful hittest
 	return this.isClicked;
-}
+};
 
+ED.RetinoscopyPowerCross.prototype.calcRx = function() {
+	var wdCompensation = (1 / this.workingDistance).toFixed(2);
+
+	// Calculate minus cyl form
+	var power1 = parseFloat(this.powerSign1 + parseInt(this.powerInt1) + this.powerDp1);
+	var power2 = parseFloat(this.powerSign2 + parseInt(this.powerInt2) + this.powerDp2);
+	var pSphere = (power1 >= power2) ? (power1 - wdCompensation).toFixed(2) : (power2 - wdCompensation).toFixed(2);
+	var pCyl = (Math.abs(power1 - power2) * -1).toFixed(2); // reports in minus cyl format
+	var angle = (power1>=power2) ? this.angle1 : this.angle2;
+
+	return {
+		pSphere: pSphere,
+		pCyl: pCyl,
+		angle: angle
+	};
+};
 
 /**
  * Returns a string containing a text description of the doodle
@@ -44351,21 +44367,11 @@ ED.RetinoscopyPowerCross.prototype.draw = function(_point) {
  * @returns {String} Description of doodle
  */
 ED.RetinoscopyPowerCross.prototype.description = function() {
-	
-	// Calculate working distance compensation in diopters
-	var wdCompensation = (1 / this.workingDistance).toFixed(2);
-	
-	// Calculate minus cyl form
-	var power1 = parseFloat(this.powerSign1 + parseInt(this.powerInt1) + this.powerDp1);
-	var power2 = parseFloat(this.powerSign2 + parseInt(this.powerInt2) + this.powerDp2);
-	var pSphere = (power1 >= power2) ? (power1 - wdCompensation).toFixed(2) : (power2 - wdCompensation).toFixed(2);
-	var pCyl = (Math.abs(power1 - power2) * -1).toFixed(2); // reports in minus cyl format
-	var angle = (power1>=power2) ? this.angle1 : this.angle2;
-	
-	
-	var Rx = (pSphere >= 0 ) ? '+' + pSphere: pSphere;
-	Rx += (pCyl == 0) ? ' / -' : ' / ';
-	Rx += pCyl + ' x ' + angle; 
+	calcRx = this.calcRx();
+
+	var Rx = (calcRx.pSphere >= 0 ) ? '+' + calcRx.pSphere: calcRx.pSphere;
+	Rx += (calcRx.pCyl == 0) ? ' / -' : ' / ';
+	Rx += calcRx.pCyl + ' x ' + calcRx.angle;
 		
 	return Rx;
 }
