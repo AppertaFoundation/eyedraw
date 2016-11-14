@@ -304,10 +304,10 @@ ED.AntSeg.prototype.draw = function(_point) {
  */
 ED.AntSeg.prototype.description = function() {
 	var returnValue = "";
+	var pupilSize = Math.round(-this.apexY * 0.03);		
 
 	// Pupil size and coloboma
 	if (this.pupilSize != 'Large') {
-		var pupilSize = Math.round(-this.apexY * 0.03);		
 		returnValue += this.pupilSize.toLowerCase() + " pupil (diameter: " + pupilSize + "mm), ";
 	}
 	// Coloboma
@@ -336,7 +336,12 @@ ED.AntSeg.prototype.description = function() {
 		*/
 		returnValue = "No abnormality";
 	}
-
+	
+	if (this.pupilSize == 'Large') {
+		if (returnValue.length == 0) returnValue = "No abnormality, ";
+		returnValue += "pupil diameter: " + pupilSize + "mm, ";
+	}
+	
 	// Remove final comma and space and capitalise first letter
 	returnValue = returnValue.replace(/, +$/, '');
 	returnValue = returnValue.charAt(0).toUpperCase() + returnValue.slice(1);
