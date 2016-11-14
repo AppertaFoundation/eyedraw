@@ -81,7 +81,7 @@ ED.CornealOedemaCrossSection.prototype.setHandles = function() {
  * Sets default properties
  */
 ED.CornealOedemaCrossSection.prototype.setPropertyDefaults = function() {
-	this.isSelectable = true;
+	this.isSelectable = false;
 		
 	// Update component of validation array for simple parameters
 	this.parameterValidationArray['originX']['range'].setMinAndMax(+50, +50);
@@ -516,7 +516,7 @@ ED.CornealOedemaCrossSection.prototype.draw = function(_point) {
 				break;
 		}
 	}
-	else ctx.fillStyle = "rgba(0,0,0,0)"
+	else ctx.fillStyle = "rgba(0,0,0,0)";
 	ctx.strokeStyle = "rgba(0,0,0,0)";
 
 	// Draw boundary path (also hit testing)

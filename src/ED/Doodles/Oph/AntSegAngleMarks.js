@@ -148,7 +148,7 @@ ED.AntSegAngleMarks.prototype.draw = function(_point) {
 		var toricLens = this.drawing.lastDoodleOfClass('ToricPCIOL');
 		if (toricLens) {
 			var phi = 0.7 * Math.PI / 4;
-			var axisRotation = toricLens.rotation + phi - 0.5 * Math.PI;
+			var axisRotation = toricLens.rotation + phi - 0.5077 * Math.PI;
 			
 			ctx.beginPath();
 			ctx.save();
