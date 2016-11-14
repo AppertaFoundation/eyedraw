@@ -47,6 +47,7 @@ ED.ACIOLCrossSection.superclass = ED.Doodle.prototype;
  */
 ED.ACIOLCrossSection.prototype.setPropertyDefaults = function() {
 	this.isUnique = true;
+	this.inFrontOfClassArray = ["HypopyonCrossSection", "HyphaemaCrossSection" ];
 	this.addAtBack = true;
 	
 	// Update component of validation array for simple parameters
