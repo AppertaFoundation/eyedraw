@@ -337,10 +337,11 @@ ED.AntSeg.prototype.description = function() {
 		returnValue = "No abnormality";
 	}
 	
+/*
 	if (this.pupilSize == 'Large') {
-		if (returnValue.length == 0) returnValue = "No abnormality, ";
 		returnValue += "pupil diameter: " + pupilSize + "mm, ";
 	}
+*/
 	
 	// Remove final comma and space and capitalise first letter
 	returnValue = returnValue.replace(/, +$/, '');
