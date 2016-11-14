@@ -33854,7 +33854,15 @@ ED.Lens.prototype.draw = function(_point) {
  */
 ED.Lens.prototype.description = function() {
 	returnValue = "";
+	
+	if (this.originY < -30) {
+		returnValue += 'Lens subluxation: superior';
+	}
+	else if (this.originY > 30) {
+		returnValue += 'Lens subluxation: inferior';
+	}
 	if (this.nuclearGrade != 'None') {
+		returnValue += returnValue.length > 0?", ":"";
 		returnValue += this.nuclearGrade + ' nuclear cataract';
 	}
 	if (this.corticalGrade != 'None') {
