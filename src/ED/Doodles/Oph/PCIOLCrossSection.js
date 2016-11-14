@@ -111,6 +111,24 @@ ED.PCIOLCrossSection.prototype.dependentParameterValues = function(_parameter, _
 					break;
 			}
 			break;
+			
+		case 'originX':
+			var iris = this.drawing.lastDoodleOfClass('AntSegCrossSection');
+			if (iris) {
+				var minApexX = iris.parameterValidationArray['apexX']['range'].min;
+				var maxApexX = 32 - (72 / 220) * (iris.apexY + 280) + this.originX;
+				if (maxApexX < minApexX) maxApexX = minApexX;
+				iris.parameterValidationArray['apexX']['range'].setMinAndMax(-40 - (140 / 220) * (iris.apexY + 280), maxApexX);
+	
+				// If being synced, make sensible decision about x
+				if (!this.drawing.isActive) {
+					var newOriginX = iris.parameterValidationArray['apexX']['range'].max;
+				} else {
+					var newOriginX = iris.parameterValidationArray['apexX']['range'].constrain(iris.apexX);
+				}
+				iris.setSimpleParameter('apexX', newOriginX);
+			}
+			break;
 	}
 
 	return returnArray;

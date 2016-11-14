@@ -15419,9 +15419,10 @@ ED.AntSegCrossSection.prototype.dependentParameterValues = function(_parameter, 
 			// ***TOSDP*** Putting this here will cancel out any saved value of apexX
 			// Set apexX and its limits for apexX according to value of apexY (prevents collisions with cornea and lens)
 				/// MSC: Max position dependent on lens type present
-			var biologicalLens = this.drawing.lastDoodleOfClass('LensCrossSection');
+			var lens = this.drawing.lastDoodleOfClass('LensCrossSection');
+			if (!lens) lens = this.drawing.lastDoodleOfClass('PCIOLCrossSection');
 			
-			var maxApexX = (biologicalLens) ? 32 - (72 / 220) * (this.apexY + 280) : 25;
+			var maxApexX = (lens.className == 'LensCrossSection') ? 32 - (72 / 220) * (this.apexY + 280) + lens.originX - 44: (lens.className == 'PCIOLCrossSection') ? lens.originX - 21 : 25;
 			this.parameterValidationArray['apexX']['range'].setMinAndMax(-40 - (140 / 220) * (this.apexY + 280), maxApexX);
 
 			// If being synced, make sensible decision about x
@@ -33971,6 +33972,40 @@ ED.LensCrossSection.prototype.setParameterDefaults = function() {
 }
 
 /**
+ * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
+ * The returned parameters are animated if their 'animate' property is set to true
+ *
+ * @param {String} _parameter Name of parameter that has changed
+ * @value {Undefined} _value Value of parameter to calculate
+ * @returns {Array} Associative array of values of dependent parameters
+ */
+ED.LensCrossSection.prototype.dependentParameterValues = function(_parameter, _value) {
+	var returnArray = new Array();
+
+	switch (_parameter) {
+		case 'originX':
+			var iris = this.drawing.lastDoodleOfClass('AntSegCrossSection');
+			if (iris) {
+				var minApexX = iris.parameterValidationArray['apexX']['range'].min;
+				var maxApexX = 32 - (72 / 220) * (iris.apexY + 280) + this.originX - 44;
+				if (maxApexX < minApexX) maxApexX = minApexX;
+				iris.parameterValidationArray['apexX']['range'].setMinAndMax(-40 - (140 / 220) * (iris.apexY + 280), maxApexX);
+	
+				// If being synced, make sensible decision about x
+				if (!this.drawing.isActive) {
+					var newOriginX = iris.parameterValidationArray['apexX']['range'].max;
+				} else {
+					var newOriginX = iris.parameterValidationArray['apexX']['range'].constrain(iris.apexX);
+				}
+				iris.setSimpleParameter('apexX', newOriginX);
+			}
+			break;
+		}
+
+	return returnArray;
+}
+
+/**
  * Draws doodle or performs a hit test if a Point parameter is passed
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
@@ -37846,6 +37881,24 @@ ED.PCIOLCrossSection.prototype.dependentParameterValues = function(_parameter, _
 				case 'Ciliary sulcus':
 					returnArray['fx'] = 2;
 					break;
+			}
+			break;
+			
+		case 'originX':
+			var iris = this.drawing.lastDoodleOfClass('AntSegCrossSection');
+			if (iris) {
+				var minApexX = iris.parameterValidationArray['apexX']['range'].min;
+				var maxApexX = 32 - (72 / 220) * (iris.apexY + 280) + this.originX;
+				if (maxApexX < minApexX) maxApexX = minApexX;
+				iris.parameterValidationArray['apexX']['range'].setMinAndMax(-40 - (140 / 220) * (iris.apexY + 280), maxApexX);
+	
+				// If being synced, make sensible decision about x
+				if (!this.drawing.isActive) {
+					var newOriginX = iris.parameterValidationArray['apexX']['range'].max;
+				} else {
+					var newOriginX = iris.parameterValidationArray['apexX']['range'].constrain(iris.apexX);
+				}
+				iris.setSimpleParameter('apexX', newOriginX);
 			}
 			break;
 	}
