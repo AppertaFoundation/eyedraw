@@ -277,13 +277,13 @@ class OEEyeDrawWidget extends CWidget
 	 * Unique name for the input element containing EyeDraw data
 	 * @var string
 	 */
-	private $inputName;
+	public $inputName;
 
 	/**
 	 * Unique id for the input element containing EyeDraw data
 	 * @var string
 	 */
-	private $inputId;
+	public $inputId;
 
 	/**
 	 * Represents the eye using the ED object enumeration (0 = right, 1 = left)
@@ -313,7 +313,7 @@ class OEEyeDrawWidget extends CWidget
 		$this->canvasId = 'ed_canvas_'.$this->mode.'_'.$this->idSuffix;
 
 		// Create matching name and id in 'Yii' format for loading and saving using POST
-		if (isset($this->model) && isset($this->attribute)) {
+		if (!isset($this->inputName) && isset($this->model) && isset($this->attribute)) {
 			if ($this->mode == 'edit') {
 				$this->inputName = CHtml::modelName($this->model).'['. $this->attribute.']';
 				$this->inputId = CHtml::modelName($this->model).'_'. $this->attribute;
