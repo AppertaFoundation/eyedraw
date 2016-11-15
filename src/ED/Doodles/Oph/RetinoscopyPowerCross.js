@@ -259,7 +259,18 @@ ED.RetinoscopyPowerCross.prototype.calcRx = function() {
 	var power2 = parseFloat(this.powerSign2 + parseInt(this.powerInt2) + this.powerDp2);
 	var pSphere = (power1 >= power2) ? (power1 - wdCompensation).toFixed(2) : (power2 - wdCompensation).toFixed(2);
 	var pCyl = (Math.abs(power1 - power2) * -1).toFixed(2); // reports in minus cyl format
-	var angle = (power1>=power2) ? this.angle1 : this.angle2;
+	var angle = (power1>=power2) ? this.angle2 : this.angle1; // as per JEM, use angle of lowest power lens
+
+	// force to be within the range of 0-180
+	if (angle > 180)
+		angle -= 180;
+
+	// correction for cylinder axis offset
+	angle -= 90;
+
+	// cannot be negative
+	if (angle < 0)
+		angle += 180;
 
 	return {
 		pSphere: pSphere,
