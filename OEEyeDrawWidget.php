@@ -384,7 +384,7 @@ class OEEyeDrawWidget extends CWidget
 		$data = get_object_vars($this);
 		$data['data'] = $data;
 
-		if (!$this->model->event || !$this->model->event->hasEventImage($this->drawingName)) {
+		if (!property_exists($this->model, 'event') || !$this->model->event || !$this->model->event->hasEventImage($this->drawingName)) {
 			// Register package (dependent scripts and stylesheets)
 			Yii::app()->clientScript->registerPackage('eyedraw');
 
