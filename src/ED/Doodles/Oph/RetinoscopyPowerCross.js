@@ -236,7 +236,7 @@ ED.RetinoscopyPowerCross.prototype.draw = function(_point) {
 		// power 1
 		x = -sp * Math.cos(this.rotation);
 		y = sp*Math.sin(-this.rotation);
-		ctx.fillText(this.powerSign2 + parseInt(this.powerInt1) + this.powerDp1,x,y);
+		ctx.fillText(this.powerSign1 + parseInt(this.powerInt1) + this.powerDp1,x,y);
 		
 		// power 2
 		x = sp * Math.sin(this.rotation);
