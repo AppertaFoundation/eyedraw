@@ -63,7 +63,7 @@ ED.RetinoscopyPowerCross.prototype.setPropertyDefaults = function() {
 	this.isMoveable = false;
 	
 	// Update component of validation array for simple parameters
-// 	this.parameterValidationArray['rotation']['range'].setMinAndMax(0, Math.PI);
+	this.parameterValidationArray['rotation']['range'].setMinAndMax(Math.PI, 2*Math.PI);
 
 	// Add complete validation arrays for derived parameters
 
@@ -76,7 +76,7 @@ ED.RetinoscopyPowerCross.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['angle1'] = {
 		kind: 'derived',
 		type: 'int',
-		range: new ED.Range(0, 360),
+		range: new ED.Range(1, 180),
 		animate: true
 	};
 	this.parameterValidationArray['powerSign1'] = {
@@ -100,7 +100,7 @@ ED.RetinoscopyPowerCross.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['angle2'] = {
 		kind: 'derived',
 		type: 'int',
-		range: new ED.Range(0, 360),
+		range: new ED.Range(1, 180),
 		animate: true
 	};
 	this.parameterValidationArray['powerSign2'] = {
