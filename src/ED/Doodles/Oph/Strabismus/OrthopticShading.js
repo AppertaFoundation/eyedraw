@@ -29,7 +29,9 @@ ED.OrthopticShading = function(_drawing, _parameterJSON)
 	
 	// Set classname
 	this.className = "OrthopticShading";
-		
+
+	this.savedParameterArray = ['originX', 'originY', 'rotation', 'scaleX', 'scaleY'];
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
