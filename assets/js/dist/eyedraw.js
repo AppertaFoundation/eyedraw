@@ -47112,10 +47112,11 @@ ED.STFB.prototype.description = function() {
  */
 ED.APattern = function(_drawing, _parameterJSON)
 {
+    this.savedParameterArray = ['rotation'];
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
-	
-	// Set classname
+
+    // Set classname
 	this.className = "APattern";
 }
 
@@ -47240,7 +47241,9 @@ ED.APattern.prototype.draw = function(_point)
  */
 ED.InverseYPattern = function(_drawing, _parameterJSON)
 {
-	// Call superclass constructor
+    this.savedParameterArray = ['side'];
+
+    // Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 	
 	// Set classname
@@ -47630,6 +47633,9 @@ ED.OrthopticShading.prototype.draw = function(_point)
  */
 ED.UpDrift = function(_drawing, _parameterJSON)
 {
+
+	this.savedParameterArray = ['originX', 'originY', 'quadrantPoint'];
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 	
@@ -47810,6 +47816,8 @@ ED.UpDrift.prototype.description = function()
  */
 ED.UpShoot = function(_drawing, _parameterJSON)
 {
+
+	this.savedParameterArray = ['originX', 'originY', 'quadrantPoint'];
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 	
@@ -47986,6 +47994,7 @@ ED.UpShoot.prototype.description = function()
  */
 ED.VPattern = function(_drawing, _parameterJSON)
 {
+    this.savedParameterArray = ['rotation'];
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 	
@@ -48114,7 +48123,9 @@ ED.VPattern.prototype.draw = function(_point)
  */
 ED.XPattern = function(_drawing, _parameterJSON)
 {
-	// Call superclass constructor
+    this.savedParameterArray = ['rotation'];
+
+    // Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 	
 	// Set classname
@@ -48260,6 +48271,8 @@ ED.XPattern.prototype.draw = function(_point)
  */
 ED.YPattern = function(_drawing, _parameterJSON)
 {
+    this.savedParameterArray = ['side'];
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 	

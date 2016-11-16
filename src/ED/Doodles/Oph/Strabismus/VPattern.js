@@ -26,6 +26,7 @@
  */
 ED.VPattern = function(_drawing, _parameterJSON)
 {
+    this.savedParameterArray = ['rotation'];
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 	

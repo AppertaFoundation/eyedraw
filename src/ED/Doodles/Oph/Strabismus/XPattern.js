@@ -26,7 +26,9 @@
  */
 ED.XPattern = function(_drawing, _parameterJSON)
 {
-	// Call superclass constructor
+    this.savedParameterArray = ['rotation'];
+
+    // Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 	
 	// Set classname

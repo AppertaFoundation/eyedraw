@@ -26,6 +26,8 @@
  */
 ED.YPattern = function(_drawing, _parameterJSON)
 {
+    this.savedParameterArray = ['side'];
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 	

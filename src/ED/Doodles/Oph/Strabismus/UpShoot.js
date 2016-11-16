@@ -26,6 +26,8 @@
  */
 ED.UpShoot = function(_drawing, _parameterJSON)
 {
+
+	this.savedParameterArray = ['originX', 'originY', 'quadrantPoint'];
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 	

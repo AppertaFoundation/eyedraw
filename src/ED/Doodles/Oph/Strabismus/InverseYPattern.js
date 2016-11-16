@@ -26,7 +26,9 @@
  */
 ED.InverseYPattern = function(_drawing, _parameterJSON)
 {
-	// Call superclass constructor
+    this.savedParameterArray = ['side'];
+
+    // Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 	
 	// Set classname
