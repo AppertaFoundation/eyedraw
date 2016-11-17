@@ -274,6 +274,25 @@ ED.HypopyonCrossSection.prototype.draw = function(_point) {
 	
 	// Get relative lens position to draw around
 	var lens = this.drawing.lastDoodleOfClass('LensCrossSection');
+	var iris = this.drawing.lastDoodleOfClass('AntSegCrossSection');
+	
+	var marginX = (iris) ? iris.apexX: -20;
+
+	if (lens) {
+		// Displacement of lens from centre
+		var ld = 100;
+	
+		// Angle of arc or lens
+		var theta = Math.asin(240 / 300);
+	
+		// X coordinate of centre of lens arc
+		var x = 300 * Math.cos(theta);
+		
+		if (lens.originX + ld + x - 300 - this.originX < iris.apexX) marginX = lens.originX + ld + x - 300 - this.originX;
+	}
+	
+/*
+	var lens = this.drawing.lastDoodleOfClass('LensCrossSection');
 	if (lens) {
 		// angle from lens arc centre to edge
 		var theta = Math.asin(207 / 300);
@@ -311,6 +330,7 @@ ED.HypopyonCrossSection.prototype.draw = function(_point) {
 		}
 
 	}
+*/
 
 	// Draw it
 	if (inferiorBezierBack) {
@@ -319,9 +339,40 @@ ED.HypopyonCrossSection.prototype.draw = function(_point) {
 	}
 	if (superiorBezierBack) {
 		ctx.bezierCurveTo(superiorBezierBack.CP2.x, superiorBezierBack.CP2.y, superiorBezierBack.CP1.x, superiorBezierBack.CP1.y, superiorBezierBack.SP.x, superiorBezierBack.SP.y);
-		if (!lens) ctx.lineTo(120, superiorBezierBack.SP.y);
+		if (!iris) ctx.lineTo(marginX, superiorBezierBack.SP.y);
+		else {
+			var x1 = (marginX < superiorBezierBack.SP.x) ? superiorBezierBack.SP.x : marginX;
+// 			if (x1 < iris.apexX - 40) x1 = iris.apexX - 40;
+			ctx.lineTo(x1, superiorBezierBack.SP.y);
+			if (this.apexY < iris.apexY) {
+				if (x1 > iris.apexX) x1 = iris.apexX;
+				ctx.lineTo(x1, iris.apexY);
+				ctx.lineTo(iris.apexX, iris.apexY);
+
+			}
+
+// 			if (this.apexY < iris.apexY) ctx.lineTo(iris.apexX, iris.apexY);
+// 			else ctx.lineTo()
+		}
 	}
 	
+	if (!iris) {
+		ctx.lineTo(marginX, inferiorBezierBack.SP.y);
+		ctx.lineTo(40, 460);
+	}
+	else {
+		var x2 = (marginX < inferiorBezierBack.SP.x) ? inferiorBezierBack.SP.x : marginX;
+		if (x2 > iris.apexX) x2 = iris.apexX;
+		ctx.lineTo(x2, inferiorBezierBack.SP.y);
+		if (this.apexY < -iris.apexY) {
+			if (x2 < iris.apexX) x2 = iris.apexX;
+			ctx.lineTo(x2, -iris.apexY);
+			ctx.lineTo(iris.apexX, -iris.apexY);
+		}
+		ctx.lineTo(40, 460);
+	}
+	
+/*
 	if (!lens) {
 		ctx.lineTo(120, inferiorBezierBack.SP.y);
 		ctx.lineTo(120, 450);
@@ -345,6 +396,7 @@ ED.HypopyonCrossSection.prototype.draw = function(_point) {
 		ctx.lineTo(74, 349);
 		ctx.lineTo(120, 450);
 	}
+*/
 	
 	// Close path
 	ctx.closePath();
