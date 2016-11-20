@@ -29732,42 +29732,24 @@ ED.HyphaemaCrossSection.prototype.draw = function(_point) {
 	
 	// Get relative lens position to draw around
 	var lens = this.drawing.lastDoodleOfClass('LensCrossSection');
-	if (lens) {
-		// angle from lens arc centre to edge
-		var theta = Math.asin(207 / 300);
-		
-		// angle from lens arc centre to y=apexY on lens arc
-		var phi = (-this.apexY + lens.originY) / 300; 
-		if (phi < 0) phi = 0;
-				
-		// if apex above top of lens capsule
-		if (phi>theta) {
-			phi = theta;
-			
-			var sp = new ED.Point(74, -349);
-			var ep = new ED.Point(14 + lens.originX, -207 + lens.originY);
-			var supZonule = sp;
-			
-			// but within zonules
-			if (this.apexY > sp.y) {
-				var angle = Math.atan(Math.abs((sp.y - ep.y)/(sp.x - ep.x)));
-				var o = Math.abs(ep.y - this.apexY);
-				var a = o / Math.tan(angle);
-				
-// 				supZonule.x += a;
-				supZonule.y = (this.apexY < sp.y) ? sp.y : this.apexY;
-			}
-		}
-		
-		// if apex within lens capsule
-		var pho = (this.apexY > lens.originY) ? (-this.apexY + lens.originY) / 300 + Math.PI : Math.PI;
-		
-		// if apex below lens capsule
-		var infZonule = new ED.Point(14 + lens.originX, 207 + lens.originY);
-		if (pho < Math.PI - theta) {
-			infZonule.y = this.apexY;
-		}
+	var iris = this.drawing.lastDoodleOfClass('AntSegCrossSection');
+	
+	var marginX = (iris) ? iris.apexX: -20;
 
+	if (lens) {
+		// Displacement of lens from centre
+		var ld = 100;
+	
+		// Angle of arc or lens
+		var theta = Math.asin(240 / 300);
+	
+		// X coordinate of centre of lens arc
+		var x = 300 * Math.cos(theta);
+		
+		if (iris) {
+			if (lens.originX + ld + x - 300 - this.originX < iris.apexX) marginX = lens.originX + ld + x - 300 - this.originX;
+		}
+		else marginX = lens.originX + ld + x - 300 - this.originX;
 	}
 
 	// Draw it
@@ -29777,31 +29759,29 @@ ED.HyphaemaCrossSection.prototype.draw = function(_point) {
 	}
 	if (superiorBezierBack) {
 		ctx.bezierCurveTo(superiorBezierBack.CP2.x, superiorBezierBack.CP2.y, superiorBezierBack.CP1.x, superiorBezierBack.CP1.y, superiorBezierBack.SP.x, superiorBezierBack.SP.y);
-		if (!lens) ctx.lineTo(120, superiorBezierBack.SP.y);
-	}
-	
-	if (!lens) {
-		ctx.lineTo(120, inferiorBezierBack.SP.y);
-		ctx.lineTo(120, 450);
-	}
-	
-	else { // draw around lens capsule
-		
-		// top zonules
-		if (phi == theta) {
-			ctx.lineTo(supZonule.x, this.apexY);
-			ctx.lineTo(14 + lens.originX, -207 + lens.originY);
+		if (!iris) ctx.lineTo(marginX, superiorBezierBack.SP.y);
+		else {
+			var x1 = (marginX < superiorBezierBack.SP.x) ? superiorBezierBack.SP.x : marginX;
+			ctx.lineTo(x1, superiorBezierBack.SP.y);
+			if (this.apexY < iris.apexY - 20) {
+				ctx.lineTo(iris.apexX, iris.apexY  - 20);
+				ctx.lineTo(marginX, iris.apexY  - 20);
+			}
 		}
-		// top half of lens capsule
-		if (this.apexY < lens.originY) ctx.arc(lens.originX + 225, lens.originY, 300, Math.PI + phi, Math.PI, true);
-		
-		// bottom half of lens capsule
-		if (pho > Math.PI - theta) ctx.arc(lens.originX + 225, lens.originY, 300, pho, Math.PI - theta, true);
-		
-		// bottom zonules
-		ctx.lineTo(infZonule.x, infZonule.y);
-		ctx.lineTo(74, 349);
-		ctx.lineTo(120, 450);
+	}
+	
+	if (!iris) {
+		ctx.lineTo(marginX, inferiorBezierBack.SP.y);
+		ctx.lineTo(40, 460);
+	}
+	else {
+		var x2 = (marginX < inferiorBezierBack.SP.x) ? inferiorBezierBack.SP.x : marginX;
+		ctx.lineTo(x2, inferiorBezierBack.SP.y);
+		if (this.apexY < -iris.apexY + 20) {
+			ctx.lineTo(marginX, -iris.apexY + 20);
+			ctx.lineTo(iris.apexX, -iris.apexY + 20);
+		}
+		ctx.lineTo(40, 460);
 	}
 	
 	// Close path
@@ -30239,6 +30219,25 @@ ED.HypopyonCrossSection.prototype.draw = function(_point) {
 	
 	// Get relative lens position to draw around
 	var lens = this.drawing.lastDoodleOfClass('LensCrossSection');
+	var iris = this.drawing.lastDoodleOfClass('AntSegCrossSection');
+	
+	var marginX = (iris) ? iris.apexX: -20;
+
+	if (lens) {
+		// Displacement of lens from centre
+		var ld = 100;
+	
+		// Angle of arc or lens
+		var theta = Math.asin(240 / 300);
+	
+		// X coordinate of centre of lens arc
+		var x = 300 * Math.cos(theta);
+		
+		if (lens.originX + ld + x - 300 - this.originX < iris.apexX) marginX = lens.originX + ld + x - 300 - this.originX;
+	}
+	
+/*
+	var lens = this.drawing.lastDoodleOfClass('LensCrossSection');
 	if (lens) {
 		// angle from lens arc centre to edge
 		var theta = Math.asin(207 / 300);
@@ -30276,6 +30275,7 @@ ED.HypopyonCrossSection.prototype.draw = function(_point) {
 		}
 
 	}
+*/
 
 	// Draw it
 	if (inferiorBezierBack) {
@@ -30284,9 +30284,40 @@ ED.HypopyonCrossSection.prototype.draw = function(_point) {
 	}
 	if (superiorBezierBack) {
 		ctx.bezierCurveTo(superiorBezierBack.CP2.x, superiorBezierBack.CP2.y, superiorBezierBack.CP1.x, superiorBezierBack.CP1.y, superiorBezierBack.SP.x, superiorBezierBack.SP.y);
-		if (!lens) ctx.lineTo(120, superiorBezierBack.SP.y);
+		if (!iris) ctx.lineTo(marginX, superiorBezierBack.SP.y);
+		else {
+			var x1 = (marginX < superiorBezierBack.SP.x) ? superiorBezierBack.SP.x : marginX;
+// 			if (x1 < iris.apexX - 40) x1 = iris.apexX - 40;
+			ctx.lineTo(x1, superiorBezierBack.SP.y);
+			if (this.apexY < iris.apexY) {
+				if (x1 > iris.apexX) x1 = iris.apexX;
+				ctx.lineTo(x1, iris.apexY);
+				ctx.lineTo(iris.apexX, iris.apexY);
+
+			}
+
+// 			if (this.apexY < iris.apexY) ctx.lineTo(iris.apexX, iris.apexY);
+// 			else ctx.lineTo()
+		}
 	}
 	
+	if (!iris) {
+		ctx.lineTo(marginX, inferiorBezierBack.SP.y);
+		ctx.lineTo(40, 460);
+	}
+	else {
+		var x2 = (marginX < inferiorBezierBack.SP.x) ? inferiorBezierBack.SP.x : marginX;
+		if (x2 > iris.apexX) x2 = iris.apexX;
+		ctx.lineTo(x2, inferiorBezierBack.SP.y);
+		if (this.apexY < -iris.apexY) {
+			if (x2 < iris.apexX) x2 = iris.apexX;
+			ctx.lineTo(x2, -iris.apexY);
+			ctx.lineTo(iris.apexX, -iris.apexY);
+		}
+		ctx.lineTo(40, 460);
+	}
+	
+/*
 	if (!lens) {
 		ctx.lineTo(120, inferiorBezierBack.SP.y);
 		ctx.lineTo(120, 450);
@@ -30310,6 +30341,7 @@ ED.HypopyonCrossSection.prototype.draw = function(_point) {
 		ctx.lineTo(74, 349);
 		ctx.lineTo(120, 450);
 	}
+*/
 	
 	// Close path
 	ctx.closePath();
