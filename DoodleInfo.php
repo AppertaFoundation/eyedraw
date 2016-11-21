@@ -43,6 +43,7 @@ class DoodleInfo
         'AngleRecession' => 'Angle recession',
         'AntPVR' => 'Anterior PVR',
         'AntSeg' => 'Anterior segment',
+        'AntSegAngleMarks' => 'Angle Marks',
         'AntSynech' => 'Anterior synechiae',
         'APattern' => 'A pattern',
         'ArcuateKeratotomy' => 'Arcuate keratotomy',
