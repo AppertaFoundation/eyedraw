@@ -23074,8 +23074,8 @@ ED.CornealOpacityCrossSection.prototype.draw = function(_point) {
 					iSuperiorBezier.SP = isq0;
 					iSuperiorBezier.CP1 = iiP2334;
 					iSuperiorBezier.CP2 = iiP34;
-					
-					
+				
+						
 					// back of cornea
 					var isq0b = new ED.Point(0,0);
 					isq0b.y = (1-tI0)*(1-tI0)*(1-tI0)*iSuperiorBezierBack.SP.y + 3*(1-tI0)*(1-tI0)*tI0*iSuperiorBezierBack.CP1.y + 3*(1-tI0)*tI0*tI0*iSuperiorBezierBack.CP2.y + tI0*tI0*tI0*iSuperiorBezierBack.EP.y;
@@ -23121,7 +23121,7 @@ ED.CornealOpacityCrossSection.prototype.draw = function(_point) {
 					iSuperiorBezier.CP1 = iiP12;
 					iSuperiorBezier.CP2 = iiP1223;
 					iSuperiorBezier.EP = iiq1;
-					
+				
 					// back of cornea
 					var iiq1b = new ED.Point(0,0);
 					iiq1b.y = (1-tI1)*(1-tI1)*(1-tI1)*iSuperiorBezierBack.SP.y + 3*(1-tI1)*(1-tI1)*tI1*iSuperiorBezierBack.CP1.y + 3*(1-tI1)*tI1*tI1*iSuperiorBezierBack.CP2.y + tI1*tI1*tI1*iSuperiorBezierBack.EP.y;
@@ -23143,10 +23143,11 @@ ED.CornealOpacityCrossSection.prototype.draw = function(_point) {
 					iSuperiorBezierBack.CP2 = iiP1223b;
 					iSuperiorBezierBack.EP = iiq1b;
 				}
+			
 			}
 			
 			
-			if (endT > 0.5) {
+			if (iEndT > 0.5) {
 				
 				var iInferiorBezier = new Object;
 				var iInferiorBezierBack = new Object;
@@ -23213,8 +23214,8 @@ ED.CornealOpacityCrossSection.prototype.draw = function(_point) {
 					iInferiorBezier.SP = isq0;
 					iInferiorBezier.CP1 = isP2334;
 					iInferiorBezier.CP2 = isP34;
-					
-					
+				}
+				if (tS0 > 0) {	
 					// back of cornea
 					var isq0b = new ED.Point(0,0);
 					isq0b.y = (1-tS0)*(1-tS0)*(1-tS0)*iInferiorBezierBack.SP.y + 3*(1-tS0)*(1-tS0)*tS0*iInferiorBezierBack.CP1.y + 3*(1-tS0)*tS0*tS0*iInferiorBezierBack.CP2.y + tS0*tS0*tS0*iInferiorBezierBack.EP.y;
@@ -23288,20 +23289,29 @@ ED.CornealOpacityCrossSection.prototype.draw = function(_point) {
 			ctx.beginPath();
 			
 			if (iInferiorBezier) {
-				ctx.moveTo(iInferiorBezierBack.EP.x, iInferiorBezierBack.EP.y);
+				ctx.moveTo(iInferiorBezierBack.EP.x, iInferiorBezierBack.EP.y); // starts at bottom of back inferior bezier
 				ctx.bezierCurveTo(iInferiorBezierBack.CP2.x, iInferiorBezierBack.CP2.y, iInferiorBezierBack.CP1.x, iInferiorBezierBack.CP1.y, iInferiorBezierBack.SP.x, iInferiorBezierBack.SP.y);				
 				ctx.lineTo(iInferiorBezier.SP.x, iInferiorBezier.SP.y);
 // 				ctx.bezierCurveTo(iInferiorBezierBack.SP.x, iInferiorBezier.SP.y,iInferiorBezier.SP.x, iInferiorBezier.SP.y,iInferiorBezier.SP.x, iInferiorBezier.SP.y)
-				ctx.bezierCurveTo(iInferiorBezier.CP1.x, iInferiorBezier.CP1.y, iInferiorBezier.CP2.x, iInferiorBezier.CP2.y, iInferiorBezier.EP.x, iInferiorBezier.EP.y);
-			
+				ctx.bezierCurveTo(iInferiorBezier.CP1.x, iInferiorBezier.CP1.y, iInferiorBezier.CP2.x, iInferiorBezier.CP2.y, iInferiorBezier.EP.x, iInferiorBezier.EP.y); // ends at bottom of front inferior bezier
+				if (endY <= 0) ctx.lineTo(iSuperiorBezierBack.EP.x, iSuperiorBezierBack.EP.y);
 			}
 			
+			
 			if (iSuperiorBezier) {
-				ctx.moveTo(iSuperiorBezierBack.EP.x, iSuperiorBezierBack.EP.y);
-				ctx.bezierCurveTo(iSuperiorBezierBack.CP2.x, iSuperiorBezierBack.CP2.y, iSuperiorBezierBack.CP1.x, iSuperiorBezierBack.CP1.y, iSuperiorBezierBack.SP.x, iSuperiorBezierBack.SP.y);
+				if (startY >= 0) {
+					ctx.moveTo(iInferiorBezierBack.SP.x, iInferiorBezierBack.SP.y);
+					ctx.lineTo(iSuperiorBezier.SP.x, iSuperiorBezier.SP.y);
+					ctx.bezierCurveTo(iSuperiorBezier.CP1.x, iSuperiorBezier.CP1.y, iSuperiorBezier.CP2.x, iSuperiorBezier.CP2.y, iSuperiorBezier.EP.x, iSuperiorBezier.EP.y); // end at bottom of front superior bezier (near midpoint)
+					ctx.lineTo(iInferiorBezierBack.SP.x, iInferiorBezierBack.SP.y);
+				}
+				else{
+					ctx.moveTo(iSuperiorBezierBack.EP.x, iSuperiorBezierBack.EP.y); // start at bottom of back superior curve (closest to midpoint)
+					ctx.bezierCurveTo(iSuperiorBezierBack.CP2.x, iSuperiorBezierBack.CP2.y, iSuperiorBezierBack.CP1.x, iSuperiorBezierBack.CP1.y, iSuperiorBezierBack.SP.x, iSuperiorBezierBack.SP.y);
 // 				ctx.bezierCurveTo(iSuperiorBezierBack.SP.x, iSuperiorBezier.SP.y, iSuperiorBezier.SP.x, iSuperiorBezier.SP.y, iSuperiorBezier.SP.x, iSuperiorBezier.SP.y)
-				ctx.lineTo(iSuperiorBezier.SP.x, iSuperiorBezier.SP.y);
-				ctx.bezierCurveTo(iSuperiorBezier.CP1.x, iSuperiorBezier.CP1.y, iSuperiorBezier.CP2.x, iSuperiorBezier.CP2.y, iSuperiorBezier.EP.x, iSuperiorBezier.EP.y);
+					ctx.lineTo(iSuperiorBezier.SP.x, iSuperiorBezier.SP.y);
+					ctx.bezierCurveTo(iSuperiorBezier.CP1.x, iSuperiorBezier.CP1.y, iSuperiorBezier.CP2.x, iSuperiorBezier.CP2.y, iSuperiorBezier.EP.x, iSuperiorBezier.EP.y); // end at bottom of front superior bezier (near midpoint)
+				}
 			}
 			
 			ctx.fillStyle = "rgba(0,0,0,0.2)";
