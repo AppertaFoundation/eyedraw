@@ -47723,8 +47723,16 @@ ED.OrthopticShading = function(_drawing, _parameterJSON)
 	
 	// Set classname
 	this.className = "OrthopticShading";
+	
+	// parameters for underaction drop down calculations
+	this.rUp = false;
+	this.rCenter = false;
+	this.rDown = false;
+	this.lUp = false;
+	this.lCenter = false;
+	this.lDown = false;
 
-	this.savedParameterArray = ['originX', 'originY', 'rotation', 'scaleX', 'scaleY'];
+	this.savedParameterArray = ['originX', 'originY', 'rotation', 'apexX', 'apexY'];
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -47742,7 +47750,8 @@ ED.OrthopticShading.superclass = ED.Doodle.prototype;
  */
 ED.OrthopticShading.prototype.setHandles = function()
 {
-	this.handleArray[3] = new ED.Doodle.Handle(null, true, ED.Mode.Scale, false);
+	this.handleArray[3] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
+	this.handleArray[3].isRotatable = true;
 }
 
 /**
@@ -47751,14 +47760,14 @@ ED.OrthopticShading.prototype.setHandles = function()
 ED.OrthopticShading.prototype.setPropertyDefaults = function()
 {
 	this.isSelectable = true;
-	this.isOrientated = true;
+	this.isOrientated = false; // MSC BC edit
 	this.isScaleable = true;
 	this.isSqueezable = true;
 	this.isMoveable = true;
 	this.isRotatable = true;
 	
-	this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.125, +1.5);
-	this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.125, +1.5);
+	this.parameterValidationArray['apexX']['range'].setMinAndMax(-360, +360);
+	this.parameterValidationArray['apexY']['range'].setMinAndMax(-360, +360);
 }
 
 /**
@@ -47766,7 +47775,12 @@ ED.OrthopticShading.prototype.setPropertyDefaults = function()
  */
 ED.OrthopticShading.prototype.setParameterDefaults = function()
 {
-    this.originY = -200;
+	this.apexX = 350;
+	this.apexY = -100;
+
+	this.setRotationWithDisplacements(0, 90);
+
+//     this.originY = -200;
 }
 
 /**
@@ -47786,7 +47800,9 @@ ED.OrthopticShading.prototype.draw = function(_point)
 	ctx.beginPath();
     
 	// Rectangular area
-	ctx.rect(-300, -100, 600, 200);
+	var w = this.apexX - -350;
+	var h = this.apexY - -350;
+	ctx.rect(-350, -350, w, h);
     
 	// Close path
 	ctx.closePath();
@@ -47802,18 +47818,18 @@ ED.OrthopticShading.prototype.draw = function(_point)
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
 	{
         ctx.beginPath();
-        ctx.moveTo(-300, 100);
+        ctx.moveTo(-350, this.apexY);
         var dash = 42;
         var gap = 20;
         var length = 0;
-        while (length < 540)
+        while (length < w-40)
         {
             length += dash;
-            ctx.lineTo(-300 + length, 100);
+            ctx.lineTo(-350 + length, this.apexY);
             length += gap;            
-            ctx.moveTo(-300 + length, 100);
+            ctx.moveTo(-350 + length, this.apexY);
         }
-        ctx.lineTo(300, 100);
+        ctx.lineTo(this.apexX, this.apexY);
         
         // Draw line
         ctx.lineWidth = 12;
@@ -47822,11 +47838,11 @@ ED.OrthopticShading.prototype.draw = function(_point)
 	}
 	
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[3].location = this.transform.transformPoint(new ED.Point(300, 100));
+	this.handleArray[3].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 	
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
-	
+		
 	// Return value indicating successful hittest
 	return this.isClicked;
 }
