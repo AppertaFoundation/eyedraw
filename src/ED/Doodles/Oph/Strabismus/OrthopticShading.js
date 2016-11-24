@@ -31,12 +31,12 @@ ED.OrthopticShading = function(_drawing, _parameterJSON)
 	this.className = "OrthopticShading";
 	
 	// parameters for underaction drop down calculations
-	this.rUp = false;
-	this.rCenter = false;
-	this.rDown = false;
-	this.lUp = false;
-	this.lCenter = false;
-	this.lDown = false;
+	this.uR = false;
+	this.cR = false;
+	this.dR = false;
+	this.rL = false;
+	this.cL = false;
+	this.dL = false;
 
 	this.savedParameterArray = ['originX', 'originY', 'rotation', 'apexX', 'apexY'];
 
@@ -73,7 +73,7 @@ ED.OrthopticShading.prototype.setPropertyDefaults = function()
 	this.isRotatable = true;
 	
 	this.parameterValidationArray['apexX']['range'].setMinAndMax(-360, +360);
-	this.parameterValidationArray['apexY']['range'].setMinAndMax(-360, +360);
+	this.parameterValidationArray['apexY']['range'].setMinAndMax(-360, -3);
 }
 
 /**
@@ -84,10 +84,12 @@ ED.OrthopticShading.prototype.setParameterDefaults = function()
 	this.apexX = 350;
 	this.apexY = -100;
 
-	this.setRotationWithDisplacements(0, 90);
+	this.setRotationWithDisplacements(0, 90.5);
 
 //     this.originY = -200;
 }
+
+
 
 /**
  * Draws doodle or performs a hit test if a Point parameter is passed
@@ -148,7 +150,144 @@ ED.OrthopticShading.prototype.draw = function(_point)
 	
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+		this.calculateUnderActions();
 		
 	// Return value indicating successful hittest
 	return this.isClicked;
+}
+
+
+/**
+ * 
+ */
+ED.OrthopticShading.prototype.calculateUnderActions = function() {
+	var x;
+	var y;
+	var d;
+	var intersectionPoint;
+	
+	// shading boundary line
+	var sp = this.transform.transformPoint(new ED.Point(-350, this.apexY));
+	var ep = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
+	
+	var dy1 = ep.y - sp.y;
+	var dx1 = ep.x - sp.x;
+	var m1 = dy1/dx1;	
+	var c1 = sp.y - m1*sp.x;
+	
+	if (dx1 == 0) {
+		m1 = 0;
+		c1 = 70;
+	}
+	
+	
+	// in canvas plane
+	var origin = new ED.Point(100,100);
+
+	var uR = new ED.Point(30,30);
+	var dL = new ED.Point(170,170);
+	var m2 = 1;
+	// if lines not parallel
+	if (m1 !== m2) {
+		// find intersection point: 0 = m1*x + c1 - x
+		x = -c1 / (m1-1);
+		y = x;
+		intersectionPoint = new ED.Point(x,y);
+		
+		// up right
+		d = uR.distanceTo(new ED.Point(x,y));
+		if (y>=30 && y<=100 && (sp.x<=100 || ep.x<=100) && (sp.y<=100 || ep.y<=100)) {
+			if (d>79.192) this.uR = "-4";
+			else if (d>59.394) this.uR = "-3";
+			else if (d>39.596) this.uR = "-2";
+			else if (d>19.798) this.uR = "-1";
+/*
+			if (d>98.99) this.uR = "-4";
+			else if (d>74.2425) this.uR = "-3";
+			else if (d>49.495) this.uR = "-2";
+			else if (d>24.7475) this.uR = "-1";
+*/
+			else this.uR = "-0.5";			
+		}
+// 		else if (this.rotation < Math.PI && y>100) this.uR = "<-4";
+		else this.uR = false;
+		
+		// down left
+		d = dL.distanceTo(new ED.Point(x,y));
+		if (y<=170 && y>=100 && (sp.x>=100 || ep.x>=100) && (sp.y>=100 || ep.y>=100)) {
+			if (d>79.192) this.dL = "-4";
+			else if (d>59.394) this.dL = "-3";
+			else if (d>39.596) this.dL = "-2";
+			else if (d>19.798) this.dL = "-1";
+			else this.dL = "-0.5";			
+		}
+		else this.dL = false;
+	}
+	
+	/// y=100
+	var cR = new ED.Point(30,100);
+	var cL = new ED.Point(170,100);
+	var m3 = 0;
+	if (m1 !== m3 || dx1 == 0) {
+		// find intersection point: x = (y-c)/m
+		y = 100;
+		x = (y-c1) / m1;
+		intersectionPoint = new ED.Point(x,y);
+		
+		// centre right
+		d = cR.distanceTo(new ED.Point(x,y));
+		if (x>=30 && x<=100) {
+			if (d>56) this.cR = "-4";
+			else if (d>42) this.cR = "-3";
+			else if (d>28) this.cR = "-2";
+			else if (d>14) this.cR = "-1";
+			else this.cR = "-0.5";			
+		}
+		else this.cR = false;
+		
+		// centre left
+		d = cL.distanceTo(new ED.Point(x,y));
+		if (x<=170 && x>=100) {
+			if (d>56) this.cL = "-4";
+			else if (d>42) this.cL = "-3";
+			else if (d>28) this.cL = "-2";
+			else if (d>14) this.cL = "-1";
+			else this.cL = "-0.5";			
+		}
+		else this.cL = false;
+	}
+	
+	var dR = new ED.Point(30,170);
+	var uL = new ED.Point(170,30);
+	var m4 = -1;
+	if (m1 !== m4) {
+		// find intersection point: (200-c1)/(m1+1) = x
+		x = (200-c1) / (m1+1);
+		y = -x + 200;
+		intersectionPoint = new ED.Point(x,y);
+		
+		// up left
+		d = uL.distanceTo(new ED.Point(x,y));
+		if (y>=30 /* && y<=100 */ && (sp.x>=100 || ep.x>=100) && (sp.y<=100 || ep.y<=100)) {
+			if (d>79.192) this.uL = "-4";
+			else if (d>59.394) this.uL = "-3";
+			else if (d>39.596) this.uL = "-2";
+			else if (d>19.798) this.uL = "-1";
+			else this.uL = "-0.5";			
+		}
+		else this.uL = false;
+
+
+		// down right
+		d = dR.distanceTo(new ED.Point(x,y));
+		if (y<=170 && y>=100 && (sp.x<=100 || ep.x<=100) && (sp.y>=100 || ep.y>=100)) {
+			if (d>79.192) this.dR = "-4";
+			else if (d>59.394) this.dR = "-3";
+			else if (d>39.596) this.dR = "-2";
+			else if (d>19.798) this.dR = "-1";
+			else this.dR = "-0.5";			
+		}
+		else this.dR = false;
+	}
+
 }
