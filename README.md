@@ -20,19 +20,12 @@ The enclosing folder should contain the following files and folders:
 - **ED_MedicalRetina.js**	: Doodles for Medical retina drawings
 - **ED_Strabismus.js**	: Doodles for Strabismus drawings
 - **ED_Vitreoretinal.js**	: Doodles for Vitreoretinal drawings
-
 - **EyeDrawJS (directory)**		: Contains an XCode project file for those who use it
-
 - **img (directory)**		: Contains all graphics and icon files for EyeDraw
-
 - **jsdoc-toolkit (directory)**	: For generating documentation
-
 - **Licence**				: Copy of the GPL3 licence
-
 - **README.md**				: This file
-
 - **OEEyeDraw.css**		: A css file containing styles
-
 - **testDoodle.html**		: An HTML file for use when testing or developing doodles
 
 
