@@ -37,8 +37,8 @@ ED.AntSeg = function(_drawing, _parameterJSON) {
 	this.colour = 'Blue';
 	this.ectropion = false;
 	this.cornealSize = 'Normal';
-  this.cells = '+';
-  this.flare = '+';
+  this.cells = '0';
+  this.flare = '0';
 
 	// Saved parameters
 	this.savedParameterArray = [
@@ -138,17 +138,17 @@ ED.AntSeg.prototype.setPropertyDefaults = function() {
 		animate: false
 	};
 
-  this.parameterValidationArray.cells = {
-    kind: 'other',
-    type: 'string',
-    list: ['+', '++', '+++', '++++'],
-    animate: false
-  };
+	this.parameterValidationArray.cells = {
+		kind: 'other',
+		type: 'string',
+		list: ['0', '0.5+', '+', '++', '+++', '++++'],
+		animate: false
+	};
 
 	this.parameterValidationArray.flare = {
 		kind: 'other',
 		type: 'string',
-		list: ['+', '++', '+++', '++++'],
+		list: ['0', '+', '++', '+++', '++++'],
 		animate: false
 	};
 };
