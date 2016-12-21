@@ -37,8 +37,8 @@ ED.AntSeg = function(_drawing, _parameterJSON) {
 	this.colour = 'Blue';
 	this.ectropion = false;
 	this.cornealSize = 'Normal';
-  this.cells = '0';
-  this.flare = '0';
+  this.cells = 'Please Select:';
+  this.flare = 'Please Select:';
 
 	// Saved parameters
 	this.savedParameterArray = [
@@ -141,14 +141,14 @@ ED.AntSeg.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray.cells = {
 		kind: 'other',
 		type: 'string',
-		list: ['0', '0.5+', '+', '++', '+++', '++++'],
+		list: ['Please Select:', '0', '0.5+', '+', '++', '+++', '++++'],
 		animate: false
 	};
 
 	this.parameterValidationArray.flare = {
 		kind: 'other',
 		type: 'string',
-		list: ['0', '+', '++', '+++', '++++'],
+		list: ['Please Select:', '0', '+', '++', '+++', '++++'],
 		animate: false
 	};
 };
@@ -387,11 +387,11 @@ ED.AntSeg.prototype.description = function() {
 		returnValue += "pseudoexfoliation, ";
 	}
 
-	if (this.cells) {
+	if (this.cells && this.cells != 'Please Select:') {
 		returnValue += "cells: " + this.cells + ", ";
 	}
 
-	if (this.flare) {
+	if (this.flare && this.flare != 'Please Select:') {
 		returnValue += "flare: " + this.flare + ", ";
 	}
 
