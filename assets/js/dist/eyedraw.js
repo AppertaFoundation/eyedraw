@@ -2956,7 +2956,7 @@ ED.Drawing.prototype.report = function() {
 			}
 		}
 	}
-console.log(returnString);
+
 	// Return result
 	return returnString;
 };
