@@ -37,8 +37,8 @@ ED.AntSeg = function(_drawing, _parameterJSON) {
 	this.colour = 'Blue';
 	this.ectropion = false;
 	this.cornealSize = 'Normal';
-  this.cells = 'Please Select:';
-  this.flare = 'Please Select:';
+  this.cells = 'Not Checked';
+  this.flare = 'Not Checked';
 
 	// Saved parameters
 	this.savedParameterArray = [
@@ -141,14 +141,14 @@ ED.AntSeg.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray.cells = {
 		kind: 'other',
 		type: 'string',
-		list: ['Please Select:', '0', '0.5+', '+', '++', '+++', '++++'],
+		list: ['Not Checked', '0 (<1)', '0.5+  (1-5)', '1+ (6-15)', '2+', '3+ (26-50)', '4+ (>50)'],
 		animate: false
 	};
 
 	this.parameterValidationArray.flare = {
 		kind: 'other',
 		type: 'string',
-		list: ['Please Select:', '0', '+', '++', '+++', '++++'],
+		list: ['Not Checked', '0 (None)', '1+ (Faint)', '2+ (Moderate)', '3+ (Marked)', '4+ (Intense)'],
 		animate: false
 	};
 };
@@ -387,11 +387,11 @@ ED.AntSeg.prototype.description = function() {
 		returnValue += "pseudoexfoliation, ";
 	}
 
-	if (this.cells && this.cells != 'Please Select:') {
+	if (this.cells && this.cells !== 'Not Checked') {
 		returnValue += "cells: " + this.cells + ", ";
 	}
 
-	if (this.flare && this.flare != 'Please Select:') {
+	if (this.flare && this.flare !== 'Not Checked') {
 		returnValue += "flare: " + this.flare + ", ";
 	}
 
