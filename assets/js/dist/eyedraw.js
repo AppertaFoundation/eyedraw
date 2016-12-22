@@ -2956,7 +2956,7 @@ ED.Drawing.prototype.report = function() {
 			}
 		}
 	}
-
+console.log(returnString);
 	// Return result
 	return returnString;
 };
@@ -14729,7 +14729,7 @@ ED.AntSeg.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray.cells = {
 		kind: 'other',
 		type: 'string',
-		list: ['Not Checked', '0 (<1)', '0.5+  (1-5)', '1+ (6-15)', '2+', '3+ (26-50)', '4+ (>50)'],
+		list: ['Not Checked', '0 (<1)', '0.5+ (1-5)', '1+ (6-15)', '2+ (16-25)', '3+ (26-50)', '4+ (>50)'],
 		animate: false
 	};
 
