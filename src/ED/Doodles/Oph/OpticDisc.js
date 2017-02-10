@@ -467,13 +467,11 @@ ED.OpticDisc.prototype.description = function() {
 	else {
 		if (this.cdRatio == "No view") {
 			returnString = "No view";
-		} else {
-			returnString = this.drawing.doodleArray.length == 1 ? "No abnormality" : "";
 		}
 	}
 
 	return returnString;
-}
+};
 
 /**
  * Defines visibility of handles
