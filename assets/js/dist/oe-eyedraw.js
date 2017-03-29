@@ -725,6 +725,7 @@ ED.Controller = (function() {
 	Controller.prototype.autoReport = function(outputElement) {
 		var report = this.drawing.report();
 		if(report){
+
 			report = report.replace(/, /g,"\n");
 			var output = '';
 			var existing = outputElement.value;
