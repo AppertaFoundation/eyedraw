@@ -730,7 +730,7 @@ ED.Controller = (function() {
 			var output = '';
 			var existing = outputElement.value;
 
-			if(existing.match(regex_escape(report)))git{
+			if(existing.match(regex_escape(report))){
 				outputElement.rows = (existing.match(/\n/g) || []).length + 1;
 				this.previousReport = report;
 				return;
