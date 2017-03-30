@@ -725,11 +725,12 @@ ED.Controller = (function() {
 	Controller.prototype.autoReport = function(outputElement) {
 		var report = this.drawing.report();
 		if(report){
+
 			report = report.replace(/, /g,"\n");
 			var output = '';
 			var existing = outputElement.value;
 
-			if(existing.match(report)){
+			if(existing.match(regex_escape(report))){
 				outputElement.rows = (existing.match(/\n/g) || []).length + 1;
 				this.previousReport = report;
 				return;
@@ -747,6 +748,10 @@ ED.Controller = (function() {
 			outputElement.rows = (output.match(/\n/g) || []).length + 1;
 			this.previousReport = report;
 		}
+
+        function regex_escape(str){
+            return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+        }
 	};
 
 	return Controller;
