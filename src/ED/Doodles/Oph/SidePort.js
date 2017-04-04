@@ -33,12 +33,12 @@ ED.SidePort = function(_drawing, _parameterJSON) {
 	
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
-}
+};
 
 /**
  * Sets superclass and constructor
  */
-ED.SidePort.prototype = new ED.Doodle;
+ED.SidePort.prototype = new ED.Doodle();
 ED.SidePort.prototype.constructor = ED.SidePort;
 ED.SidePort.superclass = ED.Doodle.prototype;
 
@@ -50,14 +50,14 @@ ED.SidePort.prototype.setPropertyDefaults = function() {
 	this.isMoveable = false;
 	this.isRotatable = true;
 	this.isArcSymmetrical = true;
-}
+};
 
 /**
  * Sets default parameters
  */
 ED.SidePort.prototype.setParameterDefaults = function() {
 	this.setRotationWithDisplacements(90, 180);
-}
+};
 
 /**
  * Draws doodle or performs a hit test if a Point parameter is passed
@@ -106,7 +106,7 @@ ED.SidePort.prototype.draw = function(_point) {
 
 	// Return value indicating successful hittest
 	return this.isClicked;
-}
+};
 
 /**
  * Returns a string containing a text description of the doodle
@@ -115,7 +115,7 @@ ED.SidePort.prototype.draw = function(_point) {
  */
 ED.SidePort.prototype.groupDescription = function() {
 	return "Sideport at ";
-}
+};
 
 /**
  * Returns a string containing a text description of the doodle
@@ -124,7 +124,7 @@ ED.SidePort.prototype.groupDescription = function() {
  */
 ED.SidePort.prototype.description = function() {
 	return this.clockHour();
-}
+};
 
 /**
  * Returns a string containing a text description of the doodle
@@ -133,4 +133,4 @@ ED.SidePort.prototype.description = function() {
  */
 ED.SidePort.prototype.groupDescriptionEnd = function() {
 	return " o'clock";
-}
+};

@@ -29,7 +29,7 @@ var ED = ED || {};
  * @namespace ED.Controller
  * @memberOf ED
  * @description Namespace for EyeDraw Controller
- */ 
+ */
 
 ED.Controller = (function() {
 
@@ -510,6 +510,10 @@ ED.Controller = (function() {
 			outputElement.value = output;
 			outputElement.rows = (output.match(/\n/g) || []).length + 1;
 			this.previousReport = report;
+		}
+
+		function regex_escape(str){
+            return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
 		}
 	};
 

@@ -37,8 +37,8 @@ ED.AntSeg = function(_drawing, _parameterJSON) {
 	this.colour = 'Blue';
 	this.ectropion = false;
 	this.cornealSize = 'Normal';
-  this.cells = '-';
-  this.flare = '-';
+  this.cells = 'Not Checked';
+  this.flare = 'Not Checked';
 
 	// Saved parameters
 	this.savedParameterArray = [
@@ -138,17 +138,17 @@ ED.AntSeg.prototype.setPropertyDefaults = function() {
 		animate: false
 	};
 
-  this.parameterValidationArray.cells = {
-    kind: 'other',
-    type: 'string',
-    list: ['-', '0', '+', '++', '+++', '++++'],
-    animate: false
-  };
+	this.parameterValidationArray.cells = {
+		kind: 'other',
+		type: 'string',
+		list: ['Not Checked', '0 (<1)', '0.5+ (1-5)', '1+ (6-15)', '2+ (16-25)', '3+ (26-50)', '4+ (>50)'],
+		animate: false
+	};
 
 	this.parameterValidationArray.flare = {
 		kind: 'other',
 		type: 'string',
-		list: ['-', '0', '+', '++', '+++', '++++'],
+		list: ['Not Checked', '0 (None)', '1+ (Faint)', '2+ (Moderate)', '3+ (Marked)', '4+ (Intense)'],
 		animate: false
 	};
 };
@@ -366,31 +366,36 @@ ED.AntSeg.prototype.draw = function(_point) {
  */
 ED.AntSeg.prototype.description = function() {
 	var returnValue = "";
-	var pupilSize = Math.round(-this.apexY * 0.03);		
+	var pupilSize = Math.round(-this.apexY * 0.03);
 
 	// Pupil size and coloboma
-	//if (this.pupilSize != 'Large') {
-		returnValue += this.pupilSize.toLowerCase() + " pupil (diameter: " + pupilSize + "mm), ";
-	//}
+	returnValue += this.pupilSize.toLowerCase() + " pupil (diameter: " + pupilSize + "mm), ";
+
 	// Coloboma
-	if (this.coloboma) returnValue += "coloboma at " + this.clockHour(6) + " o'clock, ";
+	if (this.coloboma) {
+		returnValue += "coloboma at " + this.clockHour(6) + " o'clock, ";
+	}
 
 	// Ectopion
-	if (this.ectropion) returnValue += "ectropion uveae, ";
+	if (this.ectropion) {
+		returnValue += "ectropion uveae, ";
+	}
 
 	// PXE
-	if (this.pxe) returnValue += "pseudoexfoliation, ";
+	if (this.pxe) {
+		returnValue += "pseudoexfoliation, ";
+	}
 
-	if (this.cells  && this.cells != '-') {
+	if (this.cells && this.cells !== 'Not Checked') {
 		returnValue += "cells: " + this.cells + ", ";
 	}
 
-	if (this.flare && this.flare != '-') {
+	if (this.flare && this.flare !== 'Not Checked') {
 		returnValue += "flare: " + this.flare + ", ";
 	}
 
 	// Empty report so far
-	if (returnValue.length == 0 && this.drawing.doodleArray.length == 1) {
+	if (returnValue.length === 0 && this.drawing.doodleArray.length === 1) {
 		// Is lens present and normal?
 		/*
 		var doodle = this.drawing.lastDoodleOfClass('Lens');
@@ -406,13 +411,13 @@ ED.AntSeg.prototype.description = function() {
 		*/
 		returnValue = "No abnormality";
 	}
-	
+
 /*
 	if (this.pupilSize == 'Large') {
 		returnValue += "pupil diameter: " + pupilSize + "mm, ";
 	}
 */
-	
+
 	// Remove final comma and space and capitalise first letter
 	returnValue = returnValue.replace(/, +$/, '');
 	returnValue = returnValue.charAt(0).toUpperCase() + returnValue.slice(1);

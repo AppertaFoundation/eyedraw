@@ -36,7 +36,7 @@ ED.Surgeon = function(_drawing, _parameterJSON) {
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
-}
+};
 
 /**
  * Sets superclass and constructor
@@ -71,7 +71,7 @@ ED.Surgeon.prototype.setPropertyDefaults = function() {
 	// Array of angles to snap to
 	var phi = Math.PI / 4;
 	this.anglesArray = [0, phi, phi * 2, phi * 3, phi * 4, phi * 5, phi * 6, phi * 7];
-}
+};
 
 /**
  * Sets default parameters (Only called for new doodles)
@@ -80,7 +80,7 @@ ED.Surgeon.prototype.setPropertyDefaults = function() {
 ED.Surgeon.prototype.setParameterDefaults = function() {
 	this.rotation = 0;
 	this.setParameterFromString('surgeonPosition', 'Temporal');
-}
+};
 
 /**
  * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
@@ -91,7 +91,7 @@ ED.Surgeon.prototype.setParameterDefaults = function() {
  * @returns {Array} Associative array of values of dependent parameters
  */
 ED.Surgeon.prototype.dependentParameterValues = function(_parameter, _value) {
-	var returnArray = new Array();
+	var returnArray = {};
 
 	var isRE = (this.drawing.eye == ED.eye.Right);
 	var dial = 2 * Math.PI;
@@ -100,25 +100,45 @@ ED.Surgeon.prototype.dependentParameterValues = function(_parameter, _value) {
 		// Surgeon position
 		case 'rotation':
 			if (isRE) {
-				if (_value < dial / 16) returnArray['surgeonPosition'] = 'Superior';
-				else if (_value < 3 * dial / 16) returnArray['surgeonPosition'] = 'Supero-nasal';
-				else if (_value < 5 * dial / 16) returnArray['surgeonPosition'] = 'Nasal';
-				else if (_value < 7 * dial / 16) returnArray['surgeonPosition'] = 'Infero-nasal';
-				else if (_value < 9 * dial / 16) returnArray['surgeonPosition'] = 'Inferior';
-				else if (_value < 11 * dial / 16) returnArray['surgeonPosition'] = 'Infero-temporal';
-				else if (_value < 13 * dial / 16) returnArray['surgeonPosition'] = 'Temporal';
-				else if (_value < 15 * dial / 16) returnArray['surgeonPosition'] = 'Supero-temporal';
-				else returnArray['surgeonPosition'] = 'Superior';
+				if (_value < dial / 16) {
+					returnArray['surgeonPosition'] = 'Superior';
+				} else if (_value < 3 * dial / 16) {
+					returnArray['surgeonPosition'] = 'Supero-nasal';
+				} else if (_value < 5 * dial / 16) {
+					returnArray['surgeonPosition'] = 'Nasal';
+				} else if (_value < 7 * dial / 16) {
+					returnArray['surgeonPosition'] = 'Infero-nasal';
+				} else if (_value < 9 * dial / 16) {
+					returnArray['surgeonPosition'] = 'Inferior';
+				} else if (_value < 11 * dial / 16) {
+					returnArray['surgeonPosition'] = 'Infero-temporal';
+				} else if (_value < 13 * dial / 16) {
+					returnArray['surgeonPosition'] = 'Temporal';
+				} else if (_value < 15 * dial / 16) {
+					returnArray['surgeonPosition'] = 'Supero-temporal';
+				} else {
+					returnArray['surgeonPosition'] = 'Superior';
+				}
 			} else {
-				if (_value < dial / 16) returnArray['surgeonPosition'] = 'Superior';
-				else if (_value < 3 * dial / 16) returnArray['surgeonPosition'] = 'Supero-temporal';
-				else if (_value < 5 * dial / 16) returnArray['surgeonPosition'] = 'Temporal';
-				else if (_value < 7 * dial / 16) returnArray['surgeonPosition'] = 'Infero-temporal';
-				else if (_value < 9 * dial / 16) returnArray['surgeonPosition'] = 'Inferior';
-				else if (_value < 11 * dial / 16) returnArray['surgeonPosition'] = 'Infero-nasal';
-				else if (_value < 13 * dial / 16) returnArray['surgeonPosition'] = 'Nasal';
-				else if (_value < 15 * dial / 16) returnArray['surgeonPosition'] = 'Supero-nasal';
-				else returnArray['surgeonPosition'] = 'Superior';
+				if (_value < dial / 16) {
+					returnArray['surgeonPosition'] = 'Superior';
+				} else if (_value < 3 * dial / 16) {
+					returnArray['surgeonPosition'] = 'Supero-temporal';
+				} else if (_value < 5 * dial / 16) {
+					returnArray['surgeonPosition'] = 'Temporal';
+				} else if (_value < 7 * dial / 16) {
+					returnArray['surgeonPosition'] = 'Infero-temporal';
+				} else if (_value < 9 * dial / 16) {
+					returnArray['surgeonPosition'] = 'Inferior';
+				} else if (_value < 11 * dial / 16) {
+					returnArray['surgeonPosition'] = 'Infero-nasal';
+				} else if (_value < 13 * dial / 16) {
+					returnArray['surgeonPosition'] = 'Nasal';
+				} else if (_value < 15 * dial / 16) {
+					returnArray['surgeonPosition'] = 'Supero-nasal';
+				} else {
+					returnArray['surgeonPosition'] = 'Superior';
+				}
 			}
 			break;
 
@@ -153,7 +173,7 @@ ED.Surgeon.prototype.dependentParameterValues = function(_parameter, _value) {
 	}
 
 	return returnArray;
-}
+};
 
 /**
  * Draws doodle or performs a hit test if a Point parameter is passed
@@ -242,4 +262,4 @@ ED.Surgeon.prototype.draw = function(_point) {
 
 	// Return value indicating successful hittest
 	return this.isClicked;
-}
+};
