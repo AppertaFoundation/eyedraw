@@ -898,6 +898,8 @@ ED.Drawing.prototype.mousedown = function(_point) {
 
 			// Successful hit test?
 			if (this.doodleArray[i].draw(_point)) {
+				console.log(_point);
+				console.log(this.doodleArray[i]);
 				if (this.doodleArray[i].isSelectable) {
 					// If double clicked, go into drawing mode
 					if (this.doubleClick && this.doodleArray[i].isSelected && this.doodleArray[i].isDrawable) {
@@ -1030,7 +1032,6 @@ ED.Drawing.prototype.mousemove = function(_point) {
 
 	// Start the hover timer (also resets it)
 	this.startHoverTimer(_point);
-
 	// Only drag if mouse already down and a doodle selected
 	if (this.mouseDown && doodle != null) {
 
@@ -1471,90 +1472,33 @@ ED.Drawing.prototype.mouseout = function(_point) {
 ED.Drawing.prototype.keydown = function(e) {
 	// Keyboard action works on selected doodle
 	if (this.selectedDoodle != null) {
-		// Label doodle is special case - Deprecated since doodle control bar
-		// if (this.selectedDoodle.className == "Label") {
-		if (false) {
-			// Code to send to doodle
-			var code = 0;
-
-			// Shift key has code 16
-			if (e.keyCode != 16) {
-				// Alphabetic
-				if (e.keyCode >= 65 && e.keyCode <= 90) {
-					if (e.shiftKey) {
-						code = e.keyCode;
-					} else {
-						code = e.keyCode + 32;
-					}
-				}
-				// Space or numeric
-				else if (e.keyCode == 32 || (e.keyCode > 47 && e.keyCode < 58)) {
-					code = e.keyCode;
-				}
-				// Apostrophes
-				else if (e.keyCode == 222) {
-					if (e.shiftKey) {
-						code = 34;
-					} else {
-						code = 39;
-					}
-				}
-				// Colon and semicolon
-				else if (e.keyCode == 186) {
-					if (e.shiftKey) {
-						code = 58;
-					} else {
-						code = 59;
-					}
-				}
-				// Other punctuation
-				else if (e.keyCode == 188 || e.keyCode == 190) {
-					if (e.keyCode == 188) code = 44;
-					if (e.keyCode == 190) code = 46;
-				}
-				// Backspace
-				else if (e.keyCode == 8) {
-					code = e.keyCode;
-				}
-				// Carriage return
-				else if (e.keyCode == 13) {
-					code = 13;
-				}
-			}
-
-			// Carriage return stops editing
-			if (code == 13) {
-				this.deselectDoodles();
-			}
-			// Send code to label doodle
-			else if (code > 0) {
-				this.selectedDoodle.addLetter(code);
-			}
-		} else {
-			// Delete or move doodle
-			switch (e.keyCode) {
-				case 8: // Backspace
-					if (this.selectedDoodle.className != "Label") this.deleteSelectedDoodle();
-					break;
-				case 37: // Left arrow
-					this.selectedDoodle.move(-ED.arrowDelta, 0);
-					break;
-				case 38: // Up arrow
-					this.selectedDoodle.move(0, -ED.arrowDelta);
-					break;
-				case 39: // Right arrow
-					this.selectedDoodle.move(ED.arrowDelta, 0);
-					break;
-				case 40: // Down arrow
-					this.selectedDoodle.move(0, ED.arrowDelta);
-					break;
-				default:
-					break;
-			}
+		var repaint = true;
+		// Delete or move doodle
+		switch (e.keyCode) {
+			case 8: // Backspace
+				if (this.selectedDoodle.className != "Label") this.deleteSelectedDoodle();
+				break;
+			case 37: // Left arrow
+				this.selectedDoodle.move(-ED.arrowDelta, 0);
+				break;
+			case 38: // Up arrow
+				this.selectedDoodle.move(0, -ED.arrowDelta);
+				break;
+			case 39: // Right arrow
+				this.selectedDoodle.move(ED.arrowDelta, 0);
+				break;
+			case 40: // Down arrow
+				this.selectedDoodle.move(0, ED.arrowDelta);
+				break;
+			default:
+				repaint = false;
+				break;
 		}
 
-		// Refresh canvas
-		this.repaint();
+		if (repaint) {
+            // Refresh canvas
+            this.repaint();
+        }
 
 		// Prevent key stroke bubbling up (***TODO*** may need cross browser handling)
 		e.stopPropagation();
@@ -44804,11 +44748,10 @@ ED.RRD.prototype.setParameterDefaults = function() {
 ED.RRD.prototype.draw = function(_point) {
 	// Get context
 	var ctx = this.drawing.context;
-
 	// Call draw method in superclass
 	ED.RRD.superclass.draw.call(this, _point);
 
-	// Fit outer curve just inside ora on right and left fundus diagrams
+    // Fit outer curve just inside ora on right and left fundus diagrams
 	var r = 952 / 2;
 
 	// Calculate parameters for arcs
@@ -44858,7 +44801,7 @@ ED.RRD.prototype.draw = function(_point) {
 	}
 
 	// Set line attributes
-	ctx.lineWidth = 4;
+	ctx.lineWidth = 5;
 	ctx.fillStyle = "rgba(0, 0, 255, 0.75)";
 	ctx.strokeStyle = "blue";
 

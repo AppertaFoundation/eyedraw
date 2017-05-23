@@ -176,7 +176,8 @@ ED.Controller = (function() {
 			'doodleDeleted',
 			'doodleSelected',
 			'mousedragged',
-			'drawingZoom'
+			'drawingZoom',
+			'parameterChanged'
 		]);
 	};
 
@@ -241,12 +242,14 @@ ED.Controller = (function() {
 	 * Save drawing data to the associated input field.
 	 */
 	Controller.prototype.saveDrawingToInputField = function(force) {
-		if ((force && this.hasInputField()) || this.hasInputFieldData()) {
-			this.input.value = this.drawing.save();
-		}
-		if(this.properties.autoReport){
-			var outputElement = document.getElementById(this.properties.autoReport);
-			this.autoReport(outputElement);
+        if (!this.drawing.mouseDown) {
+			if ((force && this.hasInputField()) || this.hasInputFieldData()) {
+				this.input.value = this.drawing.save();
+			}
+			if (this.properties.autoReport) {
+                var outputElement = document.getElementById(this.properties.autoReport);
+                this.autoReport(outputElement);
+			}
 		}
 	};
 
@@ -470,8 +473,6 @@ ED.Controller = (function() {
 	Controller.prototype.onParameterChanged = function(notification) {
 		// Sync with other doodles on the page.
 		this.syncEyedraws(notification.object);
-		// Save drawing to hidden input.
-		this.saveDrawingToInputField();
 	};
 
 	/**
