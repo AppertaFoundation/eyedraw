@@ -898,8 +898,6 @@ ED.Drawing.prototype.mousedown = function(_point) {
 
 			// Successful hit test?
 			if (this.doodleArray[i].draw(_point)) {
-				console.log(_point);
-				console.log(this.doodleArray[i]);
 				if (this.doodleArray[i].isSelectable) {
 					// If double clicked, go into drawing mode
 					if (this.doubleClick && this.doodleArray[i].isSelected && this.doodleArray[i].isDrawable) {
@@ -44748,10 +44746,11 @@ ED.RRD.prototype.setParameterDefaults = function() {
 ED.RRD.prototype.draw = function(_point) {
 	// Get context
 	var ctx = this.drawing.context;
+
 	// Call draw method in superclass
 	ED.RRD.superclass.draw.call(this, _point);
 
-    // Fit outer curve just inside ora on right and left fundus diagrams
+	// Fit outer curve just inside ora on right and left fundus diagrams
 	var r = 952 / 2;
 
 	// Calculate parameters for arcs
@@ -44801,7 +44800,7 @@ ED.RRD.prototype.draw = function(_point) {
 	}
 
 	// Set line attributes
-	ctx.lineWidth = 5;
+	ctx.lineWidth = 4;
 	ctx.fillStyle = "rgba(0, 0, 255, 0.75)";
 	ctx.strokeStyle = "blue";
 
