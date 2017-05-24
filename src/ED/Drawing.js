@@ -129,6 +129,7 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 	this.showDoodleControls = false;
 	this.onReadyCommands = [];
 	this.resetDoodleSet = false;
+	this.lastTouchPoint = undefined;
 
 	// Freehand drawing properties NB from November 2013 moved to Freehand doodle
 //	this.squiggleColour = new ED.Colour(0, 255, 0, 1);
@@ -271,14 +272,14 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 			} else {
 				ED.errorHandler('ED.Drawing', 'Class', 'Touches undefined: ');
 			}
+			this.lastTouchPoint = point;
 			drawing.mousedown(point);
 		}, false);
 
 		this.canvas.addEventListener('touchend', function(e) {
-			if (e.targetTouches[0] !== undefined) {
-				var canvas_pos = drawing.getPositionOfElement(drawing.canvas);
-				var point = new ED.Point(e.targetTouches[0].pageX - canvas_pos[0] - this.offsetLeft, e.targetTouches[0].pageY - canvas_pos[1]);
-				drawing.mouseup(point);
+            if (this.lastTouchPoint !== undefined) {
+				drawing.mouseup(this.lastTouchPoint);
+				this.lastTouchPoint = undefined;
 			}
 		}, false);
 
@@ -286,6 +287,7 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 			if (e.targetTouches[0] !== undefined) {
 				var canvas_pos = drawing.getPositionOfElement(drawing.canvas);
 				var point = new ED.Point(e.targetTouches[0].pageX - canvas_pos[0] - this.offsetLeft, e.targetTouches[0].pageY - canvas_pos[1]);
+                this.lastTouchPoint = point;
 				drawing.mousemove(point);
 			}
 		}, false);

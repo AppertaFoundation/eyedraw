@@ -175,7 +175,8 @@ ED.Controller = (function() {
 			'doodleAdded',
 			'doodleDeleted',
 			'doodleSelected',
-			'mousedragged',
+			//'mousedragged', // should be covered by the mouseup notification
+			'mouseup',
 			'drawingZoom',
 			'parameterChanged'
 		]);
@@ -242,7 +243,7 @@ ED.Controller = (function() {
 	 * Save drawing data to the associated input field.
 	 */
 	Controller.prototype.saveDrawingToInputField = function(force) {
-        if (!this.drawing.mouseDown) {
+		if (!this.drawing.mouseDown) {
 			if ((force && this.hasInputField()) || this.hasInputFieldData()) {
 				this.input.value = this.drawing.save();
 			}
