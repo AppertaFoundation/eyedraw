@@ -43,7 +43,7 @@ var ED = ED || {};
  * @property {AffineTransform} transform Transform converts doodle plane -> canvas plane
  * @property {AffineTransform} inverseTransform Inverse transform converts canvas plane -> doodle plane
  * @property {Doodle} selectedDoodle The currently selected doodle, null if no selection
- * @property {Bool} mouseDown Flag indicating whether mouse is down in canvas
+ * @property {Bool} mouseIsDown Flag indicating whether mouse is down in canvas
  * @property {Mode} mode The current mouse dragging mode
  * @property {Point} lastMousePosition Last position of mouse in canvas coordinates
  * @property {Image} image Optional background image
@@ -110,7 +110,7 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 	this.transform = new ED.AffineTransform();
 	this.inverseTransform = new ED.AffineTransform();
 	this.selectedDoodle = null;
-	this.mouseDown = false;
+	this.mouseIsDown = false;
 	this.doubleClick = false;
 	this.mode = ED.Mode.None;
 	this.lastMousePosition = new ED.Point(0, 0);
@@ -616,7 +616,7 @@ ED.Drawing.prototype.drawAllDoodles = function() {
  */
 ED.Drawing.prototype.mousedown = function(_point) {
 	// Set flag to indicate dragging can now take place
-	this.mouseDown = true;
+	this.mouseIsDown = true;
 	
 	var doodle = this.selectedDoodle;
 
@@ -631,7 +631,6 @@ ED.Drawing.prototype.mousedown = function(_point) {
 	var found = false;
 	this.lastSelectedDoodle = this.selectedDoodle;
 	this.selectedDoodle = null;
-
 	// Cycle through doodles from front to back doing hit test
 	for (var i = this.doodleArray.length - 1; i > -1; i--) {
 		if (!found) {
@@ -773,7 +772,7 @@ ED.Drawing.prototype.mousemove = function(_point) {
 	// Start the hover timer (also resets it)
 	this.startHoverTimer(_point);
 	// Only drag if mouse already down and a doodle selected
-	if (this.mouseDown && doodle != null) {
+	if (this.mouseIsDown && doodle != null) {
 
 		// Dragging not started
 		if (!doodle.isBeingDragged) {
@@ -1128,7 +1127,7 @@ ED.Drawing.prototype.mouseup = function(_point) {
 		 */
 
 	// Reset flags and mode
-	this.mouseDown = false;
+	this.mouseIsDown = false;
 	this.doubleClick = false;
 	this.mode = ED.Mode.None;
 	this.selectionRectangleIsBeingDragged = false;
@@ -1185,7 +1184,7 @@ ED.Drawing.prototype.mouseout = function(_point) {
 	this.stopHoverTimer();
 
 	// Reset flag and mode
-	this.mouseDown = false;
+	this.mouseIsDown = false;
 	this.mode = ED.Mode.None;
 
 	// Reset selected doodle's dragging flag
@@ -1212,7 +1211,6 @@ ED.Drawing.prototype.mouseout = function(_point) {
 ED.Drawing.prototype.keydown = function(e) {
 	// Keyboard action works on selected doodle
 	if (this.selectedDoodle != null) {
-		var repaint = true;
 		// Delete or move doodle
 		switch (e.keyCode) {
 			case 8: // Backspace
@@ -1231,14 +1229,10 @@ ED.Drawing.prototype.keydown = function(e) {
 				this.selectedDoodle.move(0, ED.arrowDelta);
 				break;
 			default:
-				repaint = false;
 				break;
 		}
 
-		if (repaint) {
-            // Refresh canvas
-            this.repaint();
-        }
+		this.repaint();
 
 		// Prevent key stroke bubbling up (***TODO*** may need cross browser handling)
 		e.stopPropagation();

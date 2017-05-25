@@ -303,7 +303,7 @@ var ED = ED || {};
  * @property {AffineTransform} transform Transform converts doodle plane -> canvas plane
  * @property {AffineTransform} inverseTransform Inverse transform converts canvas plane -> doodle plane
  * @property {Doodle} selectedDoodle The currently selected doodle, null if no selection
- * @property {Bool} mouseDown Flag indicating whether mouse is down in canvas
+ * @property {Bool} mouseIsDown Flag indicating whether mouse is down in canvas
  * @property {Mode} mode The current mouse dragging mode
  * @property {Point} lastMousePosition Last position of mouse in canvas coordinates
  * @property {Image} image Optional background image
@@ -370,7 +370,7 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 	this.transform = new ED.AffineTransform();
 	this.inverseTransform = new ED.AffineTransform();
 	this.selectedDoodle = null;
-	this.mouseDown = false;
+	this.mouseIsDown = false;
 	this.doubleClick = false;
 	this.mode = ED.Mode.None;
 	this.lastMousePosition = new ED.Point(0, 0);
@@ -876,7 +876,7 @@ ED.Drawing.prototype.drawAllDoodles = function() {
  */
 ED.Drawing.prototype.mousedown = function(_point) {
 	// Set flag to indicate dragging can now take place
-	this.mouseDown = true;
+	this.mouseIsDown = true;
 	
 	var doodle = this.selectedDoodle;
 
@@ -891,7 +891,6 @@ ED.Drawing.prototype.mousedown = function(_point) {
 	var found = false;
 	this.lastSelectedDoodle = this.selectedDoodle;
 	this.selectedDoodle = null;
-
 	// Cycle through doodles from front to back doing hit test
 	for (var i = this.doodleArray.length - 1; i > -1; i--) {
 		if (!found) {
@@ -1033,7 +1032,7 @@ ED.Drawing.prototype.mousemove = function(_point) {
 	// Start the hover timer (also resets it)
 	this.startHoverTimer(_point);
 	// Only drag if mouse already down and a doodle selected
-	if (this.mouseDown && doodle != null) {
+	if (this.mouseIsDown && doodle != null) {
 
 		// Dragging not started
 		if (!doodle.isBeingDragged) {
@@ -1388,7 +1387,7 @@ ED.Drawing.prototype.mouseup = function(_point) {
 		 */
 
 	// Reset flags and mode
-	this.mouseDown = false;
+	this.mouseIsDown = false;
 	this.doubleClick = false;
 	this.mode = ED.Mode.None;
 	this.selectionRectangleIsBeingDragged = false;
@@ -1445,7 +1444,7 @@ ED.Drawing.prototype.mouseout = function(_point) {
 	this.stopHoverTimer();
 
 	// Reset flag and mode
-	this.mouseDown = false;
+	this.mouseIsDown = false;
 	this.mode = ED.Mode.None;
 
 	// Reset selected doodle's dragging flag
@@ -1472,7 +1471,6 @@ ED.Drawing.prototype.mouseout = function(_point) {
 ED.Drawing.prototype.keydown = function(e) {
 	// Keyboard action works on selected doodle
 	if (this.selectedDoodle != null) {
-		var repaint = true;
 		// Delete or move doodle
 		switch (e.keyCode) {
 			case 8: // Backspace
@@ -1491,14 +1489,10 @@ ED.Drawing.prototype.keydown = function(e) {
 				this.selectedDoodle.move(0, ED.arrowDelta);
 				break;
 			default:
-				repaint = false;
 				break;
 		}
 
-		if (repaint) {
-            // Refresh canvas
-            this.repaint();
-        }
+		this.repaint();
 
 		// Prevent key stroke bubbling up (***TODO*** may need cross browser handling)
 		e.stopPropagation();
@@ -3795,28 +3789,35 @@ ED.Doodle.prototype.drawHandles = function(_point) {
 	ctx.restore();
 };
 
+ED.Doodle.prototype.hitTest = function(ctx, _point)
+{
+	var result;
+    // Workaround for Mozilla bug 405300 https://bugzilla.mozilla.org/show_bug.cgi?id=405300
+    if (ED.isFirefox()) {
+        ctx.save();
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        result = ctx.isPointInPath(_point.x, _point.y);
+        ctx.restore();
+    } else {
+        result = ctx.isPointInPath(_point.x, _point.y);
+    }
+    return result;
+};
+
 /**
  * Draws the boundary path or performs a hit test if a Point parameter is passed
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.Doodle.prototype.drawBoundary = function(_point) {
+ED.Doodle.prototype.drawBoundary = function(_point, mode) {
+	if (mode === undefined) {
+		mode = this.drawFunctionMode;
+	}
 	// Get context
 	var ctx = this.drawing.context;
-
 	// HitTest
-	if (this.drawFunctionMode == ED.drawFunctionMode.HitTest) {
-		// Workaround for Mozilla bug 405300 https://bugzilla.mozilla.org/show_bug.cgi?id=405300
-		if (ED.isFirefox()) {
-			ctx.save();
-			ctx.setTransform(1, 0, 0, 1, 0, 0);
-			var hitTest = ctx.isPointInPath(_point.x, _point.y);
-			ctx.restore();
-		} else {
-			var hitTest = ctx.isPointInPath(_point.x, _point.y);
-		}
-
-		if (hitTest) {
+	if (mode == ED.drawFunctionMode.HitTest) {
+		if (this.hitTest(ctx, _point)) {
 			// Set dragging mode
 			if (this.isDrawable && this.isForDrawing) {
 				this.drawing.mode = ED.Mode.Draw;
@@ -4959,7 +4960,7 @@ ED.Doodle.prototype.clockHour = function(_offset) {
 	} else {
 		var twelvePoint = new ED.Point(0, -100);
 		var thisPoint = new ED.Point(this.originX, this.originY);
-		var clockHour = ((twelvePoint.clockwiseAngleTo(thisPoint) * 6 / Math.PI) + 12 + offset) % 12;
+		clockHour = ((twelvePoint.clockwiseAngleTo(thisPoint) * 6 / Math.PI) + 12 + offset) % 12;
 	}
 
 	clockHour = clockHour.toFixed(0);
@@ -44722,6 +44723,13 @@ ED.RRD.prototype.setHandles = function() {
  */
 ED.RRD.prototype.setPropertyDefaults = function() {
 	this.isMoveable = false;
+	this._isMacOff = false;
+    if (this.drawing.eye == ED.eye.Right) {
+        this._macPoint = new ED.Point(-100, 0);
+    } else {
+        this._macPoint = new ED.Point(100, 0);
+    }
+
 
 	// Update component of validation array for simple parameters
 // 	this.parameterValidationArray['scaleX']['range'].setMinAndMax(+1, +4);
@@ -44808,6 +44816,12 @@ ED.RRD.prototype.draw = function(_point) {
 
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
+	// create the Mac point
+	// not sure if we need to do this conversion every time, but if the canvas properties change it may be necessary
+	// so for safeties sake
+    var maculaCanvasPt = this.drawing.transform.transformPoint(this._macPoint);
+    // Determine whether macula is off or not
+	this._isMacOff = this.hitTest(ctx, maculaCanvasPt);
 
 	// Coordinates of handles (in canvas plane)
 	this.handleArray[1].location = this.transform.transformPoint(new ED.Point(topLeftX, topLeftY));
@@ -44861,23 +44875,11 @@ ED.RRD.prototype.diagnosticHierarchy = function() {
 /**
  * Determines whether the macula is off or not
  *
- * @returns {Bool} True if macula is off
+ * @returns {boolean} True if macula is off
  */
 ED.RRD.prototype.isMacOff = function() {
-	// Get coordinates of macula in doodle plane
-	if (this.drawing.eye == ED.eye.Right) {
-		var macula = new ED.Point(-100, 0);
-	} else {
-		var macula = new ED.Point(100, 0);
-	}
-
-	// Convert to canvas plane
-	var maculaCanvas = this.drawing.transform.transformPoint(macula);
-
-	// Determine whether macula is off or not
-	if (this.draw(maculaCanvas)) return true;
-	else return false;
-}
+	return this._isMacOff;
+};
 
 /**
  * OpenEyes
@@ -52623,6 +52625,7 @@ ED.UTear.prototype.setPropertyDefaults = function() {
  */
 ED.UTear.prototype.setParameterDefaults = function() {
 	this.apexY = -20;
+	this.cachedClockHour = undefined;
 
 	var doodle = this.drawing.lastDoodleOfClass(this.className);
 	if (doodle) {
@@ -52648,8 +52651,7 @@ ED.UTear.prototype.draw = function(_point) {
 
 	// Call draw method in superclass
 	ED.UTear.superclass.draw.call(this, _point);
-
-	// Boundary path
+    // Boundary path
 	ctx.beginPath();
 
 	// U tear
@@ -52669,7 +52671,6 @@ ED.UTear.prototype.draw = function(_point) {
 
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
-
 	// Coordinates of handles (in canvas plane)
 	this.handleArray[3].location = this.transform.transformPoint(new ED.Point(40, -40));
 	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
@@ -52681,7 +52682,7 @@ ED.UTear.prototype.draw = function(_point) {
 	this.leftExtremity = this.transform.transformPoint(new ED.Point(-40, -40));
 	this.rightExtremity = this.transform.transformPoint(new ED.Point(40, -40));
 	this.arc = this.calculateArc();
-
+	this.cachedClockHour = this.clockHour();
 	// Return value indicating successful hittest
 	return this.isClicked;
 }
@@ -52701,7 +52702,7 @@ ED.UTear.prototype.groupDescription = function() {
  * @returns {String} Description of doodle
  */
 ED.UTear.prototype.description = function() {
-	return this.clockHour();
+	return this.cachedClockHour;
 }
 
 /**

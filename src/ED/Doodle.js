@@ -599,28 +599,35 @@ ED.Doodle.prototype.drawHandles = function(_point) {
 	ctx.restore();
 };
 
+ED.Doodle.prototype.hitTest = function(ctx, _point)
+{
+	var result;
+    // Workaround for Mozilla bug 405300 https://bugzilla.mozilla.org/show_bug.cgi?id=405300
+    if (ED.isFirefox()) {
+        ctx.save();
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        result = ctx.isPointInPath(_point.x, _point.y);
+        ctx.restore();
+    } else {
+        result = ctx.isPointInPath(_point.x, _point.y);
+    }
+    return result;
+};
+
 /**
  * Draws the boundary path or performs a hit test if a Point parameter is passed
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.Doodle.prototype.drawBoundary = function(_point) {
+ED.Doodle.prototype.drawBoundary = function(_point, mode) {
+	if (mode === undefined) {
+		mode = this.drawFunctionMode;
+	}
 	// Get context
 	var ctx = this.drawing.context;
-
 	// HitTest
-	if (this.drawFunctionMode == ED.drawFunctionMode.HitTest) {
-		// Workaround for Mozilla bug 405300 https://bugzilla.mozilla.org/show_bug.cgi?id=405300
-		if (ED.isFirefox()) {
-			ctx.save();
-			ctx.setTransform(1, 0, 0, 1, 0, 0);
-			var hitTest = ctx.isPointInPath(_point.x, _point.y);
-			ctx.restore();
-		} else {
-			var hitTest = ctx.isPointInPath(_point.x, _point.y);
-		}
-
-		if (hitTest) {
+	if (mode == ED.drawFunctionMode.HitTest) {
+		if (this.hitTest(ctx, _point)) {
 			// Set dragging mode
 			if (this.isDrawable && this.isForDrawing) {
 				this.drawing.mode = ED.Mode.Draw;
@@ -1763,7 +1770,7 @@ ED.Doodle.prototype.clockHour = function(_offset) {
 	} else {
 		var twelvePoint = new ED.Point(0, -100);
 		var thisPoint = new ED.Point(this.originX, this.originY);
-		var clockHour = ((twelvePoint.clockwiseAngleTo(thisPoint) * 6 / Math.PI) + 12 + offset) % 12;
+		clockHour = ((twelvePoint.clockwiseAngleTo(thisPoint) * 6 / Math.PI) + 12 + offset) % 12;
 	}
 
 	clockHour = clockHour.toFixed(0);

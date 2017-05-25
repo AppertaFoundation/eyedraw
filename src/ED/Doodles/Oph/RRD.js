@@ -56,6 +56,13 @@ ED.RRD.prototype.setHandles = function() {
  */
 ED.RRD.prototype.setPropertyDefaults = function() {
 	this.isMoveable = false;
+	this._isMacOff = false;
+    if (this.drawing.eye == ED.eye.Right) {
+        this._macPoint = new ED.Point(-100, 0);
+    } else {
+        this._macPoint = new ED.Point(100, 0);
+    }
+
 
 	// Update component of validation array for simple parameters
 // 	this.parameterValidationArray['scaleX']['range'].setMinAndMax(+1, +4);
@@ -142,6 +149,12 @@ ED.RRD.prototype.draw = function(_point) {
 
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
+	// create the Mac point
+	// not sure if we need to do this conversion every time, but if the canvas properties change it may be necessary
+	// so for safeties sake
+    var maculaCanvasPt = this.drawing.transform.transformPoint(this._macPoint);
+    // Determine whether macula is off or not
+	this._isMacOff = this.hitTest(ctx, maculaCanvasPt);
 
 	// Coordinates of handles (in canvas plane)
 	this.handleArray[1].location = this.transform.transformPoint(new ED.Point(topLeftX, topLeftY));
@@ -195,20 +208,8 @@ ED.RRD.prototype.diagnosticHierarchy = function() {
 /**
  * Determines whether the macula is off or not
  *
- * @returns {Bool} True if macula is off
+ * @returns {boolean} True if macula is off
  */
 ED.RRD.prototype.isMacOff = function() {
-	// Get coordinates of macula in doodle plane
-	if (this.drawing.eye == ED.eye.Right) {
-		var macula = new ED.Point(-100, 0);
-	} else {
-		var macula = new ED.Point(100, 0);
-	}
-
-	// Convert to canvas plane
-	var maculaCanvas = this.drawing.transform.transformPoint(macula);
-
-	// Determine whether macula is off or not
-	if (this.draw(maculaCanvas)) return true;
-	else return false;
-}
+	return this._isMacOff;
+};

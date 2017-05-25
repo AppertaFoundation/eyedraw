@@ -174,8 +174,8 @@ ED.Controller = (function() {
 		this.drawing.registerForNotifications(this, 'saveDrawingToInputField', [
 			'doodleAdded',
 			'doodleDeleted',
-			'doodleSelected',
-			//'mousedragged', // should be covered by the mouseup notification
+			//'doodleSelected',
+			//'mousedragged',
 			'mouseup',
 			'drawingZoom',
 			'parameterChanged'
@@ -243,15 +243,16 @@ ED.Controller = (function() {
 	 * Save drawing data to the associated input field.
 	 */
 	Controller.prototype.saveDrawingToInputField = function(force) {
-		if (!this.drawing.mouseDown) {
-			if ((force && this.hasInputField()) || this.hasInputFieldData()) {
-				this.input.value = this.drawing.save();
-			}
+        if ((force && this.hasInputField()) || this.hasInputFieldData()) {
+            this.input.value = this.drawing.save();
+        }
+		clearTimeout(this.saveTimer);
+		this.saveTimer = setTimeout(function() {
 			if (this.properties.autoReport) {
-                var outputElement = document.getElementById(this.properties.autoReport);
-                this.autoReport(outputElement);
+				var outputElement = document.getElementById(this.properties.autoReport);
+				this.autoReport(outputElement);
 			}
-		}
+		}.bind(this), 200);
 	};
 
 	/**
