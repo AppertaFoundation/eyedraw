@@ -767,6 +767,16 @@ ED.Doodle.prototype.diagnosticHierarchy = function() {
 };
 
 /**
+ * Should be overridden for doodles that can provide multiple SNOMEDs - each should be paired with with a
+ * diagnostic hierarchy value for appropriate ordering.
+ *
+ * @returns {Array}
+ */
+ED.Doodle.prototype.snomedCodes = function() {
+	return new Array([this.snomedCode(), this.diagnosticHierarchy()]);
+};
+
+/**
  * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
  * The returned parameters are animated if their 'animate' property is set to true
  *

@@ -2685,17 +2685,21 @@ ED.Drawing.prototype.diagnosis = function() {
 	// Loop through doodles with diagnoses, taking one highest in hierarchy, or those that are equal
 	for (var i = 0; i < this.doodleArray.length; i++) {
 		var doodle = this.doodleArray[i];
-		var code = doodle.snomedCode();
-		if (code > 0) {
-			var codePosition = doodle.diagnosticHierarchy();
-			if (codePosition > topOfHierarchy) {
-				topOfHierarchy = codePosition;
-				returnCodes.push(code);
-			} else if (codePosition == topOfHierarchy) {
-				if (returnCodes.indexOf(code) < 0) {
-					returnCodes.push(code);
-				}
-			}
+		var codeArray = doodle.snomedCodes();
+		for (var j = 0; j < codeArray.length; j++) {
+			var code = codeArray[j][0];
+            if (code > 0) {
+                var codePosition = codeArray[j][1];
+                if (codePosition > topOfHierarchy) {
+                    topOfHierarchy = codePosition;
+                    returnCodes.push(code);
+                } else if (codePosition == topOfHierarchy) {
+                    if (returnCodes.indexOf(code) < 0) {
+                        returnCodes.push(code);
+                    }
+                }
+            }
+
 		}
 	}
 

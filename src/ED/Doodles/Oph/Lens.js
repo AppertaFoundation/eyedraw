@@ -347,4 +347,20 @@ ED.Lens.prototype.description = function() {
 		returnValue += 'Phakodonesis';
 	}
 	return returnValue;
-}
+};
+
+ED.Lens.prototype.snomedCodes = function()
+{
+	snomedCodes = new Array();
+    if (this.nuclearGrade != 'None') {
+        snomedCodes.push([53889007, 3]);
+    }
+    if (this.corticalGrade != 'None') {
+        snomedCodes.push([193576003, 3]);
+    }
+    if (this.posteriorSubcapsularGrade != 'None') {
+        snomedCodes.push([315353005, 3]);
+    }
+
+    return snomedCodes;
+};

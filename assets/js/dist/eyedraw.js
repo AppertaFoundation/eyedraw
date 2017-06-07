@@ -2945,17 +2945,21 @@ ED.Drawing.prototype.diagnosis = function() {
 	// Loop through doodles with diagnoses, taking one highest in hierarchy, or those that are equal
 	for (var i = 0; i < this.doodleArray.length; i++) {
 		var doodle = this.doodleArray[i];
-		var code = doodle.snomedCode();
-		if (code > 0) {
-			var codePosition = doodle.diagnosticHierarchy();
-			if (codePosition > topOfHierarchy) {
-				topOfHierarchy = codePosition;
-				returnCodes.push(code);
-			} else if (codePosition == topOfHierarchy) {
-				if (returnCodes.indexOf(code) < 0) {
-					returnCodes.push(code);
-				}
-			}
+		var codeArray = doodle.snomedCodes();
+		for (var j = 0; j < codeArray.length; j++) {
+			var code = codeArray[j][0];
+            if (code > 0) {
+                var codePosition = codeArray[j][1];
+                if (codePosition > topOfHierarchy) {
+                    topOfHierarchy = codePosition;
+                    returnCodes.push(code);
+                } else if (codePosition == topOfHierarchy) {
+                    if (returnCodes.indexOf(code) < 0) {
+                        returnCodes.push(code);
+                    }
+                }
+            }
+
 		}
 	}
 
@@ -3955,6 +3959,16 @@ ED.Doodle.prototype.snomedCode = function() {
 ED.Doodle.prototype.diagnosticHierarchy = function() {
 	return 0;
 };
+
+/**
+ * Should be overridden for doodles that can provide multiple SNOMEDs - each should be paired with with a
+ * diagnostic hierarchy value for appropriate ordering.
+ *
+ * @returns {Array}
+ */
+ED.Doodle.prototype.snomedCodes = function() {
+	return new Array([this.snomedCode(), this.diagnosticHierarchy()]);
+}
 
 /**
  * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
@@ -33976,7 +33990,23 @@ ED.Lens.prototype.description = function() {
 		returnValue += 'Phakodonesis';
 	}
 	return returnValue;
-}
+};
+
+ED.Lens.prototype.snomedCodes = function()
+{
+	snomedCodes = new Array();
+    if (this.nuclearGrade != 'None') {
+        snomedCodes.push([53889007, 3]);
+    }
+    if (this.corticalGrade != 'None') {
+        snomedCodes.push([193576003, 3]);
+    }
+    if (this.posteriorSubcapsularGrade != 'None') {
+        snomedCodes.push([315353005, 3]);
+    }
+
+    return snomedCodes;
+};
 
 /**
  * OpenEyes
