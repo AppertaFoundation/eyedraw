@@ -33987,7 +33987,7 @@ ED.Lens.prototype.description = function() {
 	}
 	if (this.phakodonesis) {
 		returnValue += returnValue.length > 0?", ":"";
-		returnValue += 'Phakodonesis';
+		returnValue += 'Phacodonesis';
 	}
 	return returnValue;
 };
@@ -34012,6 +34012,9 @@ ED.Lens.prototype.snomedCodes = function()
     }
     if (this.posteriorPolar) {
         snomedCodes.push([253225009, 3]);
+    }
+    if (this.phakodonesis) {
+    	snomedCodes.push([116669003, 3]);
     }
 
     return snomedCodes;
