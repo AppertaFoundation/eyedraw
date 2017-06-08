@@ -359,7 +359,16 @@ ED.Lens.prototype.snomedCodes = function()
         snomedCodes.push([193576003, 3]);
     }
     if (this.posteriorSubcapsularGrade != 'None') {
-        snomedCodes.push([315353005, 3]);
+        snomedCodes.push([34533008, 3]);
+    }
+    if (this.coronary) {
+    	snomedCodes.push([12195004, 3]);
+    }
+    if (this.anteriorPolar) {
+    	snomedCodes.push([253224008, 3]);
+    }
+    if (this.posteriorPolar) {
+        snomedCodes.push([253225009, 3]);
     }
 
     return snomedCodes;
