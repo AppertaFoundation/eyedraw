@@ -35061,8 +35061,9 @@ ED.LensCrossSection = function(_drawing, _parameterJSON) {
 	this.phakodonesis = false;
 	this.anteriorPolar = false;
 	this.posteriorPolar = false;
+	this.acd = 3.0;
 
-	this.savedParameterArray = ['originX', 'originY', 'nuclearGrade', 'corticalGrade', 'posteriorSubcapsularGrade','phakodonesis','anteriorPolar', 'posteriorPolar' ];
+	this.savedParameterArray = ['originX', 'originY', 'nuclearGrade', 'corticalGrade', 'posteriorSubcapsularGrade','phakodonesis','anteriorPolar', 'posteriorPolar','acd'];
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -35119,6 +35120,14 @@ ED.LensCrossSection.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'bool',
 		display: false
+	};
+	
+	this.parameterValidationArray['acd'] = {
+		kind: 'derived',
+		type: 'float',
+		range: new ED.Range(0, 5),
+		precision: 1,
+		animate: false
 	};
 	
 	// Update component of validation array for simple parameters
@@ -35462,6 +35471,50 @@ ED.LensCrossSection.prototype.draw = function(_point) {
 
 	// Return value indicating successful hittest
 	return this.isClicked;
+}
+
+ED.LensCrossSection.prototype.calculateACD = function() {
+	var cornea = this.drawing.lastDoodleOfClass('CorneaCrossSection');
+	if (cornea) {
+		var anteriorX;
+		switch (cornea.shape) {
+			case 'Normal':
+				// max originX : -150 == 3mm in this doodle plane
+				// max originX : -220 in cornea doodle plane
+				/// difference: +70
+				anteriorX = -150;
+				break;
+				
+			case 'Keratoconus':
+				var thickness = cornea.pachymetry/5;
+				anteriorX = cornea.apexX + thickness + 70;
+				break;
+				
+			case 'Keratoglobus':
+				// -280 in cornea doodle plane
+				anteriorX = -210;
+				break;
+		}
+		
+		var depth = this.originX - 44 - anteriorX;
+		
+		// scale 150 : 3mm
+		this.acd = (depth * 3 / 150).toFixed(1);
+		if (this.acd<0) this.acd = 0;
+	}
+
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.LensCrossSection.prototype.description = function() {
+	var returnString = "";
+	returnString += "AC depth: " + this.acd + "mm";
+
+	return returnString;
 }
 
 /**
