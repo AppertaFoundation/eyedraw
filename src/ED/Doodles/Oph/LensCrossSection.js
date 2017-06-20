@@ -30,8 +30,12 @@ ED.LensCrossSection = function(_drawing, _parameterJSON) {
 	this.nuclearGrade = 'None';
 	this.corticalGrade = 'None';
 	this.posteriorSubcapsularGrade = 'None';
+	this.phakodonesis = false;
+	this.anteriorPolar = false;
+	this.posteriorPolar = false;
+	this.acd = 3.0;
 
-	this.savedParameterArray = ['originX', 'originY', 'nuclearGrade', 'corticalGrade', 'posteriorSubcapsularGrade' ];
+	this.savedParameterArray = ['originX', 'originY', 'nuclearGrade', 'corticalGrade', 'posteriorSubcapsularGrade','phakodonesis','anteriorPolar', 'posteriorPolar','acd'];
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -72,6 +76,32 @@ ED.LensCrossSection.prototype.setPropertyDefaults = function() {
 		animate: false
 	};
 
+    this.parameterValidationArray['phakodonesis'] = {
+		kind: 'other',
+		type: 'bool',
+		display: false
+	};
+	
+	this.parameterValidationArray['anteriorPolar'] = {
+		kind: 'derived',
+		type: 'bool',
+		display: false
+	};
+	
+	this.parameterValidationArray['posteriorPolar'] = {
+		kind: 'derived',
+		type: 'bool',
+		display: false
+	};
+	
+	this.parameterValidationArray['acd'] = {
+		kind: 'derived',
+		type: 'float',
+		range: new ED.Range(0, 5),
+		precision: 1,
+		animate: false
+	};
+	
 	// Update component of validation array for simple parameters
 	this.parameterValidationArray['originX']['range'].setMinAndMax(-150, +200);
 	this.parameterValidationArray['originY']['range'].setMinAndMax(-140, +140);
@@ -98,21 +128,30 @@ ED.LensCrossSection.prototype.dependentParameterValues = function(_parameter, _v
 
 	switch (_parameter) {
 		case 'originX':
+			// constrain iris X coordinate
 			var iris = this.drawing.lastDoodleOfClass('AntSegCrossSection');
 			if (iris) {
 				var minApexX = iris.parameterValidationArray['apexX']['range'].min;
+				
+				var currentMaxApexX = iris.parameterValidationArray['apexX']['range'].max;
+				
 				var maxApexX = 32 - (72 / 220) * (iris.apexY + 280) + this.originX - 44;
 				if (maxApexX < minApexX) maxApexX = minApexX;
 				iris.parameterValidationArray['apexX']['range'].setMinAndMax(-40 - (140 / 220) * (iris.apexY + 280), maxApexX);
-	
+				
 				// If being synced, make sensible decision about x
 				if (!this.drawing.isActive) {
 					var newOriginX = iris.parameterValidationArray['apexX']['range'].max;
 				} else {
-					var newOriginX = iris.parameterValidationArray['apexX']['range'].constrain(iris.apexX);
+					var nwX = maxApexX - (currentMaxApexX - iris.apexX);
+					var newOriginX = iris.parameterValidationArray['apexX']['range'].constrain(nwX);
 				}
 				iris.setSimpleParameter('apexX', newOriginX);
 			}
+			
+			// calculate anterior chamber depth
+			this.calculateACD();
+
 			break;
 		}
 
@@ -327,6 +366,85 @@ ED.LensCrossSection.prototype.draw = function(_point) {
 		ctx.lineWidth = 2;
 		ctx.strokeStyle = "gray";
 		ctx.stroke();
+		
+		// Pacodonesis
+		if (this.phakodonesis) {
+			// Sine wave between arrow heads:
+			//Set amplitude and width of the wave as well as sample rate
+			var amplitude = 20;
+			var width = 100;
+			var srate = 1;
+	
+			//Draw sine wave
+			ctx.beginPath();
+			ctx.moveTo(100,-125);
+			for (y=0; y<=250; y+= srate){
+				ctx.lineTo(100+amplitude*Math.sin(2*Math.PI*y/width), -125+y);
+			}
+	
+			// Set line attributes
+			ctx.lineWidth = 4;
+			ctx.strokeStyle = "blue";
+			ctx.stroke();
+	
+			// Top arrow:
+			ctx.beginPath();
+			ctx.moveTo(80,-125);
+			ctx.lineTo(100,-225);
+			ctx.lineTo(120,-125);
+	
+			// Set line attributes
+			ctx.lineWidth = 4;
+			ctx.fillStyle = "blue";
+			ctx.fill();
+	
+			// Bottom arrow:
+			ctx.beginPath();
+			ctx.moveTo(80,125);
+			ctx.lineTo(100,225);
+			ctx.lineTo(120,125);
+	
+			// Set line attributes
+			ctx.lineWidth = 4;
+			ctx.fillStyle = "blue";
+			ctx.fill();
+		}
+		
+		// anterior polar cataract
+		if (this.anteriorPolar) {			
+			var c = new ED.Point(ld + x, 0);
+			var angle = Math.PI+10/180*Math.PI;
+			var o = Math.sin(angle) * r;
+			var a = Math.cos(angle) * r;
+			var start = new ED.Point(c.x+a,c.y+o);
+
+			ctx.beginPath();
+			ctx.arc(c.x, c.y, r, Math.PI+10/180*Math.PI, Math.PI-10/180*Math.PI, true);
+			ctx.bezierCurveTo(start.x-40,10,start.x-40,-10,start.x,start.y);
+			
+			ctx.strokeStyle = "gray";
+			ctx.fillStyle = "rgba(120,120,120,0.5)";
+			ctx.fill();
+			ctx.stroke();
+		}
+		
+		// posterior polar cataract
+		if (this.posteriorPolar) {
+			var c = new ED.Point(ld - x, 0);
+			var angle = 10/180*Math.PI;
+			var o = Math.sin(angle) * r;
+			var a = Math.cos(angle) * r;
+			var start = new ED.Point(c.x+a,c.y+o);
+			
+			ctx.beginPath();
+			ctx.arc(c.x, c.y, r, 10/180*Math.PI, -10/180*Math.PI, true);
+			ctx.bezierCurveTo(start.x+40,-10,start.x+40,10,start.x,start.y);
+
+			ctx.strokeStyle = "gray";
+			ctx.fillStyle = "rgba(120,120,120,0.5)";
+			ctx.fill();
+			ctx.stroke();
+		}
 	}
 
 	// Draw handles if selected
@@ -334,4 +452,48 @@ ED.LensCrossSection.prototype.draw = function(_point) {
 
 	// Return value indicating successful hittest
 	return this.isClicked;
+}
+
+ED.LensCrossSection.prototype.calculateACD = function() {
+	var cornea = this.drawing.lastDoodleOfClass('CorneaCrossSection');
+	if (cornea) {
+		var anteriorX;
+		switch (cornea.shape) {
+			case 'Normal':
+				// max originX : -150 == 3mm in this doodle plane
+				// max originX : -220 in cornea doodle plane
+				/// difference: +70
+				anteriorX = -150;
+				break;
+				
+			case 'Keratoconus':
+				var thickness = cornea.pachymetry/5;
+				anteriorX = cornea.apexX + thickness + 70;
+				break;
+				
+			case 'Keratoglobus':
+				// -280 in cornea doodle plane
+				anteriorX = -210;
+				break;
+		}
+		
+		var depth = this.originX - 44 - anteriorX;
+		
+		// scale 150 : 3mm
+		this.acd = (depth * 3 / 150).toFixed(1);
+		if (this.acd<0) this.acd = 0;
+	}
+
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.LensCrossSection.prototype.description = function() {
+	var returnString = "";
+	returnString += "AC depth: " + this.acd + "mm";
+
+	return returnString;
 }
