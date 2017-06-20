@@ -31,8 +31,10 @@ ED.LensCrossSection = function(_drawing, _parameterJSON) {
 	this.corticalGrade = 'None';
 	this.posteriorSubcapsularGrade = 'None';
 	this.phakodonesis = false;
+	this.anteriorPolar = false;
+	this.posteriorPolar = false;
 
-	this.savedParameterArray = ['originX', 'originY', 'nuclearGrade', 'corticalGrade', 'posteriorSubcapsularGrade','phakodonesis' ];
+	this.savedParameterArray = ['originX', 'originY', 'nuclearGrade', 'corticalGrade', 'posteriorSubcapsularGrade','phakodonesis','anteriorPolar', 'posteriorPolar' ];
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -75,6 +77,18 @@ ED.LensCrossSection.prototype.setPropertyDefaults = function() {
 
     this.parameterValidationArray['phakodonesis'] = {
 		kind: 'other',
+		type: 'bool',
+		display: false
+	};
+	
+	this.parameterValidationArray['anteriorPolar'] = {
+		kind: 'derived',
+		type: 'bool',
+		display: false
+	};
+	
+	this.parameterValidationArray['posteriorPolar'] = {
+		kind: 'derived',
 		type: 'bool',
 		display: false
 	};
@@ -376,6 +390,42 @@ ED.LensCrossSection.prototype.draw = function(_point) {
 			ctx.lineWidth = 4;
 			ctx.fillStyle = "blue";
 			ctx.fill();
+		}
+		
+		// anterior polar cataract
+		if (this.anteriorPolar) {			
+			var c = new ED.Point(ld + x, 0);
+			var angle = Math.PI+10/180*Math.PI;
+			var o = Math.sin(angle) * r;
+			var a = Math.cos(angle) * r;
+			var start = new ED.Point(c.x+a,c.y+o);
+
+			ctx.beginPath();
+			ctx.arc(c.x, c.y, r, Math.PI+10/180*Math.PI, Math.PI-10/180*Math.PI, true);
+			ctx.bezierCurveTo(start.x-40,10,start.x-40,-10,start.x,start.y);
+			
+			ctx.strokeStyle = "gray";
+			ctx.fillStyle = "rgba(120,120,120,0.5)";
+			ctx.fill();
+			ctx.stroke();
+		}
+		
+		// posterior polar cataract
+		if (this.posteriorPolar) {
+			var c = new ED.Point(ld - x, 0);
+			var angle = 10/180*Math.PI;
+			var o = Math.sin(angle) * r;
+			var a = Math.cos(angle) * r;
+			var start = new ED.Point(c.x+a,c.y+o);
+			
+			ctx.beginPath();
+			ctx.arc(c.x, c.y, r, 10/180*Math.PI, -10/180*Math.PI, true);
+			ctx.bezierCurveTo(start.x+40,-10,start.x+40,10,start.x,start.y);
+
+			ctx.strokeStyle = "gray";
+			ctx.fillStyle = "rgba(120,120,120,0.5)";
+			ctx.fill();
+			ctx.stroke();
 		}
 	}
 
