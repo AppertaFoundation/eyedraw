@@ -35156,21 +35156,30 @@ ED.LensCrossSection.prototype.dependentParameterValues = function(_parameter, _v
 
 	switch (_parameter) {
 		case 'originX':
+			// constrain iris X coordinate
 			var iris = this.drawing.lastDoodleOfClass('AntSegCrossSection');
 			if (iris) {
 				var minApexX = iris.parameterValidationArray['apexX']['range'].min;
+				
+				var currentMaxApexX = iris.parameterValidationArray['apexX']['range'].max;
+				
 				var maxApexX = 32 - (72 / 220) * (iris.apexY + 280) + this.originX - 44;
 				if (maxApexX < minApexX) maxApexX = minApexX;
 				iris.parameterValidationArray['apexX']['range'].setMinAndMax(-40 - (140 / 220) * (iris.apexY + 280), maxApexX);
-	
+				
 				// If being synced, make sensible decision about x
 				if (!this.drawing.isActive) {
 					var newOriginX = iris.parameterValidationArray['apexX']['range'].max;
 				} else {
-					var newOriginX = iris.parameterValidationArray['apexX']['range'].constrain(iris.apexX);
+					var nwX = maxApexX - (currentMaxApexX - iris.apexX);
+					var newOriginX = iris.parameterValidationArray['apexX']['range'].constrain(nwX);
 				}
 				iris.setSimpleParameter('apexX', newOriginX);
 			}
+			
+			// calculate anterior chamber depth
+			this.calculateACD();
+
 			break;
 		}
 
