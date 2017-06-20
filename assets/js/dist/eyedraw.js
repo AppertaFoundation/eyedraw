@@ -34654,7 +34654,7 @@ ED.Lens = function(_drawing, _parameterJSON) {
 		'anteriorPolar':'Anterior polar',
 		'posteriorPolar':'Posterior polar',
 		'coronary':'Coronary',
-		'phakodonesis':'Phakodonesis',
+		'phakodonesis':'Phacodonesis',
 		};
 
 	// Call superclass constructor
@@ -34900,6 +34900,50 @@ ED.Lens.prototype.draw = function(_point) {
 			ctx.fill();
 			ctx.stroke();
 		}
+		
+		// Phacodonesis
+		if (this.phakodonesis) {
+			// Sine wave between arrow heads:
+			//Set amplitude and width of the wave as well as sample rate
+			var amplitude = 20;
+			var width = 100;
+			var srate = 1;
+
+			//Draw sine wave
+			ctx.beginPath();
+			ctx.moveTo(-150,0);
+			for (x=0; x<=300; x+= srate){
+				ctx.lineTo(-150+x, amplitude*Math.sin(2*Math.PI*x/width));
+			}
+
+			// Set line attributes
+			ctx.lineWidth = 4;
+			ctx.strokeStyle = "blue";
+			ctx.stroke();
+
+			// Left arrow:
+			ctx.beginPath();
+			ctx.moveTo(-150,-20);
+			ctx.lineTo(-225,0);
+			ctx.lineTo(-150,20);
+
+			// Set line attributes
+			ctx.lineWidth = 4;
+			ctx.fillStyle = "blue";
+			ctx.fill();
+
+			// Right arrow:
+			ctx.beginPath();
+			ctx.moveTo(150,-20);
+			ctx.lineTo(225,0);
+			ctx.lineTo(150,20);
+
+			// Set line attributes
+			ctx.lineWidth = 4;
+			ctx.fillStyle = "blue";
+			ctx.fill();
+		}
+
 	}
 
 	// Draw handles if selected
@@ -35014,8 +35058,9 @@ ED.LensCrossSection = function(_drawing, _parameterJSON) {
 	this.nuclearGrade = 'None';
 	this.corticalGrade = 'None';
 	this.posteriorSubcapsularGrade = 'None';
+	this.phakodonesis = false;
 
-	this.savedParameterArray = ['originX', 'originY', 'nuclearGrade', 'corticalGrade', 'posteriorSubcapsularGrade' ];
+	this.savedParameterArray = ['originX', 'originY', 'nuclearGrade', 'corticalGrade', 'posteriorSubcapsularGrade','phakodonesis' ];
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -35056,6 +35101,12 @@ ED.LensCrossSection.prototype.setPropertyDefaults = function() {
 		animate: false
 	};
 
+    this.parameterValidationArray['phakodonesis'] = {
+		kind: 'other',
+		type: 'bool',
+		display: false
+	};
+	
 	// Update component of validation array for simple parameters
 	this.parameterValidationArray['originX']['range'].setMinAndMax(-150, +200);
 	this.parameterValidationArray['originY']['range'].setMinAndMax(-140, +140);
@@ -35311,6 +35362,49 @@ ED.LensCrossSection.prototype.draw = function(_point) {
 		ctx.lineWidth = 2;
 		ctx.strokeStyle = "gray";
 		ctx.stroke();
+		
+		// Pacodonesis
+		if (this.phakodonesis) {
+			// Sine wave between arrow heads:
+			//Set amplitude and width of the wave as well as sample rate
+			var amplitude = 20;
+			var width = 100;
+			var srate = 1;
+	
+			//Draw sine wave
+			ctx.beginPath();
+			ctx.moveTo(100,-125);
+			for (y=0; y<=250; y+= srate){
+				ctx.lineTo(100+amplitude*Math.sin(2*Math.PI*y/width), -125+y);
+			}
+	
+			// Set line attributes
+			ctx.lineWidth = 4;
+			ctx.strokeStyle = "blue";
+			ctx.stroke();
+	
+			// Top arrow:
+			ctx.beginPath();
+			ctx.moveTo(80,-125);
+			ctx.lineTo(100,-225);
+			ctx.lineTo(120,-125);
+	
+			// Set line attributes
+			ctx.lineWidth = 4;
+			ctx.fillStyle = "blue";
+			ctx.fill();
+	
+			// Bottom arrow:
+			ctx.beginPath();
+			ctx.moveTo(80,125);
+			ctx.lineTo(100,225);
+			ctx.lineTo(120,125);
+	
+			// Set line attributes
+			ctx.lineWidth = 4;
+			ctx.fillStyle = "blue";
+			ctx.fill();
+		}
 	}
 
 	// Draw handles if selected
