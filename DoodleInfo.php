@@ -225,5 +225,9 @@ class DoodleInfo
         'Bruit' => 'Bruit',
         'Bruising' => 'Bruising',
         'Haematoma' => 'Haematoma',
+        'AdenoviralKeratitis' => 'Adenoviral keratitis',
+        'MarginalKeratitis' => 'Marginal keratitis',
+        'CornealLaceration' => 'Corneal laceration',
+        'MetallicForeignBody' => 'Metallic foreign body'
     );
 }
