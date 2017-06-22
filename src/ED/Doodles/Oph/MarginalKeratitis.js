@@ -53,7 +53,7 @@ ED.MarginalKeratitis.prototype.setHandles = function() {
 	this.handleArray[1] = new ED.Doodle.Handle(null, true, ED.Mode.Arc, false);
 	this.handleArray[2] = new ED.Doodle.Handle(null, true, ED.Mode.Arc, false);
 	this.handleArray[4] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);	
-	this.handleArray[5] = new ED.Doodle.Handle(null, true, ED.Mode.Handles, false);
+	this.handleArray[0] = new ED.Doodle.Handle(null, true, ED.Mode.Handles, false);
 }
 
 /**
@@ -65,7 +65,7 @@ ED.MarginalKeratitis.prototype.setPropertyDefaults = function() {
 	var range = new Object;
 	range.length = new ED.Range(380, +495);
 	range.angle = new ED.Range(0, 2*Math.PI);
-	this.handleVectorRangeArray[5] = range;
+	this.handleVectorRangeArray[0] = range;
 
 	
 	this.isMoveable = false;
@@ -99,9 +99,9 @@ ED.MarginalKeratitis.prototype.setParameterDefaults = function() {
 	// Add it to squiggle array
 	this.squiggleArray.push(squiggle);
 
-	// Populate with handles at  points around circumference
+	// defining outer handle
 	var point = new ED.Point(0, -420);
-	this.squiggleArray[0].pointsArray[5] = point;
+	this.squiggleArray[0].addPoint(point);
 }
 
 /**
@@ -142,7 +142,8 @@ ED.MarginalKeratitis.prototype.draw = function(_point) {
 
 
 	// Calculate parameters for arcs
-	var rOuter = Math.abs(this.squiggleArray[0].pointsArray[5].y);
+    // position of outer handle
+	var rOuter = Math.abs(this.squiggleArray[0].pointsArray[0].y);
 	var r = 380;
 	var rInner = Math.abs(this.apexY);
 	
@@ -233,7 +234,7 @@ ED.MarginalKeratitis.prototype.draw = function(_point) {
 	this.handleArray[1].location = this.transform.transformPoint(new ED.Point(midLeftX, midLeftY));
 	this.handleArray[2].location = this.transform.transformPoint(new ED.Point(midRightX, midRightY));
 	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));	
-	this.handleArray[5].location = this.transform.transformPoint(this.squiggleArray[0].pointsArray[5]);
+	this.handleArray[0].location = this.transform.transformPoint(this.squiggleArray[0].pointsArray[0]);
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
