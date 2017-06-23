@@ -6588,7 +6588,11 @@ ED.Squiggle.prototype.json = function() {
 
 	s = s + '"pointsArray":[';
 	for (var i = 0; i < this.pointsArray.length; i++) {
-		s = s + this.pointsArray[i].json();
+		if (this.pointsArray[i]) {
+            s = s + this.pointsArray[i].json();
+        } else {
+            s = s + '{}';
+        }
 		if (this.pointsArray.length - i > 1) {
 			s = s + ',';
 		}

@@ -229,6 +229,7 @@ class DoodleInfo
         'MarginalKeratitis' => 'Marginal keratitis',
         'CornealLaceration' => 'Corneal laceration',
         'MetallicForeignBody' => 'Metallic foreign body',
-        'Pingueculum' => 'Pingueculum'
+        'Pingueculum' => 'Pingueculum',
+        'Pterygium' => 'Pterygium'
     );
 }
