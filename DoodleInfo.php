@@ -228,6 +228,7 @@ class DoodleInfo
         'AdenoviralKeratitis' => 'Adenoviral keratitis',
         'MarginalKeratitis' => 'Marginal keratitis',
         'CornealLaceration' => 'Corneal laceration',
-        'MetallicForeignBody' => 'Metallic foreign body'
+        'MetallicForeignBody' => 'Metallic foreign body',
+        'Pingueculum' => 'Pingueculum'
     );
 }
