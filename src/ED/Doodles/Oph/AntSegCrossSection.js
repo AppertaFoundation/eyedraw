@@ -32,6 +32,7 @@ ED.AntSegCrossSection = function(_drawing, _parameterJSON) {
 	// Derived parameters
 	this.pupilSize = 'Large';
     this.c = 1;
+  this.colour = 'Blue';
     
 	// Saved parameters
 	this.savedParameterArray = ['apexY', 'apexX','colour','c'];
@@ -151,7 +152,8 @@ ED.AntSegCrossSection.prototype.dependentParameterValues = function(_parameter, 
 					break;
 			}
 			break;
-		
+
+		// commented out by MCS as seems to be blocking correct colour selection in view mode
 		// case 'c':
 		// 	if (_value === 1) returnArray['colour'] = 'Blue';
 		// 	else if (_value === 2) returnArray['colour'] = 'Brown';
