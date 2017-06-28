@@ -16178,12 +16178,12 @@ ED.AntSegCrossSection.prototype.dependentParameterValues = function(_parameter, 
 			}
 			break;
 		
-		case 'c':
-			if (_value === 1) returnArray['colour'] = 'Blue';
-			else if (_value === 2) returnArray['colour'] = 'Brown';
-			else if (_value === 3) returnArray['colour'] = 'Gray';
-			else returnArray['colour'] = 'Green';
-			break;
+		// case 'c':
+		// 	if (_value === 1) returnArray['colour'] = 'Blue';
+		// 	else if (_value === 2) returnArray['colour'] = 'Brown';
+		// 	else if (_value === 3) returnArray['colour'] = 'Gray';
+		// 	else returnArray['colour'] = 'Green';
+		// 	break;
 	}
 
 	return returnArray;
