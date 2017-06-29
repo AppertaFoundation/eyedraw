@@ -47330,6 +47330,16 @@ ED.Rubeosis.prototype.description = function() {
 }
 
 /**
+ * Returns the SnoMed code of the doodle
+ *
+ * @returns {Number} SnoMed code of entity represented by doodle
+ */
+ED.Rubeosis.prototype.snomedCode = function()
+{
+    return 51995000;
+}
+
+/**
  * OpenEyes
  *
  * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011

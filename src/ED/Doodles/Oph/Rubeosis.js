@@ -254,3 +254,13 @@ ED.Rubeosis.prototype.groupDescription = function() {
 ED.Rubeosis.prototype.description = function() {
 	return this.clockHour() + " o'clock";
 }
+
+/**
+ * Returns the SnoMed code of the doodle
+ *
+ * @returns {Number} SnoMed code of entity represented by doodle
+ */
+ED.Rubeosis.prototype.snomedCode = function()
+{
+    return 51995000;
+}
