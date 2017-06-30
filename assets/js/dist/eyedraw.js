@@ -27873,6 +27873,11 @@ ED.Eyeball.prototype.setPropertyDefaults = function() {
  * Sets default parameters
  */
 ED.Eyeball.prototype.setParameterDefaults = function() {
+  this.isDeletable = false;
+  this.isMoveable = false;
+  this.isScalable = false;
+  this.isRotatable= false;
+  this.isShowHighlight = false;
 }
 
 /**
@@ -31178,8 +31183,15 @@ ED.HypopyonCrossSection.prototype.draw = function(_point) {
 	// Get relative lens position to draw around
 	var lens = this.drawing.lastDoodleOfClass('LensCrossSection');
 	var iris = this.drawing.lastDoodleOfClass('AntSegCrossSection');
-	
+	var cornea = this.drawing.lastDoodleOfClass('CorneaCrossSection');
+
 	var marginX = (iris) ? iris.apexX: -20;
+
+  if (cornea) {
+  	console.log('here!');
+  	console.log(cornea);
+    this.setSimpleParameter('originX', cornea.originX);
+  }
 
 	if (lens) {
 		// Displacement of lens from centre
@@ -31193,7 +31205,7 @@ ED.HypopyonCrossSection.prototype.draw = function(_point) {
 		
 		if (lens.originX + ld + x - 300 - this.originX < iris.apexX) marginX = lens.originX + ld + x - 300 - this.originX;
 	}
-	
+
 /*
 	var lens = this.drawing.lastDoodleOfClass('LensCrossSection');
 	if (lens) {
@@ -35556,7 +35568,7 @@ ED.Lids = function(_drawing, _parameterJSON) {
 	this.className = "Lids";
 
 	// Saved parameters
-	this.savedParameterArray = [];
+	this.savedParameterArray = ['apexX', 'apexY', 'dir'];
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -35581,6 +35593,7 @@ ED.Lids.prototype.setHandles = function() {
  * Sets default dragging attributes
  */
 ED.Lids.prototype.setPropertyDefaults = function() {
+	this.isDeletable = false;
 	this.isMoveable = false;
 	this.isScalable = false;
 	this.isRotatable= false;
