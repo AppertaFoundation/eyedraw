@@ -1,5 +1,6 @@
 /**
  * OpenEyes
+ * MSC mod
  *
  * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
  * (C) OpenEyes Foundation, 2011-2013
@@ -38,7 +39,7 @@ ED.Lens = function(_drawing, _parameterJSON) {
 	this.phakodonesis = false;
 
 	// Saved parameters
-	this.savedParameterArray = ['originX', 'originY', 'nuclearGrade', 'corticalGrade', 'posteriorSubcapsularGrade', 'anteriorPolar', 'posteriorPolar', 'coronary', 'phakodonesis'];
+	this.savedParameterArray = ['rotation', 'originY', 'nuclearGrade', 'corticalGrade', 'posteriorSubcapsularGrade', 'anteriorPolar', 'posteriorPolar', 'coronary', 'phakodonesis'];
 
 	// Parameters in doodle control bar (parameter name: parameter label)
 	this.controlParameterArray = {
@@ -48,7 +49,7 @@ ED.Lens = function(_drawing, _parameterJSON) {
 		'anteriorPolar':'Anterior polar',
 		'posteriorPolar':'Posterior polar',
 		'coronary':'Coronary',
-		'phakodonesis':'Phakodonesis',
+		'phakodonesis':'Phacodonesis',
 		};
 
 	// Call superclass constructor
@@ -70,8 +71,8 @@ ED.Lens.prototype.setPropertyDefaults = function() {
 	this.addAtBack = true;
 
 	// Update component of validation array for simple parameters
-	this.parameterValidationArray['originX']['range'].setMinAndMax(-500, +500);
-	this.parameterValidationArray['originY']['range'].setMinAndMax(-500, +500);
+	this.parameterValidationArray['originX']['range'].setMinAndMax(-125, +125);
+	this.parameterValidationArray['originY']['range'].setMinAndMax(-125, +125);
 
 	this.parameterValidationArray['nuclearGrade'] = {
 		kind: 'derived',
@@ -294,6 +295,50 @@ ED.Lens.prototype.draw = function(_point) {
 			ctx.fill();
 			ctx.stroke();
 		}
+		
+		// Phacodonesis
+		if (this.phakodonesis) {
+			// Sine wave between arrow heads:
+			//Set amplitude and width of the wave as well as sample rate
+			var amplitude = 20;
+			var width = 100;
+			var srate = 1;
+
+			//Draw sine wave
+			ctx.beginPath();
+			ctx.moveTo(-150,0);
+			for (x=0; x<=300; x+= srate){
+				ctx.lineTo(-150+x, amplitude*Math.sin(2*Math.PI*x/width));
+			}
+
+			// Set line attributes
+			ctx.lineWidth = 4;
+			ctx.strokeStyle = "blue";
+			ctx.stroke();
+
+			// Left arrow:
+			ctx.beginPath();
+			ctx.moveTo(-150,-20);
+			ctx.lineTo(-225,0);
+			ctx.lineTo(-150,20);
+
+			// Set line attributes
+			ctx.lineWidth = 4;
+			ctx.fillStyle = "blue";
+			ctx.fill();
+
+			// Right arrow:
+			ctx.beginPath();
+			ctx.moveTo(150,-20);
+			ctx.lineTo(225,0);
+			ctx.lineTo(150,20);
+
+			// Set line attributes
+			ctx.lineWidth = 4;
+			ctx.fillStyle = "blue";
+			ctx.fill();
+		}
+
 	}
 
 	// Draw handles if selected
@@ -310,7 +355,15 @@ ED.Lens.prototype.draw = function(_point) {
  */
 ED.Lens.prototype.description = function() {
 	returnValue = "";
+	
+	if (this.originY < -30) {
+		returnValue += 'Lens subluxation: superior';
+	}
+	else if (this.originY > 30) {
+		returnValue += 'Lens subluxation: inferior';
+	}
 	if (this.nuclearGrade != 'None') {
+		returnValue += returnValue.length > 0?", ":"";
 		returnValue += this.nuclearGrade + ' nuclear cataract';
 	}
 	if (this.corticalGrade != 'None') {
@@ -335,7 +388,35 @@ ED.Lens.prototype.description = function() {
 	}
 	if (this.phakodonesis) {
 		returnValue += returnValue.length > 0?", ":"";
-		returnValue += 'Phakodonesis';
+		returnValue += 'Phacodonesis';
 	}
 	return returnValue;
-}
+};
+
+ED.Lens.prototype.snomedCodes = function()
+{
+	snomedCodes = new Array();
+    if (this.nuclearGrade != 'None') {
+        snomedCodes.push([53889007, 3]);
+    }
+    if (this.corticalGrade != 'None') {
+        snomedCodes.push([193576003, 3]);
+    }
+    if (this.posteriorSubcapsularGrade != 'None') {
+        snomedCodes.push([34533008, 3]);
+    }
+    if (this.coronary) {
+    	snomedCodes.push([12195004, 3]);
+    }
+    if (this.anteriorPolar) {
+    	snomedCodes.push([253224008, 3]);
+    }
+    if (this.posteriorPolar) {
+        snomedCodes.push([253225009, 3]);
+    }
+    if (this.phakodonesis) {
+    	snomedCodes.push([116669003, 3]);
+    }
+
+    return snomedCodes;
+};

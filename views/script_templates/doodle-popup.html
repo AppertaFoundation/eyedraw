@@ -23,6 +23,7 @@
  */
 
 {{#doodle}}
+{{^doodle.isNode}}
 	<ul class="ed-toolbar-panel ed-doodle-popup-toolbar">
 		<li>
 			{{#desc}}
@@ -77,6 +78,7 @@
 	</div>
 	<div class="ed-doodle-controls{{#doodle.isLocked}} hide{{/doodle.isLocked}}" id="{{drawing.canvas.id}}_controls">
 	</div>
+	{{/doodle.isNode}}
 	{{#doodle.isLocked}}
 		<div class="ed-doodle-description">
 			<strong>This doodle is locked and cannot be edited.</strong>

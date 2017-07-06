@@ -29,7 +29,7 @@ ED.IOL = function(_drawing, _parameterJSON) {
 	this.className = "IOL";
 
 	// Other parameters
-	this.type = "Iris Clip";
+	this.type = "PC";
 	
 	// Saved parameters
 	this.savedParameterArray = ['originX', 'originY', 'rotation', 'type'];
@@ -62,6 +62,10 @@ ED.IOL.prototype.setPropertyDefaults = function() {
 	this.addAtBack = this.type == 'PC'?true:false;
 	this.isUnique = true;
 	
+	// Update component of validation array for simple parameters
+	this.parameterValidationArray['originX']['range'].setMinAndMax(-125, +125);
+	this.parameterValidationArray['originY']['range'].setMinAndMax(-125, +125);
+	
 	// Validation arrays for derived and other parameters
 	this.parameterValidationArray['type'] = {
 		kind: 'other',
@@ -76,7 +80,7 @@ ED.IOL.prototype.setPropertyDefaults = function() {
  * Use the setParameter function for derived parameters, as this will also update dependent variables
  */
 ED.IOL.prototype.setParameterDefaults = function() {
-	this.setParameterFromString('type', 'Iris Clip');
+	this.setParameterFromString('type', 'PC');
 }
 
 /**

@@ -599,28 +599,35 @@ ED.Doodle.prototype.drawHandles = function(_point) {
 	ctx.restore();
 };
 
+ED.Doodle.prototype.hitTest = function(ctx, _point)
+{
+	var result;
+    // Workaround for Mozilla bug 405300 https://bugzilla.mozilla.org/show_bug.cgi?id=405300
+    if (ED.isFirefox()) {
+        ctx.save();
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        result = ctx.isPointInPath(_point.x, _point.y);
+        ctx.restore();
+    } else {
+        result = ctx.isPointInPath(_point.x, _point.y);
+    }
+    return result;
+};
+
 /**
  * Draws the boundary path or performs a hit test if a Point parameter is passed
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.Doodle.prototype.drawBoundary = function(_point) {
+ED.Doodle.prototype.drawBoundary = function(_point, mode) {
+	if (mode === undefined) {
+		mode = this.drawFunctionMode;
+	}
 	// Get context
 	var ctx = this.drawing.context;
-
 	// HitTest
-	if (this.drawFunctionMode == ED.drawFunctionMode.HitTest) {
-		// Workaround for Mozilla bug 405300 https://bugzilla.mozilla.org/show_bug.cgi?id=405300
-		if (ED.isFirefox()) {
-			ctx.save();
-			ctx.setTransform(1, 0, 0, 1, 0, 0);
-			var hitTest = ctx.isPointInPath(_point.x, _point.y);
-			ctx.restore();
-		} else {
-			var hitTest = ctx.isPointInPath(_point.x, _point.y);
-		}
-
-		if (hitTest) {
+	if (mode == ED.drawFunctionMode.HitTest) {
+		if (this.hitTest(ctx, _point)) {
 			// Set dragging mode
 			if (this.isDrawable && this.isForDrawing) {
 				this.drawing.mode = ED.Mode.Draw;
@@ -636,7 +643,7 @@ ED.Doodle.prototype.drawBoundary = function(_point) {
 	else {
 		// Specify highlight attributes
 		if (this.isSelected && this.isShowHighlight) {
-			ctx.shadowColor = "gray";
+            ctx.shadowColor = "gray";
 			ctx.shadowOffsetX = 0;
 			ctx.shadowOffsetY = 0;
 			ctx.shadowBlur = 20;
@@ -757,6 +764,16 @@ ED.Doodle.prototype.snomedCode = function() {
  */
 ED.Doodle.prototype.diagnosticHierarchy = function() {
 	return 0;
+};
+
+/**
+ * Should be overridden for doodles that can provide multiple SNOMEDs - each should be paired with with a
+ * diagnostic hierarchy value for appropriate ordering.
+ *
+ * @returns {Array}
+ */
+ED.Doodle.prototype.snomedCodes = function() {
+	return new Array([this.snomedCode(), this.diagnosticHierarchy()]);
 };
 
 /**
@@ -986,9 +1003,21 @@ ED.Doodle.prototype.getControlElements = function() {
  */
 ED.Doodle.prototype.addControlBindings = function() {
 	for (var parameter in this.controlParameterArray) {
-		this.addBinding(parameter, {
-			id: this.parameterControlElementId(parameter)
-		});
+		if (!parameter in this.parameterValidationArray) {
+			continue;
+		}
+		if (this.parameterValidationArray[parameter].type == 'combo') {
+			for (var i in this.parameterValidationArray[parameter].list) {
+				var childParam = this.parameterValidationArray[parameter].list[i];
+				this.addBinding(childParam, {
+					id: this.parameterControlElementId(childParam)
+				});
+			}
+		} else {
+			this.addBinding(parameter, {
+				id: this.parameterControlElementId(parameter)
+			});
+		}
 	}
 };
 
@@ -1083,9 +1112,19 @@ ED.Doodle.prototype.removeDoodleControls = function(controlDiv) {
  * @param {String} _parameter Name of the parameter
  * @returns {String} _id ID for a control element
  */
-ED.Doodle.prototype.parameterElement = function(_parameter) {
+ED.Doodle.prototype.parameterElement = function(_parameter, showLabel) {
+	if (showLabel === undefined)
+		showLabel = true;
+
 	var element;
 	switch (this.parameterValidationArray[_parameter].type) {
+		case 'combo':
+			element = document.createElement('span');
+			element.setAttribute('class', 'combo');
+			for (var i in this.parameterValidationArray[_parameter]['list']) {
+				element.appendChild(this.parameterElement(this.parameterValidationArray[_parameter]['list'][i], false));
+			}
+			break;
 		case 'string':
 			// Create a select element
 			element = document.createElement('select');
@@ -1170,14 +1209,15 @@ ED.Doodle.prototype.parameterElement = function(_parameter) {
 			break;
 	}
 
-	// Create label  ***TODO*** deal with optional label and language
-	var label = document.createElement('label');
-	label.innerText = this.controlParameterArray[_parameter];
-	label.setAttribute('for', this.parameterControlElementId(_parameter));
-
 	// Wrap in div to allow display in vertical block
 	var div = document.createElement('div');
-	div.appendChild(label);
+	if (showLabel) {
+		// Create label  ***TODO*** deal with optional label and language
+		var label = document.createElement('label');
+		label.innerText = this.controlParameterArray[_parameter];
+		label.setAttribute('for', this.parameterControlElementId(_parameter));
+		div.appendChild(label);
+	}
 	div.appendChild(element);
 
 	return div;
@@ -1740,7 +1780,7 @@ ED.Doodle.prototype.clockHour = function(_offset) {
 	} else {
 		var twelvePoint = new ED.Point(0, -100);
 		var thisPoint = new ED.Point(this.originX, this.originY);
-		var clockHour = ((twelvePoint.clockwiseAngleTo(thisPoint) * 6 / Math.PI) + 12 + offset) % 12;
+		clockHour = ((twelvePoint.clockwiseAngleTo(thisPoint) * 6 / Math.PI) + 12 + offset) % 12;
 	}
 
 	clockHour = clockHour.toFixed(0);

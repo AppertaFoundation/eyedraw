@@ -31,9 +31,11 @@ ED.AntSegCrossSection = function(_drawing, _parameterJSON) {
 
 	// Derived parameters
 	this.pupilSize = 'Large';
-
+    this.c = 1;
+  this.colour = 'Blue';
+    
 	// Saved parameters
-	this.savedParameterArray = ['apexY', 'apexX'];
+	this.savedParameterArray = ['apexY', 'apexX','colour','c'];
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -76,6 +78,19 @@ ED.AntSegCrossSection.prototype.setPropertyDefaults = function() {
 		list: ['Large', 'Medium', 'Small'],
 		animate: true
 	};
+	
+	this.parameterValidationArray['c'] = {
+		kind: 'other',
+		type: 'int',
+		animate: false
+	};
+	
+	this.parameterValidationArray.colour = {
+		kind: 'other',
+		type: 'string',
+		list: ['Blue', 'Brown', 'Gray', 'Green'],
+		animate: false
+	};
 }
 
 /**
@@ -84,6 +99,7 @@ ED.AntSegCrossSection.prototype.setPropertyDefaults = function() {
  */
 ED.AntSegCrossSection.prototype.setParameterDefaults = function() {
 	this.setParameterFromString('pupilSize', 'Large');
+	this.setParameterFromString('c', '1');
 	this.apexX = 24;
 }
 
@@ -102,7 +118,12 @@ ED.AntSegCrossSection.prototype.dependentParameterValues = function(_parameter, 
 		case 'apexY':
 			// ***TOSDP*** Putting this here will cancel out any saved value of apexX
 			// Set apexX and its limits for apexX according to value of apexY (prevents collisions with cornea and lens)
-			this.parameterValidationArray['apexX']['range'].setMinAndMax(-40 - (140 / 220) * (this.apexY + 280), 32 - (72 / 220) * (this.apexY + 280));
+				/// MSC: Max position dependent on lens type present
+			var lens = this.drawing.lastDoodleOfClass('LensCrossSection');
+			if (!lens) lens = this.drawing.lastDoodleOfClass('PCIOLCrossSection');
+			
+			var maxApexX = (lens.className == 'LensCrossSection') ? 32 - (72 / 220) * (this.apexY + 280) + lens.originX - 44: (lens.className == 'PCIOLCrossSection') ? lens.originX - 21 : 25;
+			this.parameterValidationArray['apexX']['range'].setMinAndMax(-40 - (140 / 220) * (this.apexY + 280), maxApexX);
 
 			// If being synced, make sensible decision about x
 			if (!this.drawing.isActive) {
@@ -131,6 +152,14 @@ ED.AntSegCrossSection.prototype.dependentParameterValues = function(_parameter, 
 					break;
 			}
 			break;
+
+		// commented out by MCS as seems to be blocking correct colour selection in view mode
+		// case 'c':
+		// 	if (_value === 1) returnArray['colour'] = 'Blue';
+		// 	else if (_value === 2) returnArray['colour'] = 'Brown';
+		// 	else if (_value === 3) returnArray['colour'] = 'Gray';
+		// 	else returnArray['colour'] = 'Green';
+		// 	break;
 	}
 
 	return returnArray;
@@ -187,15 +216,83 @@ ED.AntSegCrossSection.prototype.draw = function(_point) {
 	ctx.closePath();
 
 	// Set line attributes
-	ctx.lineWidth = 4;
-	ctx.fillStyle = "rgba(255, 160, 40, 1)";
-	ctx.strokeStyle = "gray";
+	ctx.lineWidth = 0;
+	ctx.strokeStyle = "rgba(0,0,0,0)";
 
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 
 	// Non boundary drawing
-	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {}
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+	    // colour fill for iris
+		ctx.lineWidth = 4;
+		ctx.strokeStyle = "gray";
+		switch (this.colour) {
+			case 'Blue':
+				ctx.fillStyle = "rgba(160, 221, 251, 1)";
+				break;
+			case 'Brown':
+				ctx.fillStyle = "rgba(203, 161, 134, 1)";
+				break;
+			case 'Gray':
+				ctx.fillStyle = "rgba(177, 181, 172, 1)";
+				break;
+			case 'Green':
+				ctx.fillStyle = "rgba(169, 206, 141, 1)";
+				break;
+		}
+		
+// 		ctx.fillStyle = "rgba(255, 160, 40, 1)";
+		
+		// bottom iris
+		ctx.beginPath();
+		ctx.moveTo(70, 380);
+		ctx.lineTo(55, 380);
+		ctx.bezierCurveTo(40, 460, marginX + 60 + f, -this.apexY, marginX, -this.apexY);
+		ctx.bezierCurveTo(marginX - 60 - f, -this.apexY, -21, 317, 0, 380);
+		ctx.lineTo(55,480);
+		ctx.fill();
+		ctx.stroke();
+		ctx.closePath();	
+		
+		// top iris
+		ctx.beginPath();
+		ctx.moveTo(70,-380);
+		ctx.lineTo(55,-380);
+		ctx.bezierCurveTo(40, -460, marginX + 60 + f, this.apexY, marginX, this.apexY);
+		ctx.bezierCurveTo(marginX - 60 - f, this.apexY, -21, -317, 0, -380);
+		ctx.lineTo(55, -480);
+		ctx.fill();
+		ctx.stroke();
+		ctx.closePath();
+		
+		ctx.fillStyle = "rgba(255, 160, 40, 1)";		
+		// top cilliary body and cutaway
+		ctx.beginPath();
+		ctx.moveTo(55, -480);
+		ctx.lineTo(140, -480);
+		ctx.lineTo(140, -380);
+	
+		ctx.bezierCurveTo(120, -340, 120, -340, 100, -380);
+		ctx.bezierCurveTo(80, -340, 80, -340, 55, -380);
+		ctx.fill();
+		ctx.stroke();
+		ctx.closePath();
+
+		
+		// bottom cilliary body	and cut away
+		ctx.beginPath();
+		ctx.moveTo(55, 480);
+		ctx.lineTo(140, 480);
+		ctx.lineTo(140, 380);
+	
+		ctx.bezierCurveTo(120, 340, 120, 340, 100, 380);
+		ctx.bezierCurveTo(80, 340, 80, 340, 55, 380);
+		ctx.fill();
+		ctx.stroke();
+		ctx.closePath();
+
+	}
 
 	// Coordinates of handles (in canvas plane)
 	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));

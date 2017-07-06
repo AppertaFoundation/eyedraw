@@ -283,7 +283,7 @@ var ED = ED || {};
  * @namespace ED.Controller
  * @memberOf ED
  * @description Namespace for EyeDraw Controller
- */ 
+ */
 
 ED.Controller = (function() {
 
@@ -381,11 +381,14 @@ ED.Controller = (function() {
 	 */
 	Controller.prototype.createDoodlePopup = function() {
 
-		var container = this.container.find('.ed-doodle-popup');
+		var container = this.container.find('.ed-doodle-popup:first');
+
+		var popupDoodles = this.properties.showDoodlePopupForDoodles || [];
 
 		return container.length ? new ED.Views.DoodlePopup(
 			this.drawing,
-			container
+			container,
+			popupDoodles
 		) : null;
 	};
 
@@ -425,9 +428,11 @@ ED.Controller = (function() {
 		this.drawing.registerForNotifications(this, 'saveDrawingToInputField', [
 			'doodleAdded',
 			'doodleDeleted',
-			'doodleSelected',
-			'mousedragged',
-			'drawingZoom'
+			//'doodleSelected',
+			//'mousedragged',
+			'mouseup',
+			'drawingZoom',
+			'parameterChanged'
 		]);
 	};
 
@@ -492,13 +497,16 @@ ED.Controller = (function() {
 	 * Save drawing data to the associated input field.
 	 */
 	Controller.prototype.saveDrawingToInputField = function(force) {
-		if ((force && this.hasInputField()) || this.hasInputFieldData()) {
-			this.input.value = this.drawing.save();
-		}
-		if(this.properties.autoReport){
-			var outputElement = document.getElementById(this.properties.autoReport);
-			this.autoReport(outputElement);
-		}
+        if ((force && this.hasInputField()) || this.hasInputFieldData()) {
+            this.input.value = this.drawing.save();
+        }
+		clearTimeout(this.saveTimer);
+		this.saveTimer = setTimeout(function() {
+			if (this.properties.autoReport) {
+				var outputElement = document.getElementById(this.properties.autoReport);
+				this.autoReport(outputElement);
+			}
+		}.bind(this), 200);
 	};
 
 	/**
@@ -593,8 +601,8 @@ ED.Controller = (function() {
 
 		// Iterate through sync array
 		for (var idSuffix in syncArray) {
-
 			// Get reference to slave drawing
+
 			var slaveDrawing = this.getEyeDrawInstance(idSuffix);
 
 			if (!slaveDrawing) {
@@ -605,6 +613,9 @@ ED.Controller = (function() {
 			// Iterate through master doodles to sync.
 			for (var masterDoodleName in syncArray[idSuffix]) {
 
+				if (!masterDoodle || masterDoodle.className !== masterDoodleName)
+					continue;
+
 				// Iterate through slave doodles to sync with master doodle.
 				for (var slaveDoodleName in syncArray[idSuffix][masterDoodleName]) {
 
@@ -612,7 +623,7 @@ ED.Controller = (function() {
 					var slaveDoodle = slaveDrawing.firstDoodleOfClass(slaveDoodleName);
 
 					// Check that doodles exist, className matches, and sync is allowed
-					if (!masterDoodle || masterDoodle.className !== masterDoodleName || !slaveDoodle || !slaveDoodle.willSync) {
+					if (!slaveDoodle && !slaveDoodle.willSync) {
 						continue;
 					}
 
@@ -637,7 +648,6 @@ ED.Controller = (function() {
 	 * @param  {ED.Drawing} slaveDrawing  The slave drawing instance.
 	 */
 	Controller.prototype.syncDoodleParameters = function(parameterArray, changedParam, masterDoodle, slaveDoodle, slaveDrawing) {
-
 		// Iterate through parameters to sync
 		for (var i = 0; i < (parameterArray || []).length; i++) {
 
@@ -649,13 +659,17 @@ ED.Controller = (function() {
 			if (masterDoodle[changedParam.parameter] === slaveDoodle[changedParam.parameter]) {
 				continue;
 			}
+			if (typeof(changedParam.value) == 'string') {
+				slaveDoodle.setParameterFromString(changedParam.parameter, changedParam.value, true);
+			}
+			else {
+				var increment = changedParam.value - changedParam.oldValue;
+				var newValue = slaveDoodle[changedParam.parameter] + increment;
 
-			var increment = changedParam.value - changedParam.oldValue;
-			var newValue = slaveDoodle[changedParam.parameter] + increment;
-
-			// Sync slave parameter to value of master
-			slaveDoodle.setSimpleParameter(changedParam.parameter, newValue);
-			slaveDoodle.updateDependentParameters(changedParam.parameter);
+				// Sync slave parameter to value of master
+				slaveDoodle.setSimpleParameter(changedParam.parameter, newValue);
+				slaveDoodle.updateDependentParameters(changedParam.parameter);
+			}
 
 			// Update any bindings associated with the slave doodle
 			slaveDrawing.updateBindings(slaveDoodle);
@@ -693,7 +707,7 @@ ED.Controller = (function() {
 
 		if(this.properties.autoReport){
 			var outputElement = document.getElementById(this.properties.autoReport);
-			this.autoReport(outputElement);
+			this.autoReport(outputElement, this.properties.autoReportEditable);
 		}
 
 		// Mark drawing object as ready
@@ -715,21 +729,28 @@ ED.Controller = (function() {
 	Controller.prototype.onParameterChanged = function(notification) {
 		// Sync with other doodles on the page.
 		this.syncEyedraws(notification.object);
-		// Save drawing to hidden input.
-		this.saveDrawingToInputField();
 	};
 
 	/**
 	 * Automatically calls the drawings report
 	 */
-	Controller.prototype.autoReport = function(outputElement) {
+	Controller.prototype.autoReport = function(outputElement, editable) {
 		var report = this.drawing.report();
 		if(report){
+
 			report = report.replace(/, /g,"\n");
+
 			var output = '';
+
+			if (!editable) {
+				outputElement.value = report;
+				return;
+			}
 			var existing = outputElement.value;
 
-			if(existing.match(regex_escape(report))){
+			var reportRegex = String(report).replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+
+			if(existing.match(reportRegex)){
 				outputElement.rows = (existing.match(/\n/g) || []).length + 1;
 				this.previousReport = report;
 				return;
@@ -738,7 +759,7 @@ ED.Controller = (function() {
 			if(this.previousReport){
 				output = existing.replace(this.previousReport, report);
 			} else {
-				if(!existing.match(/^[\n ]$/)){
+				if(existing.length && !existing.match(/^[\n ]$/)){
 					existing += "\n";
 				}
 				output = existing + report;
@@ -884,12 +905,26 @@ ED.Views.DoodlePopup = (function() {
 	 * @param {HTMLElement} widgetContainer The widget container element
 	 * @extends {ED.View}
 	 */
-	function DoodlePopup(drawing, container) {
+	function DoodlePopup(drawing, container, popupDoodles) {
 		ED.View.apply(this, arguments);
+
+		// don't want to be checking against an empty array
+		if (popupDoodles !== undefined && !popupDoodles.length) {
+			popupDoodles = undefined;
+		}
 
 		this.drawing = drawing;
 		this.container = container;
 		this.containerWidth = container.outerWidth();
+		this.popupDoodles = popupDoodles;
+
+
+		if ($(this.container).data('display-side')) {
+			this.side = $(this.container).data('display-side');
+		}
+		else {
+			this.side = 'right';
+		}
 
 		this.registerForNotifications();
 		this.createToolbar();
@@ -946,7 +981,7 @@ ED.Views.DoodlePopup = (function() {
 		if (!doodle) {
 			return;
 		}
-
+		
 		// Template data
 		var data = {
 			doodle: doodle,
@@ -976,7 +1011,11 @@ ED.Views.DoodlePopup = (function() {
 	 * @param  {Boolean} show   Show or hide the menu.
 	 */
 	DoodlePopup.prototype.update = function(show) {
-		if (show && this.drawing.selectedDoodle) {
+		var shouldDisplayForDoodle = true;
+		if (this.popupDoodles && this.drawing.selectedDoodle && this.popupDoodles.indexOf(this.drawing.selectedDoodle.className) == -1) {
+			shouldDisplayForDoodle = false;
+		}
+		if (show && this.drawing.selectedDoodle && shouldDisplayForDoodle) {
 			this.render();
 			this.show();
 		} else {
@@ -992,9 +1031,9 @@ ED.Views.DoodlePopup = (function() {
 
 			this.emit('hide.before');
 
-			this.container.css({
-				right: 0
-			});
+			var css = {};
+			css[this.side] = 0;
+			this.container.css(css);
 
 			setTimeout(function() {
 				this.container.addClass('closed');
@@ -1012,9 +1051,18 @@ ED.Views.DoodlePopup = (function() {
 
 			this.emit('show.before');
 
-			this.container.css({
-				right: -1 * (this.containerWidth - 1)
-			}).removeClass('closed');
+			if (this.side == 'left') {
+				this.container.css({
+					left: -1 * (this.containerWidth - 2)
+				}).find('.ed-button .label').addClass('left');
+				;
+			} else {
+				this.container.css({
+					right: -1 * (this.containerWidth - 1)
+				}).find('.ed-button .label').addClass('right');
+			}
+			this.container.removeClass('closed');
+
 
 			setTimeout(function() {
 				this.emit('show.after');
@@ -1380,9 +1428,9 @@ ED.Views.SelectedDoodle = (function() {
 
 	return SelectedDoodle;
 }());
-/*! Generated on 30/3/2017 */
+/*! Generated on 30/6/2017 */
 ED.scriptTemplates = {
-  "doodle-popup": "\n\n{{#doodle}}\n\t<ul class=\"ed-toolbar-panel ed-doodle-popup-toolbar\">\n\t\t<li>\n\t\t\t{{#desc}}\n\t\t\t\t<a class=\"ed-button ed-doodle-help{{lockedButtonClass}}\" href=\"#\" data-function=\"toggleHelp\">\n\t\t\t\t\t<span class=\"icon-ed-help\"></span>\n\t\t\t\t</a>\n\t\t\t{{/desc}}\n\t\t</li>\n\t\t{{#doodle.isLocked}}\n\t\t\t<li>\n\t\t\t\t<a class=\"ed-button\" href=\"#\" data-function=\"unlock\">\n\t\t\t\t\t<span class=\"icon-ed-unlock\"></span>\n\t\t\t\t\t<span class=\"label\">Unlock</span>\n\t\t\t\t</a>\n\t\t\t</li>\n\t\t{{/doodle.isLocked}}\n\t\t{{^doodle.isLocked}}\n\t\t\t<li>\n\t\t\t\t<a class=\"ed-button\" href=\"#\" data-function=\"lock\">\n\t\t\t\t\t<span class=\"icon-ed-lock\"></span>\n\t\t\t\t\t<span class=\"label\">Lock</span>\n\t\t\t\t</a>\n\t\t\t</li>\n\t\t{{/doodle.isLocked}}\n\t\t<li>\n\t\t\t<a class=\"ed-button{{lockedButtonClass}}\" href=\"#\" data-function=\"moveToBack\">\n\t\t\t\t<span class=\"icon-ed-move-to-back\"></span>\n\t\t\t\t<span class=\"label\">Move to back</span>\n\t\t\t</a>\n\t\t</li>\n\t\t<li>\n\t\t\t<a class=\"ed-button{{lockedButtonClass}}\" href=\"#\" data-function=\"moveToFront\">\n\t\t\t\t<span class=\"icon-ed-move-to-front\"></span>\n\t\t\t\t<span class=\"label\">Move to front</span>\n\t\t\t</a>\n\t\t</li>\n\t\t<li>\n\t\t\t{{#doodle.isDeletable}}\n\t\t\t\t<a class=\"ed-button{{lockedButtonClass}}\" href=\"#\" data-function=\"deleteSelectedDoodle\">\n\t\t\t\t\t<span class=\"icon-ed-delete\"></span>\n\t\t\t\t\t<span class=\"label\">Delete</span>\n\t\t\t\t</a>\n\t\t\t{{/doodle.isDeletable}}\n\t\t</li>\n\t</ul>\n\t<div class=\"ed-doodle-info hide\">\n\t\t{{^doodle.isLocked}}\n\t\t\t{{#desc}}\n\t\t\t\t<div class=\"ed-doodle-description\">{{{desc}}}</div>\n\t\t\t{{/desc}}\n\t\t{{/doodle.isLocked}}\n\t</div>\n\t<div class=\"ed-doodle-controls{{#doodle.isLocked}} hide{{/doodle.isLocked}}\" id=\"{{drawing.canvas.id}}_controls\">\n\t</div>\n\t{{#doodle.isLocked}}\n\t\t<div class=\"ed-doodle-description\">\n\t\t\t<strong>This doodle is locked and cannot be edited.</strong>\n\t\t</div>\n\t{{/doodle.isLocked}}\n{{/doodle}}"
+  "doodle-popup": "\n\n{{#doodle}}\n{{^doodle.isNode}}\n\t<ul class=\"ed-toolbar-panel ed-doodle-popup-toolbar\">\n\t\t<li>\n\t\t\t{{#desc}}\n\t\t\t\t<a class=\"ed-button ed-doodle-help{{lockedButtonClass}}\" href=\"#\" data-function=\"toggleHelp\">\n\t\t\t\t\t<span class=\"icon-ed-help\"></span>\n\t\t\t\t</a>\n\t\t\t{{/desc}}\n\t\t</li>\n\t\t{{#doodle.isLocked}}\n\t\t\t<li>\n\t\t\t\t<a class=\"ed-button\" href=\"#\" data-function=\"unlock\">\n\t\t\t\t\t<span class=\"icon-ed-unlock\"></span>\n\t\t\t\t\t<span class=\"label\">Unlock</span>\n\t\t\t\t</a>\n\t\t\t</li>\n\t\t{{/doodle.isLocked}}\n\t\t{{^doodle.isLocked}}\n\t\t\t<li>\n\t\t\t\t<a class=\"ed-button\" href=\"#\" data-function=\"lock\">\n\t\t\t\t\t<span class=\"icon-ed-lock\"></span>\n\t\t\t\t\t<span class=\"label\">Lock</span>\n\t\t\t\t</a>\n\t\t\t</li>\n\t\t{{/doodle.isLocked}}\n\t\t<li>\n\t\t\t<a class=\"ed-button{{lockedButtonClass}}\" href=\"#\" data-function=\"moveToBack\">\n\t\t\t\t<span class=\"icon-ed-move-to-back\"></span>\n\t\t\t\t<span class=\"label\">Move to back</span>\n\t\t\t</a>\n\t\t</li>\n\t\t<li>\n\t\t\t<a class=\"ed-button{{lockedButtonClass}}\" href=\"#\" data-function=\"moveToFront\">\n\t\t\t\t<span class=\"icon-ed-move-to-front\"></span>\n\t\t\t\t<span class=\"label\">Move to front</span>\n\t\t\t</a>\n\t\t</li>\n\t\t<li>\n\t\t\t{{#doodle.isDeletable}}\n\t\t\t\t<a class=\"ed-button{{lockedButtonClass}}\" href=\"#\" data-function=\"deleteSelectedDoodle\">\n\t\t\t\t\t<span class=\"icon-ed-delete\"></span>\n\t\t\t\t\t<span class=\"label\">Delete</span>\n\t\t\t\t</a>\n\t\t\t{{/doodle.isDeletable}}\n\t\t</li>\n\t</ul>\n\t<div class=\"ed-doodle-info hide\">\n\t\t{{^doodle.isLocked}}\n\t\t\t{{#desc}}\n\t\t\t\t<div class=\"ed-doodle-description\">{{{desc}}}</div>\n\t\t\t{{/desc}}\n\t\t{{/doodle.isLocked}}\n\t</div>\n\t<div class=\"ed-doodle-controls{{#doodle.isLocked}} hide{{/doodle.isLocked}}\" id=\"{{drawing.canvas.id}}_controls\">\n\t</div>\n\t{{/doodle.isNode}}\n\t{{#doodle.isLocked}}\n\t\t<div class=\"ed-doodle-description\">\n\t\t\t<strong>This doodle is locked and cannot be edited.</strong>\n\t\t</div>\n\t{{/doodle.isLocked}}\n{{/doodle}}"
 };
 /**
  * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011

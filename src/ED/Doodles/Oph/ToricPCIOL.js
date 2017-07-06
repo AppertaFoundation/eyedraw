@@ -246,5 +246,7 @@ ED.ToricPCIOL.prototype.description = function() {
 	// Add displacement description
 	if (displacementValue.length > 0) returnValue += " displaced" + displacementValue;
 
+	returnValue += ' @ ' + this.axis.toFixed(0) + '\xB0';
+
 	return returnValue;
 }

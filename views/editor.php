@@ -48,7 +48,7 @@
 
 	<?php if ($isEditable && $showDoodlePopup) {?>
 		<!-- DOODLE POPUP -->
-		<div class="ed-doodle-popup closed">
+		<div class="ed-doodle-popup closed<?= $popupDisplaySide == 'left' ? ' ' . $popupDisplaySide : ''?>" data-display-side="<?= $popupDisplaySide ? $popupDisplaySide : ''?>">
 		</div>
 	<?php }?>
 

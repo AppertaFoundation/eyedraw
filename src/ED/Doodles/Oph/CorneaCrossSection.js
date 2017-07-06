@@ -69,7 +69,7 @@ ED.CorneaCrossSection.prototype.setPropertyDefaults = function() {
 	this.isUnique = true;
 	
 	// Update validation array for simple parameters
-	this.parameterValidationArray['apexX']['range'].setMinAndMax(-410, -300);
+	this.parameterValidationArray['apexX']['range'].setMinAndMax(-365, -300);
 	this.parameterValidationArray['apexY']['range'].setMinAndMax(-100, +100);
 	
 	// Other parameters
@@ -93,8 +93,8 @@ ED.CorneaCrossSection.prototype.setPropertyDefaults = function() {
  * Use the setParameter function for derived parameters, as this will also update dependent variables
  */
 ED.CorneaCrossSection.prototype.setParameterDefaults = function() {
-	this.originX = 140;
-	this.apexX = -380;
+	this.originX = 50;
+	this.apexX = -363;
 	this.apexY = 0;
 	this.setParameterFromString('shape', 'Normal');
 	this.setParameterFromString('pachymetry', '540');
@@ -125,7 +125,8 @@ ED.CorneaCrossSection.prototype.dependentParameterValues = function(_parameter, 
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.CorneaCrossSection.prototype.draw = function(_point) {console.log(this.apexX, this.apexY);
+ED.CorneaCrossSection.prototype.draw = function(_point) {
+// 	console.log(this.apexX, this.apexY);
 	// Get context
 	var ctx = this.drawing.context;
 

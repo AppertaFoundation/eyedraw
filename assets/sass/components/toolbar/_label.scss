@@ -20,17 +20,25 @@
 		@include transition(all 0s ease);
 		background: #fff;
 		border: 1px solid #ccc;
-		left: -9999px;
 		padding: 4px 6px;
 		position: absolute;
 		top: 32px;
 		white-space: nowrap;
 		z-index: 103;
+		left: -9999px;
+	}
+	.left {
+		left: inherit;
+		right:-9999px;
 	}
 	&:hover {
 		.label {
 			@include transition-delay(0.25s);
 			left: -1px;
+		}
+		.left {
+			left: inherit;
+			right: -1px;
 		}
 	}
 	&:active, .ed-drawer-open > & {

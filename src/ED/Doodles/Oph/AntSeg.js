@@ -96,7 +96,7 @@ ED.AntSeg.prototype.setPropertyDefaults = function() {
 
 	// Update component of validation array for simple parameters (enable 2D control by adding -50,+50 apexX range
 	this.parameterValidationArray.apexX.range.setMinAndMax(0, 0);
-	this.parameterValidationArray.apexY.range.setMinAndMax(-280, -60);
+	this.parameterValidationArray.apexY.range.setMinAndMax(-300, -60);
 
 	// Add complete validation arrays for derived parameters
 	this.parameterValidationArray.pupilSize = {
@@ -366,11 +366,10 @@ ED.AntSeg.prototype.draw = function(_point) {
  */
 ED.AntSeg.prototype.description = function() {
 	var returnValue = "";
+	var pupilSize = Math.round(-this.apexY * 0.03);
 
 	// Pupil size and coloboma
-	if (this.pupilSize !== 'Large') {
-		returnValue += this.pupilSize.toLowerCase() + " pupil, ";
-	}
+	returnValue += this.pupilSize.toLowerCase() + " pupil (diameter: " + pupilSize + "mm), ";
 
 	// Coloboma
 	if (this.coloboma) {
@@ -412,6 +411,12 @@ ED.AntSeg.prototype.description = function() {
 		*/
 		returnValue = "No abnormality";
 	}
+
+/*
+	if (this.pupilSize == 'Large') {
+		returnValue += "pupil diameter: " + pupilSize + "mm, ";
+	}
+*/
 
 	// Remove final comma and space and capitalise first letter
 	returnValue = returnValue.replace(/, +$/, '');

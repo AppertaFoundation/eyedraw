@@ -37,6 +37,9 @@
 			}
 		}
 	}
+	&.left {
+		border-width: 1px 0px 1px 1px;
+	}
 }
 
 .ed-doodle-popup-toolbar {
@@ -56,7 +59,7 @@
 
 .ed-doodle-description {
 	color: #444;
-	font-size: 12px;
+	font-size: 30px;
 	font-style: italic;
 	line-height: 14px;
 	padding: 12px 0 6px 0;
@@ -89,4 +92,8 @@
 	select {
 		width: auto;
 	}
+}
+
+.combo div {
+	float: left;
 }

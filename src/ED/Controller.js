@@ -29,7 +29,7 @@ var ED = ED || {};
  * @namespace ED.Controller
  * @memberOf ED
  * @description Namespace for EyeDraw Controller
- */ 
+ */
 
 ED.Controller = (function() {
 
@@ -127,11 +127,14 @@ ED.Controller = (function() {
 	 */
 	Controller.prototype.createDoodlePopup = function() {
 
-		var container = this.container.find('.ed-doodle-popup');
+		var container = this.container.find('.ed-doodle-popup:first');
+
+		var popupDoodles = this.properties.showDoodlePopupForDoodles || [];
 
 		return container.length ? new ED.Views.DoodlePopup(
 			this.drawing,
-			container
+			container,
+			popupDoodles
 		) : null;
 	};
 
@@ -171,9 +174,11 @@ ED.Controller = (function() {
 		this.drawing.registerForNotifications(this, 'saveDrawingToInputField', [
 			'doodleAdded',
 			'doodleDeleted',
-			'doodleSelected',
-			'mousedragged',
-			'drawingZoom'
+			//'doodleSelected',
+			//'mousedragged',
+			'mouseup',
+			'drawingZoom',
+			'parameterChanged'
 		]);
 	};
 
@@ -238,13 +243,16 @@ ED.Controller = (function() {
 	 * Save drawing data to the associated input field.
 	 */
 	Controller.prototype.saveDrawingToInputField = function(force) {
-		if ((force && this.hasInputField()) || this.hasInputFieldData()) {
-			this.input.value = this.drawing.save();
-		}
-		if(this.properties.autoReport){
-			var outputElement = document.getElementById(this.properties.autoReport);
-			this.autoReport(outputElement);
-		}
+        if ((force && this.hasInputField()) || this.hasInputFieldData()) {
+            this.input.value = this.drawing.save();
+        }
+		clearTimeout(this.saveTimer);
+		this.saveTimer = setTimeout(function() {
+			if (this.properties.autoReport) {
+				var outputElement = document.getElementById(this.properties.autoReport);
+				this.autoReport(outputElement);
+			}
+		}.bind(this), 200);
 	};
 
 	/**
@@ -339,8 +347,8 @@ ED.Controller = (function() {
 
 		// Iterate through sync array
 		for (var idSuffix in syncArray) {
-
 			// Get reference to slave drawing
+
 			var slaveDrawing = this.getEyeDrawInstance(idSuffix);
 
 			if (!slaveDrawing) {
@@ -351,6 +359,9 @@ ED.Controller = (function() {
 			// Iterate through master doodles to sync.
 			for (var masterDoodleName in syncArray[idSuffix]) {
 
+				if (!masterDoodle || masterDoodle.className !== masterDoodleName)
+					continue;
+
 				// Iterate through slave doodles to sync with master doodle.
 				for (var slaveDoodleName in syncArray[idSuffix][masterDoodleName]) {
 
@@ -358,7 +369,7 @@ ED.Controller = (function() {
 					var slaveDoodle = slaveDrawing.firstDoodleOfClass(slaveDoodleName);
 
 					// Check that doodles exist, className matches, and sync is allowed
-					if (!masterDoodle || masterDoodle.className !== masterDoodleName || !slaveDoodle || !slaveDoodle.willSync) {
+					if (!slaveDoodle && !slaveDoodle.willSync) {
 						continue;
 					}
 
@@ -383,7 +394,6 @@ ED.Controller = (function() {
 	 * @param  {ED.Drawing} slaveDrawing  The slave drawing instance.
 	 */
 	Controller.prototype.syncDoodleParameters = function(parameterArray, changedParam, masterDoodle, slaveDoodle, slaveDrawing) {
-
 		// Iterate through parameters to sync
 		for (var i = 0; i < (parameterArray || []).length; i++) {
 
@@ -395,13 +405,17 @@ ED.Controller = (function() {
 			if (masterDoodle[changedParam.parameter] === slaveDoodle[changedParam.parameter]) {
 				continue;
 			}
+			if (typeof(changedParam.value) == 'string') {
+				slaveDoodle.setParameterFromString(changedParam.parameter, changedParam.value, true);
+			}
+			else {
+				var increment = changedParam.value - changedParam.oldValue;
+				var newValue = slaveDoodle[changedParam.parameter] + increment;
 
-			var increment = changedParam.value - changedParam.oldValue;
-			var newValue = slaveDoodle[changedParam.parameter] + increment;
-
-			// Sync slave parameter to value of master
-			slaveDoodle.setSimpleParameter(changedParam.parameter, newValue);
-			slaveDoodle.updateDependentParameters(changedParam.parameter);
+				// Sync slave parameter to value of master
+				slaveDoodle.setSimpleParameter(changedParam.parameter, newValue);
+				slaveDoodle.updateDependentParameters(changedParam.parameter);
+			}
 
 			// Update any bindings associated with the slave doodle
 			slaveDrawing.updateBindings(slaveDoodle);
@@ -439,7 +453,7 @@ ED.Controller = (function() {
 
 		if(this.properties.autoReport){
 			var outputElement = document.getElementById(this.properties.autoReport);
-			this.autoReport(outputElement);
+			this.autoReport(outputElement, this.properties.autoReportEditable);
 		}
 
 		// Mark drawing object as ready
@@ -461,21 +475,28 @@ ED.Controller = (function() {
 	Controller.prototype.onParameterChanged = function(notification) {
 		// Sync with other doodles on the page.
 		this.syncEyedraws(notification.object);
-		// Save drawing to hidden input.
-		this.saveDrawingToInputField();
 	};
 
 	/**
 	 * Automatically calls the drawings report
 	 */
-	Controller.prototype.autoReport = function(outputElement) {
+	Controller.prototype.autoReport = function(outputElement, editable) {
 		var report = this.drawing.report();
 		if(report){
+
 			report = report.replace(/, /g,"\n");
+
 			var output = '';
+
+			if (!editable) {
+				outputElement.value = report;
+				return;
+			}
 			var existing = outputElement.value;
 
-			if(existing.match(regex_escape(report))){
+			var reportRegex = String(report).replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+
+			if(existing.match(reportRegex)){
 				outputElement.rows = (existing.match(/\n/g) || []).length + 1;
 				this.previousReport = report;
 				return;
@@ -484,7 +505,7 @@ ED.Controller = (function() {
 			if(this.previousReport){
 				output = existing.replace(this.previousReport, report);
 			} else {
-				if(!existing.match(/^[\n ]$/)){
+				if(existing.length && !existing.match(/^[\n ]$/)){
 					existing += "\n";
 				}
 				output = existing + report;

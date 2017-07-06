@@ -32,15 +32,16 @@ ED.TrabySuture = function(_drawing, _parameterJSON) {
 	this.type = 'Fixed';
 	this.material = 'Nylon';
 	this.size = '10/0';
+	this.removed = false;
 
 	// Number of additional handles for releasable suture
 	this.numberOfHandles = 5;
 
 	// Saved parameters
-	this.savedParameterArray = ['originX', 'originY', 'apexX', 'apexY', 'arc', 'rotation', 'type', 'material', 'size'];
+	this.savedParameterArray = ['originX', 'originY', 'apexX', 'apexY', 'arc', 'rotation', 'type', 'material', 'size','removed'];
 
 	// Parameters in doodle control bar (parameter name: parameter label)
-	this.controlParameterArray = {'type':'Shape', 'material':'Material', 'size':'Size'};
+	this.controlParameterArray = {'type':'Shape', 'material':'Material', 'size':'Size','removed':'Removed'};
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -87,6 +88,11 @@ ED.TrabySuture.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'string',
 		list: ['11/0', '10/0', '9/0', '8/0', '7/0', '6/0'],
+		animate: false
+	}
+	this.parameterValidationArray['removed'] = {
+		kind: 'derived',
+		type: 'bool',
 		animate: false
 	}
 }
@@ -285,7 +291,8 @@ ED.TrabySuture.prototype.draw = function(_point) {
 		// Set line attributes
 		ctx.lineWidth = 8;
 		ctx.fillStyle = "rgba(0, 0, 0, 0)";
-		ctx.strokeStyle = "purple";
+		if (this.removed) ctx.strokeStyle = "rgba(150,150,150,0.5)";
+		else ctx.strokeStyle = "purple";
 
 		// Draw line
 		ctx.stroke();

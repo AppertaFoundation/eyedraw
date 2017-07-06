@@ -46,12 +46,26 @@ ED.Views.DoodlePopup = (function() {
 	 * @param {HTMLElement} widgetContainer The widget container element
 	 * @extends {ED.View}
 	 */
-	function DoodlePopup(drawing, container) {
+	function DoodlePopup(drawing, container, popupDoodles) {
 		ED.View.apply(this, arguments);
+
+		// don't want to be checking against an empty array
+		if (popupDoodles !== undefined && !popupDoodles.length) {
+			popupDoodles = undefined;
+		}
 
 		this.drawing = drawing;
 		this.container = container;
 		this.containerWidth = container.outerWidth();
+		this.popupDoodles = popupDoodles;
+
+
+		if ($(this.container).data('display-side')) {
+			this.side = $(this.container).data('display-side');
+		}
+		else {
+			this.side = 'right';
+		}
 
 		this.registerForNotifications();
 		this.createToolbar();
@@ -108,7 +122,7 @@ ED.Views.DoodlePopup = (function() {
 		if (!doodle) {
 			return;
 		}
-
+		
 		// Template data
 		var data = {
 			doodle: doodle,
@@ -138,7 +152,11 @@ ED.Views.DoodlePopup = (function() {
 	 * @param  {Boolean} show   Show or hide the menu.
 	 */
 	DoodlePopup.prototype.update = function(show) {
-		if (show && this.drawing.selectedDoodle) {
+		var shouldDisplayForDoodle = true;
+		if (this.popupDoodles && this.drawing.selectedDoodle && this.popupDoodles.indexOf(this.drawing.selectedDoodle.className) == -1) {
+			shouldDisplayForDoodle = false;
+		}
+		if (show && this.drawing.selectedDoodle && shouldDisplayForDoodle) {
 			this.render();
 			this.show();
 		} else {
@@ -154,9 +172,9 @@ ED.Views.DoodlePopup = (function() {
 
 			this.emit('hide.before');
 
-			this.container.css({
-				right: 0
-			});
+			var css = {};
+			css[this.side] = 0;
+			this.container.css(css);
 
 			setTimeout(function() {
 				this.container.addClass('closed');
@@ -174,9 +192,18 @@ ED.Views.DoodlePopup = (function() {
 
 			this.emit('show.before');
 
-			this.container.css({
-				right: -1 * (this.containerWidth - 1)
-			}).removeClass('closed');
+			if (this.side == 'left') {
+				this.container.css({
+					left: -1 * (this.containerWidth - 2)
+				}).find('.ed-button .label').addClass('left');
+				;
+			} else {
+				this.container.css({
+					right: -1 * (this.containerWidth - 1)
+				}).find('.ed-button .label').addClass('right');
+			}
+			this.container.removeClass('closed');
+
 
 			setTimeout(function() {
 				this.emit('show.after');

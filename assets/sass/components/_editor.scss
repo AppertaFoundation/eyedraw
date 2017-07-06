@@ -62,6 +62,9 @@ canvas {
 		position: relative;
 		z-index: 100;
 		margin: 0 0 0 2px;
+		&.secondary {
+			z-index: auto;
+		}
 	}
 	// Canvas element in display mode
 	&.ed-canvas-display {

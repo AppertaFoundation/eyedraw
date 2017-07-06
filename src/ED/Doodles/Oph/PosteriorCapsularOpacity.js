@@ -19,14 +19,14 @@
 /**
  * Corneal Oedema
  *
- * @class CornealOedema
+ * @class PosteriorCapsularOpacity
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
  * @param {Object} _parameterJSON
  */
-ED.CornealOedema = function(_drawing, _parameterJSON) {
+ED.PosteriorCapsularOpacity = function(_drawing, _parameterJSON) {
 	// Set classname
-	this.className = "CornealOedema";
+	this.className = "PosteriorCapsularOpacity";
 
 	// Private parameters
 	this.numberOfHandles = 4;
@@ -53,14 +53,14 @@ ED.CornealOedema = function(_drawing, _parameterJSON) {
 /**
  * Sets superclass and constructor
  */
-ED.CornealOedema.prototype = new ED.Doodle;
-ED.CornealOedema.prototype.constructor = ED.CornealOedema;
-ED.CornealOedema.superclass = ED.Doodle.prototype;
+ED.PosteriorCapsularOpacity.prototype = new ED.Doodle;
+ED.PosteriorCapsularOpacity.prototype.constructor = ED.PosteriorCapsularOpacity;
+ED.PosteriorCapsularOpacity.superclass = ED.Doodle.prototype;
 
 /**
  * Sets handle attributes
  */
-ED.CornealOedema.prototype.setHandles = function() {
+ED.PosteriorCapsularOpacity.prototype.setHandles = function() {
 	this.handleArray[4] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
 	// Array of handles
 // 	for (var i = 0; i < this.numberOfHandles; i++) {
@@ -71,7 +71,7 @@ ED.CornealOedema.prototype.setHandles = function() {
 /**
  * Sets default properties
  */
-ED.CornealOedema.prototype.setPropertyDefaults = function() {
+ED.PosteriorCapsularOpacity.prototype.setPropertyDefaults = function() {
 	this.isRotatable = false;
 	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
 	this.parameterValidationArray['apexY']['range'].setMinAndMax(-380, -80);
@@ -119,7 +119,7 @@ ED.CornealOedema.prototype.setPropertyDefaults = function() {
 /**
  * Sets default parameters
  */
-ED.CornealOedema.prototype.setParameterDefaults = function() {
+ED.PosteriorCapsularOpacity.prototype.setParameterDefaults = function() {
 	this.apexY = -this.initialRadius;
 	this.setParameterFromString('stromal', 'false');
 	this.setParameterFromString('epithelial', 'false');
@@ -149,12 +149,12 @@ ED.CornealOedema.prototype.setParameterDefaults = function() {
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.CornealOedema.prototype.draw = function(_point) {
+ED.PosteriorCapsularOpacity.prototype.draw = function(_point) {
 	// Get context
 	var ctx = this.drawing.context;
 
 	// Call draw method in superclass
-	ED.CornealOedema.superclass.draw.call(this, _point);
+	ED.PosteriorCapsularOpacity.superclass.draw.call(this, _point);
 
 	// Boundary path
 	ctx.beginPath();
@@ -240,6 +240,6 @@ ED.CornealOedema.prototype.draw = function(_point) {
  *
  * @returns {String} Description of doodle
  */
-ED.CornealOedema.prototype.description = function() {
+ED.PosteriorCapsularOpacity.prototype.description = function() {
 	return "Corneal oedema";
 }

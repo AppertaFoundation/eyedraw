@@ -64,6 +64,8 @@ class OEEyeDrawWidget extends CWidget
 	 */
 	public $showDoodlePopup = true;
 
+	public $showDoodlePopupForDoodles = null;
+
 	/**
 	 * Maximum amount of toolbar buttons to display in a panel.
 	 * @var integer Set to -1 to show all buttons.
@@ -231,10 +233,24 @@ class OEEyeDrawWidget extends CWidget
 	public $autoReport = '';
 
 	/**
+	 * If autoReport is set, then this determines whether the controller will handle edits to the element containing
+	 * the auto reported text.
+	 * @var bool
+	 */
+	public $autoReportEditable = true;
+
+	/**
 	 * Whether the eyedraw should be rendered with a div wrapper
 	 * @var boolean
 	 */
 	public $divWrapper = true;
+
+	/**
+	 * The side the popup should display from the eyedraw
+	 *
+	 * @var string left|right
+	 */
+	public $popupDisplaySide = 'right';
 
 	/**
 	 * Paths for the subdirectories for javascript, css and images
@@ -261,13 +277,13 @@ class OEEyeDrawWidget extends CWidget
 	 * Unique name for the input element containing EyeDraw data
 	 * @var string
 	 */
-	private $inputName;
+	public $inputName;
 
 	/**
 	 * Unique id for the input element containing EyeDraw data
 	 * @var string
 	 */
-	private $inputId;
+	public $inputId;
 
 	/**
 	 * Represents the eye using the ED object enumeration (0 = right, 1 = left)
@@ -297,7 +313,7 @@ class OEEyeDrawWidget extends CWidget
 		$this->canvasId = 'ed_canvas_'.$this->mode.'_'.$this->idSuffix;
 
 		// Create matching name and id in 'Yii' format for loading and saving using POST
-		if (isset($this->model) && isset($this->attribute)) {
+		if (!isset($this->inputName) && isset($this->model) && isset($this->attribute)) {
 			if ($this->mode == 'edit') {
 				$this->inputName = CHtml::modelName($this->model).'['. $this->attribute.']';
 				$this->inputId = CHtml::modelName($this->model).'_'. $this->attribute;
@@ -368,7 +384,7 @@ class OEEyeDrawWidget extends CWidget
 		$data = get_object_vars($this);
 		$data['data'] = $data;
 
-		if (!$this->model->event || !$this->model->event->hasEventImage($this->drawingName)) {
+		if (!property_exists($this->model, 'event') || !$this->model->event || !$this->model->event->hasEventImage($this->drawingName)) {
 			// Register package (dependent scripts and stylesheets)
 			Yii::app()->clientScript->registerPackage('eyedraw');
 
@@ -422,6 +438,8 @@ class OEEyeDrawWidget extends CWidget
 			'offsetY'=>$this->offsetY,
 			'toImage'=>$this->toImage,
 			'autoReport'=>$this->autoReport,
+			'autoReportEditable' => $this->autoReportEditable,
+			'showDoodlePopupForDoodles' => $this->showDoodlePopupForDoodles
 		);
 		// need to escape the listener names so that they are not treated as string vars in javascript
 		foreach ($this->listenerArray as $listener) {

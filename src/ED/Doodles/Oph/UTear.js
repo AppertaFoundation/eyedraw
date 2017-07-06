@@ -67,6 +67,7 @@ ED.UTear.prototype.setPropertyDefaults = function() {
  */
 ED.UTear.prototype.setParameterDefaults = function() {
 	this.apexY = -20;
+	this.cachedClockHour = undefined;
 
 	var doodle = this.drawing.lastDoodleOfClass(this.className);
 	if (doodle) {
@@ -92,8 +93,7 @@ ED.UTear.prototype.draw = function(_point) {
 
 	// Call draw method in superclass
 	ED.UTear.superclass.draw.call(this, _point);
-
-	// Boundary path
+    // Boundary path
 	ctx.beginPath();
 
 	// U tear
@@ -113,7 +113,6 @@ ED.UTear.prototype.draw = function(_point) {
 
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
-
 	// Coordinates of handles (in canvas plane)
 	this.handleArray[3].location = this.transform.transformPoint(new ED.Point(40, -40));
 	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
@@ -125,7 +124,7 @@ ED.UTear.prototype.draw = function(_point) {
 	this.leftExtremity = this.transform.transformPoint(new ED.Point(-40, -40));
 	this.rightExtremity = this.transform.transformPoint(new ED.Point(40, -40));
 	this.arc = this.calculateArc();
-
+	this.cachedClockHour = this.clockHour();
 	// Return value indicating successful hittest
 	return this.isClicked;
 }
@@ -145,7 +144,7 @@ ED.UTear.prototype.groupDescription = function() {
  * @returns {String} Description of doodle
  */
 ED.UTear.prototype.description = function() {
-	return this.clockHour();
+	return this.cachedClockHour;
 }
 
 /**
