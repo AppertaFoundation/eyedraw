@@ -76,6 +76,7 @@ ED.trans['CornealOedema'] = 'Drag to position<br/>Drag handle to change size';
 ED.trans['CornealStriae'] = '';
 ED.trans['CornealScar'] = 'Drag outer handle to change shape<br/>Drag inner handle to change density';
 ED.trans['CornealSuture'] = 'Drag to move';
+ED.trans['CornealLaceration'] = 'Please click to draw each point of the laceration.<br />Double click to complete.';
 ED.trans['CorticalCataract'] = 'Drag to move<br/>Drag handle to change density';
 ED.trans['CottonWoolSpot'] = 'Drag to position<br/>Drag handle to change shape and size';
 ED.trans['CNV'] = 'Drag to move<br/>Drag handle to scale';

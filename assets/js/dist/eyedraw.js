@@ -8773,6 +8773,7 @@ ED.trans['CornealOedema'] = 'Drag to position<br/>Drag handle to change size';
 ED.trans['CornealStriae'] = '';
 ED.trans['CornealScar'] = 'Drag outer handle to change shape<br/>Drag inner handle to change density';
 ED.trans['CornealSuture'] = 'Drag to move';
+ED.trans['CornealLaceration'] = 'Please click to draw each point of the laceration.<br />Double click to complete.';
 ED.trans['CorticalCataract'] = 'Drag to move<br/>Drag handle to change density';
 ED.trans['CottonWoolSpot'] = 'Drag to position<br/>Drag handle to change shape and size';
 ED.trans['CNV'] = 'Drag to move<br/>Drag handle to scale';
@@ -21701,7 +21702,7 @@ ED.CornealLaceration = function(_drawing, _parameterJSON) {
 	this.plane = 0;
 	
 	// derived parameter
-	this.cornealThickness = 0;
+	this.lacerationDepth = 0;
 	this.lacType = "laceration";
 	this.complete = false;
 	this.irisProlapse = false;
@@ -21711,11 +21712,11 @@ ED.CornealLaceration = function(_drawing, _parameterJSON) {
 	this.mousePoint = new ED.Point(-550,-550); //default off canvas so not visible
 
 	// Saved parameters
-	this.savedParameterArray = ['cornealThickness','numberOfHandles','irisProlapse'];
+	this.savedParameterArray = ['lacerationDepth','numberOfHandles','irisProlapse'];
 
 	// Parameters in doodle control bar (parameter name: parameter label)
 	this.controlParameterArray = {
-		'cornealThickness':'Corneal thickness',
+		'lacerationDepth':'Laceration Depth %',
 		'irisProlapse':'Iris prolapse'
 	};
 
@@ -21749,7 +21750,7 @@ ED.CornealLaceration.prototype.setPropertyDefaults = function() {
 	this.isFilled = false;
 	this.isMoveable = false;
 
-	this.parameterValidationArray['cornealThickness'] = {
+	this.parameterValidationArray['lacerationDepth'] = {
 		kind: 'other',
 		type: 'int',
 		range: new ED.Range(1, 100),
@@ -21957,8 +21958,8 @@ ED.CornealLaceration.prototype.description = function() {
 	
 	var text = "";
 	
-	if (this.cornealThickness == 100) text += 'Full thickness ' + this.lacType + ' ' + linearDistanceShort +'mm';
-	else  if (this.cornealThickness > 0) text += 'Partial thickness ' +  this.lacType + ' ' + linearDistanceShort +'mm, '+ this.cornealThickness + '%';
+	if (this.lacerationDepth == 100) text += 'Full thickness ' + this.lacType + ' ' + linearDistanceShort +'mm';
+	else  if (this.lacerationDepth > 0) text += 'Partial thickness ' +  this.lacType + ' ' + linearDistanceShort +'mm, '+ this.lacerationDepth + '%';
 	else text += this.lacType + ' ' + linearDistanceShort + 'mm';
 
 	return text;
