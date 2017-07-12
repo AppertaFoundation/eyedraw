@@ -29,7 +29,7 @@ ED.Lids = function(_drawing, _parameterJSON) {
 	this.className = "Lids";
 
 	// Saved parameters
-	this.savedParameterArray = [];
+	this.savedParameterArray = ['apexX', 'apexY', 'dir'];
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -54,6 +54,7 @@ ED.Lids.prototype.setHandles = function() {
  * Sets default dragging attributes
  */
 ED.Lids.prototype.setPropertyDefaults = function() {
+	this.isDeletable = false;
 	this.isMoveable = false;
 	this.isScalable = false;
 	this.isRotatable= false;

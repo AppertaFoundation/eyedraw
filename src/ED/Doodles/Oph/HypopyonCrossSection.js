@@ -275,8 +275,15 @@ ED.HypopyonCrossSection.prototype.draw = function(_point) {
 	// Get relative lens position to draw around
 	var lens = this.drawing.lastDoodleOfClass('LensCrossSection');
 	var iris = this.drawing.lastDoodleOfClass('AntSegCrossSection');
-	
+	var cornea = this.drawing.lastDoodleOfClass('CorneaCrossSection');
+
 	var marginX = (iris) ? iris.apexX: -20;
+
+  if (cornea) {
+  	console.log('here!');
+  	console.log(cornea);
+    this.setSimpleParameter('originX', cornea.originX);
+  }
 
 	if (lens) {
 		// Displacement of lens from centre
@@ -290,7 +297,7 @@ ED.HypopyonCrossSection.prototype.draw = function(_point) {
 		
 		if (lens.originX + ld + x - 300 - this.originX < iris.apexX) marginX = lens.originX + ld + x - 300 - this.originX;
 	}
-	
+
 /*
 	var lens = this.drawing.lastDoodleOfClass('LensCrossSection');
 	if (lens) {

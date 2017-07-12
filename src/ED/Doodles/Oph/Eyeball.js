@@ -60,6 +60,11 @@ ED.Eyeball.prototype.setPropertyDefaults = function() {
  * Sets default parameters
  */
 ED.Eyeball.prototype.setParameterDefaults = function() {
+  this.isDeletable = false;
+  this.isMoveable = false;
+  this.isScalable = false;
+  this.isRotatable= false;
+  this.isShowHighlight = false;
 }
 
 /**
