@@ -28,6 +28,9 @@ ED.Retinoschisis = function(_drawing, _parameterJSON)
     // Set classname
     this.className = "Retinoschisis";
 
+    // Saved parameters
+    this.savedParameterArray = ['arc', 'rotation', 'apexY'];
+
     // Call superclass constructor
     ED.Doodle.call(this, _drawing, _parameterJSON);
 }
