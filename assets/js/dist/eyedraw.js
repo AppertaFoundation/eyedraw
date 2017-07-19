@@ -27083,7 +27083,7 @@ ED.InnerLeafBreak = function(_drawing, _parameterJSON)
     // Set classname
     this.className = "InnerLeafBreak";
 
-    this.savedParameterArray = ['arc', 'radius', 'originX', 'originY', 'scaleX', 'scaleY'];
+    this.savedParameterArray = ['originX', 'originY', 'scaleX', 'scaleY'];
     
     // Call superclass constructor
     ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -32785,7 +32785,7 @@ ED.OuterLeafBreak = function(_drawing, _parameterJSON)
     // Set classname
     this.className = "OuterLeafBreak";
 
-    this.savedParameterArray = ['arc', 'radius', 'originX', 'originY', 'scaleX', 'scaleY'];
+    this.savedParameterArray = ['originX', 'originY', 'scaleX', 'scaleY'];
 
     // Call superclass constructor
     ED.Doodle.call(this, _drawing, _parameterJSON);
