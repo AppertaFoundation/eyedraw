@@ -28,6 +28,8 @@ ED.InnerLeafBreak = function(_drawing, _parameterJSON)
     // Set classname
     this.className = "InnerLeafBreak";
 
+    this.savedParameterArray = ['originX', 'originY', 'scaleX', 'scaleY'];
+    
     // Call superclass constructor
     ED.Doodle.call(this, _drawing, _parameterJSON);
 }
