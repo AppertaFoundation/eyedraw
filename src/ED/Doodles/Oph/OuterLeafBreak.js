@@ -28,6 +28,8 @@ ED.OuterLeafBreak = function(_drawing, _parameterJSON)
     // Set classname
     this.className = "OuterLeafBreak";
 
+    this.savedParameterArray = ['arc', 'radius', 'originX', 'originY', 'scaleX', 'scaleY'];
+
     // Call superclass constructor
     ED.Doodle.call(this, _drawing, _parameterJSON);
 
