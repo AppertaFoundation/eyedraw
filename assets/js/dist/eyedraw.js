@@ -32173,6 +32173,8 @@ ED.InnerLeafBreak = function(_drawing, _parameterJSON)
     // Set classname
     this.className = "InnerLeafBreak";
 
+    this.savedParameterArray = ['originX', 'originY', 'scaleX', 'scaleY'];
+    
     // Call superclass constructor
     ED.Doodle.call(this, _drawing, _parameterJSON);
 }
@@ -34462,6 +34464,9 @@ ED.Lattice = function(_drawing, _parameterJSON)
 {
     // Set classname
     this.className = "Lattice";
+
+    // Saved parameters
+    this.savedParameterArray = ['arc', 'radius', 'originX', 'originY', 'rotation'];
 
     // Call superclass constructor
     ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -39443,6 +39448,8 @@ ED.OuterLeafBreak = function(_drawing, _parameterJSON)
 {
     // Set classname
     this.className = "OuterLeafBreak";
+
+    this.savedParameterArray = ['originX', 'originY', 'scaleX', 'scaleY'];
 
     // Call superclass constructor
     ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -45317,6 +45324,9 @@ ED.Retinoschisis = function(_drawing, _parameterJSON)
 {
     // Set classname
     this.className = "Retinoschisis";
+
+    // Saved parameters
+    this.savedParameterArray = ['arc', 'rotation', 'apexY'];
 
     // Call superclass constructor
     ED.Doodle.call(this, _drawing, _parameterJSON);
