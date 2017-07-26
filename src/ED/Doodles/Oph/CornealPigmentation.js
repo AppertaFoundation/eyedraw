@@ -28,10 +28,6 @@ ED.CornealPigmentation = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "CornealPigmentation";
 	
-	// Other parameters
-	this.level = 'Epithelial';
-	this.type = 'Iron';
-
 	// Saved parameters
 	this.savedParameterArray = ['originX', 'originY', 'apexY', 'apexX', 'scaleX','scaleY', 'rotation', 'level', 'type'];
 
@@ -81,7 +77,7 @@ ED.CornealPigmentation.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['level'] = {
 		kind: 'derived',
 		type: 'string',
-		list: ['Epithelial', 'Subepithelial', 'Anterior stromal', 'Mid stromal', 'Posterior stromal', 'Descemet\'s'],
+		list: ['Endothelium', 'Epithelial', 'Subepithelial', 'Anterior stromal', 'Mid stromal', 'Posterior stromal', 'Descemet\'s'],
 		animate: true
 	};
 	this.parameterValidationArray['type'] = {
@@ -102,7 +98,8 @@ ED.CornealPigmentation.prototype.setPropertyDefaults = function() {
  * Sets default parameters
  */
 ED.CornealPigmentation.prototype.setParameterDefaults = function() {
-	this.setParameterFromString('level', 'Epithelial');
+	this.setParameterFromString('level', 'Endothelium');
+  this.setParameterFromString('type', 'Melanin');
 	this.apexY = -150;
 	this.apexX = 30;
 	
@@ -221,11 +218,14 @@ ED.CornealPigmentation.prototype.draw = function(_point) {
  *
  * @returns {String} Description of doodle
  */
-ED.CornealPigmentation.prototype.groupDescription = function() {
+ED.CornealPigmentation.prototype.description = function() {
 	
-	var ratio = Math.abs(this.apexX / this.apexY);
-	
-	var str = (ratio<2.5 && ratio>0.3) ? "Corneal pigmentation" : "Krukenberg spindle";
-	
-	return str;
+	// old ratio check method
+	// var ratio = Math.abs(this.apexX / this.apexY);
+	// var str = (ratio<2.5 && ratio>0.3) ? "Corneal pigmentation" : "Krukenberg spindle";
+	if (this.type === 'Melanin' && this.level === 'Endothelium') {
+		return 'Krukenberg spindle';
+	}
+
+	return 'Corneal pigmentation: ' + this.type + ', ' + this.level;
 }

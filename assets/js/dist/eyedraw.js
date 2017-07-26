@@ -2847,89 +2847,64 @@ ED.Drawing.prototype.suppressReports = function() {
 };
 
 /**
+ * Returns a list of report strings to allow more fine grained manipulation of results.
+ *
+ * @returns {Array} list of report strings from doodle(s) on drawing
+ */
+ED.Drawing.prototype.reportData = function() {
+	var reports = [];
+	var grouped = {};
+	for (var i = 0; i < this.doodleArray.length; i++) {
+		var doodle = this.doodleArray[i];
+		var description = doodle.description();
+
+		if (doodle.willReport) {
+			var groupDescription = doodle.groupDescription();
+			if (groupDescription.length > 0) {
+				if (typeof(grouped[doodle.className]) === 'undefined') {
+					grouped[doodle.className] = {
+						'start': groupDescription,
+						'descriptions': [],
+						'end': doodle.groupDescriptionEnd()
+					}
+				}
+				grouped[doodle.className]['descriptions'].push(description)
+			} else {
+				if (description.length) {
+					reports.push(description);
+				}
+			}
+		}
+	}
+
+	// consolidate group reports
+  for (var cls in grouped) {
+		var groupStr = '';
+    if (grouped.hasOwnProperty(cls)) {
+      groupStr = grouped[cls]['start'];
+      groupStr += ED.addAndAfterLastComma(grouped[cls]['descriptions'].join(", "));
+      groupStr += grouped[cls]['end'];
+      reports.push(groupStr);
+    }
+  }
+
+	return reports;
+}
+
+/**
  * Returns a string containing a description of the drawing
  *
  * @returns {String} Description of the drawing
  */
 ED.Drawing.prototype.report = function() {
 	var returnString = "";
-	var groupArray = [];
-	var groupEndArray = [];
 
-	// Go through every doodle
-	for (var i = 0; i < this.doodleArray.length; i++) {
-		var doodle = this.doodleArray[i];
-
-		// Reporting can be switched off with willReport flag
-		if (doodle.willReport) {
-			// Check for a group description
-			if (doodle.groupDescription().length > 0) {
-				// Create an array entry for it or add to existing
-				if (typeof(groupArray[doodle.className]) == 'undefined') {
-					groupArray[doodle.className] = doodle.groupDescription();
-					groupArray[doodle.className] += doodle.description();
-				} else {
-					// Only add additional detail if supplied by description method
-					if (doodle.description().length > 0) {
-						groupArray[doodle.className] += ", ";
-						groupArray[doodle.className] += doodle.description();
-					}
-				}
-
-				// Check if there is a corresponding end description
-				if (doodle.groupDescriptionEnd().length > 0) {
-					if (typeof(groupEndArray[doodle.className]) == 'undefined') {
-						groupEndArray[doodle.className] = doodle.groupDescriptionEnd();
-					}
-				}
-			} else {
-				// Get description
-				var description = doodle.description();
-
-				// If its not an empty string, add to the return
-				if (description.length > 0) {
-					// If text there already, make it lower case and add a comma before
-					if (returnString.length == 0) {
-						returnString += description;
-					} else {
-						returnString = returnString + ", " + ED.firstLetterToLowerCase(description);
-					}
-				}
-			}
-		}
+	var data = this.reportData();
+	for (var i = 0; i < data.length; i++) {
+		returnString += (i === 0) ? data[i] : ", " + ED.firstLetterToLowerCase(data[i]);
 	}
 
-	// Go through group array adding descriptions
-	for (className in groupArray) {
-		// Get description
-		var description = groupArray[className];
-
-		// Get end description
-		var endDescription = "";
-		if (typeof(groupEndArray[className]) != 'undefined') {
-			endDescription = groupEndArray[className];
-		}
-
-		// Replace last comma with a comma and 'and'
-		description = ED.addAndAfterLastComma(description) + endDescription;
-
-		// If its not an empty string, add to the return
-		if (description.length > 0) {
-			// If text there already, make it lower case and add a comma before
-			if (returnString.length == 0) {
-				returnString += description;
-			} else {
-				returnString = returnString + ", " + ED.firstLetterToLowerCase(description);
-			}
-		}
-	}
-
-	if (!returnString.length) {
-		returnString = 'No abnormality';
-	}
-
-	// Return result
-	return returnString;
+	return (returnString.length > 0) ? returnString : "No abnormality";
 };
 
 
@@ -24396,10 +24371,6 @@ ED.CornealPigmentation = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "CornealPigmentation";
 	
-	// Other parameters
-	this.level = 'Epithelial';
-	this.type = 'Iron';
-
 	// Saved parameters
 	this.savedParameterArray = ['originX', 'originY', 'apexY', 'apexX', 'scaleX','scaleY', 'rotation', 'level', 'type'];
 
@@ -24449,7 +24420,7 @@ ED.CornealPigmentation.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['level'] = {
 		kind: 'derived',
 		type: 'string',
-		list: ['Epithelial', 'Subepithelial', 'Anterior stromal', 'Mid stromal', 'Posterior stromal', 'Descemet\'s'],
+		list: ['Endothelium', 'Epithelial', 'Subepithelial', 'Anterior stromal', 'Mid stromal', 'Posterior stromal', 'Descemet\'s'],
 		animate: true
 	};
 	this.parameterValidationArray['type'] = {
@@ -24470,7 +24441,8 @@ ED.CornealPigmentation.prototype.setPropertyDefaults = function() {
  * Sets default parameters
  */
 ED.CornealPigmentation.prototype.setParameterDefaults = function() {
-	this.setParameterFromString('level', 'Epithelial');
+	this.setParameterFromString('level', 'Endothelium');
+  this.setParameterFromString('type', 'Melanin');
 	this.apexY = -150;
 	this.apexX = 30;
 	
@@ -24589,13 +24561,16 @@ ED.CornealPigmentation.prototype.draw = function(_point) {
  *
  * @returns {String} Description of doodle
  */
-ED.CornealPigmentation.prototype.groupDescription = function() {
+ED.CornealPigmentation.prototype.description = function() {
 	
-	var ratio = Math.abs(this.apexX / this.apexY);
-	
-	var str = (ratio<2.5 && ratio>0.3) ? "Corneal pigmentation" : "Krukenberg spindle";
-	
-	return str;
+	// old ratio check method
+	// var ratio = Math.abs(this.apexX / this.apexY);
+	// var str = (ratio<2.5 && ratio>0.3) ? "Corneal pigmentation" : "Krukenberg spindle";
+	if (this.type === 'Melanin' && this.level === 'Endothelium') {
+		return 'Krukenberg spindle';
+	}
+
+	return 'Corneal pigmentation: ' + this.type + ', ' + this.level;
 }
 
 /**

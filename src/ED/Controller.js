@@ -481,10 +481,11 @@ ED.Controller = (function() {
 	 * Automatically calls the drawings report
 	 */
 	Controller.prototype.autoReport = function(outputElement, editable) {
-		var report = this.drawing.report();
-		if(report){
+		var reportData = this.drawing.reportData();
+		var report = '';
+		if(reportData.length){
 
-			report = report.replace(/, /g,"\n");
+			report = reportData.join('\n');
 
 			var output = '';
 
