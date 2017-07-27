@@ -126,6 +126,9 @@ ED.Views.SelectedDoodle = (function() {
 	 */
 	SelectedDoodle.prototype.createDoodleOption = function(doodle) {
 
+		if (!doodle.isSelectable)
+			return $('');
+
 		var text = ED.titles[doodle.className] || doodle.className;
 		var selected = (doodle === this.drawing.selectedDoodle);
 

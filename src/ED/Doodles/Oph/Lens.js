@@ -37,9 +37,10 @@ ED.Lens = function(_drawing, _parameterJSON) {
 	this.posteriorPolar = false;
 	this.coronary = false;
 	this.phakodonesis = false;
+	this.csOriginX = 0;
 
 	// Saved parameters
-	this.savedParameterArray = ['rotation', 'originY', 'nuclearGrade', 'corticalGrade', 'posteriorSubcapsularGrade', 'anteriorPolar', 'posteriorPolar', 'coronary', 'phakodonesis'];
+	this.savedParameterArray = ['rotation', 'originY', 'nuclearGrade', 'corticalGrade', 'posteriorSubcapsularGrade', 'anteriorPolar', 'posteriorPolar', 'coronary', 'phakodonesis', 'csOriginX'];
 
 	// Parameters in doodle control bar (parameter name: parameter label)
 	this.controlParameterArray = {

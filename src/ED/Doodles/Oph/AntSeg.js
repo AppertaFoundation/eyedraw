@@ -37,8 +37,9 @@ ED.AntSeg = function(_drawing, _parameterJSON) {
 	this.colour = 'Blue';
 	this.ectropion = false;
 	this.cornealSize = 'Normal';
-  this.cells = 'Not Checked';
-  this.flare = 'Not Checked';
+    this.cells = 'Not Checked';
+    this.flare = 'Not Checked';
+    this.csApexX = 0;
 
 	// Saved parameters
 	this.savedParameterArray = [
@@ -51,7 +52,8 @@ ED.AntSeg = function(_drawing, _parameterJSON) {
 		'ectropion',
 		'cornealSize',
 		'cells',
-		'flare'
+		'flare',
+		'csApexX' // store of cross section apex x value
 	];
 
 	// Parameters in doodle control bar (parameter name: parameter label)
