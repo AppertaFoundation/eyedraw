@@ -192,7 +192,7 @@ ED.positiveAngle = function(_angle) {
  * @param {String} _message Error message
  */
 ED.errorHandler = function(_class, _method, _message) {
-	console.log('EYEDRAW ERROR! class: [' + _class + '] method: [' + _method + '] message: [' + _message + ']');
+	console.trace('EYEDRAW ERROR! class: [' + _class + '] method: [' + _method + '] message: [' + _message + ']');
 };
 
 /**
@@ -5325,7 +5325,7 @@ ED.Doodle.prototype.json = function() {
 				} else if (typeof(o) == 'object') {
 					o = JSON.stringify(o);
 				} else {
-					ED.errorHandler('ED.Doodle', 'json', 'Attempt to create json for an unhandled parameter type: ' + typeof(o));
+					ED.errorHandler('ED.Doodle', 'json', 'Attempt to create json for parameter ' + p + ' with an unhandled parameter type: ' + typeof(o));
 					o = "ERROR";
 				}
 
@@ -13214,10 +13214,17 @@ ED.ACIOLCrossSection = function(_drawing, _parameterJSON) {
 	this.className = "ACIOLCrossSection";
 	
 	// Saved parameters
-	this.savedParameterArray = ['originX'];
+	this.savedParameterArray = ['originX', 'originY'];
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
+
+    this.linkedDoodleParameters = {
+        'ACIOL': {
+            source: ['originY'],
+            store: [['originX', 'csOriginX']]
+        }
+    };
 }
 
 /**
@@ -16048,8 +16055,8 @@ ED.AntSegCrossSection = function(_drawing, _parameterJSON) {
 
 	// Derived parameters
 	this.pupilSize = 'Large';
-    this.c = 1;
-  this.colour = 'Blue';
+
+	this.colour = 'Blue';
     
 	// Saved parameters
 	this.savedParameterArray = ['apexY', 'apexX','colour','c'];
@@ -16059,7 +16066,7 @@ ED.AntSegCrossSection = function(_drawing, _parameterJSON) {
 
   this.linkedDoodleParameters = {
     'AntSeg': {
-      source: ['apexY', 'colour', 'c'],
+      source: ['apexY', 'colour'],
       store: [['apexX', 'csApexX']]
     }
   };
@@ -20283,6 +20290,14 @@ ED.ConjunctivalSuture.prototype.description = function() {
 	return returnValue;
 }
 
+/**
+ * Cornea
+ *
+ * @class Cornea
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Object} _parameterJSON
+ */
 ED.Cornea = function(_drawing, _parameterJSON) {
     // Set classname
     this.className = "Cornea";
@@ -20403,6 +20418,13 @@ ED.CorneaCrossSection = function(_drawing, _parameterJSON) {
 	
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
+
+    this.linkedDoodleParameters = {
+        'Cornea': {
+            source: ['shape', 'pachymetry'],
+            store: [['apexX', 'csApexX'], ['apexY', 'csApexY'], ['originX', 'csOriginX']]
+        }
+    };
 }
 
 /**
@@ -40369,6 +40391,13 @@ ED.PCIOLCrossSection = function(_drawing, _parameterJSON) {
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
+
+    this.linkedDoodleParameters = {
+        'PCIOL': {
+            source: ['fixation', 'fx', 'originY'],
+            store: [['originX', 'csOriginX']]
+        }
+    };
 }
 
 /**

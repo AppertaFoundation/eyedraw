@@ -31,8 +31,8 @@ ED.AntSegCrossSection = function(_drawing, _parameterJSON) {
 
 	// Derived parameters
 	this.pupilSize = 'Large';
-    this.c = 1;
-  this.colour = 'Blue';
+
+	this.colour = 'Blue';
     
 	// Saved parameters
 	this.savedParameterArray = ['apexY', 'apexX','colour','c'];
@@ -42,7 +42,7 @@ ED.AntSegCrossSection = function(_drawing, _parameterJSON) {
 
   this.linkedDoodleParameters = {
     'AntSeg': {
-      source: ['apexY', 'colour', 'c'],
+      source: ['apexY', 'colour'],
       store: [['apexX', 'csApexX']]
     }
   };

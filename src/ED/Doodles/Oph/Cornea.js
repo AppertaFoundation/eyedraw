@@ -1,3 +1,11 @@
+/**
+ * Cornea
+ *
+ * @class Cornea
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Object} _parameterJSON
+ */
 ED.Cornea = function(_drawing, _parameterJSON) {
     // Set classname
     this.className = "Cornea";

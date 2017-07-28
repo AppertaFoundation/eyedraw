@@ -29,10 +29,17 @@ ED.ACIOLCrossSection = function(_drawing, _parameterJSON) {
 	this.className = "ACIOLCrossSection";
 	
 	// Saved parameters
-	this.savedParameterArray = ['originX'];
+	this.savedParameterArray = ['originX', 'originY'];
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
+
+    this.linkedDoodleParameters = {
+        'ACIOL': {
+            source: ['originY'],
+            store: [['originX', 'csOriginX']]
+        }
+    };
 }
 
 /**

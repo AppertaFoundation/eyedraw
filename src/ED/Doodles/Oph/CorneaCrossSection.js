@@ -43,6 +43,13 @@ ED.CorneaCrossSection = function(_drawing, _parameterJSON) {
 	
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
+
+    this.linkedDoodleParameters = {
+        'Cornea': {
+            source: ['shape', 'pachymetry'],
+            store: [['apexX', 'csApexX'], ['apexY', 'csApexY'], ['originX', 'csOriginX']]
+        }
+    };
 }
 
 /**

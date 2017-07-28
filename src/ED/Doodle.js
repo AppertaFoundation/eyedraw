@@ -2156,7 +2156,7 @@ ED.Doodle.prototype.json = function() {
 				} else if (typeof(o) == 'object') {
 					o = JSON.stringify(o);
 				} else {
-					ED.errorHandler('ED.Doodle', 'json', 'Attempt to create json for an unhandled parameter type: ' + typeof(o));
+					ED.errorHandler('ED.Doodle', 'json', 'Attempt to create json for parameter ' + p + ' with an unhandled parameter type: ' + typeof(o));
 					o = "ERROR";
 				}
 

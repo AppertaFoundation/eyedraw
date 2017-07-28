@@ -41,6 +41,13 @@ ED.PCIOLCrossSection = function(_drawing, _parameterJSON) {
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
+
+    this.linkedDoodleParameters = {
+        'PCIOL': {
+            source: ['fixation', 'fx', 'originY'],
+            store: [['originX', 'csOriginX']]
+        }
+    };
 }
 
 /**
