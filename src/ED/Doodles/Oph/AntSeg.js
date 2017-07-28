@@ -37,9 +37,9 @@ ED.AntSeg = function(_drawing, _parameterJSON) {
 	this.colour = 'Blue';
 	this.ectropion = false;
 	this.cornealSize = 'Normal';
-    this.cells = 'Not Checked';
-    this.flare = 'Not Checked';
-    this.csApexX = 0;
+	this.cells = 'Not Checked';
+	this.flare = 'Not Checked';
+	this.csApexX = 0;
 
 	// Saved parameters
 	this.savedParameterArray = [

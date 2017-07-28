@@ -3231,6 +3231,7 @@ ED.Drawing.prototype.getScaleLevel = function() {
  * @param {Drawing} _drawing
  * @param {Object} _parameterJSON
  * @param {Int} _order
+ * @param {Object} linkedDoodleParameters
  */
 ED.Doodle = function(_drawing, _parameterJSON) {
 	// Function called as part of prototype assignment has no parameters passed
@@ -3254,6 +3255,11 @@ ED.Doodle = function(_drawing, _parameterJSON) {
 		// Set initial scale level (the scale level will be adjusted later only once
 		// params have been set)
 		this.scaleLevel = 1;
+
+		// Object indexed by linked doodle class name to define parameters that should be synced between the doodles
+		// primarily for the benefit of cross section doodles
+		// TODO: see if we can subclass to a cross section doodle and include in that instead
+		this.linkedDoodleParameters = {};
 
 		// Dragging defaults - set individual values in subclasses
 		this.isLocked = false;
@@ -5511,6 +5517,12 @@ ED.Doodle.prototype.adjustScaleAndPosition = function(amount){
 	if (this.lastOriginX) this.lastOriginX *= amount;
 	if (this.lastOriginY) this.lastOriginY *= amount;
 };
+
+ED.Doodle.prototype.getLinkedParameters = function(linkedDoodleClass) {
+	if (typeof(this.linkedDoodleParameters[linkedDoodleClass]) != "undefined") {
+		return this.linkedDoodleParameters[linkedDoodleClass];
+	}
+}
 
 /**
  * Outputs doodle information to the console
@@ -15432,9 +15444,9 @@ ED.AntSeg = function(_drawing, _parameterJSON) {
 	this.colour = 'Blue';
 	this.ectropion = false;
 	this.cornealSize = 'Normal';
-    this.cells = 'Not Checked';
-    this.flare = 'Not Checked';
-    this.csApexX = 0;
+	this.cells = 'Not Checked';
+	this.flare = 'Not Checked';
+	this.csApexX = 0;
 
 	// Saved parameters
 	this.savedParameterArray = [
@@ -16042,8 +16054,15 @@ ED.AntSegCrossSection = function(_drawing, _parameterJSON) {
 	// Saved parameters
 	this.savedParameterArray = ['apexY', 'apexX','colour','c'];
 
-	// Call superclass constructor
+  // Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
+
+  this.linkedDoodleParameters = {
+    'AntSeg': {
+      source: ['apexY', 'colour', 'c'],
+      store: [['apexX', 'csApexX']]
+    }
+  };
 
 	// Invariant simple parameters
 	this.originX = 44;
@@ -35138,6 +35157,14 @@ ED.LensCrossSection = function(_drawing, _parameterJSON) {
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
+
+  this.linkedDoodleParameters = {
+    'Lens': {
+      source: ['nuclearGrade', 'corticalGrade', 'posteriorSubcapsularGrade', 'phakodonesis'],
+      store: [['originX', 'csOriginX'], ['originY', 'originY']]
+    }
+  };
+
 }
 
 /**
