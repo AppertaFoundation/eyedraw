@@ -35203,8 +35203,8 @@ ED.LensCrossSection = function(_drawing, _parameterJSON) {
 
   this.linkedDoodleParameters = {
     'Lens': {
-      source: ['nuclearGrade', 'corticalGrade', 'posteriorSubcapsularGrade', 'phakodonesis'],
-      store: [['originX', 'csOriginX'], ['originY', 'originY']]
+      source: ['originY', 'nuclearGrade', 'corticalGrade', 'posteriorSubcapsularGrade', 'phakodonesis'],
+      store: [['originX', 'csOriginX']]
     }
   };
 
