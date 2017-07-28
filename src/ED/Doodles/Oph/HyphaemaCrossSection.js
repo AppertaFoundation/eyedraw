@@ -35,16 +35,22 @@ ED.HyphaemaCrossSection = function(_drawing, _parameterJSON) {
 	
 	// Derived parameters
 	this.ro = 380;
-	this.minimum = 304;
-	
+
 	// Saved parameters
-	this.savedParameterArray = ['originY', 'apexX', 'apexY', 'minimum', 'originX'];
+	this.savedParameterArray = ['originY', 'apexX', 'apexY', 'originX'];
 	
 	// Parameters in doodle control bar
 	this.controlParameterArray = {};
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
+
+    this.linkedDoodleParameters = {
+        'Hyphaema': {
+            source: ['apexY'],
+            store: [['originY', 'csOriginY'], ['apexX', 'csApexX'], ['originX', 'csOriginX']]
+        }
+    };
 }
 
 /**
@@ -69,7 +75,7 @@ ED.HyphaemaCrossSection.prototype.setPropertyDefaults = function() {
 		
 	// Update component of validation array for simple parameters
 	this.parameterValidationArray['apexX']['range'].setMinAndMax(-50, +50);
-	this.parameterValidationArray['apexY']['range'].setMinAndMax(-380, this.minimum);
+	this.parameterValidationArray['apexY']['range'].setMinAndMax(-380, 304);
 	
 	
 }

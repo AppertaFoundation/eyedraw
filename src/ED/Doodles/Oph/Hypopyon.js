@@ -31,12 +31,19 @@ ED.Hypopyon = function(_drawing, _parameterJSON) {
 	// Private parameters
 	this.ro = 380;
 	this.minimum = 304;
-
+	this.csOriginX = 50;
 	// Saved parameters
-	this.savedParameterArray = ['apexY'];
+	this.savedParameterArray = ['apexY', 'csOriginX'];
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
+
+    this.linkedDoodleParameters = {
+        'Hyphaema': {
+            source: ['apexY'],
+            store: [['originY', 'csOriginY'], ['apexX', 'csApexX'], ['originX', 'csOriginX']]
+        }
+    };
 }
 
 /**

@@ -16061,15 +16061,15 @@ ED.AntSegCrossSection = function(_drawing, _parameterJSON) {
 	// Saved parameters
 	this.savedParameterArray = ['apexY', 'apexX','colour','c'];
 
-  // Call superclass constructor
+    // Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 
-  this.linkedDoodleParameters = {
-    'AntSeg': {
-      source: ['apexY', 'colour'],
-      store: [['apexX', 'csApexX']]
-    }
-  };
+  	this.linkedDoodleParameters = {
+    	'AntSeg': {
+      		source: ['apexY', 'colour'],
+      		store: [['apexX', 'csApexX']]
+    	}
+  	};
 
 	// Invariant simple parameters
 	this.originX = 44;
@@ -30408,9 +30408,12 @@ ED.Hyphaema = function(_drawing, _parameterJSON) {
 	// Private parameters
 	this.ro = 380;
 	this.minimum = 304;
+	this.csOriginY = 0;
+    this.csOriginX = 50;
+	this.csApexX = 0;
 
-	// Saved parameters
-	this.savedParameterArray = ['apexX', 'apexY'];
+    // Saved parameters
+	this.savedParameterArray = ['apexX', 'apexY', 'csOriginY', 'csApexX', 'csOriginX'];
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -30544,16 +30547,22 @@ ED.HyphaemaCrossSection = function(_drawing, _parameterJSON) {
 	
 	// Derived parameters
 	this.ro = 380;
-	this.minimum = 304;
-	
+
 	// Saved parameters
-	this.savedParameterArray = ['originY', 'apexX', 'apexY', 'minimum', 'originX'];
+	this.savedParameterArray = ['originY', 'apexX', 'apexY', 'originX'];
 	
 	// Parameters in doodle control bar
 	this.controlParameterArray = {};
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
+
+    this.linkedDoodleParameters = {
+        'Hyphaema': {
+            source: ['apexY'],
+            store: [['originY', 'csOriginY'], ['apexX', 'csApexX'], ['originX', 'csOriginX']]
+        }
+    };
 }
 
 /**
@@ -30578,7 +30587,7 @@ ED.HyphaemaCrossSection.prototype.setPropertyDefaults = function() {
 		
 	// Update component of validation array for simple parameters
 	this.parameterValidationArray['apexX']['range'].setMinAndMax(-50, +50);
-	this.parameterValidationArray['apexY']['range'].setMinAndMax(-380, this.minimum);
+	this.parameterValidationArray['apexY']['range'].setMinAndMax(-380, 304);
 	
 	
 }
@@ -30903,12 +30912,19 @@ ED.Hypopyon = function(_drawing, _parameterJSON) {
 	// Private parameters
 	this.ro = 380;
 	this.minimum = 304;
-
+	this.csOriginX = 50;
 	// Saved parameters
-	this.savedParameterArray = ['apexY'];
+	this.savedParameterArray = ['apexY', 'csOriginX'];
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
+
+    this.linkedDoodleParameters = {
+        'Hyphaema': {
+            source: ['apexY'],
+            store: [['originY', 'csOriginY'], ['apexX', 'csApexX'], ['originX', 'csOriginX']]
+        }
+    };
 }
 
 /**
@@ -31048,6 +31064,13 @@ ED.HypopyonCrossSection = function(_drawing, _parameterJSON) {
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
+
+    this.linkedDoodleParameters = {
+        'Hypopyon': {
+            source: ['apexY'],
+            store: [['originX', 'csOriginX']]
+        }
+    };
 }
 
 /**
@@ -31283,9 +31306,7 @@ ED.HypopyonCrossSection.prototype.draw = function(_point) {
 	var marginX = (iris) ? iris.apexX: -20;
 
   if (cornea) {
-  	console.log('here!');
-  	console.log(cornea);
-    this.setSimpleParameter('originX', cornea.originX);
+  	this.setSimpleParameter('originX', cornea.originX);
   }
 
 	if (lens) {

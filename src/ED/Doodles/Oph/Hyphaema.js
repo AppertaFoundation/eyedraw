@@ -31,9 +31,12 @@ ED.Hyphaema = function(_drawing, _parameterJSON) {
 	// Private parameters
 	this.ro = 380;
 	this.minimum = 304;
+	this.csOriginY = 0;
+    this.csOriginX = 50;
+	this.csApexX = 0;
 
-	// Saved parameters
-	this.savedParameterArray = ['apexX', 'apexY'];
+    // Saved parameters
+	this.savedParameterArray = ['apexX', 'apexY', 'csOriginY', 'csApexX', 'csOriginX'];
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);

@@ -45,6 +45,13 @@ ED.HypopyonCrossSection = function(_drawing, _parameterJSON) {
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
+
+    this.linkedDoodleParameters = {
+        'Hypopyon': {
+            source: ['apexY'],
+            store: [['originX', 'csOriginX']]
+        }
+    };
 }
 
 /**
@@ -280,9 +287,7 @@ ED.HypopyonCrossSection.prototype.draw = function(_point) {
 	var marginX = (iris) ? iris.apexX: -20;
 
   if (cornea) {
-  	console.log('here!');
-  	console.log(cornea);
-    this.setSimpleParameter('originX', cornea.originX);
+  	this.setSimpleParameter('originX', cornea.originX);
   }
 
 	if (lens) {

@@ -37,15 +37,15 @@ ED.AntSegCrossSection = function(_drawing, _parameterJSON) {
 	// Saved parameters
 	this.savedParameterArray = ['apexY', 'apexX','colour','c'];
 
-  // Call superclass constructor
+    // Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 
-  this.linkedDoodleParameters = {
-    'AntSeg': {
-      source: ['apexY', 'colour'],
-      store: [['apexX', 'csApexX']]
-    }
-  };
+  	this.linkedDoodleParameters = {
+    	'AntSeg': {
+      		source: ['apexY', 'colour'],
+      		store: [['apexX', 'csApexX']]
+    	}
+  	};
 
 	// Invariant simple parameters
 	this.originX = 44;
