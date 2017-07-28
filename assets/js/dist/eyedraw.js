@@ -13015,9 +13015,10 @@ ED.Perforation.prototype.diagnosticHierarchy = function() {
 ED.ACIOL = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "ACIOL";
+    this.csOriginX = 0;
 
 	// Saved parameters
-	this.savedParameterArray = ['originX', 'originY', 'rotation'];
+	this.savedParameterArray = ['originX', 'originY', 'rotation', 'csOriginX'];
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -13201,7 +13202,7 @@ ED.ACIOLCrossSection = function(_drawing, _parameterJSON) {
 	this.className = "ACIOLCrossSection";
 	
 	// Saved parameters
-	this.savedParameterArray = [];
+	this.savedParameterArray = ['originX'];
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -34714,7 +34715,7 @@ ED.Lens = function(_drawing, _parameterJSON) {
 	this.csOriginX = 0;
 
 	// Saved parameters
-	this.savedParameterArray = ['rotation', 'originY', 'nuclearGrade', 'corticalGrade', 'posteriorSubcapsularGrade', 'anteriorPolar', 'posteriorPolar', 'coronary', 'phakodonesis', 'csOriginX'];
+	this.savedParameterArray = ['rotation', 'originX', 'originY', 'nuclearGrade', 'corticalGrade', 'posteriorSubcapsularGrade', 'anteriorPolar', 'posteriorPolar', 'coronary', 'phakodonesis', 'csOriginX'];
 
 	// Parameters in doodle control bar (parameter name: parameter label)
 	this.controlParameterArray = {
@@ -40110,9 +40111,10 @@ ED.PCIOL = function(_drawing, _parameterJSON) {
 	// Other parameters
 	this.fixation = 'In-the-bag';
 	this.fx = 1;
-	
+    this.csOriginX = 0;
+
 	// Saved parameters
-	this.savedParameterArray = ['fixation', 'fx', 'originX', 'originY', 'rotation'];
+	this.savedParameterArray = ['fixation', 'fx', 'originX', 'originY', 'rotation', 'csOriginX'];
 
 	// Parameters in doodle control bar
 	this.controlParameterArray = {'fixation':'Fixation'};

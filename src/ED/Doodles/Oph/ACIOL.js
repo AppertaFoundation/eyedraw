@@ -27,9 +27,10 @@
 ED.ACIOL = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "ACIOL";
+    this.csOriginX = 0;
 
 	// Saved parameters
-	this.savedParameterArray = ['originX', 'originY', 'rotation'];
+	this.savedParameterArray = ['originX', 'originY', 'rotation', 'csOriginX'];
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);

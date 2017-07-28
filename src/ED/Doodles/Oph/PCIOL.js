@@ -31,9 +31,10 @@ ED.PCIOL = function(_drawing, _parameterJSON) {
 	// Other parameters
 	this.fixation = 'In-the-bag';
 	this.fx = 1;
-	
+    this.csOriginX = 0;
+
 	// Saved parameters
-	this.savedParameterArray = ['fixation', 'fx', 'originX', 'originY', 'rotation'];
+	this.savedParameterArray = ['fixation', 'fx', 'originX', 'originY', 'rotation', 'csOriginX'];
 
 	// Parameters in doodle control bar
 	this.controlParameterArray = {'fixation':'Fixation'};
