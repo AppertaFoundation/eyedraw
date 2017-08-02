@@ -1788,7 +1788,6 @@ ED.Drawing.prototype.deleteDoodle = function(_doodle, really) {
 	var deletedClassName = false;
 
 	var errorMessage = 'Attempt to delete a doodle that does not exist';
-
 	// Check that doodle will delete
 	if (really || _doodle.willDelete()) {
 		// Iterate through doodle array looking for doodle
@@ -16157,6 +16156,7 @@ ED.AntSegCrossSection.prototype.dependentParameterValues = function(_parameter, 
 			this.parameterValidationArray['apexX']['range'].setMinAndMax(-40 - (140 / 220) * (this.apexY + 280), maxApexX);
 
 			// If being synced, make sensible decision about x
+			// Commented out by MCS as was preventing display of saved values ... the above prevents overlap with the PCIOL though
 			// if (!this.drawing.isActive) {
 			// 	var newOriginX = this.parameterValidationArray['apexX']['range'].max;
 			// } else {
@@ -23618,6 +23618,12 @@ ED.CornealOpacityCrossSection = function(_drawing, _parameterJSON) {
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
+
+  this.linkedDoodleParameters = {
+    'CornealOpacity': {
+      source: ['yMidPoint','d','h','w','iW','originY','minY','maxY']
+    }
+  };
 }
 
 /**

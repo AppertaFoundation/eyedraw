@@ -1528,7 +1528,6 @@ ED.Drawing.prototype.deleteDoodle = function(_doodle, really) {
 	var deletedClassName = false;
 
 	var errorMessage = 'Attempt to delete a doodle that does not exist';
-
 	// Check that doodle will delete
 	if (really || _doodle.willDelete()) {
 		// Iterate through doodle array looking for doodle
