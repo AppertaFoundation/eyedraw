@@ -3242,6 +3242,9 @@ ED.Doodle = function(_drawing, _parameterJSON) {
 		// Unique ID of doodle within this drawing
 		this.id = this.drawing.nextDoodleId();
 
+		// can override with 'stroke' to support line hit testing
+		this.hitTestMethod = 'path';
+
 		// Optional array of squiggles
 		this.squiggleArray = new Array();
 
@@ -3781,10 +3784,10 @@ ED.Doodle.prototype.hitTest = function(ctx, _point)
     if (ED.isFirefox()) {
         ctx.save();
         ctx.setTransform(1, 0, 0, 1, 0, 0);
-        result = ctx.isPointInPath(_point.x, _point.y);
+        result = this.hitTestMethod === 'stroke' ? ctx.isPointInStroke(_point.x, _point.y) : ctx.isPointInPath(_point.x, _point.y);
         ctx.restore();
     } else {
-        result = ctx.isPointInPath(_point.x, _point.y);
+        result = this.hitTestMethod === 'stroke' ? ctx.isPointInStroke(_point.x, _point.y) : ctx.isPointInPath(_point.x, _point.y);
     }
     return result;
 };
@@ -21806,7 +21809,7 @@ ED.CornealLaceration = function(_drawing, _parameterJSON) {
 	this.mousePoint = new ED.Point(-550,-550); //default off canvas so not visible
 
 	// Saved parameters
-	this.savedParameterArray = ['lacerationDepth','numberOfHandles','irisProlapse'];
+	this.savedParameterArray = ['complete','lacerationDepth','numberOfHandles','irisProlapse'];
 
 	// Parameters in doodle control bar (parameter name: parameter label)
 	this.controlParameterArray = {
@@ -21816,6 +21819,7 @@ ED.CornealLaceration = function(_drawing, _parameterJSON) {
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
+
 }
 
 /**
@@ -21862,15 +21866,6 @@ ED.CornealLaceration.prototype.setPropertyDefaults = function() {
 		display: false
 	};
 
-
-	// default handle positions
-	var squiggle = new ED.Squiggle(this, new ED.Colour(100, 100, 100, 1), 4, true);
-
-	this.squiggleArray.push(squiggle);
-
-	var point = new ED.Point(0, 0);
-	this.addPointToSquiggle(point);
-
 	var d = this;
 
 	//Complete doodle on double click
@@ -21913,6 +21908,9 @@ ED.CornealLaceration.prototype.setPropertyDefaults = function() {
  * Use the setParameter function for derived parameters, as this will also update dependent variables
  */
 ED.CornealLaceration.prototype.setParameterDefaults = function() {
+	// create the base squiggle
+	var squiggle = new ED.Squiggle(this, new ED.Colour(100, 100, 100, 1), 4, true);
+	this.squiggleArray.push(squiggle);
 }
 
 /**
@@ -21930,6 +21928,11 @@ ED.CornealLaceration.prototype.dependentParameterValues = function(_parameter, _
 		case 'handles':
 		returnArray['lacType'] = this.calculateLacerationType();
 		break;
+		case 'complete':
+			if (this.complete) {
+				this.numberOfHandles = this.squiggleArray[0].pointsArray.length - 1;
+				this.setHandles();
+			}
 	}
 	return returnArray;
 }
@@ -21943,8 +21946,6 @@ ED.CornealLaceration.prototype.dependentParameterValues = function(_parameter, _
 ED.CornealLaceration.prototype.draw = function(_point) {
 	// Get context
 	var ctx = this.drawing.context;
-	// firefox not calling description
-	this.description();
 
 	// Call draw method in superclass
 	ED.CornealLaceration.superclass.draw.call(this, _point);
@@ -21955,36 +21956,27 @@ ED.CornealLaceration.prototype.draw = function(_point) {
 	// Draw rectangle for boundary drawing area over entire canvas if doodle incomplete
 	if (!this.complete) {
 		ctx.rect(this.boundaryMin, this.boundaryMin, this.boundaryWidth, this.boundaryWidth);
+		this.hitTestMethod = 'path';
+		ctx.lineWidth = 2;
 	}
 	// Otherwise draw boundary rectangle around the doodle
 	else {
-		var minX = this.squiggleArray[0].pointsArray[0].x;
-		var minY = this.squiggleArray[0].pointsArray[0].y;
-		var maxX = this.squiggleArray[0].pointsArray[0].x;
-		var maxY = this.squiggleArray[0].pointsArray[0].y;
-
-		// Find the smallest x and y handle coordinates
-		for (var j=1; j<this.squiggleArray[0].pointsArray.length; j++) {
-			var p = this.squiggleArray[0].pointsArray[j];
-			if (p.x<minX) minX=p.x;
-			if (p.y<minY) minY=p.y;
-			if (p.x>maxX) maxX=p.x;
-			if (p.y>maxY) maxY=p.y;
-		}
-
-		//Find height and width of the doodle
-		var width = maxX-minX;
-		var height = maxY-minY;
-
-		// Draw boundary rectangle around handles
-		ctx.rect(minX-50, minY-50, width+100, height+100);
+		this.hitTestMethod = 'stroke';
+        var squiggle = this.squiggleArray[0];
+		// drawing lines for hit test
+		ctx.strokeStyle = "rgba(0, 0, 0, 0)";
+        ctx.lineWidth = 10; // set wider for hit testing
+        for (var i = this.numberOfHandles-1; i >= 0; i--) {
+            ctx.lineTo(squiggle.pointsArray[i].x, squiggle.pointsArray[i].y);
+        }
+        ctx.stroke();
 	}
 
 	// Close path
 	ctx.closePath();
 
 	// Set attributes for border (colour changes to indicate drawing mode)
-	ctx.lineWidth = 2;
+
 	this.isFilled = false;
 	ctx.strokeStyle = "rgba(255, 255, 255, 0)";
 	if (this.isSelected && !this.complete) ctx.strokeStyle = "gray";
@@ -22002,7 +21994,7 @@ ED.CornealLaceration.prototype.draw = function(_point) {
 			// Squiggle attributes
 			ctx.lineWidth = 5;
 			ctx.strokeStyle = "blue";
-			
+
 
 			// Iterate through squiggle points
 			for (var i = this.numberOfHandles-1; i >= 0; i--) {

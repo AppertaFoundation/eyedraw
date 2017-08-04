@@ -73,6 +73,9 @@ ED.Doodle = function(_drawing, _parameterJSON) {
 		// Unique ID of doodle within this drawing
 		this.id = this.drawing.nextDoodleId();
 
+		// can override with 'stroke' to support line hit testing
+		this.hitTestMethod = 'path';
+
 		// Optional array of squiggles
 		this.squiggleArray = new Array();
 
@@ -612,10 +615,10 @@ ED.Doodle.prototype.hitTest = function(ctx, _point)
     if (ED.isFirefox()) {
         ctx.save();
         ctx.setTransform(1, 0, 0, 1, 0, 0);
-        result = ctx.isPointInPath(_point.x, _point.y);
+        result = this.hitTestMethod === 'stroke' ? ctx.isPointInStroke(_point.x, _point.y) : ctx.isPointInPath(_point.x, _point.y);
         ctx.restore();
     } else {
-        result = ctx.isPointInPath(_point.x, _point.y);
+        result = this.hitTestMethod === 'stroke' ? ctx.isPointInStroke(_point.x, _point.y) : ctx.isPointInPath(_point.x, _point.y);
     }
     return result;
 };
