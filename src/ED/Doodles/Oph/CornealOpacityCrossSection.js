@@ -54,6 +54,12 @@ ED.CornealOpacityCrossSection = function(_drawing, _parameterJSON) {
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
+
+  this.linkedDoodleParameters = {
+    'CornealOpacity': {
+      source: ['yMidPoint','d','h','w','iW','originY','minY','maxY']
+    }
+  };
 }
 
 /**
