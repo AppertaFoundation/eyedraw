@@ -514,6 +514,8 @@ ED.Controller = (function() {
 			outputElement.value = output;
 			outputElement.rows = (output.match(/\n/g) || []).length + 1;
 			this.previousReport = report;
+		} else {
+			outputElement.value = 'No abnormality';
 		}
 
 		function regex_escape(str){
