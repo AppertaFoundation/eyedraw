@@ -320,10 +320,6 @@ class OEEyeDrawWidget extends CWidget
 			} else {
 				$this->inputId = 'ed_input_'.$this->mode.'_'.$this->idSuffix;
 			}
-
-			if (isset($_POST[CHtml::modelName($this->model)][$this->attribute])) {
-				$this->model->{$this->attribute} = $_POST[CHtml::modelName($this->model)][$this->attribute];
-			}
 		}
 
 		// Set the drawing scale level, from the scaleLevel saved in the doodle, only
