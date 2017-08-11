@@ -44,13 +44,28 @@ ED.Checker = ED.Checker || (function() {
 			var id = this.id;
 			// Is it an eyedraw canvas?
 			if (canvas.hasClass('ed-canvas-edit') || canvas.hasClass('ed-canvas-display')) {
-				if (ids.indexOf(id) === -1) {
-					ids.push(id);
-				}
+				storeCanvasId(id);
 			}
 		});
 	}
 	$(registerCanvasEyeDraws);
+
+	function storeCanvasId(id) {
+    if (ids.indexOf(id) === -1) {
+      ids.push(id);
+    }
+	}
+
+	function removeCanvasId(id) {
+		var idx = ids.indexOf(id);
+		if (idx > -1) {
+			ids.splice(idx, 1);
+		}
+		idx = readyIds.indexOf(id);
+		if (idx > -1) {
+      readyIds.splice(idx, 1);
+		}
+	}
 
 	/**
 	 * Loop through all the registered callbacks and execute them.
@@ -67,13 +82,13 @@ ED.Checker = ED.Checker || (function() {
 	 */
 	function register(instance) {
 		// Store instance
-		instances[instance.drawingName] = instance
+		instances[instance.drawingName] = instance;
+		storeCanvasId(instance.canvas.id);
 
 		// Register 'doodlesLoaded' event
 		instance.registerForNotifications({
-			callback: function onDoodlesLoaded() {
-
-				var id = instance.canvas.id;
+			callback: function drawingReady() {
+        var id = instance.canvas.id;
 				if (readyIds.indexOf(id) === -1) {
 					readyIds.push(id);
 				}
@@ -82,7 +97,7 @@ ED.Checker = ED.Checker || (function() {
 					executeCallbacks();
 				}
 			}
-		}, 'callback', ['doodlesLoaded']);
+		}, 'callback', ['ready']);
 	}
 
 	/**
@@ -136,6 +151,20 @@ ED.Checker = ED.Checker || (function() {
 		ids = [];
 	}
 
+	function getInternalState()
+	{
+		return [ids, readyIds];
+	}
+
+	function removeMissingCanvasIds()
+	{
+		$(ids).each(function(idx, id) {
+			if (!$('#' + id).length) {
+				removeCanvasId(id);
+			}
+		})
+	}
+
 	/**
 	 * Get eyedraw instance by drawingName.
 	 */
@@ -147,9 +176,12 @@ ED.Checker = ED.Checker || (function() {
 	return {
 		register: register,
 		onAllReady: allReady,
+		isReady: isAllReady,
 		getInstance: getInstance,
 		getInstanceByIdSuffix: getInstanceByIdSuffix,
 		reset: reset,
+		resync: removeMissingCanvasIds,
+		inspect: getInternalState,
 
 		/** BACKWARDS COMPATABILITY **/
 		registerForReady: allReady
