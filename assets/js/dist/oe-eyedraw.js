@@ -275,6 +275,7 @@ ED.Checker = ED.Checker || (function() {
 		reset: reset,
 		resync: removeMissingCanvasIds,
 		inspect: getInternalState,
+		storeCanvasId: storeCanvasId,
 
 		/** BACKWARDS COMPATABILITY **/
 		registerForReady: allReady
@@ -1038,6 +1039,7 @@ ED.Views.DoodlePopup = (function() {
 
 		// Add doodle controls
 		doodle.showDoodleControls();
+	
 
 		this.emit('render');
 	};

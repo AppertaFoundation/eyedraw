@@ -74,6 +74,7 @@ ED.Checker = ED.Checker || (function() {
 		callbacks.forEach(function(callback) {
 			callback();
 		});
+		callbacks = [];
 	}
 
 	/**
