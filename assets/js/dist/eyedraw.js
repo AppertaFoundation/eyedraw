@@ -43991,9 +43991,6 @@ ED.Pterygium.prototype.description = function() {
 	n = (n / 380 * 6).toFixed(2);
 	
 	var returnString = "";
-
-	// Chronic if stockers line is checked
-	if (this.stockersLine) returnString += "chonic ";
 	
 	// If injection+++, then injected
 	if (this.injection == "+++") returnString += "injected ";
