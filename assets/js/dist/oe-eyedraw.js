@@ -1019,7 +1019,7 @@ ED.Views.DoodlePopup = (function() {
 		if (!doodle) {
 			return;
 		}
-
+		
 		// Template data
 		var data = {
 			doodle: doodle,
