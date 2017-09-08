@@ -67,7 +67,7 @@ ED.Controller = (function() {
 			this.bindEditEvents();
 		}
 
-		this.registerDrawing();
+		this.registerDrawing(); //Should registering take place after initListeners()
 		this.registerForNotifications();
 		this.initListeners();
 		this.drawing.init();
