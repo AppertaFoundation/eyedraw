@@ -22048,6 +22048,10 @@ ED.CornealLaceration.prototype.description = function() {
 	else  if (this.lacerationDepth > 0) text += 'Partial thickness ' +  this.lacType + ' ' + linearDistanceShort +'mm, '+ this.lacerationDepth + '%';
 	else text += this.lacType + ' ' + linearDistanceShort + 'mm';
 
+    if (this.irisProlapse) {
+    	text += ' with iris prolapse';
+    }
+    
 	return text;
 }
  	
