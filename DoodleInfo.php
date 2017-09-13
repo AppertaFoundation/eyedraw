@@ -145,7 +145,7 @@ class DoodleInfo
         'OpticDiscPit' => 'Optic disc pit',
         'OrthopticEye' => 'Orthoptic eye',
         'OuterLeafBreak' => 'Outer leaf break',
-        'Palpebral Conjunctivitis' => 'Palpebral Conjunctivitis',
+        'PalpebralConjunctivitis' => 'Palpebral Conjunctivitis',
         'Papilloedema' => 'Papilloedema',
         'Patch' => 'Tube patch',
         'PCIOL' => 'Posterior chamber IOL',
