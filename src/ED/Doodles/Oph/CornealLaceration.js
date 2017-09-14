@@ -278,6 +278,10 @@ ED.CornealLaceration.prototype.description = function() {
 	else  if (this.lacerationDepth > 0) text += 'Partial thickness ' +  this.lacType + ' ' + linearDistanceShort +'mm, '+ this.lacerationDepth + '%';
 	else text += this.lacType + ' ' + linearDistanceShort + 'mm';
 
+    if (this.irisProlapse) {
+    	text += ' with iris prolapse';
+    }
+    
 	return text;
 }
  	
@@ -310,5 +314,17 @@ ED.CornealLaceration.prototype.addHandle = function(_position) {
 	this.updateDependentParameters('handles');
 }
 
+/**
+ * Returns the SnoMed code of the doodle
+ *
+ * @returns {Int} SnoMed code of entity representated by doodle
+ */
+ED.CornealLaceration.prototype.snomedCodes = function() {
+	var result = [[95725002, 3]];
+	if (this.irisProlapse) {
+		result.push([77676001, 3]);
+	}
 
+    return result;
+}
 
