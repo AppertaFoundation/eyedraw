@@ -40,9 +40,9 @@ Updated files can be found by pointing your browser to the destination specified
 License
 =======
 
-This software is provided unter terms of the [GNU GPL v3.0 Licence](https://www.gnu.org/licenses/gpl-3.0.en.html). All terms of that license apply.
+This software is provided under terms of the [GNU Affero General Public License v3.0](https://www.gnu.org/licenses/agpl-3.0.en.html). All terms of that license apply.
 
-Note that eyedraw components cannot be used in proprietry applications under any circumstances, including linking, use of APIs or any other type of wrappers, without first applying the GPLv3.0 terms to the proprietry application and freely releasing the (previously) proprierty code as open source and in its entirety
+Note that eyedraw components cannot be used in proprietry applications under any circumstances, including linking, use of APIs or any other type of wrappers, without first applying the GNU Affero General Public License v3.0 terms to the proprietry application and freely releasing the (previously) proprierty code as open source and in its entirety
 
 Warranty
 ========
