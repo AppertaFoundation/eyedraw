@@ -16,7 +16,7 @@
  */
 
 /**
- * TODO: shape contour, fix length of line calculation for corneas where the apex is not alogn the origin
+ * TODO: shape contour, fix length of line calculation for corneas where the apex is not along the origin
  *
  * @class CornealOpacityCrossSection
  * @property {String} className Name of doodle subclass
@@ -53,11 +53,11 @@ ED.CornealOpacityCrossSection = function(_drawing, _parameterJSON) {
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 
-  this.linkedDoodleParameters = {
-    'CornealOpacity': {
-      source: ['yMidPoint','d','h','w','iW','originY','minY','maxY']
-    }
-  };
+    this.linkedDoodleParameters = {
+        'CornealOpacity': {
+            source: ['yMidPoint','d','h','w','iW','originY','minY','maxY']
+        }
+    };
 }
 
 /**
@@ -567,6 +567,10 @@ ED.CornealOpacityCrossSection.prototype.draw = function(_point) {
 				// define start and end time points
 				var itI0 = iStartT * 2;
 				var itI1 = (iEndT < 0.5) ? iEndT * 2 : 1;
+				var ibtI0 = itI0 * infiltrateScale/100;
+/* 				if (ibtI0 < itI0)  */ibtI0 = itI0;
+				var ibtI1 = itI1 * infiltrateScale/100;
+/* 				if (ibtI1 > itI1) */ ibtI1 = itI1;
 						
 				// default bezier points (as in cornea cross section)
 				if (cornea && cornea.shape == "Keratoconus") {
@@ -627,31 +631,32 @@ ED.CornealOpacityCrossSection.prototype.draw = function(_point) {
 					iSuperiorBezier.SP = isq0;
 					iSuperiorBezier.CP1 = iiP2334;
 					iSuperiorBezier.CP2 = iiP34;
-				
-						
+				}
+				if (ibtI0 > 0) {
+		
 					// back of cornea
 					var isq0b = new ED.Point(0,0);
-					isq0b.y = (1-tI0)*(1-tI0)*(1-tI0)*iSuperiorBezierBack.SP.y + 3*(1-tI0)*(1-tI0)*tI0*iSuperiorBezierBack.CP1.y + 3*(1-tI0)*tI0*tI0*iSuperiorBezierBack.CP2.y + tI0*tI0*tI0*iSuperiorBezierBack.EP.y;
-					isq0b.x = (1-tI0)*(1-tI0)*(1-tI0)*iSuperiorBezierBack.SP.x + 3*(1-tI0)*(1-tI0)*tI0*iSuperiorBezierBack.CP1.x + 3*(1-tI0)*tI0*tI0*iSuperiorBezierBack.CP2.x + tI0*tI0*tI0*iSuperiorBezierBack.EP.x;
+					isq0b.y = (1-ibtI0)*(1-ibtI0)*(1-ibtI0)*iSuperiorBezierBack.SP.y + 3*(1-ibtI0)*(1-ibtI0)*ibtI0*iSuperiorBezierBack.CP1.y + 3*(1-ibtI0)*ibtI0*ibtI0*iSuperiorBezierBack.CP2.y + ibtI0*ibtI0*ibtI0*iSuperiorBezierBack.EP.y;
+					isq0b.x = (1-ibtI0)*(1-ibtI0)*(1-ibtI0)*iSuperiorBezierBack.SP.x + 3*(1-ibtI0)*(1-ibtI0)*ibtI0*iSuperiorBezierBack.CP1.x + 3*(1-ibtI0)*ibtI0*ibtI0*iSuperiorBezierBack.CP2.x + ibtI0*ibtI0*ibtI0*iSuperiorBezierBack.EP.x;
 					
 					var iiP23b = new ED.Point(0,0);
-					iiP23b.x = iSuperiorBezierBack.CP1.x + tI0 * (iSuperiorBezierBack.CP2.x - iSuperiorBezierBack.CP1.x);
-					iiP23b.y = iSuperiorBezierBack.CP1.y + tI0 * (iSuperiorBezierBack.CP2.y - iSuperiorBezierBack.CP1.y);
+					iiP23b.x = iSuperiorBezierBack.CP1.x + ibtI0 * (iSuperiorBezierBack.CP2.x - iSuperiorBezierBack.CP1.x);
+					iiP23b.y = iSuperiorBezierBack.CP1.y + ibtI0 * (iSuperiorBezierBack.CP2.y - iSuperiorBezierBack.CP1.y);
 					
 					var iiP34b = new ED.Point(0,0);
-					iiP34b.x = iSuperiorBezierBack.CP2.x + tI0 * (iSuperiorBezierBack.EP.x - iSuperiorBezierBack.CP2.x);
-					iiP34b.y = iSuperiorBezierBack.CP2.y + tI0 * (iSuperiorBezierBack.EP.y - iSuperiorBezierBack.CP2.y);
+					iiP34b.x = iSuperiorBezierBack.CP2.x + ibtI0 * (iSuperiorBezierBack.EP.x - iSuperiorBezierBack.CP2.x);
+					iiP34b.y = iSuperiorBezierBack.CP2.y + ibtI0 * (iSuperiorBezierBack.EP.y - iSuperiorBezierBack.CP2.y);
 					
 					var iiP2334b = new ED.Point(0,0);
-					iiP2334b.x = iiP23b.x + tI0 * (iiP34b.x - iiP23b.x);
-					iiP2334b.y = iiP23b.y + tI0 * (iiP34b.y - iiP23b.y);
+					iiP2334b.x = iiP23b.x + ibtI0 * (iiP34b.x - iiP23b.x);
+					iiP2334b.y = iiP23b.y + ibtI0 * (iiP34b.y - iiP23b.y);
 					
 					iSuperiorBezierBack.SP = isq0b;
 					iSuperiorBezierBack.CP1 = iiP2334b;
 					iSuperiorBezierBack.CP2 = iiP34b;
 				}
 				
-				if (tI1 < 1) {
+				if (itI1 < 1) {
 				// Trim end of curve
 					
 					// front of cornea
@@ -675,22 +680,24 @@ ED.CornealOpacityCrossSection.prototype.draw = function(_point) {
 					iSuperiorBezier.CP2 = iiP1223;
 					iSuperiorBezier.EP = iiq1;
 				
+				}
+				if (ibtI1 > 0) {
 					// back of cornea
 					var iiq1b = new ED.Point(0,0);
-					iiq1b.y = (1-tI1)*(1-tI1)*(1-tI1)*iSuperiorBezierBack.SP.y + 3*(1-tI1)*(1-tI1)*tI1*iSuperiorBezierBack.CP1.y + 3*(1-tI1)*tI1*tI1*iSuperiorBezierBack.CP2.y + tI1*tI1*tI1*iSuperiorBezierBack.EP.y;
-					iiq1b.x = (1-tI1)*(1-tI1)*(1-tI1)*iSuperiorBezierBack.SP.x + 3*(1-tI1)*(1-tI1)*tI1*iSuperiorBezierBack.CP1.x + 3*(1-tI1)*tI1*tI1*iSuperiorBezierBack.CP2.x + tI1*tI1*tI1*iSuperiorBezierBack.EP.x;
+					iiq1b.y = (1-ibtI1)*(1-ibtI1)*(1-ibtI1)*iSuperiorBezierBack.SP.y + 3*(1-ibtI1)*(1-ibtI1)*ibtI1*iSuperiorBezierBack.CP1.y + 3*(1-ibtI1)*ibtI1*ibtI1*iSuperiorBezierBack.CP2.y + ibtI1*ibtI1*ibtI1*iSuperiorBezierBack.EP.y;
+					iiq1b.x = (1-ibtI1)*(1-ibtI1)*(1-ibtI1)*iSuperiorBezierBack.SP.x + 3*(1-ibtI1)*(1-ibtI1)*ibtI1*iSuperiorBezierBack.CP1.x + 3*(1-ibtI1)*ibtI1*ibtI1*iSuperiorBezierBack.CP2.x + ibtI1*ibtI1*ibtI1*iSuperiorBezierBack.EP.x;
 		
 					var iiP12b = new ED.Point(0,0);
-					iiP12b.x = iSuperiorBezierBack.SP.x + tI1 * (iSuperiorBezierBack.CP1.x - iSuperiorBezierBack.SP.x);
-					iiP12b.y = iSuperiorBezierBack.SP.y + tI1 * (iSuperiorBezierBack.CP1.y - iSuperiorBezierBack.SP.y);
+					iiP12b.x = iSuperiorBezierBack.SP.x + ibtI1 * (iSuperiorBezierBack.CP1.x - iSuperiorBezierBack.SP.x);
+					iiP12b.y = iSuperiorBezierBack.SP.y + ibtI1 * (iSuperiorBezierBack.CP1.y - iSuperiorBezierBack.SP.y);
 					
 					var iiP23b = new ED.Point(0,0);
-					iiP23b.x = iSuperiorBezierBack.CP1.x + tI1 * (iSuperiorBezierBack.CP2.x - iSuperiorBezierBack.CP1.x);
-					iiP23b.y = iSuperiorBezierBack.CP1.y + tI1 * (iSuperiorBezierBack.CP2.y - iSuperiorBezierBack.CP1.y);
+					iiP23b.x = iSuperiorBezierBack.CP1.x + ibtI1 * (iSuperiorBezierBack.CP2.x - iSuperiorBezierBack.CP1.x);
+					iiP23b.y = iSuperiorBezierBack.CP1.y + ibtI1 * (iSuperiorBezierBack.CP2.y - iSuperiorBezierBack.CP1.y);
 					
 					var iiP1223b = new ED.Point(0,0);
-					iiP1223b.x = iiP12b.x + tI1 * (iiP23b.x - iiP12b.x);
-					iiP1223b.y = iiP12b.y + tI1 * (iiP23b.y - iiP12b.y);
+					iiP1223b.x = iiP12b.x + ibtI1 * (iiP23b.x - iiP12b.x);
+					iiP1223b.y = iiP12b.y + ibtI1 * (iiP23b.y - iiP12b.y);
 					
 					iSuperiorBezierBack.CP1 = iiP12b;
 					iSuperiorBezierBack.CP2 = iiP1223b;
@@ -708,6 +715,10 @@ ED.CornealOpacityCrossSection.prototype.draw = function(_point) {
 				// define start and end time points
 				var itS0 = (iStartT > 0.5) ? (iStartT - 0.5) * 2 : 0;
 				var itS1 = (iEndT - 0.5) * 2;
+				var ibtS0 = itS0 * infiltrateScale/100;
+/* 				if (ibtS0<tS0) */ ibtS0 = itS0;
+				var ibtS1 = itS1 * infiltrateScale/100;
+/* 				if (ibtS1>tS1) */ ibtS1 = itS1;
 				
 				// default bezier points (as in cornea cross section)
 				if (cornea && cornea.shape == "Keratoconus") {
@@ -768,23 +779,23 @@ ED.CornealOpacityCrossSection.prototype.draw = function(_point) {
 					iInferiorBezier.CP1 = isP2334;
 					iInferiorBezier.CP2 = isP34;
 				}
-				if (tS0 > 0) {	
+				if (ibtS0 > 0) {	
 					// back of cornea
 					var isq0b = new ED.Point(0,0);
-					isq0b.y = (1-tS0)*(1-tS0)*(1-tS0)*iInferiorBezierBack.SP.y + 3*(1-tS0)*(1-tS0)*tS0*iInferiorBezierBack.CP1.y + 3*(1-tS0)*tS0*tS0*iInferiorBezierBack.CP2.y + tS0*tS0*tS0*iInferiorBezierBack.EP.y;
-					isq0b.x = (1-tS0)*(1-tS0)*(1-tS0)*iInferiorBezierBack.SP.x + 3*(1-tS0)*(1-tS0)*tS0*iInferiorBezierBack.CP1.x + 3*(1-tS0)*tS0*tS0*iInferiorBezierBack.CP2.x + tS0*tS0*tS0*iInferiorBezierBack.EP.x;
+					isq0b.y = (1-ibtS0)*(1-ibtS0)*(1-ibtS0)*iInferiorBezierBack.SP.y + 3*(1-ibtS0)*(1-ibtS0)*ibtS0*iInferiorBezierBack.CP1.y + 3*(1-ibtS0)*ibtS0*ibtS0*iInferiorBezierBack.CP2.y + ibtS0*ibtS0*ibtS0*iInferiorBezierBack.EP.y;
+					isq0b.x = (1-ibtS0)*(1-ibtS0)*(1-ibtS0)*iInferiorBezierBack.SP.x + 3*(1-ibtS0)*(1-ibtS0)*ibtS0*iInferiorBezierBack.CP1.x + 3*(1-ibtS0)*ibtS0*ibtS0*iInferiorBezierBack.CP2.x + ibtS0*ibtS0*ibtS0*iInferiorBezierBack.EP.x;
 					
 					var isP23b = new ED.Point(0,0);
-					isP23b.x = iInferiorBezierBack.CP1.x + tS0 * (iInferiorBezierBack.CP2.x - iInferiorBezierBack.CP1.x);
-					isP23b.y = iInferiorBezierBack.CP1.y + tS0 * (iInferiorBezierBack.CP2.y - iInferiorBezierBack.CP1.y);
+					isP23b.x = iInferiorBezierBack.CP1.x + ibtS0 * (iInferiorBezierBack.CP2.x - iInferiorBezierBack.CP1.x);
+					isP23b.y = iInferiorBezierBack.CP1.y + ibtS0 * (iInferiorBezierBack.CP2.y - iInferiorBezierBack.CP1.y);
 					
 					var isP34b = new ED.Point(0,0);
-					isP34b.x = iInferiorBezierBack.CP2.x + tS0 * (iInferiorBezierBack.EP.x - iInferiorBezierBack.CP2.x);
-					isP34b.y = iInferiorBezierBack.CP2.y + tS0 * (iInferiorBezierBack.EP.y - iInferiorBezierBack.CP2.y);
+					isP34b.x = iInferiorBezierBack.CP2.x + ibtS0 * (iInferiorBezierBack.EP.x - iInferiorBezierBack.CP2.x);
+					isP34b.y = iInferiorBezierBack.CP2.y + ibtS0 * (iInferiorBezierBack.EP.y - iInferiorBezierBack.CP2.y);
 					
 					var isP2334b = new ED.Point(0,0);
-					isP2334b.x = isP23b.x + tS0 * (isP34b.x - isP23b.x);
-					isP2334b.y = isP23b.y + tS0 * (isP34b.y - isP23b.y);
+					isP2334b.x = isP23b.x + ibtS0 * (isP34b.x - isP23b.x);
+					isP2334b.y = isP23b.y + ibtS0 * (isP34b.y - isP23b.y);
 					
 					iInferiorBezierBack.SP = isq0b;
 					iInferiorBezierBack.CP1 = isP2334b;
@@ -817,25 +828,27 @@ ED.CornealOpacityCrossSection.prototype.draw = function(_point) {
 					
 					// back of cornea
 					var isq1b = new ED.Point(0,0);
-					isq1b.y = (1-tS1)*(1-tS1)*(1-tS1)*iInferiorBezierBack.SP.y + 3*(1-tS1)*(1-tS1)*tS1*iInferiorBezierBack.CP1.y + 3*(1-tS1)*tS1*tS1*iInferiorBezierBack.CP2.y + tS1*tS1*tS1*iInferiorBezierBack.EP.y;
-					isq1b.x = (1-tS1)*(1-tS1)*(1-tS1)*iInferiorBezierBack.SP.x + 3*(1-tS1)*(1-tS1)*tS1*iInferiorBezierBack.CP1.x + 3*(1-tS1)*tS1*tS1*iInferiorBezierBack.CP2.x + tS1*tS1*tS1*iInferiorBezierBack.EP.x;
+					isq1b.y = (1-ibtS1)*(1-ibtS1)*(1-ibtS1)*iInferiorBezierBack.SP.y + 3*(1-ibtS1)*(1-ibtS1)*ibtS1*iInferiorBezierBack.CP1.y + 3*(1-ibtS1)*ibtS1*ibtS1*iInferiorBezierBack.CP2.y + ibtS1*ibtS1*ibtS1*iInferiorBezierBack.EP.y;
+					isq1b.x = (1-ibtS1)*(1-ibtS1)*(1-ibtS1)*iInferiorBezierBack.SP.x + 3*(1-ibtS1)*(1-ibtS1)*ibtS1*iInferiorBezierBack.CP1.x + 3*(1-ibtS1)*ibtS1*ibtS1*iInferiorBezierBack.CP2.x + ibtS1*ibtS1*ibtS1*iInferiorBezierBack.EP.x;
 		
 					var isP12b = new ED.Point(0,0);
-					isP12b.x = iInferiorBezierBack.SP.x + tS1 * (iInferiorBezierBack.CP1.x - iInferiorBezierBack.SP.x);
-					isP12b.y = iInferiorBezierBack.SP.y + tS1 * (iInferiorBezierBack.CP1.y - iInferiorBezierBack.SP.y);
+					isP12b.x = iInferiorBezierBack.SP.x + ibtS1 * (iInferiorBezierBack.CP1.x - iInferiorBezierBack.SP.x);
+					isP12b.y = iInferiorBezierBack.SP.y + ibtS1 * (iInferiorBezierBack.CP1.y - iInferiorBezierBack.SP.y);
 					
 					var isP23b = new ED.Point(0,0);
-					isP23b.x = iInferiorBezierBack.CP1.x + tS1 * (iInferiorBezierBack.CP2.x - iInferiorBezierBack.CP1.x);
-					isP23b.y = iInferiorBezierBack.CP1.y + tS1 * (iInferiorBezierBack.CP2.y - iInferiorBezierBack.CP1.y);
+					isP23b.x = iInferiorBezierBack.CP1.x + ibtS1 * (iInferiorBezierBack.CP2.x - iInferiorBezierBack.CP1.x);
+					isP23b.y = iInferiorBezierBack.CP1.y + ibtS1 * (iInferiorBezierBack.CP2.y - iInferiorBezierBack.CP1.y);
 					
 					var isP1223b = new ED.Point(0,0);
-					isP1223b.x = isP12b.x + tS1 * (isP23b.x - isP12b.x);
-					isP1223b.y = isP12b.y + tS1 * (isP23b.y - isP12b.y);
+					isP1223b.x = isP12b.x + ibtS1 * (isP23b.x - isP12b.x);
+					isP1223b.y = isP12b.y + ibtS1 * (isP23b.y - isP12b.y);
 		
 					iInferiorBezierBack.CP1 = isP12b;
 					iInferiorBezierBack.CP2 = isP1223b;
 					iInferiorBezierBack.EP = isq1b;
+					
 				}
+				
 			}
 
 			// Draw infiltrate
@@ -844,32 +857,31 @@ ED.CornealOpacityCrossSection.prototype.draw = function(_point) {
 			if (iInferiorBezier) {
 				ctx.moveTo(iInferiorBezierBack.EP.x, iInferiorBezierBack.EP.y); // starts at bottom of back inferior bezier
 				ctx.bezierCurveTo(iInferiorBezierBack.CP2.x, iInferiorBezierBack.CP2.y, iInferiorBezierBack.CP1.x, iInferiorBezierBack.CP1.y, iInferiorBezierBack.SP.x, iInferiorBezierBack.SP.y);				
-				ctx.lineTo(iInferiorBezier.SP.x, iInferiorBezier.SP.y);
-// 				ctx.bezierCurveTo(iInferiorBezierBack.SP.x, iInferiorBezier.SP.y,iInferiorBezier.SP.x, iInferiorBezier.SP.y,iInferiorBezier.SP.x, iInferiorBezier.SP.y)
+			}
+			
+			
+			if (iSuperiorBezierBack && iSuperiorBezierBack.EP.y>=iSuperiorBezierBack.SP.y) {
+				ctx.moveTo(iSuperiorBezierBack.EP.x, iSuperiorBezierBack.EP.y); // start at bottom of back superior curve (closest to midpoint)
+				ctx.bezierCurveTo(iSuperiorBezierBack.CP2.x, iSuperiorBezierBack.CP2.y, iSuperiorBezierBack.CP1.x, iSuperiorBezierBack.CP1.y, iSuperiorBezierBack.SP.x, iSuperiorBezierBack.SP.y);
+				ctx.lineTo(iSuperiorBezier.SP.x, iSuperiorBezier.SP.y);
+				ctx.bezierCurveTo(iSuperiorBezier.CP1.x, iSuperiorBezier.CP1.y, iSuperiorBezier.CP2.x, iSuperiorBezier.CP2.y, iSuperiorBezier.EP.x, iSuperiorBezier.EP.y); // end at bottom of front superior bezier (near midpoint)
+			}
+			else if (iSuperiorBezier) {
+				ctx.lineTo(iSuperiorBezier.SP.x, iSuperiorBezier.SP.y);
+				ctx.bezierCurveTo(iSuperiorBezier.CP1.x, iSuperiorBezier.CP1.y, iSuperiorBezier.CP2.x, iSuperiorBezier.CP2.y, iSuperiorBezier.EP.x, iSuperiorBezier.EP.y);
+			}
+			
+			if (iInferiorBezier) {
+				ctx.lineTo(iInferiorBezier.SP.x, iInferiorBezier.SP.y); // top of inferior bezier at the front
 				ctx.bezierCurveTo(iInferiorBezier.CP1.x, iInferiorBezier.CP1.y, iInferiorBezier.CP2.x, iInferiorBezier.CP2.y, iInferiorBezier.EP.x, iInferiorBezier.EP.y); // ends at bottom of front inferior bezier
-				if (endY <= 0) ctx.lineTo(iSuperiorBezierBack.EP.x, iSuperiorBezierBack.EP.y);
 			}
-			
-			
-			if (iSuperiorBezier) {
-				if (startY >= 0) {
-					ctx.moveTo(iInferiorBezierBack.SP.x, iInferiorBezierBack.SP.y);
-					ctx.lineTo(iSuperiorBezier.SP.x, iSuperiorBezier.SP.y);
-					ctx.bezierCurveTo(iSuperiorBezier.CP1.x, iSuperiorBezier.CP1.y, iSuperiorBezier.CP2.x, iSuperiorBezier.CP2.y, iSuperiorBezier.EP.x, iSuperiorBezier.EP.y); // end at bottom of front superior bezier (near midpoint)
-					ctx.lineTo(iInferiorBezierBack.SP.x, iInferiorBezierBack.SP.y);
-				}
-				else{
-					ctx.moveTo(iSuperiorBezierBack.EP.x, iSuperiorBezierBack.EP.y); // start at bottom of back superior curve (closest to midpoint)
-					ctx.bezierCurveTo(iSuperiorBezierBack.CP2.x, iSuperiorBezierBack.CP2.y, iSuperiorBezierBack.CP1.x, iSuperiorBezierBack.CP1.y, iSuperiorBezierBack.SP.x, iSuperiorBezierBack.SP.y);
-// 				ctx.bezierCurveTo(iSuperiorBezierBack.SP.x, iSuperiorBezier.SP.y, iSuperiorBezier.SP.x, iSuperiorBezier.SP.y, iSuperiorBezier.SP.x, iSuperiorBezier.SP.y)
-					ctx.lineTo(iSuperiorBezier.SP.x, iSuperiorBezier.SP.y);
-					ctx.bezierCurveTo(iSuperiorBezier.CP1.x, iSuperiorBezier.CP1.y, iSuperiorBezier.CP2.x, iSuperiorBezier.CP2.y, iSuperiorBezier.EP.x, iSuperiorBezier.EP.y); // end at bottom of front superior bezier (near midpoint)
-				}
+			if (iInferiorBezierBack && iInferiorBezierBack.EP.y>=iInferiorBezierBack.SP.y) {
+				ctx.lineTo(iInferiorBezierBack.EP.x, iInferiorBezierBack.EP.y);
 			}
+			else ctx.lineTo(iSuperiorBezierBack.EP.x,iSuperiorBezierBack.EP.y);
 			
 			ctx.fillStyle = "rgba(0,0,0,0.2)";
 			ctx.fill();
-			
 			
 			// fill opacity on top of
 			ctx.beginPath();
