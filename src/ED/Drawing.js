@@ -2294,13 +2294,13 @@ ED.Drawing.prototype.updateBindings = function(_doodle) {
 				continue;
 			var attribute = doodle.bindingArray[parameter]['attribute'];
 			var value = doodle.getParameter(parameter);
-
 			// Modify value of element according to type
 			switch (element.type) {
 				case 'checkbox':
 					if (attribute) {
 						ED.errorHandler('ED.Drawing', 'updateBindings', 'Binding to a checkbox with a non-standard attribute not yet supported');
 					} else {
+
 						if (value == "true") {
 							element.setAttribute('checked', 'checked');
 						} else {
@@ -2310,6 +2310,7 @@ ED.Drawing.prototype.updateBindings = function(_doodle) {
 					break;
 
 				case 'select-one':
+					var originalValue = element.value;
 					if (attribute) {
 						for (var i = 0; i < element.length; i++) {
 							if (element.options[i].getAttribute(attribute) == value) {
@@ -2319,6 +2320,11 @@ ED.Drawing.prototype.updateBindings = function(_doodle) {
 						}
 					} else {
 						element.value = value;
+					}
+					if (originalValue !== element.value) {
+                        // trigger a change event for anything listen to the bound html elements
+                        // instead of the eyedraw doodles.
+                        window.setTimeout(function(el) { el.dispatchEvent(new Event('change', {bubbles: true, cancelable: true})); }.bind(null, element), 100)
 					}
 					break;
 
