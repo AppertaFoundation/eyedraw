@@ -119,6 +119,15 @@ ED.AntPVR.prototype.draw = function(_point) {
 }
 
 /**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.AntPVR.prototype.description = function() {
+    return "PVR (anterior) " + this.clockHourExtent("o'clock");
+}
+
+/**
  * Returns the SnoMed code of the doodle
  *
  * @returns {Int} SnoMed code of entity representated by doodle

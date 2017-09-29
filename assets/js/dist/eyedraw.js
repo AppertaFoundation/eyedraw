@@ -5018,7 +5018,13 @@ ED.Doodle.prototype.degrees = function() {
  *
  * @returns {Int} Clock hour from 1 to 12
  */
-ED.Doodle.prototype.clockHourExtent = function() {
+ED.Doodle.prototype.clockHourExtent = function(label) {
+	if (label === undefined) {
+        label = '';
+	} else {
+		label = ' ' + label;
+	}
+
 	var clockHourStart;
 	var clockHourEnd;
 
@@ -5035,7 +5041,7 @@ ED.Doodle.prototype.clockHourExtent = function() {
 	if (clockHourStart == 0) clockHourStart = 12;
 	clockHourEnd = clockHourEnd.toFixed(0);
 	if (clockHourEnd == 0) clockHourEnd = 12;
-	return "from " + clockHourStart + " to " + clockHourEnd;
+	return "from " + clockHourStart + label + " to " + clockHourEnd + label;
 };
 
 /**
@@ -15310,6 +15316,15 @@ ED.AntPVR.prototype.draw = function(_point) {
 
 	// Return value indicating successful hit test
 	return this.isClicked;
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.AntPVR.prototype.description = function() {
+    return "PVR (anterior) " + this.clockHourExtent("o'clock");
 }
 
 /**
