@@ -20212,7 +20212,7 @@ ED.Cornea.prototype.setPropertyDefaults = function() {
     this.isMoveable = false;
     this.isRotatable = false;
     this.isUnique = true;
-    this.willReport = false;
+    this.willReport = true;
 
     // Update validation array for simple parameters
     this.parameterValidationArray['apexX']['range'].setMinAndMax(-365, -300);
@@ -20242,6 +20242,18 @@ ED.Cornea.prototype.setPropertyDefaults = function() {
 ED.Cornea.prototype.draw = function(_point) {
     return false;
 }
+
+/**
+ * Report text
+ * 
+ * @returns {string}
+ */
+ED.Cornea.prototype.description = function()
+{
+    if (this.shape && this.shape != 'Normal')
+        return this.shape;
+    return '';
+};
 /**
  * OpenEyes
  *
