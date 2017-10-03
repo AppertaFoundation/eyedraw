@@ -1,19 +1,18 @@
 /**
  * OpenEyes
+ * MSC mod
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -36,9 +35,10 @@ ED.Lens = function(_drawing, _parameterJSON) {
 	this.posteriorPolar = false;
 	this.coronary = false;
 	this.phakodonesis = false;
+	this.csOriginX = 0;
 
 	// Saved parameters
-	this.savedParameterArray = ['originX', 'originY', 'nuclearGrade', 'corticalGrade', 'posteriorSubcapsularGrade', 'anteriorPolar', 'posteriorPolar', 'coronary', 'phakodonesis'];
+	this.savedParameterArray = ['rotation', 'originX', 'originY', 'nuclearGrade', 'corticalGrade', 'posteriorSubcapsularGrade', 'anteriorPolar', 'posteriorPolar', 'coronary', 'phakodonesis', 'csOriginX'];
 
 	// Parameters in doodle control bar (parameter name: parameter label)
 	this.controlParameterArray = {
@@ -48,7 +48,7 @@ ED.Lens = function(_drawing, _parameterJSON) {
 		'anteriorPolar':'Anterior polar',
 		'posteriorPolar':'Posterior polar',
 		'coronary':'Coronary',
-		'phakodonesis':'Phakodonesis',
+		'phakodonesis':'Phacodonesis',
 		};
 
 	// Call superclass constructor
@@ -70,8 +70,8 @@ ED.Lens.prototype.setPropertyDefaults = function() {
 	this.addAtBack = true;
 
 	// Update component of validation array for simple parameters
-	this.parameterValidationArray['originX']['range'].setMinAndMax(-500, +500);
-	this.parameterValidationArray['originY']['range'].setMinAndMax(-500, +500);
+	this.parameterValidationArray['originX']['range'].setMinAndMax(-125, +125);
+	this.parameterValidationArray['originY']['range'].setMinAndMax(-125, +125);
 
 	this.parameterValidationArray['nuclearGrade'] = {
 		kind: 'derived',
@@ -294,6 +294,50 @@ ED.Lens.prototype.draw = function(_point) {
 			ctx.fill();
 			ctx.stroke();
 		}
+		
+		// Phacodonesis
+		if (this.phakodonesis) {
+			// Sine wave between arrow heads:
+			//Set amplitude and width of the wave as well as sample rate
+			var amplitude = 20;
+			var width = 100;
+			var srate = 1;
+
+			//Draw sine wave
+			ctx.beginPath();
+			ctx.moveTo(-150,0);
+			for (x=0; x<=300; x+= srate){
+				ctx.lineTo(-150+x, amplitude*Math.sin(2*Math.PI*x/width));
+			}
+
+			// Set line attributes
+			ctx.lineWidth = 4;
+			ctx.strokeStyle = "blue";
+			ctx.stroke();
+
+			// Left arrow:
+			ctx.beginPath();
+			ctx.moveTo(-150,-20);
+			ctx.lineTo(-225,0);
+			ctx.lineTo(-150,20);
+
+			// Set line attributes
+			ctx.lineWidth = 4;
+			ctx.fillStyle = "blue";
+			ctx.fill();
+
+			// Right arrow:
+			ctx.beginPath();
+			ctx.moveTo(150,-20);
+			ctx.lineTo(225,0);
+			ctx.lineTo(150,20);
+
+			// Set line attributes
+			ctx.lineWidth = 4;
+			ctx.fillStyle = "blue";
+			ctx.fill();
+		}
+
 	}
 
 	// Draw handles if selected
@@ -310,7 +354,15 @@ ED.Lens.prototype.draw = function(_point) {
  */
 ED.Lens.prototype.description = function() {
 	returnValue = "";
+	
+	if (this.originY < -30) {
+		returnValue += 'Lens subluxation: superior';
+	}
+	else if (this.originY > 30) {
+		returnValue += 'Lens subluxation: inferior';
+	}
 	if (this.nuclearGrade != 'None') {
+		returnValue += returnValue.length > 0?", ":"";
 		returnValue += this.nuclearGrade + ' nuclear cataract';
 	}
 	if (this.corticalGrade != 'None') {
@@ -335,7 +387,35 @@ ED.Lens.prototype.description = function() {
 	}
 	if (this.phakodonesis) {
 		returnValue += returnValue.length > 0?", ":"";
-		returnValue += 'Phakodonesis';
+		returnValue += 'Phacodonesis';
 	}
 	return returnValue;
-}
+};
+
+ED.Lens.prototype.snomedCodes = function()
+{
+	snomedCodes = new Array();
+    if (this.nuclearGrade != 'None') {
+        snomedCodes.push([53889007, 3]);
+    }
+    if (this.corticalGrade != 'None') {
+        snomedCodes.push([193576003, 3]);
+    }
+    if (this.posteriorSubcapsularGrade != 'None') {
+        snomedCodes.push([34533008, 3]);
+    }
+    if (this.coronary) {
+    	snomedCodes.push([12195004, 3]);
+    }
+    if (this.anteriorPolar) {
+    	snomedCodes.push([253224008, 3]);
+    }
+    if (this.posteriorPolar) {
+        snomedCodes.push([253225009, 3]);
+    }
+    if (this.phakodonesis) {
+    	snomedCodes.push([116669003, 3]);
+    }
+
+    return snomedCodes;
+};

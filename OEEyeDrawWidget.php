@@ -2,19 +2,17 @@
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -63,6 +61,8 @@ class OEEyeDrawWidget extends CWidget
 	 * @var boolean
 	 */
 	public $showDoodlePopup = true;
+
+	public $showDoodlePopupForDoodles = null;
 
 	/**
 	 * Maximum amount of toolbar buttons to display in a panel.
@@ -231,10 +231,24 @@ class OEEyeDrawWidget extends CWidget
 	public $autoReport = '';
 
 	/**
+	 * If autoReport is set, then this determines whether the controller will handle edits to the element containing
+	 * the auto reported text.
+	 * @var bool
+	 */
+	public $autoReportEditable = true;
+
+	/**
 	 * Whether the eyedraw should be rendered with a div wrapper
 	 * @var boolean
 	 */
 	public $divWrapper = true;
+
+	/**
+	 * The side the popup should display from the eyedraw
+	 *
+	 * @var string left|right
+	 */
+	public $popupDisplaySide = 'right';
 
 	/**
 	 * Paths for the subdirectories for javascript, css and images
@@ -261,13 +275,13 @@ class OEEyeDrawWidget extends CWidget
 	 * Unique name for the input element containing EyeDraw data
 	 * @var string
 	 */
-	private $inputName;
+	public $inputName;
 
 	/**
 	 * Unique id for the input element containing EyeDraw data
 	 * @var string
 	 */
-	private $inputId;
+	public $inputId;
 
 	/**
 	 * Represents the eye using the ED object enumeration (0 = right, 1 = left)
@@ -297,16 +311,12 @@ class OEEyeDrawWidget extends CWidget
 		$this->canvasId = 'ed_canvas_'.$this->mode.'_'.$this->idSuffix;
 
 		// Create matching name and id in 'Yii' format for loading and saving using POST
-		if (isset($this->model) && isset($this->attribute)) {
+		if (!isset($this->inputName) && isset($this->model) && isset($this->attribute)) {
 			if ($this->mode == 'edit') {
 				$this->inputName = CHtml::modelName($this->model).'['. $this->attribute.']';
 				$this->inputId = CHtml::modelName($this->model).'_'. $this->attribute;
 			} else {
 				$this->inputId = 'ed_input_'.$this->mode.'_'.$this->idSuffix;
-			}
-
-			if (isset($_POST[CHtml::modelName($this->model)][$this->attribute])) {
-				$this->model->{$this->attribute} = $_POST[CHtml::modelName($this->model)][$this->attribute];
 			}
 		}
 
@@ -368,7 +378,7 @@ class OEEyeDrawWidget extends CWidget
 		$data = get_object_vars($this);
 		$data['data'] = $data;
 
-		if (!$this->model->event || !$this->model->event->hasEventImage($this->drawingName)) {
+		if (!isset($this->model->event) || !$this->model->event->hasEventImage($this->drawingName)) {
 			// Register package (dependent scripts and stylesheets)
 			Yii::app()->clientScript->registerPackage('eyedraw');
 
@@ -422,6 +432,8 @@ class OEEyeDrawWidget extends CWidget
 			'offsetY'=>$this->offsetY,
 			'toImage'=>$this->toImage,
 			'autoReport'=>$this->autoReport,
+			'autoReportEditable' => $this->autoReportEditable,
+			'showDoodlePopupForDoodles' => $this->showDoodlePopupForDoodles
 		);
 		// need to escape the listener names so that they are not treated as string vars in javascript
 		foreach ($this->listenerArray as $listener) {
