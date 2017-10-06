@@ -19916,18 +19916,17 @@ ED.ConjunctivalSuture = function(_drawing, _parameterJSON) {
 	// Private parameters
 	this.boundaryWidth = 180;
 	this.boundaryHeight = 180;
-	this.orientated = true;
 
 	// Derived parameters
 	this.type = "Buried Mattress";
 	this.material = 'Nylon';
 	this.size = '10/0';
-
+	
 	// Saved parameters
-	this.savedParameterArray = ['originX', 'originY', 'rotation', 'orientated', 'type', 'material', 'size'];
+	this.savedParameterArray = ['originX', 'originY', 'rotation', 'isOrientated', 'type', 'material', 'size'];
 
 	// Parameters in doodle control bar (parameter name: parameter label)
-	this.controlParameterArray = {'orientated':'Orientated', 'type':'Type', 'material':'Material', 'size':'Size'};
+	this.controlParameterArray = {'isOrientated':'Orientated', 'type':'Type', 'material':'Material', 'size':'Size'};
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -19978,7 +19977,7 @@ ED.ConjunctivalSuture.prototype.setPropertyDefaults = function() {
 		list: ['11/0', '10/0', '9/0', '8/0', '7/0', '6/0'],
 		animate: false
 	}
-	this.parameterValidationArray['orientated'] = {
+	this.parameterValidationArray['isOrientated'] = {
 		kind: 'derived',
 		type: 'bool',
 		display: false
@@ -20037,13 +20036,11 @@ ED.ConjunctivalSuture.prototype.dependentParameterValues = function(_parameter, 
 			this.apexX = this.boundaryWidth/2;
 			break;
 
-		case 'orientated':
+		case 'isOrientated':
 			if (_value == "true") {
-				this.isOrientated = true;
 				this.handleArray[2].isVisible = false;
 			}
 			else {
-				this.isOrientated = false;
 				this.handleArray[2].isVisible = true;
 			}
 			break;
