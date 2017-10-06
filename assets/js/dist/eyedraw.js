@@ -5018,7 +5018,13 @@ ED.Doodle.prototype.degrees = function() {
  *
  * @returns {Int} Clock hour from 1 to 12
  */
-ED.Doodle.prototype.clockHourExtent = function() {
+ED.Doodle.prototype.clockHourExtent = function(label) {
+	if (label === undefined) {
+        label = '';
+	} else {
+		label = ' ' + label;
+	}
+
 	var clockHourStart;
 	var clockHourEnd;
 
@@ -5035,7 +5041,7 @@ ED.Doodle.prototype.clockHourExtent = function() {
 	if (clockHourStart == 0) clockHourStart = 12;
 	clockHourEnd = clockHourEnd.toFixed(0);
 	if (clockHourEnd == 0) clockHourEnd = 12;
-	return "from " + clockHourStart + " to " + clockHourEnd;
+	return "from " + clockHourStart + label + " to " + clockHourEnd + label;
 };
 
 /**
@@ -15313,6 +15319,15 @@ ED.AntPVR.prototype.draw = function(_point) {
 }
 
 /**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.AntPVR.prototype.description = function() {
+    return "PVR (anterior) " + this.clockHourExtent("o'clock");
+}
+
+/**
  * Returns the SnoMed code of the doodle
  *
  * @returns {Int} SnoMed code of entity representated by doodle
@@ -19901,18 +19916,17 @@ ED.ConjunctivalSuture = function(_drawing, _parameterJSON) {
 	// Private parameters
 	this.boundaryWidth = 180;
 	this.boundaryHeight = 180;
-	this.orientated = true;
 
 	// Derived parameters
 	this.type = "Buried Mattress";
 	this.material = 'Nylon';
 	this.size = '10/0';
-
+	
 	// Saved parameters
-	this.savedParameterArray = ['originX', 'originY', 'rotation', 'orientated', 'type', 'material', 'size'];
+	this.savedParameterArray = ['originX', 'originY', 'rotation', 'isOrientated', 'type', 'material', 'size'];
 
 	// Parameters in doodle control bar (parameter name: parameter label)
-	this.controlParameterArray = {'orientated':'Orientated', 'type':'Type', 'material':'Material', 'size':'Size'};
+	this.controlParameterArray = {'isOrientated':'Orientated', 'type':'Type', 'material':'Material', 'size':'Size'};
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -19963,7 +19977,7 @@ ED.ConjunctivalSuture.prototype.setPropertyDefaults = function() {
 		list: ['11/0', '10/0', '9/0', '8/0', '7/0', '6/0'],
 		animate: false
 	}
-	this.parameterValidationArray['orientated'] = {
+	this.parameterValidationArray['isOrientated'] = {
 		kind: 'derived',
 		type: 'bool',
 		display: false
@@ -20022,13 +20036,11 @@ ED.ConjunctivalSuture.prototype.dependentParameterValues = function(_parameter, 
 			this.apexX = this.boundaryWidth/2;
 			break;
 
-		case 'orientated':
+		case 'isOrientated':
 			if (_value == "true") {
-				this.isOrientated = true;
 				this.handleArray[2].isVisible = false;
 			}
 			else {
-				this.isOrientated = false;
 				this.handleArray[2].isVisible = true;
 			}
 			break;
