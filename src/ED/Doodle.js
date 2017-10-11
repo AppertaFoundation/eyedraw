@@ -323,7 +323,10 @@ ED.Doodle = function(_drawing, _parameterJSON) {
 						// Add points to squiggle and complete it
 						var pointsArray = squiggleArray[j].pointsArray;
 						for (var k = 0; k < pointsArray.length; k++) {
-							var point = new ED.Point(pointsArray[k].x, pointsArray[k].y);
+							var point = undefined;
+							if (pointsArray[k].x && pointsArray[k].y) {
+                                point = new ED.Point(pointsArray[k].x, pointsArray[k].y);
+							}
 							squiggle.addPoint(point);
 						}
 						squiggle.complete = true;
