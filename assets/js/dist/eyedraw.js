@@ -3498,7 +3498,7 @@ ED.Doodle = function(_drawing, _parameterJSON) {
 						var pointsArray = squiggleArray[j].pointsArray;
 						for (var k = 0; k < pointsArray.length; k++) {
 							var point = undefined;
-							if (pointsArray[k].x && pointsArray[k].y) {
+							if (!isNaN(parseFloat(pointsArray[k].x)) && !isNaN(parseFloat(pointsArray[k].y))) {
                                 point = new ED.Point(pointsArray[k].x, pointsArray[k].y);
 							}
 							squiggle.addPoint(point);
@@ -43467,7 +43467,7 @@ ED.Pterygium.prototype.setHandles = function() {
 	this.handleArray[1] = new ED.Doodle.Handle(null, true, ED.Mode.Arc, false);
 	this.handleArray[2] = new ED.Doodle.Handle(null, true, ED.Mode.Arc, false);
 	this.handleArray[4] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
-
+	
 	this.handleArray[5] = new ED.Doodle.Handle(null, true, ED.Mode.Handles, false);
 	this.handleArray[6] = new ED.Doodle.Handle(null, true, ED.Mode.Handles, false);
 }

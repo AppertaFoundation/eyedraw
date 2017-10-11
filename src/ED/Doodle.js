@@ -324,7 +324,7 @@ ED.Doodle = function(_drawing, _parameterJSON) {
 						var pointsArray = squiggleArray[j].pointsArray;
 						for (var k = 0; k < pointsArray.length; k++) {
 							var point = undefined;
-							if (pointsArray[k].x && pointsArray[k].y) {
+							if (!isNaN(parseFloat(pointsArray[k].x)) && !isNaN(parseFloat(pointsArray[k].y))) {
                                 point = new ED.Point(pointsArray[k].x, pointsArray[k].y);
 							}
 							squiggle.addPoint(point);
