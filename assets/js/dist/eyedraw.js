@@ -3497,7 +3497,10 @@ ED.Doodle = function(_drawing, _parameterJSON) {
 						// Add points to squiggle and complete it
 						var pointsArray = squiggleArray[j].pointsArray;
 						for (var k = 0; k < pointsArray.length; k++) {
-							var point = new ED.Point(pointsArray[k].x, pointsArray[k].y);
+							var point = undefined;
+							if (!isNaN(parseFloat(pointsArray[k].x)) && !isNaN(parseFloat(pointsArray[k].y))) {
+                                point = new ED.Point(pointsArray[k].x, pointsArray[k].y);
+							}
 							squiggle.addPoint(point);
 						}
 						squiggle.complete = true;
@@ -5018,7 +5021,13 @@ ED.Doodle.prototype.degrees = function() {
  *
  * @returns {Int} Clock hour from 1 to 12
  */
-ED.Doodle.prototype.clockHourExtent = function() {
+ED.Doodle.prototype.clockHourExtent = function(label) {
+	if (label === undefined) {
+        label = '';
+	} else {
+		label = ' ' + label;
+	}
+
 	var clockHourStart;
 	var clockHourEnd;
 
@@ -5035,7 +5044,7 @@ ED.Doodle.prototype.clockHourExtent = function() {
 	if (clockHourStart == 0) clockHourStart = 12;
 	clockHourEnd = clockHourEnd.toFixed(0);
 	if (clockHourEnd == 0) clockHourEnd = 12;
-	return "from " + clockHourStart + " to " + clockHourEnd;
+	return "from " + clockHourStart + label + " to " + clockHourEnd + label;
 };
 
 /**
@@ -15313,6 +15322,15 @@ ED.AntPVR.prototype.draw = function(_point) {
 }
 
 /**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.AntPVR.prototype.description = function() {
+    return "PVR (anterior) " + this.clockHourExtent("o'clock");
+}
+
+/**
  * Returns the SnoMed code of the doodle
  *
  * @returns {Int} SnoMed code of entity representated by doodle
@@ -20209,7 +20227,7 @@ ED.Cornea.prototype.setPropertyDefaults = function() {
     this.isMoveable = false;
     this.isRotatable = false;
     this.isUnique = true;
-    this.willReport = false;
+    this.willReport = true;
 
     // Update validation array for simple parameters
     this.parameterValidationArray['apexX']['range'].setMinAndMax(-365, -300);
@@ -20239,6 +20257,18 @@ ED.Cornea.prototype.setPropertyDefaults = function() {
 ED.Cornea.prototype.draw = function(_point) {
     return false;
 }
+
+/**
+ * Report text
+ * 
+ * @returns {string}
+ */
+ED.Cornea.prototype.description = function()
+{
+    if (this.shape && this.shape != 'Normal')
+        return this.shape;
+    return '';
+};
 /**
  * OpenEyes
  *
