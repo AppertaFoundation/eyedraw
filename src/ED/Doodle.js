@@ -323,7 +323,10 @@ ED.Doodle = function(_drawing, _parameterJSON) {
 						// Add points to squiggle and complete it
 						var pointsArray = squiggleArray[j].pointsArray;
 						for (var k = 0; k < pointsArray.length; k++) {
-							var point = new ED.Point(pointsArray[k].x, pointsArray[k].y);
+							var point = undefined;
+							if (!isNaN(parseFloat(pointsArray[k].x)) && !isNaN(parseFloat(pointsArray[k].y))) {
+                                point = new ED.Point(pointsArray[k].x, pointsArray[k].y);
+							}
 							squiggle.addPoint(point);
 						}
 						squiggle.complete = true;
@@ -1844,7 +1847,13 @@ ED.Doodle.prototype.degrees = function() {
  *
  * @returns {Int} Clock hour from 1 to 12
  */
-ED.Doodle.prototype.clockHourExtent = function() {
+ED.Doodle.prototype.clockHourExtent = function(label) {
+	if (label === undefined) {
+        label = '';
+	} else {
+		label = ' ' + label;
+	}
+
 	var clockHourStart;
 	var clockHourEnd;
 
@@ -1861,7 +1870,7 @@ ED.Doodle.prototype.clockHourExtent = function() {
 	if (clockHourStart == 0) clockHourStart = 12;
 	clockHourEnd = clockHourEnd.toFixed(0);
 	if (clockHourEnd == 0) clockHourEnd = 12;
-	return "from " + clockHourStart + " to " + clockHourEnd;
+	return "from " + clockHourStart + label + " to " + clockHourEnd + label;
 };
 
 /**
