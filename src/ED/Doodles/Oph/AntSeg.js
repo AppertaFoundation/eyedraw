@@ -57,7 +57,7 @@ ED.AntSeg = function(_drawing, _parameterJSON) {
 	// Parameters in doodle control bar (parameter name: parameter label)
 	this.controlParameterArray = {
 		'pupilSize':'Pupil size',
-		'pxe':'PXE',
+		'pxe':'Pseudoexfoliation',
 		'coloboma':'Coloboma',
 		'colour':'Colour',
 		'ectropion':'Ectropion uveae',
