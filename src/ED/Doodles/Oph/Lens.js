@@ -294,7 +294,7 @@ ED.Lens.prototype.draw = function(_point) {
 			ctx.fill();
 			ctx.stroke();
 		}
-		
+
 		// Phacodonesis
 		if (this.phakodonesis) {
 			// Sine wave between arrow heads:
@@ -354,7 +354,7 @@ ED.Lens.prototype.draw = function(_point) {
  */
 ED.Lens.prototype.description = function() {
 	returnValue = "";
-	
+
 	if (this.originY < -30) {
 		returnValue += 'Lens subluxation: superior';
 	}
@@ -402,7 +402,7 @@ ED.Lens.prototype.snomedCodes = function()
         snomedCodes.push([193576003, 3]);
     }
     if (this.posteriorSubcapsularGrade != 'None') {
-        snomedCodes.push([34533008, 3]);
+        snomedCodes.push([315353005, 3]);
     }
     if (this.coronary) {
     	snomedCodes.push([12195004, 3]);
