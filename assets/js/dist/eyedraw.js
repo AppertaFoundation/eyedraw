@@ -32498,6 +32498,7 @@ ED.OpticDisc.prototype.description = function() {
 				}
 			}
 		} else {
+
 			returnString = this.drawing.doodleArray.length == 1 ? "No abnormality" : "";
 		}
 	}
@@ -32506,8 +32507,11 @@ ED.OpticDisc.prototype.description = function() {
 		if (this.cdRatio == "No view") {
 			returnString = "No view";
 		}
-	}
+    if (returnString.length === 0 && this.drawing.doodleArray.length === 1) {
+      returnString = "No abnormality";
+    }
 
+  }
 	return returnString;
 };
 
