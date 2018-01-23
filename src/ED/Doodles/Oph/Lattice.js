@@ -28,9 +28,6 @@ ED.Lattice = function(_drawing, _parameterJSON)
     // Set classname
     this.className = "Lattice";
   
-  // Saved parameters
-  +    this.savedParameterArray = ['arc', 'radius', 'originX', 'originY', 'rotation'];
-
     // Saved parameters
     this.savedParameterArray = ['arc', 'radius', 'originX', 'originY', 'rotation'];
 
