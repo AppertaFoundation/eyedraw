@@ -32108,11 +32108,7 @@ ED.InnerLeafBreak = function(_drawing, _parameterJSON)
     this.className = "InnerLeafBreak";
 
     this.savedParameterArray = ['originX', 'originY', 'scaleX', 'scaleY'];
-<<<<<<< HEAD
-
-=======
     
->>>>>>> origin/release/v2.1
     // Call superclass constructor
     ED.Doodle.call(this, _drawing, _parameterJSON);
 }
@@ -41938,12 +41934,6 @@ ED.PosteriorCapsule = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "PosteriorCapsule";
 
-<<<<<<< HEAD
-    this.savedParameterArray = ['originX', 'originY', 'scaleX', 'scaleY'];
-
-    // Call superclass constructor
-    ED.Doodle.call(this, _drawing, _parameterJSON);
-=======
 	// Derived parameters
 	this.opacity = '1';
 	this.capsulotomy = 'None';
@@ -41956,7 +41946,6 @@ ED.PosteriorCapsule = function(_drawing, _parameterJSON) {
 		'opacity':'Opacity',
 		'capsulotomy':'Capsulotomy',
 		};
->>>>>>> origin/release/v2.1
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
