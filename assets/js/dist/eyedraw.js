@@ -34374,7 +34374,7 @@ ED.Lattice = function(_drawing, _parameterJSON)
 {
     // Set classname
     this.className = "Lattice";
-
+  
     // Saved parameters
     this.savedParameterArray = ['arc', 'radius', 'originX', 'originY', 'rotation'];
 
@@ -39050,6 +39050,7 @@ ED.OpticDisc.prototype.description = function() {
 				}
 			}
 		} else {
+
 			returnString = this.drawing.doodleArray.length == 1 ? "No abnormality" : "";
 		}
 	}
@@ -39058,8 +39059,11 @@ ED.OpticDisc.prototype.description = function() {
 		if (this.cdRatio == "No view") {
 			returnString = "No view";
 		}
-	}
+    if (returnString.length === 0 && this.drawing.doodleArray.length === 1) {
+      returnString = "No abnormality";
+    }
 
+  }
 	return returnString;
 };
 
