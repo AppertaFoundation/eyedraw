@@ -2,19 +2,17 @@
 /**
  * OpenEyes.
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @link http://www.openeyes.org.uk
  *
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -43,6 +41,7 @@ class DoodleInfo
         'AngleRecession' => 'Angle recession',
         'AntPVR' => 'Anterior PVR',
         'AntSeg' => 'Anterior segment',
+        'AntSegAngleMarks' => 'Angle Marks',
         'AntSynech' => 'Anterior synechiae',
         'APattern' => 'A pattern',
         'ArcuateKeratotomy' => 'Arcuate keratotomy',
@@ -66,11 +65,15 @@ class DoodleInfo
         'CNV' => 'Choroidal new vessels',
         'ConjunctivalFlap' => 'Conjunctival flap',
         'ConjunctivalSuture' => 'Conjunctival suture',
+        'Conjunctivitis' => 'Conjunctivitis',
         'CornealAbrasion' => 'Corneal abrasion',
+        'CornealEpithelialDefect' => 'Corneal epithelial defect',
         'CornealErosion' => 'Removal of corneal epithelium',
         'CornealGraft' => 'Corneal graft',
         'CornealInlay' => 'Corneal inlay',
         'CornealOedema' => 'Corneal oedema',
+        'CornealOpacity' => 'Corneal opacity',
+        'CornealPigmentation' => 'Corneal pigmentation',
         'CornealScar' => 'Corneal scar',
         'CornealStriae' => 'Corneal striae',
         'CornealSuture' => 'Corneal suture',
@@ -79,6 +82,7 @@ class DoodleInfo
         'Cryo' => 'Cryotherapy scar',
         'CutterPI' => 'Cutter iridectomy',
         'CystoidMacularOedema' => 'Cystoid macular oedema',
+        'DendriticUlcer' => 'Dendritic ulcer',
         'DiabeticNV' => 'Diabetic new vessels',
         'Dialysis' => 'Dialysis',
         'DiscHaemorrhage' => 'Disc haemorrhage',
@@ -89,6 +93,7 @@ class DoodleInfo
         'EntrySiteBreak' => 'Entry site break',
         'EpiretinalMembrane' => 'Epiretinal membrane',
         'Episcleritis' => 'Episcleritis',
+
         'FibrousProliferation' => 'Fibrous proliferation',
         'FibrovascularScar' => 'Fibrovascular Scar',
         'FocalLaser' => 'Focal laser',
@@ -138,6 +143,7 @@ class DoodleInfo
         'OpticDiscPit' => 'Optic disc pit',
         'OrthopticEye' => 'Orthoptic eye',
         'OuterLeafBreak' => 'Outer leaf break',
+        'PalpebralConjunctivitis' => 'Palpebral Conjunctivitis',
         'Papilloedema' => 'Papilloedema',
         'Patch' => 'Tube patch',
         'PCIOL' => 'Posterior chamber IOL',
@@ -180,7 +186,9 @@ class DoodleInfo
         'SidePort' => 'Side port',
         'Slider' => 'Slider',
         'SMILE' => 'Small incision lenticule extraction',
+        'SPEE' => 'SPEE',
         'StarFold' => 'Star fold',
+        'STFB' => 'STFB',
         'SubretinalFluid' => 'Subretinal fluid',
         'SubretinalPFCL' => 'Subretinal PFCL',
         'Supramid' => 'Supramid suture',
@@ -215,5 +223,11 @@ class DoodleInfo
         'Bruit' => 'Bruit',
         'Bruising' => 'Bruising',
         'Haematoma' => 'Haematoma',
+        'AdenoviralKeratitis' => 'Adenoviral keratitis',
+        'MarginalKeratitis' => 'Marginal keratitis',
+        'CornealLaceration' => 'Corneal laceration',
+        'MetallicForeignBody' => 'Metallic foreign body',
+        'Pingueculum' => 'Pingueculum',
+        'Pterygium' => 'Pterygium'
     );
 }

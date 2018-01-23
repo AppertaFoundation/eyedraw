@@ -1,19 +1,18 @@
 /**
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2014
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
  *
  * OpenEyes is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
+ * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * OpenEyes is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU Affero General Public License
  * along with OpenEyes.  If not, see <http://www.gnu.org/licenses/>.
  */
 
@@ -112,8 +111,13 @@ ED.Point.prototype.direction = function() {
  * @returns {Float} The angle in radians
  */
 ED.Point.prototype.clockwiseAngleTo = function(_point) { //console.log("cat: ",(this.length() * _point.length()));
+	var len = (this.length() * _point.length());
+	if (len == 0.0) {
+		return 0.0;
+	}
+
 	// Floating point errors occasionally produce a number for the acos function greater than 1, causing a NaN error
-	var num = this.dotProduct(_point) / (this.length() * _point.length());
+	var num = this.dotProduct(_point) / len;
 	if (num > 1) num = 1;
 	var angle = Math.acos(num);
 	if (this.crossProduct(_point) < 0) {
@@ -202,7 +206,7 @@ ED.Point.prototype.tangentialControlPoint = function(_phi) {
 }
 
 /**
- * Creates a new point on a straight line between two points at a proportional distance 
+ * Creates a new point on a straight line between two points at a proportional distance
  *
  * @param {Float} _percent Percentage distance along line
  * @param {Point} _ep End point
@@ -220,7 +224,7 @@ ED.Point.prototype.pointAtPercentageFromPointToPoint = function(_percent, _point
 }
 
 /**
- * Creates a new point on a cubic Bezier curve at parameter t along curve 
+ * Creates a new point on a cubic Bezier curve at parameter t along curve
  *
  * @param {Float} _t Proportion along curve (0-1)
  * @param {Point} _cp1 Control point 1
@@ -235,14 +239,14 @@ ED.Point.prototype.bezierPointAtParameter = function(_t, _cp1, _cp2, _ep) {
 	var mt = 1 - _t;
 	var mt2 = mt * mt;
 	var mt3 = mt2 * mt;
-	
+
 	// Calculate x and y values of point
 	var x = this.x * mt3 + 3 * _cp1.x * mt2 * _t + 3 * _cp2.x * mt * t2 + _ep.x * t3;
 	var y = this.y * mt3 + 3 * _cp1.y * mt2 * _t + 3 * _cp2.y * mt * t2 + _ep.y * t3;
-	
+
 	// Return point
 	return new ED.Point(x, y);
-} 
+}
 /**
  * Returns a point in JSON encoding
  *

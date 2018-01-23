@@ -1,19 +1,17 @@
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -27,9 +25,14 @@
 ED.CornealSuture = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "CornealSuture";
-
+	
+	// Derived parameters
+	this.removed = false;
+	
 	// Saved parameters
-	this.savedParameterArray = ['radius', 'rotation'];
+	this.savedParameterArray = ['radius', 'rotation','removed'];
+	
+	this.controlParameterArray = {'removed':'Removed'};
 	
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -48,6 +51,12 @@ ED.CornealSuture.superclass = ED.Doodle.prototype;
 ED.CornealSuture.prototype.setPropertyDefaults = function() {
 	this.isScaleable = false;
 	this.isMoveable = false;
+	
+	this.parameterValidationArray['removed'] = {
+		kind: 'derived',
+		type: 'bool',
+		animate: false
+	}
 }
 
 /**
@@ -100,9 +109,12 @@ ED.CornealSuture.prototype.draw = function(_point) {
 		ctx.lineTo(-10, -r + 30);
 
 		ctx.lineWidth = 2;
-		var colour = "rgba(0,0,120,0.7)"
-		ctx.strokeStyle = colour;
-
+		if (this.removed) ctx.strokeStyle = "rgba(150,150,150,0.6)";
+		else {
+			var colour = "rgba(0,0,120,0.7)"
+			ctx.strokeStyle = colour;
+		}
+	
 		ctx.stroke();
 
 		// Knot

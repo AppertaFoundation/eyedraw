@@ -192,7 +192,7 @@ ED.positiveAngle = function(_angle) {
  * @param {String} _message Error message
  */
 ED.errorHandler = function(_class, _method, _message) {
-	console.log('EYEDRAW ERROR! class: [' + _class + '] method: [' + _method + '] message: [' + _message + ']');
+	console.trace('EYEDRAW ERROR! class: [' + _class + '] method: [' + _method + '] message: [' + _message + ']');
 };
 
 /**
@@ -269,16 +269,16 @@ ED.randomArray = [0.6570, 0.2886, 0.7388, 0.1621, 0.9896, 0.0434, 0.1695, 0.9099
  * This file is part of OpenEyes.
  *
  * OpenEyes is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
+ * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * OpenEyes is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU Affero General Public License
  * along with OpenEyes.  If not, see <http://www.gnu.org/licenses/>.
  */
 
@@ -303,7 +303,7 @@ var ED = ED || {};
  * @property {AffineTransform} transform Transform converts doodle plane -> canvas plane
  * @property {AffineTransform} inverseTransform Inverse transform converts canvas plane -> doodle plane
  * @property {Doodle} selectedDoodle The currently selected doodle, null if no selection
- * @property {Bool} mouseDown Flag indicating whether mouse is down in canvas
+ * @property {Bool} mouseIsDown Flag indicating whether mouse is down in canvas
  * @property {Mode} mode The current mouse dragging mode
  * @property {Point} lastMousePosition Last position of mouse in canvas coordinates
  * @property {Image} image Optional background image
@@ -370,7 +370,7 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 	this.transform = new ED.AffineTransform();
 	this.inverseTransform = new ED.AffineTransform();
 	this.selectedDoodle = null;
-	this.mouseDown = false;
+	this.mouseIsDown = false;
 	this.doubleClick = false;
 	this.mode = ED.Mode.None;
 	this.lastMousePosition = new ED.Point(0, 0);
@@ -389,6 +389,7 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 	this.showDoodleControls = false;
 	this.onReadyCommands = [];
 	this.resetDoodleSet = false;
+	this.lastTouchPoint = undefined;
 
 	// Freehand drawing properties NB from November 2013 moved to Freehand doodle
 //	this.squiggleColour = new ED.Colour(0, 255, 0, 1);
@@ -503,7 +504,7 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 				'ed-button',
 				'ed-canvas',
 				'ed_canvas',
-				'ed-selected-doodle-select'
+				'ed-selected-doodle-select',
 			].join(')|(') + ')';
 
 			do {
@@ -531,14 +532,14 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 			} else {
 				ED.errorHandler('ED.Drawing', 'Class', 'Touches undefined: ');
 			}
+			this.lastTouchPoint = point;
 			drawing.mousedown(point);
 		}, false);
 
 		this.canvas.addEventListener('touchend', function(e) {
-			if (e.targetTouches[0] !== undefined) {
-				var canvas_pos = drawing.getPositionOfElement(drawing.canvas);
-				var point = new ED.Point(e.targetTouches[0].pageX - canvas_pos[0] - this.offsetLeft, e.targetTouches[0].pageY - canvas_pos[1]);
-				drawing.mouseup(point);
+            if (this.lastTouchPoint !== undefined) {
+				drawing.mouseup(this.lastTouchPoint);
+				this.lastTouchPoint = undefined;
 			}
 		}, false);
 
@@ -546,6 +547,7 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 			if (e.targetTouches[0] !== undefined) {
 				var canvas_pos = drawing.getPositionOfElement(drawing.canvas);
 				var point = new ED.Point(e.targetTouches[0].pageX - canvas_pos[0] - this.offsetLeft, e.targetTouches[0].pageY - canvas_pos[1]);
+                this.lastTouchPoint = point;
 				drawing.mousemove(point);
 			}
 		}, false);
@@ -874,7 +876,9 @@ ED.Drawing.prototype.drawAllDoodles = function() {
  */
 ED.Drawing.prototype.mousedown = function(_point) {
 	// Set flag to indicate dragging can now take place
-	this.mouseDown = true;
+	this.mouseIsDown = true;
+	
+	var doodle = this.selectedDoodle;
 
 	// Detect double click
 	if (ED.recentClick) {
@@ -887,7 +891,6 @@ ED.Drawing.prototype.mousedown = function(_point) {
 	var found = false;
 	this.lastSelectedDoodle = this.selectedDoodle;
 	this.selectedDoodle = null;
-
 	// Cycle through doodles from front to back doing hit test
 	for (var i = this.doodleArray.length - 1; i > -1; i--) {
 		if (!found) {
@@ -910,6 +913,7 @@ ED.Drawing.prototype.mousedown = function(_point) {
 						// Add new squiggle
 						this.doodleArray[i].addSquiggle();
 					}
+					
 				}
 			}
 			// Ensure that unselected doodles are marked as such
@@ -970,6 +974,24 @@ ED.Drawing.prototype.mousedown = function(_point) {
 	});
 };
 
+
+/**
+ * Responds to mouse down event in canvas, cycles through doodles from front to back.
+ * Selected doodle is first selectable doodle to have click within boundary path.
+ * Double clicking on a selected doodle promotes it to drawing mode (if is drawable)
+ *
+ * @event
+ * @param {Point} _point Coordinates of mouse in canvas plane
+ */
+ED.Drawing.prototype.click = function(_point) {
+	// Notify
+	this.notify("click", {
+		drawing: this,
+		point: _point
+	});
+}
+
+
 /**
  * Responds to mouse move event in canvas according to the drawing mode
  *
@@ -1009,9 +1031,8 @@ ED.Drawing.prototype.mousemove = function(_point) {
 
 	// Start the hover timer (also resets it)
 	this.startHoverTimer(_point);
-
 	// Only drag if mouse already down and a doodle selected
-	if (this.mouseDown && doodle != null) {
+	if (this.mouseIsDown && doodle != null) {
 
 		// Dragging not started
 		if (!doodle.isBeingDragged) {
@@ -1366,7 +1387,7 @@ ED.Drawing.prototype.mouseup = function(_point) {
 		 */
 
 	// Reset flags and mode
-	this.mouseDown = false;
+	this.mouseIsDown = false;
 	this.doubleClick = false;
 	this.mode = ED.Mode.None;
 	this.selectionRectangleIsBeingDragged = false;
@@ -1388,6 +1409,7 @@ ED.Drawing.prototype.mouseup = function(_point) {
 		}
 	}
 
+	
 	// Redraw to get rid of select rectangle
 	this.repaint();
 
@@ -1422,7 +1444,7 @@ ED.Drawing.prototype.mouseout = function(_point) {
 	this.stopHoverTimer();
 
 	// Reset flag and mode
-	this.mouseDown = false;
+	this.mouseIsDown = false;
 	this.mode = ED.Mode.None;
 
 	// Reset selected doodle's dragging flag
@@ -1449,89 +1471,27 @@ ED.Drawing.prototype.mouseout = function(_point) {
 ED.Drawing.prototype.keydown = function(e) {
 	// Keyboard action works on selected doodle
 	if (this.selectedDoodle != null) {
-		// Label doodle is special case - Deprecated since doodle control bar
-		// if (this.selectedDoodle.className == "Label") {
-		if (false) {
-			// Code to send to doodle
-			var code = 0;
-
-			// Shift key has code 16
-			if (e.keyCode != 16) {
-				// Alphabetic
-				if (e.keyCode >= 65 && e.keyCode <= 90) {
-					if (e.shiftKey) {
-						code = e.keyCode;
-					} else {
-						code = e.keyCode + 32;
-					}
-				}
-				// Space or numeric
-				else if (e.keyCode == 32 || (e.keyCode > 47 && e.keyCode < 58)) {
-					code = e.keyCode;
-				}
-				// Apostrophes
-				else if (e.keyCode == 222) {
-					if (e.shiftKey) {
-						code = 34;
-					} else {
-						code = 39;
-					}
-				}
-				// Colon and semicolon
-				else if (e.keyCode == 186) {
-					if (e.shiftKey) {
-						code = 58;
-					} else {
-						code = 59;
-					}
-				}
-				// Other punctuation
-				else if (e.keyCode == 188 || e.keyCode == 190) {
-					if (e.keyCode == 188) code = 44;
-					if (e.keyCode == 190) code = 46;
-				}
-				// Backspace
-				else if (e.keyCode == 8) {
-					code = e.keyCode;
-				}
-				// Carriage return
-				else if (e.keyCode == 13) {
-					code = 13;
-				}
-			}
-
-			// Carriage return stops editing
-			if (code == 13) {
-				this.deselectDoodles();
-			}
-			// Send code to label doodle
-			else if (code > 0) {
-				this.selectedDoodle.addLetter(code);
-			}
-		} else {
-			// Delete or move doodle
-			switch (e.keyCode) {
-				case 8: // Backspace
-					if (this.selectedDoodle.className != "Label") this.deleteSelectedDoodle();
-					break;
-				case 37: // Left arrow
-					this.selectedDoodle.move(-ED.arrowDelta, 0);
-					break;
-				case 38: // Up arrow
-					this.selectedDoodle.move(0, -ED.arrowDelta);
-					break;
-				case 39: // Right arrow
-					this.selectedDoodle.move(ED.arrowDelta, 0);
-					break;
-				case 40: // Down arrow
-					this.selectedDoodle.move(0, ED.arrowDelta);
-					break;
-				default:
-					break;
-			}
+		// Delete or move doodle
+		switch (e.keyCode) {
+			case 8: // Backspace
+				if (this.selectedDoodle.className != "Label") this.deleteSelectedDoodle();
+				break;
+			case 37: // Left arrow
+				this.selectedDoodle.move(-ED.arrowDelta, 0);
+				break;
+			case 38: // Up arrow
+				this.selectedDoodle.move(0, -ED.arrowDelta);
+				break;
+			case 39: // Right arrow
+				this.selectedDoodle.move(ED.arrowDelta, 0);
+				break;
+			case 40: // Down arrow
+				this.selectedDoodle.move(0, ED.arrowDelta);
+				break;
+			default:
+				break;
 		}
 
-		// Refresh canvas
 		this.repaint();
 
 		// Prevent key stroke bubbling up (***TODO*** may need cross browser handling)
@@ -1828,7 +1788,6 @@ ED.Drawing.prototype.deleteDoodle = function(_doodle, really) {
 	var deletedClassName = false;
 
 	var errorMessage = 'Attempt to delete a doodle that does not exist';
-
 	// Check that doodle will delete
 	if (really || _doodle.willDelete()) {
 		// Iterate through doodle array looking for doodle
@@ -1945,6 +1904,7 @@ ED.Drawing.prototype.deleteSelectedDoodle = function() {
 		}
 		 */
 };
+
 
 /**
  * Resets the eyedraw canvas completely including any related form inputs
@@ -2209,7 +2169,7 @@ ED.Drawing.prototype.selectDoodle = function(doodle) {
 
 	doodle.isSelected = true;
 	this.selectedDoodle = doodle;
-
+	
 	// Run onDeselection code for last doodle
 	if (this.lastSelectedDoodle) this.lastSelectedDoodle.onDeselection();
 
@@ -2241,6 +2201,7 @@ ED.Drawing.prototype.isReady = function() {
  * @returns {Doodle} The newly added doodle
  */
 ED.Drawing.prototype.addDoodle = function(_className, _parameterDefaults, _parameterBindings) {
+		
 	// Set flag to indicate whether a doodle of this className already exists
 	var doodleExists = this.hasDoodleOfClass(_className);
 
@@ -2384,7 +2345,10 @@ ED.Drawing.prototype.addDoodle = function(_className, _parameterDefaults, _param
 		this.notify("doodleAdded", newDoodle);
 
 		// Run onSelection code
-		this.selectedDoodle.onSelection();
+		if (this.selectedDoodle) {
+			// might already have been deselected depending on syncing rules
+			this.selectedDoodle.onSelection();
+		}
 
 		// Return doodle
 		return newDoodle;
@@ -2433,7 +2397,7 @@ ED.Drawing.prototype.addBindings = function(_bindingArray) {
 					doodle.addBinding(parameter, _bindingArray[className][parameter]);
 				}
 			} else {
-				ED.errorHandler('ED.Drawing', 'addBindings', 'Attempt to add binding for an element that does not exist for parameter: ' + parameter);
+				ED.errorHandler('ED.Drawing', 'addBindings', 'Attempt to add binding for an element that does not exist for parameter: ' + parameter + ' with id ' + elementId);
 			}
 		}
 	}
@@ -2586,15 +2550,17 @@ ED.Drawing.prototype.updateBindings = function(_doodle) {
 		// Iterate through this doodle's bindings array and alter value of HTML element
 		for (var parameter in doodle.bindingArray) {
 			var element = document.getElementById(doodle.bindingArray[parameter]['id']);
+			if (!element)
+				continue;
 			var attribute = doodle.bindingArray[parameter]['attribute'];
 			var value = doodle.getParameter(parameter);
-
 			// Modify value of element according to type
 			switch (element.type) {
 				case 'checkbox':
 					if (attribute) {
 						ED.errorHandler('ED.Drawing', 'updateBindings', 'Binding to a checkbox with a non-standard attribute not yet supported');
 					} else {
+
 						if (value == "true") {
 							element.setAttribute('checked', 'checked');
 						} else {
@@ -2604,6 +2570,7 @@ ED.Drawing.prototype.updateBindings = function(_doodle) {
 					break;
 
 				case 'select-one':
+					var originalValue = element.value;
 					if (attribute) {
 						for (var i = 0; i < element.length; i++) {
 							if (element.options[i].getAttribute(attribute) == value) {
@@ -2613,6 +2580,11 @@ ED.Drawing.prototype.updateBindings = function(_doodle) {
 						}
 					} else {
 						element.value = value;
+					}
+					if (originalValue !== element.value) {
+                        // trigger a change event for anything listen to the bound html elements
+                        // instead of the eyedraw doodles.
+                        window.setTimeout(function(el) { el.dispatchEvent(new Event('change', {bubbles: true, cancelable: true})); }.bind(null, element), 100)
 					}
 					break;
 
@@ -2880,85 +2852,64 @@ ED.Drawing.prototype.suppressReports = function() {
 };
 
 /**
+ * Returns a list of report strings to allow more fine grained manipulation of results.
+ *
+ * @returns {Array} list of report strings from doodle(s) on drawing
+ */
+ED.Drawing.prototype.reportData = function() {
+	var reports = [];
+	var grouped = {};
+	for (var i = 0; i < this.doodleArray.length; i++) {
+		var doodle = this.doodleArray[i];
+		var description = doodle.description();
+
+		if (doodle.willReport) {
+			var groupDescription = doodle.groupDescription();
+			if (groupDescription.length > 0) {
+				if (typeof(grouped[doodle.className]) === 'undefined') {
+					grouped[doodle.className] = {
+						'start': groupDescription,
+						'descriptions': [],
+						'end': doodle.groupDescriptionEnd()
+					}
+				}
+				grouped[doodle.className]['descriptions'].push(description)
+			} else {
+				if (description.length) {
+					reports.push(description);
+				}
+			}
+		}
+	}
+
+	// consolidate group reports
+  for (var cls in grouped) {
+		var groupStr = '';
+    if (grouped.hasOwnProperty(cls)) {
+      groupStr = grouped[cls]['start'];
+      groupStr += ED.addAndAfterLastComma(grouped[cls]['descriptions'].join(", "));
+      groupStr += grouped[cls]['end'];
+      reports.push(groupStr);
+    }
+  }
+
+	return reports;
+}
+
+/**
  * Returns a string containing a description of the drawing
  *
  * @returns {String} Description of the drawing
  */
 ED.Drawing.prototype.report = function() {
 	var returnString = "";
-	var groupArray = [];
-	var groupEndArray = [];
 
-	// Go through every doodle
-	for (var i = 0; i < this.doodleArray.length; i++) {
-		var doodle = this.doodleArray[i];
-
-		// Reporting can be switched off with willReport flag
-		if (doodle.willReport) {
-			// Check for a group description
-			if (doodle.groupDescription().length > 0) {
-				// Create an array entry for it or add to existing
-				if (typeof(groupArray[doodle.className]) == 'undefined') {
-					groupArray[doodle.className] = doodle.groupDescription();
-					groupArray[doodle.className] += doodle.description();
-				} else {
-					// Only add additional detail if supplied by description method
-					if (doodle.description().length > 0) {
-						groupArray[doodle.className] += ", ";
-						groupArray[doodle.className] += doodle.description();
-					}
-				}
-
-				// Check if there is a corresponding end description
-				if (doodle.groupDescriptionEnd().length > 0) {
-					if (typeof(groupEndArray[doodle.className]) == 'undefined') {
-						groupEndArray[doodle.className] = doodle.groupDescriptionEnd();
-					}
-				}
-			} else {
-				// Get description
-				var description = doodle.description();
-
-				// If its not an empty string, add to the return
-				if (description.length > 0) {
-					// If text there already, make it lower case and add a comma before
-					if (returnString.length == 0) {
-						returnString += description;
-					} else {
-						returnString = returnString + ", " + ED.firstLetterToLowerCase(description);
-					}
-				}
-			}
-		}
+	var data = this.reportData();
+	for (var i = 0; i < data.length; i++) {
+		returnString += (i === 0) ? data[i] : ", " + ED.firstLetterToLowerCase(data[i]);
 	}
 
-	// Go through group array adding descriptions
-	for (className in groupArray) {
-		// Get description
-		var description = groupArray[className];
-
-		// Get end description
-		var endDescription = "";
-		if (typeof(groupEndArray[className]) != 'undefined') {
-			endDescription = groupEndArray[className];
-		}
-
-		// Replace last comma with a comma and 'and'
-		description = ED.addAndAfterLastComma(description) + endDescription;
-
-		// If its not an empty string, add to the return
-		if (description.length > 0) {
-			// If text there already, make it lower case and add a comma before
-			if (returnString.length == 0) {
-				returnString += description;
-			} else {
-				returnString = returnString + ", " + ED.firstLetterToLowerCase(description);
-			}
-		}
-	}
-
-	// Return result
-	return returnString;
+	return (returnString.length > 0) ? returnString : "No abnormality";
 };
 
 
@@ -2974,17 +2925,21 @@ ED.Drawing.prototype.diagnosis = function() {
 	// Loop through doodles with diagnoses, taking one highest in hierarchy, or those that are equal
 	for (var i = 0; i < this.doodleArray.length; i++) {
 		var doodle = this.doodleArray[i];
-		var code = doodle.snomedCode();
-		if (code > 0) {
-			var codePosition = doodle.diagnosticHierarchy();
-			if (codePosition > topOfHierarchy) {
-				topOfHierarchy = codePosition;
-				returnCodes.push(code);
-			} else if (codePosition == topOfHierarchy) {
-				if (returnCodes.indexOf(code) < 0) {
-					returnCodes.push(code);
-				}
-			}
+		var codeArray = doodle.snomedCodes();
+		for (var j = 0; j < codeArray.length; j++) {
+			var code = codeArray[j][0];
+            if (code > 0) {
+                var codePosition = codeArray[j][1];
+                if (codePosition > topOfHierarchy) {
+                    topOfHierarchy = codePosition;
+                    returnCodes.push(code);
+                } else if (codePosition == topOfHierarchy) {
+                    if (returnCodes.indexOf(code) < 0) {
+                        returnCodes.push(code);
+                    }
+                }
+            }
+
 		}
 	}
 
@@ -3281,6 +3236,7 @@ ED.Drawing.prototype.getScaleLevel = function() {
  * @param {Drawing} _drawing
  * @param {Object} _parameterJSON
  * @param {Int} _order
+ * @param {Object} linkedDoodleParameters
  */
 ED.Doodle = function(_drawing, _parameterJSON) {
 	// Function called as part of prototype assignment has no parameters passed
@@ -3290,6 +3246,9 @@ ED.Doodle = function(_drawing, _parameterJSON) {
 
 		// Unique ID of doodle within this drawing
 		this.id = this.drawing.nextDoodleId();
+
+		// can override with 'stroke' to support line hit testing
+		this.hitTestMethod = 'path';
 
 		// Optional array of squiggles
 		this.squiggleArray = new Array();
@@ -3304,6 +3263,11 @@ ED.Doodle = function(_drawing, _parameterJSON) {
 		// Set initial scale level (the scale level will be adjusted later only once
 		// params have been set)
 		this.scaleLevel = 1;
+
+		// Object indexed by linked doodle class name to define parameters that should be synced between the doodles
+		// primarily for the benefit of cross section doodles
+		// TODO: see if we can subclass to a cross section doodle and include in that instead
+		this.linkedDoodleParameters = {};
 
 		// Dragging defaults - set individual values in subclasses
 		this.isLocked = false;
@@ -3533,7 +3497,10 @@ ED.Doodle = function(_drawing, _parameterJSON) {
 						// Add points to squiggle and complete it
 						var pointsArray = squiggleArray[j].pointsArray;
 						for (var k = 0; k < pointsArray.length; k++) {
-							var point = new ED.Point(pointsArray[k].x, pointsArray[k].y);
+							var point = undefined;
+							if (!isNaN(parseFloat(pointsArray[k].x)) && !isNaN(parseFloat(pointsArray[k].y))) {
+                                point = new ED.Point(pointsArray[k].x, pointsArray[k].y);
+							}
 							squiggle.addPoint(point);
 						}
 						squiggle.complete = true;
@@ -3818,28 +3785,35 @@ ED.Doodle.prototype.drawHandles = function(_point) {
 	ctx.restore();
 };
 
+ED.Doodle.prototype.hitTest = function(ctx, _point)
+{
+	var result;
+    // Workaround for Mozilla bug 405300 https://bugzilla.mozilla.org/show_bug.cgi?id=405300
+    if (ED.isFirefox()) {
+        ctx.save();
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        result = this.hitTestMethod === 'stroke' ? ctx.isPointInStroke(_point.x, _point.y) : ctx.isPointInPath(_point.x, _point.y);
+        ctx.restore();
+    } else {
+        result = this.hitTestMethod === 'stroke' ? ctx.isPointInStroke(_point.x, _point.y) : ctx.isPointInPath(_point.x, _point.y);
+    }
+    return result;
+};
+
 /**
  * Draws the boundary path or performs a hit test if a Point parameter is passed
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.Doodle.prototype.drawBoundary = function(_point) {
+ED.Doodle.prototype.drawBoundary = function(_point, mode) {
+	if (mode === undefined) {
+		mode = this.drawFunctionMode;
+	}
 	// Get context
 	var ctx = this.drawing.context;
-
 	// HitTest
-	if (this.drawFunctionMode == ED.drawFunctionMode.HitTest) {
-		// Workaround for Mozilla bug 405300 https://bugzilla.mozilla.org/show_bug.cgi?id=405300
-		if (ED.isFirefox()) {
-			ctx.save();
-			ctx.setTransform(1, 0, 0, 1, 0, 0);
-			var hitTest = ctx.isPointInPath(_point.x, _point.y);
-			ctx.restore();
-		} else {
-			var hitTest = ctx.isPointInPath(_point.x, _point.y);
-		}
-
-		if (hitTest) {
+	if (mode == ED.drawFunctionMode.HitTest) {
+		if (this.hitTest(ctx, _point)) {
 			// Set dragging mode
 			if (this.isDrawable && this.isForDrawing) {
 				this.drawing.mode = ED.Mode.Draw;
@@ -3855,7 +3829,7 @@ ED.Doodle.prototype.drawBoundary = function(_point) {
 	else {
 		// Specify highlight attributes
 		if (this.isSelected && this.isShowHighlight) {
-			ctx.shadowColor = "gray";
+            ctx.shadowColor = "gray";
 			ctx.shadowOffsetX = 0;
 			ctx.shadowOffsetY = 0;
 			ctx.shadowBlur = 20;
@@ -3976,6 +3950,16 @@ ED.Doodle.prototype.snomedCode = function() {
  */
 ED.Doodle.prototype.diagnosticHierarchy = function() {
 	return 0;
+};
+
+/**
+ * Should be overridden for doodles that can provide multiple SNOMEDs - each should be paired with with a
+ * diagnostic hierarchy value for appropriate ordering.
+ *
+ * @returns {Array}
+ */
+ED.Doodle.prototype.snomedCodes = function() {
+	return new Array([this.snomedCode(), this.diagnosticHierarchy()]);
 };
 
 /**
@@ -4205,9 +4189,21 @@ ED.Doodle.prototype.getControlElements = function() {
  */
 ED.Doodle.prototype.addControlBindings = function() {
 	for (var parameter in this.controlParameterArray) {
-		this.addBinding(parameter, {
-			id: this.parameterControlElementId(parameter)
-		});
+		if (!parameter in this.parameterValidationArray) {
+			continue;
+		}
+		if (this.parameterValidationArray[parameter].type == 'combo') {
+			for (var i in this.parameterValidationArray[parameter].list) {
+				var childParam = this.parameterValidationArray[parameter].list[i];
+				this.addBinding(childParam, {
+					id: this.parameterControlElementId(childParam)
+				});
+			}
+		} else {
+			this.addBinding(parameter, {
+				id: this.parameterControlElementId(parameter)
+			});
+		}
 	}
 };
 
@@ -4302,9 +4298,19 @@ ED.Doodle.prototype.removeDoodleControls = function(controlDiv) {
  * @param {String} _parameter Name of the parameter
  * @returns {String} _id ID for a control element
  */
-ED.Doodle.prototype.parameterElement = function(_parameter) {
+ED.Doodle.prototype.parameterElement = function(_parameter, showLabel) {
+	if (showLabel === undefined)
+		showLabel = true;
+
 	var element;
 	switch (this.parameterValidationArray[_parameter].type) {
+		case 'combo':
+			element = document.createElement('span');
+			element.setAttribute('class', 'combo');
+			for (var i in this.parameterValidationArray[_parameter]['list']) {
+				element.appendChild(this.parameterElement(this.parameterValidationArray[_parameter]['list'][i], false));
+			}
+			break;
 		case 'string':
 			// Create a select element
 			element = document.createElement('select');
@@ -4389,14 +4395,15 @@ ED.Doodle.prototype.parameterElement = function(_parameter) {
 			break;
 	}
 
-	// Create label  ***TODO*** deal with optional label and language
-	var label = document.createElement('label');
-	label.innerText = this.controlParameterArray[_parameter];
-	label.setAttribute('for', this.parameterControlElementId(_parameter));
-
 	// Wrap in div to allow display in vertical block
 	var div = document.createElement('div');
-	div.appendChild(label);
+	if (showLabel) {
+		// Create label  ***TODO*** deal with optional label and language
+		var label = document.createElement('label');
+		label.innerText = this.controlParameterArray[_parameter];
+		label.setAttribute('for', this.parameterControlElementId(_parameter));
+		div.appendChild(label);
+	}
 	div.appendChild(element);
 
 	return div;
@@ -4959,7 +4966,7 @@ ED.Doodle.prototype.clockHour = function(_offset) {
 	} else {
 		var twelvePoint = new ED.Point(0, -100);
 		var thisPoint = new ED.Point(this.originX, this.originY);
-		var clockHour = ((twelvePoint.clockwiseAngleTo(thisPoint) * 6 / Math.PI) + 12 + offset) % 12;
+		clockHour = ((twelvePoint.clockwiseAngleTo(thisPoint) * 6 / Math.PI) + 12 + offset) % 12;
 	}
 
 	clockHour = clockHour.toFixed(0);
@@ -5014,7 +5021,13 @@ ED.Doodle.prototype.degrees = function() {
  *
  * @returns {Int} Clock hour from 1 to 12
  */
-ED.Doodle.prototype.clockHourExtent = function() {
+ED.Doodle.prototype.clockHourExtent = function(label) {
+	if (label === undefined) {
+        label = '';
+	} else {
+		label = ' ' + label;
+	}
+
 	var clockHourStart;
 	var clockHourEnd;
 
@@ -5031,7 +5044,7 @@ ED.Doodle.prototype.clockHourExtent = function() {
 	if (clockHourStart == 0) clockHourStart = 12;
 	clockHourEnd = clockHourEnd.toFixed(0);
 	if (clockHourEnd == 0) clockHourEnd = 12;
-	return "from " + clockHourStart + " to " + clockHourEnd;
+	return "from " + clockHourStart + label + " to " + clockHourEnd + label;
 };
 
 /**
@@ -5329,7 +5342,7 @@ ED.Doodle.prototype.json = function() {
 				} else if (typeof(o) == 'object') {
 					o = JSON.stringify(o);
 				} else {
-					ED.errorHandler('ED.Doodle', 'json', 'Attempt to create json for an unhandled parameter type: ' + typeof(o));
+					ED.errorHandler('ED.Doodle', 'json', 'Attempt to create json for parameter ' + p + ' with an unhandled parameter type: ' + typeof(o));
 					o = "ERROR";
 				}
 
@@ -5522,6 +5535,12 @@ ED.Doodle.prototype.adjustScaleAndPosition = function(amount){
 	if (this.lastOriginY) this.lastOriginY *= amount;
 };
 
+ED.Doodle.prototype.getLinkedParameters = function(linkedDoodleClass) {
+	if (typeof(this.linkedDoodleParameters[linkedDoodleClass]) != "undefined") {
+		return this.linkedDoodleParameters[linkedDoodleClass];
+	}
+}
+
 /**
  * Outputs doodle information to the console
  */
@@ -5557,21 +5576,20 @@ ED.Doodle.Handle = function(_location, _isVisible, _mode, _isRotatable) {
 	this.isRotatable = _isRotatable;
 };
 /**
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2014
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
  *
  * OpenEyes is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
+ * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * OpenEyes is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU Affero General Public License
  * along with OpenEyes.  If not, see <http://www.gnu.org/licenses/>.
  */
 
@@ -5795,21 +5813,20 @@ ED.Report.prototype.isMacOff = function() {
 }
 
 /**
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2014
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
  *
  * OpenEyes is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
+ * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * OpenEyes is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU Affero General Public License
  * along with OpenEyes.  If not, see <http://www.gnu.org/licenses/>.
  */
 
@@ -5976,21 +5993,20 @@ ED.AffineTransform.prototype.createInverse = function() {
 	return inv;
 }
 /**
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2014
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
  *
  * OpenEyes is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
+ * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * OpenEyes is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU Affero General Public License
  * along with OpenEyes.  If not, see <http://www.gnu.org/licenses/>.
  */
 
@@ -6070,21 +6086,20 @@ ED.Colour.prototype.json = function() {
 }
 
 /**
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2014
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
  *
  * OpenEyes is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
+ * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * OpenEyes is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU Affero General Public License
  * along with OpenEyes.  If not, see <http://www.gnu.org/licenses/>.
  */
 
@@ -6183,8 +6198,13 @@ ED.Point.prototype.direction = function() {
  * @returns {Float} The angle in radians
  */
 ED.Point.prototype.clockwiseAngleTo = function(_point) { //console.log("cat: ",(this.length() * _point.length()));
+	var len = (this.length() * _point.length());
+	if (len == 0.0) {
+		return 0.0;
+	}
+
 	// Floating point errors occasionally produce a number for the acos function greater than 1, causing a NaN error
-	var num = this.dotProduct(_point) / (this.length() * _point.length());
+	var num = this.dotProduct(_point) / len;
 	if (num > 1) num = 1;
 	var angle = Math.acos(num);
 	if (this.crossProduct(_point) < 0) {
@@ -6273,7 +6293,7 @@ ED.Point.prototype.tangentialControlPoint = function(_phi) {
 }
 
 /**
- * Creates a new point on a straight line between two points at a proportional distance 
+ * Creates a new point on a straight line between two points at a proportional distance
  *
  * @param {Float} _percent Percentage distance along line
  * @param {Point} _ep End point
@@ -6291,7 +6311,7 @@ ED.Point.prototype.pointAtPercentageFromPointToPoint = function(_percent, _point
 }
 
 /**
- * Creates a new point on a cubic Bezier curve at parameter t along curve 
+ * Creates a new point on a cubic Bezier curve at parameter t along curve
  *
  * @param {Float} _t Proportion along curve (0-1)
  * @param {Point} _cp1 Control point 1
@@ -6306,14 +6326,14 @@ ED.Point.prototype.bezierPointAtParameter = function(_t, _cp1, _cp2, _ep) {
 	var mt = 1 - _t;
 	var mt2 = mt * mt;
 	var mt3 = mt2 * mt;
-	
+
 	// Calculate x and y values of point
 	var x = this.x * mt3 + 3 * _cp1.x * mt2 * _t + 3 * _cp2.x * mt * t2 + _ep.x * t3;
 	var y = this.y * mt3 + 3 * _cp1.y * mt2 * _t + 3 * _cp2.y * mt * t2 + _ep.y * t3;
-	
+
 	// Return point
 	return new ED.Point(x, y);
-} 
+}
 /**
  * Returns a point in JSON encoding
  *
@@ -6322,22 +6342,22 @@ ED.Point.prototype.bezierPointAtParameter = function(_t, _cp1, _cp2, _ep) {
 ED.Point.prototype.json = function() {
 	return "{\"x\":" + this.x.toFixed(2) + ",\"y\":" + this.y.toFixed(2) + "}";
 }
+
 /**
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2014
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
  *
  * OpenEyes is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
+ * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * OpenEyes is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU Affero General Public License
  * along with OpenEyes.  If not, see <http://www.gnu.org/licenses/>.
  */
 
@@ -6507,21 +6527,20 @@ ED.Range.prototype.constrainToAngularRange = function(_angle, _isDegrees) {
 	}
 }
 /**
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2014
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
  *
  * OpenEyes is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
+ * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * OpenEyes is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU Affero General Public License
  * along with OpenEyes.  If not, see <http://www.gnu.org/licenses/>.
  */
 
@@ -6573,7 +6592,11 @@ ED.Squiggle.prototype.json = function() {
 
 	s = s + '"pointsArray":[';
 	for (var i = 0; i < this.pointsArray.length; i++) {
-		s = s + this.pointsArray[i].json();
+		if (this.pointsArray[i]) {
+            s = s + this.pointsArray[i].json();
+        } else {
+            s = s + '{}';
+        }
 		if (this.pointsArray.length - i > 1) {
 			s = s + ',';
 		}
@@ -6594,16 +6617,16 @@ ED.Squiggle.prototype.json = function() {
  * This file is part of OpenEyes.
  * 
  * OpenEyes is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
+ * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  * 
  * OpenEyes is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * GNU Affero General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU Affero General Public License
  * along with OpenEyes.  If not, see <http://www.gnu.org/licenses/>.
  */
 
@@ -6639,19 +6662,17 @@ ED.Categories['SubretinalPFCL'] = {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -6885,19 +6906,17 @@ ED.FamilyMember.prototype.setNode = function(_node) {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -7244,19 +7263,17 @@ ED.GraphAxes.prototype.draw = function(_point) {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -7597,19 +7614,17 @@ ED.Label.prototype.onSelection = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -7715,23 +7730,20 @@ ED.MemberConnector.prototype.draw = function(_point) {
 	// Return value indicating successful hittest
 	return this.isClicked;
 }
-
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
  
 /**
@@ -7812,19 +7824,17 @@ ED.OperatingTable.prototype.draw = function(_point) {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
  
 /**
@@ -7990,6 +8000,159 @@ ED.Patient.prototype.draw = function(_point) {
 	this.drawBoundary(_point);
 
 	// Return value indicating successful hit test
+	return this.isClicked;
+}
+/**
+ * OpenEyes
+ *
+ * Copyright (C) OpenEyes Foundation, 2011-2017
+ * This file is part of OpenEyes.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package OpenEyes
+ * @link http://www.openeyes.org.uk
+ * @author OpenEyes <info@openeyes.org.uk>
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
+ */
+
+/**
+ *
+ *
+ * @class Signature
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Object} _parameterJSON
+ */
+ED.Signature = function(_drawing, _parameterJSON) {
+	// Set classname
+	this.className = "Signature";
+
+	this.colourString = "00FF00FF";
+
+
+	// Saved parameters
+	this.savedParameterArray = [];
+
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _parameterJSON);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.Signature.prototype = new ED.Doodle;
+ED.Signature.prototype.constructor = ED.Signature;
+ED.Signature.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.Signature.prototype.setHandles = function() {
+}
+
+/**
+ * Sets default dragging attributes
+ */
+ED.Signature.prototype.setPropertyDefaults = function() {
+	this.isDrawable = true;
+	this.isMoveable = false;
+	this.isRotatable = false;
+	this.isFilled = false;
+}
+
+/**
+ * Sets default parameters (Only called for new doodles)
+ * Use the setParameter function for derived parameters, as this will also update dependent variables
+ */
+ED.Signature.prototype.setParameterDefaults = function() {
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.Signature.prototype.draw = function(_point) {
+	// Get context
+	var ctx = this.drawing.context;
+
+	// Call draw method in superclass
+	ED.Signature.superclass.draw.call(this, _point);
+
+	// Boundary path
+	ctx.beginPath();
+
+	// Draw invisible boundary around whole canvas for signature drawing area
+	var height = this.drawing.canvas.height / this.drawing.scale *0.99;
+	var width = this.drawing.canvas.width / this.drawing.scale *0.99;
+	var halfWidth = width/2;
+	var halfHeight = height/2;
+	ctx.rect(-halfWidth, -halfHeight, width, height);
+
+	// Close path
+	ctx.closePath();
+	
+	// Set attributes for border (colour changes to indicate drawing mode)
+	ctx.lineWidth = 2;
+	ctx.strokeStyle = "rgba(255, 255, 255, 0)";
+	
+
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+
+	// Non boundary paths here
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+		
+		// Calculated no. dashes in line proportional to canvas size
+		var d = 40;
+		var n = parseInt(width*0.85/d);
+		
+		ctx.beginPath();
+		// Draw cross
+		ctx.moveTo(-halfWidth*0.85, halfHeight*0.75 - 40);
+		ctx.lineTo(-halfWidth*0.85 + 50, halfHeight*0.75 + 10);
+		ctx.moveTo(-halfWidth*0.85, halfHeight*0.75 + 10);
+		ctx.lineTo(-halfWidth*0.85 + 50, halfHeight*0.75 - 40);
+		
+		// Draw dashed line
+		for (var h=2; h<n; h++) { // start at 2 to allow for space at beginning
+			ctx.moveTo(-halfWidth*0.85 + h*d, halfHeight*0.75);
+			ctx.lineTo(-halfWidth*0.85 + h*d + 0.5*d, halfHeight*0.75);
+		}
+		
+		ctx.lineWidth = 6;
+		ctx.strokeStyle = "gray";
+		if (this.isForDrawing && this.isSelected) ctx.strokeStyle = "blue";
+// 		else if (this.isSelected) ctx.strokeStyle = "gray";
+		
+		ctx.stroke();
+		
+		// Iterate through squiggles, drawing them
+		for (var i = 0; i < this.squiggleArray.length; i++) {
+			var squiggle = this.squiggleArray[i];
+
+			// New path for squiggle
+			ctx.beginPath();
+
+			// Squiggle attributes
+			ctx.lineWidth = 6;
+			ctx.strokeStyle = "black";
+
+			// Iterate through squiggle points
+			for (var j = 0; j < squiggle.pointsArray.length; j++) {
+				ctx.lineTo(squiggle.pointsArray[j].x, squiggle.pointsArray[j].y);
+			}
+
+			// Draw squiggle
+			ctx.stroke();
+			
+		}
+	}
+
+	// Return value indicating successful hittest
 	return this.isClicked;
 }
 /**
@@ -8260,19 +8423,17 @@ ED.Slider2D.prototype.draw = function(_point) {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -8533,16 +8694,16 @@ ED.Surgeon.prototype.draw = function(_point) {
  * This file is part of OpenEyes.
  *
  * OpenEyes is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
+ * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * OpenEyes is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU Affero General Public License
  * along with OpenEyes.  If not, see <http://www.gnu.org/licenses/>.
  */
 
@@ -8600,6 +8761,7 @@ ED.trans['CornealOedema'] = 'Drag to position<br/>Drag handle to change size';
 ED.trans['CornealStriae'] = '';
 ED.trans['CornealScar'] = 'Drag outer handle to change shape<br/>Drag inner handle to change density';
 ED.trans['CornealSuture'] = 'Drag to move';
+ED.trans['CornealLaceration'] = 'Please click to draw each point of the laceration.<br />Double click to complete.';
 ED.trans['CorticalCataract'] = 'Drag to move<br/>Drag handle to change density';
 ED.trans['CottonWoolSpot'] = 'Drag to position<br/>Drag handle to change shape and size';
 ED.trans['CNV'] = 'Drag to move<br/>Drag handle to scale';
@@ -8733,19 +8895,17 @@ ED.trans['Haematoma'] = 'Drag to move<br/>Drag handle to resize';
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -8943,19 +9103,17 @@ ED.AgentDose.prototype.draw = function(_point) { //console.log(this.originX);
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -9168,19 +9326,17 @@ ED.AgentDuration.prototype.drawHighlightExtras = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -9405,19 +9561,17 @@ ED.RecordGrid.prototype.getGridX = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -9610,91 +9764,81 @@ ED.RecordReading.prototype.drawHighlightExtras = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -9708,16 +9852,16 @@ ED.RecordReading.prototype.drawHighlightExtras = function() {
  * This file is part of OpenEyes.
  *
  * OpenEyes is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
+ * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * OpenEyes is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU Affero General Public License
  * along with OpenEyes.  If not, see <http://www.gnu.org/licenses/>.
  */
 
@@ -11640,19 +11784,17 @@ ED.Bruit.prototype.description = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -11793,37 +11935,33 @@ ED.Crepitations.prototype.description = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -11935,91 +12073,81 @@ ED.Effusion.prototype.description = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -12112,73 +12240,65 @@ ED.Lungs.prototype.description = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -12292,19 +12412,17 @@ ED.Wheeze.prototype.description = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -12483,19 +12601,17 @@ ED.EarDrum.prototype.draw = function(_point) {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -12625,19 +12741,17 @@ ED.Grommet.prototype.description = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -12840,19 +12954,17 @@ ED.Perforation.prototype.diagnosticHierarchy = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -12866,9 +12978,10 @@ ED.Perforation.prototype.diagnosticHierarchy = function() {
 ED.ACIOL = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "ACIOL";
+    this.csOriginX = -140;
 
 	// Saved parameters
-	this.savedParameterArray = ['originX', 'originY', 'rotation'];
+	this.savedParameterArray = ['originX', 'originY', 'rotation', 'csOriginX'];
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -12898,6 +13011,10 @@ ED.ACIOL.prototype.setHandles = function() {
 ED.ACIOL.prototype.setPropertyDefaults = function() {
 	this.isScaleable = false;
 	this.isUnique = true;
+	
+	// Update component of validation array for simple parameters
+	this.parameterValidationArray['originX']['range'].setMinAndMax(-200, +200);
+	this.parameterValidationArray['originY']['range'].setMinAndMax(-200, +200);
 }
 
 /**
@@ -13020,19 +13137,136 @@ ED.ACIOL.prototype.description = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
+ */
+
+/**
+ * AC IOL Cross Section
+ *
+ * @class ACIOLCrossSection
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Object} _parameterJSON
+ */
+ED.ACIOLCrossSection = function(_drawing, _parameterJSON) {
+	// Set classname
+	this.className = "ACIOLCrossSection";
+	
+	// Saved parameters
+	this.savedParameterArray = ['originX', 'originY'];
+
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _parameterJSON);
+
+    this.linkedDoodleParameters = {
+        'ACIOL': {
+            source: ['originY'],
+            store: [['originX', 'csOriginX']]
+        }
+    };
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.ACIOLCrossSection.prototype = new ED.Doodle;
+ED.ACIOLCrossSection.prototype.constructor = ED.ACIOLCrossSection;
+ED.ACIOLCrossSection.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets default dragging attributes
+ */
+ED.ACIOLCrossSection.prototype.setPropertyDefaults = function() {
+	this.isUnique = true;
+	this.inFrontOfClassArray = ["HypopyonCrossSection", "HyphaemaCrossSection" ];
+	this.addAtBack = true;
+	
+	// Update component of validation array for simple parameters
+	this.parameterValidationArray['originX']['range'].setMinAndMax(-220, -100);
+	this.parameterValidationArray['originY']['range'].setMinAndMax(-140, +140);
+}
+
+/**
+ * Sets default parameters (Only called for new doodles)
+ * Use the setParameter function for derived parameters, as this will also update dependent variables
+ */
+ED.ACIOLCrossSection.prototype.setParameterDefaults = function() {
+	this.originX = -140;
+}
+
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.ACIOLCrossSection.prototype.draw = function(_point) {
+	// Get context
+	var ctx = this.drawing.context;
+
+	// Call draw method in superclass
+	ED.ACIOLCrossSection.superclass.draw.call(this, _point);
+
+	// Draw lens
+	ctx.beginPath();
+	ctx.ellipse(100, 0, 160, 20, 0.5 * Math.PI, 0, 2 * Math.PI);
+
+	// Set line attributes
+	ctx.lineWidth = 5;
+	ctx.fillStyle = "rgba(255, 255, 255, 0.75)";
+	ctx.strokeStyle = "#898989";
+
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+
+	// Non boundary drawing
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+
+		// Loops
+		ctx.beginPath();
+		ctx.arc(10 - this.originX, -310 - this.originY, 10, 0*Math.PI, 1*Math.PI, false);
+		ctx.moveTo(5 - this.originX, -310 - this.originY);
+		ctx.bezierCurveTo(80 - this.originX, -300 - this.originY, 70, -220, 100, -160);
+		ctx.moveTo(40 - this.originX, 300 - this.originY);
+		ctx.arc(10 - this.originX, 310 - this.originY, 10, 0, 1*Math.PI, true);
+		ctx.moveTo(5 - this.originX, 310 - this.originY);
+		ctx.bezierCurveTo(80 - this.originX, 300 - this.originY, 70, 220, 100, 160);
+		ctx.strokeStyle = "#898989";
+		ctx.stroke();
+
+	}
+
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * OpenEyes
+ *
+ * Copyright (C) OpenEyes Foundation, 2011-2017
+ * This file is part of OpenEyes.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package OpenEyes
+ * @link http://www.openeyes.org.uk
+ * @author OpenEyes <info@openeyes.org.uk>
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -13165,19 +13399,556 @@ ED.ACMaintainer.prototype.description = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * (C) OpenEyes Foundation, 2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
+ */
+
+/**
+ * Adenoviral keratitis
+ *
+ * @class AdenoviralKeratitis
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Object} _parameterJSON
+ */
+ED.AdenoviralKeratitis = function(_drawing, _parameterJSON) {
+	// Set classname
+	this.className = "AdenoviralKeratitis";
+
+	// Private parameters used in bound sideview doodle
+	this.h = 250;
+	
+	// Saved parameters
+	this.savedParameterArray = ['apexX', 'apexY', 'scaleX', 'scaleY','originX','originY','h'];
+
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _parameterJSON);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.AdenoviralKeratitis.prototype = new ED.Doodle;
+ED.AdenoviralKeratitis.prototype.constructor = ED.AdenoviralKeratitis;
+ED.AdenoviralKeratitis.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.AdenoviralKeratitis.prototype.setHandles = function() {
+	this.handleArray[2] = new ED.Doodle.Handle(null, true, ED.Mode.Scale, false);
+	this.handleArray[4] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
+}
+
+/**
+ * Sets default dragging attributes
+ */
+ED.AdenoviralKeratitis.prototype.setPropertyDefaults = function() {
+	this.isRotatable = false;
+	this.isUnique = true;
+
+	// Update component of validation array for simple parameters
+	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +40);
+	this.parameterValidationArray['apexY']['range'].setMinAndMax(-160, +0);
+	this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.5, +1.5);
+	this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.5, +1.5);
+	
+	this.parameterValidationArray['h'] = {
+		kind: 'derived',
+		type: 'int',
+		animate: false
+	};
+}
+
+/**
+ * Sets default parameters (Only called for new doodles)
+ * Use the setParameter function for derived parameters, as this will also update dependent variables
+ */
+ED.AdenoviralKeratitis.prototype.setParameterDefaults = function() {
+	this.apexY = -5;
+}
+
+/**
+ * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
+ * The returned parameters are animated if the 'animate' property in the parameterValidationArray is set to true
+ *
+ * @param {String} _parameter Name of parameter that has changed
+ * @param {Undefined} _value Value of parameter to calculate
+ * @returns {Array} Associative array of values of dependent parameters
+ */
+ED.AdenoviralKeratitis.prototype.dependentParameterValues = function(_parameter, _value) {
+	var returnArray = {},
+		returnValue;
+
+	switch (_parameter) {
+		// dependent parameters for bound side view doodle		
+		case 'scaleX':
+			returnArray.h = Math.round(_value * 250);
+			break;
+			
+		case 'h':
+			returnArray['h'] = _value;
+			break;
+			
+	}
+
+	return returnArray;
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.AdenoviralKeratitis.prototype.draw = function(_point) {
+	// Get context
+	var ctx = this.drawing.context;
+
+	// Call draw method in superclass
+	ED.AdenoviralKeratitis.superclass.draw.call(this, _point);
+
+	// Boundary path
+	ctx.beginPath();
+
+	// Invisible boundary
+	var r = 250;
+	ctx.arc(0, 0, r, 0, Math.PI * 2, true);
+
+	// Close path
+	ctx.closePath();
+
+	// Set line attributes
+	ctx.lineWidth = 0;
+	ctx.fillStyle = "rgba(0, 0, 0, 0)";
+	ctx.strokeStyle = "rgba(0, 0, 0, 0)";
+
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+
+	// Non boundary paths
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+		// Colours
+		var fill = "rgba(230, 230, 230, 0.8)";
+		ctx.shadowBlur = 3;
+		ctx.shadowColor="black";
+
+		var dr = 8 * ((this.apexX + 20) / 20) / this.scaleX;
+
+		var p = new ED.Point(0, 0);
+		var n = 2 + Math.abs(Math.floor(this.apexY / 2));
+		for (var i = 0; i < n; i++) {
+			p.setWithPolars(r * ED.randomArray[i], 2 * Math.PI * ED.randomArray[i+100]);
+			this.drawSpot(ctx, p.x, p.y, dr, fill);
+		}
+		this.drawSpot(ctx, 0, r, dr, fill);
+		this.drawSpot(ctx, 0, -r, dr, fill);
+		this.drawSpot(ctx, r, 0, dr, fill);
+		this.drawSpot(ctx, -r, 0, dr, fill);
+		
+		ctx.shadowColor="rgba(0, 0, 0, 0)";
+	}
+
+	// Coordinates of handles (in canvas plane)
+	this.handleArray[2].location = this.transform.transformPoint(new ED.Point(r * 0.7, -r * 0.7));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
+
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.AdenoviralKeratitis.prototype.description = function() {
+	return "Adenoviral keratitis";
+}
+
+/**
+ * OpenEyes
+ *
+ * (C) OpenEyes Foundation, 2017
+ * This file is part of OpenEyes.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package OpenEyes
+ * @link http://www.openeyes.org.uk
+ * @author OpenEyes <info@openeyes.org.uk>
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
+ */
+
+/**
+ * Adenoviral Keratitis Cross Section
+ *
+ * @class AdenoviralKeratitisCrossSection
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Object} _parameterJSON
+ */
+ED.AdenoviralKeratitisCrossSection = function(_drawing, _parameterJSON) {
+	// Set classname
+	this.className = "AdenoviralKeratitisCrossSection";
+	
+	// Derived parameters
+	this.h = 250;
+	
+	// Saved parameters
+	this.savedParameterArray = ['originX', 'originY', 'h'];
+	
+	// Parameters in doodle control bar
+	this.controlParameterArray = {};
+
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _parameterJSON);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.AdenoviralKeratitisCrossSection.prototype = new ED.Doodle;
+ED.AdenoviralKeratitisCrossSection.prototype.constructor = ED.AdenoviralKeratitisCrossSection;
+ED.AdenoviralKeratitisCrossSection.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.AdenoviralKeratitisCrossSection.prototype.setHandles = function() {
+}
+
+/**
+ * Sets default properties
+ */
+ED.AdenoviralKeratitisCrossSection.prototype.setPropertyDefaults = function() {
+	this.isSelectable = false;
+	this.isFilled = false;
+		
+	// Update component of validation array for simple parameters
+	this.parameterValidationArray['originX']['range'].setMinAndMax(+50, +50);
+	this.parameterValidationArray['originY']['range'].setMinAndMax(-500, +500);
+	
+	this.parameterValidationArray['h'] = {
+		kind: 'other',
+		type: 'int',
+		range: [0,1080],
+		animate: true
+	};
+}
+
+/**
+ * Sets default parameters
+ */
+ED.AdenoviralKeratitisCrossSection.prototype.setParameterDefaults = function() {
+	this.originX = 50; // as is in Cornea cross section doodle to dulicate bezier control points
+
+}
+
+/**
+ * Draws a circular spot with given parameters
+ *
+ * @param {Object} _ctx Context of canvas
+ * @param {Float} _x X-coordinate of origin
+ * @param {Float} _y Y-coordinate of origin
+ * @param {Float} _r Radius
+ * @param {String} _colour String containing colour
+ */
+ED.AdenoviralKeratitisCrossSection.prototype.drawOval = function(_ctx, _x, _y, _r, _rotation) {
+	_ctx.save();
+	_ctx.beginPath();
+	_ctx.ellipse(_x, _y, 0.5*_r, _r, _rotation, 0, 2*Math.PI, true);
+	_ctx.fillStyle = "rgba(215, 215, 215, 0.8)";
+	_ctx.strokeStyle = "rgba(215, 215, 215, 0.8)";
+	_ctx.shadowBlur = 2;
+	_ctx.shadowColor="black";
+	_ctx.lineWidth = 0;
+	_ctx.fill();
+	_ctx.stroke();
+	_ctx.restore();
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.AdenoviralKeratitisCrossSection.prototype.draw = function(_point) {	
+	
+	// Get context
+	var ctx = this.drawing.context;
+
+	var cornea = this.drawing.lastDoodleOfClass('CorneaCrossSection');
+	var cornealThickness = cornea.pachymetry/5;
+
+	// Call draw method in superclass
+	ED.AdenoviralKeratitisCrossSection.superclass.draw.call(this, _point);
+
+	// Boundary path
+	ctx.beginPath();
+	
+	// Calculate segment extent in terms of time along curve
+	var r = this.h; // TO DO
+	var startY = this.originY - r;
+	var endY = this.originY + r;
+		
+	var startT = (startY + 380) / 760;
+	if (startT<0) startT = 0;
+	var endT = (endY + 380) / 760;
+	if (endT>1) endT = 1;
+			
+	if (startT < 0.5) {
+		
+		var superiorBezier = new Object;
+
+		// define start and end time points
+		var tI0 = startT * 2;
+		var tI1 = (endT < 0.5) ? endT * 2 : 1;
+		
+		// default bezier points (as in cornea cross section)
+		if (cornea && cornea.shape == "Keratoconus") {			
+			superiorBezier.SP = new ED.Point(-120, -380 - this.originY);
+			superiorBezier.CP1 = new ED.Point(-240, -260 - this.originY);
+			superiorBezier.CP2 = new ED.Point(cornea.apexX, cornea.apexY - 100 - this.originY);
+			superiorBezier.EP = new ED.Point(cornea.apexX, cornea.apexY - this.originY);
+		}
+		else if (cornea && cornea.shape == "Keratoglobus") {
+			superiorBezier.SP = new ED.Point(-120, -380 - this.originY);
+			superiorBezier.CP1 = new ED.Point(-240, -260 - this.originY);
+			superiorBezier.CP2 = new ED.Point(-380, -100 - this.originY);
+			superiorBezier.EP = new ED.Point(-380, 100 - this.originY);
+		}
+		else {			
+			superiorBezier.SP = new ED.Point(-120, -380 - this.originY);
+			superiorBezier.CP1 = new ED.Point(-240, -260 - this.originY);
+			superiorBezier.CP2 = new ED.Point(-320, -160 - this.originY);
+			superiorBezier.EP = new ED.Point(-320, 0 - this.originY);
+		}
+		
+			
+		if (tI0 > 0) {
+		// Trim start of curve			
+			
+			// front of cornea
+			var sq0 = new ED.Point(0,0);
+			sq0.y = (1-tI0)*(1-tI0)*(1-tI0)*superiorBezier.SP.y + 3*(1-tI0)*(1-tI0)*tI0*superiorBezier.CP1.y + 3*(1-tI0)*tI0*tI0*superiorBezier.CP2.y + tI0*tI0*tI0*superiorBezier.EP.y;
+			sq0.x = (1-tI0)*(1-tI0)*(1-tI0)*superiorBezier.SP.x + 3*(1-tI0)*(1-tI0)*tI0*superiorBezier.CP1.x + 3*(1-tI0)*tI0*tI0*superiorBezier.CP2.x + tI0*tI0*tI0*superiorBezier.EP.x;
+			
+			var iP23 = new ED.Point(0,0);
+			iP23.x = superiorBezier.CP1.x + tI0 * (superiorBezier.CP2.x - superiorBezier.CP1.x);
+			iP23.y = superiorBezier.CP1.y + tI0 * (superiorBezier.CP2.y - superiorBezier.CP1.y);
+			
+			var iP34 = new ED.Point(0,0);
+			iP34.x = superiorBezier.CP2.x + tI0 * (superiorBezier.EP.x - superiorBezier.CP2.x);
+			iP34.y = superiorBezier.CP2.y + tI0 * (superiorBezier.EP.y - superiorBezier.CP2.y);
+			
+			var iP2334 = new ED.Point(0,0);
+			iP2334.x = iP23.x + tI0 * (iP34.x - iP23.x);
+			iP2334.y = iP23.y + tI0 * (iP34.y - iP23.y);
+			
+			superiorBezier.SP = sq0;
+			superiorBezier.CP1 = iP2334;
+			superiorBezier.CP2 = iP34;
+		}
+		
+		if (tI1 < 1) {
+		// Trim end of curve			
+			
+			// front of cornea
+			var iq1 = new ED.Point(0,0);
+			iq1.y = (1-tI1)*(1-tI1)*(1-tI1)*superiorBezier.SP.y + 3*(1-tI1)*(1-tI1)*tI1*superiorBezier.CP1.y + 3*(1-tI1)*tI1*tI1*superiorBezier.CP2.y + tI1*tI1*tI1*superiorBezier.EP.y;
+			iq1.x = (1-tI1)*(1-tI1)*(1-tI1)*superiorBezier.SP.x + 3*(1-tI1)*(1-tI1)*tI1*superiorBezier.CP1.x + 3*(1-tI1)*tI1*tI1*superiorBezier.CP2.x + tI1*tI1*tI1*superiorBezier.EP.x;
+
+			var iP12 = new ED.Point(0,0);
+			iP12.x = superiorBezier.SP.x + tI1 * (superiorBezier.CP1.x - superiorBezier.SP.x);
+			iP12.y = superiorBezier.SP.y + tI1 * (superiorBezier.CP1.y - superiorBezier.SP.y);
+			
+			var iP23 = new ED.Point(0,0);
+			iP23.x = superiorBezier.CP1.x + tI1 * (superiorBezier.CP2.x - superiorBezier.CP1.x);
+			iP23.y = superiorBezier.CP1.y + tI1 * (superiorBezier.CP2.y - superiorBezier.CP1.y);
+			
+			var iP1223 = new ED.Point(0,0);
+			iP1223.x = iP12.x + tI1 * (iP23.x - iP12.x);
+			iP1223.y = iP12.y + tI1 * (iP23.y - iP12.y);
+			
+			superiorBezier.CP1 = iP12;
+			superiorBezier.CP2 = iP1223;
+			superiorBezier.EP = iq1;
+		}
+	}
+	
+	
+	if (endT > 0.5) {
+		
+		var inferiorBezier = new Object;
+		
+		// define start and end time points
+		var tS0 = (startT > 0.5) ? (startT - 0.5) * 2 : 0;
+		var tS1 = (endT - 0.5) * 2;
+		
+		// default bezier points (as in cornea cross section)
+		if (cornea && cornea.shape == "Keratoconus") {			
+			inferiorBezier.SP = new ED.Point(cornea.apexX, cornea.apexY - this.originY);
+			inferiorBezier.CP1 = new ED.Point(cornea.apexX, cornea.apexY + 100 - this.originY);
+			inferiorBezier.CP2 = new ED.Point(-240, 260 - this.originY);
+			inferiorBezier.EP = new ED.Point(-120, 380 - this.originY);
+		}
+		else if (cornea && cornea.shape == "Keratoglobus") {
+			inferiorBezier.SP = new ED.Point(-380, 100 - this.originY);
+			inferiorBezier.CP1 = new ED.Point(-380, 200 - this.originY);
+			inferiorBezier.CP2 = new ED.Point(-240, 360 - this.originY);
+			inferiorBezier.EP = new ED.Point(-120, 380 - this.originY);
+		}
+		else {			
+			inferiorBezier.SP = new ED.Point(-320, -0 - this.originY);
+			inferiorBezier.CP1 = new ED.Point(-320, 160 - this.originY);
+			inferiorBezier.CP2 = new ED.Point(-240, 260 - this.originY);
+			inferiorBezier.EP = new ED.Point(-120, 380 - this.originY);
+		}			
+		
+		
+		if (tS0 > 0) {
+		// Trim start of curve
+			
+			// front of cornea			
+			var sq0 = new ED.Point(0,0);
+			sq0.y = (1-tS0)*(1-tS0)*(1-tS0)*inferiorBezier.SP.y + 3*(1-tS0)*(1-tS0)*tS0*inferiorBezier.CP1.y + 3*(1-tS0)*tS0*tS0*inferiorBezier.CP2.y + tS0*tS0*tS0*inferiorBezier.EP.y;
+			sq0.x = (1-tS0)*(1-tS0)*(1-tS0)*inferiorBezier.SP.x + 3*(1-tS0)*(1-tS0)*tS0*inferiorBezier.CP1.x + 3*(1-tS0)*tS0*tS0*inferiorBezier.CP2.x + tS0*tS0*tS0*inferiorBezier.EP.x;
+			
+			var sP23 = new ED.Point(0,0);
+			sP23.x = inferiorBezier.CP1.x + tS0 * (inferiorBezier.CP2.x - inferiorBezier.CP1.x);
+			sP23.y = inferiorBezier.CP1.y + tS0 * (inferiorBezier.CP2.y - inferiorBezier.CP1.y);
+			
+			var sP34 = new ED.Point(0,0);
+			sP34.x = inferiorBezier.CP2.x + tS0 * (inferiorBezier.EP.x - inferiorBezier.CP2.x);
+			sP34.y = inferiorBezier.CP2.y + tS0 * (inferiorBezier.EP.y - inferiorBezier.CP2.y);
+			
+			var sP2334 = new ED.Point(0,0);
+			sP2334.x = sP23.x + tS0 * (sP34.x - sP23.x);
+			sP2334.y = sP23.y + tS0 * (sP34.y - sP23.y);
+			
+			inferiorBezier.SP = sq0;
+			inferiorBezier.CP1 = sP2334;
+			inferiorBezier.CP2 = sP34;
+		}
+		
+		if (tS1 < 1) {
+		// Trim end of curve
+			
+			// front of cornea
+			var sq1 = new ED.Point(0,0);
+			sq1.y = (1-tS1)*(1-tS1)*(1-tS1)*inferiorBezier.SP.y + 3*(1-tS1)*(1-tS1)*tS1*inferiorBezier.CP1.y + 3*(1-tS1)*tS1*tS1*inferiorBezier.CP2.y + tS1*tS1*tS1*inferiorBezier.EP.y;
+			sq1.x = (1-tS1)*(1-tS1)*(1-tS1)*inferiorBezier.SP.x + 3*(1-tS1)*(1-tS1)*tS1*inferiorBezier.CP1.x + 3*(1-tS1)*tS1*tS1*inferiorBezier.CP2.x + tS1*tS1*tS1*inferiorBezier.EP.x;
+
+			var sP12 = new ED.Point(0,0);
+			sP12.x = inferiorBezier.SP.x + tS1 * (inferiorBezier.CP1.x - inferiorBezier.SP.x);
+			sP12.y = inferiorBezier.SP.y + tS1 * (inferiorBezier.CP1.y - inferiorBezier.SP.y);
+			
+			var sP23 = new ED.Point(0,0);
+			sP23.x = inferiorBezier.CP1.x + tS1 * (inferiorBezier.CP2.x - inferiorBezier.CP1.x);
+			sP23.y = inferiorBezier.CP1.y + tS1 * (inferiorBezier.CP2.y - inferiorBezier.CP1.y);
+			
+			var sP1223 = new ED.Point(0,0);
+			sP1223.x = sP12.x + tS1 * (sP23.x - sP12.x);
+			sP1223.y = sP12.y + tS1 * (sP23.y - sP12.y);
+
+			inferiorBezier.CP1 = sP12;
+			inferiorBezier.CP2 = sP1223;
+			inferiorBezier.EP = sq1;
+		}
+	}
+	
+	if (inferiorBezier) {
+		ctx.moveTo(inferiorBezier.SP.x, inferiorBezier.SP.y);
+		ctx.bezierCurveTo(inferiorBezier.CP1.x, inferiorBezier.CP1.y, inferiorBezier.CP2.x, inferiorBezier.CP2.y, inferiorBezier.EP.x, inferiorBezier.EP.y);
+	}
+	if (superiorBezier) {
+		ctx.moveTo(superiorBezier.SP.x, superiorBezier.SP.y);
+		ctx.bezierCurveTo(superiorBezier.CP1.x, superiorBezier.CP1.y, superiorBezier.CP2.x, superiorBezier.CP2.y, superiorBezier.EP.x, superiorBezier.EP.y);
+	}
+	
+	
+	// Close path
+	ctx.closePath();
+
+	// Set attributes
+	ctx.lineWidth = 0;
+	ctx.strokeStyle = "rgba(0,0,0,0)";
+
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+		
+	// Non boundary drawing
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+
+		var dr = 8 * ((this.apexX + 20) / 20) / this.scaleX;		
+		var n = 4 + Math.abs(Math.floor(this.apexY / 8));
+		
+		var bezier;
+		var p = new ED.Point(0, 0);
+		var tP;
+		var o = new ED.Point(0, 0);
+		var angle;
+
+		for (var i = 0; i < n; i++) {
+			// random point in time
+			tP = ED.randomArray[i+100];
+			
+			// set bezier appropriate for time point
+			if (-r + this.h * 2 * tP + this.originY>0) bezier = inferiorBezier;
+			else bezier = superiorBezier;
+			
+			// time along current bezier
+			tP = (tP<=0.5) ? tP * 2 : (tP-0.5) * 2;
+			
+			// set point on bezier
+			p.x = dr*0.5 + (1-tP)*(1-tP)*(1-tP)*bezier.SP.x + 3*(1-tP)*(1-tP)*tP*bezier.CP1.x + 3*(1-tP)*tP*tP*bezier.CP2.x + tP*tP*tP*bezier.EP.x;
+			p.y = (1-tP)*(1-tP)*(1-tP)*bezier.SP.y + 3*(1-tP)*(1-tP)*tP*bezier.CP1.y + 3*(1-tP)*tP*tP*bezier.CP2.y + tP*tP*tP*bezier.EP.y;
+			
+			angle = p.direction() + 0.5*Math.PI;
+						
+			// draw spot
+			this.drawOval(ctx, p.x, p.y, dr, angle);
+		}
+	}
+	
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+
+	// Return value indicating successful hittest
+	return this.isClicked;
+	
+}
+
+
+
+/**
+ * OpenEyes
+ *
+ * Copyright (C) OpenEyes Foundation, 2011-2017
+ * This file is part of OpenEyes.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package OpenEyes
+ * @link http://www.openeyes.org.uk
+ * @author OpenEyes <info@openeyes.org.uk>
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -13386,19 +14157,17 @@ ED.AngleGradeEast.prototype.draw = function(_point) {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -13607,19 +14376,17 @@ ED.AngleGradeNorth.prototype.draw = function(_point) {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -13828,19 +14595,17 @@ ED.AngleGradeSouth.prototype.draw = function(_point) {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -14049,19 +14814,17 @@ ED.AngleGradeWest.prototype.draw = function(_point) {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -14197,19 +14960,17 @@ ED.AngleNV.prototype.groupDescription = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -14342,19 +15103,17 @@ ED.AngleRecession.prototype.groupDescription = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -14569,6 +15328,15 @@ ED.AntPVR.prototype.draw = function(_point) {
 }
 
 /**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.AntPVR.prototype.description = function() {
+    return "PVR (anterior) " + this.clockHourExtent("o'clock");
+}
+
+/**
  * Returns the SnoMed code of the doodle
  *
  * @returns {Int} SnoMed code of entity representated by doodle
@@ -14589,19 +15357,17 @@ ED.AntPVR.prototype.diagnosticHierarchy = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -14625,8 +15391,9 @@ ED.AntSeg = function(_drawing, _parameterJSON) {
 	this.colour = 'Blue';
 	this.ectropion = false;
 	this.cornealSize = 'Normal';
-  this.cells = 'Not Checked';
-  this.flare = 'Not Checked';
+	this.cells = 'Not Checked';
+	this.flare = 'Not Checked';
+	this.csApexX = 0;
 
 	// Saved parameters
 	this.savedParameterArray = [
@@ -14639,13 +15406,14 @@ ED.AntSeg = function(_drawing, _parameterJSON) {
 		'ectropion',
 		'cornealSize',
 		'cells',
-		'flare'
+		'flare',
+		'csApexX' // store of cross section apex x value
 	];
 
 	// Parameters in doodle control bar (parameter name: parameter label)
 	this.controlParameterArray = {
 		'pupilSize':'Pupil size',
-		'pxe':'PXE',
+		'pxe':'Pseudoexfoliation',
 		'coloboma':'Coloboma',
 		'colour':'Colour',
 		'ectropion':'Ectropion uveae',
@@ -14684,7 +15452,7 @@ ED.AntSeg.prototype.setPropertyDefaults = function() {
 
 	// Update component of validation array for simple parameters (enable 2D control by adding -50,+50 apexX range
 	this.parameterValidationArray.apexX.range.setMinAndMax(0, 0);
-	this.parameterValidationArray.apexY.range.setMinAndMax(-280, -60);
+	this.parameterValidationArray.apexY.range.setMinAndMax(-300, -60);
 
 	// Add complete validation arrays for derived parameters
 	this.parameterValidationArray.pupilSize = {
@@ -14954,11 +15722,10 @@ ED.AntSeg.prototype.draw = function(_point) {
  */
 ED.AntSeg.prototype.description = function() {
 	var returnValue = "";
+	var pupilSize = Math.round(-this.apexY * 0.03);
 
 	// Pupil size and coloboma
-	if (this.pupilSize !== 'Large') {
-		returnValue += this.pupilSize.toLowerCase() + " pupil, ";
-	}
+	returnValue += this.pupilSize.toLowerCase() + " pupil (diameter: " + pupilSize + "mm), ";
 
 	// Coloboma
 	if (this.coloboma) {
@@ -15001,6 +15768,12 @@ ED.AntSeg.prototype.description = function() {
 		returnValue = "No abnormality";
 	}
 
+/*
+	if (this.pupilSize == 'Large') {
+		returnValue += "pupil diameter: " + pupilSize + "mm, ";
+	}
+*/
+
 	// Remove final comma and space and capitalise first letter
 	returnValue = returnValue.replace(/, +$/, '');
 	returnValue = returnValue.charAt(0).toUpperCase() + returnValue.slice(1);
@@ -15011,19 +15784,196 @@ ED.AntSeg.prototype.description = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
+ */
+
+/**
+ *
+ *
+ * @class AntSegAngleMarks
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Object} _parameterJSON
+ */
+ED.AntSegAngleMarks = function(_drawing, _parameterJSON) {
+	// Set classname
+	this.className = "AntSegAngleMarks";
+
+	
+	// Saved parameters
+	this.savedParameterArray = [];
+	
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _parameterJSON);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.AntSegAngleMarks.prototype = new ED.Doodle;
+ED.AntSegAngleMarks.prototype.constructor = ED.AntSegAngleMarks;
+ED.AntSegAngleMarks.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets default dragging attributes
+ */
+ED.AntSegAngleMarks.prototype.setPropertyDefaults = function() {
+	this.isSelectable = false;
+	this.addAtBack = true;
+}
+
+/**
+ * Sets default parameters (Only called for new doodles)
+ * Use the setParameter function for derived parameters, as this will also update dependent variables
+ */
+ED.AntSegAngleMarks.prototype.setParameterDefaults = function() {
+}
+
+/**
+ * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
+ * The returned parameters are animated if their 'animate' property is set to true
+ *
+ * @param {String} _parameter Name of parameter that has changed
+ * @value {Undefined} _value Value of parameter to calculate
+ * @returns {Array} Associative array of values of dependent parameters
+ */
+ED.AntSegAngleMarks.prototype.dependentParameterValues = function(_parameter, _value) {
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.AntSegAngleMarks.prototype.draw = function(_point) {
+	
+	// Axis length
+	var l = 499;
+	
+	// Get context
+	var ctx = this.drawing.context;
+
+	// Call draw method in superclass
+	ED.AntSegAngleMarks.superclass.draw.call(this, _point);
+	
+	// Draw invisible boundary box around canvas
+	ctx.moveTo(-l,-l);
+	ctx.lineTo(-l,l);
+	ctx.lineTo(l,l);
+	ctx.lineTo(l,-l);
+	ctx.lineTo(-l,-l);
+	
+	ctx.fillStyle = "rgba(255, 255, 255, 0)";
+	ctx.strokeStyle = "rgba(0,0,0,0)"
+	
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+	
+	// Non boundary drawing
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+		ctx.beginPath();
+		
+		// Set style defaults
+		ctx.font="36px Arial";
+		ctx.fillStyle="black";
+		ctx.textAlign="center"; 
+		ctx.textBaseline = "middle";
+		ctx.lineWidth = 3;
+		ctx.strokeStyle = "black";
+		
+		// Number of tick marks
+		var n = 8;
+		
+		// Distance of tick marks from origin
+		var r = 400;
+		
+		// Length of single tick mark
+		var d = 25;
+		
+		var point1 = new ED.Point(0,0);
+		var point2 = new ED.Point(0,0);
+		var point3 = new ED.Point(0,0);
+		for (var i=0; i<n; i++) {
+			var angleRad = 2*Math.PI / n * i;
+			var angleDeg = angleRad * 180 / Math.PI;
+			
+			point1.setWithPolars(r, 2 * Math.PI - angleRad + 0.5*Math.PI);
+			point2.setWithPolars(r+d, 2 * Math.PI - angleRad + 0.5*Math.PI);
+			point3.setWithPolars(r+d*2.5,2 * Math.PI - angleRad + 0.5*Math.PI);
+			
+			ctx.moveTo(point1.x, point1.y);
+			ctx.lineTo(point2.x, point2.y);
+			ctx.fillText(angleDeg + "\xB0",point3.x,point3.y);
+		}
+		
+/*
+		ctx.moveTo(-500,0);
+		ctx.lineTo(500,0);
+*/
+		
+		ctx.stroke();
+		
+		
+		
+		// If toric lens exists, draw flat axis
+		var toricLens = this.drawing.lastDoodleOfClass('ToricPCIOL');
+		if (toricLens) {
+			var phi = 0.7 * Math.PI / 4;
+			var axisRotation = toricLens.rotation + phi - 0.5077 * Math.PI;
+			
+			ctx.beginPath();
+			ctx.save();
+			ctx.rotate(axisRotation);
+			
+			ctx.strokeStyle = "blue";
+			ctx.lineWidth = 8;
+			
+			var w = 420;
+			var z = Math.round(2 * w / (d*2));
+			for (var j=0; j<z; j++) {
+				ctx.moveTo(-w + j*d*2, 0);
+				ctx.lineTo(-w + j*d*2 + d, 0);
+			};
+/*
+			ctx.moveTo(-w, 0);
+			ctx.lineTo(w,0);
+*/
+			ctx.stroke();
+			ctx.restore();
+		}		
+		
+	}
+
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+
+
+/**
+ * OpenEyes
+ *
+ * Copyright (C) OpenEyes Foundation, 2011-2017
+ * This file is part of OpenEyes.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package OpenEyes
+ * @link http://www.openeyes.org.uk
+ * @author OpenEyes <info@openeyes.org.uk>
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 
@@ -15042,11 +15992,20 @@ ED.AntSegCrossSection = function(_drawing, _parameterJSON) {
 	// Derived parameters
 	this.pupilSize = 'Large';
 
+	this.colour = 'Blue';
+    
 	// Saved parameters
-	this.savedParameterArray = ['apexY', 'apexX'];
+	this.savedParameterArray = ['apexY', 'apexX','colour','c'];
 
-	// Call superclass constructor
+    // Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
+
+  	this.linkedDoodleParameters = {
+    	'AntSeg': {
+      		source: ['apexY', 'colour'],
+      		store: [['apexX', 'csApexX']]
+    	}
+  	};
 
 	// Invariant simple parameters
 	this.originX = 44;
@@ -15086,6 +16045,19 @@ ED.AntSegCrossSection.prototype.setPropertyDefaults = function() {
 		list: ['Large', 'Medium', 'Small'],
 		animate: true
 	};
+	
+	this.parameterValidationArray['c'] = {
+		kind: 'other',
+		type: 'int',
+		animate: false
+	};
+	
+	this.parameterValidationArray.colour = {
+		kind: 'other',
+		type: 'string',
+		list: ['Blue', 'Brown', 'Gray', 'Green'],
+		animate: false
+	};
 }
 
 /**
@@ -15094,6 +16066,7 @@ ED.AntSegCrossSection.prototype.setPropertyDefaults = function() {
  */
 ED.AntSegCrossSection.prototype.setParameterDefaults = function() {
 	this.setParameterFromString('pupilSize', 'Large');
+	this.setParameterFromString('c', '1');
 	this.apexX = 24;
 }
 
@@ -15112,15 +16085,21 @@ ED.AntSegCrossSection.prototype.dependentParameterValues = function(_parameter, 
 		case 'apexY':
 			// ***TOSDP*** Putting this here will cancel out any saved value of apexX
 			// Set apexX and its limits for apexX according to value of apexY (prevents collisions with cornea and lens)
-			this.parameterValidationArray['apexX']['range'].setMinAndMax(-40 - (140 / 220) * (this.apexY + 280), 32 - (72 / 220) * (this.apexY + 280));
+				/// MSC: Max position dependent on lens type present
+			var lens = this.drawing.lastDoodleOfClass('LensCrossSection');
+			if (!lens) lens = this.drawing.lastDoodleOfClass('PCIOLCrossSection');
+			
+			var maxApexX = (lens.className == 'LensCrossSection') ? 32 - (72 / 220) * (this.apexY + 280) + lens.originX - 44: (lens.className == 'PCIOLCrossSection') ? lens.originX - 21 : 25;
+			this.parameterValidationArray['apexX']['range'].setMinAndMax(-40 - (140 / 220) * (this.apexY + 280), maxApexX);
 
 			// If being synced, make sensible decision about x
-			if (!this.drawing.isActive) {
-				var newOriginX = this.parameterValidationArray['apexX']['range'].max;
-			} else {
-				var newOriginX = this.parameterValidationArray['apexX']['range'].constrain(this.apexX);
-			}
-			this.setSimpleParameter('apexX', newOriginX);
+			// Commented out by MCS as was preventing display of saved values ... the above prevents overlap with the PCIOL though
+			// if (!this.drawing.isActive) {
+			// 	var newOriginX = this.parameterValidationArray['apexX']['range'].max;
+			// } else {
+			// 	var newOriginX = this.parameterValidationArray['apexX']['range'].constrain(this.apexX);
+			// }
+			// this.setSimpleParameter('apexX', newOriginX);
 
 			// Set pupil size value
 			if (_value < -200) returnArray['pupilSize'] = 'Large';
@@ -15141,6 +16120,14 @@ ED.AntSegCrossSection.prototype.dependentParameterValues = function(_parameter, 
 					break;
 			}
 			break;
+
+		// commented out by MCS as seems to be blocking correct colour selection in view mode
+		// case 'c':
+		// 	if (_value === 1) returnArray['colour'] = 'Blue';
+		// 	else if (_value === 2) returnArray['colour'] = 'Brown';
+		// 	else if (_value === 3) returnArray['colour'] = 'Gray';
+		// 	else returnArray['colour'] = 'Green';
+		// 	break;
 	}
 
 	return returnArray;
@@ -15197,15 +16184,83 @@ ED.AntSegCrossSection.prototype.draw = function(_point) {
 	ctx.closePath();
 
 	// Set line attributes
-	ctx.lineWidth = 4;
-	ctx.fillStyle = "rgba(255, 160, 40, 1)";
-	ctx.strokeStyle = "gray";
+	ctx.lineWidth = 0;
+	ctx.strokeStyle = "rgba(0,0,0,0)";
 
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 
 	// Non boundary drawing
-	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {}
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+	    // colour fill for iris
+		ctx.lineWidth = 4;
+		ctx.strokeStyle = "gray";
+		switch (this.colour) {
+			case 'Blue':
+				ctx.fillStyle = "rgba(160, 221, 251, 1)";
+				break;
+			case 'Brown':
+				ctx.fillStyle = "rgba(203, 161, 134, 1)";
+				break;
+			case 'Gray':
+				ctx.fillStyle = "rgba(177, 181, 172, 1)";
+				break;
+			case 'Green':
+				ctx.fillStyle = "rgba(169, 206, 141, 1)";
+				break;
+		}
+		
+// 		ctx.fillStyle = "rgba(255, 160, 40, 1)";
+		
+		// bottom iris
+		ctx.beginPath();
+		ctx.moveTo(70, 380);
+		ctx.lineTo(55, 380);
+		ctx.bezierCurveTo(40, 460, marginX + 60 + f, -this.apexY, marginX, -this.apexY);
+		ctx.bezierCurveTo(marginX - 60 - f, -this.apexY, -21, 317, 0, 380);
+		ctx.lineTo(55,480);
+		ctx.fill();
+		ctx.stroke();
+		ctx.closePath();	
+		
+		// top iris
+		ctx.beginPath();
+		ctx.moveTo(70,-380);
+		ctx.lineTo(55,-380);
+		ctx.bezierCurveTo(40, -460, marginX + 60 + f, this.apexY, marginX, this.apexY);
+		ctx.bezierCurveTo(marginX - 60 - f, this.apexY, -21, -317, 0, -380);
+		ctx.lineTo(55, -480);
+		ctx.fill();
+		ctx.stroke();
+		ctx.closePath();
+		
+		ctx.fillStyle = "rgba(255, 160, 40, 1)";		
+		// top cilliary body and cutaway
+		ctx.beginPath();
+		ctx.moveTo(55, -480);
+		ctx.lineTo(140, -480);
+		ctx.lineTo(140, -380);
+	
+		ctx.bezierCurveTo(120, -340, 120, -340, 100, -380);
+		ctx.bezierCurveTo(80, -340, 80, -340, 55, -380);
+		ctx.fill();
+		ctx.stroke();
+		ctx.closePath();
+
+		
+		// bottom cilliary body	and cut away
+		ctx.beginPath();
+		ctx.moveTo(55, 480);
+		ctx.lineTo(140, 480);
+		ctx.lineTo(140, 380);
+	
+		ctx.bezierCurveTo(120, 340, 120, 340, 100, 380);
+		ctx.bezierCurveTo(80, 340, 80, 340, 55, 380);
+		ctx.fill();
+		ctx.stroke();
+		ctx.closePath();
+
+	}
 
 	// Coordinates of handles (in canvas plane)
 	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
@@ -15220,19 +16275,17 @@ ED.AntSegCrossSection.prototype.draw = function(_point) {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -15375,19 +16428,17 @@ ED.AntSynech.prototype.groupDescription = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -15729,19 +16780,17 @@ ED.ArcuateKeratotomy.prototype.description = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -15872,19 +16921,17 @@ ED.ArcuateScotoma.prototype.description = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -16056,19 +17103,17 @@ ED.AxialLengthGraph.prototype.draw = function(_point) {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -16181,19 +17226,17 @@ ED.BiopsySite.prototype.description = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -16359,19 +17402,17 @@ ED.Bleb.prototype.description = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -16468,19 +17509,17 @@ ED.BlotHaemorrhage.prototype.groupDescription = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -16638,19 +17677,17 @@ ED.BuckleOperation.prototype.drawRectus = function(_ctx, _quad) {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -16768,19 +17805,17 @@ ED.BuckleSuture.prototype.draw = function(_point) {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -16881,19 +17916,17 @@ ED.BusaccaNodule.prototype.groupDescription = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -17059,19 +18092,17 @@ ED.CapsularTensionRing.prototype.description = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -17207,19 +18238,17 @@ ED.ChandelierDouble.prototype.description = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -17347,19 +18376,17 @@ ED.ChandelierSingle.prototype.description = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -17529,19 +18556,17 @@ ED.ChoroidalHaemorrhage.prototype.snomedCode = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -17736,19 +18761,17 @@ ED.ChoroidalNaevus.prototype.snomedCode = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -17999,19 +19022,17 @@ ED.CiliaryInjection.prototype.drawSoftLine = function(x1, y1, x2, y2, lineWidth,
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -18160,19 +19181,17 @@ ED.Circinate.prototype.description = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -18338,19 +19357,17 @@ ED.CircumferentialBuckle.prototype.description = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -18530,19 +19547,175 @@ ED.CNV.prototype.diagnosticHierarchy = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
+ */
+
+/**
+ * Conjunctivitis
+ *
+ * @class Conjunctivitis
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Object} _parameterJSON
+ */
+ED.Conjunctivitis = function(_drawing, _parameterJSON) {
+  // Set classname
+  this.className = "Conjunctivitis";
+
+  // Other parameters
+  this.type = 'Papillary';
+  this.mucopurulent = false;
+  this.hyperaemia = "+";
+
+  // Saved parameters
+  this.savedParameterArray = ['type', 'mucopurulent', 'hyperaemia'];
+
+  // Parameters in doodle control bar (parameter name: parameter label)
+  this.controlParameterArray = {'type':'Type', 'mucopurulent':'Mucopurulent', 'hyperaemia':'Hyperaemia'};
+
+  // Call superclass constructor
+  ED.Doodle.call(this, _drawing, _parameterJSON);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.Conjunctivitis.prototype = new ED.Doodle;
+ED.Conjunctivitis.prototype.constructor = ED.Conjunctivitis;
+ED.Conjunctivitis.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets default dragging attributes
+ */
+ED.Conjunctivitis.prototype.setPropertyDefaults = function() {
+  this.isUnique = true;
+  this.isMoveable = false;
+  this.isRotatable = false;
+
+  // Add complete validation arrays for other parameters
+  this.parameterValidationArray['type'] = {
+    kind: 'other',
+    type: 'string',
+    list: ['Papillary', 'Follicular'],
+    animate: false
+  };
+  this.parameterValidationArray['mucopurulent'] = {
+    kind: 'derived',
+    type: 'bool',
+    display: true
+  };
+  this.parameterValidationArray['hyperaemia'] = {
+    kind: 'other',
+    type: 'string',
+    list: ['+', '++', '+++'],
+    animate: false
+  };
+}
+
+/**
+ * Sets default parameters
+ */
+ED.Conjunctivitis.prototype.setParameterDefaults = function() {
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.Conjunctivitis.prototype.draw = function(_point) {
+
+  // Get context
+  var ctx = this.drawing.context;
+
+  // Call draw method in superclass
+  ED.AntSeg.superclass.draw.call(this, _point);
+
+  // Radius of limbus
+  var ro = 380;
+  var ri = -this.apexY;
+  var rs = 500;
+
+  // Calculate parameters for arcs
+  var arcStart = -Math.PI/2;
+  var arcEnd = 2 * Math.PI - Math.PI/2;
+
+  // Boundary path
+  ctx.beginPath();
+
+  // Interpalpebral fissure
+  var bh = 350;
+  var bv = 150;
+  ctx.lineTo(0, -ro);
+  ctx.bezierCurveTo(-bh, -ro, -rs, -bv, -rs, 0);
+  ctx.bezierCurveTo(-rs, +bv, -bh, +ro, 0, +ro);
+  ctx.bezierCurveTo(+bh, +ro, +rs, +bv, +rs, 0);
+  ctx.bezierCurveTo(+rs, -bv, +bh, -ro, 0, -ro);
+
+  // Do a 360 arc
+  ctx.arc(0, 0, ro, arcStart, arcEnd, false);
+
+  // Edge attributes
+  ctx.lineWidth = 4;
+  var ptrn = ctx.createPattern(this.drawing.imageArray['NewVesselPattern'], 'repeat');
+  ctx.fillStyle = ptrn;
+  ctx.strokeStyle = "pink";
+
+  if (this.hyperaemia == "+") ctx.filter = "opacity(10%)";
+  if (this.hyperaemia == "++") ctx.filter = "opacity(30%)";
+  if (this.hyperaemia == "+++") ctx.filter = "opacity(50%)";
+
+  // Draw boundary path (also hit testing)
+  this.drawBoundary(_point);
+
+  // Other paths and drawing here
+  if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+  }
+
+  ctx.filter = "none";
+
+  // Return value indicating successful hit test
+  return this.isClicked;
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.Conjunctivitis.prototype.description = function() {
+  var returnValue = this.type + " conjunctivitis";
+
+  if (this.mucopurulent) returnValue += ", mucopurulent,";
+
+  returnValue += " with " + this.hyperaemia + " hyperaemia";
+
+  return returnValue;
+}
+/**
+ * OpenEyes
+ *
+ * Copyright (C) OpenEyes Foundation, 2011-2017
+ * This file is part of OpenEyes.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package OpenEyes
+ * @link http://www.openeyes.org.uk
+ * @author OpenEyes <info@openeyes.org.uk>
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -18724,19 +19897,17 @@ ED.ConjunctivalFlap.prototype.description = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -18754,18 +19925,17 @@ ED.ConjunctivalSuture = function(_drawing, _parameterJSON) {
 	// Private parameters
 	this.boundaryWidth = 180;
 	this.boundaryHeight = 180;
-	this.orientated = true;
 
 	// Derived parameters
 	this.type = "Buried Mattress";
 	this.material = 'Nylon';
 	this.size = '10/0';
-
+	
 	// Saved parameters
-	this.savedParameterArray = ['originX', 'originY', 'rotation', 'orientated', 'type', 'material', 'size'];
+	this.savedParameterArray = ['originX', 'originY', 'rotation', 'isOrientated', 'type', 'material', 'size'];
 
 	// Parameters in doodle control bar (parameter name: parameter label)
-	this.controlParameterArray = {'orientated':'Orientated', 'type':'Type', 'material':'Material', 'size':'Size'};
+	this.controlParameterArray = {'isOrientated':'Orientated', 'type':'Type', 'material':'Material', 'size':'Size'};
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -18816,7 +19986,7 @@ ED.ConjunctivalSuture.prototype.setPropertyDefaults = function() {
 		list: ['11/0', '10/0', '9/0', '8/0', '7/0', '6/0'],
 		animate: false
 	}
-	this.parameterValidationArray['orientated'] = {
+	this.parameterValidationArray['isOrientated'] = {
 		kind: 'derived',
 		type: 'bool',
 		display: false
@@ -18875,13 +20045,11 @@ ED.ConjunctivalSuture.prototype.dependentParameterValues = function(_parameter, 
 			this.apexX = this.boundaryWidth/2;
 			break;
 
-		case 'orientated':
+		case 'isOrientated':
 			if (_value == "true") {
-				this.isOrientated = true;
 				this.handleArray[2].isVisible = false;
 			}
 			else {
-				this.isOrientated = false;
 				this.handleArray[2].isVisible = true;
 			}
 			break;
@@ -19013,21 +20181,114 @@ ED.ConjunctivalSuture.prototype.description = function() {
 }
 
 /**
+ * Cornea
+ *
+ * @class Cornea
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Object} _parameterJSON
+ */
+ED.Cornea = function(_drawing, _parameterJSON) {
+    // Set classname
+    this.className = "Cornea";
+
+    // Other parameters
+    this.shape = "";
+    this.pachymetry = 540;
+
+    // Saved parameters
+    this.savedParameterArray = ['shape', 'pachymetry', 'csOriginX', 'csApexX', 'csApexY'];
+
+    // Call superclass constructor
+    ED.Doodle.call(this, _drawing, _parameterJSON);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.Cornea.prototype = new ED.Doodle;
+ED.Cornea.prototype.constructor = ED.Cornea;
+ED.Cornea.superclass = ED.Doodle.prototype;
+
+
+/**
+ * Sets default parameters (Only called for new doodles)
+ * Use the setParameter function for derived parameters, as this will also update dependent variables
+ */
+ED.Cornea.prototype.setParameterDefaults = function() {
+    this.csOriginX = 50;
+    this.csApexX = -363;
+    this.csApexY = 0;
+    this.setParameterFromString('shape', 'Normal');
+    this.setParameterFromString('pachymetry', '540');
+}
+
+/**
+ * This is basically duplicated from CorneaCrossSection, which could certainly benefit from some refactoring
+ * further down the track
+ */
+ED.Cornea.prototype.setPropertyDefaults = function() {
+    this.isSelectable = false;
+    this.isDeletable = false;
+    this.isMoveable = false;
+    this.isRotatable = false;
+    this.isUnique = true;
+    this.willReport = true;
+
+    // Update validation array for simple parameters
+    this.parameterValidationArray['apexX']['range'].setMinAndMax(-365, -300);
+    this.parameterValidationArray['apexY']['range'].setMinAndMax(-100, +100);
+
+    // Other parameters
+    this.parameterValidationArray['shape'] = {
+        kind: 'other',
+        type: 'string',
+        list: ['Normal', 'Keratoconus', 'Keratoglobus'],
+        animate: false
+    };
+    this.parameterValidationArray['pachymetry'] = {
+        kind: 'other',
+        type: 'int',
+        range: new ED.Range(400, 700),
+        precision: 1,
+        animate: false
+    };
+}
+
+/**
+ * Transparent doodle can not be clicked
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.Cornea.prototype.draw = function(_point) {
+    return false;
+}
+
+/**
+ * Report text
+ * 
+ * @returns {string}
+ */
+ED.Cornea.prototype.description = function()
+{
+    if (this.shape && this.shape != 'Normal')
+        return this.shape;
+    return '';
+};
+/**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -19057,6 +20318,13 @@ ED.CorneaCrossSection = function(_drawing, _parameterJSON) {
 	
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
+
+    this.linkedDoodleParameters = {
+        'Cornea': {
+            source: ['shape', 'pachymetry'],
+            store: [['apexX', 'csApexX'], ['apexY', 'csApexY'], ['originX', 'csOriginX']]
+        }
+    };
 }
 
 /**
@@ -19083,7 +20351,7 @@ ED.CorneaCrossSection.prototype.setPropertyDefaults = function() {
 	this.isUnique = true;
 	
 	// Update validation array for simple parameters
-	this.parameterValidationArray['apexX']['range'].setMinAndMax(-410, -300);
+	this.parameterValidationArray['apexX']['range'].setMinAndMax(-365, -300);
 	this.parameterValidationArray['apexY']['range'].setMinAndMax(-100, +100);
 	
 	// Other parameters
@@ -19107,8 +20375,8 @@ ED.CorneaCrossSection.prototype.setPropertyDefaults = function() {
  * Use the setParameter function for derived parameters, as this will also update dependent variables
  */
 ED.CorneaCrossSection.prototype.setParameterDefaults = function() {
-	this.originX = 140;
-	this.apexX = -380;
+	this.originX = 50;
+	this.apexX = -363;
 	this.apexY = 0;
 	this.setParameterFromString('shape', 'Normal');
 	this.setParameterFromString('pachymetry', '540');
@@ -19139,7 +20407,8 @@ ED.CorneaCrossSection.prototype.dependentParameterValues = function(_parameter, 
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.CorneaCrossSection.prototype.draw = function(_point) {console.log(this.apexX, this.apexY);
+ED.CorneaCrossSection.prototype.draw = function(_point) {
+// 	console.log(this.apexX, this.apexY);
 	// Get context
 	var ctx = this.drawing.context;
 
@@ -19244,19 +20513,17 @@ ED.CorneaCrossSection.prototype.draw = function(_point) {console.log(this.apexX,
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -19383,20 +20650,348 @@ ED.CornealAbrasion.prototype.description = function() {
 
 /**
  * OpenEyes
+ * MSC
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
+ */
+
+/**
+ * 
+ *
+ * @class CornealEpithelialDefect
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Object} _parameterJSON
+ */
+ED.CornealEpithelialDefect = function(_drawing, _parameterJSON) {
+	// Set classname
+	this.className = "CornealEpithelialDefect";
+
+	// Private parameters
+	this.numberOfHandles = 4;
+	this.initialRadius = 81;
+	this.resetWidth = true;
+	this.resetHeight = true;
+	this.resetInfiltrate = true;
+	
+	// Other parameters
+	this.height = Math.round(this.initialRadius * 2 / 54);
+	this.width = Math.round(this.initialRadius * 2 / 54);
+
+	// Saved parameters
+	this.savedParameterArray = ['originX', 'originY', 'rotation', 'height', 'width'];
+	
+	// Parameters in doodle control bar
+	this.controlParameterArray = {'height':'Height', 'width':'Width'};
+
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _parameterJSON);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.CornealEpithelialDefect.prototype = new ED.Doodle;
+ED.CornealEpithelialDefect.prototype.constructor = ED.CornealEpithelialDefect;
+ED.CornealEpithelialDefect.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.CornealEpithelialDefect.prototype.setHandles = function() {
+	// Array of handles
+	for (var i = 0; i < this.numberOfHandles; i++) {
+		this.handleArray[i] = new ED.Doodle.Handle(null, true, ED.Mode.Handles, false);
+	}
+
+	// Allow top handle to rotate doodle
+	/// ? Removed as need specific handles to be along X and Y axis - can change... **TODO**
+// 	this.handleArray[0].isRotatable = true;
+}
+
+/**
+ * Sets default properties
+ */
+ED.CornealEpithelialDefect.prototype.setPropertyDefaults = function() {
+	// Create ranges to constrain handles
+	this.handleVectorRangeArray = new Array();
+	for (var i = 0; i < this.numberOfHandles; i++) {
+		// Full circle in radians
+		var cir = 2 * Math.PI;
+
+		// Create a range object for each handle
+		var n = this.numberOfHandles;
+		var range = new Object;
+		range.length = new ED.Range(+50, +380);
+		range.angle = new ED.Range((((2 * n - 1) * cir / (2 * n)) + i * cir / n) % cir, ((1 * cir / (2 * n)) + i * cir / n) % cir);
+		this.handleVectorRangeArray[i] = range;
+	}
+	
+	// Update component of validation array for simple parameters
+	this.parameterValidationArray['originX']['range'].setMinAndMax(-350, +350);
+	this.parameterValidationArray['originY']['range'].setMinAndMax(-350, +350);
+	
+	// Validation arrays for other parameters
+	this.parameterValidationArray['height'] = {
+		kind: 'other',
+		type: 'int',
+		range: new ED.Range(1, 14),
+		precision: 1,
+		animate: false
+	};
+	this.parameterValidationArray['width'] = {
+		kind: 'other',
+		type: 'int',
+		range: new ED.Range(1, 14),
+		precision: 1,
+		animate: false
+	};
+	this.parameterValidationArray['resetWidth'] = {
+		kind: 'derived',
+		type: 'bool',
+		display: false
+	};
+	this.parameterValidationArray['resetHeight'] = {
+		kind: 'derived',
+		type: 'bool',
+		display: false
+	};
+}
+
+/**
+ * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
+ * The returned parameters are animated if their 'animate' property is set to true
+ *
+ * @param {String} _parameter Name of parameter that has changed
+ * @value {Undefined} _value Value of parameter to calculate
+ * @returns {Array} Associative array of values of dependent parameters
+ */
+ED.CornealEpithelialDefect.prototype.dependentParameterValues = function(_parameter, _value) {
+	var returnArray = new Array();
+
+	switch (_parameter) {
+		case 'width':
+			returnArray['resetWidth'] = true;
+			break;
+
+		case 'height':
+			returnArray['resetHeight'] = true;
+			break;
+	}
+
+	return returnArray;
+}
+
+/**
+ * Sets default parameters
+ */
+ED.CornealEpithelialDefect.prototype.setParameterDefaults = function() {
+	var doodle = this.drawing.lastDoodleOfClass(this.className);
+	if (doodle) {
+		var np = new ED.Point(doodle.originX + 100, doodle.originY);
+		this.move(np.x, np.y);
+	} else {
+		this.move(150, 50);
+	}
+
+	// Create a squiggle to store the handles points
+	var squiggle = new ED.Squiggle(this, new ED.Colour(100, 100, 100, 1), 4, true);
+
+	// Add it to squiggle array
+	this.squiggleArray.push(squiggle);
+
+	// Populate with handles at equidistant points around circumference
+	for (var i = 0; i < this.numberOfHandles; i++) {
+		var point = new ED.Point(0, 0);
+		point.setWithPolars(this.initialRadius, i * 2 * Math.PI / this.numberOfHandles);
+		this.addPointToSquiggle(point);
+	}
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.CornealEpithelialDefect.prototype.draw = function(_point) {
+	// Get context
+	var ctx = this.drawing.context;
+
+	// Call draw method in superclass
+	ED.CornealEpithelialDefect.superclass.draw.call(this, _point);
+
+	// Boundary path
+	ctx.beginPath();
+
+	// Bezier points
+	var fp;
+	var tp;
+	var cp1;
+	var cp2;
+
+	// Angle of control point from radius line to point (this value makes path a circle Math.PI/12 for 8 points
+	var phi = 2 * Math.PI / (3 * this.numberOfHandles);
+	
+	// Time intervals along bezier curve
+	var T = [0.0,0.125,0.25,0.375,0.50,0.625,0.75,0.875,1];
+	
+	// If inputted a dimension, reset pointsArray, 
+	// otherwise recalculate dimension
+	var minY = '';
+	var maxY = '';
+	if (this.resetWidth) {
+		this.squiggleArray[0].pointsArray[1].x = 0.5 * this.width * 54;
+		this.squiggleArray[0].pointsArray[3].x = 0.5 * this.width * -54;
+
+		this.resetWidth = false;
+	}
+	else {
+		/// solve bezier to find min and max point along axis
+		var maxX = '';
+        var minX = '';
+        var squiggle = this.squiggleArray[0];
+		for (var i=0; i<this.numberOfHandles; i++) {
+	        fp = this.squiggleArray[0].pointsArray[i];
+			var toIndex = (i < this.numberOfHandles - 1) ? i + 1 : 0;
+	        tp = this.squiggleArray[0].pointsArray[toIndex];
+	        var x1 = fp.x;
+			var x2 = fp.tangentialControlPoint(+phi).x;
+			var x3 = tp.tangentialControlPoint(-phi).x;
+			var x4 = tp.x;
+		            
+            for (var j=0; j<T.length; j++) {
+                var t = T[j];
+                var x = (1-t)*(1-t)*(1-t)*x1 + 3*(1-t)*(1-t)*t*x2 + 3*(1-t)*t*t*x3 + t*t*t*x4;
+                if (maxX == '' || x > maxX) {
+                    maxX = x;
+                }
+                if (minX == '' || x < minX) {
+                    minX = x;
+                }
+            }
+        }
+        this.width = Math.round((maxX - minX) / 54);
+        this.w = this.width;
+	}
+	
+	if (this.resetHeight) {
+		this.squiggleArray[0].pointsArray[0].y = 0.5 * this.height * -54;
+		this.squiggleArray[0].pointsArray[2].y = 0.5 * this.height * 54;
+
+		this.resetHeight = false;
+		minY = this.squiggleArray[0].pointsArray[0].y;
+		maxY = this.squiggleArray[0].pointsArray[2].y;
+	}
+	else {
+		// recalculate height/// solve bezier to find min and max point along axis
+        var squiggle = this.squiggleArray[0];
+		for (var i=0; i<this.numberOfHandles; i++) {
+	        fp = this.squiggleArray[0].pointsArray[i];
+			var toIndex = (i < this.numberOfHandles - 1) ? i + 1 : 0;
+	        tp = this.squiggleArray[0].pointsArray[toIndex];
+	        var y1 = fp.y;
+			var y2 = fp.tangentialControlPoint(+phi).y;
+			var y3 = tp.tangentialControlPoint(-phi).y;
+			var y4 = tp.y;
+		            
+            for (var j=0; j<T.length; j++) {
+                var t = T[j];
+                var y = (1-t)*(1-t)*(1-t)*y1 + 3*(1-t)*(1-t)*t*y2 + 3*(1-t)*t*t*y3 + t*t*t*y4;
+                if (maxY == '' || y > maxY) {
+                    maxY = y;
+                }
+                if (minY == '' || y < minY) {
+                    minY = y;
+                }
+            }
+        }
+				
+        this.height = Math.round((maxY - minY) / 54);
+        this.h = this.height;
+        		
+	}
+	
+	
+	// Start curve
+	ctx.moveTo(this.squiggleArray[0].pointsArray[0].x, this.squiggleArray[0].pointsArray[0].y);
+
+	// Complete curve segments
+	for (var i = 0; i < this.numberOfHandles; i++) {
+		// From and to points
+		fp = this.squiggleArray[0].pointsArray[i];
+		var toIndex = (i < this.numberOfHandles - 1) ? i + 1 : 0;
+		tp = this.squiggleArray[0].pointsArray[toIndex];
+
+		// Control points
+		cp1 = fp.tangentialControlPoint(+phi);
+		cp2 = tp.tangentialControlPoint(-phi);
+		
+		// Draw Bezier curve
+		ctx.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, tp.x, tp.y);
+	}
+
+	// Close path
+	ctx.closePath();
+
+	// Set attributes
+	ctx.lineWidth = 1;
+	ctx.fillStyle = "rgba(50,205,50,0.8)";
+	ctx.strokeStyle = "rgba(50,205,50,1)";
+
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+	
+	// Coordinates of expert handles (in canvas plane)
+	for (var i = 0; i < this.numberOfHandles /* * 2 */; i++) {
+		this.handleArray[i].location = this.transform.transformPoint(this.squiggleArray[0].pointsArray[i]);
+	}
+			
+
+	// Non boundary drawing
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+		
+	}
+	
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.CornealEpithelialDefect.prototype.description = function() {
+	return 'Epithelial defect H-W: ' + this.height + 'x' + this.width + 'mm';
+}
+
+/**
+ * OpenEyes
+ *
+ * Copyright (C) OpenEyes Foundation, 2011-2017
+ * This file is part of OpenEyes.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package OpenEyes
+ * @link http://www.openeyes.org.uk
+ * @author OpenEyes <info@openeyes.org.uk>
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -19512,19 +21107,17 @@ ED.CornealErosion.prototype.groupDescription = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -19765,19 +21358,17 @@ ED.CornealGraft.prototype.description = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -19941,19 +21532,17 @@ ED.CornealGraftSuture.prototype.description = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -20067,19 +21656,348 @@ ED.CornealInlay.prototype.description = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * (C) OpenEyes Foundation, 2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
+ */
+
+/**
+ * Corneal Laceration drawing
+ *
+ * @class CornealLaceration
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Object} _parameterJSON
+ */
+ED.CornealLaceration = function(_drawing, _parameterJSON) {
+	// Set classname
+	this.className = "CornealLaceration";
+
+	this.plane = 0;
+	
+	// derived parameter
+	this.lacerationDepth = 0;
+	this.lacType = "laceration";
+	this.complete = false;
+	this.irisProlapse = false;
+	this.boundaryMin = -450;
+	this.boundaryWidth = 900;
+	this.numberOfHandles = 0;
+	this.mousePoint = new ED.Point(-550,-550); //default off canvas so not visible
+
+	// Saved parameters
+	this.savedParameterArray = ['complete','lacerationDepth','numberOfHandles','irisProlapse'];
+
+	// Parameters in doodle control bar (parameter name: parameter label)
+	this.controlParameterArray = {
+		'lacerationDepth':'Laceration Depth %',
+		'irisProlapse':'Iris prolapse'
+	};
+
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _parameterJSON);
+
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.CornealLaceration.prototype = new ED.Doodle;
+ED.CornealLaceration.prototype.constructor = ED.CornealLaceration;
+ED.CornealLaceration.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.CornealLaceration.prototype.setHandles = function() {
+	if (this.numberOfHandles>0) {
+		for (var i = 0; i < this.numberOfHandles; i++) {
+			this.handleArray[i] = new ED.Doodle.Handle(null, true, ED.Mode.Handles, false);
+		}
+	}
+}
+
+/**
+ * Sets default dragging attributes
+ */
+ED.CornealLaceration.prototype.setPropertyDefaults = function() {
+	this.isRotatable = false;
+	this.isFilled = false;
+	this.isMoveable = false;
+
+	this.parameterValidationArray['lacerationDepth'] = {
+		kind: 'other',
+		type: 'int',
+		range: new ED.Range(1, 100),
+		animate: false
+	};
+	this.parameterValidationArray['lacType'] = {
+		kind: 'derived',
+		type: 'string',
+		list: ['laceration', 'cornealscleral laceration'],
+		animate: false
+	};
+	this.parameterValidationArray['irisProlapse'] = {
+		kind: 'derived',
+		type: 'bool',
+		display: false
+	};
+
+	var d = this;
+
+	//Complete doodle on double click
+	d.drawing.canvas.addEventListener('dblclick', function(e) {
+		if (d.isSelected && !d.complete) {
+			//Deletion of handle upon completion removed DAC 20170411
+			/*d.squiggleArray[0].pointsArray.shift();
+			d.handleArray.shift();
+			d.numberOfHandles--;*/
+			d.complete = true;
+			d.drawing.repaint();
+		}
+	}, false);
+
+	//Draws straight line to mouse
+	this.drawing.canvas.addEventListener('mousemove', function(e) {
+		if (!d.complete) {
+			var position = ED.findPosition(this, e);
+			var mousePosDoodlePlane = d.drawing.inverseTransform.transformPoint(position); // coordinates of mouse in doodle plane
+			d.mousePoint = new ED.Point(mousePosDoodlePlane.x, mousePosDoodlePlane.y);
+			d.drawing.repaint();
+		}
+	}, false);
+
+	//Draws handle at mousedown location
+	this.drawing.canvas.addEventListener('mousedown', function(e) {
+		if (d.draggingHandleIndex==null && d.isSelected && !d.complete) {
+			var position = ED.findPosition(this, e);
+			var mousePosDoodlePlane = d.drawing.inverseTransform.transformPoint(position); // coordinates of mouse in doodle plane
+			if (mousePosDoodlePlane.x>d.boundaryMin && mousePosDoodlePlane.y>d.boundaryMin && mousePosDoodlePlane.x<(d.boundaryMin+d.boundaryWidth) && mousePosDoodlePlane.y<(d.boundaryMin+d.boundaryWidth)) {
+				d.addHandle(mousePosDoodlePlane);
+			}
+		}
+	}, false);
+
+}
+
+/**
+ * Sets default parameters (Only called for new doodles)
+ * Use the setParameter function for derived parameters, as this will also update dependent variables
+ */
+ED.CornealLaceration.prototype.setParameterDefaults = function() {
+	// create the base squiggle
+	var squiggle = new ED.Squiggle(this, new ED.Colour(100, 100, 100, 1), 4, true);
+	this.squiggleArray.push(squiggle);
+}
+
+/**
+ * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
+ * The returned parameters are animated if their 'animate' property is set to true
+ *
+ * @param {String} _parameter Name of parameter that has changed
+ * @value {Undefined} _value Value of parameter to calculate
+ * @returns {Array} Associative array of values of dependent parameters
+ */
+ED.CornealLaceration.prototype.dependentParameterValues = function(_parameter, _value) {
+	var returnArray = new Array();
+
+	switch (_parameter) {
+		case 'handles':
+		returnArray['lacType'] = this.calculateLacerationType();
+		break;
+		case 'complete':
+			if (this.complete) {
+				this.numberOfHandles = this.squiggleArray[0].pointsArray.length - 1;
+				this.setHandles();
+			}
+	}
+	return returnArray;
+}
+
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.CornealLaceration.prototype.draw = function(_point) {
+	// Get context
+	var ctx = this.drawing.context;
+
+	// Call draw method in superclass
+	ED.CornealLaceration.superclass.draw.call(this, _point);
+
+	// Boundary path
+	ctx.beginPath();
+
+	// Draw rectangle for boundary drawing area over entire canvas if doodle incomplete
+	if (!this.complete) {
+		ctx.rect(this.boundaryMin, this.boundaryMin, this.boundaryWidth, this.boundaryWidth);
+		this.hitTestMethod = 'path';
+		ctx.lineWidth = 2;
+	}
+	// Otherwise draw boundary rectangle around the doodle
+	else {
+		this.hitTestMethod = 'stroke';
+        var squiggle = this.squiggleArray[0];
+		// drawing lines for hit test
+		ctx.strokeStyle = "rgba(0, 0, 0, 0)";
+        ctx.lineWidth = 10; // set wider for hit testing
+        for (var i = this.numberOfHandles-1; i >= 0; i--) {
+            ctx.lineTo(squiggle.pointsArray[i].x, squiggle.pointsArray[i].y);
+        }
+        ctx.stroke();
+	}
+
+	// Close path
+	ctx.closePath();
+
+	// Set attributes for border (colour changes to indicate drawing mode)
+
+	this.isFilled = false;
+	ctx.strokeStyle = "rgba(255, 255, 255, 0)";
+	if (this.isSelected && !this.complete) ctx.strokeStyle = "gray";
+
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+
+	// Non boundary paths here
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+		if (this.numberOfHandles>0) {
+			// Get coordinates of mouse in doodle plane
+			// Draw straight line between points in squiggle array
+			var squiggle = this.squiggleArray[0];
+			ctx.beginPath();
+			// Squiggle attributes
+			ctx.lineWidth = 5;
+			ctx.strokeStyle = "blue";
+
+
+			// Iterate through squiggle points
+			for (var i = this.numberOfHandles-1; i >= 0; i--) {
+				ctx.lineTo(squiggle.pointsArray[i].x, squiggle.pointsArray[i].y);
+			}
+			// Line to mouse coordinates, if selected, incomplete, and within boundary
+			if (this.isSelected && this.draggingHandleIndex==null && !this.complete) {
+					if (this.mousePoint.x>this.boundaryMin && this.mousePoint.y>this.boundaryMin && this.mousePoint.x<(this.boundaryMin+this.boundaryWidth) && this.mousePoint.y<(this.boundaryMin+this.boundaryWidth)) {
+					ctx.lineTo(this.mousePoint.x,this.mousePoint.y);
+				}
+			}
+			ctx.stroke();
+		}
+
+		// Draw circle to indicate position for next handle
+		if (!this.complete && this.isSelected && this.mousePoint.x>this.boundaryMin && this.mousePoint.y>this.boundaryMin && this.mousePoint.x<(this.boundaryMin+this.boundaryWidth) && this.mousePoint.y<(this.boundaryMin+this.boundaryWidth)) {
+			ctx.beginPath();
+			ctx.arc(this.mousePoint.x,this.mousePoint.y,25,0,2*Math.PI);
+			ctx.strokeStyle="red";
+			ctx.fillStyle="yellow";
+			ctx.fill();
+			ctx.stroke();
+		}
+	}
+
+	// Coordinates of handles (in canvas plane)
+	if (this.numberOfHandles>0) {
+		for (var i = 0; i < this.numberOfHandles; i++) {
+			this.handleArray[i].location=this.transform.transformPoint(this.squiggleArray[0].pointsArray[i]);
+		}
+	}
+
+	// Draw handles if selected but not if for drawing
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+
+ED.CornealLaceration.prototype.description = function() {
+	var s = this.squiggleArray[0];	
+	//Linear distance of laceration (scale 380px:6mm)
+	var linearDistance = (this.numberOfHandles>=2) ? 6*( Math.sqrt(Math.pow(s.pointsArray[0].x - s.pointsArray[this.numberOfHandles-1].x,2) + Math.pow(s.pointsArray[0].y - s.pointsArray[this.numberOfHandles-1].y,2)) )/380 : 0;	
+	var linearDistanceShort = linearDistance.toFixed(2);
+	this.lacType = this.calculateLacerationType();
+	
+	var text = "";
+	
+	if (this.lacerationDepth == 100) text += 'Full thickness ' + this.lacType + ' ' + linearDistanceShort +'mm';
+	else  if (this.lacerationDepth > 0) text += 'Partial thickness ' +  this.lacType + ' ' + linearDistanceShort +'mm, '+ this.lacerationDepth + '%';
+	else text += this.lacType + ' ' + linearDistanceShort + 'mm';
+
+    if (this.irisProlapse) {
+    	text += ' with iris prolapse';
+    }
+    
+	return text;
+}
+ 	
+//Computes laceration type
+ED.CornealLaceration.prototype.calculateLacerationType = function() {
+	var i=0;
+	var scleralInvolvement = false;
+	while (!scleralInvolvement && i<this.numberOfHandles) { 
+		var p = this.squiggleArray[0].pointsArray[i];
+		//Distance of handle from the origin
+		var distance = Math.sqrt(p.x*p.x + p.y*p.y);
+		//Tests whether a handle is within the sclera
+		if (distance > 380) scleralInvolvement = true;
+		i++;
+	}
+
+	var lacType = (scleralInvolvement) ? "corneoscleral laceration" : "corneal laceration";
+	return lacType;
+}
+
+ED.CornealLaceration.prototype.addHandle = function(_position) {
+	// Add point to squiggle array
+	this.squiggleArray[0].pointsArray.splice(0, 0, _position);
+	// Add handle to handle array
+	this.handleArray.splice(0,0,(new ED.Doodle.Handle(null, true, ED.Mode.Handles, false)));
+	// Increase handle counter
+	this.numberOfHandles++;
+		
+	this.lacType = this.calculateLacerationType();
+	this.updateDependentParameters('handles');
+}
+
+/**
+ * Returns the SnoMed code of the doodle
+ *
+ * @returns {Int} SnoMed code of entity representated by doodle
+ */
+ED.CornealLaceration.prototype.snomedCodes = function() {
+	var result = [[95725002, 3]];
+	if (this.irisProlapse) {
+		result.push([77676001, 3]);
+	}
+
+    return result;
+}
+
+
+/**
+ * OpenEyes
+ *
+ * Copyright (C) OpenEyes Foundation, 2011-2017
+ * This file is part of OpenEyes.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package OpenEyes
+ * @link http://www.openeyes.org.uk
+ * @author OpenEyes <info@openeyes.org.uk>
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -20100,14 +22018,15 @@ ED.CornealOedema = function(_drawing, _parameterJSON) {
 
 	// Derived parameters
 	this.intensity = 'Mild';
+	this.i = 1;
 	
 	// Other parameters
-	this.stromal = false;
+	this.stromal = true;
 	this.epithelial = false;
 	this.endothelial = false;
 
 	// Saved parameters
-	this.savedParameterArray = ['originX', 'originY', 'apexX', 'apexY', 'rotation', 'intensity', 'stromal', 'epithelial', 'endothelial'];
+	this.savedParameterArray = ['originX', 'originY', 'apexX', 'apexY', 'rotation', 'intensity', 'stromal', 'epithelial', 'endothelial','i'];
 
 	// Parameters in doodle control bar (parameter name: parameter label)
 	this.controlParameterArray = {'intensity':'Intensity',  'epithelial':'Epithelial', 'stromal':'Stromal','endothelial':'Endothelial'};
@@ -20123,7 +22042,7 @@ ED.CornealOedema.prototype = new ED.Doodle;
 ED.CornealOedema.prototype.constructor = ED.CornealOedema;
 ED.CornealOedema.superclass = ED.Doodle.prototype;
 
-/**
+/**=
  * Sets handle attributes
  */
 ED.CornealOedema.prototype.setHandles = function() {
@@ -20164,6 +22083,30 @@ ED.CornealOedema.prototype.setPropertyDefaults = function() {
 		type: 'bool',
 		display: true
 	};
+	this.parameterValidationArray['epi'] = {
+		kind: 'other',
+		type: 'int',
+		range: [0,1],
+		animate: false
+	};
+	this.parameterValidationArray['str'] = {
+		kind: 'other',
+		type: 'int',
+		range: [0,1],
+		animate: false
+	};
+	this.parameterValidationArray['endo'] = {
+		kind: 'other',
+		type: 'int',
+		range: [0,1],
+		animate: false
+	};
+	this.parameterValidationArray['i'] = {
+		kind: 'other',
+		type: 'int',
+		range: [1, 2, 3],
+		animate: false
+	};
 
 	/*
 	// Create ranges to constrain handles
@@ -20187,7 +22130,7 @@ ED.CornealOedema.prototype.setPropertyDefaults = function() {
  */
 ED.CornealOedema.prototype.setParameterDefaults = function() {
 	this.apexY = -this.initialRadius;
-	this.setParameterFromString('stromal', 'false');
+	this.setParameterFromString('stromal', 'true');
 	this.setParameterFromString('epithelial', 'false');
 	this.setParameterFromString('endothelial', 'false');
 
@@ -20211,6 +22154,51 @@ ED.CornealOedema.prototype.setParameterDefaults = function() {
 }
 
 /**
+ * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
+ * The returned parameters are animated if their 'animate' property is set to true
+ *
+ * @param {String} _parameter Name of parameter that has changed
+ * @value {Undefined} _value Value of parameter to calculate
+ * @returns {Array} Associative array of values of dependent parameters
+ */
+ED.CornealOedema.prototype.dependentParameterValues = function(_parameter, _value) {
+	var returnArray = new Array();
+
+	switch (_parameter) {
+		case 'intensity':
+			switch (_value) {
+				case 'Mild':
+					returnArray['i'] = 1;
+					break;
+				case 'Moderate':
+					returnArray['i'] = 2;
+					break;
+				case 'Severe':
+					returnArray['i'] = 3;
+					break;
+			}
+			break;
+			
+		case 'epithelial':
+			if (_value == true) returnArray['epi'] = 1;
+			else if (_value == false) returnArray['epi'] = 0;
+			break;
+		
+		case 'stromal':
+			if (_value == true) returnArray['str'] = 1;
+			else if (_value == false) returnArray['str'] = 0;
+			break;
+			
+		case 'endothelial':
+			if (_value == true) returnArray['endo'] = 1;
+			else if (_value == false) returnArray['endo'] = 0;
+			break;
+	}
+
+	return returnArray;
+}
+
+/**
  * Draws doodle or performs a hit test if a Point parameter is passed
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
@@ -20224,7 +22212,7 @@ ED.CornealOedema.prototype.draw = function(_point) {
 
 	// Boundary path
 	ctx.beginPath();
-
+	
 	/*
 	// Bezier points
 	var fp;
@@ -20278,7 +22266,7 @@ ED.CornealOedema.prototype.draw = function(_point) {
 
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
-
+	
 	// Non boundary paths
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
 		if (false) {
@@ -20312,24 +22300,2087 @@ ED.CornealOedema.prototype.description = function() {
 
 /**
  * OpenEyes
+ * MSC
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
- * CornealPigmentationtherapy
+ * 
+ *
+ * @class CornealOedemaCrossSection
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Object} _parameterJSON
+ */
+ED.CornealOedemaCrossSection = function(_drawing, _parameterJSON) {
+	// Set classname
+	this.className = "CornealOedemaCrossSection";
+
+	// Private parameters
+	this.initialRadius = 360;
+	
+	// Derived parameters
+	this.intensity = 'Mild';
+	this.i = 1;
+	this.epi = 0;
+	this.str = 1;
+	this.endo = 0;
+	
+	// Other parameters
+	this.stromal = true;
+	this.epithelial = false;
+	this.endothelial = false;
+	
+	// Other parameters
+	this.height = Math.round(this.initialRadius * 2 / 54);
+	this.width = Math.round(this.initialRadius * 2 / 54);
+	
+	this.h = Math.round(this.initialRadius * 2 / 54);
+	this.w = Math.round(this.initialRadius * 2 / 54);
+	
+	this.minY = this.initialRadius * -1;
+	this.maxY = this.initialRadius;
+	
+	// Saved parameters
+	this.savedParameterArray = ['originX', 'originY', 'apexX', 'apexY', 'rotation', 'intensity', 'stromal', 'epithelial', 'endothelial','i'];
+	
+	// Parameters in doodle control bar
+	this.controlParameterArray = {};
+
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _parameterJSON);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.CornealOedemaCrossSection.prototype = new ED.Doodle;
+ED.CornealOedemaCrossSection.prototype.constructor = ED.CornealOedemaCrossSection;
+ED.CornealOedemaCrossSection.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.CornealOedemaCrossSection.prototype.setHandles = function() {
+}
+
+/**
+ * Sets default properties
+ */
+ED.CornealOedemaCrossSection.prototype.setPropertyDefaults = function() {
+	this.isSelectable = false;
+		
+	// Update component of validation array for simple parameters
+	this.parameterValidationArray['originX']['range'].setMinAndMax(+50, +50);
+	this.parameterValidationArray['originY']['range'].setMinAndMax(-500, +500);
+	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
+	this.parameterValidationArray['apexY']['range'].setMinAndMax(-380, -80);
+	
+	// Validation arrays for other parameters
+	this.parameterValidationArray['intensity'] = {
+		kind: 'derived',
+		type: 'string',
+		list: ['Mild', 'Moderate', 'Severe'],
+		animate: false
+	};
+	this.parameterValidationArray['stromal'] = {
+		kind: 'derived',
+		type: 'bool',
+		display: true
+	};
+	this.parameterValidationArray['epithelial'] = {
+		kind: 'derived',
+		type: 'bool',
+		display: true
+	};
+	this.parameterValidationArray['endothelial'] = {
+		kind: 'derived',
+		type: 'bool',
+		display: true
+	};
+	this.parameterValidationArray['i'] = {
+		kind: 'other',
+		type: 'int',
+		range: [1, 2, 3],
+		animate: false
+	};
+	this.parameterValidationArray['epi'] = {
+		kind: 'other',
+		type: 'int',
+		range: [0,1],
+		animate: false
+	};
+	this.parameterValidationArray['str'] = {
+		kind: 'other',
+		type: 'int',
+		range: [0,1],
+		animate: false
+	};
+	this.parameterValidationArray['endo'] = {
+		kind: 'other',
+		type: 'int',
+		range: [0,1],
+		animate: false
+	};
+}
+
+/**
+ * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
+ * The returned parameters are animated if their 'animate' property is set to true
+ *
+ * @param {String} _parameter Name of parameter that has changed
+ * @value {Undefined} _value Value of parameter to calculate
+ * @returns {Array} Associative array of values of dependent parameters
+ */
+ED.CornealOedemaCrossSection.prototype.dependentParameterValues = function(_parameter, _value) {
+	var returnArray = new Array();
+
+	switch (_parameter) {
+		case 'i':
+			if (_value === 3) returnArray['intensity'] = 'Severe';
+			else if (_value === 2) returnArray['intensity'] = 'Moderate';
+			else returnArray['intensity'] = 'Mild';
+			break;
+			
+	}
+
+	return returnArray;
+}
+
+/**
+ * Sets default parameters
+ */
+ED.CornealOedemaCrossSection.prototype.setParameterDefaults = function() {
+	this.originX = 50; // as is in Cornea cross section doodle to dulicate bezier control points
+	
+	this.apexY = -this.initialRadius;
+/*
+	this.setParameterFromString('stromal', 'true');
+	this.setParameterFromString('epithelial', 'false');
+	this.setParameterFromString('endothelial', 'false');
+*/
+
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.CornealOedemaCrossSection.prototype.draw = function(_point) {
+	
+	// Get context
+	var ctx = this.drawing.context;
+
+	var cornea = this.drawing.lastDoodleOfClass('CorneaCrossSection');
+	var cornealThickness = cornea.pachymetry/5;
+
+	// Call draw method in superclass
+	ED.CornealOedemaCrossSection.superclass.draw.call(this, _point);
+
+	// Boundary path
+	ctx.beginPath();
+	
+	// Calculate segment extent in terms of time along curve
+	var r = Math.sqrt(this.apexX * this.apexX + this.apexY * this.apexY);
+	var startY = this.originY - r;
+	var endY = this.originY + r;
+	
+	var startT = (startY + 380) / 760;
+	if (startT<0) startT = 0;
+	var endT = (endY + 380) / 760;
+	if (endT>1) endT = 1;
+		
+	if (startT < 0.5) {
+		
+		var superiorBezier = new Object;
+		var superiorBezierBack = new Object;
+
+		// define start and end time points
+		var tI0 = startT * 2;
+		var tI1 = (endT < 0.5) ? endT * 2 : 1;
+		
+		// default bezier points (as in cornea cross section)
+		if (cornea && cornea.shape == "Keratoconus") {
+			superiorBezier.SP = new ED.Point(-120, -380 - this.originY);
+			superiorBezier.CP1 = new ED.Point(-240, -260 - this.originY);
+			superiorBezier.CP2 = new ED.Point(cornea.apexX, cornea.apexY - 100 - this.originY);
+			superiorBezier.EP = new ED.Point(cornea.apexX, cornea.apexY - this.originY);
+			
+			superiorBezierBack.SP = new ED.Point(-120 + 120, -380 - this.originY);
+			superiorBezierBack.CP1 = new ED.Point(-240 + 160, -260 - this.originY);
+			superiorBezierBack.CP2 = new ED.Point(cornea.apexX + cornealThickness, cornea.apexY - 120 - this.originY);
+			superiorBezierBack.EP = new ED.Point(cornea.apexX + cornealThickness, cornea.apexY - this.originY);
+		}
+		else if (cornea && cornea.shape == "Keratoglobus") {
+			superiorBezier.SP = new ED.Point(-120, -380 - this.originY);
+			superiorBezier.CP1 = new ED.Point(-240, -260 - this.originY);
+			superiorBezier.CP2 = new ED.Point(-380, -100 - this.originY);
+			superiorBezier.EP = new ED.Point(-380, 100 - this.originY);
+			
+			superiorBezierBack.SP = new ED.Point(-120 + 120, -380 - this.originY);
+			superiorBezierBack.CP1 = new ED.Point(-240 + 120, -200 - this.originY);
+			superiorBezierBack.CP2 = new ED.Point(-380 + 100, -140 - this.originY);
+			superiorBezierBack.EP = new ED.Point(-380 + 100, 100 - this.originY);
+		}
+		else {
+			superiorBezier.SP = new ED.Point(-120, -380 - this.originY);
+			superiorBezier.CP1 = new ED.Point(-240, -260 - this.originY);
+			superiorBezier.CP2 = new ED.Point(-320, -160 - this.originY);
+			superiorBezier.EP = new ED.Point(-320, 0 - this.originY);
+			
+			superiorBezierBack.SP = new ED.Point(-120 + 120, -380 - this.originY);
+			superiorBezierBack.CP1 = new ED.Point(-240 + 160, -260 - this.originY);
+			superiorBezierBack.CP2 = new ED.Point(-320 + 100, -160 - this.originY);
+			superiorBezierBack.EP = new ED.Point(-320 + 100, 0 - this.originY);
+		}
+		
+			
+		if (tI0 > 0) {
+		// Trim start of curve			
+			
+			// front of cornea
+			var sq0 = new ED.Point(0,0);
+			sq0.y = (1-tI0)*(1-tI0)*(1-tI0)*superiorBezier.SP.y + 3*(1-tI0)*(1-tI0)*tI0*superiorBezier.CP1.y + 3*(1-tI0)*tI0*tI0*superiorBezier.CP2.y + tI0*tI0*tI0*superiorBezier.EP.y;
+			sq0.x = (1-tI0)*(1-tI0)*(1-tI0)*superiorBezier.SP.x + 3*(1-tI0)*(1-tI0)*tI0*superiorBezier.CP1.x + 3*(1-tI0)*tI0*tI0*superiorBezier.CP2.x + tI0*tI0*tI0*superiorBezier.EP.x;
+			
+			var iP23 = new ED.Point(0,0);
+			iP23.x = superiorBezier.CP1.x + tI0 * (superiorBezier.CP2.x - superiorBezier.CP1.x);
+			iP23.y = superiorBezier.CP1.y + tI0 * (superiorBezier.CP2.y - superiorBezier.CP1.y);
+			
+			var iP34 = new ED.Point(0,0);
+			iP34.x = superiorBezier.CP2.x + tI0 * (superiorBezier.EP.x - superiorBezier.CP2.x);
+			iP34.y = superiorBezier.CP2.y + tI0 * (superiorBezier.EP.y - superiorBezier.CP2.y);
+			
+			var iP2334 = new ED.Point(0,0);
+			iP2334.x = iP23.x + tI0 * (iP34.x - iP23.x);
+			iP2334.y = iP23.y + tI0 * (iP34.y - iP23.y);
+			
+			superiorBezier.SP = sq0;
+			superiorBezier.CP1 = iP2334;
+			superiorBezier.CP2 = iP34;
+			
+			
+			// back of cornea
+			var sq0b = new ED.Point(0,0);
+			sq0b.y = (1-tI0)*(1-tI0)*(1-tI0)*superiorBezierBack.SP.y + 3*(1-tI0)*(1-tI0)*tI0*superiorBezierBack.CP1.y + 3*(1-tI0)*tI0*tI0*superiorBezierBack.CP2.y + tI0*tI0*tI0*superiorBezierBack.EP.y;
+			sq0b.x = (1-tI0)*(1-tI0)*(1-tI0)*superiorBezierBack.SP.x + 3*(1-tI0)*(1-tI0)*tI0*superiorBezierBack.CP1.x + 3*(1-tI0)*tI0*tI0*superiorBezierBack.CP2.x + tI0*tI0*tI0*superiorBezierBack.EP.x;
+			
+			var iP23b = new ED.Point(0,0);
+			iP23b.x = superiorBezierBack.CP1.x + tI0 * (superiorBezierBack.CP2.x - superiorBezierBack.CP1.x);
+			iP23b.y = superiorBezierBack.CP1.y + tI0 * (superiorBezierBack.CP2.y - superiorBezierBack.CP1.y);
+			
+			var iP34b = new ED.Point(0,0);
+			iP34b.x = superiorBezierBack.CP2.x + tI0 * (superiorBezierBack.EP.x - superiorBezierBack.CP2.x);
+			iP34b.y = superiorBezierBack.CP2.y + tI0 * (superiorBezierBack.EP.y - superiorBezierBack.CP2.y);
+			
+			var iP2334b = new ED.Point(0,0);
+			iP2334b.x = iP23b.x + tI0 * (iP34b.x - iP23b.x);
+			iP2334b.y = iP23b.y + tI0 * (iP34b.y - iP23b.y);
+			
+			superiorBezierBack.SP = sq0b;
+			superiorBezierBack.CP1 = iP2334b;
+			superiorBezierBack.CP2 = iP34b;
+		}
+		
+		if (tI1 < 1) {
+		// Trim end of curve
+			
+			// front of cornea
+			var iq1 = new ED.Point(0,0);
+			iq1.y = (1-tI1)*(1-tI1)*(1-tI1)*superiorBezier.SP.y + 3*(1-tI1)*(1-tI1)*tI1*superiorBezier.CP1.y + 3*(1-tI1)*tI1*tI1*superiorBezier.CP2.y + tI1*tI1*tI1*superiorBezier.EP.y;
+			iq1.x = (1-tI1)*(1-tI1)*(1-tI1)*superiorBezier.SP.x + 3*(1-tI1)*(1-tI1)*tI1*superiorBezier.CP1.x + 3*(1-tI1)*tI1*tI1*superiorBezier.CP2.x + tI1*tI1*tI1*superiorBezier.EP.x;
+
+			var iP12 = new ED.Point(0,0);
+			iP12.x = superiorBezier.SP.x + tI1 * (superiorBezier.CP1.x - superiorBezier.SP.x);
+			iP12.y = superiorBezier.SP.y + tI1 * (superiorBezier.CP1.y - superiorBezier.SP.y);
+			
+			var iP23 = new ED.Point(0,0);
+			iP23.x = superiorBezier.CP1.x + tI1 * (superiorBezier.CP2.x - superiorBezier.CP1.x);
+			iP23.y = superiorBezier.CP1.y + tI1 * (superiorBezier.CP2.y - superiorBezier.CP1.y);
+			
+			var iP1223 = new ED.Point(0,0);
+			iP1223.x = iP12.x + tI1 * (iP23.x - iP12.x);
+			iP1223.y = iP12.y + tI1 * (iP23.y - iP12.y);
+			
+			superiorBezier.CP1 = iP12;
+			superiorBezier.CP2 = iP1223;
+			superiorBezier.EP = iq1;
+			
+			
+			// back of cornea
+			var iq1b = new ED.Point(0,0);
+			iq1b.y = (1-tI1)*(1-tI1)*(1-tI1)*superiorBezierBack.SP.y + 3*(1-tI1)*(1-tI1)*tI1*superiorBezierBack.CP1.y + 3*(1-tI1)*tI1*tI1*superiorBezierBack.CP2.y + tI1*tI1*tI1*superiorBezierBack.EP.y;
+			iq1b.x = (1-tI1)*(1-tI1)*(1-tI1)*superiorBezierBack.SP.x + 3*(1-tI1)*(1-tI1)*tI1*superiorBezierBack.CP1.x + 3*(1-tI1)*tI1*tI1*superiorBezierBack.CP2.x + tI1*tI1*tI1*superiorBezierBack.EP.x;
+
+			var iP12b = new ED.Point(0,0);
+			iP12b.x = superiorBezierBack.SP.x + tI1 * (superiorBezierBack.CP1.x - superiorBezierBack.SP.x);
+			iP12b.y = superiorBezierBack.SP.y + tI1 * (superiorBezierBack.CP1.y - superiorBezierBack.SP.y);
+			
+			var iP23b = new ED.Point(0,0);
+			iP23b.x = superiorBezierBack.CP1.x + tI1 * (superiorBezierBack.CP2.x - superiorBezierBack.CP1.x);
+			iP23b.y = superiorBezierBack.CP1.y + tI1 * (superiorBezierBack.CP2.y - superiorBezierBack.CP1.y);
+			
+			var iP1223b = new ED.Point(0,0);
+			iP1223b.x = iP12b.x + tI1 * (iP23b.x - iP12b.x);
+			iP1223b.y = iP12b.y + tI1 * (iP23b.y - iP12b.y);
+			
+			superiorBezierBack.CP1 = iP12b;
+			superiorBezierBack.CP2 = iP1223b;
+			superiorBezierBack.EP = iq1b;
+		}
+	}
+	
+	
+	if (endT > 0.5) {
+		
+		var inferiorBezier = new Object;
+		var inferiorBezierBack = new Object;
+		
+		// define start and end time points
+		var tS0 = (startT > 0.5) ? (startT - 0.5) * 2 : 0;
+		var tS1 = (endT - 0.5) * 2;
+		
+		// default bezier points (as in cornea cross section)
+		if (cornea && cornea.shape == "Keratoconus") {
+			inferiorBezier.SP = new ED.Point(cornea.apexX, cornea.apexY - this.originY);
+			inferiorBezier.CP1 = new ED.Point(cornea.apexX, cornea.apexY + 100 - this.originY);
+			inferiorBezier.CP2 = new ED.Point(-240, 260 - this.originY);
+			inferiorBezier.EP = new ED.Point(-120, 380 - this.originY);
+			
+			inferiorBezierBack.SP = new ED.Point(cornea.apexX + cornealThickness, cornea.apexY - this.originY);
+			inferiorBezierBack.CP1 = new ED.Point(cornea.apexX + cornealThickness, cornea.apexY + 120 - this.originY);
+			inferiorBezierBack.CP2 = new ED.Point(-240 + 160, 260 - this.originY);
+			inferiorBezierBack.EP = new ED.Point(-120 + 120, 380 - this.originY);
+		}
+		else if (cornea && cornea.shape == "Keratoglobus") {
+			inferiorBezier.SP = new ED.Point(-380, 100 - this.originY);
+			inferiorBezier.CP1 = new ED.Point(-380, 200 - this.originY);
+			inferiorBezier.CP2 = new ED.Point(-240, 360 - this.originY);
+			inferiorBezier.EP = new ED.Point(-120, 380 - this.originY);
+			
+			inferiorBezierBack.SP = new ED.Point(-380 + 100, 100 - this.originY);
+			inferiorBezierBack.CP1 = new ED.Point(-380 + 120, 220 - this.originY);
+			inferiorBezierBack.CP2 = new ED.Point(-240 + 160, 260 - this.originY);
+			inferiorBezierBack.EP = new ED.Point(-120 + 120, 380 - this.originY);
+		}
+		else {
+			inferiorBezier.SP = new ED.Point(-320, -0 - this.originY);
+			inferiorBezier.CP1 = new ED.Point(-320, 160 - this.originY);
+			inferiorBezier.CP2 = new ED.Point(-240, 260 - this.originY);
+			inferiorBezier.EP = new ED.Point(-120, 380 - this.originY);
+			
+			inferiorBezierBack.SP = new ED.Point(-320 + 100, -0 - this.originY);
+			inferiorBezierBack.CP1 = new ED.Point(-320 + 100, 160 - this.originY);
+			inferiorBezierBack.CP2 = new ED.Point(-240 + 160, 260 - this.originY);
+			inferiorBezierBack.EP = new ED.Point(-120 + 120, 380 - this.originY);
+		}			
+		
+		
+		if (tS0 > 0) {
+		// Trim start of curve
+		
+			// front of cornea			
+			var sq0 = new ED.Point(0,0);
+			sq0.y = (1-tS0)*(1-tS0)*(1-tS0)*inferiorBezier.SP.y + 3*(1-tS0)*(1-tS0)*tS0*inferiorBezier.CP1.y + 3*(1-tS0)*tS0*tS0*inferiorBezier.CP2.y + tS0*tS0*tS0*inferiorBezier.EP.y;
+			sq0.x = (1-tS0)*(1-tS0)*(1-tS0)*inferiorBezier.SP.x + 3*(1-tS0)*(1-tS0)*tS0*inferiorBezier.CP1.x + 3*(1-tS0)*tS0*tS0*inferiorBezier.CP2.x + tS0*tS0*tS0*inferiorBezier.EP.x;
+			
+			var sP23 = new ED.Point(0,0);
+			sP23.x = inferiorBezier.CP1.x + tS0 * (inferiorBezier.CP2.x - inferiorBezier.CP1.x);
+			sP23.y = inferiorBezier.CP1.y + tS0 * (inferiorBezier.CP2.y - inferiorBezier.CP1.y);
+			
+			var sP34 = new ED.Point(0,0);
+			sP34.x = inferiorBezier.CP2.x + tS0 * (inferiorBezier.EP.x - inferiorBezier.CP2.x);
+			sP34.y = inferiorBezier.CP2.y + tS0 * (inferiorBezier.EP.y - inferiorBezier.CP2.y);
+			
+			var sP2334 = new ED.Point(0,0);
+			sP2334.x = sP23.x + tS0 * (sP34.x - sP23.x);
+			sP2334.y = sP23.y + tS0 * (sP34.y - sP23.y);
+			
+			inferiorBezier.SP = sq0;
+			inferiorBezier.CP1 = sP2334;
+			inferiorBezier.CP2 = sP34;
+			
+			// back of cornea
+			var sq0b = new ED.Point(0,0);
+			sq0b.y = (1-tS0)*(1-tS0)*(1-tS0)*inferiorBezierBack.SP.y + 3*(1-tS0)*(1-tS0)*tS0*inferiorBezierBack.CP1.y + 3*(1-tS0)*tS0*tS0*inferiorBezierBack.CP2.y + tS0*tS0*tS0*inferiorBezierBack.EP.y;
+			sq0b.x = (1-tS0)*(1-tS0)*(1-tS0)*inferiorBezierBack.SP.x + 3*(1-tS0)*(1-tS0)*tS0*inferiorBezierBack.CP1.x + 3*(1-tS0)*tS0*tS0*inferiorBezierBack.CP2.x + tS0*tS0*tS0*inferiorBezierBack.EP.x;
+			
+			var sP23b = new ED.Point(0,0);
+			sP23b.x = inferiorBezierBack.CP1.x + tS0 * (inferiorBezierBack.CP2.x - inferiorBezierBack.CP1.x);
+			sP23b.y = inferiorBezierBack.CP1.y + tS0 * (inferiorBezierBack.CP2.y - inferiorBezierBack.CP1.y);
+			
+			var sP34b = new ED.Point(0,0);
+			sP34b.x = inferiorBezierBack.CP2.x + tS0 * (inferiorBezierBack.EP.x - inferiorBezierBack.CP2.x);
+			sP34b.y = inferiorBezierBack.CP2.y + tS0 * (inferiorBezierBack.EP.y - inferiorBezierBack.CP2.y);
+			
+			var sP2334b = new ED.Point(0,0);
+			sP2334b.x = sP23b.x + tS0 * (sP34b.x - sP23b.x);
+			sP2334b.y = sP23b.y + tS0 * (sP34b.y - sP23b.y);
+			
+			inferiorBezierBack.SP = sq0b;
+			inferiorBezierBack.CP1 = sP2334b;
+			inferiorBezierBack.CP2 = sP34b;
+		}
+		
+		if (tS1 < 1) {
+		// Trim end of curve
+		
+			// front of cornea
+			var sq1 = new ED.Point(0,0);
+			sq1.y = (1-tS1)*(1-tS1)*(1-tS1)*inferiorBezier.SP.y + 3*(1-tS1)*(1-tS1)*tS1*inferiorBezier.CP1.y + 3*(1-tS1)*tS1*tS1*inferiorBezier.CP2.y + tS1*tS1*tS1*inferiorBezier.EP.y;
+			sq1.x = (1-tS1)*(1-tS1)*(1-tS1)*inferiorBezier.SP.x + 3*(1-tS1)*(1-tS1)*tS1*inferiorBezier.CP1.x + 3*(1-tS1)*tS1*tS1*inferiorBezier.CP2.x + tS1*tS1*tS1*inferiorBezier.EP.x;
+
+			var sP12 = new ED.Point(0,0);
+			sP12.x = inferiorBezier.SP.x + tS1 * (inferiorBezier.CP1.x - inferiorBezier.SP.x);
+			sP12.y = inferiorBezier.SP.y + tS1 * (inferiorBezier.CP1.y - inferiorBezier.SP.y);
+			
+			var sP23 = new ED.Point(0,0);
+			sP23.x = inferiorBezier.CP1.x + tS1 * (inferiorBezier.CP2.x - inferiorBezier.CP1.x);
+			sP23.y = inferiorBezier.CP1.y + tS1 * (inferiorBezier.CP2.y - inferiorBezier.CP1.y);
+			
+			var sP1223 = new ED.Point(0,0);
+			sP1223.x = sP12.x + tS1 * (sP23.x - sP12.x);
+			sP1223.y = sP12.y + tS1 * (sP23.y - sP12.y);
+
+			inferiorBezier.CP1 = sP12;
+			inferiorBezier.CP2 = sP1223;
+			inferiorBezier.EP = sq1;
+			
+			
+			// back of cornea
+			var sq1b = new ED.Point(0,0);
+			sq1b.y = (1-tS1)*(1-tS1)*(1-tS1)*inferiorBezierBack.SP.y + 3*(1-tS1)*(1-tS1)*tS1*inferiorBezierBack.CP1.y + 3*(1-tS1)*tS1*tS1*inferiorBezierBack.CP2.y + tS1*tS1*tS1*inferiorBezierBack.EP.y;
+			sq1b.x = (1-tS1)*(1-tS1)*(1-tS1)*inferiorBezierBack.SP.x + 3*(1-tS1)*(1-tS1)*tS1*inferiorBezierBack.CP1.x + 3*(1-tS1)*tS1*tS1*inferiorBezierBack.CP2.x + tS1*tS1*tS1*inferiorBezierBack.EP.x;
+
+			var sP12b = new ED.Point(0,0);
+			sP12b.x = inferiorBezierBack.SP.x + tS1 * (inferiorBezierBack.CP1.x - inferiorBezierBack.SP.x);
+			sP12b.y = inferiorBezierBack.SP.y + tS1 * (inferiorBezierBack.CP1.y - inferiorBezierBack.SP.y);
+			
+			var sP23b = new ED.Point(0,0);
+			sP23b.x = inferiorBezierBack.CP1.x + tS1 * (inferiorBezierBack.CP2.x - inferiorBezierBack.CP1.x);
+			sP23b.y = inferiorBezierBack.CP1.y + tS1 * (inferiorBezierBack.CP2.y - inferiorBezierBack.CP1.y);
+			
+			var sP1223b = new ED.Point(0,0);
+			sP1223b.x = sP12b.x + tS1 * (sP23b.x - sP12b.x);
+			sP1223b.y = sP12b.y + tS1 * (sP23b.y - sP12b.y);
+
+			inferiorBezierBack.CP1 = sP12b;
+			inferiorBezierBack.CP2 = sP1223b;
+			inferiorBezierBack.EP = sq1b;
+		}
+	}
+	
+	if (inferiorBezier) {
+		ctx.moveTo(inferiorBezierBack.EP.x, inferiorBezierBack.EP.y);
+		ctx.bezierCurveTo(inferiorBezierBack.CP2.x, inferiorBezierBack.CP2.y, inferiorBezierBack.CP1.x, inferiorBezierBack.CP1.y, inferiorBezierBack.SP.x, inferiorBezierBack.SP.y);
+		ctx.lineTo(inferiorBezier.SP.x, inferiorBezier.SP.y);
+		ctx.bezierCurveTo(inferiorBezier.CP1.x, inferiorBezier.CP1.y, inferiorBezier.CP2.x, inferiorBezier.CP2.y, inferiorBezier.EP.x, inferiorBezier.EP.y);
+	}
+	if (superiorBezier) {
+		ctx.moveTo(superiorBezierBack.EP.x, superiorBezierBack.EP.y);
+		ctx.bezierCurveTo(superiorBezierBack.CP2.x, superiorBezierBack.CP2.y, superiorBezierBack.CP1.x, superiorBezierBack.CP1.y, superiorBezierBack.SP.x, superiorBezierBack.SP.y);
+		ctx.lineTo(superiorBezier.SP.x, superiorBezier.SP.y);
+		ctx.bezierCurveTo(superiorBezier.CP1.x, superiorBezier.CP1.y, superiorBezier.CP2.x, superiorBezier.CP2.y, superiorBezier.EP.x, superiorBezier.EP.y);
+	}
+	
+	
+	// Close path
+	ctx.closePath();
+
+	// Set attributes
+	ctx.lineWidth = 0;
+	if (this.str == 1) {
+		switch (this.intensity) {
+			case 'Mild':
+				ctx.fillStyle = "rgba(0, 0, 255, 0.2)";
+				break;
+			case 'Moderate':
+				ctx.fillStyle = ctx.createPattern(this.drawing.imageArray['OedemaPattern'], 'repeat');
+				break;
+			case 'Severe':
+				ctx.fillStyle = ctx.createPattern(this.drawing.imageArray['OedemaPatternBullous'], 'repeat');
+				break;
+		}
+	}
+	else ctx.fillStyle = "rgba(0,0,0,0)";
+	ctx.strokeStyle = "rgba(0,0,0,0)";
+
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+		
+	// Non boundary drawing
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+		// epithelium
+		if (this.epi == 1) {
+			ctx.beginPath();
+			
+			if (inferiorBezier) {
+				ctx.moveTo(inferiorBezier.SP.x, inferiorBezier.SP.y);
+				ctx.bezierCurveTo(inferiorBezier.CP1.x, inferiorBezier.CP1.y, inferiorBezier.CP2.x, inferiorBezier.CP2.y, inferiorBezier.EP.x, inferiorBezier.EP.y);
+			}
+			if (superiorBezier) {
+				ctx.moveTo(superiorBezier.SP.x, superiorBezier.SP.y);
+				ctx.bezierCurveTo(superiorBezier.CP1.x, superiorBezier.CP1.y, superiorBezier.CP2.x, superiorBezier.CP2.y, superiorBezier.EP.x, superiorBezier.EP.y);
+			}
+			switch (this.intensity) {
+				case 'Mild':
+					ctx.strokeStyle = "rgba(0, 0, 255, 0.2)";
+					break;
+				case 'Moderate':
+					ctx.strokeStyle = "rgba(0, 0, 255, 0.3)";
+					break;
+				case 'Severe':
+					ctx.strokeStyle = "rgba(0, 0, 255, 0.4)";
+					break;
+			}
+			ctx.lineWidth = 8;
+			ctx.stroke();
+		}
+		
+		// endothelium
+		if (this.endo == 1) {
+			ctx.beginPath();
+			
+			if (inferiorBezier) {
+				ctx.moveTo(inferiorBezierBack.SP.x, inferiorBezierBack.SP.y);
+				ctx.bezierCurveTo(inferiorBezierBack.CP1.x, inferiorBezierBack.CP1.y, inferiorBezierBack.CP2.x, inferiorBezierBack.CP2.y, inferiorBezierBack.EP.x, inferiorBezierBack.EP.y);
+			}
+			if (superiorBezier) {
+				ctx.moveTo(superiorBezierBack.SP.x, superiorBezierBack.SP.y);
+				ctx.bezierCurveTo(superiorBezierBack.CP1.x, superiorBezierBack.CP1.y, superiorBezierBack.CP2.x, superiorBezierBack.CP2.y, superiorBezierBack.EP.x, superiorBezierBack.EP.y);
+			}
+			switch (this.intensity) {
+				case 'Mild':
+					ctx.strokeStyle = "rgba(0, 0, 255, 0.2)";
+					break;
+				case 'Moderate':
+					ctx.strokeStyle = "rgba(0, 0, 255, 0.3)";
+					break;
+				case 'Severe':
+					ctx.strokeStyle = "rgba(0, 0, 255, 0.4)";
+					break;
+			}
+			ctx.lineWidth = 8;
+			ctx.stroke();
+		}
+	}
+	
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+
+	// Return value indicating successful hittest
+	return this.isClicked;
+	
+}
+
+
+
+/**
+ * OpenEyes
+ * MSC
+ *
+ * Copyright (C) OpenEyes Foundation, 2011-2017
+ * This file is part of OpenEyes.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package OpenEyes
+ * @link http://www.openeyes.org.uk
+ * @author OpenEyes <info@openeyes.org.uk>
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
+ */
+
+/**
+ * TODO: infiltrate control point definitions 
+ *
+ * @class CornealOpacity
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Object} _parameterJSON
+ */
+ED.CornealOpacity = function(_drawing, _parameterJSON) {
+	// Set classname
+	this.className = "CornealOpacity";
+
+	// Private parameters
+	this.numberOfHandles = 4;
+	this.initialRadius = 81;
+	this.resetWidth = true;
+	this.resetInfiltrate = true;
+
+	this.bezierTimeIntervals = [0.0,0.125,0.25,0.375,0.50,0.625,0.75,0.875,1];
+	this.minX = this.minY = this.initialRadius * -1;
+	this.maxX = this.maxY = this.initialRadius;
+	
+	// Other parameters
+	this.height = Math.round(this.initialRadius * 2 / 54);
+	this.width = Math.round(this.initialRadius * 2 / 54);
+	this.depth = 33;
+	this.infiltrateWidth = 0;
+		
+	this.h = Math.round(this.initialRadius * 2 / 54);
+	this.w = Math.round(this.initialRadius * 2 / 54);
+	this.d = 33;
+	this.iW = 0;
+
+	// Saved parameters
+	this.savedParameterArray = ['originX', 'originY', 'rotation', 'height', 'width', 'depth', 'infiltrateWidth','h','w','d','iW','minY','maxY'];
+	
+	// Parameters in doodle control bar
+	this.controlParameterArray = {'height':'Height', 'width':'Width', 'depth':'Depth (%)', 'infiltrateWidth':'Infiltrate width'};
+
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _parameterJSON);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.CornealOpacity.prototype = new ED.Doodle;
+ED.CornealOpacity.prototype.constructor = ED.CornealOpacity;
+ED.CornealOpacity.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.CornealOpacity.prototype.setHandles = function() {
+	// Array of handles
+	for (var i = 0; i < this.numberOfHandles; i++) {
+		this.handleArray[i] = new ED.Doodle.Handle(null, true, ED.Mode.Handles, false);
+	}
+
+	// Allow top handle to rotate doodle
+	/// ? Removed as need specific handles to be along X and Y axis - can change... **TODO**
+// 	this.handleArray[0].isRotatable = true;
+}
+
+/**
+ * Sets default properties
+ */
+ED.CornealOpacity.prototype.setPropertyDefaults = function() {
+	// Create ranges to constrain handles
+	this.handleVectorRangeArray = new Array();
+	for (var i = 0; i < this.numberOfHandles; i++) {
+		// Full circle in radians
+		var cir = 2 * Math.PI;
+
+		// Create a range object for each handle
+		/// **TODO**: Ideally relative to canvas centre, not doodle - when update originX or originY
+		var n = this.numberOfHandles;
+		var range = new Object;
+		range.length = new ED.Range(+50, +380);
+		range.angle = new ED.Range((((2 * n - 1) * cir / (2 * n)) + i * cir / n) % cir, ((1 * cir / (2 * n)) + i * cir / n) % cir);
+		this.handleVectorRangeArray[i] = range;
+	}
+	
+	// Update component of validation array for simple parameters
+	this.parameterValidationArray['originX']['range'].setMinAndMax(-350, +350);
+	this.parameterValidationArray['originY']['range'].setMinAndMax(-350, +350);
+	
+	// Validation arrays for other parameters
+	this.parameterValidationArray['height'] = {
+		kind: 'other',
+		type: 'int',
+		range: new ED.Range(1, 14),
+		precision: 1,
+		animate: false
+	};
+	this.parameterValidationArray['width'] = {
+		kind: 'other',
+		type: 'int',
+		range: new ED.Range(1, 14),
+		precision: 1,
+		animate: false
+	};
+	this.parameterValidationArray['depth'] = {
+		kind: 'other',
+		type: 'int',
+		range: new ED.Range(1, 100),
+		precision: 1,
+		animate: false
+	};
+	this.parameterValidationArray['infiltrateWidth'] = {
+		kind: 'other',
+		type: 'int',
+		range: new ED.Range(0, 15),
+		precision: 1,
+		animate: false
+	};
+	this.parameterValidationArray['h'] = {
+		kind: 'other',
+		type: 'int',
+		range: [1, 14],
+		animate: false
+	};
+	this.parameterValidationArray['w'] = {
+		kind: 'other',
+		type: 'int',
+		range: [1, 14],
+		animate: false
+	};
+	this.parameterValidationArray['iW'] = {
+		kind: 'other',
+		type: 'int',
+		range: [0, 15],
+		animate: false
+	};
+	this.parameterValidationArray['d'] = {
+		kind: 'other',
+		type: 'int',
+		range: [1, 100],
+		animate: false
+	};
+	this.parameterValidationArray['resetWidth'] = {
+		kind: 'derived',
+		type: 'bool',
+		display: false
+	};
+	this.parameterValidationArray['resetInfiltrate'] = {
+		kind: 'derived',
+		type: 'bool',
+		display: false
+	};
+	this.parameterValidationArray['minY'] = {
+		kind: 'other',
+		type: 'int',
+		range: [-500,500],
+		animate: false
+	};
+	this.parameterValidationArray['maxY'] = {
+		kind: 'other',
+		type: 'int',
+		range: [-500,500],
+		animate: false
+	};
+	
+}
+
+/**
+ * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
+ * The returned parameters are animated if their 'animate' property is set to true
+ *
+ * @param {String} _parameter Name of parameter that has changed
+ * @value {Undefined} _value Value of parameter to calculate
+ * @returns {Array} Associative array of values of dependent parameters
+ */
+ED.CornealOpacity.prototype.dependentParameterValues = function(_parameter, _value) {
+	var returnArray = new Array();
+
+	switch (_parameter) {
+		case 'width':
+			returnArray['resetWidth'] = true;
+			returnArray['w'] = parseInt(_value);
+			break;
+
+		case 'height':
+			this.squiggleArray[0].pointsArray[0].y = 0.5 * _value * -54;
+			this.squiggleArray[0].pointsArray[2].y = 0.5 * _value * 54;
+			returnArray['h'] = parseInt(_value);
+			returnArray['minY'] = this.calculateMinY();
+			returnArray['maxY'] = this.calculateMaxY();
+			break;
+			
+		case 'infiltrateWidth':
+			returnArray['resetInfiltrate'] = true;
+			returnArray['iW'] = parseInt(_value);
+			break;
+		
+		case 'depth':
+			returnArray['d'] = parseInt(_value);
+			break;
+			
+		case 'h':
+			returnArray['h'] = _value;
+			break;
+		
+		case 'd':
+			returnArray['depth'] = _value;
+			break;
+			
+		case 'w':
+			returnArray['w'] = _value;
+			break;
+		
+		case 'iW':
+			returnArray['infiltrateWidth'] = _value;
+			break;
+			
+		case 'minY':
+			returnArray['minY'] = _value;
+			break;
+			
+		case 'maxY':
+			returnArray['maxY'] = _value;
+			break;
+			
+		case 'handles':
+			returnArray['w'] = this.calculateWidth();
+			returnArray['h'] = this.calculateHeight();
+			returnArray['height'] = this.calculateHeight();
+			returnArray['minY'] = this.calculateMinY();
+			returnArray['maxY'] = this.calculateMaxY();
+			break;
+	}
+
+	return returnArray;
+}
+
+/**
+ * Sets default parameters
+ */
+ED.CornealOpacity.prototype.setParameterDefaults = function() {
+	var doodle = this.drawing.lastDoodleOfClass(this.className);
+	if (doodle) {
+		var np = new ED.Point(doodle.originX + 100, 1);
+		this.move(np.x, np.y);
+	} else {
+		this.move(100, 1);
+	}
+
+	// Create a squiggle to store the handles points
+	var squiggle = new ED.Squiggle(this, new ED.Colour(100, 100, 100, 1), 4, true);
+
+	// Add it to squiggle array
+	this.squiggleArray.push(squiggle);
+
+	// Populate with handles at equidistant points around circumference
+	for (var i = 0; i < this.numberOfHandles; i++) {
+		var point = new ED.Point(0, 0);
+		point.setWithPolars(this.initialRadius, i * 2 * Math.PI / this.numberOfHandles);
+		this.addPointToSquiggle(point);
+	}
+	for (var i = 0; i < this.numberOfHandles; i++) {
+		var point = new ED.Point(0, 0);
+		point.setWithPolars(this.initialRadius, i * 2 * Math.PI / this.numberOfHandles);
+		this.addPointToSquiggle(point);
+	}
+};
+
+// Angle of control point from radius line to point (this value makes path a circle Math.PI/12 for 8 points
+ED.CornealOpacity.prototype.getPhi = function()
+{
+	return 2 * Math.PI / (3 * this.numberOfHandles);
+};
+
+ED.CornealOpacity.prototype.calculateWidth = function()
+{
+	/// solve bezier to find min and max point along axis
+	var maxX = '';
+	var minX = '';
+
+	var phi = this.getPhi();
+
+	var squiggle = this.squiggleArray[0];
+	for (var i=0; i<this.numberOfHandles; i++) {
+		fp = this.squiggleArray[0].pointsArray[i];
+		var toIndex = (i < this.numberOfHandles - 1) ? i + 1 : 0;
+		tp = this.squiggleArray[0].pointsArray[toIndex];
+		var x1 = fp.x;
+		var x2 = fp.tangentialControlPoint(+phi).x;
+		var x3 = tp.tangentialControlPoint(-phi).x;
+		var x4 = tp.x;
+
+		for (var j=0; j<this.bezierTimeIntervals.length; j++) {
+			var t = this.bezierTimeIntervals[j];
+			var x = (1-t)*(1-t)*(1-t)*x1 + 3*(1-t)*(1-t)*t*x2 + 3*(1-t)*t*t*x3 + t*t*t*x4;
+			if (maxX == '' || x > maxX) {
+				maxX = x;
+			}
+			if (minX == '' || x < minX) {
+				minX = x;
+			}
+		}
+	}
+	this.maxX = maxX;
+	this.minX = minX;
+	return Math.round((maxX - minX) / 54);
+};
+
+ED.CornealOpacity.prototype.calculateHeight = function()
+{
+	// recalculate height /// solve bezier to find min and max point along axis
+	var minY = this.calculateMinY();
+	var maxY = this.calculateMaxY();
+
+	return Math.round((maxY - minY) / 54);
+};
+
+ED.CornealOpacity.prototype.calculateMinY = function() {
+	// recalculate height/// solve bezier to find min and max point along axis
+	var phi = this.getPhi();
+	var minY = '';
+
+	var squiggle = this.squiggleArray[0];
+	for (var i=0; i<this.numberOfHandles; i++) {
+		fp = this.squiggleArray[0].pointsArray[i];
+		var toIndex = (i < this.numberOfHandles - 1) ? i + 1 : 0;
+		tp = this.squiggleArray[0].pointsArray[toIndex];
+		var y1 = fp.y;
+		var y2 = fp.tangentialControlPoint(+phi).y;
+		var y3 = tp.tangentialControlPoint(-phi).y;
+		var y4 = tp.y;
+
+		for (var j=0; j<this.bezierTimeIntervals.length; j++) {
+			var t = this.bezierTimeIntervals[j];
+			var y = (1-t)*(1-t)*(1-t)*y1 + 3*(1-t)*(1-t)*t*y2 + 3*(1-t)*t*t*y3 + t*t*t*y4;
+			if (minY == '' || y <= minY) {
+				minY = y;
+			}
+		}
+	}
+	return minY;
+}
+ED.CornealOpacity.prototype.calculateMaxY = function() {
+	// recalculate height/// solve bezier to find min and max point along axis
+	var phi = this.getPhi();
+	var minY = '';
+	var maxY = '';
+
+	var squiggle = this.squiggleArray[0];
+	for (var i=0; i<this.numberOfHandles; i++) {
+		fp = this.squiggleArray[0].pointsArray[i];
+		var toIndex = (i < this.numberOfHandles - 1) ? i + 1 : 0;
+		tp = this.squiggleArray[0].pointsArray[toIndex];
+		var y1 = fp.y;
+		var y2 = fp.tangentialControlPoint(+phi).y;
+		var y3 = tp.tangentialControlPoint(-phi).y;
+		var y4 = tp.y;
+
+		for (var j=0; j<this.bezierTimeIntervals.length; j++) {
+			var t = this.bezierTimeIntervals[j];
+			var y = (1-t)*(1-t)*(1-t)*y1 + 3*(1-t)*(1-t)*t*y2 + 3*(1-t)*t*t*y3 + t*t*t*y4;
+			if (maxY == '' || y > maxY) {
+				maxY = y;
+			}
+			if (minY == '' || y < minY) {
+				minY = y;
+			}
+		}
+	}
+
+	return maxY;
+}
+
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.CornealOpacity.prototype.draw = function(_point) {
+	
+	// Get context
+	var ctx = this.drawing.context;
+
+	// Call draw method in superclass
+	ED.CornealOpacity.superclass.draw.call(this, _point);
+
+	// Boundary path
+	ctx.beginPath();
+
+	// Bezier points
+	var fp;
+	var tp;
+	var cp1;
+	var cp2;
+
+	var phi = this.getPhi();
+	
+	// If inputted a dimension, reset pointsArray,
+	// otherwise recalculate dimension
+	if (this.resetWidth) {
+		this.squiggleArray[0].pointsArray[1].x = 0.5 * this.width * 54;
+		this.squiggleArray[0].pointsArray[3].x = 0.5 * this.width * -54;
+
+		this.resetWidth = false;
+	}
+	else {
+		this.width = this.calculateWidth();
+	}
+	
+	
+	// Start curve
+	ctx.moveTo(this.squiggleArray[0].pointsArray[0].x, this.squiggleArray[0].pointsArray[0].y);
+
+	// Complete curve segments
+	for (var i = 0; i < this.numberOfHandles; i++) {
+		// From and to points
+		fp = this.squiggleArray[0].pointsArray[i];
+		var toIndex = (i < this.numberOfHandles - 1) ? i + 1 : 0;
+		tp = this.squiggleArray[0].pointsArray[toIndex];
+
+		// Control points
+		cp1 = fp.tangentialControlPoint(+phi);
+		cp2 = tp.tangentialControlPoint(-phi);
+		
+		// Draw Bezier curve
+		ctx.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, tp.x, tp.y);
+	}
+
+	// Close path
+	ctx.closePath();
+
+	// Set attributes
+	ctx.lineWidth = 4;
+	ctx.fillStyle = "gray";
+	ctx.strokeStyle = "gray";
+
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+	
+	// Coordinates of expert handles (in canvas plane)
+	for (var i = 0; i < this.numberOfHandles /* * 2 */; i++) {
+		this.handleArray[i].location = this.transform.transformPoint(this.squiggleArray[0].pointsArray[i]);
+	}
+			
+
+	// Non boundary drawing
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+		
+		// Infiltrate
+		if (this.infiltrateWidth > 0) {
+			// Convert infiltrate width to doodle scale
+			var iW = this.infiltrateWidth * 54;
+			var n = this.numberOfHandles;
+			
+			var infiltratePoints = [];
+
+			// If do not exist, create extra handles for infiltrate boundary
+// 			if (this.resetInfiltrate) {
+				// redefine infiltrate control points based on width
+				this.resetInfiltrate = false;
+				for (var i=0; i<this.numberOfHandles; i++) {
+					var handle = this.squiggleArray[0].pointsArray[i];
+					var x = Math.abs(handle.x);
+					var y = Math.abs(handle.y);
+					
+					// Length of new handle from origin
+					var h = Math.sqrt(x*x + y*y) + iW;
+					
+					// Angle of handle from origin
+					var theta = Math.atan(y/x);
+					
+					// Height of new point above origin
+					var o = h * Math.sin(theta);
+					// X displacement of new point from origin
+					var a = h * Math.cos(theta);
+					
+					// get sign of handle coordinates
+					var xS = (handle.x>=0) ? 1 : -1;
+					var yS = (handle.y>=0) ? 1 : -1;
+					
+					var p = new ED.Point(a * xS, o * yS);
+					infiltratePoints.push(p);
+					
+					this.squiggleArray[0].pointsArray[n+i] = p;				
+				}
+// 			}
+			
+			// Draw infiltrate
+			ctx.beginPath();
+			ctx.moveTo(this.squiggleArray[0].pointsArray[4].x, this.squiggleArray[0].pointsArray[4].y);
+			// Complete curve segments
+			for (var j=0; j< this.numberOfHandles; j++) {
+				// From and to points
+				fp = this.squiggleArray[0].pointsArray[j + n];
+				var toIndex = (j < this.numberOfHandles - 1) ? j + 1 + n : this.numberOfHandles;
+				tp = this.squiggleArray[0].pointsArray[toIndex];
+		
+				// Control points
+				cp1 = fp.tangentialControlPoint(+phi);
+				cp2 = tp.tangentialControlPoint(-phi);
+		
+				// Draw Bezier curve
+				ctx.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, tp.x, tp.y);
+			}
+			ctx.fillStyle = "rgba(0,0,0,0.2)";
+			ctx.fill();
+			
+			// Flood fill shape on ontop of gradient
+			ctx.beginPath();
+			ctx.moveTo(this.squiggleArray[0].pointsArray[0].x, this.squiggleArray[0].pointsArray[0].y);
+			// Complete curve segments
+			for (var i = 0; i < this.numberOfHandles; i++) {
+				// From and to points
+				fp = this.squiggleArray[0].pointsArray[i];
+				var toIndex = (i < this.numberOfHandles - 1) ? i + 1 : 0;
+				tp = this.squiggleArray[0].pointsArray[toIndex];
+		
+				// Control points
+				cp1 = fp.tangentialControlPoint(+phi);
+				cp2 = tp.tangentialControlPoint(-phi);
+		
+				// Draw Bezier curve
+				ctx.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, tp.x, tp.y);
+			}
+			ctx.fillStyle = "gray";
+			ctx.stroke();
+			ctx.fill();
+		}
+	}
+	
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.CornealOpacity.prototype.description = function() {
+	return 'Corneal opacity: H-W: ' + this.height + 'x' + this.width + 'mm // Stromal depth: ' + this.depth + '% // Infiltrate width: ' + this.infiltrateWidth + 'mm';
+}
+
+/**
+ * OpenEyes
+ * MSC
+ *
+ * Copyright (C) OpenEyes Foundation, 2011-2017
+ * This file is part of OpenEyes.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package OpenEyes
+ * @link http://www.openeyes.org.uk
+ * @author OpenEyes <info@openeyes.org.uk>
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
+ */
+
+/**
+ * TODO: shape contour, fix length of line calculation for corneas where the apex is not along the origin
+ *
+ * @class CornealOpacityCrossSection
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Object} _parameterJSON
+ */
+ED.CornealOpacityCrossSection = function(_drawing, _parameterJSON) {
+	// Set classname
+	this.className = "CornealOpacityCrossSection";
+
+	// Private parameters
+	this.initialRadius = 81;
+	
+	// Other parameters
+	this.height = Math.round(this.initialRadius * 2 / 54);
+	this.width = Math.round(this.initialRadius * 2 / 54);
+	this.depth = 33;
+	this.infiltrateWidth = 0;
+	
+	this.h = Math.round(this.initialRadius * 2 / 54);
+	this.w = Math.round(this.initialRadius * 2 / 54);
+	this.d = 33;
+	this.iW = 0;
+	
+	this.minY = this.initialRadius * -1;
+	this.maxY = this.initialRadius;
+	
+	// Saved parameters
+	this.savedParameterArray = ['originX', 'originY', 'height', 'width', 'depth', 'infiltrateWidth','h','w','d','iW','minY','maxY'];
+	
+	// Parameters in doodle control bar
+	this.controlParameterArray = {'height':'Height', 'width':'Width', 'depth':'Depth (%)', 'infiltrateWidth':'Infiltrate width'};
+
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _parameterJSON);
+
+    this.linkedDoodleParameters = {
+        'CornealOpacity': {
+            source: ['yMidPoint','d','h','w','iW','originY','minY','maxY']
+        }
+    };
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.CornealOpacityCrossSection.prototype = new ED.Doodle;
+ED.CornealOpacityCrossSection.prototype.constructor = ED.CornealOpacityCrossSection;
+ED.CornealOpacityCrossSection.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.CornealOpacityCrossSection.prototype.setHandles = function() {
+}
+
+/**
+ * Sets default properties
+ */
+ED.CornealOpacityCrossSection.prototype.setPropertyDefaults = function() {
+	this.isSelectable = false;
+		
+	// Update component of validation array for simple parameters
+	this.parameterValidationArray['originX']['range'].setMinAndMax(+50, +50);
+	this.parameterValidationArray['originY']['range'].setMinAndMax(-500, +500);
+	
+	// Validation arrays for other parameters
+	this.parameterValidationArray['height'] = {
+		kind: 'other',
+		type: 'int',
+		range: new ED.Range(1, 14),
+		precision: 1,
+		animate: false
+	};
+	this.parameterValidationArray['width'] = {
+		kind: 'other',
+		type: 'int',
+		range: new ED.Range(1, 14),
+		precision: 1,
+		animate: false
+	};
+	this.parameterValidationArray['depth'] = {
+		kind: 'other',
+		type: 'int',
+		range: new ED.Range(1, 100),
+		precision: 1,
+		animate: false
+	};
+	this.parameterValidationArray['infiltrateWidth'] = {
+		kind: 'other',
+		type: 'int',
+		range: new ED.Range(0, 15),
+		precision: 1,
+		animate: false
+	};
+	this.parameterValidationArray['h'] = {
+		kind: 'other',
+		type: 'int',
+		range: [1, 14],
+		animate: false
+	};
+	this.parameterValidationArray['w'] = {
+		kind: 'other',
+		type: 'int',
+		range: [1, 14],
+		animate: false
+	};this.parameterValidationArray['iW'] = {
+		kind: 'other',
+		type: 'int',
+		range: [0, 15],
+		animate: false
+	};
+	this.parameterValidationArray['d'] = {
+		kind: 'other',
+		type: 'int',
+		range: [1, 100],
+		animate: false
+	};
+	this.parameterValidationArray['minY'] = {
+		kind: 'other',
+		type: 'int',
+		range: [-500,500],
+		animate: false
+	};
+	this.parameterValidationArray['maxY'] = {
+		kind: 'other',
+		type: 'int',
+		range: [-500,500],
+		animate: false
+	};
+}
+
+/**
+ * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
+ * The returned parameters are animated if their 'animate' property is set to true
+ *
+ * @param {String} _parameter Name of parameter that has changed
+ * @value {Undefined} _value Value of parameter to calculate
+ * @returns {Array} Associative array of values of dependent parameters
+ */
+ED.CornealOpacityCrossSection.prototype.dependentParameterValues = function(_parameter, _value) {
+	var returnArray = new Array();
+
+	switch (_parameter) {
+		case 'width':
+			returnArray['w'] = parseInt(_value);
+			break;
+
+		case 'height':
+			returnArray['h'] = parseInt(_value);
+			break;
+			
+		case 'infiltrateWidth':
+			returnArray['iW'] = parseInt(_value);
+			break;
+		
+		case 'depth':
+			returnArray['d'] = parseInt(_value);
+			break;
+			
+		case 'h':
+			returnArray['height'] = _value;
+			break;
+		
+		case 'd':
+			returnArray['depth'] = _value;
+			break;
+			
+		case 'w':
+			returnArray['width'] = _value;
+			break;
+		
+		case 'iW':
+			returnArray['infiltrateWidth'] = _value;
+			break;
+
+	}
+
+	return returnArray;
+}
+
+/**
+ * Sets default parameters
+ */
+ED.CornealOpacityCrossSection.prototype.setParameterDefaults = function() {
+
+	this.originX = 50; // as is in Cornea cross section doodle to dulicate bezier control points
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.CornealOpacityCrossSection.prototype.draw = function(_point) {
+
+	// Get context
+	var ctx = this.drawing.context;
+
+	var cornea = this.drawing.lastDoodleOfClass('CorneaCrossSection');
+	var cornealThickness = cornea.pachymetry/5;
+
+	// Call draw method in superclass
+	ED.CornealOpacityCrossSection.superclass.draw.call(this, _point);
+
+	// Boundary path
+	ctx.beginPath();
+	
+	// Calculate segment extent in terms of time along curve
+	var startY = this.minY + this.originY;
+	var endY = this.maxY + this.originY;
+	
+	var startT = (startY + 380) / 760;
+	if (startT<0) startT = 0;
+	var endT = (endY + 380) / 760;
+	if (endT>1) endT = 1;
+		
+	if (startT < 0.5) {
+		
+		var superiorBezier = new Object;
+		var superiorBezierBack = new Object;
+
+		// define start and end time points
+		var tI0 = startT * 2;
+		var tI1 = (endT < 0.5) ? endT * 2 : 1;
+		
+		// default bezier points (as in cornea cross section)
+		if (cornea && cornea.shape == "Keratoconus") {
+			superiorBezier.SP = new ED.Point(-120, -380 - this.originY);
+			superiorBezier.CP1 = new ED.Point(-240, -260 - this.originY);
+			superiorBezier.CP2 = new ED.Point(cornea.apexX, cornea.apexY - 100 - this.originY);
+			superiorBezier.EP = new ED.Point(cornea.apexX, cornea.apexY - this.originY);
+			
+			superiorBezierBack.SP = new ED.Point(-120 + 120*this.depth/100, -380 - this.originY);
+			superiorBezierBack.CP1 = new ED.Point(-240 + 160*this.depth/100, -260 - this.originY);
+			superiorBezierBack.CP2 = new ED.Point(cornea.apexX + cornealThickness*this.depth/100, cornea.apexY - 120 - this.originY);
+			superiorBezierBack.EP = new ED.Point(cornea.apexX + cornealThickness*this.depth/100, cornea.apexY - this.originY);
+		}
+		else if (cornea && cornea.shape == "Keratoglobus") {
+			superiorBezier.SP = new ED.Point(-120, -380 - this.originY);
+			superiorBezier.CP1 = new ED.Point(-240, -260 - this.originY);
+			superiorBezier.CP2 = new ED.Point(-380, -100 - this.originY);
+			superiorBezier.EP = new ED.Point(-380, 100 - this.originY);
+			
+			superiorBezierBack.SP = new ED.Point(-120 + 120*this.depth/100, -380 - this.originY);
+			superiorBezierBack.CP1 = new ED.Point(-240 + 120*this.depth/100, -200 - this.originY);
+			superiorBezierBack.CP2 = new ED.Point(-380 + 100*this.depth/100, -140 - this.originY);
+			superiorBezierBack.EP = new ED.Point(-380 + 100*this.depth/100, 100 - this.originY);
+		}
+		else {
+			superiorBezier.SP = new ED.Point(-120, -380 - this.originY);
+			superiorBezier.CP1 = new ED.Point(-240, -260 - this.originY);
+			superiorBezier.CP2 = new ED.Point(-320, -160 - this.originY);
+			superiorBezier.EP = new ED.Point(-320, 0 - this.originY);
+			
+			superiorBezierBack.SP = new ED.Point(-120 + 120*this.depth/100, -380 - this.originY);
+			superiorBezierBack.CP1 = new ED.Point(-240 + 160*this.depth/100, -260 - this.originY);
+			superiorBezierBack.CP2 = new ED.Point(-320 + 100*this.depth/100, -160 - this.originY);
+			superiorBezierBack.EP = new ED.Point(-320 + 100*this.depth/100, 0 - this.originY);
+		}
+		
+			
+		if (tI0 > 0) {
+		// Trim start of curve			
+			
+			// front of cornea
+			var sq0 = new ED.Point(0,0);
+			sq0.y = (1-tI0)*(1-tI0)*(1-tI0)*superiorBezier.SP.y + 3*(1-tI0)*(1-tI0)*tI0*superiorBezier.CP1.y + 3*(1-tI0)*tI0*tI0*superiorBezier.CP2.y + tI0*tI0*tI0*superiorBezier.EP.y;
+			sq0.x = (1-tI0)*(1-tI0)*(1-tI0)*superiorBezier.SP.x + 3*(1-tI0)*(1-tI0)*tI0*superiorBezier.CP1.x + 3*(1-tI0)*tI0*tI0*superiorBezier.CP2.x + tI0*tI0*tI0*superiorBezier.EP.x;
+			
+			var iP23 = new ED.Point(0,0);
+			iP23.x = superiorBezier.CP1.x + tI0 * (superiorBezier.CP2.x - superiorBezier.CP1.x);
+			iP23.y = superiorBezier.CP1.y + tI0 * (superiorBezier.CP2.y - superiorBezier.CP1.y);
+			
+			var iP34 = new ED.Point(0,0);
+			iP34.x = superiorBezier.CP2.x + tI0 * (superiorBezier.EP.x - superiorBezier.CP2.x);
+			iP34.y = superiorBezier.CP2.y + tI0 * (superiorBezier.EP.y - superiorBezier.CP2.y);
+			
+			var iP2334 = new ED.Point(0,0);
+			iP2334.x = iP23.x + tI0 * (iP34.x - iP23.x);
+			iP2334.y = iP23.y + tI0 * (iP34.y - iP23.y);
+			
+			superiorBezier.SP = sq0;
+			superiorBezier.CP1 = iP2334;
+			superiorBezier.CP2 = iP34;
+			
+			
+			// back of cornea
+			var sq0b = new ED.Point(0,0);
+			sq0b.y = (1-tI0)*(1-tI0)*(1-tI0)*superiorBezierBack.SP.y + 3*(1-tI0)*(1-tI0)*tI0*superiorBezierBack.CP1.y + 3*(1-tI0)*tI0*tI0*superiorBezierBack.CP2.y + tI0*tI0*tI0*superiorBezierBack.EP.y;
+			sq0b.x = (1-tI0)*(1-tI0)*(1-tI0)*superiorBezierBack.SP.x + 3*(1-tI0)*(1-tI0)*tI0*superiorBezierBack.CP1.x + 3*(1-tI0)*tI0*tI0*superiorBezierBack.CP2.x + tI0*tI0*tI0*superiorBezierBack.EP.x;
+			
+			var iP23b = new ED.Point(0,0);
+			iP23b.x = superiorBezierBack.CP1.x + tI0 * (superiorBezierBack.CP2.x - superiorBezierBack.CP1.x);
+			iP23b.y = superiorBezierBack.CP1.y + tI0 * (superiorBezierBack.CP2.y - superiorBezierBack.CP1.y);
+			
+			var iP34b = new ED.Point(0,0);
+			iP34b.x = superiorBezierBack.CP2.x + tI0 * (superiorBezierBack.EP.x - superiorBezierBack.CP2.x);
+			iP34b.y = superiorBezierBack.CP2.y + tI0 * (superiorBezierBack.EP.y - superiorBezierBack.CP2.y);
+			
+			var iP2334b = new ED.Point(0,0);
+			iP2334b.x = iP23b.x + tI0 * (iP34b.x - iP23b.x);
+			iP2334b.y = iP23b.y + tI0 * (iP34b.y - iP23b.y);
+			
+			superiorBezierBack.SP = sq0b;
+			superiorBezierBack.CP1 = iP2334b;
+			superiorBezierBack.CP2 = iP34b;
+		}
+		
+		if (tI1 < 1) {
+		// Trim end of curve
+			
+			// front of cornea
+			var iq1 = new ED.Point(0,0);
+			iq1.y = (1-tI1)*(1-tI1)*(1-tI1)*superiorBezier.SP.y + 3*(1-tI1)*(1-tI1)*tI1*superiorBezier.CP1.y + 3*(1-tI1)*tI1*tI1*superiorBezier.CP2.y + tI1*tI1*tI1*superiorBezier.EP.y;
+			iq1.x = (1-tI1)*(1-tI1)*(1-tI1)*superiorBezier.SP.x + 3*(1-tI1)*(1-tI1)*tI1*superiorBezier.CP1.x + 3*(1-tI1)*tI1*tI1*superiorBezier.CP2.x + tI1*tI1*tI1*superiorBezier.EP.x;
+
+			var iP12 = new ED.Point(0,0);
+			iP12.x = superiorBezier.SP.x + tI1 * (superiorBezier.CP1.x - superiorBezier.SP.x);
+			iP12.y = superiorBezier.SP.y + tI1 * (superiorBezier.CP1.y - superiorBezier.SP.y);
+			
+			var iP23 = new ED.Point(0,0);
+			iP23.x = superiorBezier.CP1.x + tI1 * (superiorBezier.CP2.x - superiorBezier.CP1.x);
+			iP23.y = superiorBezier.CP1.y + tI1 * (superiorBezier.CP2.y - superiorBezier.CP1.y);
+			
+			var iP1223 = new ED.Point(0,0);
+			iP1223.x = iP12.x + tI1 * (iP23.x - iP12.x);
+			iP1223.y = iP12.y + tI1 * (iP23.y - iP12.y);
+			
+			superiorBezier.CP1 = iP12;
+			superiorBezier.CP2 = iP1223;
+			superiorBezier.EP = iq1;
+			
+			
+			// back of cornea
+			var iq1b = new ED.Point(0,0);
+			iq1b.y = (1-tI1)*(1-tI1)*(1-tI1)*superiorBezierBack.SP.y + 3*(1-tI1)*(1-tI1)*tI1*superiorBezierBack.CP1.y + 3*(1-tI1)*tI1*tI1*superiorBezierBack.CP2.y + tI1*tI1*tI1*superiorBezierBack.EP.y;
+			iq1b.x = (1-tI1)*(1-tI1)*(1-tI1)*superiorBezierBack.SP.x + 3*(1-tI1)*(1-tI1)*tI1*superiorBezierBack.CP1.x + 3*(1-tI1)*tI1*tI1*superiorBezierBack.CP2.x + tI1*tI1*tI1*superiorBezierBack.EP.x;
+
+			var iP12b = new ED.Point(0,0);
+			iP12b.x = superiorBezierBack.SP.x + tI1 * (superiorBezierBack.CP1.x - superiorBezierBack.SP.x);
+			iP12b.y = superiorBezierBack.SP.y + tI1 * (superiorBezierBack.CP1.y - superiorBezierBack.SP.y);
+			
+			var iP23b = new ED.Point(0,0);
+			iP23b.x = superiorBezierBack.CP1.x + tI1 * (superiorBezierBack.CP2.x - superiorBezierBack.CP1.x);
+			iP23b.y = superiorBezierBack.CP1.y + tI1 * (superiorBezierBack.CP2.y - superiorBezierBack.CP1.y);
+			
+			var iP1223b = new ED.Point(0,0);
+			iP1223b.x = iP12b.x + tI1 * (iP23b.x - iP12b.x);
+			iP1223b.y = iP12b.y + tI1 * (iP23b.y - iP12b.y);
+			
+			superiorBezierBack.CP1 = iP12b;
+			superiorBezierBack.CP2 = iP1223b;
+			superiorBezierBack.EP = iq1b;
+		}
+	}
+	
+	
+	if (endT > 0.5) {
+		
+		var inferiorBezier = new Object;
+		var inferiorBezierBack = new Object;
+		
+		// define start and end time points
+		var tS0 = (startT > 0.5) ? (startT - 0.5) * 2 : 0;
+		var tS1 = (endT - 0.5) * 2;
+		
+		// default bezier points (as in cornea cross section)
+		if (cornea && cornea.shape == "Keratoconus") {
+			inferiorBezier.SP = new ED.Point(cornea.apexX, cornea.apexY - this.originY);
+			inferiorBezier.CP1 = new ED.Point(cornea.apexX, cornea.apexY + 100 - this.originY);
+			inferiorBezier.CP2 = new ED.Point(-240, 260 - this.originY);
+			inferiorBezier.EP = new ED.Point(-120, 380 - this.originY);
+			
+			inferiorBezierBack.SP = new ED.Point(cornea.apexX + cornealThickness*this.depth/100, cornea.apexY - this.originY);
+			inferiorBezierBack.CP1 = new ED.Point(cornea.apexX + cornealThickness*this.depth/100, cornea.apexY + 120 - this.originY);
+			inferiorBezierBack.CP2 = new ED.Point(-240 + 160*this.depth/100, 260 - this.originY);
+			inferiorBezierBack.EP = new ED.Point(-120 + 120*this.depth/100, 380 - this.originY);
+		}
+		else if (cornea && cornea.shape == "Keratoglobus") {
+			inferiorBezier.SP = new ED.Point(-380, 100 - this.originY);
+			inferiorBezier.CP1 = new ED.Point(-380, 200 - this.originY);
+			inferiorBezier.CP2 = new ED.Point(-240, 360 - this.originY);
+			inferiorBezier.EP = new ED.Point(-120, 380 - this.originY);
+			
+			inferiorBezierBack.SP = new ED.Point(-380 + 100*this.depth/100, 100 - this.originY);
+			inferiorBezierBack.CP1 = new ED.Point(-380 + 120*this.depth/100, 220 - this.originY);
+			inferiorBezierBack.CP2 = new ED.Point(-240 + 160*this.depth/100, 260 - this.originY);
+			inferiorBezierBack.EP = new ED.Point(-120 + 120*this.depth/100, 380 - this.originY);
+		}
+		else {
+			inferiorBezier.SP = new ED.Point(-320, -0 - this.originY);
+			inferiorBezier.CP1 = new ED.Point(-320, 160 - this.originY);
+			inferiorBezier.CP2 = new ED.Point(-240, 260 - this.originY);
+			inferiorBezier.EP = new ED.Point(-120, 380 - this.originY);
+			
+			inferiorBezierBack.SP = new ED.Point(-320 + 100*this.depth/100, -0 - this.originY);
+			inferiorBezierBack.CP1 = new ED.Point(-320 + 100*this.depth/100, 160 - this.originY);
+			inferiorBezierBack.CP2 = new ED.Point(-240 + 160*this.depth/100, 260 - this.originY);
+			inferiorBezierBack.EP = new ED.Point(-120 + 120*this.depth/100, 380 - this.originY);
+		}			
+		
+		
+		if (tS0 > 0) {
+		// Trim start of curve
+		
+			// front of cornea			
+			var sq0 = new ED.Point(0,0);
+			sq0.y = (1-tS0)*(1-tS0)*(1-tS0)*inferiorBezier.SP.y + 3*(1-tS0)*(1-tS0)*tS0*inferiorBezier.CP1.y + 3*(1-tS0)*tS0*tS0*inferiorBezier.CP2.y + tS0*tS0*tS0*inferiorBezier.EP.y;
+			sq0.x = (1-tS0)*(1-tS0)*(1-tS0)*inferiorBezier.SP.x + 3*(1-tS0)*(1-tS0)*tS0*inferiorBezier.CP1.x + 3*(1-tS0)*tS0*tS0*inferiorBezier.CP2.x + tS0*tS0*tS0*inferiorBezier.EP.x;
+			
+			var sP23 = new ED.Point(0,0);
+			sP23.x = inferiorBezier.CP1.x + tS0 * (inferiorBezier.CP2.x - inferiorBezier.CP1.x);
+			sP23.y = inferiorBezier.CP1.y + tS0 * (inferiorBezier.CP2.y - inferiorBezier.CP1.y);
+			
+			var sP34 = new ED.Point(0,0);
+			sP34.x = inferiorBezier.CP2.x + tS0 * (inferiorBezier.EP.x - inferiorBezier.CP2.x);
+			sP34.y = inferiorBezier.CP2.y + tS0 * (inferiorBezier.EP.y - inferiorBezier.CP2.y);
+			
+			var sP2334 = new ED.Point(0,0);
+			sP2334.x = sP23.x + tS0 * (sP34.x - sP23.x);
+			sP2334.y = sP23.y + tS0 * (sP34.y - sP23.y);
+			
+			inferiorBezier.SP = sq0;
+			inferiorBezier.CP1 = sP2334;
+			inferiorBezier.CP2 = sP34;
+			
+			// back of cornea
+			var sq0b = new ED.Point(0,0);
+			sq0b.y = (1-tS0)*(1-tS0)*(1-tS0)*inferiorBezierBack.SP.y + 3*(1-tS0)*(1-tS0)*tS0*inferiorBezierBack.CP1.y + 3*(1-tS0)*tS0*tS0*inferiorBezierBack.CP2.y + tS0*tS0*tS0*inferiorBezierBack.EP.y;
+			sq0b.x = (1-tS0)*(1-tS0)*(1-tS0)*inferiorBezierBack.SP.x + 3*(1-tS0)*(1-tS0)*tS0*inferiorBezierBack.CP1.x + 3*(1-tS0)*tS0*tS0*inferiorBezierBack.CP2.x + tS0*tS0*tS0*inferiorBezierBack.EP.x;
+			
+			var sP23b = new ED.Point(0,0);
+			sP23b.x = inferiorBezierBack.CP1.x + tS0 * (inferiorBezierBack.CP2.x - inferiorBezierBack.CP1.x);
+			sP23b.y = inferiorBezierBack.CP1.y + tS0 * (inferiorBezierBack.CP2.y - inferiorBezierBack.CP1.y);
+			
+			var sP34b = new ED.Point(0,0);
+			sP34b.x = inferiorBezierBack.CP2.x + tS0 * (inferiorBezierBack.EP.x - inferiorBezierBack.CP2.x);
+			sP34b.y = inferiorBezierBack.CP2.y + tS0 * (inferiorBezierBack.EP.y - inferiorBezierBack.CP2.y);
+			
+			var sP2334b = new ED.Point(0,0);
+			sP2334b.x = sP23b.x + tS0 * (sP34b.x - sP23b.x);
+			sP2334b.y = sP23b.y + tS0 * (sP34b.y - sP23b.y);
+			
+			inferiorBezierBack.SP = sq0b;
+			inferiorBezierBack.CP1 = sP2334b;
+			inferiorBezierBack.CP2 = sP34b;
+		}
+		
+		if (tS1 < 1) {
+		// Trim end of curve
+		
+			// front of cornea
+			var sq1 = new ED.Point(0,0);
+			sq1.y = (1-tS1)*(1-tS1)*(1-tS1)*inferiorBezier.SP.y + 3*(1-tS1)*(1-tS1)*tS1*inferiorBezier.CP1.y + 3*(1-tS1)*tS1*tS1*inferiorBezier.CP2.y + tS1*tS1*tS1*inferiorBezier.EP.y;
+			sq1.x = (1-tS1)*(1-tS1)*(1-tS1)*inferiorBezier.SP.x + 3*(1-tS1)*(1-tS1)*tS1*inferiorBezier.CP1.x + 3*(1-tS1)*tS1*tS1*inferiorBezier.CP2.x + tS1*tS1*tS1*inferiorBezier.EP.x;
+
+			var sP12 = new ED.Point(0,0);
+			sP12.x = inferiorBezier.SP.x + tS1 * (inferiorBezier.CP1.x - inferiorBezier.SP.x);
+			sP12.y = inferiorBezier.SP.y + tS1 * (inferiorBezier.CP1.y - inferiorBezier.SP.y);
+			
+			var sP23 = new ED.Point(0,0);
+			sP23.x = inferiorBezier.CP1.x + tS1 * (inferiorBezier.CP2.x - inferiorBezier.CP1.x);
+			sP23.y = inferiorBezier.CP1.y + tS1 * (inferiorBezier.CP2.y - inferiorBezier.CP1.y);
+			
+			var sP1223 = new ED.Point(0,0);
+			sP1223.x = sP12.x + tS1 * (sP23.x - sP12.x);
+			sP1223.y = sP12.y + tS1 * (sP23.y - sP12.y);
+
+			inferiorBezier.CP1 = sP12;
+			inferiorBezier.CP2 = sP1223;
+			inferiorBezier.EP = sq1;
+			
+			
+			// back of cornea
+			var sq1b = new ED.Point(0,0);
+			sq1b.y = (1-tS1)*(1-tS1)*(1-tS1)*inferiorBezierBack.SP.y + 3*(1-tS1)*(1-tS1)*tS1*inferiorBezierBack.CP1.y + 3*(1-tS1)*tS1*tS1*inferiorBezierBack.CP2.y + tS1*tS1*tS1*inferiorBezierBack.EP.y;
+			sq1b.x = (1-tS1)*(1-tS1)*(1-tS1)*inferiorBezierBack.SP.x + 3*(1-tS1)*(1-tS1)*tS1*inferiorBezierBack.CP1.x + 3*(1-tS1)*tS1*tS1*inferiorBezierBack.CP2.x + tS1*tS1*tS1*inferiorBezierBack.EP.x;
+
+			var sP12b = new ED.Point(0,0);
+			sP12b.x = inferiorBezierBack.SP.x + tS1 * (inferiorBezierBack.CP1.x - inferiorBezierBack.SP.x);
+			sP12b.y = inferiorBezierBack.SP.y + tS1 * (inferiorBezierBack.CP1.y - inferiorBezierBack.SP.y);
+			
+			var sP23b = new ED.Point(0,0);
+			sP23b.x = inferiorBezierBack.CP1.x + tS1 * (inferiorBezierBack.CP2.x - inferiorBezierBack.CP1.x);
+			sP23b.y = inferiorBezierBack.CP1.y + tS1 * (inferiorBezierBack.CP2.y - inferiorBezierBack.CP1.y);
+			
+			var sP1223b = new ED.Point(0,0);
+			sP1223b.x = sP12b.x + tS1 * (sP23b.x - sP12b.x);
+			sP1223b.y = sP12b.y + tS1 * (sP23b.y - sP12b.y);
+
+			inferiorBezierBack.CP1 = sP12b;
+			inferiorBezierBack.CP2 = sP1223b;
+			inferiorBezierBack.EP = sq1b;
+		}
+	}
+	
+	if (inferiorBezier) {
+		ctx.moveTo(inferiorBezierBack.EP.x, inferiorBezierBack.EP.y);
+		ctx.bezierCurveTo(inferiorBezierBack.CP2.x, inferiorBezierBack.CP2.y, inferiorBezierBack.CP1.x, inferiorBezierBack.CP1.y, inferiorBezierBack.SP.x, inferiorBezierBack.SP.y);
+		ctx.lineTo(inferiorBezier.SP.x, inferiorBezier.SP.y);
+		ctx.bezierCurveTo(inferiorBezier.CP1.x, inferiorBezier.CP1.y, inferiorBezier.CP2.x, inferiorBezier.CP2.y, inferiorBezier.EP.x, inferiorBezier.EP.y);
+	}
+	if (superiorBezier) {
+		ctx.moveTo(superiorBezierBack.EP.x, superiorBezierBack.EP.y);
+		ctx.bezierCurveTo(superiorBezierBack.CP2.x, superiorBezierBack.CP2.y, superiorBezierBack.CP1.x, superiorBezierBack.CP1.y, superiorBezierBack.SP.x, superiorBezierBack.SP.y);
+		ctx.lineTo(superiorBezier.SP.x, superiorBezier.SP.y);
+		ctx.bezierCurveTo(superiorBezier.CP1.x, superiorBezier.CP1.y, superiorBezier.CP2.x, superiorBezier.CP2.y, superiorBezier.EP.x, superiorBezier.EP.y);
+	}
+	
+	
+	// Close path
+	ctx.closePath();
+
+	// Set attributes
+	ctx.lineWidth = 0;
+	ctx.fillStyle = "gray";
+	ctx.strokeStyle = "gray";
+
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+		
+	// Non boundary drawing
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+		
+		// Infiltrate
+		if (this.infiltrateWidth > 0) {
+			// Re do all calculations, with extra length and width proportional to infiltrate width
+			var iEndY = this.maxY + this.originY + 0.5 * this.infiltrateWidth * 2 * 54;
+			var iStartY = this.minY + this.originY - 0.5 * this.infiltrateWidth * 2 * 54;
+			
+			var iStartT = (iStartY + 380) / 760;
+			if (iStartT<0) iStartT = 0;
+			var iEndT = (iEndY + 380) / 760;
+			if (iEndT>1) iEndT = 1;
+			
+			var averageDimension = (this.height + this.width) / 2;
+			var averageDimensionTotal = (this.height + this.width + 4*this.infiltrateWidth) / 2;
+			
+			var infiltrateScale = this.depth / averageDimension * averageDimensionTotal;
+			if (infiltrateScale > 100) infiltrateScale = 100;
+				
+			if (iStartT < 0.5) {
+				
+				var iSuperiorBezier = new Object;
+				var iSuperiorBezierBack = new Object;
+		
+				// define start and end time points
+				var itI0 = iStartT * 2;
+				var itI1 = (iEndT < 0.5) ? iEndT * 2 : 1;
+				var ibtI0 = itI0 * infiltrateScale/100;
+/* 				if (ibtI0 < itI0)  */ibtI0 = itI0;
+				var ibtI1 = itI1 * infiltrateScale/100;
+/* 				if (ibtI1 > itI1) */ ibtI1 = itI1;
+						
+				// default bezier points (as in cornea cross section)
+				if (cornea && cornea.shape == "Keratoconus") {
+					iSuperiorBezier.SP = new ED.Point(-120, -380 - this.originY);
+					iSuperiorBezier.CP1 = new ED.Point(-240, -260 - this.originY);
+					iSuperiorBezier.CP2 = new ED.Point(cornea.apexX, cornea.apexY - 100 - this.originY);
+					iSuperiorBezier.EP = new ED.Point(cornea.apexX, cornea.apexY - this.originY);
+					
+					iSuperiorBezierBack.SP = new ED.Point(-120 + 120*infiltrateScale/100, -380 - this.originY);
+					iSuperiorBezierBack.CP1 = new ED.Point(-240 + 160*infiltrateScale/100, -260 - this.originY);
+					iSuperiorBezierBack.CP2 = new ED.Point(cornea.apexX + cornealThickness*infiltrateScale/100, cornea.apexY - 120 - this.originY);
+					iSuperiorBezierBack.EP = new ED.Point(cornea.apexX + cornealThickness*infiltrateScale/100, cornea.apexY - this.originY);
+				}
+				else if (cornea && cornea.shape == "Keratoglobus") {
+					iSuperiorBezier.SP = new ED.Point(-120, -380 - this.originY);
+					iSuperiorBezier.CP1 = new ED.Point(-240, -260 - this.originY);
+					iSuperiorBezier.CP2 = new ED.Point(-380, -100 - this.originY);
+					iSuperiorBezier.EP = new ED.Point(-380, 100 - this.originY);
+					
+					iSuperiorBezierBack.SP = new ED.Point(-120 + 120*infiltrateScale/100, -380 - this.originY);
+					iSuperiorBezierBack.CP1 = new ED.Point(-240 + 120*infiltrateScale/100, -200 - this.originY);
+					iSuperiorBezierBack.CP2 = new ED.Point(-380 + 100*infiltrateScale/100, -140 - this.originY);
+					iSuperiorBezierBack.EP = new ED.Point(-380 + 100*infiltrateScale/100, 100 - this.originY);
+				}
+				else {
+					iSuperiorBezier.SP = new ED.Point(-120, -380 - this.originY);
+					iSuperiorBezier.CP1 = new ED.Point(-240, -260 - this.originY);
+					iSuperiorBezier.CP2 = new ED.Point(-320, -160 - this.originY);
+					iSuperiorBezier.EP = new ED.Point(-320, 0 - this.originY);
+					
+					iSuperiorBezierBack.SP = new ED.Point(-120 + 120*infiltrateScale/100, -380 - this.originY);
+					iSuperiorBezierBack.CP1 = new ED.Point(-240 + 160*infiltrateScale/100, -260 - this.originY);
+					iSuperiorBezierBack.CP2 = new ED.Point(-320 + 100*infiltrateScale/100, -160 - this.originY);
+					iSuperiorBezierBack.EP = new ED.Point(-320 + 100*infiltrateScale/100, 0 - this.originY);
+				}
+				
+					
+				if (itI0 > 0) {
+				// Trim start of curve
+				
+					// front of cornea			
+					var isq0 = new ED.Point(0,0);
+					isq0.y = (1-itI0)*(1-itI0)*(1-itI0)*iSuperiorBezier.SP.y + 3*(1-itI0)*(1-itI0)*itI0*iSuperiorBezier.CP1.y + 3*(1-itI0)*itI0*itI0*iSuperiorBezier.CP2.y + itI0*itI0*itI0*iSuperiorBezier.EP.y;
+					isq0.x = (1-itI0)*(1-itI0)*(1-itI0)*iSuperiorBezier.SP.x + 3*(1-itI0)*(1-itI0)*itI0*iSuperiorBezier.CP1.x + 3*(1-itI0)*itI0*itI0*iSuperiorBezier.CP2.x + itI0*itI0*itI0*iSuperiorBezier.EP.x;
+					
+					var iiP23 = new ED.Point(0,0);
+					iiP23.x = iSuperiorBezier.CP1.x + itI0 * (iSuperiorBezier.CP2.x - iSuperiorBezier.CP1.x);
+					iiP23.y = iSuperiorBezier.CP1.y + itI0 * (iSuperiorBezier.CP2.y - iSuperiorBezier.CP1.y);
+					
+					var iiP34 = new ED.Point(0,0);
+					iiP34.x = iSuperiorBezier.CP2.x + itI0 * (iSuperiorBezier.EP.x - iSuperiorBezier.CP2.x);
+					iiP34.y = iSuperiorBezier.CP2.y + itI0 * (iSuperiorBezier.EP.y - iSuperiorBezier.CP2.y);
+					
+					var iiP2334 = new ED.Point(0,0);
+					iiP2334.x = iiP23.x + itI0 * (iiP34.x - iiP23.x);
+					iiP2334.y = iiP23.y + itI0 * (iiP34.y - iiP23.y);
+					
+					iSuperiorBezier.SP = isq0;
+					iSuperiorBezier.CP1 = iiP2334;
+					iSuperiorBezier.CP2 = iiP34;
+				}
+				if (ibtI0 > 0) {
+		
+					// back of cornea
+					var isq0b = new ED.Point(0,0);
+					isq0b.y = (1-ibtI0)*(1-ibtI0)*(1-ibtI0)*iSuperiorBezierBack.SP.y + 3*(1-ibtI0)*(1-ibtI0)*ibtI0*iSuperiorBezierBack.CP1.y + 3*(1-ibtI0)*ibtI0*ibtI0*iSuperiorBezierBack.CP2.y + ibtI0*ibtI0*ibtI0*iSuperiorBezierBack.EP.y;
+					isq0b.x = (1-ibtI0)*(1-ibtI0)*(1-ibtI0)*iSuperiorBezierBack.SP.x + 3*(1-ibtI0)*(1-ibtI0)*ibtI0*iSuperiorBezierBack.CP1.x + 3*(1-ibtI0)*ibtI0*ibtI0*iSuperiorBezierBack.CP2.x + ibtI0*ibtI0*ibtI0*iSuperiorBezierBack.EP.x;
+					
+					var iiP23b = new ED.Point(0,0);
+					iiP23b.x = iSuperiorBezierBack.CP1.x + ibtI0 * (iSuperiorBezierBack.CP2.x - iSuperiorBezierBack.CP1.x);
+					iiP23b.y = iSuperiorBezierBack.CP1.y + ibtI0 * (iSuperiorBezierBack.CP2.y - iSuperiorBezierBack.CP1.y);
+					
+					var iiP34b = new ED.Point(0,0);
+					iiP34b.x = iSuperiorBezierBack.CP2.x + ibtI0 * (iSuperiorBezierBack.EP.x - iSuperiorBezierBack.CP2.x);
+					iiP34b.y = iSuperiorBezierBack.CP2.y + ibtI0 * (iSuperiorBezierBack.EP.y - iSuperiorBezierBack.CP2.y);
+					
+					var iiP2334b = new ED.Point(0,0);
+					iiP2334b.x = iiP23b.x + ibtI0 * (iiP34b.x - iiP23b.x);
+					iiP2334b.y = iiP23b.y + ibtI0 * (iiP34b.y - iiP23b.y);
+					
+					iSuperiorBezierBack.SP = isq0b;
+					iSuperiorBezierBack.CP1 = iiP2334b;
+					iSuperiorBezierBack.CP2 = iiP34b;
+				}
+				
+				if (itI1 < 1) {
+				// Trim end of curve
+					
+					// front of cornea
+					var iiq1 = new ED.Point(0,0);
+					iiq1.y = (1-itI1)*(1-itI1)*(1-itI1)*iSuperiorBezier.SP.y + 3*(1-itI1)*(1-itI1)*itI1*iSuperiorBezier.CP1.y + 3*(1-itI1)*itI1*itI1*iSuperiorBezier.CP2.y + itI1*itI1*itI1*iSuperiorBezier.EP.y;
+					iiq1.x = (1-itI1)*(1-itI1)*(1-itI1)*iSuperiorBezier.SP.x + 3*(1-itI1)*(1-itI1)*itI1*iSuperiorBezier.CP1.x + 3*(1-itI1)*itI1*itI1*iSuperiorBezier.CP2.x + itI1*itI1*itI1*iSuperiorBezier.EP.x;
+		
+					var iiP12 = new ED.Point(0,0);
+					iiP12.x = iSuperiorBezier.SP.x + itI1 * (iSuperiorBezier.CP1.x - iSuperiorBezier.SP.x);
+					iiP12.y = iSuperiorBezier.SP.y + itI1 * (iSuperiorBezier.CP1.y - iSuperiorBezier.SP.y);
+					
+					var iiP23 = new ED.Point(0,0);
+					iiP23.x = iSuperiorBezier.CP1.x + itI1 * (iSuperiorBezier.CP2.x - iSuperiorBezier.CP1.x);
+					iiP23.y = iSuperiorBezier.CP1.y + itI1 * (iSuperiorBezier.CP2.y - iSuperiorBezier.CP1.y);
+					
+					var iiP1223 = new ED.Point(0,0);
+					iiP1223.x = iiP12.x + itI1 * (iiP23.x - iiP12.x);
+					iiP1223.y = iiP12.y + itI1 * (iiP23.y - iiP12.y);
+					
+					iSuperiorBezier.CP1 = iiP12;
+					iSuperiorBezier.CP2 = iiP1223;
+					iSuperiorBezier.EP = iiq1;
+				
+				}
+				if (ibtI1 > 0) {
+					// back of cornea
+					var iiq1b = new ED.Point(0,0);
+					iiq1b.y = (1-ibtI1)*(1-ibtI1)*(1-ibtI1)*iSuperiorBezierBack.SP.y + 3*(1-ibtI1)*(1-ibtI1)*ibtI1*iSuperiorBezierBack.CP1.y + 3*(1-ibtI1)*ibtI1*ibtI1*iSuperiorBezierBack.CP2.y + ibtI1*ibtI1*ibtI1*iSuperiorBezierBack.EP.y;
+					iiq1b.x = (1-ibtI1)*(1-ibtI1)*(1-ibtI1)*iSuperiorBezierBack.SP.x + 3*(1-ibtI1)*(1-ibtI1)*ibtI1*iSuperiorBezierBack.CP1.x + 3*(1-ibtI1)*ibtI1*ibtI1*iSuperiorBezierBack.CP2.x + ibtI1*ibtI1*ibtI1*iSuperiorBezierBack.EP.x;
+		
+					var iiP12b = new ED.Point(0,0);
+					iiP12b.x = iSuperiorBezierBack.SP.x + ibtI1 * (iSuperiorBezierBack.CP1.x - iSuperiorBezierBack.SP.x);
+					iiP12b.y = iSuperiorBezierBack.SP.y + ibtI1 * (iSuperiorBezierBack.CP1.y - iSuperiorBezierBack.SP.y);
+					
+					var iiP23b = new ED.Point(0,0);
+					iiP23b.x = iSuperiorBezierBack.CP1.x + ibtI1 * (iSuperiorBezierBack.CP2.x - iSuperiorBezierBack.CP1.x);
+					iiP23b.y = iSuperiorBezierBack.CP1.y + ibtI1 * (iSuperiorBezierBack.CP2.y - iSuperiorBezierBack.CP1.y);
+					
+					var iiP1223b = new ED.Point(0,0);
+					iiP1223b.x = iiP12b.x + ibtI1 * (iiP23b.x - iiP12b.x);
+					iiP1223b.y = iiP12b.y + ibtI1 * (iiP23b.y - iiP12b.y);
+					
+					iSuperiorBezierBack.CP1 = iiP12b;
+					iSuperiorBezierBack.CP2 = iiP1223b;
+					iSuperiorBezierBack.EP = iiq1b;
+				}
+			
+			}
+			
+			
+			if (iEndT > 0.5) {
+				
+				var iInferiorBezier = new Object;
+				var iInferiorBezierBack = new Object;
+				
+				// define start and end time points
+				var itS0 = (iStartT > 0.5) ? (iStartT - 0.5) * 2 : 0;
+				var itS1 = (iEndT - 0.5) * 2;
+				var ibtS0 = itS0 * infiltrateScale/100;
+/* 				if (ibtS0<tS0) */ ibtS0 = itS0;
+				var ibtS1 = itS1 * infiltrateScale/100;
+/* 				if (ibtS1>tS1) */ ibtS1 = itS1;
+				
+				// default bezier points (as in cornea cross section)
+				if (cornea && cornea.shape == "Keratoconus") {
+					iInferiorBezier.SP = new ED.Point(cornea.apexX, cornea.apexY - this.originY);
+					iInferiorBezier.CP1 = new ED.Point(cornea.apexX, cornea.apexY + 100 - this.originY);
+					iInferiorBezier.CP2 = new ED.Point(-240, 260 - this.originY);
+					iInferiorBezier.EP = new ED.Point(-120, 380 - this.originY);
+					
+					iInferiorBezierBack.SP = new ED.Point(cornea.apexX + cornealThickness*infiltrateScale/100, cornea.apexY - this.originY);
+					iInferiorBezierBack.CP1 = new ED.Point(cornea.apexX + cornealThickness*infiltrateScale/100, cornea.apexY + 120 - this.originY);
+					iInferiorBezierBack.CP2 = new ED.Point(-240 + 160*infiltrateScale/100, 260 - this.originY);
+					iInferiorBezierBack.EP = new ED.Point(-120 + 120*infiltrateScale/100, 380 - this.originY);
+				}
+				else if (cornea && cornea.shape == "Keratoglobus") {
+					iInferiorBezier.SP = new ED.Point(-380, 100 - this.originY);
+					iInferiorBezier.CP1 = new ED.Point(-380, 200 - this.originY);
+					iInferiorBezier.CP2 = new ED.Point(-240, 360 - this.originY);
+					iInferiorBezier.EP = new ED.Point(-120, 380 - this.originY);
+					
+					iInferiorBezierBack.SP = new ED.Point(-380 + 100*infiltrateScale/100, 100 - this.originY);
+					iInferiorBezierBack.CP1 = new ED.Point(-380 + 120*infiltrateScale/100, 220 - this.originY);
+					iInferiorBezierBack.CP2 = new ED.Point(-240 + 160*infiltrateScale/100, 260 - this.originY);
+					iInferiorBezierBack.EP = new ED.Point(-120 + 120*infiltrateScale/100, 380 - this.originY);
+				}
+				else {
+					iInferiorBezier.SP = new ED.Point(-320, -0 - this.originY);
+					iInferiorBezier.CP1 = new ED.Point(-320, 160 - this.originY);
+					iInferiorBezier.CP2 = new ED.Point(-240, 260 - this.originY);
+					iInferiorBezier.EP = new ED.Point(-120, 380 - this.originY);
+					
+					iInferiorBezierBack.SP = new ED.Point(-320 + 100*infiltrateScale/100, -0 - this.originY);
+					iInferiorBezierBack.CP1 = new ED.Point(-320 + 100*infiltrateScale/100, 160 - this.originY);
+					iInferiorBezierBack.CP2 = new ED.Point(-240 + 160*infiltrateScale/100, 260 - this.originY);
+					iInferiorBezierBack.EP = new ED.Point(-120 + 120*infiltrateScale/100, 380 - this.originY);
+				}	
+				
+				if (itS0 > 0) {
+				// Trim start of curve	
+				
+					// front of cornea		
+					var isq0 = new ED.Point(0,0);
+					isq0.y = (1-itS0)*(1-itS0)*(1-itS0)*iInferiorBezier.SP.y + 3*(1-itS0)*(1-itS0)*itS0*iInferiorBezier.CP1.y + 3*(1-itS0)*itS0*itS0*iInferiorBezier.CP2.y + itS0*itS0*itS0*iInferiorBezier.EP.y;
+					isq0.x = (1-itS0)*(1-itS0)*(1-itS0)*iInferiorBezier.SP.x + 3*(1-itS0)*(1-itS0)*itS0*iInferiorBezier.CP1.x + 3*(1-itS0)*itS0*itS0*iInferiorBezier.CP2.x + itS0*itS0*itS0*iInferiorBezier.EP.x;
+					
+					var isP23 = new ED.Point(0,0);
+					isP23.x = iInferiorBezier.CP1.x + itS0 * (iInferiorBezier.CP2.x - iInferiorBezier.CP1.x);
+					isP23.y = iInferiorBezier.CP1.y + itS0 * (iInferiorBezier.CP2.y - iInferiorBezier.CP1.y);
+					
+					var isP34 = new ED.Point(0,0);
+					isP34.x = iInferiorBezier.CP2.x + itS0 * (iInferiorBezier.EP.x - iInferiorBezier.CP2.x);
+					isP34.y = iInferiorBezier.CP2.y + itS0 * (iInferiorBezier.EP.y - iInferiorBezier.CP2.y);
+					
+					var isP2334 = new ED.Point(0,0);
+					isP2334.x = isP23.x + itS0 * (isP34.x - isP23.x);
+					isP2334.y = isP23.y + itS0 * (isP34.y - isP23.y);
+					
+					iInferiorBezier.SP = isq0;
+					iInferiorBezier.CP1 = isP2334;
+					iInferiorBezier.CP2 = isP34;
+				}
+				if (ibtS0 > 0) {	
+					// back of cornea
+					var isq0b = new ED.Point(0,0);
+					isq0b.y = (1-ibtS0)*(1-ibtS0)*(1-ibtS0)*iInferiorBezierBack.SP.y + 3*(1-ibtS0)*(1-ibtS0)*ibtS0*iInferiorBezierBack.CP1.y + 3*(1-ibtS0)*ibtS0*ibtS0*iInferiorBezierBack.CP2.y + ibtS0*ibtS0*ibtS0*iInferiorBezierBack.EP.y;
+					isq0b.x = (1-ibtS0)*(1-ibtS0)*(1-ibtS0)*iInferiorBezierBack.SP.x + 3*(1-ibtS0)*(1-ibtS0)*ibtS0*iInferiorBezierBack.CP1.x + 3*(1-ibtS0)*ibtS0*ibtS0*iInferiorBezierBack.CP2.x + ibtS0*ibtS0*ibtS0*iInferiorBezierBack.EP.x;
+					
+					var isP23b = new ED.Point(0,0);
+					isP23b.x = iInferiorBezierBack.CP1.x + ibtS0 * (iInferiorBezierBack.CP2.x - iInferiorBezierBack.CP1.x);
+					isP23b.y = iInferiorBezierBack.CP1.y + ibtS0 * (iInferiorBezierBack.CP2.y - iInferiorBezierBack.CP1.y);
+					
+					var isP34b = new ED.Point(0,0);
+					isP34b.x = iInferiorBezierBack.CP2.x + ibtS0 * (iInferiorBezierBack.EP.x - iInferiorBezierBack.CP2.x);
+					isP34b.y = iInferiorBezierBack.CP2.y + ibtS0 * (iInferiorBezierBack.EP.y - iInferiorBezierBack.CP2.y);
+					
+					var isP2334b = new ED.Point(0,0);
+					isP2334b.x = isP23b.x + ibtS0 * (isP34b.x - isP23b.x);
+					isP2334b.y = isP23b.y + ibtS0 * (isP34b.y - isP23b.y);
+					
+					iInferiorBezierBack.SP = isq0b;
+					iInferiorBezierBack.CP1 = isP2334b;
+					iInferiorBezierBack.CP2 = isP34b;
+				}
+				
+				if (itS1 < 1) {
+				// Trim end of curve
+				
+					// front of cornea
+					var isq1 = new ED.Point(0,0);
+					isq1.y = (1-itS1)*(1-itS1)*(1-itS1)*iInferiorBezier.SP.y + 3*(1-itS1)*(1-itS1)*itS1*iInferiorBezier.CP1.y + 3*(1-itS1)*itS1*itS1*iInferiorBezier.CP2.y + itS1*itS1*itS1*iInferiorBezier.EP.y;
+					isq1.x = (1-itS1)*(1-itS1)*(1-itS1)*iInferiorBezier.SP.x + 3*(1-itS1)*(1-itS1)*itS1*iInferiorBezier.CP1.x + 3*(1-itS1)*itS1*itS1*iInferiorBezier.CP2.x + itS1*itS1*itS1*iInferiorBezier.EP.x;
+		
+					var isP12 = new ED.Point(0,0);
+					isP12.x = iInferiorBezier.SP.x + itS1 * (iInferiorBezier.CP1.x - iInferiorBezier.SP.x);
+					isP12.y = iInferiorBezier.SP.y + itS1 * (iInferiorBezier.CP1.y - iInferiorBezier.SP.y);
+					
+					var isP23 = new ED.Point(0,0);
+					isP23.x = iInferiorBezier.CP1.x + itS1 * (iInferiorBezier.CP2.x - iInferiorBezier.CP1.x);
+					isP23.y = iInferiorBezier.CP1.y + itS1 * (iInferiorBezier.CP2.y - iInferiorBezier.CP1.y);
+					
+					var isP1223 = new ED.Point(0,0);
+					isP1223.x = isP12.x + itS1 * (isP23.x - isP12.x);
+					isP1223.y = isP12.y + itS1 * (isP23.y - isP12.y);
+		
+					iInferiorBezier.CP1 = isP12;
+					iInferiorBezier.CP2 = isP1223;
+					iInferiorBezier.EP = isq1;
+					
+					// back of cornea
+					var isq1b = new ED.Point(0,0);
+					isq1b.y = (1-ibtS1)*(1-ibtS1)*(1-ibtS1)*iInferiorBezierBack.SP.y + 3*(1-ibtS1)*(1-ibtS1)*ibtS1*iInferiorBezierBack.CP1.y + 3*(1-ibtS1)*ibtS1*ibtS1*iInferiorBezierBack.CP2.y + ibtS1*ibtS1*ibtS1*iInferiorBezierBack.EP.y;
+					isq1b.x = (1-ibtS1)*(1-ibtS1)*(1-ibtS1)*iInferiorBezierBack.SP.x + 3*(1-ibtS1)*(1-ibtS1)*ibtS1*iInferiorBezierBack.CP1.x + 3*(1-ibtS1)*ibtS1*ibtS1*iInferiorBezierBack.CP2.x + ibtS1*ibtS1*ibtS1*iInferiorBezierBack.EP.x;
+		
+					var isP12b = new ED.Point(0,0);
+					isP12b.x = iInferiorBezierBack.SP.x + ibtS1 * (iInferiorBezierBack.CP1.x - iInferiorBezierBack.SP.x);
+					isP12b.y = iInferiorBezierBack.SP.y + ibtS1 * (iInferiorBezierBack.CP1.y - iInferiorBezierBack.SP.y);
+					
+					var isP23b = new ED.Point(0,0);
+					isP23b.x = iInferiorBezierBack.CP1.x + ibtS1 * (iInferiorBezierBack.CP2.x - iInferiorBezierBack.CP1.x);
+					isP23b.y = iInferiorBezierBack.CP1.y + ibtS1 * (iInferiorBezierBack.CP2.y - iInferiorBezierBack.CP1.y);
+					
+					var isP1223b = new ED.Point(0,0);
+					isP1223b.x = isP12b.x + ibtS1 * (isP23b.x - isP12b.x);
+					isP1223b.y = isP12b.y + ibtS1 * (isP23b.y - isP12b.y);
+		
+					iInferiorBezierBack.CP1 = isP12b;
+					iInferiorBezierBack.CP2 = isP1223b;
+					iInferiorBezierBack.EP = isq1b;
+					
+				}
+				
+			}
+
+			// Draw infiltrate
+			ctx.beginPath();
+			
+			if (iInferiorBezier) {
+				ctx.moveTo(iInferiorBezierBack.EP.x, iInferiorBezierBack.EP.y); // starts at bottom of back inferior bezier
+				ctx.bezierCurveTo(iInferiorBezierBack.CP2.x, iInferiorBezierBack.CP2.y, iInferiorBezierBack.CP1.x, iInferiorBezierBack.CP1.y, iInferiorBezierBack.SP.x, iInferiorBezierBack.SP.y);				
+			}
+			
+			
+			if (iSuperiorBezierBack && iSuperiorBezierBack.EP.y>=iSuperiorBezierBack.SP.y) {
+				ctx.moveTo(iSuperiorBezierBack.EP.x, iSuperiorBezierBack.EP.y); // start at bottom of back superior curve (closest to midpoint)
+				ctx.bezierCurveTo(iSuperiorBezierBack.CP2.x, iSuperiorBezierBack.CP2.y, iSuperiorBezierBack.CP1.x, iSuperiorBezierBack.CP1.y, iSuperiorBezierBack.SP.x, iSuperiorBezierBack.SP.y);
+				ctx.lineTo(iSuperiorBezier.SP.x, iSuperiorBezier.SP.y);
+				ctx.bezierCurveTo(iSuperiorBezier.CP1.x, iSuperiorBezier.CP1.y, iSuperiorBezier.CP2.x, iSuperiorBezier.CP2.y, iSuperiorBezier.EP.x, iSuperiorBezier.EP.y); // end at bottom of front superior bezier (near midpoint)
+			}
+			else if (iSuperiorBezier) {
+				ctx.lineTo(iSuperiorBezier.SP.x, iSuperiorBezier.SP.y);
+				ctx.bezierCurveTo(iSuperiorBezier.CP1.x, iSuperiorBezier.CP1.y, iSuperiorBezier.CP2.x, iSuperiorBezier.CP2.y, iSuperiorBezier.EP.x, iSuperiorBezier.EP.y);
+			}
+			
+			if (iInferiorBezier) {
+				ctx.lineTo(iInferiorBezier.SP.x, iInferiorBezier.SP.y); // top of inferior bezier at the front
+				ctx.bezierCurveTo(iInferiorBezier.CP1.x, iInferiorBezier.CP1.y, iInferiorBezier.CP2.x, iInferiorBezier.CP2.y, iInferiorBezier.EP.x, iInferiorBezier.EP.y); // ends at bottom of front inferior bezier
+			}
+			if (iInferiorBezierBack && iInferiorBezierBack.EP.y>=iInferiorBezierBack.SP.y) {
+				ctx.lineTo(iInferiorBezierBack.EP.x, iInferiorBezierBack.EP.y);
+			}
+			else ctx.lineTo(iSuperiorBezierBack.EP.x,iSuperiorBezierBack.EP.y);
+			
+			ctx.fillStyle = "rgba(0,0,0,0.2)";
+			ctx.fill();
+			
+			// fill opacity on top of
+			ctx.beginPath();
+			if (inferiorBezier) {
+				ctx.moveTo(inferiorBezierBack.EP.x, inferiorBezierBack.EP.y);
+				ctx.bezierCurveTo(inferiorBezierBack.CP2.x, inferiorBezierBack.CP2.y, inferiorBezierBack.CP1.x, inferiorBezierBack.CP1.y, inferiorBezierBack.SP.x, inferiorBezierBack.SP.y);
+				ctx.lineTo(inferiorBezier.SP.x, inferiorBezier.SP.y);
+				ctx.bezierCurveTo(inferiorBezier.CP1.x, inferiorBezier.CP1.y, inferiorBezier.CP2.x, inferiorBezier.CP2.y, inferiorBezier.EP.x, inferiorBezier.EP.y);
+			}
+			if (superiorBezier) {
+				ctx.moveTo(superiorBezierBack.EP.x, superiorBezierBack.EP.y);
+				ctx.bezierCurveTo(superiorBezierBack.CP2.x, superiorBezierBack.CP2.y, superiorBezierBack.CP1.x, superiorBezierBack.CP1.y, superiorBezierBack.SP.x, superiorBezierBack.SP.y);
+				ctx.lineTo(superiorBezier.SP.x, superiorBezier.SP.y);
+				ctx.bezierCurveTo(superiorBezier.CP1.x, superiorBezier.CP1.y, superiorBezier.CP2.x, superiorBezier.CP2.y, superiorBezier.EP.x, superiorBezier.EP.y);
+			}
+			ctx.fillStyle = "gray";
+			ctx.fill();
+		}
+	}
+	
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+
+	// Return value indicating successful hittest
+	return this.isClicked;
+	
+}
+
+
+
+/**
+ * OpenEyes
+ *
+ * Copyright (C) OpenEyes Foundation, 2011-2017
+ * This file is part of OpenEyes.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package OpenEyes
+ * @link http://www.openeyes.org.uk
+ * @author OpenEyes <info@openeyes.org.uk>
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
+ */
+
+/**
+ * 
  *
  * @class CornealPigmentation
  * @property {String} className Name of doodle subclass
@@ -20340,12 +24391,8 @@ ED.CornealPigmentation = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "CornealPigmentation";
 	
-	// Other parameters
-	this.level = 'Epithelial';
-	this.type = 'Iron';
-
 	// Saved parameters
-	this.savedParameterArray = ['originX', 'originY', 'apexY', 'rotation', 'level', 'type'];
+	this.savedParameterArray = ['originX', 'originY', 'apexY', 'apexX', 'scaleX','scaleY', 'rotation', 'level', 'type'];
 
 	// Parameters in doodle control bar (parameter name: parameter label)
 	this.controlParameterArray = {'level':'Level', 'type':'Type'};
@@ -20365,22 +24412,35 @@ ED.CornealPigmentation.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.CornealPigmentation.prototype.setHandles = function() {
+	
+	// pigmentation density
+	this.handleArray[0] = new ED.Doodle.Handle(null, true, ED.Mode.Handles, false);
+	
+	// shape
 	this.handleArray[4] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
+	this.handleArray[4].isRotatable = true;
 }
 
 /**
  * Sets default properties
  */
 ED.CornealPigmentation.prototype.setPropertyDefaults = function() {
+	this.isSqueezable = true;
+	
+/*
+	this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.2, +3);
+	this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.2, +3);
+	
+*/
 	// Update component of validation array for simple parameters
-	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
-	this.parameterValidationArray['apexY']['range'].setMinAndMax(-380, -40);
+	this.parameterValidationArray['apexX']['range'].setMinAndMax(-400, +400);
+	this.parameterValidationArray['apexY']['range'].setMinAndMax(-400, +400);
 	
 	// Add complete validation arrays for derived parameters
 	this.parameterValidationArray['level'] = {
 		kind: 'derived',
 		type: 'string',
-		list: ['Epithelial', 'Subepithelial', 'Anterior stromal', 'Mid stromal', 'Posterior stromal', 'Descemet\'s'],
+		list: ['Endothelium', 'Epithelial', 'Subepithelial', 'Anterior stromal', 'Mid stromal', 'Posterior stromal', 'Descemet\'s'],
 		animate: true
 	};
 	this.parameterValidationArray['type'] = {
@@ -20389,17 +24449,32 @@ ED.CornealPigmentation.prototype.setPropertyDefaults = function() {
 		list: ['Iron', 'Melanin', 'Blood', 'Copper', 'Lead', 'Organic', 'Unknown'],
 		animate: true
 	};
+	
+	this.handleVectorRangeArray = new Array();
+	var range = new Object;
+	range.length = new ED.Range(+1, +150);
+	range.angle = new ED.Range(0.5*Math.PI, 0.5*Math.PI);
+	this.handleVectorRangeArray[0] = range;
 }
 
 /**
  * Sets default parameters
  */
 ED.CornealPigmentation.prototype.setParameterDefaults = function() {
-	this.setParameterFromString('level', 'Epithelial');
-	this.apexY = -200;
+	this.setParameterFromString('level', 'Endothelium');
+  this.setParameterFromString('type', 'Melanin');
+	this.apexY = -150;
+	this.apexX = 30;
+	
+	// Create a squiggle to store the handles points
+	var squiggle = new ED.Squiggle(this, new ED.Colour(100, 100, 100, 1), 4, true);
 
-	// Put control handle at 45 degrees
-	this.rotation = Math.PI / 4;
+	// Add it to squiggle array
+	this.squiggleArray.push(squiggle);
+
+	var point = new ED.Point(40, 0);
+	this.addPointToSquiggle(point);
+
 }
 
 /**
@@ -20417,20 +24492,79 @@ ED.CornealPigmentation.prototype.draw = function(_point) {
 	// Boundary path
 	ctx.beginPath();
 
-	// Circular scar
-	var r = Math.sqrt(this.apexX * this.apexX + this.apexY * this.apexY);
-
-	// Circular scar
-	ctx.arc(0, 0, r, 0, 2 * Math.PI, true);
-
+	// Invisible boundary
+	ctx.ellipse(0, 0, Math.abs(this.apexY), Math.abs(this.apexX), 0.5 * Math.PI, 0, 2 * Math.PI);
+	
 	// Set line attributes  
-	ctx.lineWidth = 4;
-	var ptrn = ctx.createPattern(this.drawing.imageArray['BrownSpotPattern'], 'repeat');
-	ctx.fillStyle = ptrn;
-	ctx.strokeStyle = "rgba(200, 200, 200, 1)";
+	ctx.lineWidth = 1;
+	ctx.strokeStyle = "rgba(0, 0, 0, 0)";
+	ctx.fillStyle = "rgba(0,0,0,0)";
 
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
+	
+	// Coordinates of expert handles (in canvas plane)
+	this.handleArray[0].location = this.transform.transformPoint(this.squiggleArray[0].pointsArray[0]);
+	
+	// Non boundary paths
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+		// Pigment dots
+		
+		// Colours
+		var fill = "brown";
+		
+		// Pigmentation density
+		var pD = this.squiggleArray[0].pointsArray[0].x;
+		
+		// Radius
+		var dr = 2;
+
+		// Calculate shape area
+		var A = Math.PI * Math.abs(this.apexX * this.apexY);
+		
+		// Calculate number of dots within boundary
+		var n = A / 250 * (pD / 30);
+		
+		var p = new ED.Point(0, 0);
+		
+		// Calculate random positions for dots
+/*
+		var xS;
+		var yS;
+		for (var z=1; z<5; z++) {
+			/// ED.randomArray is too short (length == 200)	, but using Math.random() means non reproducible, so do quarter at a time for more dots!
+			var xS = (z < 3) ? -1 : 1;
+			var yS = (z % 2 == 0) ? -1 : 1;
+*/
+			
+			for (var i = 0; i < n; i++) {
+				var j = (i < 150) ? i : (i < 199) ? i - 50 : (i < 249) ? i - 100 : (i < 299) ? i - 150 : (i < 349) ? i - 200 : i - 250;
+
+				var k = (i < 200) ? i : (i < 398) ? (i - 199) : (i < 397) ? (i - 298) : (i - 396);
+
+				var r = Math.sqrt(n * ED.randomArray[k]);
+				var rX = this.apexX * ED.randomArray[k];
+				var rY = this.apexY * ED.randomArray[j];
+				var theta = 2 * Math.PI * ED.randomArray[j + 50];
+								
+/*
+				p.x = Math.abs(rX * Math.cos(theta*r)) * xS;
+				p.y = Math.abs(rY * Math.sin(theta*r)) * yS;
+*/
+				p.x = rX * Math.cos(theta*r);
+				p.y = rY * Math.sin(theta*r);
+				
+				// Draw dot
+				this.drawSpot(ctx, p.x, p.y, dr, fill);
+			}
+// 		}
+		
+		// Additionally draw spots at boundarys to ensure indicated
+		this.drawSpot(ctx, 0, Math.abs(this.apexY), dr, fill);
+		this.drawSpot(ctx, 0, -1 * Math.abs(this.apexY), dr, fill);
+		this.drawSpot(ctx, Math.abs(this.apexX), 0, dr, fill);
+		this.drawSpot(ctx, -1 * Math.abs(this.apexX), 0, dr, fill);
+	}
 
 	// Coordinates of handles (in canvas plane)
 	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
@@ -20447,26 +24581,32 @@ ED.CornealPigmentation.prototype.draw = function(_point) {
  *
  * @returns {String} Description of doodle
  */
-ED.CornealPigmentation.prototype.groupDescription = function() {
-	return "CornealPigmentation";
+ED.CornealPigmentation.prototype.description = function() {
+	
+	// old ratio check method
+	// var ratio = Math.abs(this.apexX / this.apexY);
+	// var str = (ratio<2.5 && ratio>0.3) ? "Corneal pigmentation" : "Krukenberg spindle";
+	if (this.type === 'Melanin' && this.level === 'Endothelium') {
+		return 'Krukenberg spindle';
+	}
+
+	return 'Corneal pigmentation: ' + this.type + ', ' + this.level;
 }
 
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -20628,19 +24768,17 @@ ED.CornealScar.prototype.diagnosticHierarchy = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -20748,19 +24886,17 @@ ED.CornealStriae.prototype.description = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -20774,9 +24910,14 @@ ED.CornealStriae.prototype.description = function() {
 ED.CornealSuture = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "CornealSuture";
-
+	
+	// Derived parameters
+	this.removed = false;
+	
 	// Saved parameters
-	this.savedParameterArray = ['radius', 'rotation'];
+	this.savedParameterArray = ['radius', 'rotation','removed'];
+	
+	this.controlParameterArray = {'removed':'Removed'};
 	
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -20795,6 +24936,12 @@ ED.CornealSuture.superclass = ED.Doodle.prototype;
 ED.CornealSuture.prototype.setPropertyDefaults = function() {
 	this.isScaleable = false;
 	this.isMoveable = false;
+	
+	this.parameterValidationArray['removed'] = {
+		kind: 'derived',
+		type: 'bool',
+		animate: false
+	}
 }
 
 /**
@@ -20847,9 +24994,12 @@ ED.CornealSuture.prototype.draw = function(_point) {
 		ctx.lineTo(-10, -r + 30);
 
 		ctx.lineWidth = 2;
-		var colour = "rgba(0,0,120,0.7)"
-		ctx.strokeStyle = colour;
-
+		if (this.removed) ctx.strokeStyle = "rgba(150,150,150,0.6)";
+		else {
+			var colour = "rgba(0,0,120,0.7)"
+			ctx.strokeStyle = colour;
+		}
+	
 		ctx.stroke();
 
 		// Knot
@@ -20876,19 +25026,17 @@ ED.CornealSuture.prototype.description = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -21096,19 +25244,17 @@ ED.CorticalCataract.prototype.diagnosticHierarchy = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -21290,19 +25436,17 @@ ED.CorticalCataractCrossSection.prototype.draw = function(_point) {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -21428,19 +25572,17 @@ ED.CottonWoolSpot.prototype.groupDescription = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -21560,19 +25702,17 @@ ED.Cryo.prototype.groupDescription = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -21662,19 +25802,17 @@ ED.CutterPI.prototype.groupDescription = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -21826,19 +25964,17 @@ ED.CystoidMacularOedema.prototype.diagnosticHierarchy = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -22037,19 +26173,17 @@ ED.DendriticUlcer.prototype.description = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -22373,19 +26507,17 @@ ED.Dialysis.prototype.diagnosticHierarchy = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -22504,19 +26636,17 @@ ED.DiscHaemorrhage.prototype.description = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -22712,19 +26842,17 @@ ED.DiscPallor.prototype.description = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -22806,19 +26934,17 @@ ED.DrainageRetinotomy.prototype.description = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -22937,19 +27063,17 @@ ED.DrainageSite.prototype.description = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -23089,19 +27213,17 @@ ED.EncirclingBand.prototype.description = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -23216,19 +27338,17 @@ ED.EntrySiteBreak.prototype.draw = function(_point) {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -23399,19 +27519,17 @@ ED.EpiretinalMembrane.prototype.diagnosticHierarchy = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -23654,19 +27772,148 @@ ED.Episcleritis.prototype.drawSoftLine = function(x1, y1, x2, y2, lineWidth, r, 
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
+ */
+
+/**
+ * Eyeball
+ *
+ * @class Eyeball
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Object} _parameterJSON
+ */
+ED.Eyeball = function(_drawing, _parameterJSON) {
+	// Set classname
+	this.className = "Eyeball";
+
+	// Saved parameters
+// 	this.savedParameterArray = [];
+
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _parameterJSON);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.Eyeball.prototype = new ED.Doodle;
+ED.Eyeball.prototype.constructor = ED.Eyeball;
+ED.Eyeball.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.Eyeball.prototype.setHandles = function() {
+}
+
+/**
+ * Sets default dragging attributes
+ */
+ED.Eyeball.prototype.setPropertyDefaults = function() {
+	this.isSelectable = false;
+	this.isFilled = false;
+}
+
+/**
+ * Sets default parameters
+ */
+ED.Eyeball.prototype.setParameterDefaults = function() {
+  this.isDeletable = false;
+  this.isMoveable = false;
+  this.isScalable = false;
+  this.isRotatable= false;
+  this.isShowHighlight = false;
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.Eyeball.prototype.draw = function(_point) {
+	// Get context
+	var ctx = this.drawing.context;
+
+	// Call draw method in superclass
+	ED.Eyeball.superclass.draw.call(this, _point);
+
+	// Radius
+	var r = 250;
+
+	// Boundary path
+	ctx.beginPath();
+
+	
+	// Boundary path
+	ctx.beginPath();
+
+	// Main eyeball
+	ctx.arc(0, 0, r, 0, 2*Math.PI, true);
+
+	// Close path
+	ctx.closePath();
+
+	// Set drawing attributes
+	ctx.lineWidth = 4;
+	ctx.strokeStyle = "black";
+
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+
+	// Non-boundary paths
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+		
+		// iris
+		var rI = 120;
+		ctx.beginPath();
+		ctx.moveTo(0+rI, 0);
+		ctx.arc(0,0,rI, 0, 2*Math.PI);
+		ctx.fillStyle = "gray";
+		ctx.fill();
+		ctx.stroke();
+		ctx.closePath();
+		
+		// pupil
+		var rP = 45;
+		ctx.beginPath();
+		ctx.moveTo(0+rP, 0);
+		ctx.arc(0,0,rP, 0, 2*Math.PI);
+		ctx.fillStyle = "black";
+		ctx.stroke();
+		ctx.fill();
+		ctx.closePath();
+		
+	}
+
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * OpenEyes
+ *
+ * Copyright (C) OpenEyes Foundation, 2011-2017
+ * This file is part of OpenEyes.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package OpenEyes
+ * @link http://www.openeyes.org.uk
+ * @author OpenEyes <info@openeyes.org.uk>
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -23781,19 +28028,17 @@ ED.FibrousProliferation.prototype.description = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -23973,19 +28218,17 @@ ED.FibrovascularScar.prototype.description = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -24075,19 +28318,17 @@ ED.FieldCircle.prototype.draw = function(_point) {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -24291,19 +28532,17 @@ ED.FocalChoroiditis.prototype.description = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -24442,19 +28681,17 @@ ED.FocalLaser.prototype.groupDescription = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -24573,19 +28810,17 @@ ED.Fuchs.prototype.diagnosticHierarchy = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -24709,19 +28944,17 @@ ED.Fundus.prototype.description = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -24874,19 +29107,17 @@ ED.Geographic.prototype.diagnosticHierarchy = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -25314,19 +29545,17 @@ ED.GRT.prototype.diagnosticHierarchy = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -25463,19 +29692,17 @@ ED.HardDrusen.prototype.description = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -25557,19 +29784,17 @@ ED.HardExudate.prototype.groupDescription = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -25904,19 +30129,17 @@ ED.HVT.prototype.draw = function(_point) {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -25990,19 +30213,17 @@ ED.HVTGrid.prototype.draw = function(_point) {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -26020,9 +30241,12 @@ ED.Hyphaema = function(_drawing, _parameterJSON) {
 	// Private parameters
 	this.ro = 380;
 	this.minimum = 304;
+	this.csOriginY = 0;
+    this.csOriginX = 50;
+	this.csApexX = 0;
 
-	// Saved parameters
-	this.savedParameterArray = ['apexX', 'apexY'];
+    // Saved parameters
+	this.savedParameterArray = ['apexX', 'apexY', 'csOriginY', 'csApexX', 'csOriginX'];
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -26121,20 +30345,385 @@ ED.Hyphaema.prototype.description = function() {
 
 /**
  * OpenEyes
+ * MSC
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
+ */
+
+/**
+ * MSC TODO: (1) Calculate t instead of current estimation based on time so level with apexY
+ *           (2) Calculate x coordinate of stop positon if within inf / sup zonules 
+ *
+ * @class HyphaemaCrossSection
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Object} _parameterJSON
+ */
+ED.HyphaemaCrossSection = function(_drawing, _parameterJSON) {
+	// Set classname
+	this.className = "HyphaemaCrossSection";
+
+	// Private parameters
+	this.initialRadius = 360;
+	
+	// Derived parameters
+	this.ro = 380;
+
+	// Saved parameters
+	this.savedParameterArray = ['originY', 'apexX', 'apexY', 'originX'];
+	
+	// Parameters in doodle control bar
+	this.controlParameterArray = {};
+
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _parameterJSON);
+
+    this.linkedDoodleParameters = {
+        'Hyphaema': {
+            source: ['apexY'],
+            store: [['originY', 'csOriginY'], ['apexX', 'csApexX'], ['originX', 'csOriginX']]
+        }
+    };
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.HyphaemaCrossSection.prototype = new ED.Doodle;
+ED.HyphaemaCrossSection.prototype.constructor = ED.HyphaemaCrossSection;
+ED.HyphaemaCrossSection.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.HyphaemaCrossSection.prototype.setHandles = function() {
+}
+
+/**
+ * Sets default properties
+ */
+ED.HyphaemaCrossSection.prototype.setPropertyDefaults = function() {
+	this.isSelectable = false;
+	this.addAtBack = true;
+		
+	// Update component of validation array for simple parameters
+	this.parameterValidationArray['apexX']['range'].setMinAndMax(-50, +50);
+	this.parameterValidationArray['apexY']['range'].setMinAndMax(-380, 304);
+	
+	
+}
+
+/**
+ * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
+ * The returned parameters are animated if their 'animate' property is set to true
+ *
+ * @param {String} _parameter Name of parameter that has changed
+ * @value {Undefined} _value Value of parameter to calculate
+ * @returns {Array} Associative array of values of dependent parameters
+ */
+ED.HyphaemaCrossSection.prototype.dependentParameterValues = function(_parameter, _value) {
+	var returnArray = new Array();
+
+	switch (_parameter) {
+			
+	}
+
+	return returnArray;
+}
+
+/**
+ * Sets default parameters
+ */
+ED.HyphaemaCrossSection.prototype.setParameterDefaults = function() {
+	this.originX = 50; // as is in Cornea cross section doodle to dulicate bezier control points
+	
+	this.apexY = 152;
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.HyphaemaCrossSection.prototype.draw = function(_point) {
+	
+	// Get context
+	var ctx = this.drawing.context;
+
+	var cornea = this.drawing.lastDoodleOfClass('CorneaCrossSection');
+	var cornealThickness = cornea.pachymetry/5;
+
+	// Call draw method in superclass
+	ED.HyphaemaCrossSection.superclass.draw.call(this, _point);
+
+	// Boundary path
+	ctx.beginPath();
+	
+	// Calculate segment extent in terms of time along curve
+	var startY = this.apexY - this.apexY/12; //buffer needed as only estimating t
+	var startT = (startY + 380) / 760;
+	if (startT<0) startT = 0;
+	var endT = 1;
+		
+	if (startT < 0.5) {
+		
+		var superiorBezierBack = new Object;
+
+		// define start and end time points
+		var tI0 = startT * 2;
+		var tI1 = (endT < 0.5) ? endT * 2 : 1;
+		
+		// default bezier points (as in cornea cross section)
+		if (cornea && cornea.shape == "Keratoconus") {
+			superiorBezierBack.SP = new ED.Point(-120 + 120, -380 - this.originY);
+			superiorBezierBack.CP1 = new ED.Point(-240 + 160, -260 - this.originY);
+			superiorBezierBack.CP2 = new ED.Point(cornea.apexX + cornealThickness, cornea.apexY - 120 - this.originY);
+			superiorBezierBack.EP = new ED.Point(cornea.apexX + cornealThickness, cornea.apexY - this.originY);
+		}
+		else if (cornea && cornea.shape == "Keratoglobus") {
+			superiorBezierBack.SP = new ED.Point(-120 + 120, -380 - this.originY);
+			superiorBezierBack.CP1 = new ED.Point(-240 + 120, -200 - this.originY);
+			superiorBezierBack.CP2 = new ED.Point(-380 + 100, -140 - this.originY);
+			superiorBezierBack.EP = new ED.Point(-380 + 100, 100 - this.originY);
+		}
+		else {
+			superiorBezierBack.SP = new ED.Point(-120 + 120, -380 - this.originY);
+			superiorBezierBack.CP1 = new ED.Point(-240 + 160, -260 - this.originY);
+			superiorBezierBack.CP2 = new ED.Point(-320 + 100, -160 - this.originY);
+			superiorBezierBack.EP = new ED.Point(-320 + 100, 0 - this.originY);
+		}
+		
+			
+		if (tI0 > 0) {
+		// Trim start of curve			
+			var sq0b = new ED.Point(0,0);
+			sq0b.y = (1-tI0)*(1-tI0)*(1-tI0)*superiorBezierBack.SP.y + 3*(1-tI0)*(1-tI0)*tI0*superiorBezierBack.CP1.y + 3*(1-tI0)*tI0*tI0*superiorBezierBack.CP2.y + tI0*tI0*tI0*superiorBezierBack.EP.y;
+			sq0b.x = (1-tI0)*(1-tI0)*(1-tI0)*superiorBezierBack.SP.x + 3*(1-tI0)*(1-tI0)*tI0*superiorBezierBack.CP1.x + 3*(1-tI0)*tI0*tI0*superiorBezierBack.CP2.x + tI0*tI0*tI0*superiorBezierBack.EP.x;
+			
+			var iP23b = new ED.Point(0,0);
+			iP23b.x = superiorBezierBack.CP1.x + tI0 * (superiorBezierBack.CP2.x - superiorBezierBack.CP1.x);
+			iP23b.y = superiorBezierBack.CP1.y + tI0 * (superiorBezierBack.CP2.y - superiorBezierBack.CP1.y);
+			
+			var iP34b = new ED.Point(0,0);
+			iP34b.x = superiorBezierBack.CP2.x + tI0 * (superiorBezierBack.EP.x - superiorBezierBack.CP2.x);
+			iP34b.y = superiorBezierBack.CP2.y + tI0 * (superiorBezierBack.EP.y - superiorBezierBack.CP2.y);
+			
+			var iP2334b = new ED.Point(0,0);
+			iP2334b.x = iP23b.x + tI0 * (iP34b.x - iP23b.x);
+			iP2334b.y = iP23b.y + tI0 * (iP34b.y - iP23b.y);
+			
+			superiorBezierBack.SP = sq0b;
+			superiorBezierBack.CP1 = iP2334b;
+			superiorBezierBack.CP2 = iP34b;
+		}
+		
+		if (tI1 < 1) {
+		// Trim end of curve
+			var iq1b = new ED.Point(0,0);
+			iq1b.y = (1-tI1)*(1-tI1)*(1-tI1)*superiorBezierBack.SP.y + 3*(1-tI1)*(1-tI1)*tI1*superiorBezierBack.CP1.y + 3*(1-tI1)*tI1*tI1*superiorBezierBack.CP2.y + tI1*tI1*tI1*superiorBezierBack.EP.y;
+			iq1b.x = (1-tI1)*(1-tI1)*(1-tI1)*superiorBezierBack.SP.x + 3*(1-tI1)*(1-tI1)*tI1*superiorBezierBack.CP1.x + 3*(1-tI1)*tI1*tI1*superiorBezierBack.CP2.x + tI1*tI1*tI1*superiorBezierBack.EP.x;
+
+			var iP12b = new ED.Point(0,0);
+			iP12b.x = superiorBezierBack.SP.x + tI1 * (superiorBezierBack.CP1.x - superiorBezierBack.SP.x);
+			iP12b.y = superiorBezierBack.SP.y + tI1 * (superiorBezierBack.CP1.y - superiorBezierBack.SP.y);
+			
+			var iP23b = new ED.Point(0,0);
+			iP23b.x = superiorBezierBack.CP1.x + tI1 * (superiorBezierBack.CP2.x - superiorBezierBack.CP1.x);
+			iP23b.y = superiorBezierBack.CP1.y + tI1 * (superiorBezierBack.CP2.y - superiorBezierBack.CP1.y);
+			
+			var iP1223b = new ED.Point(0,0);
+			iP1223b.x = iP12b.x + tI1 * (iP23b.x - iP12b.x);
+			iP1223b.y = iP12b.y + tI1 * (iP23b.y - iP12b.y);
+			
+			superiorBezierBack.CP1 = iP12b;
+			superiorBezierBack.CP2 = iP1223b;
+			superiorBezierBack.EP = iq1b;
+		}
+	}
+	
+	
+	if (endT > 0.5) {
+		
+		var inferiorBezierBack = new Object;
+		
+		// define start and end time points
+		var tS0 = (startT > 0.5) ? (startT - 0.5) * 2 : 0;
+		var tS1 = (endT - 0.5) * 2;
+		
+		// default bezier points (as in cornea cross section)
+		if (cornea && cornea.shape == "Keratoconus") {
+			inferiorBezierBack.SP = new ED.Point(cornea.apexX + cornealThickness, cornea.apexY - this.originY);
+			inferiorBezierBack.CP1 = new ED.Point(cornea.apexX + cornealThickness, cornea.apexY + 120 - this.originY);
+			inferiorBezierBack.CP2 = new ED.Point(-240 + 160, 260 - this.originY);
+			inferiorBezierBack.EP = new ED.Point(-120 + 120, 380 - this.originY);
+		}
+		else if (cornea && cornea.shape == "Keratoglobus") {
+			inferiorBezierBack.SP = new ED.Point(-380 + 100, 100 - this.originY);
+			inferiorBezierBack.CP1 = new ED.Point(-380 + 120, 220 - this.originY);
+			inferiorBezierBack.CP2 = new ED.Point(-240 + 160, 260 - this.originY);
+			inferiorBezierBack.EP = new ED.Point(-120 + 120, 380 - this.originY);
+		}
+		else {
+			inferiorBezierBack.SP = new ED.Point(-320 + 100, -0 - this.originY);
+			inferiorBezierBack.CP1 = new ED.Point(-320 + 100, 160 - this.originY);
+			inferiorBezierBack.CP2 = new ED.Point(-240 + 160, 260 - this.originY);
+			inferiorBezierBack.EP = new ED.Point(-120 + 120, 380 - this.originY);
+		}			
+		
+		
+		if (tS0 > 0) {
+		// Trim start of curve
+			var sq0b = new ED.Point(0,0);
+			sq0b.y = (1-tS0)*(1-tS0)*(1-tS0)*inferiorBezierBack.SP.y + 3*(1-tS0)*(1-tS0)*tS0*inferiorBezierBack.CP1.y + 3*(1-tS0)*tS0*tS0*inferiorBezierBack.CP2.y + tS0*tS0*tS0*inferiorBezierBack.EP.y;
+			sq0b.x = (1-tS0)*(1-tS0)*(1-tS0)*inferiorBezierBack.SP.x + 3*(1-tS0)*(1-tS0)*tS0*inferiorBezierBack.CP1.x + 3*(1-tS0)*tS0*tS0*inferiorBezierBack.CP2.x + tS0*tS0*tS0*inferiorBezierBack.EP.x;
+			
+			var sP23b = new ED.Point(0,0);
+			sP23b.x = inferiorBezierBack.CP1.x + tS0 * (inferiorBezierBack.CP2.x - inferiorBezierBack.CP1.x);
+			sP23b.y = inferiorBezierBack.CP1.y + tS0 * (inferiorBezierBack.CP2.y - inferiorBezierBack.CP1.y);
+			
+			var sP34b = new ED.Point(0,0);
+			sP34b.x = inferiorBezierBack.CP2.x + tS0 * (inferiorBezierBack.EP.x - inferiorBezierBack.CP2.x);
+			sP34b.y = inferiorBezierBack.CP2.y + tS0 * (inferiorBezierBack.EP.y - inferiorBezierBack.CP2.y);
+			
+			var sP2334b = new ED.Point(0,0);
+			sP2334b.x = sP23b.x + tS0 * (sP34b.x - sP23b.x);
+			sP2334b.y = sP23b.y + tS0 * (sP34b.y - sP23b.y);
+			
+			inferiorBezierBack.SP = sq0b;
+			inferiorBezierBack.CP1 = sP2334b;
+			inferiorBezierBack.CP2 = sP34b;
+		}
+		
+		if (tS1 < 1) {
+		// Trim end of curve
+			var sq1b = new ED.Point(0,0);
+			sq1b.y = (1-tS1)*(1-tS1)*(1-tS1)*inferiorBezierBack.SP.y + 3*(1-tS1)*(1-tS1)*tS1*inferiorBezierBack.CP1.y + 3*(1-tS1)*tS1*tS1*inferiorBezierBack.CP2.y + tS1*tS1*tS1*inferiorBezierBack.EP.y;
+			sq1b.x = (1-tS1)*(1-tS1)*(1-tS1)*inferiorBezierBack.SP.x + 3*(1-tS1)*(1-tS1)*tS1*inferiorBezierBack.CP1.x + 3*(1-tS1)*tS1*tS1*inferiorBezierBack.CP2.x + tS1*tS1*tS1*inferiorBezierBack.EP.x;
+
+			var sP12b = new ED.Point(0,0);
+			sP12b.x = inferiorBezierBack.SP.x + tS1 * (inferiorBezierBack.CP1.x - inferiorBezierBack.SP.x);
+			sP12b.y = inferiorBezierBack.SP.y + tS1 * (inferiorBezierBack.CP1.y - inferiorBezierBack.SP.y);
+			
+			var sP23b = new ED.Point(0,0);
+			sP23b.x = inferiorBezierBack.CP1.x + tS1 * (inferiorBezierBack.CP2.x - inferiorBezierBack.CP1.x);
+			sP23b.y = inferiorBezierBack.CP1.y + tS1 * (inferiorBezierBack.CP2.y - inferiorBezierBack.CP1.y);
+			
+			var sP1223b = new ED.Point(0,0);
+			sP1223b.x = sP12b.x + tS1 * (sP23b.x - sP12b.x);
+			sP1223b.y = sP12b.y + tS1 * (sP23b.y - sP12b.y);
+
+			inferiorBezierBack.CP1 = sP12b;
+			inferiorBezierBack.CP2 = sP1223b;
+			inferiorBezierBack.EP = sq1b;
+		}
+	}
+	
+	// Get relative lens position to draw around
+	var lens = this.drawing.lastDoodleOfClass('LensCrossSection');
+	var iris = this.drawing.lastDoodleOfClass('AntSegCrossSection');
+	
+	var marginX = (iris) ? iris.apexX: -20;
+
+	if (lens) {
+		// Displacement of lens from centre
+		var ld = 100;
+	
+		// Angle of arc or lens
+		var theta = Math.asin(240 / 300);
+	
+		// X coordinate of centre of lens arc
+		var x = 300 * Math.cos(theta);
+		
+		if (iris) {
+			if (lens.originX + ld + x - 300 - this.originX < iris.apexX) marginX = lens.originX + ld + x - 300 - this.originX;
+		}
+		else marginX = lens.originX + ld + x - 300 - this.originX;
+	}
+
+	// Draw it
+	if (inferiorBezierBack) {
+		ctx.moveTo(inferiorBezierBack.EP.x, inferiorBezierBack.EP.y);
+		ctx.bezierCurveTo(inferiorBezierBack.CP2.x, inferiorBezierBack.CP2.y, inferiorBezierBack.CP1.x, inferiorBezierBack.CP1.y, inferiorBezierBack.SP.x, inferiorBezierBack.SP.y);
+	}
+	if (superiorBezierBack) {
+		ctx.bezierCurveTo(superiorBezierBack.CP2.x, superiorBezierBack.CP2.y, superiorBezierBack.CP1.x, superiorBezierBack.CP1.y, superiorBezierBack.SP.x, superiorBezierBack.SP.y);
+		if (!iris) ctx.lineTo(marginX, superiorBezierBack.SP.y);
+		else {
+			var x1 = (marginX < superiorBezierBack.SP.x) ? superiorBezierBack.SP.x : marginX;
+			ctx.lineTo(x1, superiorBezierBack.SP.y);
+			if (this.apexY < iris.apexY - 20) {
+				ctx.lineTo(iris.apexX, iris.apexY  - 20);
+				ctx.lineTo(marginX, iris.apexY  - 20);
+			}
+		}
+	}
+	
+	if (!iris) {
+		ctx.lineTo(marginX, inferiorBezierBack.SP.y);
+		ctx.lineTo(40, 460);
+	}
+	else {
+		var x2 = (marginX < inferiorBezierBack.SP.x) ? inferiorBezierBack.SP.x : marginX;
+		ctx.lineTo(x2, inferiorBezierBack.SP.y);
+		if (this.apexY < -iris.apexY + 20) {
+			ctx.lineTo(marginX, -iris.apexY + 20);
+			ctx.lineTo(iris.apexX, -iris.apexY + 20);
+		}
+		ctx.lineTo(40, 460);
+	}
+	
+	// Close path
+	ctx.closePath();
+
+	// Set attributes
+	ctx.lineWidth = 5;
+	// Colour of fill, density depends on setting of apexX
+	var density = (0.1 + (this.apexX + 50) / 111).toFixed(2);
+	ctx.fillStyle = "rgba(255,0,0," + density + ")";
+	ctx.strokeStyle = ctx.fillStyle;
+
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+		
+	// Non boundary drawing
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+		
+	}
+	
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+
+	// Return value indicating successful hittest
+	return this.isClicked;
+	
+}
+
+
+
+/**
+ * OpenEyes
+ *
+ * Copyright (C) OpenEyes Foundation, 2011-2017
+ * This file is part of OpenEyes.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package OpenEyes
+ * @link http://www.openeyes.org.uk
+ * @author OpenEyes <info@openeyes.org.uk>
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -26152,12 +30741,19 @@ ED.Hypopyon = function(_drawing, _parameterJSON) {
 	// Private parameters
 	this.ro = 380;
 	this.minimum = 304;
-
+	this.csOriginX = 50;
 	// Saved parameters
-	this.savedParameterArray = ['apexY'];
+	this.savedParameterArray = ['apexY', 'csOriginX'];
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
+
+    this.linkedDoodleParameters = {
+        'Hyphaema': {
+            source: ['apexY'],
+            store: [['originY', 'csOriginY'], ['apexX', 'csApexX'], ['originX', 'csOriginX']]
+        }
+    };
 }
 
 /**
@@ -26252,20 +30848,454 @@ ED.Hypopyon.prototype.description = function() {
 
 /**
  * OpenEyes
+ * MSC
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
+ */
+
+/**
+ * MSC TODO: (1) Calculate t instead of current estimation based on time so level with apexY
+ *           (2) Calculate x coordinate of stop positon if within inf / sup zonules 
+ *
+ * @class HypopyonCrossSection
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Object} _parameterJSON
+ */
+ED.HypopyonCrossSection = function(_drawing, _parameterJSON) {
+	// Set classname
+	this.className = "HypopyonCrossSection";
+
+	// Private parameters
+	this.initialRadius = 360;
+	
+	// Derived parameters
+	this.ro = 380;
+	this.minimum = 304;
+	
+	// Saved parameters
+	this.savedParameterArray = ['apexY', 'originX'];
+	
+	// Parameters in doodle control bar
+	this.controlParameterArray = {};
+
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _parameterJSON);
+
+    this.linkedDoodleParameters = {
+        'Hypopyon': {
+            source: ['apexY'],
+            store: [['originX', 'csOriginX']]
+        }
+    };
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.HypopyonCrossSection.prototype = new ED.Doodle;
+ED.HypopyonCrossSection.prototype.constructor = ED.HypopyonCrossSection;
+ED.HypopyonCrossSection.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.HypopyonCrossSection.prototype.setHandles = function() {
+}
+
+/**
+ * Sets default properties
+ */
+ED.HypopyonCrossSection.prototype.setPropertyDefaults = function() {
+	this.isSelectable = false;
+	this.addAtBack = true;
+	this.isUnique = true;
+
+	// Update component of validation array for simple parameters
+	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
+	this.parameterValidationArray['apexY']['range'].setMinAndMax(-380, this.minimum);
+
+}
+
+/**
+ * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
+ * The returned parameters are animated if their 'animate' property is set to true
+ *
+ * @param {String} _parameter Name of parameter that has changed
+ * @value {Undefined} _value Value of parameter to calculate
+ * @returns {Array} Associative array of values of dependent parameters
+ */
+ED.HypopyonCrossSection.prototype.dependentParameterValues = function(_parameter, _value) {
+}
+
+/**
+ * Sets default parameters
+ */
+ED.HypopyonCrossSection.prototype.setParameterDefaults = function() {
+	this.originX = 50; // as is in Cornea cross section doodle to dulicate bezier control points
+	
+	this.apexY = 260;
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.HypopyonCrossSection.prototype.draw = function(_point) {
+	
+	// Get context
+	var ctx = this.drawing.context;
+
+	var cornea = this.drawing.lastDoodleOfClass('CorneaCrossSection');
+	var cornealThickness = cornea.pachymetry/5;
+
+	// Call draw method in superclass
+	ED.HypopyonCrossSection.superclass.draw.call(this, _point);
+
+	// Boundary path
+	ctx.beginPath();
+	
+	// Calculate segment extent in terms of time along curve
+	var startY = this.apexY - this.apexY/12; //buffer needed as only estimating t
+	var startT = (startY + 380) / 760;
+	if (startT<0) startT = 0;
+	var endT = 1;
+		
+	if (startT < 0.5) {
+		
+		var superiorBezierBack = new Object;
+
+		// define start and end time points
+		var tI0 = startT * 2;
+		var tI1 = (endT < 0.5) ? endT * 2 : 1;
+		
+		// default bezier points (as in cornea cross section)
+		if (cornea && cornea.shape == "Keratoconus") {
+			superiorBezierBack.SP = new ED.Point(-120 + 120, -380 - this.originY);
+			superiorBezierBack.CP1 = new ED.Point(-240 + 160, -260 - this.originY);
+			superiorBezierBack.CP2 = new ED.Point(cornea.apexX + cornealThickness, cornea.apexY - 120 - this.originY);
+			superiorBezierBack.EP = new ED.Point(cornea.apexX + cornealThickness, cornea.apexY - this.originY);
+		}
+		else if (cornea && cornea.shape == "Keratoglobus") {
+			superiorBezierBack.SP = new ED.Point(-120 + 120, -380 - this.originY);
+			superiorBezierBack.CP1 = new ED.Point(-240 + 120, -200 - this.originY);
+			superiorBezierBack.CP2 = new ED.Point(-380 + 100, -140 - this.originY);
+			superiorBezierBack.EP = new ED.Point(-380 + 100, 100 - this.originY);
+		}
+		else {
+			superiorBezierBack.SP = new ED.Point(-120 + 120, -380 - this.originY);
+			superiorBezierBack.CP1 = new ED.Point(-240 + 160, -260 - this.originY);
+			superiorBezierBack.CP2 = new ED.Point(-320 + 100, -160 - this.originY);
+			superiorBezierBack.EP = new ED.Point(-320 + 100, 0 - this.originY);
+		}
+		
+			
+		if (tI0 > 0) {
+		// Trim start of curve			
+			var sq0b = new ED.Point(0,0);
+			sq0b.y = (1-tI0)*(1-tI0)*(1-tI0)*superiorBezierBack.SP.y + 3*(1-tI0)*(1-tI0)*tI0*superiorBezierBack.CP1.y + 3*(1-tI0)*tI0*tI0*superiorBezierBack.CP2.y + tI0*tI0*tI0*superiorBezierBack.EP.y;
+			sq0b.x = (1-tI0)*(1-tI0)*(1-tI0)*superiorBezierBack.SP.x + 3*(1-tI0)*(1-tI0)*tI0*superiorBezierBack.CP1.x + 3*(1-tI0)*tI0*tI0*superiorBezierBack.CP2.x + tI0*tI0*tI0*superiorBezierBack.EP.x;
+			
+			var iP23b = new ED.Point(0,0);
+			iP23b.x = superiorBezierBack.CP1.x + tI0 * (superiorBezierBack.CP2.x - superiorBezierBack.CP1.x);
+			iP23b.y = superiorBezierBack.CP1.y + tI0 * (superiorBezierBack.CP2.y - superiorBezierBack.CP1.y);
+			
+			var iP34b = new ED.Point(0,0);
+			iP34b.x = superiorBezierBack.CP2.x + tI0 * (superiorBezierBack.EP.x - superiorBezierBack.CP2.x);
+			iP34b.y = superiorBezierBack.CP2.y + tI0 * (superiorBezierBack.EP.y - superiorBezierBack.CP2.y);
+			
+			var iP2334b = new ED.Point(0,0);
+			iP2334b.x = iP23b.x + tI0 * (iP34b.x - iP23b.x);
+			iP2334b.y = iP23b.y + tI0 * (iP34b.y - iP23b.y);
+			
+			superiorBezierBack.SP = sq0b;
+			superiorBezierBack.CP1 = iP2334b;
+			superiorBezierBack.CP2 = iP34b;
+		}
+		
+		if (tI1 < 1) {
+		// Trim end of curve
+			var iq1b = new ED.Point(0,0);
+			iq1b.y = (1-tI1)*(1-tI1)*(1-tI1)*superiorBezierBack.SP.y + 3*(1-tI1)*(1-tI1)*tI1*superiorBezierBack.CP1.y + 3*(1-tI1)*tI1*tI1*superiorBezierBack.CP2.y + tI1*tI1*tI1*superiorBezierBack.EP.y;
+			iq1b.x = (1-tI1)*(1-tI1)*(1-tI1)*superiorBezierBack.SP.x + 3*(1-tI1)*(1-tI1)*tI1*superiorBezierBack.CP1.x + 3*(1-tI1)*tI1*tI1*superiorBezierBack.CP2.x + tI1*tI1*tI1*superiorBezierBack.EP.x;
+
+			var iP12b = new ED.Point(0,0);
+			iP12b.x = superiorBezierBack.SP.x + tI1 * (superiorBezierBack.CP1.x - superiorBezierBack.SP.x);
+			iP12b.y = superiorBezierBack.SP.y + tI1 * (superiorBezierBack.CP1.y - superiorBezierBack.SP.y);
+			
+			var iP23b = new ED.Point(0,0);
+			iP23b.x = superiorBezierBack.CP1.x + tI1 * (superiorBezierBack.CP2.x - superiorBezierBack.CP1.x);
+			iP23b.y = superiorBezierBack.CP1.y + tI1 * (superiorBezierBack.CP2.y - superiorBezierBack.CP1.y);
+			
+			var iP1223b = new ED.Point(0,0);
+			iP1223b.x = iP12b.x + tI1 * (iP23b.x - iP12b.x);
+			iP1223b.y = iP12b.y + tI1 * (iP23b.y - iP12b.y);
+			
+			superiorBezierBack.CP1 = iP12b;
+			superiorBezierBack.CP2 = iP1223b;
+			superiorBezierBack.EP = iq1b;
+		}
+	}
+	
+	
+	if (endT > 0.5) {
+		
+		var inferiorBezierBack = new Object;
+		
+		// define start and end time points
+		var tS0 = (startT > 0.5) ? (startT - 0.5) * 2 : 0;
+		var tS1 = (endT - 0.5) * 2;
+		
+		// default bezier points (as in cornea cross section)
+		if (cornea && cornea.shape == "Keratoconus") {
+			inferiorBezierBack.SP = new ED.Point(cornea.apexX + cornealThickness, cornea.apexY - this.originY);
+			inferiorBezierBack.CP1 = new ED.Point(cornea.apexX + cornealThickness, cornea.apexY + 120 - this.originY);
+			inferiorBezierBack.CP2 = new ED.Point(-240 + 160, 260 - this.originY);
+			inferiorBezierBack.EP = new ED.Point(-120 + 120, 380 - this.originY);
+		}
+		else if (cornea && cornea.shape == "Keratoglobus") {
+			inferiorBezierBack.SP = new ED.Point(-380 + 100, 100 - this.originY);
+			inferiorBezierBack.CP1 = new ED.Point(-380 + 120, 220 - this.originY);
+			inferiorBezierBack.CP2 = new ED.Point(-240 + 160, 260 - this.originY);
+			inferiorBezierBack.EP = new ED.Point(-120 + 120, 380 - this.originY);
+		}
+		else {
+			inferiorBezierBack.SP = new ED.Point(-320 + 100, -0 - this.originY);
+			inferiorBezierBack.CP1 = new ED.Point(-320 + 100, 160 - this.originY);
+			inferiorBezierBack.CP2 = new ED.Point(-240 + 160, 260 - this.originY);
+			inferiorBezierBack.EP = new ED.Point(-120 + 120, 380 - this.originY);
+		}			
+		
+		
+		if (tS0 > 0) {
+		// Trim start of curve
+			var sq0b = new ED.Point(0,0);
+			sq0b.y = (1-tS0)*(1-tS0)*(1-tS0)*inferiorBezierBack.SP.y + 3*(1-tS0)*(1-tS0)*tS0*inferiorBezierBack.CP1.y + 3*(1-tS0)*tS0*tS0*inferiorBezierBack.CP2.y + tS0*tS0*tS0*inferiorBezierBack.EP.y;
+			sq0b.x = (1-tS0)*(1-tS0)*(1-tS0)*inferiorBezierBack.SP.x + 3*(1-tS0)*(1-tS0)*tS0*inferiorBezierBack.CP1.x + 3*(1-tS0)*tS0*tS0*inferiorBezierBack.CP2.x + tS0*tS0*tS0*inferiorBezierBack.EP.x;
+			
+			var sP23b = new ED.Point(0,0);
+			sP23b.x = inferiorBezierBack.CP1.x + tS0 * (inferiorBezierBack.CP2.x - inferiorBezierBack.CP1.x);
+			sP23b.y = inferiorBezierBack.CP1.y + tS0 * (inferiorBezierBack.CP2.y - inferiorBezierBack.CP1.y);
+			
+			var sP34b = new ED.Point(0,0);
+			sP34b.x = inferiorBezierBack.CP2.x + tS0 * (inferiorBezierBack.EP.x - inferiorBezierBack.CP2.x);
+			sP34b.y = inferiorBezierBack.CP2.y + tS0 * (inferiorBezierBack.EP.y - inferiorBezierBack.CP2.y);
+			
+			var sP2334b = new ED.Point(0,0);
+			sP2334b.x = sP23b.x + tS0 * (sP34b.x - sP23b.x);
+			sP2334b.y = sP23b.y + tS0 * (sP34b.y - sP23b.y);
+			
+			inferiorBezierBack.SP = sq0b;
+			inferiorBezierBack.CP1 = sP2334b;
+			inferiorBezierBack.CP2 = sP34b;
+		}
+		
+		if (tS1 < 1) {
+		// Trim end of curve
+			var sq1b = new ED.Point(0,0);
+			sq1b.y = (1-tS1)*(1-tS1)*(1-tS1)*inferiorBezierBack.SP.y + 3*(1-tS1)*(1-tS1)*tS1*inferiorBezierBack.CP1.y + 3*(1-tS1)*tS1*tS1*inferiorBezierBack.CP2.y + tS1*tS1*tS1*inferiorBezierBack.EP.y;
+			sq1b.x = (1-tS1)*(1-tS1)*(1-tS1)*inferiorBezierBack.SP.x + 3*(1-tS1)*(1-tS1)*tS1*inferiorBezierBack.CP1.x + 3*(1-tS1)*tS1*tS1*inferiorBezierBack.CP2.x + tS1*tS1*tS1*inferiorBezierBack.EP.x;
+
+			var sP12b = new ED.Point(0,0);
+			sP12b.x = inferiorBezierBack.SP.x + tS1 * (inferiorBezierBack.CP1.x - inferiorBezierBack.SP.x);
+			sP12b.y = inferiorBezierBack.SP.y + tS1 * (inferiorBezierBack.CP1.y - inferiorBezierBack.SP.y);
+			
+			var sP23b = new ED.Point(0,0);
+			sP23b.x = inferiorBezierBack.CP1.x + tS1 * (inferiorBezierBack.CP2.x - inferiorBezierBack.CP1.x);
+			sP23b.y = inferiorBezierBack.CP1.y + tS1 * (inferiorBezierBack.CP2.y - inferiorBezierBack.CP1.y);
+			
+			var sP1223b = new ED.Point(0,0);
+			sP1223b.x = sP12b.x + tS1 * (sP23b.x - sP12b.x);
+			sP1223b.y = sP12b.y + tS1 * (sP23b.y - sP12b.y);
+
+			inferiorBezierBack.CP1 = sP12b;
+			inferiorBezierBack.CP2 = sP1223b;
+			inferiorBezierBack.EP = sq1b;
+		}
+	}
+	
+	// Get relative lens position to draw around
+	var lens = this.drawing.lastDoodleOfClass('LensCrossSection');
+	var iris = this.drawing.lastDoodleOfClass('AntSegCrossSection');
+	var cornea = this.drawing.lastDoodleOfClass('CorneaCrossSection');
+
+	var marginX = (iris) ? iris.apexX: -20;
+
+  if (cornea) {
+  	this.setSimpleParameter('originX', cornea.originX);
+  }
+
+	if (lens) {
+		// Displacement of lens from centre
+		var ld = 100;
+	
+		// Angle of arc or lens
+		var theta = Math.asin(240 / 300);
+	
+		// X coordinate of centre of lens arc
+		var x = 300 * Math.cos(theta);
+		
+		if (lens.originX + ld + x - 300 - this.originX < iris.apexX) marginX = lens.originX + ld + x - 300 - this.originX;
+	}
+
+/*
+	var lens = this.drawing.lastDoodleOfClass('LensCrossSection');
+	if (lens) {
+		// angle from lens arc centre to edge
+		var theta = Math.asin(207 / 300);
+		
+		// angle from lens arc centre to y=apexY on lens arc
+		var phi = (-this.apexY + lens.originY) / 300; 
+		if (phi < 0) phi = 0;
+				
+		// if apex above top of lens capsule
+		if (phi>theta) {
+			phi = theta;
+			
+			var sp = new ED.Point(74, -349);
+			var ep = new ED.Point(14 + lens.originX, -207 + lens.originY);
+			var supZonule = sp;
+			
+			// but within zonules
+			if (this.apexY > sp.y) {
+				var angle = Math.atan(Math.abs((sp.y - ep.y)/(sp.x - ep.x)));
+				var o = Math.abs(ep.y - this.apexY);
+				var a = o / Math.tan(angle);
+				
+// 				supZonule.x += a;
+				supZonule.y = (this.apexY < sp.y) ? sp.y : this.apexY;
+			}
+		}
+		
+		// if apex within lens capsule
+		var pho = (this.apexY > lens.originY) ? (-this.apexY + lens.originY) / 300 + Math.PI : Math.PI;
+		
+		// if apex below lens capsule
+		var infZonule = new ED.Point(14 + lens.originX, 207 + lens.originY);
+		if (pho < Math.PI - theta) {
+			infZonule.y = this.apexY;
+		}
+
+	}
+*/
+
+	// Draw it
+	if (inferiorBezierBack) {
+		ctx.moveTo(inferiorBezierBack.EP.x, inferiorBezierBack.EP.y);
+		ctx.bezierCurveTo(inferiorBezierBack.CP2.x, inferiorBezierBack.CP2.y, inferiorBezierBack.CP1.x, inferiorBezierBack.CP1.y, inferiorBezierBack.SP.x, inferiorBezierBack.SP.y);
+	}
+	if (superiorBezierBack) {
+		ctx.bezierCurveTo(superiorBezierBack.CP2.x, superiorBezierBack.CP2.y, superiorBezierBack.CP1.x, superiorBezierBack.CP1.y, superiorBezierBack.SP.x, superiorBezierBack.SP.y);
+		if (!iris) ctx.lineTo(marginX, superiorBezierBack.SP.y);
+		else {
+			var x1 = (marginX < superiorBezierBack.SP.x) ? superiorBezierBack.SP.x : marginX;
+// 			if (x1 < iris.apexX - 40) x1 = iris.apexX - 40;
+			ctx.lineTo(x1, superiorBezierBack.SP.y);
+			if (this.apexY < iris.apexY) {
+				if (x1 > iris.apexX) x1 = iris.apexX;
+				ctx.lineTo(x1, iris.apexY);
+				ctx.lineTo(iris.apexX, iris.apexY);
+
+			}
+
+// 			if (this.apexY < iris.apexY) ctx.lineTo(iris.apexX, iris.apexY);
+// 			else ctx.lineTo()
+		}
+	}
+	
+	if (!iris) {
+		ctx.lineTo(marginX, inferiorBezierBack.SP.y);
+		ctx.lineTo(40, 460);
+	}
+	else {
+		var x2 = (marginX < inferiorBezierBack.SP.x) ? inferiorBezierBack.SP.x : marginX;
+		if (x2 > iris.apexX) x2 = iris.apexX;
+		ctx.lineTo(x2, inferiorBezierBack.SP.y);
+		if (this.apexY < -iris.apexY) {
+			if (x2 < iris.apexX) x2 = iris.apexX;
+			ctx.lineTo(x2, -iris.apexY);
+			ctx.lineTo(iris.apexX, -iris.apexY);
+		}
+		ctx.lineTo(40, 460);
+	}
+	
+/*
+	if (!lens) {
+		ctx.lineTo(120, inferiorBezierBack.SP.y);
+		ctx.lineTo(120, 450);
+	}
+	
+	else { // draw around lens capsule
+		
+		// top zonules
+		if (phi == theta) {
+			ctx.lineTo(supZonule.x, this.apexY);
+			ctx.lineTo(14 + lens.originX, -207 + lens.originY);
+		}
+		// top half of lens capsule
+		if (this.apexY < lens.originY) ctx.arc(lens.originX + 225, lens.originY, 300, Math.PI + phi, Math.PI, true);
+		
+		// bottom half of lens capsule
+		if (pho > Math.PI - theta) ctx.arc(lens.originX + 225, lens.originY, 300, pho, Math.PI - theta, true);
+		
+		// bottom zonules
+		ctx.lineTo(infZonule.x, infZonule.y);
+		ctx.lineTo(74, 349);
+		ctx.lineTo(120, 450);
+	}
+*/
+	
+	// Close path
+	ctx.closePath();
+
+	// Set attributes
+	ctx.lineWidth = 5;
+	ctx.fillStyle = "rgba(221,209,171,1)";
+	ctx.strokeStyle = ctx.fillStyle;
+
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+		
+	// Non boundary drawing
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+		
+	}
+	
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+
+	// Return value indicating successful hittest
+	return this.isClicked;
+	
+}
+
+
+
+/**
+ * OpenEyes
+ *
+ * Copyright (C) OpenEyes Foundation, 2011-2017
+ * This file is part of OpenEyes.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package OpenEyes
+ * @link http://www.openeyes.org.uk
+ * @author OpenEyes <info@openeyes.org.uk>
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -26374,19 +31404,17 @@ ED.IatrogenicBreak.prototype.description = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -26677,19 +31705,17 @@ ED.ICL.prototype.description = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -26797,19 +31823,17 @@ ED.ILMPeel.prototype.groupDescription = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -27059,15 +32083,15 @@ ED.InjectionSite.prototype.description = function() {
  * (C) OpenEyes Foundation, 2016
  *
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2016, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -27084,7 +32108,11 @@ ED.InnerLeafBreak = function(_drawing, _parameterJSON)
     this.className = "InnerLeafBreak";
 
     this.savedParameterArray = ['originX', 'originY', 'scaleX', 'scaleY'];
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> origin/release/v2.1
     // Call superclass constructor
     ED.Doodle.call(this, _drawing, _parameterJSON);
 }
@@ -27209,19 +32237,17 @@ ED.InnerLeafBreak.prototype.description = function()
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -27237,7 +32263,7 @@ ED.IOL = function(_drawing, _parameterJSON) {
 	this.className = "IOL";
 
 	// Other parameters
-	this.type = "Iris Clip";
+	this.type = "PC";
 	
 	// Saved parameters
 	this.savedParameterArray = ['originX', 'originY', 'rotation', 'type'];
@@ -27270,6 +32296,10 @@ ED.IOL.prototype.setPropertyDefaults = function() {
 	this.addAtBack = this.type == 'PC'?true:false;
 	this.isUnique = true;
 	
+	// Update component of validation array for simple parameters
+	this.parameterValidationArray['originX']['range'].setMinAndMax(-125, +125);
+	this.parameterValidationArray['originY']['range'].setMinAndMax(-125, +125);
+	
 	// Validation arrays for derived and other parameters
 	this.parameterValidationArray['type'] = {
 		kind: 'other',
@@ -27284,7 +32314,7 @@ ED.IOL.prototype.setPropertyDefaults = function() {
  * Use the setParameter function for derived parameters, as this will also update dependent variables
  */
 ED.IOL.prototype.setParameterDefaults = function() {
-	this.setParameterFromString('type', 'Iris Clip');
+	this.setParameterFromString('type', 'PC');
 }
 
 /**
@@ -27532,19 +32562,187 @@ ED.IOL.prototype.description = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
+ */
+
+/**
+ * IOL Cross Section ***TODO***
+ *
+ * @class IOLCrossSection
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Object} _parameterJSON
+ */
+ED.IOLCrossSection = function(_drawing, _parameterJSON) {
+	// Set classname
+	this.className = "IOLCrossSection";
+
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _parameterJSON);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.IOLCrossSection.prototype = new ED.Doodle;
+ED.IOLCrossSection.prototype.constructor = ED.IOLCrossSection;
+ED.IOLCrossSection.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets default dragging attributes
+ */
+ED.IOLCrossSection.prototype.setPropertyDefaults = function() {
+	this.isUnique = true;
+	this.addAtBack = true;
+
+	// Update component of validation array for simple parameters
+	this.parameterValidationArray['originX']['range'].setMinAndMax(-150, +200);
+	this.parameterValidationArray['originY']['range'].setMinAndMax(-140, +140);
+}
+
+/**
+ * Sets default parameters (Only called for new doodles)
+ * Use the setParameter function for derived parameters, as this will also update dependent variables
+ */
+ED.IOLCrossSection.prototype.setParameterDefaults = function() {
+	this.originX = 44;
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.IOLCrossSection.prototype.draw = function(_point) {
+	// Get context
+	var ctx = this.drawing.context;
+
+	// Call draw method in superclass
+	ED.IOLCrossSection.superclass.draw.call(this, _point);
+
+	// Height of cross section (half value of ro in AntSeg doodle)
+	var h = 240;
+
+	// Arbitrary radius of curvature
+	var r = 420;
+
+	// Displacement of lens from centre
+	var ld = 100;
+
+	// Angle of arc
+	var theta = Math.asin(h / r);
+
+	// X coordinate of centre of circle
+	var x = r * Math.cos(theta);
+
+	// Measurements of nucleus
+	var rn = r - 60;
+
+	// Calculate nucleus angles
+	var phi = Math.acos(x / rn);
+
+	// Lens
+	ctx.beginPath();
+
+	// Draw invisible boundary around lens bag with two sections of circumference of circle
+	ctx.arc(ld - x, 0, r, theta, -theta, true);
+	ctx.arc(ld + x, 0, r, Math.PI + theta, Math.PI - theta, true);
+
+	// Set line attributes
+	ctx.lineWidth = 4;
+	ctx.fillStyle = "rgba(255, 255, 255, 0)";
+	ctx.strokeStyle = "rgba(255, 255, 255, 0)";
+
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+
+	// Non boundary drawing
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+		// Lens bag
+		ctx.beginPath();
+		ctx.arc(ld - x, 0, r, theta, -theta, true);
+		ctx.arc(ld + x, 0, r, Math.PI + theta, Math.PI + 0.6*theta, true);
+		ctx.moveTo(ld, 240);
+		ctx.arc(ld + x, 0, r, Math.PI - theta, Math.PI - 0.6*theta, false);
+		ctx.strokeStyle = "gray";
+		ctx.stroke();
+
+		// Lens
+		ctx.beginPath();
+		ctx.ellipse(100, 0, 160, 20, 0.5 * Math.PI, 0, 2 * Math.PI);
+		ctx.strokeStyle = "rgba(0, 0, 0, 0.7)";
+		ctx.lineWidth = 5;
+		ctx.stroke();
+		
+		// Loops
+		ctx.beginPath();
+// 		ctx.moveTo(80,0);
+		ctx.ellipse(100, 0, 227, 20, 0.5 * Math.PI, 0.5 * Math.PI, 1.2 * Math.PI);
+		ctx.moveTo(120,0);
+		ctx.ellipse(100, 0, 227, 20, 0.5 * Math.PI, 1.5 * Math.PI, 0.2 * Math.PI);
+		ctx.strokeStyle = "rgba(0, 0, 0, 0.6)";
+		ctx.stroke();
+		
+		
+		// Zonules
+		ctx.beginPath();
+
+		// Top zonules
+		ctx.moveTo(44 - this.originX + 80, -this.originY - 349);
+		ctx.lineTo(80, -207);
+		ctx.moveTo(44 - this.originX + 80, -this.originY - 349);
+		ctx.lineTo(120, -207);
+		ctx.moveTo(44 - this.originX + 120, -this.originY - 349);
+		ctx.lineTo(80, -207);
+		ctx.moveTo(44 - this.originX + 120, -this.originY - 349);
+		ctx.lineTo(120, -207);
+
+		// Bottom zonules
+		ctx.moveTo(44 - this.originX + 80, -this.originY + 349);
+		ctx.lineTo(80, 207);
+		ctx.moveTo(44 - this.originX + 80, -this.originY + 349);
+		ctx.lineTo(120, 207);
+		ctx.moveTo(44 - this.originX + 120, -this.originY + 349);
+		ctx.lineTo(80, 207);
+		ctx.moveTo(44 - this.originX + 120, -this.originY + 349);
+		ctx.lineTo(120, 207);
+
+		ctx.lineWidth = 2;
+		ctx.strokeStyle = "gray";
+		ctx.stroke();
+	}
+
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * OpenEyes
+ *
+ * Copyright (C) OpenEyes Foundation, 2011-2017
+ * This file is part of OpenEyes.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package OpenEyes
+ * @link http://www.openeyes.org.uk
+ * @author OpenEyes <info@openeyes.org.uk>
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -27690,19 +32888,17 @@ ED.IrisHook.prototype.groupDescriptionEnd = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -27810,19 +33006,17 @@ ED.IrisNaevus.prototype.description = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -27939,19 +33133,17 @@ ED.IRMA.prototype.description = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -28084,19 +33276,17 @@ ED.KeraticPrecipitates.prototype.description = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -28193,19 +33383,17 @@ ED.KoeppeNodule.prototype.groupDescription = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -28309,19 +33497,17 @@ ED.KrukenbergSpindle.prototype.description = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -28500,19 +33686,17 @@ ED.LaserCircle.prototype.groupDescription = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -28731,19 +33915,17 @@ ED.LaserDemarcation.prototype.description = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -28853,19 +34035,17 @@ ED.LaserSpot.prototype.groupDescription = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -29175,15 +34355,15 @@ ED.LasikFlap.prototype.description = function() {
  * (C) OpenEyes Foundation, 2016
  *
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2016, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -29201,6 +34381,9 @@ ED.Lattice = function(_drawing, _parameterJSON)
   
   // Saved parameters
   +    this.savedParameterArray = ['arc', 'radius', 'originX', 'originY', 'rotation'];
+
+    // Saved parameters
+    this.savedParameterArray = ['arc', 'radius', 'originX', 'originY', 'rotation'];
 
     // Call superclass constructor
     ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -29356,20 +34539,19 @@ ED.Lattice.prototype.diagnosticHierarchy = function()
 }
 /**
  * OpenEyes
+ * MSC mod
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -29392,9 +34574,10 @@ ED.Lens = function(_drawing, _parameterJSON) {
 	this.posteriorPolar = false;
 	this.coronary = false;
 	this.phakodonesis = false;
+	this.csOriginX = 0;
 
 	// Saved parameters
-	this.savedParameterArray = ['originX', 'originY', 'nuclearGrade', 'corticalGrade', 'posteriorSubcapsularGrade', 'anteriorPolar', 'posteriorPolar', 'coronary', 'phakodonesis'];
+	this.savedParameterArray = ['rotation', 'originX', 'originY', 'nuclearGrade', 'corticalGrade', 'posteriorSubcapsularGrade', 'anteriorPolar', 'posteriorPolar', 'coronary', 'phakodonesis', 'csOriginX'];
 
 	// Parameters in doodle control bar (parameter name: parameter label)
 	this.controlParameterArray = {
@@ -29404,7 +34587,7 @@ ED.Lens = function(_drawing, _parameterJSON) {
 		'anteriorPolar':'Anterior polar',
 		'posteriorPolar':'Posterior polar',
 		'coronary':'Coronary',
-		'phakodonesis':'Phakodonesis',
+		'phakodonesis':'Phacodonesis',
 		};
 
 	// Call superclass constructor
@@ -29426,8 +34609,8 @@ ED.Lens.prototype.setPropertyDefaults = function() {
 	this.addAtBack = true;
 
 	// Update component of validation array for simple parameters
-	this.parameterValidationArray['originX']['range'].setMinAndMax(-500, +500);
-	this.parameterValidationArray['originY']['range'].setMinAndMax(-500, +500);
+	this.parameterValidationArray['originX']['range'].setMinAndMax(-125, +125);
+	this.parameterValidationArray['originY']['range'].setMinAndMax(-125, +125);
 
 	this.parameterValidationArray['nuclearGrade'] = {
 		kind: 'derived',
@@ -29650,6 +34833,50 @@ ED.Lens.prototype.draw = function(_point) {
 			ctx.fill();
 			ctx.stroke();
 		}
+
+		// Phacodonesis
+		if (this.phakodonesis) {
+			// Sine wave between arrow heads:
+			//Set amplitude and width of the wave as well as sample rate
+			var amplitude = 20;
+			var width = 100;
+			var srate = 1;
+
+			//Draw sine wave
+			ctx.beginPath();
+			ctx.moveTo(-150,0);
+			for (x=0; x<=300; x+= srate){
+				ctx.lineTo(-150+x, amplitude*Math.sin(2*Math.PI*x/width));
+			}
+
+			// Set line attributes
+			ctx.lineWidth = 4;
+			ctx.strokeStyle = "blue";
+			ctx.stroke();
+
+			// Left arrow:
+			ctx.beginPath();
+			ctx.moveTo(-150,-20);
+			ctx.lineTo(-225,0);
+			ctx.lineTo(-150,20);
+
+			// Set line attributes
+			ctx.lineWidth = 4;
+			ctx.fillStyle = "blue";
+			ctx.fill();
+
+			// Right arrow:
+			ctx.beginPath();
+			ctx.moveTo(150,-20);
+			ctx.lineTo(225,0);
+			ctx.lineTo(150,20);
+
+			// Set line attributes
+			ctx.lineWidth = 4;
+			ctx.fillStyle = "blue";
+			ctx.fill();
+		}
+
 	}
 
 	// Draw handles if selected
@@ -29666,7 +34893,15 @@ ED.Lens.prototype.draw = function(_point) {
  */
 ED.Lens.prototype.description = function() {
 	returnValue = "";
+
+	if (this.originY < -30) {
+		returnValue += 'Lens subluxation: superior';
+	}
+	else if (this.originY > 30) {
+		returnValue += 'Lens subluxation: inferior';
+	}
 	if (this.nuclearGrade != 'None') {
+		returnValue += returnValue.length > 0?", ":"";
 		returnValue += this.nuclearGrade + ' nuclear cataract';
 	}
 	if (this.corticalGrade != 'None') {
@@ -29691,27 +34926,53 @@ ED.Lens.prototype.description = function() {
 	}
 	if (this.phakodonesis) {
 		returnValue += returnValue.length > 0?", ":"";
-		returnValue += 'Phakodonesis';
+		returnValue += 'Phacodonesis';
 	}
 	return returnValue;
-}
+};
+
+ED.Lens.prototype.snomedCodes = function()
+{
+	snomedCodes = new Array();
+    if (this.nuclearGrade != 'None') {
+        snomedCodes.push([53889007, 3]);
+    }
+    if (this.corticalGrade != 'None') {
+        snomedCodes.push([193576003, 3]);
+    }
+    if (this.posteriorSubcapsularGrade != 'None') {
+        snomedCodes.push([315353005, 3]);
+    }
+    if (this.coronary) {
+    	snomedCodes.push([12195004, 3]);
+    }
+    if (this.anteriorPolar) {
+    	snomedCodes.push([253224008, 3]);
+    }
+    if (this.posteriorPolar) {
+        snomedCodes.push([253225009, 3]);
+    }
+    if (this.phakodonesis) {
+    	snomedCodes.push([116669003, 3]);
+    }
+
+    return snomedCodes;
+};
 
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -29725,9 +34986,26 @@ ED.Lens.prototype.description = function() {
 ED.LensCrossSection = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "LensCrossSection";
+	this.nuclearGrade = 'None';
+	this.corticalGrade = 'None';
+	this.posteriorSubcapsularGrade = 'None';
+	this.phakodonesis = false;
+	this.anteriorPolar = false;
+	this.posteriorPolar = false;
+	this.acd = 3.0;
+
+	this.savedParameterArray = ['originX', 'originY', 'nuclearGrade', 'corticalGrade', 'posteriorSubcapsularGrade','phakodonesis','anteriorPolar', 'posteriorPolar','acd'];
 
 	// Call superclass constructor
-ED.Doodle.call(this, _drawing, _parameterJSON);
+	ED.Doodle.call(this, _drawing, _parameterJSON);
+
+  this.linkedDoodleParameters = {
+    'Lens': {
+      source: ['originY', 'nuclearGrade', 'corticalGrade', 'posteriorSubcapsularGrade', 'phakodonesis', 'anteriorPolar', 'posteriorPolar'],
+      store: [['originX', 'csOriginX']]
+    }
+  };
+
 }
 
 /**
@@ -29744,9 +35022,56 @@ ED.LensCrossSection.prototype.setPropertyDefaults = function() {
 	this.isUnique = true;
 	this.addAtBack = true;
 
+	this.parameterValidationArray['nuclearGrade'] = {
+		kind: 'derived',
+		type: 'string',
+		list: ['None', 'Mild', 'Moderate', 'Brunescent'],
+		animate: false
+	};
+
+	this.parameterValidationArray['corticalGrade'] = {
+		kind: 'derived',
+		type: 'string',
+		list: ['None', 'Mild', 'Moderate', 'White'],
+		animate: true
+	};
+
+	this.parameterValidationArray['posteriorSubcapsularGrade'] = {
+		kind: 'derived',
+		type: 'string',
+		list: ['None', 'Small', 'Medium', 'Large'],
+		animate: false
+	};
+
+    this.parameterValidationArray['phakodonesis'] = {
+		kind: 'other',
+		type: 'bool',
+		display: false
+	};
+	
+	this.parameterValidationArray['anteriorPolar'] = {
+		kind: 'derived',
+		type: 'bool',
+		display: false
+	};
+	
+	this.parameterValidationArray['posteriorPolar'] = {
+		kind: 'derived',
+		type: 'bool',
+		display: false
+	};
+	
+	this.parameterValidationArray['acd'] = {
+		kind: 'derived',
+		type: 'float',
+		range: new ED.Range(0, 5),
+		precision: 1,
+		animate: false
+	};
+	
 	// Update component of validation array for simple parameters
 	this.parameterValidationArray['originX']['range'].setMinAndMax(-150, +200);
-	this.parameterValidationArray['originY']['range'].setMinAndMax(-380, +380);
+	this.parameterValidationArray['originY']['range'].setMinAndMax(-140, +140);
 }
 
 /**
@@ -29755,6 +35080,49 @@ ED.LensCrossSection.prototype.setPropertyDefaults = function() {
  */
 ED.LensCrossSection.prototype.setParameterDefaults = function() {
 	this.originX = 44;
+}
+
+/**
+ * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
+ * The returned parameters are animated if their 'animate' property is set to true
+ *
+ * @param {String} _parameter Name of parameter that has changed
+ * @value {Undefined} _value Value of parameter to calculate
+ * @returns {Array} Associative array of values of dependent parameters
+ */
+ED.LensCrossSection.prototype.dependentParameterValues = function(_parameter, _value) {
+	var returnArray = new Array();
+
+	switch (_parameter) {
+		case 'originX':
+			// constrain iris X coordinate
+			var iris = this.drawing.lastDoodleOfClass('AntSegCrossSection');
+			if (iris) {
+				var minApexX = iris.parameterValidationArray['apexX']['range'].min;
+				
+				var currentMaxApexX = iris.parameterValidationArray['apexX']['range'].max;
+				
+				var maxApexX = 32 - (72 / 220) * (iris.apexY + 280) + this.originX - 44;
+				if (maxApexX < minApexX) maxApexX = minApexX;
+				iris.parameterValidationArray['apexX']['range'].setMinAndMax(-40 - (140 / 220) * (iris.apexY + 280), maxApexX);
+				
+				// If being synced, make sensible decision about x
+				if (!this.drawing.isActive) {
+					var newOriginX = iris.parameterValidationArray['apexX']['range'].max;
+				} else {
+					var nwX = maxApexX - (currentMaxApexX - iris.apexX);
+					var newOriginX = iris.parameterValidationArray['apexX']['range'].constrain(nwX);
+				}
+				iris.setSimpleParameter('apexX', newOriginX);
+			}
+			
+			// calculate anterior chamber depth
+			this.calculateACD();
+
+			break;
+		}
+
+	return returnArray;
 }
 
 /**
@@ -29818,6 +35186,127 @@ ED.LensCrossSection.prototype.draw = function(_point) {
 		ctx.strokeStyle = "rgba(220, 220, 220, 0.75)";
 		ctx.stroke();
 
+		if (this.nuclearGrade != 'None') {
+			var col;
+			switch (this.nuclearGrade) {
+				case 'Mild':
+					col = -120;
+					break;
+				case 'Moderate':
+					col = -80;
+					break;
+				case 'Brunescent':
+					col = +0;
+					break;
+			}
+			yellowColour = "rgba(255, 255, 0, 0.75)";
+			var brownColour = "rgba(" + Math.round(120 - col) + ", " + Math.round(60 - col) + ", 0, 0.75)";
+			var gradient = ctx.createRadialGradient(0, 0, 210, 0, 0, 50);
+			gradient.addColorStop(0, yellowColour);
+			gradient.addColorStop(1, brownColour);
+			ctx.fillStyle = gradient;
+			ctx.fill();
+		}
+
+		// Cortical Cataract
+		if (this.corticalGrade != "None") {
+			var apexY;
+
+			switch (this.corticalGrade) {
+				case 'Mild':
+					apexY = -180;
+					break;
+				case 'Moderate':
+					apexY = -100;
+					break;
+				case 'White':
+					apexY = -20;
+					break;
+			}
+
+			// Angle of arc
+			var theta = Math.asin(h / r);
+
+			// X coordinate of centre of circle
+			var x = r * Math.cos(theta);
+
+			// Radius of cortical cataract (half way between capsule and nucleus)
+			var rco = r - 30;
+
+			// Calculate nucleus angles
+			theta = Math.acos(x / rco);
+
+			// Calculate cataract angles
+			var phi = Math.asin(-apexY / rco);
+
+			// Boundary path
+			ctx.beginPath();
+
+			// Draw cataract with two sections of circumference of circle
+			ctx.arc(ld - x, 0, rco, phi, theta, false);
+			ctx.arc(ld + x, 0, rco, Math.PI - theta, Math.PI - phi, false);
+
+			// Move to upper half and draw it
+			var l = rco * Math.cos(phi);
+			ctx.moveTo(ld - x + l, apexY);
+			ctx.arc(ld - x, 0, rco, -phi, -theta, true);
+			ctx.arc(ld + x, 0, rco, Math.PI + theta, Math.PI + phi, true);
+
+			// Set line attributes
+			ctx.lineWidth = 30;
+			ctx.lineCap = 'round';
+			ctx.lineJoin = 'round';
+			ctx.fillStyle = "rgba(0, 0, 0, 0)";
+			ctx.strokeStyle = "rgba(200,200,200,0.75)";
+			// Draw boundary path (also hit testing)
+			this.drawBoundary(_point);
+		}
+
+		// Post SubCap Cataract
+		if (this.posteriorSubcapsularGrade != "None") {
+			var apexY;
+			switch (this.posteriorSubcapsularGrade) {
+				case 'Small':
+					apexY = 30;
+					break;
+				case 'Medium':
+					apexY = 60;
+					break;
+				case 'Large':
+					apexY = 90;
+					break;
+			}
+
+			// Angle of arc
+			var theta = Math.asin(h / r);
+
+			// X coordinate of centre of circle
+			var x = r * Math.cos(theta);
+
+			// Radius of cataract (Just inside capsule)
+			var rco = r - 10;
+
+			// Calculate cataract angles
+			var phi = Math.asin(apexY / rco);
+
+			// Boundary path
+			ctx.beginPath();
+
+			// Draw cataract with two sections of circumference of circle
+			ctx.arc(ld - x, 0, rco, -phi, phi, false);
+
+			// Set line attributes
+			ctx.lineWidth = 10;
+			ctx.lineCap = 'round';
+			ctx.lineJoin = 'round';
+			ctx.fillStyle = "rgba(0, 0, 0, 0)";
+			ctx.strokeStyle = "rgba(150,150,150,0.75)";
+
+			// Draw boundary path (also hit testing)
+			this.drawBoundary(_point);
+		}
+
+
 		// Zonules
 		ctx.beginPath();
 
@@ -29844,6 +35333,85 @@ ED.LensCrossSection.prototype.draw = function(_point) {
 		ctx.lineWidth = 2;
 		ctx.strokeStyle = "gray";
 		ctx.stroke();
+		
+		// Pacodonesis
+		if (this.phakodonesis) {
+			// Sine wave between arrow heads:
+			//Set amplitude and width of the wave as well as sample rate
+			var amplitude = 20;
+			var width = 100;
+			var srate = 1;
+	
+			//Draw sine wave
+			ctx.beginPath();
+			ctx.moveTo(100,-125);
+			for (y=0; y<=250; y+= srate){
+				ctx.lineTo(100+amplitude*Math.sin(2*Math.PI*y/width), -125+y);
+			}
+	
+			// Set line attributes
+			ctx.lineWidth = 4;
+			ctx.strokeStyle = "blue";
+			ctx.stroke();
+	
+			// Top arrow:
+			ctx.beginPath();
+			ctx.moveTo(80,-125);
+			ctx.lineTo(100,-225);
+			ctx.lineTo(120,-125);
+	
+			// Set line attributes
+			ctx.lineWidth = 4;
+			ctx.fillStyle = "blue";
+			ctx.fill();
+	
+			// Bottom arrow:
+			ctx.beginPath();
+			ctx.moveTo(80,125);
+			ctx.lineTo(100,225);
+			ctx.lineTo(120,125);
+	
+			// Set line attributes
+			ctx.lineWidth = 4;
+			ctx.fillStyle = "blue";
+			ctx.fill();
+		}
+		
+		// anterior polar cataract
+		if (this.anteriorPolar) {			
+			var c = new ED.Point(ld + x, 0);
+			var angle = Math.PI+10/180*Math.PI;
+			var o = Math.sin(angle) * r;
+			var a = Math.cos(angle) * r;
+			var start = new ED.Point(c.x+a,c.y+o);
+
+			ctx.beginPath();
+			ctx.arc(c.x, c.y, r, Math.PI+10/180*Math.PI, Math.PI-10/180*Math.PI, true);
+			ctx.bezierCurveTo(start.x-40,10,start.x-40,-10,start.x,start.y);
+			
+			ctx.strokeStyle = "gray";
+			ctx.fillStyle = "rgba(120,120,120,0.5)";
+			ctx.fill();
+			ctx.stroke();
+		}
+		
+		// posterior polar cataract
+		if (this.posteriorPolar) {
+			var c = new ED.Point(ld - x, 0);
+			var angle = 10/180*Math.PI;
+			var o = Math.sin(angle) * r;
+			var a = Math.cos(angle) * r;
+			var start = new ED.Point(c.x+a,c.y+o);
+			
+			ctx.beginPath();
+			ctx.arc(c.x, c.y, r, 10/180*Math.PI, -10/180*Math.PI, true);
+			ctx.bezierCurveTo(start.x+40,-10,start.x+40,10,start.x,start.y);
+
+			ctx.strokeStyle = "gray";
+			ctx.fillStyle = "rgba(120,120,120,0.5)";
+			ctx.fill();
+			ctx.stroke();
+		}
 	}
 
 	// Draw handles if selected
@@ -29853,22 +35421,336 @@ ED.LensCrossSection.prototype.draw = function(_point) {
 	return this.isClicked;
 }
 
+ED.LensCrossSection.prototype.calculateACD = function() {
+	var cornea = this.drawing.lastDoodleOfClass('CorneaCrossSection');
+	if (cornea) {
+		var anteriorX;
+		switch (cornea.shape) {
+			case 'Normal':
+				// max originX : -150 == 3mm in this doodle plane
+				// max originX : -220 in cornea doodle plane
+				/// difference: +70
+				anteriorX = -150;
+				break;
+				
+			case 'Keratoconus':
+				var thickness = cornea.pachymetry/5;
+				anteriorX = cornea.apexX + thickness + 70;
+				break;
+				
+			case 'Keratoglobus':
+				// -280 in cornea doodle plane
+				anteriorX = -210;
+				break;
+		}
+		
+		var depth = this.originX - 44 - anteriorX;
+		
+		// scale 150 : 3mm
+		this.acd = (depth * 3 / 150).toFixed(1);
+		if (this.acd<0) this.acd = 0;
+	}
+
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.LensCrossSection.prototype.description = function() {
+	var returnString = "";
+	returnString += "AC depth: " + this.acd + "mm";
+
+	return returnString;
+}
+
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
+ */
+
+/**
+ * Lids
+ *
+ * @class Lids
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Object} _parameterJSON
+ */
+ED.Lids = function(_drawing, _parameterJSON) {
+	// Set classname
+	this.className = "Lids";
+
+	// Saved parameters
+	this.savedParameterArray = ['apexX', 'apexY', 'dir'];
+
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _parameterJSON);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.Lids.prototype = new ED.Doodle;
+ED.Lids.prototype.constructor = ED.Lids;
+ED.Lids.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.Lids.prototype.setHandles = function() {
+	this.handleArray[0] = new ED.Doodle.Handle(null, true, ED.Mode.Handles, true);
+	this.handleArray[1] = new ED.Doodle.Handle(null, true, ED.Mode.Handles, true);
+}
+
+/**
+ * Sets default dragging attributes
+ */
+ED.Lids.prototype.setPropertyDefaults = function() {
+	this.isDeletable = false;
+	this.isMoveable = false;
+	this.isScalable = false;
+	this.isRotatable= false;
+	this.isShowHighlight = false;
+	
+	// Create ranges to constrain handles
+	this.handleCoordinateRangeArray = new Array();
+	this.handleCoordinateRangeArray[0] = {
+		// lower lid
+		x: new ED.Range(-260, +260),
+		y: new ED.Range(+30, +300)
+	};
+	this.handleCoordinateRangeArray[1] = {
+		// upper lid
+		x: new ED.Range(-0, +0),
+		y: new ED.Range(-120, +110)
+	};
+}
+
+/**
+ * Sets default parameters
+ */
+ED.Lids.prototype.setParameterDefaults = function() {
+	if (this.drawing.eye != ED.eye.Right) {
+		this.dir = -1;
+	}
+	else if (this.drawing.eye != ED.eye.Left){
+		this.dir = +1;
+	}
+	
+	// handle start position
+	this.apexX = 0;
+	this.apexY = 110;
+	
+	// Create a squiggle to store the handles points
+	var squiggle = new ED.Squiggle(this, new ED.Colour(100, 100, 100, 1), 4, true);
+
+	// Add it to squiggle array
+	this.squiggleArray.push(squiggle);
+
+	// Populate with handles on each lid
+	var point1 = new ED.Point(0, 115);
+	this.squiggleArray[0].pointsArray.push(point1);
+	
+	var point2 = new ED.Point(0, -90);
+	this.squiggleArray[0].pointsArray.push(point2);	
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.Lids.prototype.draw = function(_point) {
+	// Get context
+	var ctx = this.drawing.context;
+
+	// Call draw method in superclass
+	ED.Lids.superclass.draw.call(this, _point);
+
+	// Arc radius
+	var d = 250;
+	
+	// control point height
+	var h = 160;
+	
+	// control point width
+	var w = 90;
+	
+	// Pupil radius
+	var rP = 100;
+	
+	// punctum radius
+	var p = 45;
+
+	
+	// Calculate control point positions for bezier curves
+	var bMP = this.squiggleArray[0].pointsArray[0];
+	var bStart = new ED.Point(d * this.dir, p + (bMP.y-115)/5);
+	var bEnd = new ED.Point(-d * this.dir, 0);
+
+	if (bMP.x*this.dir > 20) bStart.x += (bMP.x-20)/5;
+		
+	var bCP1 = new ED.Point(bMP.x + 60*this.dir, bMP.y * 1.45);
+	var bCP2 = new ED.Point(bMP.x - 180*this.dir, bMP.y * 1.16);
+	
+	var tMP = this.squiggleArray[0].pointsArray[1];
+	var tEnd = new ED.Point(d * this.dir, 0 + (tMP.y/5+19));
+
+	var tCP1 = new ED.Point(-85 * this.dir, tMP.y * 1.3);
+	var tCP2 = new ED.Point(85 * this.dir, tMP.y * 1.35);
+	
+	// Boundary path
+	ctx.beginPath();
+
+	// Draw invisible boundary around canvas and lids
+	ctx.moveTo(-510 * this.dir,-510);
+	ctx.lineTo(-510 * this.dir,510);
+	ctx.lineTo(510 * this.dir,510);
+	ctx.lineTo(510 * this.dir,-510);
+	ctx.lineTo(-510 * this.dir,-510);
+	
+	// Draw lids boundary
+	ctx.moveTo(bEnd.x, bEnd.y);
+	
+	// Top lid
+// 	ctx.bezierCurveTo(-rP * 0.85 * this.dir, -h, rP * 1.05 * this.dir, -h, tEnd.x, tEnd.y);
+	ctx.bezierCurveTo(tCP1.x, tCP1.y, tCP2.x, tCP2.y, tEnd.x, tEnd.y);
+	
+	// Punctum
+		ctx.bezierCurveTo(d * 1.25 * this.dir, p*0.9, d * 1.2 * this.dir, p, bStart.x, bStart.y);
+	  
+	// Bottom lid
+	ctx.bezierCurveTo(bCP1.x, bCP1.y, bCP2.x, bCP2.y, bEnd.x, bEnd.y);
+	
+	// Close path
+	ctx.closePath();
+
+	// Set drawing attributes
+	ctx.lineWidth = 5;
+	ctx.fillStyle = "white"
+	ctx.strokeStyle = "rgba(0,0,0,0)";
+	ctx.shadowBlur = 15;
+	ctx.shadowColor = "rgba(0,0,0,0.8)";
+
+
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+
+	// Non-boundary paths
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+	
+		// lids outline
+		ctx.beginPath();
+		ctx.moveTo(-d * this.dir,0);
+		ctx.bezierCurveTo(tCP1.x, tCP1.y, tCP2.x, tCP2.y, tEnd.x, tEnd.y);
+		ctx.bezierCurveTo(d * 1.25 * this.dir, p*0.9, d * 1.2 * this.dir, p, bStart.x, bStart.y);
+		ctx.bezierCurveTo(bCP1.x, bCP1.y, bCP2.x, bCP2.y, bEnd.x, bEnd.y);
+		ctx.moveTo(-d * this.dir,0);
+		ctx.strokeStyle = "black";
+		ctx.stroke();
+		ctx.closePath();
+		
+		// top lashes (ish)
+		ctx.beginPath();
+		ctx.moveTo(bEnd.x, bEnd.y);
+		ctx.lineTo(bEnd.x - p * 0.5 * this.dir,bEnd.y + p*0.5 - tMP.y/5-19);
+		ctx.stroke();
+		ctx.closePath();
+		
+		
+		// bottom lid ridge
+		var bRidgeCP1 = new ED.Point(bMP.x - 170*this.dir, bMP.y * 1.38);
+		var bRidgeCP2 = new ED.Point(bMP.x + 70*this.dir, bMP.y * 1.45);
+		ctx.beginPath();
+		ctx.moveTo(-d * this.dir,0);
+		ctx.bezierCurveTo(bRidgeCP1.x, bRidgeCP1.y, bRidgeCP2.x, bRidgeCP2.y, bStart.x, bStart.y);
+	// 	ctx.strokeStyle = "gray";
+		ctx.lineWidth = 3;
+		ctx.stroke();
+		ctx.closePath();
+		
+		// top eye crease
+		ctx.beginPath();
+		ctx.moveTo(-d * this.dir - p * 0.9 * this.dir, p * 0.1);
+		ctx.bezierCurveTo(-rP*1.3 * this.dir,-h*1.2,rP * this.dir,-h*1.2, d*this.dir + p*this.dir, 0);
+		// 	ctx.strokeStyle = "gray";
+		ctx.lineWidth = 3;
+		ctx.shadowBlur = 7;
+		ctx.shadowColor = "black";
+		ctx.stroke();
+		ctx.closePath();
+		
+		// bottom crease
+			
+	}
+
+	// Coordinates of handles (in canvas plane)
+	this.handleArray[0].location = this.transform.transformPoint(this.squiggleArray[0].pointsArray[0]); // bottom lid - ectropion
+	this.handleArray[1].location = this.transform.transformPoint(this.squiggleArray[0].pointsArray[1]); // top lid - ptosis
+		
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.Lids.prototype.description = function() {
+	var bMP = this.squiggleArray[0].pointsArray[0];
+	var tMP = this.squiggleArray[0].pointsArray[1];
+	
+	var returnString = "";
+	
+	var ptosis = "";
+	if (tMP.y>=-57 && tMP.y<-38) ptosis = "Mild ptosis";
+	else if (tMP.y>=-38 && tMP.y<-19) ptosis = "Moderate ptosis";
+	else if (tMP.y>=-19) ptosis = "Severe ptosis";
+	
+	// TODO: change to an arc tangent to define ectropion?
+	var ectropion = "";
+	if (bMP.y>132 && bMP.x*this.dir > 90) ectropion = "Medial ectropion";
+	else if (bMP.y>132 && bMP.x*this.dir < -90) ectropion = "Lateral ectropion";
+	else if (bMP.y>132) ectropion = "Ectropion";
+	
+	if (ptosis.length > 0) returnString += ptosis;
+	if (ptosis.length > 0 && ectropion.length > 0) returnString += ", ";
+	if (ectropion.length > 0) returnString += ectropion;
+	
+	return returnString;
+	
+}
+/**
+ * OpenEyes
+ *
+ * Copyright (C) OpenEyes Foundation, 2011-2017
+ * This file is part of OpenEyes.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package OpenEyes
+ * @link http://www.openeyes.org.uk
+ * @author OpenEyes <info@openeyes.org.uk>
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -30011,19 +35893,17 @@ ED.LimbalRelaxingIncision.prototype.description = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -30125,19 +36005,17 @@ ED.Macroaneurysm.prototype.snomedCode = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -30312,19 +36190,17 @@ ED.MacularDystrophy.prototype.snomedCode = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -30472,19 +36348,17 @@ ED.MacularGrid.prototype.description = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -30629,19 +36503,17 @@ ED.MacularHole.prototype.diagnosticHierarchy = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -30791,19 +36663,17 @@ ED.MacularThickening.prototype.description = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -30975,19 +36845,272 @@ ED.Malyugin.prototype.snomedCode = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * (C) OpenEyes Foundation, 2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
+ */
+
+/**
+ * Marginal Keratitis
+ *
+ * @class MarginalKeratitis
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Object} _parameterJSON
+ */
+ED.MarginalKeratitis = function(_drawing, _parameterJSON) {
+	// Set classname
+	this.className = "MarginalKeratitis";
+	this.epithelialDefectPercent = 90;
+
+	// Saved parameters
+	this.savedParameterArray = ['apexY', 'arc', 'rotation','epithelialDefectPercent'];
+	
+	// Parameters in doodle control bar (parameter name: parameter label)
+	this.controlParameterArray = {
+		'epithelialDefectPercent':"% Epithelial defect of corneal infiltrate"
+	};
+
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _parameterJSON);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.MarginalKeratitis.prototype = new ED.Doodle;
+ED.MarginalKeratitis.prototype.constructor = ED.MarginalKeratitis;
+ED.MarginalKeratitis.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.MarginalKeratitis.prototype.setHandles = function() {
+	this.handleArray[1] = new ED.Doodle.Handle(null, true, ED.Mode.Arc, false);
+	this.handleArray[2] = new ED.Doodle.Handle(null, true, ED.Mode.Arc, false);
+	this.handleArray[4] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);	
+	this.handleArray[0] = new ED.Doodle.Handle(null, true, ED.Mode.Handles, false);
+}
+
+/**
+ * Sets default dragging attributes
+ */
+ED.MarginalKeratitis.prototype.setPropertyDefaults = function() {
+	// Create ranges to constrain handles
+	this.handleVectorRangeArray = new Array();
+	var range = new Object;
+	range.length = new ED.Range(380, +495);
+	range.angle = new ED.Range(0, 2*Math.PI);
+	this.handleVectorRangeArray[0] = range;
+
+	
+	this.isMoveable = false;
+	this.isUnique = false;
+	this.isFilled = false;
+	
+	// Add complete validation arrays for derived parameters
+	this.parameterValidationArray.epithelialDefectPercent = {
+		kind: 'other',
+		type: 'int',
+		range: new ED.Range(0, 100),
+		animate: false
+	};
+
+	// Update component of validation array for simple parameters
+	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
+	this.parameterValidationArray['apexY']['range'].setMinAndMax(-375, -226);
+// 	this.parameterValidationArray['arc']['range'].setMinAndMax(Math.PI / 6, Math.PI);
+}
+
+/**
+ * Sets default parameters
+ */
+ED.MarginalKeratitis.prototype.setParameterDefaults = function() {
+	this.apexY = -340;
+	this.arc = 45 * Math.PI / 180;
+	
+	// Create a squiggle to store the handles points
+	var squiggle = new ED.Squiggle(this, new ED.Colour(100, 100, 100, 1), 4, true);
+
+	// Add it to squiggle array
+	this.squiggleArray.push(squiggle);
+
+	// defining outer handle
+	var point = new ED.Point(0, -420);
+	this.squiggleArray[0].addPoint(point);
+}
+
+/**
+ * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
+ * The returned parameters are animated if the 'animate' property in the parameterValidationArray is set to true
+ *
+ * @param {String} _parameter Name of parameter that has changed
+ * @param {Undefined} _value Value of parameter to calculate
+ * @returns {Array} Associative array of values of dependent parameters
+ */
+ED.MarginalKeratitis.prototype.dependentParameterValues = function(_parameter, _value) {
+	var returnArray = {},
+		returnValue;
+
+	switch (_parameter) {
+		
+		// constrain handles to only move in the X plane
+		case 'handles':
+			this.squiggleArray[0].pointsArray[this.draggingHandleIndex].x = 0;
+			break;
+	}
+
+	return returnArray;
+};
+
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.MarginalKeratitis.prototype.draw = function(_point) {
+	// Get context
+	var ctx = this.drawing.context;
+
+	// Call draw method in superclass
+	ED.RRD.superclass.draw.call(this, _point);
+
+
+	// Calculate parameters for arcs
+    // position of outer handle
+	var rOuter = Math.abs(this.squiggleArray[0].pointsArray[0].y);
+	var r = 380;
+	var rInner = Math.abs(this.apexY);
+	
+	var theta = this.arc / 2;
+	var arcStart = -Math.PI / 2 + theta;
+	var arcEnd = -Math.PI / 2 - theta;
+
+	// Coordinates of corners of arcs
+	var topRightX = rOuter * Math.sin(theta);
+	var topRightY = -rOuter * Math.cos(theta);
+	var topLeftX = -rOuter * Math.sin(theta);
+	var topLeftY = topRightY;
+	
+	var midRightX = r * Math.sin(theta);
+	var midRightY = -r * Math.cos(theta);
+	var midLeftX = -r * Math.sin(theta);
+	var midLeftY = midRightY;
+	
+	var bottomRightX = rInner * Math.sin(theta);
+	var bottomRightY = -rInner * Math.cos(theta);
+	var bottomLeftX = -rInner * Math.sin(theta);
+	var bottomLeftY = bottomRightY;
+
+	// Boundary path
+	ctx.beginPath();
+
+	// Outer arc - inflammation
+	ctx.arc(0, 0, rOuter, arcStart, arcEnd, true);
+	
+	// Inner arc - opacity
+	ctx.arc(0, 0, rInner, arcEnd, arcStart, false);
+	
+	// Set line attributes - invisible boundary
+	ctx.strokeStyle = "rgba(255,255,255,0)";
+
+
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+	
+		// Non-boundary paths
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+		// inflammation
+		ctx.beginPath();
+		ctx.arc(0, 0, rOuter, arcStart, arcEnd, true);
+		ctx.arc(0, 0, r, arcEnd, arcStart, false);
+		var ptrn = ctx.createPattern(this.drawing.imageArray['NewVesselPattern'], 'repeat');
+		ctx.fillStyle = ptrn;
+		ctx.fill();
+		var gradient = ctx.createRadialGradient(0, 0, r, 0, 0, rOuter);
+		gradient.addColorStop(0, 'red');           
+		gradient.addColorStop(1, 'rgba(255,255,255,0)');
+		ctx.fillStyle = gradient;
+		ctx.fill();
+		ctx.closePath();
+		
+		// corneal infiltrate
+		ctx.beginPath();
+		ctx.arc(0, 0, r, arcStart, arcEnd, true);
+		ctx.arc(0, 0, rInner, arcEnd, arcStart, false);
+		ctx.fillStyle = "gray";
+		ctx.strokeStyle = "gray";
+		ctx.fill();
+		ctx.stroke();
+		ctx.closePath();
+		
+		// epithelial defect
+		var phi = this.epithelialDefectPercent / 100 * this.arc / 2;
+		var arcStartE = -Math.PI / 2 + phi;
+		var arcEndE = -Math.PI / 2 - phi;
+		
+		var infiltrateDepth = r - rInner;
+		var epithelialDepth = infiltrateDepth * this.epithelialDefectPercent / 100;
+		var rEpi = r - epithelialDepth;
+		var epiRightX = rEpi * Math.sin(phi);
+		var epiRightY = -rEpi * Math.cos(phi);
+		var epiLeftX = -rEpi * Math.sin(phi);
+		var epiLeftY = epiRightY;
+		ctx.beginPath();
+		ctx.arc(0, 0, r, arcStartE, arcEndE, true);
+		ctx.arc(0, 0, rEpi, arcEndE, arcStartE, false);
+		ctx.fillStyle = "green";
+		ctx.fill();
+		ctx.closePath();		
+	}
+
+
+	// Coordinates of handles (in canvas plane)
+	this.handleArray[1].location = this.transform.transformPoint(new ED.Point(midLeftX, midLeftY));
+	this.handleArray[2].location = this.transform.transformPoint(new ED.Point(midRightX, midRightY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));	
+	this.handleArray[0].location = this.transform.transformPoint(this.squiggleArray[0].pointsArray[0]);
+
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.MarginalKeratitis.prototype.description = function() {
+	return "Marginal keratitis";
+}
+
+/**
+ * OpenEyes
+ *
+ * Copyright (C) OpenEyes Foundation, 2011-2017
+ * This file is part of OpenEyes.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package OpenEyes
+ * @link http://www.openeyes.org.uk
+ * @author OpenEyes <info@openeyes.org.uk>
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -31103,19 +37226,462 @@ ED.MattressSuture.prototype.description = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * (C) OpenEyes Foundation, 2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
+ */
+
+/**
+ * Metallic Foreign Body
+ *
+ * @class MetallicForeignBody
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Object} _parameterJSON
+ */
+ED.MetallicForeignBody = function(_drawing, _parameterJSON) {
+	// Set classname
+	this.className = "MetallicForeignBody";
+
+	// Private parameters used in bound sideview doodle
+	this.mfb = true;
+	this.coats = false;
+	this.rustRing = false;
+	this.h = 30;
+	this.fb=1;
+	
+	// Saved parameters
+	this.savedParameterArray = ['originX','originY','scaleX', 'scaleY','mfb','coats','rustRing','h'];
+
+	this.controlParameterArray = {
+		'mfb':'Metallic foreign body',
+		'rustRing':'Rust ring',
+		'coats':'Coats ring'
+	};
+
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _parameterJSON);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.MetallicForeignBody.prototype = new ED.Doodle;
+ED.MetallicForeignBody.prototype.constructor = ED.MetallicForeignBody;
+ED.MetallicForeignBody.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.MetallicForeignBody.prototype.setHandles = function() {
+	this.handleArray[2] = new ED.Doodle.Handle(null, true, ED.Mode.Scale, false);
+}
+
+/**
+ * Sets default dragging attributes
+ */
+ED.MetallicForeignBody.prototype.setPropertyDefaults = function() {
+	this.isRotatable = false;
+	this.isUnique = false;
+
+	// Update component of validation array for simple parameters
+	this.parameterValidationArray['scaleX']['range'].setMinAndMax(+1, +2.5);
+	this.parameterValidationArray['scaleY']['range'].setMinAndMax(+1, +2.5);
+	
+	
+	this.parameterValidationArray['mfb'] = {
+		kind: 'derived',
+		type: 'bool',
+		display: false
+	};
+	
+	this.parameterValidationArray['coats'] = {
+		kind: 'derived',
+		type: 'bool',
+		display: false
+	};
+	
+	this.parameterValidationArray['rustRing'] = {
+		kind: 'derived',
+		type: 'bool',
+		display: false
+	};
+	
+	this.parameterValidationArray['h'] = {
+		kind: 'derived',
+		type: 'int',
+		animate: false
+	};
+	this.parameterValidationArray['fb'] = {
+		kind: 'other',
+		type: 'int',
+		range: [0,1],
+		animate: false
+	};
+}
+
+/**
+ * Sets default parameters (Only called for new doodles)
+ * Use the setParameter function for derived parameters, as this will also update dependent variables
+ */
+ED.MetallicForeignBody.prototype.setParameterDefaults = function() {
+}
+
+/**
+ * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
+ * The returned parameters are animated if the 'animate' property in the parameterValidationArray is set to true
+ *
+ * @param {String} _parameter Name of parameter that has changed
+ * @param {Undefined} _value Value of parameter to calculate
+ * @returns {Array} Associative array of values of dependent parameters
+ */
+ED.MetallicForeignBody.prototype.dependentParameterValues = function(_parameter, _value) {
+	var returnArray = {},
+		returnValue;
+
+	switch (_parameter) {
+		case 'coats':
+			if (_value==true) {
+				returnArray.rustRing = false;
+				returnArray.mfb = false;
+			}
+			break;
+			
+		case 'scaleX':
+			returnArray.h = Math.round(_value * 30);
+			break;
+			
+		case 'mfb':
+			if (_value == true) returnArray['fb'] = 1;
+			else if (_value == false) returnArray['fb'] = 0;
+			break;
+						
+	}
+
+	return returnArray;
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.MetallicForeignBody.prototype.draw = function(_point) {
+	// Get context
+	var ctx = this.drawing.context;
+
+	// Call draw method in superclass
+	ED.MetallicForeignBody.superclass.draw.call(this, _point);
+
+	// Boundary path
+	ctx.beginPath();
+
+	// Invisible boundary
+	var r = 30;
+	ctx.arc(0, 0, r, 0, Math.PI * 2, true);
+
+	// Close path
+	ctx.closePath();
+
+	// Set line attributes
+	ctx.lineWidth = 0;
+	ctx.fillStyle = "rgba(0, 0, 0, 0)";
+	ctx.strokeStyle = "rgba(0, 0, 0, 0)";
+
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+
+	// Non boundary paths
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+		if (this.mfb) {
+			ctx.beginPath()
+			ctx.arc(0,0,r*0.8,0,2*Math.PI,true);
+			ctx.fillStyle = "brown";
+			ctx.fill();
+		}
+		
+		if (this.rustRing) {
+			ctx.beginPath()
+			ctx.arc(0,0,r*1.05,0,2*Math.PI,true);
+			ctx.lineWidth = 8;
+			ctx.strokeStyle = "brown";
+			ctx.stroke();
+		}
+		
+		if (this.coats) {
+			ctx.beginPath()
+			ctx.arc(0,0,r,0,2*Math.PI,true);
+			ctx.lineWidth = 12;
+			ctx.strokeStyle = "rgba(180,180,180,1)";
+			ctx.stroke();
+		}
+	}
+
+	// Coordinates of handles (in canvas plane)
+	this.handleArray[2].location = this.transform.transformPoint(new ED.Point(r, -r));
+
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * OpenEyes
+ *
+ * (C) OpenEyes Foundation, 2017
+ * This file is part of OpenEyes.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package OpenEyes
+ * @link http://www.openeyes.org.uk
+ * @author OpenEyes <info@openeyes.org.uk>
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
+ */
+
+/**
+ * Metallic Foreign Body Cross Section
+ *
+ * @class MetallicForeignBodyCrossSection
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Object} _parameterJSON
+ */
+ED.MetallicForeignBodyCrossSection = function(_drawing, _parameterJSON) {
+	// Set classname
+	this.className = "MetallicForeignBodyCrossSection";
+	
+	// Derived parameters
+	this.fb = 1;
+	this.h = 30;
+
+	this.point = new ED.Point(0,0);	
+	
+	// Saved parameters
+	this.savedParameterArray = ['originX','originY','h','fb'];
+	
+	// Parameters in doodle control bar
+	this.controlParameterArray = {};
+
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _parameterJSON);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.MetallicForeignBodyCrossSection.prototype = new ED.Doodle;
+ED.MetallicForeignBodyCrossSection.prototype.constructor = ED.MetallicForeignBodyCrossSection;
+ED.MetallicForeignBodyCrossSection.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.MetallicForeignBodyCrossSection.prototype.setHandles = function() {
+}
+
+/**
+ * Sets default properties
+ */
+ED.MetallicForeignBodyCrossSection.prototype.setPropertyDefaults = function() {
+	this.isUnique = false;
+	this.isRotatable = false;
+		
+	// Update component of validation array for simple parameters
+	this.parameterValidationArray['originX']['range'].setMinAndMax(0, +108);
+	
+	this.parameterValidationArray['h'] = {
+		kind: 'other',
+		type: 'int',
+		range: [0,1080],
+		animate: true
+	};
+	
+	this.parameterValidationArray['fb'] = {
+		kind: 'other',
+		type: 'int',
+		range: [0,1],
+		animate: false
+	};
+
+}
+
+/**
+ * Sets default parameters
+ */
+ED.MetallicForeignBodyCrossSection.prototype.setParameterDefaults = function() {
+	this.originX = 0;
+	this.originY = 0;
+	
+	this.defineBezier();
+	
+}
+
+/**
+ * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
+ * The returned parameters are animated if the 'animate' property in the parameterValidationArray is set to true
+ *
+ * @param {String} _parameter Name of parameter that has changed
+ * @param {Undefined} _value Value of parameter to calculate
+ * @returns {Array} Associative array of values of dependent parameters
+ */
+ED.MetallicForeignBodyCrossSection.prototype.dependentParameterValues = function(_parameter, _value) {
+	var returnArray = {},
+		returnValue;
+
+	switch (_parameter) {
+		case 'originY':
+			// recalculate point for drawing
+			this.defineBezier();
+			break;
+			
+		case 'originX':
+			// recalculate point for drawing
+			this.defineBezier();
+			break;
+						
+	}
+
+	return returnArray;
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.MetallicForeignBodyCrossSection.prototype.draw = function(_point) {
+	
+	// Get context
+	var ctx = this.drawing.context;
+
+	// Call draw method in superclass
+	ED.MetallicForeignBodyCrossSection.superclass.draw.call(this, _point);
+
+	// Boundary path
+	ctx.beginPath();
+
+	// calculate direction to point
+	var o = new ED.Point(251,-this.originY);
+	angle = o.direction() + 0.5*Math.PI;
+				
+	// draw ellipse
+	var r = 30;
+	ctx.ellipse(this.point.x, this.point.y, 0.5*this.h, this.h, angle, 0, 2*Math.PI, true);		
+		
+	
+	// Close path
+	ctx.closePath();
+
+	// Set attributes
+	ctx.lineWidth = 0;
+	ctx.fillStyle = "brown";
+
+	// Draw boundary path (also hit testing)
+	if (this.fb==1) this.drawBoundary(_point);
+		
+	// Non boundary drawing
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+
+	}
+	
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+
+	// Return value indicating successful hittest
+	return this.isClicked;
+	
+}
+
+
+ED.MetallicForeignBodyCrossSection.prototype.defineBezier = function(_point) {	
+	
+	var xDisplacement = this.originX;
+	
+	var cornea = this.drawing.lastDoodleOfClass('CorneaCrossSection');
+	var cornealThickness = cornea.pachymetry/5;
+	
+	var tP = (this.originY + 380) / 760;
+	
+	var bezier = new Object;
+	
+	if (this.originY<0) {
+		// superior bezier
+		if (cornea && cornea.shape == "Keratoconus") {			
+			bezier.SP = new ED.Point(-120 - this.originX, -380 - this.originY);
+			bezier.CP1 = new ED.Point(-240 - this.originX, -260 - this.originY);
+			bezier.CP2 = new ED.Point(cornea.apexX - this.originX, cornea.apexY - 100 - this.originY);
+			bezier.EP = new ED.Point(cornea.apexX - this.originX, cornea.apexY - this.originY);
+		}
+		else if (cornea && cornea.shape == "Keratoglobus") {
+			bezier.SP = new ED.Point(-120 - this.originX, -380 - this.originY);
+			bezier.CP1 = new ED.Point(-240 - this.originX, -260 - this.originY);
+			bezier.CP2 = new ED.Point(-380 - this.originX, -100 - this.originY);
+			bezier.EP = new ED.Point(-380 - this.originX, 100 - this.originY);
+		}
+		else {			
+			bezier.SP = new ED.Point(-120 - this.originX + 50, -380 - this.originY);
+			bezier.CP1 = new ED.Point(-240 - this.originX + 50, -260 - this.originY);
+			bezier.CP2 = new ED.Point(-320 - this.originX + 50, -160 - this.originY);
+			bezier.EP = new ED.Point(-320 - this.originX + 50, 0 - this.originY);
+		}
+		
+		tP = tP*2;
+	}
+	else {
+		// inferior bezier
+		if (cornea && cornea.shape == "Keratoconus") {			
+			bezier.SP = new ED.Point(cornea.apexX - this.originX, cornea.apexY - this.originY);
+			bezier.CP1 = new ED.Point(cornea.apexX - this.originX, cornea.apexY + 100 - this.originY);
+			bezier.CP2 = new ED.Point(-240 - this.originX, 260 - this.originY);
+			bezier.EP = new ED.Point(-120 - this.originX, 380 - this.originY);
+		}
+		else if (cornea && cornea.shape == "Keratoglobus") {
+			bezier.SP = new ED.Point(-380 - this.originX - 50, 100 - this.originY);
+			bezier.CP1 = new ED.Point(-380 - this.originX - 50, 200 - this.originY);
+			bezier.CP2 = new ED.Point(-240 - this.originX - 50, 360 - this.originY);
+			bezier.EP = new ED.Point(-120 - this.originX - 50, 380 - this.originY);
+		}
+		else {			
+			bezier.SP = new ED.Point(-320- this.originX + 50, -0 - this.originY);
+			bezier.CP1 = new ED.Point(-320- this.originX + 50, 160 - this.originY);
+			bezier.CP2 = new ED.Point(-240 - this.originX + 50, 260 - this.originY);
+			bezier.EP = new ED.Point(-120 - this.originX + 50, 380 - this.originY);
+		}
+		
+		tP = (tP-0.5) * 2
+	}
+	
+	// get point on bezier
+	this.point.x = xDisplacement + (1-tP)*(1-tP)*(1-tP)*bezier.SP.x + 3*(1-tP)*(1-tP)*tP*bezier.CP1.x + 3*(1-tP)*tP*tP*bezier.CP2.x + tP*tP*tP*bezier.EP.x;
+	this.point.y = (1-tP)*(1-tP)*(1-tP)*bezier.SP.y + 3*(1-tP)*(1-tP)*tP*bezier.CP1.y + 3*(1-tP)*tP*tP*bezier.CP2.y + tP*tP*tP*bezier.EP.y;
+}
+/**
+ * OpenEyes
+ *
+ * Copyright (C) OpenEyes Foundation, 2011-2017
+ * This file is part of OpenEyes.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package OpenEyes
+ * @link http://www.openeyes.org.uk
+ * @author OpenEyes <info@openeyes.org.uk>
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -31197,19 +37763,17 @@ ED.Microaneurysm.prototype.groupDescription = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -31324,19 +37888,17 @@ ED.MultifocalChoroiditis.prototype.description = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -31497,19 +38059,17 @@ ED.Needle.prototype.description = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -31649,19 +38209,17 @@ ED.NerveFibreDefect.prototype.description = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -31707,8 +38265,8 @@ ED.NuclearCataract.prototype.setPropertyDefaults = function() {
 	this.isScaleable = false;
 	this.isRotatable = false;
 	this.isUnique = true;
-	//this.parentClass = "Lens";
-	//this.inFrontOfClassArray = ["Lens", "PostSubcapCataract"];
+	this.parentClass = "Lens";
+	this.inFrontOfClassArray = ["Lens", "PostSubcapCataract" ];
 	this.addAtBack = true;
 
 	// Update validation array for simple parameters
@@ -31851,19 +38409,17 @@ ED.NuclearCataract.prototype.diagnosticHierarchy = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -32044,19 +38600,17 @@ ED.NuclearCataractCrossSection.prototype.draw = function(_point) {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -32622,19 +39176,17 @@ ED.OpticDisc.prototype.resetHandles = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -32765,15 +39317,15 @@ ED.OpticDiscPit.prototype.description = function() {
  * (C) OpenEyes Foundation, 2016
  *
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2016, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -32915,19 +39467,169 @@ ED.OuterLeafBreak.prototype.description = function()
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
+ */
+
+/**
+ *
+ *
+ * @class PalpebralConjunctivitis
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Object} _parameterJSON
+ */
+ED.PalpebralConjunctivitis = function(_drawing, _parameterJSON) {
+	// Set classname
+	this.className = "PalpebralConjunctivitis";
+	
+	// Other parameters
+	this.type = 'Papillary';
+	this.hyperaemia = "+";
+	
+	// Saved parameters
+	this.savedParameterArray = ['type', 'hyperaemia'];
+	
+	// Parameters in doodle control bar
+	this.controlParameterArray = {'type':'Type', 'hyperaemia':'Hyperaemia'};
+
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _parameterJSON);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.PalpebralConjunctivitis.prototype = new ED.Doodle;
+ED.PalpebralConjunctivitis.prototype.constructor = ED.PalpebralConjunctivitis;
+ED.PalpebralConjunctivitis.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets default dragging attributes
+ */
+ED.PalpebralConjunctivitis.prototype.setPropertyDefaults = function() {
+	this.isUnique = true;
+	this.isMoveable = false;
+	this.isRotatable = false;
+	this.addAtBack = true;
+	
+	// Validation arrays for other parameters
+	this.parameterValidationArray['type'] = {
+		kind: 'other',
+		type: 'string',
+		list: ['Papillary', 'Follicular'],
+		animate: false
+	};
+	this.parameterValidationArray['hyperaemia'] = {
+		kind: 'other',
+		type: 'string',
+		list: ['+','++','+++'],
+		animate: false
+	};
+}
+
+/**
+ * Sets default parameters (Only called for new doodles)
+ * Use the setParameter function for derived parameters, as this will also update dependent variables
+ */
+ED.PalpebralConjunctivitis.prototype.setParameterDefaults = function() {
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.PalpebralConjunctivitis.prototype.draw = function(_point) {
+	// Get context
+	var ctx = this.drawing.context;
+
+	// Call draw method in superclass
+	ED.PalpebralConjunctivitis.superclass.draw.call(this, _point);
+	
+	// Radius of arc
+	var r = 480;
+	
+	// Height of arc
+	var h = 700;
+	
+	// Start angle of arc
+	var o = r - h;
+	var theta = Math.asin(o/r);
+	
+	// Radius of plate
+	var l = r * Math.cos(theta);
+	
+	// Draw superior plate
+	ctx.moveTo(-l,o*0.5);
+	ctx.arc(0,-o*0.5,r,theta,Math.PI-theta,true);
+	ctx.lineTo(-l,o*0.5);
+	
+	// Draw inferior plate
+	ctx.moveTo(-l,-o*0.5);
+	ctx.arc(0,o*0.5,r,-theta,Math.PI+theta,false);
+	ctx.lineTo(-l,-o*0.5);
+
+	// Draw it
+	ctx.stroke();
+
+	// Set line attributes
+	ctx.lineWidth = 4;
+	var ptrn = ctx.createPattern(this.drawing.imageArray['NewVesselPattern'], 'repeat')
+	ctx.fillStyle = ptrn;
+	ctx.strokeStyle = "pink";
+
+	if (this.hyperaemia == "+") ctx.filter = "opacity(10%)";
+	else if (this.hyperaemia == "++") ctx.filter = "opacity(30%)";
+	else if (this.hyperaemia == "+++") ctx.filter = "opacity(50%)";
+	
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+	
+	ctx.filter = "none";
+
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.PalpebralConjunctivitis.prototype.description = function() {
+	var returnValue = this.type + " conjunctivitis";
+	
+	returnValue += " with " + this.hyperaemia + " hyperaemia";
+
+	return returnValue;
+}
+
+
+/**
+ * OpenEyes
+ *
+ * Copyright (C) OpenEyes Foundation, 2011-2017
+ * This file is part of OpenEyes.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package OpenEyes
+ * @link http://www.openeyes.org.uk
+ * @author OpenEyes <info@openeyes.org.uk>
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -33025,19 +39727,17 @@ ED.Papilloedema.prototype.description = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -33213,19 +39913,17 @@ ED.Patch.prototype.description = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -33240,9 +39938,18 @@ ED.PCIOL = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "PCIOL";
 
-	// Saved parameters
-	this.savedParameterArray = ['originX', 'originY', 'rotation'];
+	// Other parameters
+	this.fixation = 'In-the-bag';
+	this.fx = 1;
+    this.csOriginX = 0;
 
+	// Saved parameters
+	this.savedParameterArray = ['fixation', 'fx', 'originX', 'originY', 'rotation', 'csOriginX'];
+
+	// Parameters in doodle control bar
+	this.controlParameterArray = {'fixation':'Fixation'};
+
+	
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 
@@ -33272,6 +39979,56 @@ ED.PCIOL.prototype.setPropertyDefaults = function() {
 	this.addAtBack = true;
 	this.isScaleable = false;
 	this.isUnique = true;
+	
+	// Validation arrays for other parameters
+	this.parameterValidationArray['fixation'] = {
+		kind: 'derived',
+		type: 'string',
+		list: ['In-the-bag', 'Ciliary sulcus'],
+		animate: true
+	};
+	this.parameterValidationArray['fx'] = {
+		kind: 'other',
+		type: 'int',
+		range: [1, 2],
+		animate: false
+	};
+	
+	// Update component of validation array for simple parameters
+	this.parameterValidationArray['originX']['range'].setMinAndMax(-200, +200);
+	this.parameterValidationArray['originY']['range'].setMinAndMax(-200, +200);
+}
+
+/**
+ * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
+ * The returned parameters are animated if their 'animate' property is set to true
+ *
+ * @param {String} _parameter Name of parameter that has changed
+ * @value {Undefined} _value Value of parameter to calculate
+ * @returns {Array} Associative array of values of dependent parameters
+ */
+ED.PCIOL.prototype.dependentParameterValues = function(_parameter, _value) {
+	var returnArray = new Array();
+
+	switch (_parameter) {
+		case 'fx':
+			if (_value === 2) returnArray['fixation'] = 'Ciliary sulcus';
+			else returnArray['fixation'] = 'In-the-bag';
+			break;
+
+		case 'fixation':
+			switch (_value) {
+				case 'In-the-bag':
+					returnArray['fx'] = 1;
+					break;
+				case 'Ciliary sulcus':
+					returnArray['fx'] = 2;
+					break;
+			}
+			break;
+	}
+
+	return returnArray;
 }
 
 /**
@@ -33342,6 +40099,7 @@ ED.PCIOL.prototype.draw = function(_point) {
  */
 ED.PCIOL.prototype.description = function() {
 	var returnValue = "Posterior chamber IOL";
+	returnValue += " (" + this.fixation + " fixation)";
 
 	// Displacement limit
 	var limit = 40;
@@ -33374,19 +40132,289 @@ ED.PCIOL.prototype.description = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
+ */
+
+/**
+ * PCIOL Cross Section ***TODO***
+ *
+ * @class PCIOLCrossSection
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Object} _parameterJSON
+ */
+ED.PCIOLCrossSection = function(_drawing, _parameterJSON) {
+	// Set classname
+	this.className = "PCIOLCrossSection";
+	
+	// Other parameters
+	this.fixation = 'In-the-bag';
+	this.fx = 1;
+	
+	// Saved parameters
+	this.savedParameterArray = ['fixation', 'fx', 'originX', 'originY'];
+	
+	// Parameters in doodle control bar
+	this.controlParameterArray = {'fixation':'Fixation'};
+
+
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _parameterJSON);
+
+    this.linkedDoodleParameters = {
+        'PCIOL': {
+            source: ['fixation', 'fx', 'originY'],
+            store: [['originX', 'csOriginX']]
+        }
+    };
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.PCIOLCrossSection.prototype = new ED.Doodle;
+ED.PCIOLCrossSection.prototype.constructor = ED.PCIOLCrossSection;
+ED.PCIOLCrossSection.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets default dragging attributes
+ */
+ED.PCIOLCrossSection.prototype.setPropertyDefaults = function() {
+	this.isUnique = true;
+	this.inFrontOfClassArray = ["HypopyonCrossSection", "HyphaemaCrossSection" ];
+	this.addAtBack = true;
+
+	// Validation arrays for other parameters
+	this.parameterValidationArray['fixation'] = {
+		kind: 'derived',
+		type: 'string',
+		list: ['In-the-bag', 'Ciliary sulcus'],
+		animate: true
+	};
+	this.parameterValidationArray['fx'] = {
+		kind: 'other',
+		type: 'int',
+		range: [1, 2],
+		animate: false
+	};
+	
+	// Update component of validation array for simple parameters
+	this.parameterValidationArray['originX']['range'].setMinAndMax(-150, +44);
+	this.parameterValidationArray['originY']['range'].setMinAndMax(-140, +140);
+}
+
+/**
+ * Sets default parameters (Only called for new doodles)
+ * Use the setParameter function for derived parameters, as this will also update dependent variables
+ */
+ED.PCIOLCrossSection.prototype.setParameterDefaults = function() {
+	this.originX = 44;
+}
+
+/**
+ * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
+ * The returned parameters are animated if their 'animate' property is set to true
+ *
+ * @param {String} _parameter Name of parameter that has changed
+ * @value {Undefined} _value Value of parameter to calculate
+ * @returns {Array} Associative array of values of dependent parameters
+ */
+ED.PCIOLCrossSection.prototype.dependentParameterValues = function(_parameter, _value) {
+	var returnArray = new Array();
+
+	switch (_parameter) {
+		case 'fx':
+			if (_value === 2) returnArray['fixation'] = 'Ciliary sulcus';
+			else returnArray['fixation'] = 'In-the-bag';
+			break;
+
+		case 'fixation':
+			switch (_value) {
+				case 'In-the-bag':
+					returnArray['fx'] = 1;
+					break;
+				case 'Ciliary sulcus':
+					returnArray['fx'] = 2;
+					break;
+			}
+			break;
+			
+		case 'originX':
+			var iris = this.drawing.lastDoodleOfClass('AntSegCrossSection');
+			if (iris) {
+				var minApexX = iris.parameterValidationArray['apexX']['range'].min;
+				var maxApexX = 32 - (72 / 220) * (iris.apexY + 280) + this.originX;
+				if (maxApexX < minApexX) maxApexX = minApexX;
+				iris.parameterValidationArray['apexX']['range'].setMinAndMax(-40 - (140 / 220) * (iris.apexY + 280), maxApexX);
+	
+				// If being synced, make sensible decision about x
+				if (!this.drawing.isActive) {
+					var newOriginX = iris.parameterValidationArray['apexX']['range'].max;
+				} else {
+					var newOriginX = iris.parameterValidationArray['apexX']['range'].constrain(iris.apexX);
+				}
+				iris.setSimpleParameter('apexX', newOriginX);
+			}
+			break;
+	}
+
+	return returnArray;
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.PCIOLCrossSection.prototype.draw = function(_point) {
+	// Get context
+	var ctx = this.drawing.context;
+
+	// Call draw method in superclass
+	ED.PCIOLCrossSection.superclass.draw.call(this, _point);
+
+	// Height of cross section (half value of ro in AntSeg doodle)
+	var h = 240;
+
+	// Arbitrary radius of curvature
+	var r = 450;
+
+	// Displacement of lens from centre
+	var ld = 100;
+
+	// Angle of arc
+	var theta = Math.asin(h / r);
+
+	// X coordinate of centre of circle
+	var x = r * Math.cos(theta);
+
+	// Measurements of nucleus
+	var rn = r - 60;
+
+	// Calculate nucleus angles
+	var phi = Math.acos(x / rn);
+
+	// Draw lens
+	ctx.beginPath();
+	
+	if (this.fixation == 'In-the-bag') {
+		ctx.ellipse(100, 0, 160, 20, 0.5 * Math.PI, 0, 2 * Math.PI);
+	}
+	else {
+		ctx.ellipse(50, 0, 160, 25, 0.5 * Math.PI, 0, 2 * Math.PI);
+	}
+
+
+	// Set line attributes
+	ctx.lineWidth = 5;
+	ctx.fillStyle = "rgba(255, 255, 255, 0.75)";
+	ctx.strokeStyle = "#898989";
+
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+
+	// Non boundary drawing
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+		
+		var xShift = (this.fixation == 'In-the-bag') ? 0 : this.originX - 44;
+		
+		// Lens bag
+		ctx.beginPath();
+		ctx.arc(ld - x - xShift, 0 - this.originY, r, theta, -theta, true);
+		ctx.arc(ld + x - xShift, 0 - this.originY, r, Math.PI + theta, Math.PI + 0.75*theta, true);
+		ctx.moveTo(ld - xShift, 240 - this.originY);
+		ctx.arc(ld + x - xShift, 0 - this.originY, r, Math.PI - theta, Math.PI - 0.75*theta, false);
+		ctx.strokeStyle = "gray";
+		ctx.lineWidth = 3;
+		ctx.stroke();
+
+		// Loops
+		ctx.beginPath();
+		if (this.fixation == 'In-the-bag') {	
+/*
+			ctx.arc(30 + 115 - this.originX, -210 - this.originY, 10, 2.2*Math.PI, 1*Math.PI, true);
+			ctx.lineTo(85,-125);
+			ctx.moveTo(120 - this.originX, 210 - this.originY);
+			ctx.arc(25 + 115 - this.originX, 210 - this.originY, 13, 0, 1*Math.PI, false);
+			ctx.moveTo(100 - this.originX, 210 - this.originY);
+			ctx.lineTo(44 + 65,125);	
+*/	
+			ctx.ellipse(144 - 44, 0 - this.originY, 227, 20, 0.5 * Math.PI, 0.5 * Math.PI, 1.2 * Math.PI);
+			ctx.moveTo(164 - 44,0 - this.originY);
+			ctx.ellipse(144 - 44, 0 - this.originY, 227, 20, 0.5 * Math.PI, 1.5 * Math.PI, 0.2 * Math.PI);
+		}
+		else {
+			ctx.arc(115 - this.originX, -350 - this.originY, 15, 0*Math.PI, 1*Math.PI, true);
+			ctx.lineTo(35,-125);
+			ctx.moveTo(120 - this.originX, 350 - this.originY);
+			ctx.arc(115 - this.originX, 350 - this.originY, 15, 0, 1*Math.PI, false);
+			ctx.moveTo(100 - this.originX, 350 - this.originY);
+			ctx.lineTo(65,125);
+		}
+		ctx.strokeStyle = "#898989";
+		ctx.lineWidth = 5;
+		ctx.stroke();
+
+		
+		// Zonules
+		ctx.beginPath();
+
+		// Top zonules
+		ctx.moveTo(44 - this.originX + 80, - this.originY - 349);
+		ctx.lineTo(80 - xShift, -207 - this.originY);
+		ctx.moveTo(44 - this.originX + 80, - this.originY - 349);
+		ctx.lineTo(120 - xShift, -207 - this.originY);
+		ctx.moveTo(44  - this.originX + 120, - this.originY - 349);
+		ctx.lineTo(80 - xShift, -207 - this.originY);
+		ctx.moveTo(44 - this.originX + 120, - this.originY - 349);
+		ctx.lineTo(120 - xShift, -207 - this.originY);
+
+		// Bottom zonules
+		ctx.moveTo(44 - this.originX + 80, -this.originY + 349);
+		ctx.lineTo(80 - xShift, 207 - this.originY);
+		ctx.moveTo(44 - this.originX + 80, -this.originY + 349);
+		ctx.lineTo(120 - xShift, 207 - this.originY);
+		ctx.moveTo(44 - this.originX + 120, -this.originY + 349);
+		ctx.lineTo(80 - xShift, 207 - this.originY);
+		ctx.moveTo(44 - this.originX + 120, -this.originY + 349);
+		ctx.lineTo(120 - xShift, 207 - this.originY);
+
+		ctx.lineWidth = 2;
+		ctx.strokeStyle = "gray";
+		ctx.stroke();
+	}
+
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * OpenEyes
+ *
+ * Copyright (C) OpenEyes Foundation, 2011-2017
+ * This file is part of OpenEyes.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package OpenEyes
+ * @link http://www.openeyes.org.uk
+ * @author OpenEyes <info@openeyes.org.uk>
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -33611,19 +40639,17 @@ ED.PeripapillaryAtrophy.prototype.description = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -33813,19 +40839,17 @@ ED.PeripheralRetinectomy.prototype.description = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -33999,19 +41023,17 @@ ED.PeripheralRRD.prototype.diagnosticHierarchy = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -34361,19 +41383,17 @@ ED.PhakoIncision.prototype.description = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -34434,7 +41454,7 @@ ED.PI.prototype.setPropertyDefaults = function() {
  * Sets default parameters
  */
 ED.PI.prototype.setParameterDefaults = function() {
-	this.setRotationWithDisplacements(60, -60);
+	this.setRotationWithDisplacements(30, -30);
 }
 
 /**
@@ -34495,32 +41515,184 @@ ED.PI.prototype.description = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * (C) OpenEyes Foundation, 2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
+ */
+
+/**
+ * Pingueculum
+ *
+ * @class Pingueculum
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Object} _parameterJSON
+ */
+ED.Pingueculum = function(_drawing, _parameterJSON) {
+	// Set classname
+	this.className = "Pingueculum";
+
+	// Derived parameters
+
+	// Saved parameters
+	this.savedParameterArray = ['arc','rotation'];
+
+	// Parameters in doodle control bar (parameter name: parameter label)
+	this.controlParameterArray = {};
+
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _parameterJSON);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.Pingueculum.prototype = new ED.Doodle;
+ED.Pingueculum.prototype.constructor = ED.Pingueculum;
+ED.Pingueculum.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.Pingueculum.prototype.setHandles = function() {
+	this.handleArray[2] = new ED.Doodle.Handle(null, true, ED.Mode.Arc, false);
+}
+
+
+/**
+ * Sets default dragging attributes
+ */
+ED.Pingueculum.prototype.setPropertyDefaults = function() {
+	this.isUnique = false;
+	this.isMoveable = false;
+	this.isRotatable = false;
+	
+	this.parameterValidationArray['arc']['range'].setMinAndMax(0.75*Math.PI, 1.25*Math.PI);
+}
+
+/**
+ * Sets default parameters (Only called for new doodles)
+ * Use the setParameter function for derived parameters, as this will also update dependent variables
+ */
+ED.Pingueculum.prototype.setParameterDefaults = function() {
+	this.arc = 180 * Math.PI / 180;
+	this.setRotationWithDisplacements(0, 180);
+	if (this.rotation>0.5*Math.PI) this.rotation = Math.PI;
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.Pingueculum.prototype.draw = function(_point) {
+	// Get context
+	var ctx = this.drawing.context;
+
+	// Call draw method in superclass
+	ED.Pingueculum.superclass.draw.call(this, _point);
+
+	//Set variables used to draw pingueculum
+	// Calculate parameters for arcs
+	var theta = this.arc / 2;
+	var outerR = 460;
+	var xPos = outerR * Math.sin(theta); // x start coordinate
+	var yPos = -outerR * Math.cos(theta); // y start coordinate
+
+	var r = 38; // radius of circles used for pingueculum
+
+
+	// Boundary path
+	// Draw circle around pingueculum
+	ctx.beginPath();
+	ctx.arc(xPos, yPos, 2*r, 0, 2 * Math.PI, true);
+	ctx.closePath();
+
+	// Set line attributes
+	ctx.lineWidth = 4;
+	ctx.fillStyle = "rgba(255, 255, 255, 0)";
+	ctx.strokeStyle = "rgba(255, 255, 255, 0)";
+
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+
+	// Non boundary drawing
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+
+		//Draw pingueculum:
+		ctx.fillStyle = 'yellow'; //Set pingueculum colour
+
+		//Draw 3 circles around start point
+		ctx.beginPath();
+		ctx.arc(xPos - r, yPos - 0.5*r, r, 0, Math.PI * 2, false);
+		ctx.fill();
+		ctx.beginPath();
+		ctx.arc(xPos - r, yPos + 0.5*r, r, 0, Math.PI * 2, false);
+		ctx.fill();
+		ctx.beginPath();
+		ctx.arc(xPos, yPos, r, 0, Math.PI * 2, false);
+		ctx.fill();
+	}
+
+	// Set handle position
+	var topRightX = outerR * Math.sin(theta);
+	var topRightY = -outerR * Math.cos(theta);
+	var topLeftX = -outerR * Math.sin(theta);
+	var topLeftY = topRightY;
+	this.handleArray[2].location = this.transform.transformPoint(new ED.Point(topRightX, topRightY));
+
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.Pingueculum.prototype.description = function() {
+	var returnValue = "Pingueculum";
+	return returnValue;
+}
+
+/**
+ * OpenEyes
+ *
+ * Copyright (C) OpenEyes Foundation, 2011-2017
+ * This file is part of OpenEyes.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package OpenEyes
+ * @link http://www.openeyes.org.uk
+ * @author OpenEyes <info@openeyes.org.uk>
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
  * Corneal Oedema
  *
- * @class CornealOedema
+ * @class PosteriorCapsularOpacity
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
  * @param {Object} _parameterJSON
  */
-ED.CornealOedema = function(_drawing, _parameterJSON) {
+ED.PosteriorCapsularOpacity = function(_drawing, _parameterJSON) {
 	// Set classname
-	this.className = "CornealOedema";
+	this.className = "PosteriorCapsularOpacity";
 
 	// Private parameters
 	this.numberOfHandles = 4;
@@ -34547,14 +41719,14 @@ ED.CornealOedema = function(_drawing, _parameterJSON) {
 /**
  * Sets superclass and constructor
  */
-ED.CornealOedema.prototype = new ED.Doodle;
-ED.CornealOedema.prototype.constructor = ED.CornealOedema;
-ED.CornealOedema.superclass = ED.Doodle.prototype;
+ED.PosteriorCapsularOpacity.prototype = new ED.Doodle;
+ED.PosteriorCapsularOpacity.prototype.constructor = ED.PosteriorCapsularOpacity;
+ED.PosteriorCapsularOpacity.superclass = ED.Doodle.prototype;
 
 /**
  * Sets handle attributes
  */
-ED.CornealOedema.prototype.setHandles = function() {
+ED.PosteriorCapsularOpacity.prototype.setHandles = function() {
 	this.handleArray[4] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
 	// Array of handles
 // 	for (var i = 0; i < this.numberOfHandles; i++) {
@@ -34565,7 +41737,7 @@ ED.CornealOedema.prototype.setHandles = function() {
 /**
  * Sets default properties
  */
-ED.CornealOedema.prototype.setPropertyDefaults = function() {
+ED.PosteriorCapsularOpacity.prototype.setPropertyDefaults = function() {
 	this.isRotatable = false;
 	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
 	this.parameterValidationArray['apexY']['range'].setMinAndMax(-380, -80);
@@ -34613,7 +41785,7 @@ ED.CornealOedema.prototype.setPropertyDefaults = function() {
 /**
  * Sets default parameters
  */
-ED.CornealOedema.prototype.setParameterDefaults = function() {
+ED.PosteriorCapsularOpacity.prototype.setParameterDefaults = function() {
 	this.apexY = -this.initialRadius;
 	this.setParameterFromString('stromal', 'false');
 	this.setParameterFromString('epithelial', 'false');
@@ -34643,12 +41815,12 @@ ED.CornealOedema.prototype.setParameterDefaults = function() {
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.CornealOedema.prototype.draw = function(_point) {
+ED.PosteriorCapsularOpacity.prototype.draw = function(_point) {
 	// Get context
 	var ctx = this.drawing.context;
 
 	// Call draw method in superclass
-	ED.CornealOedema.superclass.draw.call(this, _point);
+	ED.PosteriorCapsularOpacity.superclass.draw.call(this, _point);
 
 	// Boundary path
 	ctx.beginPath();
@@ -34734,26 +41906,24 @@ ED.CornealOedema.prototype.draw = function(_point) {
  *
  * @returns {String} Description of doodle
  */
-ED.CornealOedema.prototype.description = function() {
+ED.PosteriorCapsularOpacity.prototype.description = function() {
 	return "Corneal oedema";
 }
 
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -34768,6 +41938,12 @@ ED.PosteriorCapsule = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "PosteriorCapsule";
 
+<<<<<<< HEAD
+    this.savedParameterArray = ['originX', 'originY', 'scaleX', 'scaleY'];
+
+    // Call superclass constructor
+    ED.Doodle.call(this, _drawing, _parameterJSON);
+=======
 	// Derived parameters
 	this.opacity = '1';
 	this.capsulotomy = 'None';
@@ -34780,6 +41956,7 @@ ED.PosteriorCapsule = function(_drawing, _parameterJSON) {
 		'opacity':'Opacity',
 		'capsulotomy':'Capsulotomy',
 		};
+>>>>>>> origin/release/v2.1
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -34946,19 +42123,17 @@ ED.PosteriorCapsule.prototype.description = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -35049,19 +42224,17 @@ ED.PosteriorEmbryotoxon.prototype.description = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -35197,19 +42370,17 @@ ED.PosteriorRetinectomy.prototype.groupDescription = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -35453,19 +42624,17 @@ ED.PosteriorSynechia.prototype.description = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -35710,19 +42879,17 @@ ED.PostPole.prototype.isWithinArcades = function(_doodle) {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -35886,19 +43053,17 @@ ED.PostSubcapCataract.prototype.diagnosticHierarchy = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -36026,19 +43191,17 @@ ED.PostSubcapCataractCrossSection.prototype.draw = function(_point) {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -36159,19 +43322,17 @@ ED.PreRetinalHaemorrhage.prototype.groupDescription = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -36300,9 +43461,17 @@ ED.PRPPostPole.prototype.description = function() {
 ED.Pterygium = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "Pterygium";
-
+	
+	this.plane = 0;
+	
 	// Saved parameters
-	this.savedParameterArray = ['apexY', 'arc', 'rotation'];
+	this.savedParameterArray = ['apexY', 'arc', 'rotation','injection','stockersLine'];
+	
+	// Parameters in doodle control bar (parameter name: parameter label)
+	this.controlParameterArray = {
+		'injection':'Injection',
+		'stockersLine':"Stocker's line"
+	};
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -36322,6 +43491,9 @@ ED.Pterygium.prototype.setHandles = function() {
 	this.handleArray[1] = new ED.Doodle.Handle(null, true, ED.Mode.Arc, false);
 	this.handleArray[2] = new ED.Doodle.Handle(null, true, ED.Mode.Arc, false);
 	this.handleArray[4] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
+	
+	this.handleArray[5] = new ED.Doodle.Handle(null, true, ED.Mode.Handles, false);
+	this.handleArray[6] = new ED.Doodle.Handle(null, true, ED.Mode.Handles, false);
 }
 
 /**
@@ -36329,23 +43501,85 @@ ED.Pterygium.prototype.setHandles = function() {
  */
 ED.Pterygium.prototype.setPropertyDefaults = function() {
 	this.isMoveable = false;
+	this.isUnique = false;
+	
+	// Add complete validation arrays for derived parameters
+	this.parameterValidationArray.injection = {
+		kind: 'derived',
+		type: 'string',
+		list: ['+', '++', '+++'],
+		animate: true
+	};
+	this.parameterValidationArray.stockersLine = {
+		kind: 'derived',
+		type: 'bool',
+		display: true
+	};
 
 	// Update component of validation array for simple parameters
 	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
-	this.parameterValidationArray['apexY']['range'].setMinAndMax(-450, +100);
+	this.parameterValidationArray['apexY']['range'].setMinAndMax(-360, +100);
 	this.parameterValidationArray['arc']['range'].setMinAndMax(Math.PI / 6, Math.PI);
+	this.parameterValidationArray['rotation']['range'].setMinAndMax(0, 2*Math.PI);
 }
 
 /**
  * Sets default parameters
  */
 ED.Pterygium.prototype.setParameterDefaults = function() {
-	this.apexY = -100;
-	this.arc = 80 * Math.PI / 180;
+	this.apexY = -120;
+	this.arc = 60 * Math.PI / 180;
 
 	// Default to temporal quadrant
-	this.setRotationWithDisplacements(90, 120);
+    this.setRotationWithDisplacements(270, 180);
+	if (this.rotation>Math.PI) this.rotation = 1.5*Math.PI;
+	
+	this.setParameterFromString('injection', '+');
+	this.setParameterFromString('stockersLine', 'false');
+	
+	// Create a squiggle to store the handles points
+	var squiggle = new ED.Squiggle(this, new ED.Colour(100, 100, 100, 1), 4, true);
+
+	// Add it to squiggle array
+	this.squiggleArray.push(squiggle);
+
+	// Populate with handles at  points around circumference
+	var point = new ED.Point(-80, -170);
+	this.squiggleArray[0].pointsArray[5] = point;
+	point = new ED.Point(80, -170);
+	this.squiggleArray[0].pointsArray[6] = point;
+
 }
+
+/**
+ * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
+ * The returned parameters are animated if the 'animate' property in the parameterValidationArray is set to true
+ *
+ * @param {String} _parameter Name of parameter that has changed
+ * @param {Undefined} _value Value of parameter to calculate
+ * @returns {Array} Associative array of values of dependent parameters
+ */
+ED.Pterygium.prototype.dependentParameterValues = function(_parameter, _value) {
+	var returnArray = {},
+		returnValue;
+
+	switch (_parameter) {
+		
+		// insure handles y coodinate set distance away from apex
+		case 'apexY':
+			this.squiggleArray[0].pointsArray[5].y = _value - 50;
+			this.squiggleArray[0].pointsArray[6].y = _value - 50;
+			break;
+			
+		// constrain handles to only move in the X plane
+		case 'handles':
+			this.squiggleArray[0].pointsArray[this.draggingHandleIndex].y = this.apexY - 50;
+			break;
+	}
+
+	return returnArray;
+};
+
 
 /**
  * Draws doodle or performs a hit test if a Point parameter is passed
@@ -36360,7 +43594,7 @@ ED.Pterygium.prototype.draw = function(_point) {
 	ED.RRD.superclass.draw.call(this, _point);
 
 	// Fit outer curve just inside ora on right and left fundus diagrams
-	var r = 952 / 2;
+	var r = 470;
 
 	// Calculate parameters for arcs
 	var theta = this.arc / 2;
@@ -36382,13 +43616,28 @@ ED.Pterygium.prototype.draw = function(_point) {
 	// Connect across the bottom via the apex point
 	var bp = +0.4;
 
-	// Curve back to start via apex point
-	ctx.bezierCurveTo(topLeftX, topLeftY, bp * topLeftX, this.apexY, this.apexX, this.apexY);
-	ctx.bezierCurveTo(-bp * topLeftX, this.apexY, topRightX, topRightY, topRightX, topRightY);
+	// Bezier curves between handles, back to start point at bottom
+	ctx.bezierCurveTo(topLeftX - 0.7*(topLeftX - this.squiggleArray[0].pointsArray[5].x), topLeftY, this.squiggleArray[0].pointsArray[5].x,this.squiggleArray[0].pointsArray[5].y, this.squiggleArray[0].pointsArray[5].x,this.squiggleArray[0].pointsArray[5].y);
+	ctx.bezierCurveTo(this.squiggleArray[0].pointsArray[5].x, this.apexY, this.apexX, this.apexY, this.apexX, this.apexY);
+	ctx.bezierCurveTo(this.apexX, this.apexY, this.squiggleArray[0].pointsArray[6].x, this.apexY, this.squiggleArray[0].pointsArray[6].x,this.squiggleArray[0].pointsArray[6].y);
+	ctx.bezierCurveTo(this.squiggleArray[0].pointsArray[6].x,this.squiggleArray[0].pointsArray[6].y, topRightX - 0.7*(topRightX - this.squiggleArray[0].pointsArray[6].x), topRightY, topRightX, topRightY);
+
 
 	// Set line attributes
 	ctx.lineWidth = 4;
-	ctx.fillStyle = "rgba(200,200,200,0.5)";
+	
+	switch (this.injection) {
+		case '+':
+			ctx.fillStyle = "rgba(255, 204, 204, 0.7)";
+			break;
+		case '++':
+			ctx.fillStyle = "rgba(255, 153, 153, 0.7)";
+			break;
+		case '+++':
+			ctx.fillStyle = "rgba(255, 102, 102, 0.7)";
+			break;
+	}
+	
 	ctx.strokeStyle = "gray";
 
 	// Draw boundary path (also hit testing)
@@ -36396,11 +43645,22 @@ ED.Pterygium.prototype.draw = function(_point) {
 	
 		// Non-boundary paths
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
-		// Total number of vessels
+		// Draw Stocker's line
+		if (this.stockersLine) {
+			ctx.beginPath();
+			ctx.moveTo(this.squiggleArray[0].pointsArray[5].x - 20,this.squiggleArray[0].pointsArray[5].y + 20);
+			ctx.bezierCurveTo(this.squiggleArray[0].pointsArray[5].x, this.apexY + 20, this.apexX, this.apexY + 20, this.apexX, this.apexY + 20);
+			ctx.bezierCurveTo(this.apexX, this.apexY + 20, this.squiggleArray[0].pointsArray[6].x, this.apexY + 20, this.squiggleArray[0].pointsArray[6].x + 20,this.squiggleArray[0].pointsArray[6].y  + 20);
+			ctx.strokeStyle = "brown";
+			ctx.lineWidth = 8;
+			ctx.stroke();
+		}
+		
+		// Draw vessels
 		var v = 6;
-
-		// Angular separation
-		var phi = this.arc/v
+		var phi = this.arc/v;
+		var lX = Math.abs(this.squiggleArray[0].pointsArray[5].x - this.squiggleArray[0].pointsArray[6].x);
+		var xDif = lX/(v+1);
 
 		// Start and end points of vessel
 		var sp = new ED.Point(0, 0);
@@ -36417,14 +43677,25 @@ ED.Pterygium.prototype.draw = function(_point) {
 			
 			// Go a proportion along line to apex Point
 			var p = 0.8;
-			ep.x = sp.x + p * (ap.x - sp.x);
+			ep.x = this.squiggleArray[0].pointsArray[5].x + xDif*(i+1);
+// 			ep.x = sp.x + p * (ap.x - sp.x);
 			ep.y = sp.y + p * (ap.y - sp.y);
 			ctx.moveTo(sp.x, sp.y);
-			ctx.lineTo(ep.x, ep.y);
+			ctx.bezierCurveTo(ep.x-0.7*(ep.x-sp.x), sp.y, ep.x, ep.y, ep.x, ep.y);
 		}
 
-		ctx.strokeStyle = "red";
-		ctx.lineWidth = 8;
+		ctx.strokeStyle = "rgba(255,0,0,0.6)";
+		switch (this.injection) {
+		case '+':
+			ctx.lineWidth = 4;
+			break;
+		case '++':
+			ctx.lineWidth = 6;
+			break;
+		case '+++':
+			ctx.lineWidth = 8;
+			break;
+	}
 		
 		ctx.stroke();
 	}
@@ -36433,7 +43704,9 @@ ED.Pterygium.prototype.draw = function(_point) {
 	// Coordinates of handles (in canvas plane)
 	this.handleArray[1].location = this.transform.transformPoint(new ED.Point(topLeftX, topLeftY));
 	this.handleArray[2].location = this.transform.transformPoint(new ED.Point(topRightX, topRightY));
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));	
+	this.handleArray[5].location = this.transform.transformPoint(this.squiggleArray[0].pointsArray[5]);
+	this.handleArray[6].location = this.transform.transformPoint(this.squiggleArray[0].pointsArray[6]);
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -36449,14 +43722,27 @@ ED.Pterygium.prototype.draw = function(_point) {
  * @returns {String} Description of doodle
  */
 ED.Pterygium.prototype.description = function() {
+	
+	// calculate distance between apex and visual axis
+	var n = Math.sqrt((this.apexX*this.apexX) + (this.apexY*this.apexY));
+	n = (n / 380 * 6).toFixed(2);
+	
 	var returnString = "";
+	
+	// If injection+++, then injected
+	if (this.injection == "+++") returnString += "injected ";
 
-	// Size description
-	if (this.arc < Math.PI / 4) returnString = "Small ";
-	else returnString = "Large ";
-
-	// U tear
-	returnString += "Pterygium ";
+	// Temrporal / nasal
+	if (this.rotation>=0 && this.rotation< Math.PI) {
+		if (this.drawing.eye == ED.eye.Right) returnString += "nasal ";
+		else returnString += "temporal ";
+	}
+	else {
+		if (this.drawing.eye == ED.eye.Right) returnString += "temporal ";
+		else returnString += "nasal ";
+	}
+	
+	returnString += "pterygium within " + n + "mm of visual axis";
 
 	return returnString;
 }
@@ -36482,19 +43768,17 @@ ED.Pterygium.prototype.diagnosticHierarchy = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -36685,19 +43969,17 @@ ED.PTK.prototype.description = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -36833,19 +44115,17 @@ ED.RadialSponge.prototype.description = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -37118,19 +44398,17 @@ ED.Rectus.prototype.draw = function(_point) {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -37349,19 +44627,17 @@ ED.RetinalArteryOcclusionPostPole.prototype.type = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -37514,19 +44790,17 @@ ED.RetinalHaemorrhage.prototype.groupDescription = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -37628,19 +44902,17 @@ ED.RetinalTouch.prototype.draw = function(_point) {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -37879,15 +45151,15 @@ ED.RetinalVeinOcclusionPostPole.prototype.type = function() {
  * (C) OpenEyes Foundation, 2016
  *
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2016, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -37902,6 +45174,9 @@ ED.Retinoschisis = function(_drawing, _parameterJSON)
 {
     // Set classname
     this.className = "Retinoschisis";
+
+    // Saved parameters
+    this.savedParameterArray = ['arc', 'rotation', 'apexY'];
 
     // Call superclass constructor
     ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -38096,19 +45371,312 @@ ED.Retinoschisis.prototype.diagnosticHierarchy = function()
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
+ */
+
+/**
+ *
+ *
+ * @class RetinoscopyPowerCross
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Object} _parameterJSON
+ */
+ED.RetinoscopyPowerCross = function(_drawing, _parameterJSON) {
+	// Set classname
+	this.className = "RetinoscopyPowerCross";
+
+	this.workingDistance = 0.5;
+	this.angle1 = 180;
+	this.angle2 = 90;
+	this.powerSign1 = "+";
+	this.powerSign2 = "+";
+	this.powerInt1 = 0;
+	this.powerInt2 = 0;
+	this.powerDp1 = ".00";
+	this.powerDp2 = ".00";
+	
+	// Saved parameters
+	this.savedParameterArray = ['rotation', 'powerSign1', 'powerSign2', 'powerInt1', 'powerInt2', 'powerDp1', 'powerDp2'];
+
+	// Parameters in doodle control bar (parameter name: parameter label)
+	this.controlParameterArray = {};
+	
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _parameterJSON);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.RetinoscopyPowerCross.prototype = new ED.Doodle;
+ED.RetinoscopyPowerCross.prototype.constructor = ED.RetinoscopyPowerCross;
+ED.RetinoscopyPowerCross.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets default dragging attributes
+ */
+ED.RetinoscopyPowerCross.prototype.setPropertyDefaults = function() {
+	this.isScaleable = false;
+	this.isMoveable = false;
+	
+	// Update component of validation array for simple parameters
+	this.parameterValidationArray['rotation']['range'].setMinAndMax(Math.PI, 2*Math.PI);
+
+	// Add complete validation arrays for derived parameters
+
+	this.parameterValidationArray['workingDistance'] = {
+		kind: 'derived',
+		type: 'string',
+		list: ['0.333','0.500','0.667','1.000','1.500'],
+		animate: true
+	};
+	this.parameterValidationArray['angle1'] = {
+		kind: 'derived',
+		type: 'int',
+		range: new ED.Range(1, 180),
+		animate: true
+	};
+	this.parameterValidationArray['powerSign1'] = {
+		kind: 'derived',
+		type: 'string',
+		list: ['+', '-'],
+		animate: true
+	};
+	this.parameterValidationArray['powerInt1'] = {
+		kind: 'derived',
+		type: 'int',
+		range: new ED.Range(0,20),
+		animate: true
+	};
+	this.parameterValidationArray['powerDp1'] = {
+		kind: 'derived',
+		type: 'string',
+		list: ['.00', '.25','.50','.75'],
+		animate: true
+	};
+	this.parameterValidationArray['angle2'] = {
+		kind: 'derived',
+		type: 'int',
+		range: new ED.Range(1, 180),
+		animate: true
+	};
+	this.parameterValidationArray['powerSign2'] = {
+		kind: 'derived',
+		type: 'string',
+		list: ['+', '-'],
+		animate: true
+	};
+	this.parameterValidationArray['powerInt2'] = {
+		kind: 'derived',
+		type: 'int',
+		range: new ED.Range(0,20),
+		animate: true
+	};
+	this.parameterValidationArray['powerDp2'] = {
+		kind: 'derived',
+		type: 'string',
+		list: ['.00', '.25','.50','.75'],
+		animate: true
+	};
+
+}
+
+/**
+ * Sets default parameters (Only called for new doodles)
+ * Use the setParameter function for derived parameters, as this will also update dependent variables
+ */
+ED.RetinoscopyPowerCross.prototype.setParameterDefaults = function() {
+	this.rotation = Math.PI;
+}
+
+/**
+ * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
+ * The returned parameters are animated if their 'animate' property is set to true
+ *
+ * @param {String} _parameter Name of parameter that has changed
+ * @value {Undefined} _value Value of parameter to calculate
+ * @returns {Array} Associative array of values of dependent parameters
+ */
+ED.RetinoscopyPowerCross.prototype.dependentParameterValues = function(_parameter, _value) {
+	var returnArray = new Array();
+
+	switch (_parameter) {
+		case 'angle1':
+			returnArray['rotation'] = 2*Math.PI - parseFloat(_value*Math.PI/180);
+			returnArray['angle2'] = (parseInt(_value)>90) ? parseInt(_value) - 90 : parseInt(_value) + 90;
+			break;
+			
+		case 'rotation':
+			var degAngle = Math.round(_value * 180 / Math.PI);
+			returnArray['angle1'] = 360 - degAngle;
+			returnArray['angle2'] = (360 - degAngle>90) ? 360 - degAngle - 90 : 360 - degAngle + 90;
+			break;
+	}
+
+	return returnArray;
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.RetinoscopyPowerCross.prototype.draw = function(_point) {
+	
+	// Axis length
+	var l = 340;
+	
+	// Get context
+	var ctx = this.drawing.context;
+
+	// Call draw method in superclass
+	ED.RetinoscopyPowerCross.superclass.draw.call(this, _point);
+	
+	// Draw invisible boundary box around axes
+	ctx.moveTo(-l,-l);
+	ctx.lineTo(-l,l);
+	ctx.lineTo(l,l);
+	ctx.lineTo(l,-l);
+	ctx.lineTo(-l,-l);
+	
+	ctx.fillStyle = "rgba(255, 255, 255, 0)";
+	ctx.strokeStyle = "rgba(0,0,0,0)";
+	
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+	
+	// Non boundary drawing
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+		ctx.beginPath();
+		
+		// Draw y axis
+		ctx.moveTo(0,-l);
+		ctx.lineTo(0,l);
+		
+		// Draw X axis
+		ctx.moveTo(l,0);
+		ctx.lineTo(-l,0);
+	
+		// Set line attributes
+		ctx.lineWidth = 7;
+		ctx.fillStyle = "rgba(255, 255, 255, 0)";
+		ctx.strokeStyle = "black";
+		
+		// Draw it
+		ctx.stroke();
+		
+		// Text labels
+		ctx.save();
+		ctx.rotate(-this.rotation);
+		var x;
+		var y;
+
+		ctx.font="48px Arial";
+		ctx.fillStyle="black";
+		ctx.textAlign="center"; 
+		ctx.textBaseline = "middle";
+	
+		ctx.beginPath();
+
+		var sp = l + 70;
+
+		// axis 1		
+		x = sp * Math.cos(this.rotation);
+		y = -sp*Math.sin(-this.rotation);
+		ctx.fillText(this.angle1 + "\xB0",x,y);
+		
+		// axis 2
+		x = -sp * Math.sin(this.rotation);
+		y = sp * Math.cos(this.rotation);
+		ctx.fillText(this.angle2 + "\xB0",x,y);
+		
+		// power 1
+		x = -sp * Math.cos(this.rotation);
+		y = sp*Math.sin(-this.rotation);
+		ctx.fillText(this.powerSign1 + parseInt(this.powerInt1) + this.powerDp1,x,y);
+		
+		// power 2
+		x = sp * Math.sin(this.rotation);
+		y = -sp * Math.cos(-this.rotation);
+		ctx.fillText(this.powerSign2 + parseInt(this.powerInt2) + this.powerDp2,x,y);
+		
+		ctx.restore();
+
+	}
+
+	// Return value indicating successful hittest
+	return this.isClicked;
+};
+
+ED.RetinoscopyPowerCross.prototype.calcRx = function() {
+	var wdCompensation = (1 / this.workingDistance).toFixed(2);
+
+	// Calculate minus cyl form
+	var power1 = parseFloat(this.powerSign1 + parseInt(this.powerInt1) + this.powerDp1);
+	var power2 = parseFloat(this.powerSign2 + parseInt(this.powerInt2) + this.powerDp2);
+	var pSphere = (power1 >= power2) ? (power1 - wdCompensation).toFixed(2) : (power2 - wdCompensation).toFixed(2);
+	var pCyl = (Math.abs(power1 - power2) * -1).toFixed(2); // reports in minus cyl format
+	var angle = (power1>=power2) ? this.angle2 : this.angle1; // as per JEM, use angle of lowest power lens
+
+	// force to be within the range of 0-180
+	if (angle > 180)
+		angle -= 180;
+
+	// correction for cylinder axis offset
+	angle -= 90;
+
+	// cannot be negative
+	if (angle < 0)
+		angle += 180;
+
+	return {
+		pSphere: pSphere,
+		pCyl: pCyl,
+		angle: angle
+	};
+};
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.RetinoscopyPowerCross.prototype.description = function() {
+	calcRx = this.calcRx();
+
+	var Rx = (calcRx.pSphere >= 0 ) ? '+' + calcRx.pSphere: calcRx.pSphere;
+	Rx += (calcRx.pCyl == 0) ? ' / -' : ' / ';
+	Rx += calcRx.pCyl + ' x ' + calcRx.angle;
+		
+	return Rx;
+}
+
+
+/**
+ * OpenEyes
+ *
+ * Copyright (C) OpenEyes Foundation, 2011-2017
+ * This file is part of OpenEyes.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package OpenEyes
+ * @link http://www.openeyes.org.uk
+ * @author OpenEyes <info@openeyes.org.uk>
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -38251,19 +45819,17 @@ ED.RingSegment.prototype.description = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -38426,19 +45992,17 @@ ED.RK.prototype.description = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -38596,19 +46160,17 @@ ED.RoundHole.prototype.diagnosticHierarchy = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -38705,19 +46267,17 @@ ED.RPEAtrophy.prototype.groupDescription = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -38885,19 +46445,17 @@ ED.RPEDetachment.prototype.description = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -38994,19 +46552,17 @@ ED.RPEHypertrophy.prototype.groupDescription = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -39161,19 +46717,17 @@ ED.RPERip.prototype.description = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -39216,6 +46770,13 @@ ED.RRD.prototype.setHandles = function() {
  */
 ED.RRD.prototype.setPropertyDefaults = function() {
 	this.isMoveable = false;
+	this._isMacOff = false;
+    if (this.drawing.eye == ED.eye.Right) {
+        this._macPoint = new ED.Point(-100, 0);
+    } else {
+        this._macPoint = new ED.Point(100, 0);
+    }
+
 
 	// Update component of validation array for simple parameters
 // 	this.parameterValidationArray['scaleX']['range'].setMinAndMax(+1, +4);
@@ -39302,6 +46863,12 @@ ED.RRD.prototype.draw = function(_point) {
 
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
+	// create the Mac point
+	// not sure if we need to do this conversion every time, but if the canvas properties change it may be necessary
+	// so for safeties sake
+    var maculaCanvasPt = this.drawing.transform.transformPoint(this._macPoint);
+    // Determine whether macula is off or not
+	this._isMacOff = this.hitTest(ctx, maculaCanvasPt);
 
 	// Coordinates of handles (in canvas plane)
 	this.handleArray[1].location = this.transform.transformPoint(new ED.Point(topLeftX, topLeftY));
@@ -39355,40 +46922,26 @@ ED.RRD.prototype.diagnosticHierarchy = function() {
 /**
  * Determines whether the macula is off or not
  *
- * @returns {Bool} True if macula is off
+ * @returns {boolean} True if macula is off
  */
 ED.RRD.prototype.isMacOff = function() {
-	// Get coordinates of macula in doodle plane
-	if (this.drawing.eye == ED.eye.Right) {
-		var macula = new ED.Point(-100, 0);
-	} else {
-		var macula = new ED.Point(100, 0);
-	}
-
-	// Convert to canvas plane
-	var maculaCanvas = this.drawing.transform.transformPoint(macula);
-
-	// Determine whether macula is off or not
-	if (this.draw(maculaCanvas)) return true;
-	else return false;
-}
+	return this._isMacOff;
+};
 
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -39631,21 +47184,29 @@ ED.Rubeosis.prototype.description = function() {
 }
 
 /**
+ * Returns the SnoMed code of the doodle
+ *
+ * @returns {Number} SnoMed code of entity represented by doodle
+ */
+ED.Rubeosis.prototype.snomedCode = function()
+{
+    return 51995000;
+}
+
+/**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -39822,19 +47383,17 @@ ED.ScleralIncision.prototype.groupDescriptionEnd = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -40130,19 +47689,17 @@ ED.Sclerostomy.prototype.groupDescriptionEnd = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -40295,19 +47852,17 @@ ED.SectorIridectomy.prototype.description = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -40460,19 +48015,17 @@ ED.SectorPRP.prototype.draw = function(_point) {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -40633,19 +48186,17 @@ ED.SectorPRPPostPole.prototype.description = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -40770,19 +48321,17 @@ ED.SidePort.prototype.groupDescriptionEnd = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -41040,6 +48589,193 @@ ED.SMILE.prototype.description = function() {
 }
 
 /**
+ * OpenEyes
+ *
+ * Copyright (C) OpenEyes Foundation, 2011-2017
+ * This file is part of OpenEyes.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package OpenEyes
+ * @link http://www.openeyes.org.uk
+ * @author OpenEyes <info@openeyes.org.uk>
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
+ */
+
+/**
+ * 
+ *
+ * @class SPEE
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Object} _parameterJSON
+ */
+ED.SPEE = function(_drawing, _parameterJSON) {
+	// Set classname
+	this.className = "SPEE";
+
+	// Saved parameters
+	this.savedParameterArray = ['originX', 'originY', 'apexY', 'apexX', 'scaleX','scaleY', 'rotation'];
+
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _parameterJSON);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.SPEE.prototype = new ED.Doodle;
+ED.SPEE.prototype.constructor = ED.SPEE;
+ED.SPEE.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.SPEE.prototype.setHandles = function() {
+	
+	// pigmentation density
+	this.handleArray[0] = new ED.Doodle.Handle(null, true, ED.Mode.Handles, false);
+	
+	// shape
+	this.handleArray[4] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
+	this.handleArray[4].isRotatable = true;
+}
+
+/**
+ * Sets default properties
+ */
+ED.SPEE.prototype.setPropertyDefaults = function() {
+	this.isSqueezable = true;
+	
+	// Update component of validation array for simple parameters
+	this.parameterValidationArray['apexX']['range'].setMinAndMax(-400, +400);
+	this.parameterValidationArray['apexY']['range'].setMinAndMax(-400, +400);
+	
+	
+	this.handleVectorRangeArray = new Array();
+	var range = new Object;
+	range.length = new ED.Range(+1, +150);
+	range.angle = new ED.Range(0.5*Math.PI, 0.5*Math.PI);
+	this.handleVectorRangeArray[0] = range;
+}
+
+/**
+ * Sets default parameters
+ */
+ED.SPEE.prototype.setParameterDefaults = function() {
+	this.originX = 150;
+	this.originY = 40;
+	this.apexY = -50;
+	this.apexX = 170;
+	
+	// Create a squiggle to store the handles points
+	var squiggle = new ED.Squiggle(this, new ED.Colour(100, 100, 100, 1), 4, true);
+
+	// Add it to squiggle array
+	this.squiggleArray.push(squiggle);
+
+	var point = new ED.Point(40, 0);
+	this.addPointToSquiggle(point);
+
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.SPEE.prototype.draw = function(_point) {
+	// Get context
+	var ctx = this.drawing.context;
+
+	// Call draw method in superclass
+	ED.SPEE.superclass.draw.call(this, _point);
+
+	// Boundary path
+	ctx.beginPath();
+
+	// Invisible boundary
+	ctx.ellipse(0, 0, Math.abs(this.apexY), Math.abs(this.apexX), 0.5 * Math.PI, 0, 2 * Math.PI);
+	
+	// Set line attributes  
+	ctx.lineWidth = 1;
+	ctx.strokeStyle = "rgba(0, 0, 0, 0)";
+	ctx.fillStyle = "rgba(0,0,0,0)";
+
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+	
+	// Coordinates of expert handles (in canvas plane)
+	this.handleArray[0].location = this.transform.transformPoint(this.squiggleArray[0].pointsArray[0]);
+	
+	// Non boundary paths
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+		// Pigment dots
+		
+		// Colours
+		var fill = "rgba(50,205,50,1)";
+		
+		// Pigmentation density
+		var pD = this.squiggleArray[0].pointsArray[0].x;
+		
+		// Radius
+		var dr = 2;
+
+		// Calculate shape area
+		var A = Math.PI * Math.abs(this.apexX * this.apexY);
+		
+		// Calculate number of dots within boundary
+		var n = A / 250 * (pD / 30);
+		
+		var p = new ED.Point(0, 0);
+		
+		// Calculate random positions for dots			
+		for (var i = 0; i < n; i++) {
+			var j = (i < 150) ? i : (i < 199) ? i - 50 : (i < 249) ? i - 100 : (i < 299) ? i - 150 : (i < 349) ? i - 200 : i - 250;
+
+			var k = (i < 200) ? i : (i < 398) ? (i - 199) : (i < 397) ? (i - 298) : (i - 396);
+
+			var r = Math.sqrt(n * ED.randomArray[k]);
+			var rX = this.apexX * ED.randomArray[k];
+			var rY = this.apexY * ED.randomArray[j];
+			var theta = 2 * Math.PI * ED.randomArray[j + 50];
+							
+			p.x = rX * Math.cos(theta*r);
+			p.y = rY * Math.sin(theta*r);
+			
+			// Draw dot
+			this.drawSpot(ctx, p.x, p.y, dr, fill);
+		}
+		
+		// Additionally draw spots at boundarys to ensure indicated
+		this.drawSpot(ctx, 0, Math.abs(this.apexY), dr, fill);
+		this.drawSpot(ctx, 0, -1 * Math.abs(this.apexY), dr, fill);
+		this.drawSpot(ctx, Math.abs(this.apexX), 0, dr, fill);
+		this.drawSpot(ctx, -1 * Math.abs(this.apexX), 0, dr, fill);
+	}
+
+	// Coordinates of handles (in canvas plane)
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
+
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.SPEE.prototype.groupDescription = function() {	
+	return "Superficial punctate epithelial erosions";
+}
+
+/**
  * Star fold of PVR
  *
  * @class StarFold
@@ -41198,19 +48934,17 @@ ED.StarFold.prototype.diagnosticHierarchy = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -41354,19 +49088,1594 @@ ED.SteepAxis.prototype.draw = function(_point) {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
+ */
+
+/**
+ *
+ *
+ * @class STFB
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Object} _parameterJSON
+ */
+ED.STFB = function(_drawing, _parameterJSON) {
+	// Set classname
+	this.className = "STFB";
+
+	// Saved parameters
+	this.savedParameterArray = ['originX', 'originY', 'scaleX', 'scaleY', 'rotation'];
+	
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _parameterJSON);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.STFB.prototype = new ED.Doodle;
+ED.STFB.prototype.constructor = ED.STFB;
+ED.STFB.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.STFB.prototype.setHandles = function() {
+	this.handleArray[2] = new ED.Doodle.Handle(null, true, ED.Mode.Scale, false);
+	this.handleArray[2].isRotatable = true;
+}
+
+/**
+ * Sets default dragging attributes
+ */
+ED.STFB.prototype.setPropertyDefaults = function() {
+	this.isSqueezable = true;
+		
+	// Update component of validation array for simple parameters
+	this.parameterValidationArray['originX']['range'].setMinAndMax(-380, +380);
+	this.parameterValidationArray['originY']['range'].setMinAndMax(-370, +370);
+	this.parameterValidationArray['scaleX']['range'].setMinAndMax(0.5, 5);
+	this.parameterValidationArray['scaleY']['range'].setMinAndMax(0.5, 3);
+}
+
+/**
+ * Sets default parameters (Only called for new doodles)
+ * Use the setParameter function for derived parameters, as this will also update dependent variables
+ */
+ED.STFB.prototype.setParameterDefaults = function() {	
+	var doodle = this.drawing.lastDoodleOfClass(this.className);
+	if (doodle) {
+		var np = new ED.Point(doodle.originX, doodle.originY + 70);
+		this.move(np.x, np.y);
+	} else {
+		this.move(120, -200);
+	};
+	this.rotation = 0.25 * Math.PI;
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.STFB.prototype.draw = function(_point) {
+	// Get context
+	var ctx = this.drawing.context;
+
+	// Call draw method in superclass
+	ED.STFB.superclass.draw.call(this, _point);
+	
+	// Boundary path
+	ctx.beginPath();
+	
+	ctx.ellipse(0, 0, 15, 40, 0, 0, 2 * Math.PI);
+	
+	// Set line attributes
+	ctx.lineWidth = 3;
+	ctx.fillStyle = "#402A15";
+	ctx.strokeStyle = "#402A15";
+	
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+	
+	// Coordinates of handles (in canvas plane)
+	var point = new ED.Point(15, -40);
+	this.handleArray[2].location = this.transform.transformPoint(point);
+
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+	
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.STFB.prototype.description = function() {
+	var position = "";
+	var str = "Sub tarsal foreign body";
+	
+	if (this.originY < -110) position = "Upper lid ";
+	else if (this.originY > 110) position = "Lower lid ";
+	
+	var returnValue = (position.length>0) ? position + str.toLowerCase() : str;
+
+	return returnValue;
+}
+
+
+/**
+ * OpenEyes
+ *
+ * Copyright (C) OpenEyes Foundation, 2011-2017
+ * This file is part of OpenEyes.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package OpenEyes
+ * @link http://www.openeyes.org.uk
+ * @author OpenEyes <info@openeyes.org.uk>
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
+ */
+ 
+/**
+ * APattern
+ *
+ * @class APattern
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Object} _parameterJSON
+ */
+ED.APattern = function(_drawing, _parameterJSON)
+{
+    this.savedParameterArray = ['rotation'];
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _parameterJSON);
+
+    // Set classname
+	this.className = "APattern";
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.APattern.prototype = new ED.Doodle;
+ED.APattern.prototype.constructor = ED.APattern;
+ED.APattern.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.APattern.prototype.setHandles = function()
+{
+}
+
+/**
+ * Sets default dragging attributes
+ */
+ED.APattern.prototype.setPropertyDefaults = function()
+{
+	this.isSelectable = false;
+	this.isOrientated = false;
+	this.isScaleable = false;
+	this.isSqueezable = false;
+	this.isMoveable = false;
+	this.isRotatable = false;
+}
+
+/**
+ * Sets default parameters
+ */
+ED.APattern.prototype.setParameterDefaults = function()
+{
+    if(this.drawing.eye == ED.eye.Right)
+    {
+        this.rotation = Math.PI/8;
+    }
+    else
+    {
+        this.rotation = -Math.PI/8;        
+    }
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.APattern.prototype.draw = function(_point)
+{
+	// Get context
+	var ctx = this.drawing.context;
+	
+	// Call draw method in superclass
+	ED.APattern.superclass.draw.call(this, _point);
+    
+	// Boundary path
+	ctx.beginPath();
+    
+	// Dotted Line
+    var dash = 4;
+    var gap = 4;
+    var length = 0;
+    var startY = -500;
+    ctx.moveTo(0, startY)
+    while (length < -2*startY)
+    {
+        length += dash;
+        ctx.lineTo(0, startY + length);
+        length += gap;            
+        ctx.moveTo(0, startY + length);
+    }
+    
+	// Close path
+	ctx.closePath();
+	
+	// Set line attributes
+	ctx.lineWidth = 4;
+    ctx.strokeStyle = "rgba(80, 80, 80, 1)";
+    
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+	
+	// Other stuff here
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
+	{
+	}
+	
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+	
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+/**
+ * OpenEyes
+ *
+ * Copyright (C) OpenEyes Foundation, 2011-2017
+ * This file is part of OpenEyes.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package OpenEyes
+ * @link http://www.openeyes.org.uk
+ * @author OpenEyes <info@openeyes.org.uk>
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
+ */
+ 
+/**
+ * 
+ *
+ * @class InverseYPattern
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Object} _parameterJSON
+ */
+ED.InverseYPattern = function(_drawing, _parameterJSON)
+{
+    this.savedParameterArray = ['side'];
+
+    // Call superclass constructor
+	ED.Doodle.call(this, _drawing, _parameterJSON);
+	
+	// Set classname
+	this.className = "InverseYPattern";
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.InverseYPattern.prototype = new ED.Doodle;
+ED.InverseYPattern.prototype.constructor = ED.InverseYPattern;
+ED.InverseYPattern.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.InverseYPattern.prototype.setHandles = function()
+{
+}
+
+/**
+ * Sets default dragging attributes
+ */
+ED.InverseYPattern.prototype.setPropertyDefaults = function()
+{
+	this.isSelectable = false;
+	this.isOrientated = false;
+	this.isScaleable = false;
+	this.isSqueezable = false;
+	this.isMoveable = false;
+	this.isRotatable = false;
+	this.isUnique = true;
+}
+
+/**
+ * Sets default parameters
+ */
+ED.InverseYPattern.prototype.setParameterDefaults = function()
+{
+    if(this.drawing.eye == ED.eye.Right)
+    {
+        this.side = 1;
+    }
+    else
+    {
+        this.side = -1;        
+    }
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.InverseYPattern.prototype.draw = function(_point)
+{
+	// Get context
+	var ctx = this.drawing.context;
+	
+	// Call draw method in superclass
+	ED.InverseYPattern.superclass.draw.call(this, _point);
+    
+	// Boundary path
+	ctx.beginPath();
+    
+	// Dotted Line
+    var dash = 4;
+    var gap = 4;
+    var length = 0;
+    var depth = 0;
+    var startY = -450;
+        
+    ctx.moveTo(-350 * this.side, -1*startY);
+    while (length < 185)
+    {
+        length += 2 * dash;
+        depth += dash;
+        ctx.lineTo((-350 + length) * this.side, -1*startY - depth);
+        length += gap; 
+        depth += gap;           
+        ctx.moveTo((-350 + length) * this.side, -1*startY - depth);
+    }
+    
+    length = 0;
+    depth = 0;
+    ctx.moveTo(0, startY - 20);
+    while (length < 40)
+    {
+        depth += dash * 2;
+        ctx.lineTo(0, startY + depth - 20);
+        length += gap; 
+        depth += gap;             
+        ctx.moveTo(-0, startY + depth - 20);
+    }
+    
+	// Close path
+	ctx.closePath();
+	
+	// Set line attributes
+	ctx.lineWidth = 4;
+    ctx.strokeStyle = "rgba(80, 80, 80, 1)";
+    
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+	
+	// Other stuff here
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
+	{
+	}
+	
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+	
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+/**
+ * OpenEyes
+ *
+ * Copyright (C) OpenEyes Foundation, 2011-2017
+ * This file is part of OpenEyes.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package OpenEyes
+ * @link http://www.openeyes.org.uk
+ * @author OpenEyes <info@openeyes.org.uk>
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
+ */
+
+/**
+ * 
+ *
+ * @class OrthopticEye
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Object} _parameterJSON
+ */
+ED.OrthopticEye = function(_drawing, _parameterJSON) {
+	// Set classname
+	this.className = "OrthopticEye";
+
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _parameterJSON);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.OrthopticEye.prototype = new ED.Doodle;
+ED.OrthopticEye.prototype.constructor = ED.OrthopticEye;
+ED.OrthopticEye.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.OrthopticEye.prototype.setHandles = function() {
+}
+
+/**
+ * Sets default dragging attributes
+ */
+ED.OrthopticEye.prototype.setPropertyDefaults = function() {
+	this.isSelectable = false;
+	this.isOrientated = false;
+	this.isScaleable = false;
+	this.isSqueezable = false;
+	this.isMoveable = false;
+	this.isRotatable = false;
+    this.isFilled = false;
+}
+
+/**
+ * Sets default parameters
+ */
+ED.OrthopticEye.prototype.setParameterDefaults = function() {
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.OrthopticEye.prototype.draw = function(_point) {
+	
+	// Get context
+	var ctx = this.drawing.context;
+	
+	// Call draw method in superclass
+	ED.OrthopticEye.superclass.draw.call(this, _point);
+    
+	// Boundary path
+	//ctx.beginPath();
+	
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+	
+	// Other stuff here
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+		
+        // Set line attributes
+        ctx.lineWidth = 12;
+        ctx.strokeStyle = "rgba(80,80,80,1)";
+        
+        // Upper Eye lid
+        ctx.beginPath();
+        ctx.arc(0,150,500,-Math.PI*3/4,-Math.PI*1/4,false);
+        ctx.stroke();
+        
+        // Lower Eye lid
+        ctx.beginPath();
+        ctx.arc(0,-150,500,Math.PI*1/4,Math.PI*3/4,false);
+        ctx.stroke();
+	}
+	
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * OpenEyes
+ *
+ * Copyright (C) OpenEyes Foundation, 2011-2017
+ * This file is part of OpenEyes.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package OpenEyes
+ * @link http://www.openeyes.org.uk
+ * @author OpenEyes <info@openeyes.org.uk>
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
+ */
+ 
+/**
+ * 
+ *
+ * @class OrthopticShading
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Object} _parameterJSON
+ */
+ED.OrthopticShading = function(_drawing, _parameterJSON)
+{
+	
+	// Set classname
+	this.className = "OrthopticShading";
+	
+	// parameters for underaction drop down calculations
+	this.uR = false;
+	this.cR = false;
+	this.dR = false;
+	this.rL = false;
+	this.cL = false;
+	this.dL = false;
+
+	this.savedParameterArray = ['originX', 'originY', 'rotation', 'apexX', 'apexY'];
+
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _parameterJSON);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.OrthopticShading.prototype = new ED.Doodle;
+ED.OrthopticShading.prototype.constructor = ED.OrthopticShading;
+ED.OrthopticShading.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.OrthopticShading.prototype.setHandles = function()
+{
+	this.handleArray[3] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
+	this.handleArray[3].isRotatable = true;
+}
+
+/**
+ * Sets default dragging attributes
+ */
+ED.OrthopticShading.prototype.setPropertyDefaults = function()
+{
+	this.isSelectable = true;
+	this.isOrientated = false; // MSC BC edit
+	this.isScaleable = true;
+	this.isSqueezable = true;
+	this.isMoveable = true;
+	this.isRotatable = true;
+	
+	this.parameterValidationArray['apexX']['range'].setMinAndMax(-360, +360);
+	this.parameterValidationArray['apexY']['range'].setMinAndMax(-360, -3);
+}
+
+/**
+ * Sets default parameters
+ */
+ED.OrthopticShading.prototype.setParameterDefaults = function()
+{
+	this.apexX = 350;
+	this.apexY = -100;
+
+	this.setRotationWithDisplacements(0, 90.5);
+
+//     this.originY = -200;
+}
+
+
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.OrthopticShading.prototype.draw = function(_point)
+{
+	// Get context
+	var ctx = this.drawing.context;
+	
+	// Call draw method in superclass
+	ED.OrthopticShading.superclass.draw.call(this, _point);
+    
+	// Boundary path
+	ctx.beginPath();
+    
+	// Rectangular area
+	var w = this.apexX - -350;
+	var h = this.apexY - -350;
+	ctx.rect(-350, -350, w, h);
+    
+	// Close path
+	ctx.closePath();
+    
+    // create pattern
+	ctx.fillStyle = "rgba(190, 190, 190, 0.55)";
+	ctx.strokeStyle = "rgba(0, 0, 0, 0)";
+	
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+	
+	// Other stuff here
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
+	{
+        ctx.beginPath();
+        ctx.moveTo(-350, this.apexY);
+        var dash = 42;
+        var gap = 20;
+        var length = 0;
+        while (length < w-40)
+        {
+            length += dash;
+            ctx.lineTo(-350 + length, this.apexY);
+            length += gap;            
+            ctx.moveTo(-350 + length, this.apexY);
+        }
+        ctx.lineTo(this.apexX, this.apexY);
+        
+        // Draw line
+        ctx.lineWidth = 12;
+        ctx.strokeStyle = "rgba(80, 80, 80, 1)";
+        ctx.stroke();
+	}
+	
+	// Coordinates of handles (in canvas plane)
+	this.handleArray[3].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
+	
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+		this.calculateUnderActions();
+		
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+
+/**
+ * 
+ */
+ED.OrthopticShading.prototype.calculateUnderActions = function() {
+	var x;
+	var y;
+	var d;
+	var intersectionPoint;
+	
+	// shading boundary line
+	var sp = this.transform.transformPoint(new ED.Point(-350, this.apexY));
+	var ep = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
+	
+	var dy1 = ep.y - sp.y;
+	var dx1 = ep.x - sp.x;
+	var m1 = dy1/dx1;	
+	var c1 = sp.y - m1*sp.x;
+	
+	if (dx1 == 0) {
+		m1 = 0;
+		c1 = 70;
+	}
+	
+	
+	// in canvas plane
+	var origin = new ED.Point(100,100);
+
+	var uR = new ED.Point(30,30);
+	var dL = new ED.Point(170,170);
+	var m2 = 1;
+	// if lines not parallel
+	if (m1 !== m2) {
+		// find intersection point: 0 = m1*x + c1 - x
+		x = -c1 / (m1-1);
+		y = x;
+		intersectionPoint = new ED.Point(x,y);
+		
+		// up right
+		d = uR.distanceTo(new ED.Point(x,y));
+		if (y>=30 && y<=100 && (sp.x<=100 || ep.x<=100) && (sp.y<=100 || ep.y<=100)) {
+			if (d>79.192) this.uR = "-4";
+			else if (d>59.394) this.uR = "-3";
+			else if (d>39.596) this.uR = "-2";
+			else if (d>19.798) this.uR = "-1";
+/*
+			if (d>98.99) this.uR = "-4";
+			else if (d>74.2425) this.uR = "-3";
+			else if (d>49.495) this.uR = "-2";
+			else if (d>24.7475) this.uR = "-1";
+*/
+			else this.uR = "-0.5";			
+		}
+// 		else if (this.rotation < Math.PI && y>100) this.uR = "<-4";
+		else this.uR = false;
+		
+		// down left
+		d = dL.distanceTo(new ED.Point(x,y));
+		if (y<=170 && y>=100 && (sp.x>=100 || ep.x>=100) && (sp.y>=100 || ep.y>=100)) {
+			if (d>79.192) this.dL = "-4";
+			else if (d>59.394) this.dL = "-3";
+			else if (d>39.596) this.dL = "-2";
+			else if (d>19.798) this.dL = "-1";
+			else this.dL = "-0.5";			
+		}
+		else this.dL = false;
+	}
+	
+	/// y=100
+	var cR = new ED.Point(30,100);
+	var cL = new ED.Point(170,100);
+	var m3 = 0;
+	if (m1 !== m3 || dx1 == 0) {
+		// find intersection point: x = (y-c)/m
+		y = 100;
+		x = (y-c1) / m1;
+		intersectionPoint = new ED.Point(x,y);
+		
+		// centre right
+		d = cR.distanceTo(new ED.Point(x,y));
+		if (x>=30 && x<=100) {
+			if (d>56) this.cR = "-4";
+			else if (d>42) this.cR = "-3";
+			else if (d>28) this.cR = "-2";
+			else if (d>14) this.cR = "-1";
+			else this.cR = "-0.5";			
+		}
+		else this.cR = false;
+		
+		// centre left
+		d = cL.distanceTo(new ED.Point(x,y));
+		if (x<=170 && x>=100) {
+			if (d>56) this.cL = "-4";
+			else if (d>42) this.cL = "-3";
+			else if (d>28) this.cL = "-2";
+			else if (d>14) this.cL = "-1";
+			else this.cL = "-0.5";			
+		}
+		else this.cL = false;
+	}
+	
+	var dR = new ED.Point(30,170);
+	var uL = new ED.Point(170,30);
+	var m4 = -1;
+	if (m1 !== m4) {
+		// find intersection point: (200-c1)/(m1+1) = x
+		x = (200-c1) / (m1+1);
+		y = -x + 200;
+		intersectionPoint = new ED.Point(x,y);
+		
+		// up left
+		d = uL.distanceTo(new ED.Point(x,y));
+		if (y>=30 /* && y<=100 */ && (sp.x>=100 || ep.x>=100) && (sp.y<=100 || ep.y<=100)) {
+			if (d>79.192) this.uL = "-4";
+			else if (d>59.394) this.uL = "-3";
+			else if (d>39.596) this.uL = "-2";
+			else if (d>19.798) this.uL = "-1";
+			else this.uL = "-0.5";			
+		}
+		else this.uL = false;
+
+
+		// down right
+		d = dR.distanceTo(new ED.Point(x,y));
+		if (y<=170 && y>=100 && (sp.x<=100 || ep.x<=100) && (sp.y>=100 || ep.y>=100)) {
+			if (d>79.192) this.dR = "-4";
+			else if (d>59.394) this.dR = "-3";
+			else if (d>39.596) this.dR = "-2";
+			else if (d>19.798) this.dR = "-1";
+			else this.dR = "-0.5";			
+		}
+		else this.dR = false;
+	}
+
+}
+
+/**
+ * OpenEyes
+ *
+ * Copyright (C) OpenEyes Foundation, 2011-2017
+ * This file is part of OpenEyes.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package OpenEyes
+ * @link http://www.openeyes.org.uk
+ * @author OpenEyes <info@openeyes.org.uk>
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
+ */
+ 
+/**
+ * UpDrift
+ *
+ * @class UpDrift
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Object} _parameterJSON
+ */
+ED.UpDrift = function(_drawing, _parameterJSON)
+{
+
+	this.savedParameterArray = ['originX', 'originY', 'quadrantPoint'];
+
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _parameterJSON);
+	
+	// Set classname
+	this.className = "UpDrift";
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.UpDrift.prototype = new ED.Doodle;
+ED.UpDrift.prototype.constructor = ED.UpDrift;
+ED.UpDrift.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.UpDrift.prototype.setHandles = function()
+{
+	this.handleArray[0] = new ED.Doodle.Handle(null, true, ED.Mode.Handles, false);
+}
+
+/**
+ * Sets default dragging attributes
+ */
+ED.UpDrift.prototype.setPropertyDefaults = function()
+{
+	this.isSelectable = true;
+	this.isOrientated = false;
+	this.isScaleable = false;
+	this.isSqueezable = false;
+	this.isMoveable = true;
+	this.isRotatable = false;
+    this.snapToQuadrant = true;
+    this.quadrantPoint = new ED.Point(335, 220);
+    
+    this.handleVectorRangeArray = new Array();
+	var range = new Object;
+	range.length = new ED.Range(+50, +320);
+	range.angle = new ED.Range(1.75*Math.PI, 1.75*Math.PI);
+	this.handleVectorRangeArray[0] = range;
+}
+
+/**
+ * Sets default parameters
+ */
+ED.UpDrift.prototype.setParameterDefaults = function()
+{
+	
+	// Create a squiggle to store handle points
+	var squiggle = new ED.Squiggle(this, new ED.Colour(100, 100, 100, 1), 4, true);
+
+	// Add it to squiggle array
+	this.squiggleArray.push(squiggle);
+
+	var point = new ED.Point(-125, -125);
+	this.addPointToSquiggle(point);
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.UpDrift.prototype.draw = function(_point)
+{
+    // Use scale to flip arrow into correct position for quadrant
+    this.scaleX = this.originX/Math.abs(this.originX);
+    this.scaleY = this.originY/Math.abs(this.originY);
+    
+    
+	// Get context
+	var ctx = this.drawing.context;
+	
+	// Call draw method in superclass
+	ED.UpDrift.superclass.draw.call(this, _point);
+    
+	// Boundary path
+	ctx.beginPath();
+	
+	var c = Math.abs(this.squiggleArray[0].pointsArray[0].x);
+    var r = 100 + c;
+    
+	// Rectangular area
+	ctx.rect(c * -1, c * -1, r, r);
+    
+	// Close path
+	ctx.closePath();
+	
+	// Set line attributes
+	// Set line attributes
+	ctx.lineWidth = 0;
+	ctx.fillStyle = "rgba(0, 0, 0, 0)";
+	ctx.strokeStyle = ctx.fillStyle;
+    
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+	
+	// Coordinates of expert handles (in canvas plane)
+	this.handleArray[0].location = this.transform.transformPoint(this.squiggleArray[0].pointsArray[0]);
+	
+	// Other stuff here
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
+	{
+        // Arrow body
+        ctx.beginPath();
+        ctx.arc(c * -1, 100, r, -Math.PI/2, -0.1, false);
+        ctx.lineWidth = 6;
+        ctx.lineJoin = 'miter';
+        ctx.strokeStyle = "rgba(80, 80, 80, 1)";
+        ctx.fillStyle = "rgba(0, 0, 0, 0)";
+        if (this.isSelected) {
+	        ctx.shadowBlur = 10;
+			ctx.shadowColor = "rgba(0,0,0,0.9)";
+        }
+        ctx.stroke();
+        
+        // Arrow head
+        ctx.beginPath();
+        ctx.moveTo(100, 100);
+        ctx.lineTo(70, 60);
+        ctx.lineTo(130, 60);
+        ctx.closePath();
+        ctx.fillStyle = "rgba(80, 80, 80, 1)";
+        if (this.isSelected) {
+	        ctx.shadowBlur = 10;
+			ctx.shadowColor = "rgba(0,0,0,0.9)";
+        }
+        ctx.fill();
+	}
+	
+// 	this.handleArray[0].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
+	
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+	
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.UpDrift.prototype.description = function()
+{
+    var returnString = "Up drift";
+	
+	return returnString;
+}
+
+/**
+ * OpenEyes
+ *
+ * Copyright (C) OpenEyes Foundation, 2011-2017
+ * This file is part of OpenEyes.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package OpenEyes
+ * @link http://www.openeyes.org.uk
+ * @author OpenEyes <info@openeyes.org.uk>
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
+ */
+ 
+/**
+ * UpShoot
+ *
+ * @class UpShoot
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Object} _parameterJSON
+ */
+ED.UpShoot = function(_drawing, _parameterJSON)
+{
+
+	this.savedParameterArray = ['originX', 'originY', 'quadrantPoint'];
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _parameterJSON);
+	
+	// Set classname
+	this.className = "UpShoot";
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.UpShoot.prototype = new ED.Doodle;
+ED.UpShoot.prototype.constructor = ED.UpShoot;
+ED.UpShoot.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.UpShoot.prototype.setHandles = function()
+{
+	this.handleArray[0] = new ED.Doodle.Handle(null, true, ED.Mode.Handles, false);
+}
+
+/**
+ * Sets default dragging attributes
+ */
+ED.UpShoot.prototype.setPropertyDefaults = function()
+{
+	this.isSelectable = true;
+	this.isOrientated = false;
+	this.isScaleable = false;
+	this.isSqueezable = false;
+	this.isMoveable = true;
+	this.isRotatable = false;
+    this.snapToQuadrant = true;
+    this.quadrantPoint = new ED.Point(335, 220);
+    
+    this.handleVectorRangeArray = new Array();
+	var range = new Object;
+	range.length = new ED.Range(+50, +320);
+	range.angle = new ED.Range(1.75*Math.PI, 1.75*Math.PI);
+	this.handleVectorRangeArray[0] = range;
+}
+
+/**
+ * Sets default parameters
+ */
+ED.UpShoot.prototype.setParameterDefaults = function()
+{
+	// Create a squiggle to store handle points
+	var squiggle = new ED.Squiggle(this, new ED.Colour(100, 100, 100, 1), 4, true);
+
+	// Add it to squiggle array
+	this.squiggleArray.push(squiggle);
+
+	var point = new ED.Point(-125, -125);
+	this.addPointToSquiggle(point);
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.UpShoot.prototype.draw = function(_point)
+{
+    // Use scale to flip arrow into correct position for quadrant
+    this.scaleX = this.originX/Math.abs(this.originX);
+    this.scaleY = this.originY/Math.abs(this.originY);
+    
+	// Get context
+	var ctx = this.drawing.context;
+	
+	// Call draw method in superclass
+	ED.UpShoot.superclass.draw.call(this, _point);
+    
+	// Boundary path
+	ctx.beginPath();
+    
+	var c = Math.abs(this.squiggleArray[0].pointsArray[0].x);
+    var r = 100 + c;
+    
+	// Rectangular area
+	ctx.rect(c * -1, c * -1, r, r);
+    
+	// Close path
+	ctx.closePath();
+	
+	// Set line attributes
+	ctx.lineWidth = 0;
+	ctx.fillStyle = "rgba(0, 0, 0, 0)";
+	ctx.strokeStyle = ctx.fillStyle;
+    
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+	
+	// Coordinates of expert handles (in canvas plane)
+	this.handleArray[0].location = this.transform.transformPoint(this.squiggleArray[0].pointsArray[0]);
+	
+	// Other stuff here
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
+	{
+        // Arrow shaft
+        ctx.beginPath();
+        ctx.moveTo(c * -1, c * -1);
+        ctx.lineTo(c * -1 + r, c * -1);
+        ctx.lineTo(c * -1 + r, c * -1 + r);
+        
+        ctx.lineWidth = 6;
+        ctx.lineJoin = 'miter';
+        ctx.strokeStyle = "rgba(80, 80, 80, 1)";
+        if (this.isSelected) {
+	        ctx.shadowBlur = 10;
+			ctx.shadowColor = "rgba(0,0,0,0.9)";
+        }
+        ctx.stroke();
+        
+        // Arrow head
+        ctx.beginPath();
+        ctx.moveTo(100, 100);
+        ctx.lineTo(70, 60);
+        ctx.lineTo(130, 60);
+        ctx.closePath();
+        if (this.isSelected) {
+	        ctx.shadowBlur = 10;
+			ctx.shadowColor = "rgba(0,0,0,0.9)";
+        }
+        ctx.fillStyle = "rgba(80, 80, 80, 1)";
+        ctx.fill();
+	}
+	
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+	
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.UpShoot.prototype.description = function()
+{
+    var returnString = "Up shoot";
+	
+	return returnString;
+}
+/**
+ * OpenEyes
+ *
+ * Copyright (C) OpenEyes Foundation, 2011-2017
+ * This file is part of OpenEyes.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package OpenEyes
+ * @link http://www.openeyes.org.uk
+ * @author OpenEyes <info@openeyes.org.uk>
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
+ */
+ 
+/**
+ * VPattern
+ *
+ * @class VPattern
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Object} _parameterJSON
+ */
+ED.VPattern = function(_drawing, _parameterJSON)
+{
+    this.savedParameterArray = ['rotation'];
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _parameterJSON);
+	
+	// Set classname
+	this.className = "VPattern";
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.VPattern.prototype = new ED.Doodle;
+ED.VPattern.prototype.constructor = ED.VPattern;
+ED.VPattern.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.VPattern.prototype.setHandles = function()
+{
+}
+
+/**
+ * Sets default dragging attributes
+ */
+ED.VPattern.prototype.setPropertyDefaults = function()
+{
+	this.isSelectable = false;
+	this.isOrientated = false;
+	this.isScaleable = false;
+	this.isSqueezable = false;
+	this.isMoveable = false;
+	this.isRotatable = false;
+}
+
+/**
+ * Sets default parameters
+ */
+ED.VPattern.prototype.setParameterDefaults = function()
+{
+    if(this.drawing.eye == ED.eye.Right)
+    {
+        this.rotation = -Math.PI/8;
+    }
+    else
+    {
+        this.rotation = Math.PI/8;        
+    }
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.VPattern.prototype.draw = function(_point)
+{
+	// Get context
+	var ctx = this.drawing.context;
+	
+	// Call draw method in superclass
+	ED.VPattern.superclass.draw.call(this, _point);
+    
+	// Boundary path
+	ctx.beginPath();
+    
+	// Dotted Line
+    var dash = 4;
+    var gap = 4;
+    var length = 0;
+    var startY = -500;
+    ctx.moveTo(0, startY)
+    while (length < -2*startY)
+    {
+        length += dash;
+        ctx.lineTo(0, startY + length);
+        length += gap;            
+        ctx.moveTo(0, startY + length);
+    }
+    
+	// Close path
+	ctx.closePath();
+	
+	// Set line attributes
+	ctx.lineWidth = 4;
+    ctx.strokeStyle = "rgba(80, 80, 80, 1)";
+    
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+	
+	// Other stuff here
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
+	{
+	}
+	
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+	
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+/**
+ * OpenEyes
+ *
+ * Copyright (C) OpenEyes Foundation, 2011-2017
+ * This file is part of OpenEyes.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package OpenEyes
+ * @link http://www.openeyes.org.uk
+ * @author OpenEyes <info@openeyes.org.uk>
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
+ */
+ 
+/**
+ * 
+ *
+ * @class XPattern
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Object} _parameterJSON
+ */
+ED.XPattern = function(_drawing, _parameterJSON)
+{
+    this.savedParameterArray = ['rotation'];
+
+    // Call superclass constructor
+	ED.Doodle.call(this, _drawing, _parameterJSON);
+	
+	// Set classname
+	this.className = "XPattern";
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.XPattern.prototype = new ED.Doodle;
+ED.XPattern.prototype.constructor = ED.XPattern;
+ED.XPattern.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.XPattern.prototype.setHandles = function()
+{
+}
+
+/**
+ * Sets default dragging attributes
+ */
+ED.XPattern.prototype.setPropertyDefaults = function()
+{
+	this.isSelectable = false;
+	this.isOrientated = false;
+	this.isScaleable = false;
+	this.isSqueezable = false;
+	this.isMoveable = false;
+	this.isRotatable = false;
+	this.isUnique = true;
+}
+
+/**
+ * Sets default parameters
+ */
+ED.XPattern.prototype.setParameterDefaults = function()
+{
+    if(this.drawing.eye == ED.eye.Right)
+    {
+        this.rotation = 0;
+    }
+    else
+    {
+        this.rotation = Math.PI;        
+    }
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.XPattern.prototype.draw = function(_point)
+{
+	// Get context
+	var ctx = this.drawing.context;
+	
+	// Call draw method in superclass
+	ED.XPattern.superclass.draw.call(this, _point);
+    
+	// Boundary path
+	ctx.beginPath();
+    
+	// Dotted Line
+    var dash = 4;
+    var gap = 4;
+    var length = 0;
+    var depth = 0;
+    var startY = -450;
+        
+    ctx.moveTo(-350, startY);
+    while (length < 185)
+    {
+        length += 2 * dash;
+        depth += dash;
+        ctx.lineTo(-350 + length, startY + depth);
+        length += gap; 
+        depth += gap;           
+        ctx.moveTo(-350 + length, startY + depth);
+    }
+    
+    length = 0;
+    depth = 0;
+    ctx.moveTo(-350, startY * -1);
+    while (length < 185)
+    {
+        length += 2 * dash;
+        depth += dash;
+        ctx.lineTo(-350 + length, startY*-1 - depth);
+        length += gap; 
+        depth += gap;             
+        ctx.moveTo(-350 + length, startY*-1 - depth);
+    }
+    
+	// Close path
+	ctx.closePath();
+	
+	// Set line attributes
+	ctx.lineWidth = 4;
+    ctx.strokeStyle = "rgba(80, 80, 80, 1)";
+    
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+	
+	// Other stuff here
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
+	{
+	}
+	
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+	
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+/**
+ * OpenEyes
+ *
+ * Copyright (C) OpenEyes Foundation, 2011-2017
+ * This file is part of OpenEyes.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package OpenEyes
+ * @link http://www.openeyes.org.uk
+ * @author OpenEyes <info@openeyes.org.uk>
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
+ */
+ 
+/**
+ * YPattern
+ *
+ * @class YPattern
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Object} _parameterJSON
+ */
+ED.YPattern = function(_drawing, _parameterJSON)
+{
+    this.savedParameterArray = ['side'];
+
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _parameterJSON);
+	
+	// Set classname
+	this.className = "YPattern";
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.YPattern.prototype = new ED.Doodle;
+ED.YPattern.prototype.constructor = ED.YPattern;
+ED.YPattern.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.YPattern.prototype.setHandles = function()
+{
+}
+
+/**
+ * Sets default dragging attributes
+ */
+ED.YPattern.prototype.setPropertyDefaults = function()
+{
+	this.isSelectable = false;
+	this.isOrientated = false;
+	this.isScaleable = false;
+	this.isSqueezable = false;
+	this.isMoveable = false;
+	this.isRotatable = false;
+	this.isUnique = true;
+}
+
+/**
+ * Sets default parameters
+ */
+ED.YPattern.prototype.setParameterDefaults = function()
+{
+    if(this.drawing.eye == ED.eye.Right)
+    {
+        this.side = 1;
+    }
+    else
+    {
+        this.side = -1;        
+    }
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.YPattern.prototype.draw = function(_point)
+{
+	// Get context
+	var ctx = this.drawing.context;
+	
+	// Call draw method in superclass
+	ED.YPattern.superclass.draw.call(this, _point);
+    
+	// Boundary path
+	ctx.beginPath();
+    
+	// Dotted Line
+    var dash = 4;
+    var gap = 4;
+    var length = 0;
+    var depth = 0;
+    var startY = -450;
+        
+    ctx.moveTo(-350 * this.side, startY);
+    while (length < 185)
+    {
+        length += 2 * dash;
+        depth += dash;
+        ctx.lineTo((-350 + length) * this.side, startY + depth);
+        length += gap; 
+        depth += gap;           
+        ctx.moveTo((-350 + length) * this.side, startY + depth);
+    }
+    
+    length = 0;
+    depth = 0;
+    ctx.moveTo(0, 20+startY * -1);
+    while (length < 40)
+    {
+        depth += dash * 2;
+        ctx.lineTo(0, 20+startY*-1 - depth);
+        length += gap; 
+        depth += gap;             
+        ctx.moveTo(-0, 20+startY*-1 - depth);
+    }
+    
+	// Close path
+	ctx.closePath();
+	
+	// Set line attributes
+	ctx.lineWidth = 4;
+    ctx.strokeStyle = "rgba(80, 80, 80, 1)";
+    
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+	
+	// Other stuff here
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw)
+	{
+	}
+	
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+	
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+/**
+ * OpenEyes
+ *
+ * Copyright (C) OpenEyes Foundation, 2011-2017
+ * This file is part of OpenEyes.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package OpenEyes
+ * @link http://www.openeyes.org.uk
+ * @author OpenEyes <info@openeyes.org.uk>
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -41467,19 +50776,17 @@ ED.StrabOpTemplate.prototype.draw = function(_point) {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -41647,19 +50954,17 @@ ED.SubretinalFluid.prototype.description = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -41787,19 +51092,17 @@ ED.SubretinalPFCL.prototype.groupDescription = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -41993,19 +51296,17 @@ ED.Supramid.prototype.description = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -42117,19 +51418,122 @@ ED.SwollenDisc.prototype.description = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
+ */
+
+/**
+ *
+ *
+ * @class TarsalPlates
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Object} _parameterJSON
+ */
+ED.TarsalPlates = function(_drawing, _parameterJSON) {
+	// Set classname
+	this.className = "TarsalPlates";
+
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _parameterJSON);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.TarsalPlates.prototype = new ED.Doodle;
+ED.TarsalPlates.prototype.constructor = ED.TarsalPlates;
+ED.TarsalPlates.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets default dragging attributes
+ */
+ED.TarsalPlates.prototype.setPropertyDefaults = function() {
+	this.isUnique = true;
+	this.isSelectable = false;
+	this.isDeletable = false;
+}
+
+/**
+ * Sets default parameters (Only called for new doodles)
+ * Use the setParameter function for derived parameters, as this will also update dependent variables
+ */
+ED.TarsalPlates.prototype.setParameterDefaults = function() {
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.TarsalPlates.prototype.draw = function(_point) {
+	// Get context
+	var ctx = this.drawing.context;
+
+	// Call draw method in superclass
+	ED.TarsalPlates.superclass.draw.call(this, _point);
+	
+	// Radius of arc
+	var r = 480;
+	
+	// Height of arc
+	var h = 700;
+	
+	// Start angle of arc
+	var o = r - h;
+	var theta = Math.asin(o/r);
+	
+	// Radius of plate
+	var l = r * Math.cos(theta);
+	
+	// Draw superior plate
+	ctx.moveTo(-l,o*0.5);
+	ctx.arc(0,-o*0.5,r,theta,Math.PI-theta,true);
+	ctx.lineTo(-l,o*0.5);
+	
+	// Draw inferior plate
+	ctx.moveTo(-l,-o*0.5);
+	ctx.arc(0,o*0.5,r,-theta,Math.PI+theta,false);
+	ctx.lineTo(-l,-o*0.5);
+
+	// Draw it
+	ctx.stroke();
+
+	// Set line attributes
+	ctx.lineWidth = 4;
+	ctx.fillStyle = "rgba(255, 255, 255, 0)";
+	ctx.strokeStyle = "gray";
+
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * OpenEyes
+ *
+ * Copyright (C) OpenEyes Foundation, 2011-2017
+ * This file is part of OpenEyes.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package OpenEyes
+ * @link http://www.openeyes.org.uk
+ * @author OpenEyes <info@openeyes.org.uk>
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -42271,19 +51675,17 @@ ED.Telangiectasis.prototype.description = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -42516,25 +51918,25 @@ ED.ToricPCIOL.prototype.description = function() {
 	// Add displacement description
 	if (displacementValue.length > 0) returnValue += " displaced" + displacementValue;
 
+	returnValue += ' @ ' + this.axis.toFixed(0) + '\xB0';
+
 	return returnValue;
 }
 
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -42705,19 +52107,17 @@ ED.Trabectome.prototype.description = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -42867,19 +52267,17 @@ ED.TrabyConjIncision.prototype.description = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -43169,19 +52567,17 @@ ED.TrabyFlap.prototype.description = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -43200,15 +52596,16 @@ ED.TrabySuture = function(_drawing, _parameterJSON) {
 	this.type = 'Fixed';
 	this.material = 'Nylon';
 	this.size = '10/0';
+	this.removed = false;
 
 	// Number of additional handles for releasable suture
 	this.numberOfHandles = 5;
 
 	// Saved parameters
-	this.savedParameterArray = ['originX', 'originY', 'apexX', 'apexY', 'arc', 'rotation', 'type', 'material', 'size'];
+	this.savedParameterArray = ['originX', 'originY', 'apexX', 'apexY', 'arc', 'rotation', 'type', 'material', 'size','removed'];
 
 	// Parameters in doodle control bar (parameter name: parameter label)
-	this.controlParameterArray = {'type':'Shape', 'material':'Material', 'size':'Size'};
+	this.controlParameterArray = {'type':'Shape', 'material':'Material', 'size':'Size','removed':'Removed'};
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -43255,6 +52652,11 @@ ED.TrabySuture.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'string',
 		list: ['11/0', '10/0', '9/0', '8/0', '7/0', '6/0'],
+		animate: false
+	}
+	this.parameterValidationArray['removed'] = {
+		kind: 'derived',
+		type: 'bool',
 		animate: false
 	}
 }
@@ -43453,7 +52855,8 @@ ED.TrabySuture.prototype.draw = function(_point) {
 		// Set line attributes
 		ctx.lineWidth = 8;
 		ctx.fillStyle = "rgba(0, 0, 0, 0)";
-		ctx.strokeStyle = "purple";
+		if (this.removed) ctx.strokeStyle = "rgba(150,150,150,0.5)";
+		else ctx.strokeStyle = "purple";
 
 		// Draw line
 		ctx.stroke();
@@ -43496,19 +52899,17 @@ ED.TrabySuture.prototype.groupDescriptionEnd = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -43629,19 +53030,17 @@ ED.TractionRetinalDetachment.prototype.description = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -43818,19 +53217,17 @@ ED.TransilluminationDefect.prototype.groupDescription = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -43973,19 +53370,17 @@ ED.TrialFrame.prototype.draw = function(_point) {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -44126,19 +53521,17 @@ ED.TrialLens.prototype.draw = function(_point) {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -44646,19 +54039,17 @@ ED.Tube.prototype.description = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -44941,19 +54332,17 @@ ED.TubeExtender.prototype.roundRect = function(ctx, x, y, width, height, radius)
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -45149,19 +54538,17 @@ ED.TubeLigation.prototype.groupDescription = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -45215,6 +54602,7 @@ ED.UTear.prototype.setPropertyDefaults = function() {
  */
 ED.UTear.prototype.setParameterDefaults = function() {
 	this.apexY = -20;
+	this.cachedClockHour = undefined;
 
 	var doodle = this.drawing.lastDoodleOfClass(this.className);
 	if (doodle) {
@@ -45240,8 +54628,7 @@ ED.UTear.prototype.draw = function(_point) {
 
 	// Call draw method in superclass
 	ED.UTear.superclass.draw.call(this, _point);
-
-	// Boundary path
+    // Boundary path
 	ctx.beginPath();
 
 	// U tear
@@ -45261,7 +54648,6 @@ ED.UTear.prototype.draw = function(_point) {
 
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
-
 	// Coordinates of handles (in canvas plane)
 	this.handleArray[3].location = this.transform.transformPoint(new ED.Point(40, -40));
 	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
@@ -45273,7 +54659,7 @@ ED.UTear.prototype.draw = function(_point) {
 	this.leftExtremity = this.transform.transformPoint(new ED.Point(-40, -40));
 	this.rightExtremity = this.transform.transformPoint(new ED.Point(40, -40));
 	this.arc = this.calculateArc();
-
+	this.cachedClockHour = this.clockHour();
 	// Return value indicating successful hittest
 	return this.isClicked;
 }
@@ -45293,7 +54679,7 @@ ED.UTear.prototype.groupDescription = function() {
  * @returns {String} Description of doodle
  */
 ED.UTear.prototype.description = function() {
-	return this.clockHour();
+	return this.cachedClockHour;
 }
 
 /**
@@ -45327,19 +54713,17 @@ ED.UTear.prototype.diagnosticHierarchy = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -45452,19 +54836,17 @@ ED.Vicryl.prototype.description = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -45596,19 +54978,17 @@ ED.ViewObscured.prototype.description = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -45826,19 +55206,17 @@ ED.VisualField.prototype.description = function() {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -45975,19 +55353,17 @@ ED.VisualFieldChart.prototype.draw = function(_point) {
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**

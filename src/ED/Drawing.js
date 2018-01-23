@@ -9,16 +9,16 @@
  * This file is part of OpenEyes.
  *
  * OpenEyes is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
+ * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * OpenEyes is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU Affero General Public License
  * along with OpenEyes.  If not, see <http://www.gnu.org/licenses/>.
  */
 
@@ -43,7 +43,7 @@ var ED = ED || {};
  * @property {AffineTransform} transform Transform converts doodle plane -> canvas plane
  * @property {AffineTransform} inverseTransform Inverse transform converts canvas plane -> doodle plane
  * @property {Doodle} selectedDoodle The currently selected doodle, null if no selection
- * @property {Bool} mouseDown Flag indicating whether mouse is down in canvas
+ * @property {Bool} mouseIsDown Flag indicating whether mouse is down in canvas
  * @property {Mode} mode The current mouse dragging mode
  * @property {Point} lastMousePosition Last position of mouse in canvas coordinates
  * @property {Image} image Optional background image
@@ -110,7 +110,7 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 	this.transform = new ED.AffineTransform();
 	this.inverseTransform = new ED.AffineTransform();
 	this.selectedDoodle = null;
-	this.mouseDown = false;
+	this.mouseIsDown = false;
 	this.doubleClick = false;
 	this.mode = ED.Mode.None;
 	this.lastMousePosition = new ED.Point(0, 0);
@@ -129,6 +129,7 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 	this.showDoodleControls = false;
 	this.onReadyCommands = [];
 	this.resetDoodleSet = false;
+	this.lastTouchPoint = undefined;
 
 	// Freehand drawing properties NB from November 2013 moved to Freehand doodle
 //	this.squiggleColour = new ED.Colour(0, 255, 0, 1);
@@ -243,7 +244,7 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 				'ed-button',
 				'ed-canvas',
 				'ed_canvas',
-				'ed-selected-doodle-select'
+				'ed-selected-doodle-select',
 			].join(')|(') + ')';
 
 			do {
@@ -271,14 +272,14 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 			} else {
 				ED.errorHandler('ED.Drawing', 'Class', 'Touches undefined: ');
 			}
+			this.lastTouchPoint = point;
 			drawing.mousedown(point);
 		}, false);
 
 		this.canvas.addEventListener('touchend', function(e) {
-			if (e.targetTouches[0] !== undefined) {
-				var canvas_pos = drawing.getPositionOfElement(drawing.canvas);
-				var point = new ED.Point(e.targetTouches[0].pageX - canvas_pos[0] - this.offsetLeft, e.targetTouches[0].pageY - canvas_pos[1]);
-				drawing.mouseup(point);
+            if (this.lastTouchPoint !== undefined) {
+				drawing.mouseup(this.lastTouchPoint);
+				this.lastTouchPoint = undefined;
 			}
 		}, false);
 
@@ -286,6 +287,7 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 			if (e.targetTouches[0] !== undefined) {
 				var canvas_pos = drawing.getPositionOfElement(drawing.canvas);
 				var point = new ED.Point(e.targetTouches[0].pageX - canvas_pos[0] - this.offsetLeft, e.targetTouches[0].pageY - canvas_pos[1]);
+                this.lastTouchPoint = point;
 				drawing.mousemove(point);
 			}
 		}, false);
@@ -614,7 +616,9 @@ ED.Drawing.prototype.drawAllDoodles = function() {
  */
 ED.Drawing.prototype.mousedown = function(_point) {
 	// Set flag to indicate dragging can now take place
-	this.mouseDown = true;
+	this.mouseIsDown = true;
+	
+	var doodle = this.selectedDoodle;
 
 	// Detect double click
 	if (ED.recentClick) {
@@ -627,7 +631,6 @@ ED.Drawing.prototype.mousedown = function(_point) {
 	var found = false;
 	this.lastSelectedDoodle = this.selectedDoodle;
 	this.selectedDoodle = null;
-
 	// Cycle through doodles from front to back doing hit test
 	for (var i = this.doodleArray.length - 1; i > -1; i--) {
 		if (!found) {
@@ -650,6 +653,7 @@ ED.Drawing.prototype.mousedown = function(_point) {
 						// Add new squiggle
 						this.doodleArray[i].addSquiggle();
 					}
+					
 				}
 			}
 			// Ensure that unselected doodles are marked as such
@@ -710,6 +714,24 @@ ED.Drawing.prototype.mousedown = function(_point) {
 	});
 };
 
+
+/**
+ * Responds to mouse down event in canvas, cycles through doodles from front to back.
+ * Selected doodle is first selectable doodle to have click within boundary path.
+ * Double clicking on a selected doodle promotes it to drawing mode (if is drawable)
+ *
+ * @event
+ * @param {Point} _point Coordinates of mouse in canvas plane
+ */
+ED.Drawing.prototype.click = function(_point) {
+	// Notify
+	this.notify("click", {
+		drawing: this,
+		point: _point
+	});
+}
+
+
 /**
  * Responds to mouse move event in canvas according to the drawing mode
  *
@@ -749,9 +771,8 @@ ED.Drawing.prototype.mousemove = function(_point) {
 
 	// Start the hover timer (also resets it)
 	this.startHoverTimer(_point);
-
 	// Only drag if mouse already down and a doodle selected
-	if (this.mouseDown && doodle != null) {
+	if (this.mouseIsDown && doodle != null) {
 
 		// Dragging not started
 		if (!doodle.isBeingDragged) {
@@ -1106,7 +1127,7 @@ ED.Drawing.prototype.mouseup = function(_point) {
 		 */
 
 	// Reset flags and mode
-	this.mouseDown = false;
+	this.mouseIsDown = false;
 	this.doubleClick = false;
 	this.mode = ED.Mode.None;
 	this.selectionRectangleIsBeingDragged = false;
@@ -1128,6 +1149,7 @@ ED.Drawing.prototype.mouseup = function(_point) {
 		}
 	}
 
+	
 	// Redraw to get rid of select rectangle
 	this.repaint();
 
@@ -1162,7 +1184,7 @@ ED.Drawing.prototype.mouseout = function(_point) {
 	this.stopHoverTimer();
 
 	// Reset flag and mode
-	this.mouseDown = false;
+	this.mouseIsDown = false;
 	this.mode = ED.Mode.None;
 
 	// Reset selected doodle's dragging flag
@@ -1189,89 +1211,27 @@ ED.Drawing.prototype.mouseout = function(_point) {
 ED.Drawing.prototype.keydown = function(e) {
 	// Keyboard action works on selected doodle
 	if (this.selectedDoodle != null) {
-		// Label doodle is special case - Deprecated since doodle control bar
-		// if (this.selectedDoodle.className == "Label") {
-		if (false) {
-			// Code to send to doodle
-			var code = 0;
-
-			// Shift key has code 16
-			if (e.keyCode != 16) {
-				// Alphabetic
-				if (e.keyCode >= 65 && e.keyCode <= 90) {
-					if (e.shiftKey) {
-						code = e.keyCode;
-					} else {
-						code = e.keyCode + 32;
-					}
-				}
-				// Space or numeric
-				else if (e.keyCode == 32 || (e.keyCode > 47 && e.keyCode < 58)) {
-					code = e.keyCode;
-				}
-				// Apostrophes
-				else if (e.keyCode == 222) {
-					if (e.shiftKey) {
-						code = 34;
-					} else {
-						code = 39;
-					}
-				}
-				// Colon and semicolon
-				else if (e.keyCode == 186) {
-					if (e.shiftKey) {
-						code = 58;
-					} else {
-						code = 59;
-					}
-				}
-				// Other punctuation
-				else if (e.keyCode == 188 || e.keyCode == 190) {
-					if (e.keyCode == 188) code = 44;
-					if (e.keyCode == 190) code = 46;
-				}
-				// Backspace
-				else if (e.keyCode == 8) {
-					code = e.keyCode;
-				}
-				// Carriage return
-				else if (e.keyCode == 13) {
-					code = 13;
-				}
-			}
-
-			// Carriage return stops editing
-			if (code == 13) {
-				this.deselectDoodles();
-			}
-			// Send code to label doodle
-			else if (code > 0) {
-				this.selectedDoodle.addLetter(code);
-			}
-		} else {
-			// Delete or move doodle
-			switch (e.keyCode) {
-				case 8: // Backspace
-					if (this.selectedDoodle.className != "Label") this.deleteSelectedDoodle();
-					break;
-				case 37: // Left arrow
-					this.selectedDoodle.move(-ED.arrowDelta, 0);
-					break;
-				case 38: // Up arrow
-					this.selectedDoodle.move(0, -ED.arrowDelta);
-					break;
-				case 39: // Right arrow
-					this.selectedDoodle.move(ED.arrowDelta, 0);
-					break;
-				case 40: // Down arrow
-					this.selectedDoodle.move(0, ED.arrowDelta);
-					break;
-				default:
-					break;
-			}
+		// Delete or move doodle
+		switch (e.keyCode) {
+			case 8: // Backspace
+				if (this.selectedDoodle.className != "Label") this.deleteSelectedDoodle();
+				break;
+			case 37: // Left arrow
+				this.selectedDoodle.move(-ED.arrowDelta, 0);
+				break;
+			case 38: // Up arrow
+				this.selectedDoodle.move(0, -ED.arrowDelta);
+				break;
+			case 39: // Right arrow
+				this.selectedDoodle.move(ED.arrowDelta, 0);
+				break;
+			case 40: // Down arrow
+				this.selectedDoodle.move(0, ED.arrowDelta);
+				break;
+			default:
+				break;
 		}
 
-		// Refresh canvas
 		this.repaint();
 
 		// Prevent key stroke bubbling up (***TODO*** may need cross browser handling)
@@ -1568,7 +1528,6 @@ ED.Drawing.prototype.deleteDoodle = function(_doodle, really) {
 	var deletedClassName = false;
 
 	var errorMessage = 'Attempt to delete a doodle that does not exist';
-
 	// Check that doodle will delete
 	if (really || _doodle.willDelete()) {
 		// Iterate through doodle array looking for doodle
@@ -1685,6 +1644,7 @@ ED.Drawing.prototype.deleteSelectedDoodle = function() {
 		}
 		 */
 };
+
 
 /**
  * Resets the eyedraw canvas completely including any related form inputs
@@ -1949,7 +1909,7 @@ ED.Drawing.prototype.selectDoodle = function(doodle) {
 
 	doodle.isSelected = true;
 	this.selectedDoodle = doodle;
-
+	
 	// Run onDeselection code for last doodle
 	if (this.lastSelectedDoodle) this.lastSelectedDoodle.onDeselection();
 
@@ -1981,6 +1941,7 @@ ED.Drawing.prototype.isReady = function() {
  * @returns {Doodle} The newly added doodle
  */
 ED.Drawing.prototype.addDoodle = function(_className, _parameterDefaults, _parameterBindings) {
+		
 	// Set flag to indicate whether a doodle of this className already exists
 	var doodleExists = this.hasDoodleOfClass(_className);
 
@@ -2124,7 +2085,10 @@ ED.Drawing.prototype.addDoodle = function(_className, _parameterDefaults, _param
 		this.notify("doodleAdded", newDoodle);
 
 		// Run onSelection code
-		this.selectedDoodle.onSelection();
+		if (this.selectedDoodle) {
+			// might already have been deselected depending on syncing rules
+			this.selectedDoodle.onSelection();
+		}
 
 		// Return doodle
 		return newDoodle;
@@ -2173,7 +2137,7 @@ ED.Drawing.prototype.addBindings = function(_bindingArray) {
 					doodle.addBinding(parameter, _bindingArray[className][parameter]);
 				}
 			} else {
-				ED.errorHandler('ED.Drawing', 'addBindings', 'Attempt to add binding for an element that does not exist for parameter: ' + parameter);
+				ED.errorHandler('ED.Drawing', 'addBindings', 'Attempt to add binding for an element that does not exist for parameter: ' + parameter + ' with id ' + elementId);
 			}
 		}
 	}
@@ -2326,15 +2290,17 @@ ED.Drawing.prototype.updateBindings = function(_doodle) {
 		// Iterate through this doodle's bindings array and alter value of HTML element
 		for (var parameter in doodle.bindingArray) {
 			var element = document.getElementById(doodle.bindingArray[parameter]['id']);
+			if (!element)
+				continue;
 			var attribute = doodle.bindingArray[parameter]['attribute'];
 			var value = doodle.getParameter(parameter);
-
 			// Modify value of element according to type
 			switch (element.type) {
 				case 'checkbox':
 					if (attribute) {
 						ED.errorHandler('ED.Drawing', 'updateBindings', 'Binding to a checkbox with a non-standard attribute not yet supported');
 					} else {
+
 						if (value == "true") {
 							element.setAttribute('checked', 'checked');
 						} else {
@@ -2344,6 +2310,7 @@ ED.Drawing.prototype.updateBindings = function(_doodle) {
 					break;
 
 				case 'select-one':
+					var originalValue = element.value;
 					if (attribute) {
 						for (var i = 0; i < element.length; i++) {
 							if (element.options[i].getAttribute(attribute) == value) {
@@ -2353,6 +2320,11 @@ ED.Drawing.prototype.updateBindings = function(_doodle) {
 						}
 					} else {
 						element.value = value;
+					}
+					if (originalValue !== element.value) {
+                        // trigger a change event for anything listen to the bound html elements
+                        // instead of the eyedraw doodles.
+                        window.setTimeout(function(el) { el.dispatchEvent(new Event('change', {bubbles: true, cancelable: true})); }.bind(null, element), 100)
 					}
 					break;
 
@@ -2620,85 +2592,64 @@ ED.Drawing.prototype.suppressReports = function() {
 };
 
 /**
+ * Returns a list of report strings to allow more fine grained manipulation of results.
+ *
+ * @returns {Array} list of report strings from doodle(s) on drawing
+ */
+ED.Drawing.prototype.reportData = function() {
+	var reports = [];
+	var grouped = {};
+	for (var i = 0; i < this.doodleArray.length; i++) {
+		var doodle = this.doodleArray[i];
+		var description = doodle.description();
+
+		if (doodle.willReport) {
+			var groupDescription = doodle.groupDescription();
+			if (groupDescription.length > 0) {
+				if (typeof(grouped[doodle.className]) === 'undefined') {
+					grouped[doodle.className] = {
+						'start': groupDescription,
+						'descriptions': [],
+						'end': doodle.groupDescriptionEnd()
+					}
+				}
+				grouped[doodle.className]['descriptions'].push(description)
+			} else {
+				if (description.length) {
+					reports.push(description);
+				}
+			}
+		}
+	}
+
+	// consolidate group reports
+  for (var cls in grouped) {
+		var groupStr = '';
+    if (grouped.hasOwnProperty(cls)) {
+      groupStr = grouped[cls]['start'];
+      groupStr += ED.addAndAfterLastComma(grouped[cls]['descriptions'].join(", "));
+      groupStr += grouped[cls]['end'];
+      reports.push(groupStr);
+    }
+  }
+
+	return reports;
+}
+
+/**
  * Returns a string containing a description of the drawing
  *
  * @returns {String} Description of the drawing
  */
 ED.Drawing.prototype.report = function() {
 	var returnString = "";
-	var groupArray = [];
-	var groupEndArray = [];
 
-	// Go through every doodle
-	for (var i = 0; i < this.doodleArray.length; i++) {
-		var doodle = this.doodleArray[i];
-
-		// Reporting can be switched off with willReport flag
-		if (doodle.willReport) {
-			// Check for a group description
-			if (doodle.groupDescription().length > 0) {
-				// Create an array entry for it or add to existing
-				if (typeof(groupArray[doodle.className]) == 'undefined') {
-					groupArray[doodle.className] = doodle.groupDescription();
-					groupArray[doodle.className] += doodle.description();
-				} else {
-					// Only add additional detail if supplied by description method
-					if (doodle.description().length > 0) {
-						groupArray[doodle.className] += ", ";
-						groupArray[doodle.className] += doodle.description();
-					}
-				}
-
-				// Check if there is a corresponding end description
-				if (doodle.groupDescriptionEnd().length > 0) {
-					if (typeof(groupEndArray[doodle.className]) == 'undefined') {
-						groupEndArray[doodle.className] = doodle.groupDescriptionEnd();
-					}
-				}
-			} else {
-				// Get description
-				var description = doodle.description();
-
-				// If its not an empty string, add to the return
-				if (description.length > 0) {
-					// If text there already, make it lower case and add a comma before
-					if (returnString.length == 0) {
-						returnString += description;
-					} else {
-						returnString = returnString + ", " + ED.firstLetterToLowerCase(description);
-					}
-				}
-			}
-		}
+	var data = this.reportData();
+	for (var i = 0; i < data.length; i++) {
+		returnString += (i === 0) ? data[i] : ", " + ED.firstLetterToLowerCase(data[i]);
 	}
 
-	// Go through group array adding descriptions
-	for (className in groupArray) {
-		// Get description
-		var description = groupArray[className];
-
-		// Get end description
-		var endDescription = "";
-		if (typeof(groupEndArray[className]) != 'undefined') {
-			endDescription = groupEndArray[className];
-		}
-
-		// Replace last comma with a comma and 'and'
-		description = ED.addAndAfterLastComma(description) + endDescription;
-
-		// If its not an empty string, add to the return
-		if (description.length > 0) {
-			// If text there already, make it lower case and add a comma before
-			if (returnString.length == 0) {
-				returnString += description;
-			} else {
-				returnString = returnString + ", " + ED.firstLetterToLowerCase(description);
-			}
-		}
-	}
-
-	// Return result
-	return returnString;
+	return (returnString.length > 0) ? returnString : "No abnormality";
 };
 
 
@@ -2714,17 +2665,21 @@ ED.Drawing.prototype.diagnosis = function() {
 	// Loop through doodles with diagnoses, taking one highest in hierarchy, or those that are equal
 	for (var i = 0; i < this.doodleArray.length; i++) {
 		var doodle = this.doodleArray[i];
-		var code = doodle.snomedCode();
-		if (code > 0) {
-			var codePosition = doodle.diagnosticHierarchy();
-			if (codePosition > topOfHierarchy) {
-				topOfHierarchy = codePosition;
-				returnCodes.push(code);
-			} else if (codePosition == topOfHierarchy) {
-				if (returnCodes.indexOf(code) < 0) {
-					returnCodes.push(code);
-				}
-			}
+		var codeArray = doodle.snomedCodes();
+		for (var j = 0; j < codeArray.length; j++) {
+			var code = codeArray[j][0];
+            if (code > 0) {
+                var codePosition = codeArray[j][1];
+                if (codePosition > topOfHierarchy) {
+                    topOfHierarchy = codePosition;
+                    returnCodes.push(code);
+                } else if (codePosition == topOfHierarchy) {
+                    if (returnCodes.indexOf(code) < 0) {
+                        returnCodes.push(code);
+                    }
+                }
+            }
+
 		}
 	}
 

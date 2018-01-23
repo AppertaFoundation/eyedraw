@@ -9,16 +9,16 @@
  * This file is part of OpenEyes.
  *
  * OpenEyes is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
+ * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * OpenEyes is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; with§§§out even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU Affero General Public License
  * along with OpenEyes.  If not, see <http://www.gnu.org/licenses/>.
  * @package EyeDraw
  * @author Bill Aylward <bill.aylward@openeyes.org>
@@ -91,21 +91,20 @@ ED.init = (function() {
 	};
 }());
 /**
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2014
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
  *
  * OpenEyes is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
+ * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * OpenEyes is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU Affero General Public License
  * along with OpenEyes.  If not, see <http://www.gnu.org/licenses/>.
  */
 
@@ -136,13 +135,28 @@ ED.Checker = ED.Checker || (function() {
 			var id = this.id;
 			// Is it an eyedraw canvas?
 			if (canvas.hasClass('ed-canvas-edit') || canvas.hasClass('ed-canvas-display')) {
-				if (ids.indexOf(id) === -1) {
-					ids.push(id);
-				}
+				storeCanvasId(id);
 			}
 		});
 	}
 	$(registerCanvasEyeDraws);
+
+	function storeCanvasId(id) {
+    if (ids.indexOf(id) === -1) {
+      ids.push(id);
+    }
+	}
+
+	function removeCanvasId(id) {
+		var idx = ids.indexOf(id);
+		if (idx > -1) {
+			ids.splice(idx, 1);
+		}
+		idx = readyIds.indexOf(id);
+		if (idx > -1) {
+      readyIds.splice(idx, 1);
+		}
+	}
 
 	/**
 	 * Loop through all the registered callbacks and execute them.
@@ -151,6 +165,7 @@ ED.Checker = ED.Checker || (function() {
 		callbacks.forEach(function(callback) {
 			callback();
 		});
+		callbacks = [];
 	}
 
 	/**
@@ -159,13 +174,13 @@ ED.Checker = ED.Checker || (function() {
 	 */
 	function register(instance) {
 		// Store instance
-		instances[instance.drawingName] = instance
+		instances[instance.drawingName] = instance;
+		storeCanvasId(instance.canvas.id);
 
 		// Register 'doodlesLoaded' event
 		instance.registerForNotifications({
-			callback: function onDoodlesLoaded() {
-
-				var id = instance.canvas.id;
+			callback: function drawingReady() {
+        var id = instance.canvas.id;
 				if (readyIds.indexOf(id) === -1) {
 					readyIds.push(id);
 				}
@@ -174,7 +189,7 @@ ED.Checker = ED.Checker || (function() {
 					executeCallbacks();
 				}
 			}
-		}, 'callback', ['doodlesLoaded']);
+		}, 'callback', ['ready']);
 	}
 
 	/**
@@ -228,6 +243,20 @@ ED.Checker = ED.Checker || (function() {
 		ids = [];
 	}
 
+	function getInternalState()
+	{
+		return [ids, readyIds];
+	}
+
+	function removeMissingCanvasIds()
+	{
+		$(ids).each(function(idx, id) {
+			if (!$('#' + id).length) {
+				removeCanvasId(id);
+			}
+		})
+	}
+
 	/**
 	 * Get eyedraw instance by drawingName.
 	 */
@@ -239,9 +268,13 @@ ED.Checker = ED.Checker || (function() {
 	return {
 		register: register,
 		onAllReady: allReady,
+		isReady: isAllReady,
 		getInstance: getInstance,
 		getInstanceByIdSuffix: getInstanceByIdSuffix,
 		reset: reset,
+		resync: removeMissingCanvasIds,
+		inspect: getInternalState,
+		storeCanvasId: storeCanvasId,
 
 		/** BACKWARDS COMPATABILITY **/
 		registerForReady: allReady
@@ -252,22 +285,22 @@ ED.Checker = ED.Checker || (function() {
 window.getOEEyeDrawChecker = function() {
 	return ED.Checker;
 };
+
 /**
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2014
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
  *
  * OpenEyes is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
+ * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * OpenEyes is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU Affero General Public License
  * along with OpenEyes.  If not, see <http://www.gnu.org/licenses/>.
  */
 
@@ -283,7 +316,7 @@ var ED = ED || {};
  * @namespace ED.Controller
  * @memberOf ED
  * @description Namespace for EyeDraw Controller
- */ 
+ */
 
 ED.Controller = (function() {
 
@@ -321,7 +354,7 @@ ED.Controller = (function() {
 			this.bindEditEvents();
 		}
 
-		this.registerDrawing();
+		this.registerDrawing(); //Should registering take place after initListeners()
 		this.registerForNotifications();
 		this.initListeners();
 		this.drawing.init();
@@ -381,11 +414,14 @@ ED.Controller = (function() {
 	 */
 	Controller.prototype.createDoodlePopup = function() {
 
-		var container = this.container.find('.ed-doodle-popup');
+		var container = this.container.find('.ed-doodle-popup:first');
+
+		var popupDoodles = this.properties.showDoodlePopupForDoodles || [];
 
 		return container.length ? new ED.Views.DoodlePopup(
 			this.drawing,
-			container
+			container,
+			popupDoodles
 		) : null;
 	};
 
@@ -425,9 +461,11 @@ ED.Controller = (function() {
 		this.drawing.registerForNotifications(this, 'saveDrawingToInputField', [
 			'doodleAdded',
 			'doodleDeleted',
-			'doodleSelected',
-			'mousedragged',
-			'drawingZoom'
+			//'doodleSelected',
+			//'mousedragged',
+			'mouseup',
+			'drawingZoom',
+			'parameterChanged'
 		]);
 	};
 
@@ -492,13 +530,16 @@ ED.Controller = (function() {
 	 * Save drawing data to the associated input field.
 	 */
 	Controller.prototype.saveDrawingToInputField = function(force) {
-		if ((force && this.hasInputField()) || this.hasInputFieldData()) {
-			this.input.value = this.drawing.save();
-		}
-		if(this.properties.autoReport){
-			var outputElement = document.getElementById(this.properties.autoReport);
-			this.autoReport(outputElement);
-		}
+        if ((force && this.hasInputField()) || this.hasInputFieldData()) {
+            this.input.value = this.drawing.save();
+        }
+		clearTimeout(this.saveTimer);
+		this.saveTimer = setTimeout(function() {
+			if (this.properties.autoReport) {
+				var outputElement = document.getElementById(this.properties.autoReport);
+				this.autoReport(outputElement);
+			}
+		}.bind(this), 200);
 	};
 
 	/**
@@ -593,8 +634,8 @@ ED.Controller = (function() {
 
 		// Iterate through sync array
 		for (var idSuffix in syncArray) {
-
 			// Get reference to slave drawing
+
 			var slaveDrawing = this.getEyeDrawInstance(idSuffix);
 
 			if (!slaveDrawing) {
@@ -605,6 +646,9 @@ ED.Controller = (function() {
 			// Iterate through master doodles to sync.
 			for (var masterDoodleName in syncArray[idSuffix]) {
 
+				if (!masterDoodle || masterDoodle.className !== masterDoodleName)
+					continue;
+
 				// Iterate through slave doodles to sync with master doodle.
 				for (var slaveDoodleName in syncArray[idSuffix][masterDoodleName]) {
 
@@ -612,7 +656,7 @@ ED.Controller = (function() {
 					var slaveDoodle = slaveDrawing.firstDoodleOfClass(slaveDoodleName);
 
 					// Check that doodles exist, className matches, and sync is allowed
-					if (!masterDoodle || masterDoodle.className !== masterDoodleName || !slaveDoodle || !slaveDoodle.willSync) {
+					if (!slaveDoodle && !slaveDoodle.willSync) {
 						continue;
 					}
 
@@ -637,7 +681,6 @@ ED.Controller = (function() {
 	 * @param  {ED.Drawing} slaveDrawing  The slave drawing instance.
 	 */
 	Controller.prototype.syncDoodleParameters = function(parameterArray, changedParam, masterDoodle, slaveDoodle, slaveDrawing) {
-
 		// Iterate through parameters to sync
 		for (var i = 0; i < (parameterArray || []).length; i++) {
 
@@ -649,13 +692,17 @@ ED.Controller = (function() {
 			if (masterDoodle[changedParam.parameter] === slaveDoodle[changedParam.parameter]) {
 				continue;
 			}
+			if (typeof(changedParam.value) == 'string') {
+				slaveDoodle.setParameterFromString(changedParam.parameter, changedParam.value, true);
+			}
+			else {
+				var increment = changedParam.value - changedParam.oldValue;
+				var newValue = slaveDoodle[changedParam.parameter] + increment;
 
-			var increment = changedParam.value - changedParam.oldValue;
-			var newValue = slaveDoodle[changedParam.parameter] + increment;
-
-			// Sync slave parameter to value of master
-			slaveDoodle.setSimpleParameter(changedParam.parameter, newValue);
-			slaveDoodle.updateDependentParameters(changedParam.parameter);
+				// Sync slave parameter to value of master
+				slaveDoodle.setSimpleParameter(changedParam.parameter, newValue);
+				slaveDoodle.updateDependentParameters(changedParam.parameter);
+			}
 
 			// Update any bindings associated with the slave doodle
 			slaveDrawing.updateBindings(slaveDoodle);
@@ -693,7 +740,7 @@ ED.Controller = (function() {
 
 		if(this.properties.autoReport){
 			var outputElement = document.getElementById(this.properties.autoReport);
-			this.autoReport(outputElement);
+			this.autoReport(outputElement, this.properties.autoReportEditable);
 		}
 
 		// Mark drawing object as ready
@@ -715,21 +762,29 @@ ED.Controller = (function() {
 	Controller.prototype.onParameterChanged = function(notification) {
 		// Sync with other doodles on the page.
 		this.syncEyedraws(notification.object);
-		// Save drawing to hidden input.
-		this.saveDrawingToInputField();
 	};
 
 	/**
 	 * Automatically calls the drawings report
 	 */
-	Controller.prototype.autoReport = function(outputElement) {
-		var report = this.drawing.report();
-		if(report){
-			report = report.replace(/, /g,"\n");
+	Controller.prototype.autoReport = function(outputElement, editable) {
+		var reportData = this.drawing.reportData();
+		var report = '';
+		if(reportData.length){
+
+			report = reportData.join('\n');
+
 			var output = '';
+
+			if (!editable) {
+				outputElement.value = report;
+				return;
+			}
 			var existing = outputElement.value;
 
-			if(existing.match(regex_escape(report))){
+			var reportRegex = String(report).replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+
+			if(existing.match(reportRegex)){
 				outputElement.rows = (existing.match(/\n/g) || []).length + 1;
 				this.previousReport = report;
 				return;
@@ -738,7 +793,7 @@ ED.Controller = (function() {
 			if(this.previousReport){
 				output = existing.replace(this.previousReport, report);
 			} else {
-				if(!existing.match(/^[\n ]$/)){
+				if(existing.length && !existing.match(/^[\n ]$/)){
 					existing += "\n";
 				}
 				output = existing + report;
@@ -746,6 +801,8 @@ ED.Controller = (function() {
 			outputElement.value = output;
 			outputElement.rows = (output.match(/\n/g) || []).length + 1;
 			this.previousReport = report;
+		} else {
+			outputElement.value = 'No abnormality';
 		}
 
 		function regex_escape(str){
@@ -757,21 +814,20 @@ ED.Controller = (function() {
 }());
 
 /**
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2014
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
  *
  * OpenEyes is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
+ * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * OpenEyes is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU Affero General Public License
  * along with OpenEyes.  If not, see <http://www.gnu.org/licenses/>.
  */
 
@@ -837,21 +893,20 @@ ED.View = (function() {
 }());
 
 /**
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2014
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
  *
  * OpenEyes is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
+ * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * OpenEyes is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU Affero General Public License
  * along with OpenEyes.  If not, see <http://www.gnu.org/licenses/>.
  */
 
@@ -884,12 +939,26 @@ ED.Views.DoodlePopup = (function() {
 	 * @param {HTMLElement} widgetContainer The widget container element
 	 * @extends {ED.View}
 	 */
-	function DoodlePopup(drawing, container) {
+	function DoodlePopup(drawing, container, popupDoodles) {
 		ED.View.apply(this, arguments);
+
+		// don't want to be checking against an empty array
+		if (popupDoodles !== undefined && !popupDoodles.length) {
+			popupDoodles = undefined;
+		}
 
 		this.drawing = drawing;
 		this.container = container;
 		this.containerWidth = container.outerWidth();
+		this.popupDoodles = popupDoodles;
+
+
+		if ($(this.container).data('display-side')) {
+			this.side = $(this.container).data('display-side');
+		}
+		else {
+			this.side = 'right';
+		}
 
 		this.registerForNotifications();
 		this.createToolbar();
@@ -946,7 +1015,7 @@ ED.Views.DoodlePopup = (function() {
 		if (!doodle) {
 			return;
 		}
-
+		
 		// Template data
 		var data = {
 			doodle: doodle,
@@ -976,7 +1045,11 @@ ED.Views.DoodlePopup = (function() {
 	 * @param  {Boolean} show   Show or hide the menu.
 	 */
 	DoodlePopup.prototype.update = function(show) {
-		if (show && this.drawing.selectedDoodle) {
+		var shouldDisplayForDoodle = true;
+		if (this.popupDoodles && this.drawing.selectedDoodle && this.popupDoodles.indexOf(this.drawing.selectedDoodle.className) == -1) {
+			shouldDisplayForDoodle = false;
+		}
+		if (show && this.drawing.selectedDoodle && shouldDisplayForDoodle) {
 			this.render();
 			this.show();
 		} else {
@@ -992,9 +1065,9 @@ ED.Views.DoodlePopup = (function() {
 
 			this.emit('hide.before');
 
-			this.container.css({
-				right: 0
-			});
+			var css = {};
+			css[this.side] = 0;
+			this.container.css(css);
 
 			setTimeout(function() {
 				this.container.addClass('closed');
@@ -1012,9 +1085,18 @@ ED.Views.DoodlePopup = (function() {
 
 			this.emit('show.before');
 
-			this.container.css({
-				right: -1 * (this.containerWidth - 1)
-			}).removeClass('closed');
+			if (this.side == 'left') {
+				this.container.css({
+					left: -1 * (this.containerWidth - 2)
+				}).find('.ed-button .label').addClass('left');
+				;
+			} else {
+				this.container.css({
+					right: -1 * (this.containerWidth - 1)
+				}).find('.ed-button .label').addClass('right');
+			}
+			this.container.removeClass('closed');
+
 
 			setTimeout(function() {
 				this.emit('show.after');
@@ -1056,21 +1138,20 @@ ED.Views.DoodlePopup = (function() {
 }());
 
 /**
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2014
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
  *
  * OpenEyes is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
+ * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * OpenEyes is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU Affero General Public License
  * along with OpenEyes.  If not, see <http://www.gnu.org/licenses/>.
  */
 
@@ -1206,21 +1287,20 @@ ED.Views.DoodlePopup.Help = (function() {
 
 }());
 /**
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2014
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
  *
  * OpenEyes is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
+ * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * OpenEyes is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU Affero General Public License
  * along with OpenEyes.  If not, see <http://www.gnu.org/licenses/>.
  */
 
@@ -1333,6 +1413,9 @@ ED.Views.SelectedDoodle = (function() {
 	 */
 	SelectedDoodle.prototype.createDoodleOption = function(doodle) {
 
+		if (!doodle.isSelectable)
+			return $('');
+
 		var text = ED.titles[doodle.className] || doodle.className;
 		var selected = (doodle === this.drawing.selectedDoodle);
 
@@ -1380,26 +1463,29 @@ ED.Views.SelectedDoodle = (function() {
 
 	return SelectedDoodle;
 }());
+<<<<<<< HEAD
 /*! Generated on 23/1/2018 */
+=======
+/*! Generated on 19/12/2017 */
+>>>>>>> origin/release/v2.1
 ED.scriptTemplates = {
-  "doodle-popup": "\n\n{{#doodle}}\n\t<ul class=\"ed-toolbar-panel ed-doodle-popup-toolbar\">\n\t\t<li>\n\t\t\t{{#desc}}\n\t\t\t\t<a class=\"ed-button ed-doodle-help{{lockedButtonClass}}\" href=\"#\" data-function=\"toggleHelp\">\n\t\t\t\t\t<span class=\"icon-ed-help\"></span>\n\t\t\t\t</a>\n\t\t\t{{/desc}}\n\t\t</li>\n\t\t{{#doodle.isLocked}}\n\t\t\t<li>\n\t\t\t\t<a class=\"ed-button\" href=\"#\" data-function=\"unlock\">\n\t\t\t\t\t<span class=\"icon-ed-unlock\"></span>\n\t\t\t\t\t<span class=\"label\">Unlock</span>\n\t\t\t\t</a>\n\t\t\t</li>\n\t\t{{/doodle.isLocked}}\n\t\t{{^doodle.isLocked}}\n\t\t\t<li>\n\t\t\t\t<a class=\"ed-button\" href=\"#\" data-function=\"lock\">\n\t\t\t\t\t<span class=\"icon-ed-lock\"></span>\n\t\t\t\t\t<span class=\"label\">Lock</span>\n\t\t\t\t</a>\n\t\t\t</li>\n\t\t{{/doodle.isLocked}}\n\t\t<li>\n\t\t\t<a class=\"ed-button{{lockedButtonClass}}\" href=\"#\" data-function=\"moveToBack\">\n\t\t\t\t<span class=\"icon-ed-move-to-back\"></span>\n\t\t\t\t<span class=\"label\">Move to back</span>\n\t\t\t</a>\n\t\t</li>\n\t\t<li>\n\t\t\t<a class=\"ed-button{{lockedButtonClass}}\" href=\"#\" data-function=\"moveToFront\">\n\t\t\t\t<span class=\"icon-ed-move-to-front\"></span>\n\t\t\t\t<span class=\"label\">Move to front</span>\n\t\t\t</a>\n\t\t</li>\n\t\t<li>\n\t\t\t{{#doodle.isDeletable}}\n\t\t\t\t<a class=\"ed-button{{lockedButtonClass}}\" href=\"#\" data-function=\"deleteSelectedDoodle\">\n\t\t\t\t\t<span class=\"icon-ed-delete\"></span>\n\t\t\t\t\t<span class=\"label\">Delete</span>\n\t\t\t\t</a>\n\t\t\t{{/doodle.isDeletable}}\n\t\t</li>\n\t</ul>\n\t<div class=\"ed-doodle-info hide\">\n\t\t{{^doodle.isLocked}}\n\t\t\t{{#desc}}\n\t\t\t\t<div class=\"ed-doodle-description\">{{{desc}}}</div>\n\t\t\t{{/desc}}\n\t\t{{/doodle.isLocked}}\n\t</div>\n\t<div class=\"ed-doodle-controls{{#doodle.isLocked}} hide{{/doodle.isLocked}}\" id=\"{{drawing.canvas.id}}_controls\">\n\t</div>\n\t{{#doodle.isLocked}}\n\t\t<div class=\"ed-doodle-description\">\n\t\t\t<strong>This doodle is locked and cannot be edited.</strong>\n\t\t</div>\n\t{{/doodle.isLocked}}\n{{/doodle}}"
+  "doodle-popup": "\n\n{{#doodle}}\n{{^doodle.isNode}}\n\t<ul class=\"ed-toolbar-panel ed-doodle-popup-toolbar\">\n\t\t<li>\n\t\t\t{{#desc}}\n\t\t\t\t<a class=\"ed-button ed-doodle-help{{lockedButtonClass}}\" href=\"#\" data-function=\"toggleHelp\">\n\t\t\t\t\t<span class=\"icon-ed-help\"></span>\n\t\t\t\t</a>\n\t\t\t{{/desc}}\n\t\t</li>\n\t\t{{#doodle.isLocked}}\n\t\t\t<li>\n\t\t\t\t<a class=\"ed-button\" href=\"#\" data-function=\"unlock\">\n\t\t\t\t\t<span class=\"icon-ed-unlock\"></span>\n\t\t\t\t\t<span class=\"label\">Unlock</span>\n\t\t\t\t</a>\n\t\t\t</li>\n\t\t{{/doodle.isLocked}}\n\t\t{{^doodle.isLocked}}\n\t\t\t<li>\n\t\t\t\t<a class=\"ed-button\" href=\"#\" data-function=\"lock\">\n\t\t\t\t\t<span class=\"icon-ed-lock\"></span>\n\t\t\t\t\t<span class=\"label\">Lock</span>\n\t\t\t\t</a>\n\t\t\t</li>\n\t\t{{/doodle.isLocked}}\n\t\t<li>\n\t\t\t<a class=\"ed-button{{lockedButtonClass}}\" href=\"#\" data-function=\"moveToBack\">\n\t\t\t\t<span class=\"icon-ed-move-to-back\"></span>\n\t\t\t\t<span class=\"label\">Move to back</span>\n\t\t\t</a>\n\t\t</li>\n\t\t<li>\n\t\t\t<a class=\"ed-button{{lockedButtonClass}}\" href=\"#\" data-function=\"moveToFront\">\n\t\t\t\t<span class=\"icon-ed-move-to-front\"></span>\n\t\t\t\t<span class=\"label\">Move to front</span>\n\t\t\t</a>\n\t\t</li>\n\t\t<li>\n\t\t\t{{#doodle.isDeletable}}\n\t\t\t\t<a class=\"ed-button{{lockedButtonClass}}\" href=\"#\" data-function=\"deleteSelectedDoodle\">\n\t\t\t\t\t<span class=\"icon-ed-delete\"></span>\n\t\t\t\t\t<span class=\"label\">Delete</span>\n\t\t\t\t</a>\n\t\t\t{{/doodle.isDeletable}}\n\t\t</li>\n\t</ul>\n\t<div class=\"ed-doodle-info hide\">\n\t\t{{^doodle.isLocked}}\n\t\t\t{{#desc}}\n\t\t\t\t<div class=\"ed-doodle-description\">{{{desc}}}</div>\n\t\t\t{{/desc}}\n\t\t{{/doodle.isLocked}}\n\t</div>\n\t<div class=\"ed-doodle-controls{{#doodle.isLocked}} hide{{/doodle.isLocked}}\" id=\"{{drawing.canvas.id}}_controls\">\n\t</div>\n\t{{/doodle.isNode}}\n\t{{#doodle.isLocked}}\n\t\t<div class=\"ed-doodle-description\">\n\t\t\t<strong>This doodle is locked and cannot be edited.</strong>\n\t\t</div>\n\t{{/doodle.isLocked}}\n{{/doodle}}"
 };
 /**
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2014
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
  *
  * OpenEyes is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
+ * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * OpenEyes is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU Affero General Public License
  * along with OpenEyes.  If not, see <http://www.gnu.org/licenses/>.
  */
 
@@ -1596,21 +1682,20 @@ ED.Views.Toolbar = (function() {
 	return Toolbar;
 }());
 /**
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2014
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
  *
  * OpenEyes is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
+ * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * OpenEyes is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU Affero General Public License
  * along with OpenEyes.  If not, see <http://www.gnu.org/licenses/>.
  */
 
@@ -1659,21 +1744,20 @@ ED.Views.Toolbar.Drawing = (function() {
 	return DrawingToolbar;
 }());
 /**
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2014
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
  *
  * OpenEyes is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
+ * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * OpenEyes is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU Affero General Public License
  * along with OpenEyes.  If not, see <http://www.gnu.org/licenses/>.
  */
 

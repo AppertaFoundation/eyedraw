@@ -1,19 +1,17 @@
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -28,9 +26,18 @@ ED.PCIOL = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "PCIOL";
 
-	// Saved parameters
-	this.savedParameterArray = ['originX', 'originY', 'rotation'];
+	// Other parameters
+	this.fixation = 'In-the-bag';
+	this.fx = 1;
+    this.csOriginX = 0;
 
+	// Saved parameters
+	this.savedParameterArray = ['fixation', 'fx', 'originX', 'originY', 'rotation', 'csOriginX'];
+
+	// Parameters in doodle control bar
+	this.controlParameterArray = {'fixation':'Fixation'};
+
+	
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 
@@ -60,6 +67,56 @@ ED.PCIOL.prototype.setPropertyDefaults = function() {
 	this.addAtBack = true;
 	this.isScaleable = false;
 	this.isUnique = true;
+	
+	// Validation arrays for other parameters
+	this.parameterValidationArray['fixation'] = {
+		kind: 'derived',
+		type: 'string',
+		list: ['In-the-bag', 'Ciliary sulcus'],
+		animate: true
+	};
+	this.parameterValidationArray['fx'] = {
+		kind: 'other',
+		type: 'int',
+		range: [1, 2],
+		animate: false
+	};
+	
+	// Update component of validation array for simple parameters
+	this.parameterValidationArray['originX']['range'].setMinAndMax(-200, +200);
+	this.parameterValidationArray['originY']['range'].setMinAndMax(-200, +200);
+}
+
+/**
+ * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
+ * The returned parameters are animated if their 'animate' property is set to true
+ *
+ * @param {String} _parameter Name of parameter that has changed
+ * @value {Undefined} _value Value of parameter to calculate
+ * @returns {Array} Associative array of values of dependent parameters
+ */
+ED.PCIOL.prototype.dependentParameterValues = function(_parameter, _value) {
+	var returnArray = new Array();
+
+	switch (_parameter) {
+		case 'fx':
+			if (_value === 2) returnArray['fixation'] = 'Ciliary sulcus';
+			else returnArray['fixation'] = 'In-the-bag';
+			break;
+
+		case 'fixation':
+			switch (_value) {
+				case 'In-the-bag':
+					returnArray['fx'] = 1;
+					break;
+				case 'Ciliary sulcus':
+					returnArray['fx'] = 2;
+					break;
+			}
+			break;
+	}
+
+	return returnArray;
 }
 
 /**
@@ -130,6 +187,7 @@ ED.PCIOL.prototype.draw = function(_point) {
  */
 ED.PCIOL.prototype.description = function() {
 	var returnValue = "Posterior chamber IOL";
+	returnValue += " (" + this.fixation + " fixation)";
 
 	// Displacement limit
 	var limit = 40;

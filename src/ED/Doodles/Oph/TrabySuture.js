@@ -1,19 +1,17 @@
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -32,15 +30,16 @@ ED.TrabySuture = function(_drawing, _parameterJSON) {
 	this.type = 'Fixed';
 	this.material = 'Nylon';
 	this.size = '10/0';
+	this.removed = false;
 
 	// Number of additional handles for releasable suture
 	this.numberOfHandles = 5;
 
 	// Saved parameters
-	this.savedParameterArray = ['originX', 'originY', 'apexX', 'apexY', 'arc', 'rotation', 'type', 'material', 'size'];
+	this.savedParameterArray = ['originX', 'originY', 'apexX', 'apexY', 'arc', 'rotation', 'type', 'material', 'size','removed'];
 
 	// Parameters in doodle control bar (parameter name: parameter label)
-	this.controlParameterArray = {'type':'Shape', 'material':'Material', 'size':'Size'};
+	this.controlParameterArray = {'type':'Shape', 'material':'Material', 'size':'Size','removed':'Removed'};
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -87,6 +86,11 @@ ED.TrabySuture.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'string',
 		list: ['11/0', '10/0', '9/0', '8/0', '7/0', '6/0'],
+		animate: false
+	}
+	this.parameterValidationArray['removed'] = {
+		kind: 'derived',
+		type: 'bool',
 		animate: false
 	}
 }
@@ -285,7 +289,8 @@ ED.TrabySuture.prototype.draw = function(_point) {
 		// Set line attributes
 		ctx.lineWidth = 8;
 		ctx.fillStyle = "rgba(0, 0, 0, 0)";
-		ctx.strokeStyle = "purple";
+		if (this.removed) ctx.strokeStyle = "rgba(150,150,150,0.5)";
+		else ctx.strokeStyle = "purple";
 
 		// Draw line
 		ctx.stroke();
