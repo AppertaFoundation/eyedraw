@@ -32108,7 +32108,11 @@ ED.InnerLeafBreak = function(_drawing, _parameterJSON)
     this.className = "InnerLeafBreak";
 
     this.savedParameterArray = ['originX', 'originY', 'scaleX', 'scaleY'];
+<<<<<<< HEAD
+
+=======
     
+>>>>>>> origin/release/v2.1
     // Call superclass constructor
     ED.Doodle.call(this, _drawing, _parameterJSON);
 }
@@ -34374,6 +34378,9 @@ ED.Lattice = function(_drawing, _parameterJSON)
 {
     // Set classname
     this.className = "Lattice";
+  
+  // Saved parameters
+  +    this.savedParameterArray = ['arc', 'radius', 'originX', 'originY', 'rotation'];
 
     // Saved parameters
     this.savedParameterArray = ['arc', 'radius', 'originX', 'originY', 'rotation'];
@@ -39050,6 +39057,7 @@ ED.OpticDisc.prototype.description = function() {
 				}
 			}
 		} else {
+
 			returnString = this.drawing.doodleArray.length == 1 ? "No abnormality" : "";
 		}
 	}
@@ -39058,8 +39066,11 @@ ED.OpticDisc.prototype.description = function() {
 		if (this.cdRatio == "No view") {
 			returnString = "No view";
 		}
-	}
+    if (returnString.length === 0 && this.drawing.doodleArray.length === 1) {
+      returnString = "No abnormality";
+    }
 
+  }
 	return returnString;
 };
 
@@ -41927,6 +41938,12 @@ ED.PosteriorCapsule = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "PosteriorCapsule";
 
+<<<<<<< HEAD
+    this.savedParameterArray = ['originX', 'originY', 'scaleX', 'scaleY'];
+
+    // Call superclass constructor
+    ED.Doodle.call(this, _drawing, _parameterJSON);
+=======
 	// Derived parameters
 	this.opacity = '1';
 	this.capsulotomy = 'None';
@@ -41939,6 +41956,7 @@ ED.PosteriorCapsule = function(_drawing, _parameterJSON) {
 		'opacity':'Opacity',
 		'capsulotomy':'Capsulotomy',
 		};
+>>>>>>> origin/release/v2.1
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
