@@ -29200,7 +29200,7 @@ ED.Lattice = function(_drawing, _parameterJSON)
     this.className = "Lattice";
   
   // Saved parameters
-  +    this.savedParameterArray = ['arc', 'radius', 'originX', 'originY', 'rotation'];
+    this.savedParameterArray = ['arc', 'radius', 'originX', 'originY', 'rotation'];
 
     // Call superclass constructor
     ED.Doodle.call(this, _drawing, _parameterJSON);
