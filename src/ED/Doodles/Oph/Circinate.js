@@ -147,7 +147,7 @@ ED.Circinate.prototype.draw = function(_point) {
  * @returns {String} Group description
  */
 ED.Circinate.prototype.groupDescription = function() {
-	return "Circinate maculopathy ";
+	return "Circinate retinopathy ";
 }
 
 /**
