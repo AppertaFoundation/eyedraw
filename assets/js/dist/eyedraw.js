@@ -34530,6 +34530,7 @@ ED.Lattice.prototype.diagnosticHierarchy = function()
 {
     return 2;
 }
+
 /**
  * OpenEyes
  * MSC mod
