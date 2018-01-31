@@ -1,19 +1,18 @@
 /**
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2014
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
  *
  * OpenEyes is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
+ * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * OpenEyes is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU Affero General Public License
  * along with OpenEyes.  If not, see <http://www.gnu.org/licenses/>.
  */
 
@@ -44,13 +43,28 @@ ED.Checker = ED.Checker || (function() {
 			var id = this.id;
 			// Is it an eyedraw canvas?
 			if (canvas.hasClass('ed-canvas-edit') || canvas.hasClass('ed-canvas-display')) {
-				if (ids.indexOf(id) === -1) {
-					ids.push(id);
-				}
+				storeCanvasId(id);
 			}
 		});
 	}
 	$(registerCanvasEyeDraws);
+
+	function storeCanvasId(id) {
+    if (ids.indexOf(id) === -1) {
+      ids.push(id);
+    }
+	}
+
+	function removeCanvasId(id) {
+		var idx = ids.indexOf(id);
+		if (idx > -1) {
+			ids.splice(idx, 1);
+		}
+		idx = readyIds.indexOf(id);
+		if (idx > -1) {
+      readyIds.splice(idx, 1);
+		}
+	}
 
 	/**
 	 * Loop through all the registered callbacks and execute them.
@@ -59,6 +73,7 @@ ED.Checker = ED.Checker || (function() {
 		callbacks.forEach(function(callback) {
 			callback();
 		});
+		callbacks = [];
 	}
 
 	/**
@@ -67,13 +82,13 @@ ED.Checker = ED.Checker || (function() {
 	 */
 	function register(instance) {
 		// Store instance
-		instances[instance.drawingName] = instance
+		instances[instance.drawingName] = instance;
+		storeCanvasId(instance.canvas.id);
 
 		// Register 'doodlesLoaded' event
 		instance.registerForNotifications({
-			callback: function onDoodlesLoaded() {
-
-				var id = instance.canvas.id;
+			callback: function drawingReady() {
+        var id = instance.canvas.id;
 				if (readyIds.indexOf(id) === -1) {
 					readyIds.push(id);
 				}
@@ -82,7 +97,7 @@ ED.Checker = ED.Checker || (function() {
 					executeCallbacks();
 				}
 			}
-		}, 'callback', ['doodlesLoaded']);
+		}, 'callback', ['ready']);
 	}
 
 	/**
@@ -136,6 +151,20 @@ ED.Checker = ED.Checker || (function() {
 		ids = [];
 	}
 
+	function getInternalState()
+	{
+		return [ids, readyIds];
+	}
+
+	function removeMissingCanvasIds()
+	{
+		$(ids).each(function(idx, id) {
+			if (!$('#' + id).length) {
+				removeCanvasId(id);
+			}
+		})
+	}
+
 	/**
 	 * Get eyedraw instance by drawingName.
 	 */
@@ -147,9 +176,13 @@ ED.Checker = ED.Checker || (function() {
 	return {
 		register: register,
 		onAllReady: allReady,
+		isReady: isAllReady,
 		getInstance: getInstance,
 		getInstanceByIdSuffix: getInstanceByIdSuffix,
 		reset: reset,
+		resync: removeMissingCanvasIds,
+		inspect: getInternalState,
+		storeCanvasId: storeCanvasId,
 
 		/** BACKWARDS COMPATABILITY **/
 		registerForReady: allReady

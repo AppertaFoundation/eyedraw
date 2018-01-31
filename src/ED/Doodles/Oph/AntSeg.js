@@ -1,19 +1,17 @@
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
+ * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package OpenEyes
  * @link http://www.openeyes.org.uk
  * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
 /**
@@ -37,8 +35,9 @@ ED.AntSeg = function(_drawing, _parameterJSON) {
 	this.colour = 'Blue';
 	this.ectropion = false;
 	this.cornealSize = 'Normal';
-  this.cells = 'Not Checked';
-  this.flare = 'Not Checked';
+	this.cells = 'Not Checked';
+	this.flare = 'Not Checked';
+	this.csApexX = 0;
 
 	// Saved parameters
 	this.savedParameterArray = [
@@ -51,13 +50,14 @@ ED.AntSeg = function(_drawing, _parameterJSON) {
 		'ectropion',
 		'cornealSize',
 		'cells',
-		'flare'
+		'flare',
+		'csApexX' // store of cross section apex x value
 	];
 
 	// Parameters in doodle control bar (parameter name: parameter label)
 	this.controlParameterArray = {
 		'pupilSize':'Pupil size',
-		'pxe':'PXE',
+		'pxe':'Pseudoexfoliation',
 		'coloboma':'Coloboma',
 		'colour':'Colour',
 		'ectropion':'Ectropion uveae',
@@ -96,7 +96,7 @@ ED.AntSeg.prototype.setPropertyDefaults = function() {
 
 	// Update component of validation array for simple parameters (enable 2D control by adding -50,+50 apexX range
 	this.parameterValidationArray.apexX.range.setMinAndMax(0, 0);
-	this.parameterValidationArray.apexY.range.setMinAndMax(-280, -60);
+	this.parameterValidationArray.apexY.range.setMinAndMax(-300, -60);
 
 	// Add complete validation arrays for derived parameters
 	this.parameterValidationArray.pupilSize = {
@@ -366,11 +366,10 @@ ED.AntSeg.prototype.draw = function(_point) {
  */
 ED.AntSeg.prototype.description = function() {
 	var returnValue = "";
+	var pupilSize = Math.round(-this.apexY * 0.03);
 
 	// Pupil size and coloboma
-	if (this.pupilSize !== 'Large') {
-		returnValue += this.pupilSize.toLowerCase() + " pupil, ";
-	}
+	returnValue += this.pupilSize.toLowerCase() + " pupil (diameter: " + pupilSize + "mm), ";
 
 	// Coloboma
 	if (this.coloboma) {
@@ -412,6 +411,12 @@ ED.AntSeg.prototype.description = function() {
 		*/
 		returnValue = "No abnormality";
 	}
+
+/*
+	if (this.pupilSize == 'Large') {
+		returnValue += "pupil diameter: " + pupilSize + "mm, ";
+	}
+*/
 
 	// Remove final comma and space and capitalise first letter
 	returnValue = returnValue.replace(/, +$/, '');

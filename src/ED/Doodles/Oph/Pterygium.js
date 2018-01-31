@@ -9,9 +9,17 @@
 ED.Pterygium = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "Pterygium";
-
+	
+	this.plane = 0;
+	
 	// Saved parameters
-	this.savedParameterArray = ['apexY', 'arc', 'rotation'];
+	this.savedParameterArray = ['apexY', 'arc', 'rotation','injection','stockersLine'];
+	
+	// Parameters in doodle control bar (parameter name: parameter label)
+	this.controlParameterArray = {
+		'injection':'Injection',
+		'stockersLine':"Stocker's line"
+	};
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -31,6 +39,9 @@ ED.Pterygium.prototype.setHandles = function() {
 	this.handleArray[1] = new ED.Doodle.Handle(null, true, ED.Mode.Arc, false);
 	this.handleArray[2] = new ED.Doodle.Handle(null, true, ED.Mode.Arc, false);
 	this.handleArray[4] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
+	
+	this.handleArray[5] = new ED.Doodle.Handle(null, true, ED.Mode.Handles, false);
+	this.handleArray[6] = new ED.Doodle.Handle(null, true, ED.Mode.Handles, false);
 }
 
 /**
@@ -38,23 +49,85 @@ ED.Pterygium.prototype.setHandles = function() {
  */
 ED.Pterygium.prototype.setPropertyDefaults = function() {
 	this.isMoveable = false;
+	this.isUnique = false;
+	
+	// Add complete validation arrays for derived parameters
+	this.parameterValidationArray.injection = {
+		kind: 'derived',
+		type: 'string',
+		list: ['+', '++', '+++'],
+		animate: true
+	};
+	this.parameterValidationArray.stockersLine = {
+		kind: 'derived',
+		type: 'bool',
+		display: true
+	};
 
 	// Update component of validation array for simple parameters
 	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
-	this.parameterValidationArray['apexY']['range'].setMinAndMax(-450, +100);
+	this.parameterValidationArray['apexY']['range'].setMinAndMax(-360, +100);
 	this.parameterValidationArray['arc']['range'].setMinAndMax(Math.PI / 6, Math.PI);
+	this.parameterValidationArray['rotation']['range'].setMinAndMax(0, 2*Math.PI);
 }
 
 /**
  * Sets default parameters
  */
 ED.Pterygium.prototype.setParameterDefaults = function() {
-	this.apexY = -100;
-	this.arc = 80 * Math.PI / 180;
+	this.apexY = -120;
+	this.arc = 60 * Math.PI / 180;
 
 	// Default to temporal quadrant
-	this.setRotationWithDisplacements(90, 120);
+    this.setRotationWithDisplacements(270, 180);
+	if (this.rotation>Math.PI) this.rotation = 1.5*Math.PI;
+	
+	this.setParameterFromString('injection', '+');
+	this.setParameterFromString('stockersLine', 'false');
+	
+	// Create a squiggle to store the handles points
+	var squiggle = new ED.Squiggle(this, new ED.Colour(100, 100, 100, 1), 4, true);
+
+	// Add it to squiggle array
+	this.squiggleArray.push(squiggle);
+
+	// Populate with handles at  points around circumference
+	var point = new ED.Point(-80, -170);
+	this.squiggleArray[0].pointsArray[5] = point;
+	point = new ED.Point(80, -170);
+	this.squiggleArray[0].pointsArray[6] = point;
+
 }
+
+/**
+ * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
+ * The returned parameters are animated if the 'animate' property in the parameterValidationArray is set to true
+ *
+ * @param {String} _parameter Name of parameter that has changed
+ * @param {Undefined} _value Value of parameter to calculate
+ * @returns {Array} Associative array of values of dependent parameters
+ */
+ED.Pterygium.prototype.dependentParameterValues = function(_parameter, _value) {
+	var returnArray = {},
+		returnValue;
+
+	switch (_parameter) {
+		
+		// insure handles y coodinate set distance away from apex
+		case 'apexY':
+			this.squiggleArray[0].pointsArray[5].y = _value - 50;
+			this.squiggleArray[0].pointsArray[6].y = _value - 50;
+			break;
+			
+		// constrain handles to only move in the X plane
+		case 'handles':
+			this.squiggleArray[0].pointsArray[this.draggingHandleIndex].y = this.apexY - 50;
+			break;
+	}
+
+	return returnArray;
+};
+
 
 /**
  * Draws doodle or performs a hit test if a Point parameter is passed
@@ -69,7 +142,7 @@ ED.Pterygium.prototype.draw = function(_point) {
 	ED.RRD.superclass.draw.call(this, _point);
 
 	// Fit outer curve just inside ora on right and left fundus diagrams
-	var r = 952 / 2;
+	var r = 470;
 
 	// Calculate parameters for arcs
 	var theta = this.arc / 2;
@@ -91,13 +164,28 @@ ED.Pterygium.prototype.draw = function(_point) {
 	// Connect across the bottom via the apex point
 	var bp = +0.4;
 
-	// Curve back to start via apex point
-	ctx.bezierCurveTo(topLeftX, topLeftY, bp * topLeftX, this.apexY, this.apexX, this.apexY);
-	ctx.bezierCurveTo(-bp * topLeftX, this.apexY, topRightX, topRightY, topRightX, topRightY);
+	// Bezier curves between handles, back to start point at bottom
+	ctx.bezierCurveTo(topLeftX - 0.7*(topLeftX - this.squiggleArray[0].pointsArray[5].x), topLeftY, this.squiggleArray[0].pointsArray[5].x,this.squiggleArray[0].pointsArray[5].y, this.squiggleArray[0].pointsArray[5].x,this.squiggleArray[0].pointsArray[5].y);
+	ctx.bezierCurveTo(this.squiggleArray[0].pointsArray[5].x, this.apexY, this.apexX, this.apexY, this.apexX, this.apexY);
+	ctx.bezierCurveTo(this.apexX, this.apexY, this.squiggleArray[0].pointsArray[6].x, this.apexY, this.squiggleArray[0].pointsArray[6].x,this.squiggleArray[0].pointsArray[6].y);
+	ctx.bezierCurveTo(this.squiggleArray[0].pointsArray[6].x,this.squiggleArray[0].pointsArray[6].y, topRightX - 0.7*(topRightX - this.squiggleArray[0].pointsArray[6].x), topRightY, topRightX, topRightY);
+
 
 	// Set line attributes
 	ctx.lineWidth = 4;
-	ctx.fillStyle = "rgba(200,200,200,0.5)";
+	
+	switch (this.injection) {
+		case '+':
+			ctx.fillStyle = "rgba(255, 204, 204, 0.7)";
+			break;
+		case '++':
+			ctx.fillStyle = "rgba(255, 153, 153, 0.7)";
+			break;
+		case '+++':
+			ctx.fillStyle = "rgba(255, 102, 102, 0.7)";
+			break;
+	}
+	
 	ctx.strokeStyle = "gray";
 
 	// Draw boundary path (also hit testing)
@@ -105,11 +193,22 @@ ED.Pterygium.prototype.draw = function(_point) {
 	
 		// Non-boundary paths
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
-		// Total number of vessels
+		// Draw Stocker's line
+		if (this.stockersLine) {
+			ctx.beginPath();
+			ctx.moveTo(this.squiggleArray[0].pointsArray[5].x - 20,this.squiggleArray[0].pointsArray[5].y + 20);
+			ctx.bezierCurveTo(this.squiggleArray[0].pointsArray[5].x, this.apexY + 20, this.apexX, this.apexY + 20, this.apexX, this.apexY + 20);
+			ctx.bezierCurveTo(this.apexX, this.apexY + 20, this.squiggleArray[0].pointsArray[6].x, this.apexY + 20, this.squiggleArray[0].pointsArray[6].x + 20,this.squiggleArray[0].pointsArray[6].y  + 20);
+			ctx.strokeStyle = "brown";
+			ctx.lineWidth = 8;
+			ctx.stroke();
+		}
+		
+		// Draw vessels
 		var v = 6;
-
-		// Angular separation
-		var phi = this.arc/v
+		var phi = this.arc/v;
+		var lX = Math.abs(this.squiggleArray[0].pointsArray[5].x - this.squiggleArray[0].pointsArray[6].x);
+		var xDif = lX/(v+1);
 
 		// Start and end points of vessel
 		var sp = new ED.Point(0, 0);
@@ -126,14 +225,25 @@ ED.Pterygium.prototype.draw = function(_point) {
 			
 			// Go a proportion along line to apex Point
 			var p = 0.8;
-			ep.x = sp.x + p * (ap.x - sp.x);
+			ep.x = this.squiggleArray[0].pointsArray[5].x + xDif*(i+1);
+// 			ep.x = sp.x + p * (ap.x - sp.x);
 			ep.y = sp.y + p * (ap.y - sp.y);
 			ctx.moveTo(sp.x, sp.y);
-			ctx.lineTo(ep.x, ep.y);
+			ctx.bezierCurveTo(ep.x-0.7*(ep.x-sp.x), sp.y, ep.x, ep.y, ep.x, ep.y);
 		}
 
-		ctx.strokeStyle = "red";
-		ctx.lineWidth = 8;
+		ctx.strokeStyle = "rgba(255,0,0,0.6)";
+		switch (this.injection) {
+		case '+':
+			ctx.lineWidth = 4;
+			break;
+		case '++':
+			ctx.lineWidth = 6;
+			break;
+		case '+++':
+			ctx.lineWidth = 8;
+			break;
+	}
 		
 		ctx.stroke();
 	}
@@ -142,7 +252,9 @@ ED.Pterygium.prototype.draw = function(_point) {
 	// Coordinates of handles (in canvas plane)
 	this.handleArray[1].location = this.transform.transformPoint(new ED.Point(topLeftX, topLeftY));
 	this.handleArray[2].location = this.transform.transformPoint(new ED.Point(topRightX, topRightY));
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));	
+	this.handleArray[5].location = this.transform.transformPoint(this.squiggleArray[0].pointsArray[5]);
+	this.handleArray[6].location = this.transform.transformPoint(this.squiggleArray[0].pointsArray[6]);
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -158,14 +270,27 @@ ED.Pterygium.prototype.draw = function(_point) {
  * @returns {String} Description of doodle
  */
 ED.Pterygium.prototype.description = function() {
+	
+	// calculate distance between apex and visual axis
+	var n = Math.sqrt((this.apexX*this.apexX) + (this.apexY*this.apexY));
+	n = (n / 380 * 6).toFixed(2);
+	
 	var returnString = "";
+	
+	// If injection+++, then injected
+	if (this.injection == "+++") returnString += "injected ";
 
-	// Size description
-	if (this.arc < Math.PI / 4) returnString = "Small ";
-	else returnString = "Large ";
-
-	// U tear
-	returnString += "Pterygium ";
+	// Temrporal / nasal
+	if (this.rotation>=0 && this.rotation< Math.PI) {
+		if (this.drawing.eye == ED.eye.Right) returnString += "nasal ";
+		else returnString += "temporal ";
+	}
+	else {
+		if (this.drawing.eye == ED.eye.Right) returnString += "temporal ";
+		else returnString += "nasal ";
+	}
+	
+	returnString += "pterygium within " + n + "mm of visual axis";
 
 	return returnString;
 }
