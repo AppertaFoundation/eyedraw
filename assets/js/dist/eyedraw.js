@@ -15781,6 +15781,15 @@ ED.AntSeg.prototype.description = function() {
 	return returnValue;
 };
 
+ED.AntSeg.prototype.snomedCodes = function()
+{
+    snomedCodes = [];
+    if (this.pxe) {
+        snomedCodes.push([44219007, 3]);
+    }
+    return snomedCodes;
+};
+
 /**
  * OpenEyes
  *
