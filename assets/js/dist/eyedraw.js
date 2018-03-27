@@ -15781,6 +15781,15 @@ ED.AntSeg.prototype.description = function() {
 	return returnValue;
 };
 
+ED.AntSeg.prototype.snomedCodes = function()
+{
+    snomedCodes = [];
+    if (this.pxe) {
+        snomedCodes.push([44219007, 3]);
+    }
+    return snomedCodes;
+};
+
 /**
  * OpenEyes
  *
@@ -19166,7 +19175,7 @@ ED.Circinate.prototype.draw = function(_point) {
  * @returns {String} Group description
  */
 ED.Circinate.prototype.groupDescription = function() {
-	return "Circinate maculopathy ";
+	return "Circinate retinopathy ";
 }
 
 /**
@@ -34530,6 +34539,7 @@ ED.Lattice.prototype.diagnosticHierarchy = function()
 {
     return 2;
 }
+
 /**
  * OpenEyes
  * MSC mod
