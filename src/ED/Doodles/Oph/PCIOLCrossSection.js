@@ -14,14 +14,6 @@
  * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
-/**
- * PCIOL Cross Section ***TODO***
- *
- * @class PCIOLCrossSection
- * @property {String} className Name of doodle subclass
- * @param {Drawing} _drawing
- * @param {Object} _parameterJSON
- */
 ED.PCIOLCrossSection = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "PCIOLCrossSection";
@@ -29,9 +21,11 @@ ED.PCIOLCrossSection = function(_drawing, _parameterJSON) {
 	// Other parameters
 	this.fixation = 'In-the-bag';
 	this.fx = 1;
+	this.opacity = '1';
+	this.capsulotomy = "None";
 	
 	// Saved parameters
-	this.savedParameterArray = ['fixation', 'fx', 'originX', 'originY'];
+	this.savedParameterArray = ['fixation', 'fx', 'originX', 'originY','opacity','capsulotomy'];
 	
 	// Parameters in doodle control bar
 	this.controlParameterArray = {'fixation':'Fixation'};
@@ -44,7 +38,7 @@ ED.PCIOLCrossSection = function(_drawing, _parameterJSON) {
         'PCIOL': {
             source: ['fixation', 'fx', 'originY'],
             store: [['originX', 'csOriginX']]
-        }
+        },
     };
 }
 
@@ -74,6 +68,18 @@ ED.PCIOLCrossSection.prototype.setPropertyDefaults = function() {
 		kind: 'other',
 		type: 'int',
 		range: [1, 2],
+		animate: false
+	};
+	this.parameterValidationArray['opacity'] = {
+		kind: 'derived',
+		type: 'string',
+		list: ['1', '2', '3', '4'],
+		animate: false
+	};
+	this.parameterValidationArray['capsulotomy'] = {
+		kind: 'derived',
+		type: 'string',
+		list: ['None', 'Diamond', 'Circle'],
 		animate: false
 	};
 	
@@ -135,6 +141,11 @@ ED.PCIOLCrossSection.prototype.dependentParameterValues = function(_parameter, _
 				iris.setSimpleParameter('apexX', newOriginX);
 			}
 			break;
+/*
+		case 'capsulotomy':
+			this.drawing.repaint();
+			break;
+*/
 	}
 
 	return returnArray;
@@ -206,7 +217,32 @@ ED.PCIOLCrossSection.prototype.draw = function(_point) {
 		ctx.strokeStyle = "gray";
 		ctx.lineWidth = 3;
 		ctx.stroke();
+		
+		// opacity
+		if (this.opacity!=='1') {
+			var angle = theta / 4 * parseInt(this.opacity);
+			ctx.beginPath();
+			ctx.strokeStyle="rgba(120,120,120," + (1-1/this.opacity) + ")";
+			ctx.lineCap = "round";
+			ctx.lineWidth = "20";
+			ctx.arc(ld - x - xShift - 5, 0 - this.originY, r, theta, theta-angle, true);
+			ctx.stroke();
+			
+			ctx.beginPath();
+			ctx.arc(ld - x - xShift - 5, 0 - this.originY, r, -theta+angle, -theta, true);
 
+			ctx.stroke();
+		}
+		
+		// capsulotomy
+		if (this.capsulotomy !== "None") {
+			ctx.beginPath();
+			ctx.fillStyle="white"
+			ctx.fillRect(150, -230 - this.originY, 200, 460);
+			ctx.fillStyle = "rgba(255, 255, 255, 0.75)";
+
+		}
+		
 		// Loops
 		ctx.beginPath();
 		if (this.fixation == 'In-the-bag') {	
