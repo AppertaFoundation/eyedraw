@@ -37438,6 +37438,21 @@ ED.MetallicForeignBody.prototype.draw = function(_point) {
 	return this.isClicked;
 }
 
+ED.MetallicForeignBody.prototype.description = function() {
+    var desc = [];
+    if(this.mfb) {
+        desc.push("metallic foreign body");
+    }
+    if(this.rustRing) {
+        desc.push("rust ring");
+    }
+    if(this.coats) {
+        desc.push("coats ring");
+    }
+    desc = desc.join(", ");
+    return desc.charAt(0).toUpperCase() + desc.slice(1);
+};
+
 /**
  * OpenEyes
  *
