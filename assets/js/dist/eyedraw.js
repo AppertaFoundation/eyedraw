@@ -37439,8 +37439,9 @@ ED.MetallicForeignBody.prototype.draw = function(_point) {
 }
 
 ED.MetallicForeignBody.prototype.description = function() {
-    var desc = [];
-    if(this.mfb) {
+    console.log(this.fb, this.rustRing, this.coats);
+	var desc = [];
+    if(this.fb == 1) {
         desc.push("metallic foreign body");
     }
     if(this.rustRing) {
