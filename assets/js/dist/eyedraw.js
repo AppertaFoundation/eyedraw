@@ -42684,6 +42684,7 @@ ED.PostPole.prototype.setPropertyDefaults = function() {
 	this.isMoveable = false;
 	this.isRotatable = false;
 	this.isUnique = true;
+    this.willReport = true;
 
 	// Update component of validation array for simple parameterss
 	var apexX = this.drawing.eye == ED.eye.Right ? 300 : -300;
@@ -42849,7 +42850,13 @@ ED.PostPole.prototype.draw = function(_point) {
  * @returns {String} Description of doodle
  */
 ED.PostPole.prototype.description = function() {
-	return this.drawing.doodleArray.length == 1 ? "No abnormality" : "";
+    var returnValue = "";
+    returnValue += 'Watzke: ' + this.watzke.toLowerCase() + " ";
+
+    if (returnValue.length === 0 && this.drawing.doodleArray.length === 1) {
+        returnValue = "No abnormality";
+	}
+	return returnValue;
 }
 
 /**
