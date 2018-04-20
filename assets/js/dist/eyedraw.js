@@ -42651,8 +42651,11 @@ ED.PostPole = function(_drawing, _parameterJSON) {
 	// Derived parameters
 	this.cdRatio = '0';
 
+    // Other parameters
+    this.watzke = 'Not assessed';
+
 	// Saved parameters
-	this.savedParameterArray = ['apexX', 'apexY'];
+	this.savedParameterArray = ['apexX', 'apexY', 'watzke'];
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -42686,6 +42689,17 @@ ED.PostPole.prototype.setPropertyDefaults = function() {
 	var apexX = this.drawing.eye == ED.eye.Right ? 300 : -300;
 	this.parameterValidationArray['apexX']['range'].setMinAndMax(apexX, apexX);
 	this.parameterValidationArray['apexY']['range'].setMinAndMax(-80, -8);
+
+    this.controlParameterArray = {
+		'watzke': 'Watzke Result'
+	};
+
+    this.parameterValidationArray.watzke = {
+		kind: 'derived',
+		type: 'string',
+		list: ['Not assessed', 'Normal', 'Abnormal'],
+		animate: true
+    };
 
 	// Add complete validation arrays for derived parameters
 	this.parameterValidationArray['cdRatio'] = {
