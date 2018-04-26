@@ -15818,9 +15818,16 @@ ED.AntSegAngleMarks = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "AntSegAngleMarks";
 
+	// Parameters from biometry
+	this.axis = 180; // steep axis
+	this.flatK = 999.9;
+	this.steepK = 999.9;
+	
+	// Calculated parameter
+	this.deltaK = 0;
 	
 	// Saved parameters
-	this.savedParameterArray = [];
+	this.savedParameterArray = ['axis','flatK','steepK','deltaK'];
 	
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -15839,6 +15846,31 @@ ED.AntSegAngleMarks.superclass = ED.Doodle.prototype;
 ED.AntSegAngleMarks.prototype.setPropertyDefaults = function() {
 	this.isSelectable = false;
 	this.addAtBack = true;
+	this.isUnique = true;
+
+	// Add complete validation arrays for derived parameters
+	this.parameterValidationArray['axis'] = {
+		kind: 'derived',
+		type: 'mod',
+		range: new ED.Range(0, 180),
+		clock: 'bottom',
+		animate: true
+	};
+	this.parameterValidationArray['flatK'] = {
+		kind: 'derived',
+		type: 'float',
+		range: new ED.Range(0, 1000),
+		precision: 2,
+		animate: true
+	};
+	this.parameterValidationArray['steepK'] = {
+		kind: 'derived',
+		type: 'float',
+		range: new ED.Range(0, 1000),
+		precision: 2,
+		animate: true
+	};
+
 }
 
 /**
@@ -15924,28 +15956,55 @@ ED.AntSegAngleMarks.prototype.draw = function(_point) {
 			ctx.lineTo(point2.x, point2.y);
 			ctx.fillText(angleDeg + "\xB0",point3.x,point3.y);
 		}
-		
-/*
-		ctx.moveTo(-500,0);
-		ctx.lineTo(500,0);
-*/
-		
+
+		// draw tick marks and label with angle in degrees
 		ctx.stroke();
 		
+		// Indicate Infero-nasal corner of canvas
+		//// ** TO DO ** confirm will always be in corner of canvas - might need to use this.drawing.canvas.width*0.5 etc
+		ctx.beginPath();
 		
+		// Fill triangle in appropriate corner and colour for eye
+		ctx.fillStyle = (this.drawing.eye == ED.eye.Right) ? "green" : "red";
+		var eyeToggle = (this.drawing.eye == ED.eye.Right) ? +1 : -1;
+		ctx.moveTo(300 * eyeToggle,-500);
+		ctx.lineTo(500 * eyeToggle,-500);
+		ctx.lineTo(500 * eyeToggle,-300);
+		ctx.fill();
 		
+		// Label "R" or "L" eye
+		ctx.font="84px Arial";
+		ctx.lineWidth = 3;
+		ctx.strokeStyle = ctx.fillStyle;
+		var eyeText = (this.drawing.eye == ED.eye.Right) ? "R" : "L"
+		ctx.fillText(eyeText,-445 * eyeToggle,-440);		
+		
+		// Label "SN" text in appropriate corner for eye
+		ctx.font="56px Arial";
+		ctx.fillStyle="white";
+		ctx.textAlign="center"; 
+		ctx.textBaseline = "middle";
+		ctx.lineWidth = 3;
+		ctx.strokeStyle = "white";
+		ctx.fillText("SN",440 * eyeToggle,-440);
+
+		// Convert axis from degrees to radians
+		var axisRad = this.axis / 180 * Math.PI;		
+		
+		// Commented out by MSC 05/2018 so will indicate axis for all IOL types, not just the Toric
 		// If toric lens exists, draw flat axis
-		var toricLens = this.drawing.lastDoodleOfClass('ToricPCIOL');
-		if (toricLens) {
-			var phi = 0.7 * Math.PI / 4;
-			var axisRotation = toricLens.rotation + phi - 0.5077 * Math.PI;
+// 		var toricLens = this.drawing.lastDoodleOfClass('ToricPCIOL');
+// 		if (toricLens) {
+// 			var phi = 0.7 * Math.PI / 4;
+// 			var axisRotation = toricLens.rotation + phi - 0.5077 * Math.PI;
 			
+			// Draw steep axis
 			ctx.beginPath();
-			ctx.save();
-			ctx.rotate(axisRotation);
-			
 			ctx.strokeStyle = "blue";
 			ctx.lineWidth = 8;
+		
+			ctx.save();
+			ctx.rotate(-axisRad);
 			
 			var w = 420;
 			var z = Math.round(2 * w / (d*2));
@@ -15953,14 +16012,34 @@ ED.AntSegAngleMarks.prototype.draw = function(_point) {
 				ctx.moveTo(-w + j*d*2, 0);
 				ctx.lineTo(-w + j*d*2 + d, 0);
 			};
-/*
-			ctx.moveTo(-w, 0);
-			ctx.lineTo(w,0);
-*/
 			ctx.stroke();
 			ctx.restore();
-		}		
+// 		}		
 		
+		// Legend - steep axis
+		ctx.beginPath();
+		ctx.moveTo(-495 * eyeToggle, 480);
+		ctx.lineTo(-480 * eyeToggle, 480);
+		ctx.moveTo(-475 * eyeToggle, 480);
+		ctx.lineTo(-460 * eyeToggle, 480);
+		ctx.moveTo(-455 * eyeToggle, 480);
+		ctx.lineTo(-440 * eyeToggle, 480);
+		ctx.stroke();
+		
+		ctx.font="italic 36px Arial";
+		ctx.fillStyle="black";
+		ctx.textAlign="center"; 
+		ctx.textBaseline = "middle";
+		ctx.lineWidth = 3;
+		ctx.strokeStyle = "black";
+		ctx.fillText("Steep axis",-350 * eyeToggle,480);
+		
+		// Write delta K value, if derived from biometry (ie. not default values)
+		if (this.flatK !== 999.9 && this.steepK !== 999.9) {
+			this.calculateDeltaK();
+			ctx.font="bold 44px Arial";
+			ctx.fillText("\u0394 " + this.deltaK + "D",-400 * eyeToggle,430);
+		}
 	}
 
 	// Return value indicating successful hittest
@@ -15968,6 +16047,9 @@ ED.AntSegAngleMarks.prototype.draw = function(_point) {
 }
 
 
+ED.AntSegAngleMarks.prototype.calculateDeltaK = function(_point) {
+	this.deltaK = (this.steepK - this.flatK).toFixed(2);
+}
 
 /**
  * OpenEyes
