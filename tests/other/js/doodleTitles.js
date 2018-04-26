@@ -176,5 +176,6 @@ window.eyedrawDoodleTitles = {
     "Bypass": "Coronary artery bypass",
     "Bruit": "Bruit",
     "Bruising": "Bruising",
-    "Haematoma": "Haematoma"
+    "Haematoma": "Haematoma",
+    "MaculaPostPole": "Macula PostPole"
 };
