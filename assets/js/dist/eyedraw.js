@@ -46182,7 +46182,7 @@ ED.RPEAtrophy = function(_drawing, _parameterJSON) {
 	this.className = "RPEAtrophy";
 	
 	// Saved parameters
-	this.savedParameterArray = ['originX', 'originY', 'scaleX', 'scaleY'];
+	this.savedParameterArray = ['originX', 'originY', 'scaleX', 'scaleY', 'apexX', 'apexY'];
 	
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -46200,7 +46200,22 @@ ED.RPEAtrophy.superclass = ED.Doodle.prototype;
  */
 ED.RPEAtrophy.prototype.setHandles = function() {
 	this.handleArray[2] = new ED.Doodle.Handle(null, true, ED.Mode.Scale, false);
+    this.handleArray[4] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
 }
+
+/**
+ * Sets default dragging attributes
+ */
+ED.RPEAtrophy.prototype.setPropertyDefaults = function() {
+    this.isRotatable = false;
+
+    // Update component of validation array for simple parameters
+    this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +80);
+    this.parameterValidationArray['apexY']['range'].setMinAndMax(-160, +0);
+
+    this.parameterValidationArray['originX']['range'].setMinAndMax(-260-30, 150+30);
+    this.parameterValidationArray['originY']['range'].setMinAndMax(-220-30, 220+30);
+};
 
 /**
  * Sets default parameters (Only called for new doodles)
@@ -46208,6 +46223,30 @@ ED.RPEAtrophy.prototype.setHandles = function() {
  */
 ED.RPEAtrophy.prototype.setParameterDefaults = function() {
 	this.setOriginWithDisplacements(0, -60);
+    this.apexX = 40;
+}
+
+ED.RPEAtrophy.prototype.dependentParameterValues = function(_parameter, _value) {
+    var returnArray = new Array();
+
+    switch (_parameter) {
+        case 'scaleY':
+            var r = 72;
+
+            this.parameterValidationArray['originX']['range'].setMinAndMax(-260-30+r*_value-72, 150+30-r*_value+72);
+            this.parameterValidationArray['originY']['range'].setMinAndMax(-220-30+r*_value-72, 220+30-r*_value+72);
+
+            var newOriginY = this.parameterValidationArray['originY']['range'].constrain(this.originY);
+            var newOriginX = this.parameterValidationArray['originX']['range'].constrain(this.originX);
+
+            this.setSimpleParameter('originX', newOriginX);
+            this.setSimpleParameter('originY', newOriginY);
+
+console.log(-r*_value);
+
+			break;
+    }
+    return returnArray;
 }
 
 /**
@@ -46223,7 +46262,7 @@ ED.RPEAtrophy.prototype.draw = function(_point) {
 	ED.RPEAtrophy.superclass.draw.call(this, _point);
 
 	// Radius
-	var r = 120;
+	var r = 72;
 
 	// Boundary path
 	ctx.beginPath();
@@ -46233,16 +46272,32 @@ ED.RPEAtrophy.prototype.draw = function(_point) {
 
 	// Set attributes
 	ctx.lineWidth = 1;
-	ctx.fillStyle = "rgba(253, 238, 173, 0.75)";
+	ctx.fillStyle = "rgba(255, 255, 255, 0)";
 	ctx.strokeStyle = ctx.fillStyle;
 	
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 
+    // Non boundary paths
+    if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+        // Colours
+        var fill = "rgba(111, 82, 76, " + (0.2+(this.apexX/100)) +")";
+
+        var dr = 10 / this.scaleX;
+
+        var p = new ED.Point(0, 0);
+        var n = 40 + Math.abs(Math.floor(this.apexY / 2));
+        for (var i = 0; i < n; i++) {
+            p.setWithPolars(r * ED.randomArray[i], 2 * Math.PI * ED.randomArray[i + 100]);
+            this.drawSpot(ctx, p.x, p.y, dr, fill);
+        }
+    }
+
 	// Coordinates of handles (in canvas plane)
 	var point = new ED.Point(0, 0);
 	point.setWithPolars(r, Math.PI / 4);
 	this.handleArray[2].location = this.transform.transformPoint(point);
+    this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
