@@ -167,16 +167,20 @@ ED.Drusen.prototype.draw = function(_point) {
         }
 
 		for (var i = 0; i < n; i++) {
-
 			p.setWithPolars(r * ED.randomArray[i], 2 * Math.PI * ED.randomArray[i + 100]);
-			//this.drawSpot(ctx, p.x, p.y, dr, fill);
+
             ctx.save();
             ctx.beginPath();
-            ctx.filter = filter;
             ctx.arc(p.x, p.y, dr, 0, Math.PI * 2, true);
+
+            //Because of performance reasons we do not set the filer while the user dragging
+            if(!this.drawing.mouseIsDown){
+                ctx.filter = filter;
+			}
             ctx.fillStyle = fill;
             ctx.strokeStyle = fill;
             ctx.lineWidth = 0;
+
             ctx.fill();
             ctx.stroke();
 
@@ -207,3 +211,4 @@ ED.Drusen.prototype.description = function() {
 
 	return returnString + "hard drusen";
 }
+
