@@ -112,7 +112,10 @@ ED.MaculaPostPole.prototype.draw = function(_point) {
  */
 ED.MaculaPostPole.prototype.description = function() {
     var returnValue = "";
-    returnValue += 'Watzke: ' + this.watzke.toLowerCase() + " ";
+
+	if(this.watzke !== 'Not assessed'){
+		returnValue += 'Watzke: ' + this.watzke.toLowerCase() + " ";
+	}
 
     if (returnValue.length === 0 && this.drawing.doodleArray.length === 1) {
         returnValue = "No abnormality";
