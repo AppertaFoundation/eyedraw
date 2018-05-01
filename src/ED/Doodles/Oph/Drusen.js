@@ -209,6 +209,6 @@ ED.Drusen.prototype.description = function() {
 	if (this.apexY > -100) returnString = "Moderate numbers of ";
 	if (this.apexY > -50) returnString = "Several ";
 
-	return returnString + "hard drusen";
+	return returnString + this.drusenType.toLowerCase() + " drusen";
 }
 

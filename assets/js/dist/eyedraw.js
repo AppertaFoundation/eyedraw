@@ -27238,12 +27238,13 @@ ED.Drusen.prototype.draw = function(_point) {
         }
 
 		for (var i = 0; i < n; i++) {
-
 			p.setWithPolars(r * ED.randomArray[i], 2 * Math.PI * ED.randomArray[i + 100]);
 
             ctx.save();
             ctx.beginPath();
             ctx.arc(p.x, p.y, dr, 0, Math.PI * 2, true);
+
+            //Because of performance reasons we do not set the filer while the user dragging
             if(!this.drawing.mouseIsDown){
                 ctx.filter = filter;
 			}
@@ -27279,7 +27280,7 @@ ED.Drusen.prototype.description = function() {
 	if (this.apexY > -100) returnString = "Moderate numbers of ";
 	if (this.apexY > -50) returnString = "Several ";
 
-	return returnString + "hard drusen";
+	return returnString + this.drusenType.toLowerCase() + " drusen";
 }
 
 
