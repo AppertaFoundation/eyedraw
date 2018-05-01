@@ -188,5 +188,6 @@ window.eyedrawDoodleScripts = [
     "ED/Doodles/Oph/ViewObscured.js",
     "ED/Doodles/Oph/VisualField.js",
     "ED/Doodles/Oph/VisualFieldChart.js",
-    "ED/Doodles/Oph/VitreousOpacity.js"
+    "ED/Doodles/Oph/VitreousOpacity.js",
+    "ED/Doodles/Oph/MaculaPostPole.js"
 ];

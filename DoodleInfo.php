@@ -228,6 +228,7 @@ class DoodleInfo
         'CornealLaceration' => 'Corneal laceration',
         'MetallicForeignBody' => 'Metallic foreign body',
         'Pingueculum' => 'Pingueculum',
-        'Pterygium' => 'Pterygium'
+        'Pterygium' => 'Pterygium',
+        'MaculaPostPole' => 'Macula (posterior pole)',
     );
 }
