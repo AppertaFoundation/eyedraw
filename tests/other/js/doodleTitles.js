@@ -53,7 +53,7 @@ window.eyedrawDoodleTitles = {
     "DiscPallor": "Disc pallor",
     "DrainageRetinotomy": "Drainage retinotomy",
     "DrainageSite": "Drainage site",
-    "Drusen": "Hard drusen",
+    "Drusen": "Drusen",
     "EncirclingBand": "Encircling band",
     "EntrySiteBreak": "Entry site break",
     "EpiretinalMembrane": "Epiretinal membrane",
