@@ -27189,7 +27189,6 @@ ED.Drusen.prototype.dependentParameterValues = function(_parameter, _value) {
 	}
 
 	return returnArray;
-
 }
 
 /**
@@ -27225,37 +27224,29 @@ ED.Drusen.prototype.draw = function(_point) {
 	// Non boundary paths
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
 		// Colours
-		var fill = "lightgray";
+		var fill = "lightgray",
+			dr, gradient,
+        	base_radius = this.drusenType === 'Soft' ? 25 : ( this.drusenType === 'Confluent' ? 31 : 10);
 
-		var dr = 10 / this.scaleX;
+        var p = new ED.Point(0, 0);
+        var n = 20 + Math.abs(Math.floor(this.apexY / 2));
 
-		var p = new ED.Point(0, 0);
-		var n = 20 + Math.abs(Math.floor(this.apexY / 2));
-		var blur = this.drusenType === 'Hard' ? 0 :(this.drusenType === 'Soft' ? 1 : 2);
-        var filter = 'blur(0px)';
-        if(blur === 1 || blur === 2){
-            filter = 'blur(' + blur + 'px)';
-        }
+        dr = base_radius / this.scaleX;
 
 		for (var i = 0; i < n; i++) {
 			p.setWithPolars(r * ED.randomArray[i], 2 * Math.PI * ED.randomArray[i + 100]);
-
             ctx.save();
             ctx.beginPath();
             ctx.arc(p.x, p.y, dr, 0, Math.PI * 2, true);
 
-            //Because of performance reasons we do not set the filer while the user dragging
-            if(!this.drawing.mouseIsDown){
-                ctx.filter = filter;
-			}
-            ctx.fillStyle = fill;
-            ctx.strokeStyle = fill;
+            gradient = ctx.createRadialGradient(p.x, p.y, (10 / this.scaleX), p.x, p.y, dr);
+            gradient.addColorStop(0, fill);
+            gradient.addColorStop(1, 'rgba(255,255,255,0)');
+            ctx.fillStyle = this.drusenType === 'Hard' ? fill : gradient;
             ctx.lineWidth = 0;
-
             ctx.fill();
             ctx.stroke();
-
-            ctx.restore();
+            ctx.closePath();
 		}
 	}
 
@@ -27282,8 +27273,6 @@ ED.Drusen.prototype.description = function() {
 
 	return returnString + this.drusenType.toLowerCase() + " drusen";
 }
-
-
 /**
  * OpenEyes
  *
