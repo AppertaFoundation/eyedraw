@@ -24,33 +24,35 @@
 		top: 32px;
 		white-space: nowrap;
 		z-index: 103;
-		left: -9999px;
+		display:none;
 	}
 	.left {
 		left: inherit;
-		right:-9999px;
+		display: none;
 	}
 	&:hover {
 		.label {
 			@include transition-delay(0.25s);
 			left: -1px;
+			display: unset;
 		}
 		.left {
 			left: inherit;
 			right: -1px;
+			display: unset;
 		}
 	}
 	&:active, .ed-drawer-open > & {
 		.label {
 			@include transition-delay(0s);
-			left: -9999px;
+			display: none;
 		}
 	}
 	&.disabled {
 		&:hover {
 			.label {
 				@include transition-delay(0s);
-				left: -9999px;
+				display: none;
 			}
 		}
 	}
