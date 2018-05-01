@@ -28804,7 +28804,7 @@ ED.Fuchs.prototype.description = function() {
  * @returns {Int} SnoMed code of entity representated by doodle
  */
 ED.Fuchs.prototype.snomedCode = function() {
-	return 0;
+	return 373424008;
 };
 
 /**
@@ -42176,31 +42176,33 @@ ED.PosteriorCapsule.prototype.draw = function(_point) {
 			}
 		}
 
+		// Pattern
+
+		var ptrn = ctx.createPattern(this.drawing.imageArray['PSCPattern'], 'repeat');
+		
+		if (this.opacity > 1) {ctx.fillStyle = ptrn;}
+		ctx.fill();
+
 		// Opacity
-		if (this.opacity != '1') {
-			// Pattern
-
-			var ptrn = ctx.createPattern(this.drawing.imageArray['PSCPattern'], 'repeat');
-			ctx.fillStyle = ptrn;
-			ctx.fill();
-
-			// Opacity
-			switch (this.opacity) {
-				case '2':
-					ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
-					break;
-				case '3':
-					ctx.fillStyle = "rgba(200, 200, 200, 0.5)";
-					break;
-				case '4':
-					ctx.fillStyle = "rgba(150, 150, 150, 0.5)";
-					break;
-			}
-			ctx.fill();
-			ctx.stroke();
+		switch (this.opacity) {
+			case '1':
+				ctx.fillStyle = "rgba(255, 255, 255, 0.1)";
+				break;
+			case '2':
+				ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
+				break;
+			case '3':
+				ctx.fillStyle = "rgba(200, 200, 200, 0.5)";
+				break;
+			case '4':
+				ctx.fillStyle = "rgba(150, 150, 150, 0.5)";
+				break;
+			default:
+				ctx.fillStyle = "rgba(255, 150, 100, 0.1)";
+				break;
 		}
-
-
+		ctx.fill();
+		ctx.stroke();
 	}
 
 	// Draw handles if selected
