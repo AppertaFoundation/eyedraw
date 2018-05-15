@@ -167,14 +167,15 @@
   top: 32px;
   white-space: nowrap;
   z-index: 103;
+  pointer-events: none;
   display: none;
 }
-/* line 29, ../sass/components/toolbar/_label.scss */
+/* line 30, ../sass/components/toolbar/_label.scss */
 .ed-button .left {
   left: inherit;
   display: none;
 }
-/* line 34, ../sass/components/toolbar/_label.scss */
+/* line 35, ../sass/components/toolbar/_label.scss */
 .ed-button:hover .label {
   -moz-transition-delay: 0.25s;
   -o-transition-delay: 0.25s;
@@ -183,13 +184,13 @@
   left: -1px;
   display: unset;
 }
-/* line 39, ../sass/components/toolbar/_label.scss */
+/* line 40, ../sass/components/toolbar/_label.scss */
 .ed-button:hover .left {
   left: inherit;
   right: -1px;
   display: unset;
 }
-/* line 46, ../sass/components/toolbar/_label.scss */
+/* line 47, ../sass/components/toolbar/_label.scss */
 .ed-button:active .label, .ed-drawer-open > .ed-button .label {
   -moz-transition-delay: 0s;
   -o-transition-delay: 0s;
@@ -197,7 +198,7 @@
   transition-delay: 0s;
   display: none;
 }
-/* line 53, ../sass/components/toolbar/_label.scss */
+/* line 54, ../sass/components/toolbar/_label.scss */
 .ed-button.disabled:hover .label {
   -moz-transition-delay: 0s;
   -o-transition-delay: 0s;
