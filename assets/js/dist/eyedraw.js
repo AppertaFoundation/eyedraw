@@ -15904,6 +15904,8 @@ ED.AntSegAngleMarks.prototype.draw = function(_point) {
 	// Get context
 	var ctx = this.drawing.context;
 
+    ccc = ctx;
+
 	// Call draw method in superclass
 	ED.AntSegAngleMarks.superclass.draw.call(this, _point);
 	
@@ -15988,6 +15990,7 @@ ED.AntSegAngleMarks.prototype.draw = function(_point) {
 		ctx.strokeStyle = "white";
 		ctx.fillText("SN",440 * eyeToggle,-440);
 
+this.axis = 48;
 		// Convert axis from degrees to radians
 		var axisRad = this.axis / 180 * Math.PI;		
 		
@@ -16014,6 +16017,22 @@ ED.AntSegAngleMarks.prototype.draw = function(_point) {
 			};
 			ctx.stroke();
 			ctx.restore();
+
+
+        	var indicator_point = new ED.Point(0,0);
+        	indicator_point.setWithPolars(r+d,2 * Math.PI - axisRad + 0.5*Math.PI);
+
+        	ctx.fillStyle = '#e4edf5';
+        	//ctx.fillStyle = 'white';
+        	ctx.fillRect(indicator_point.x-40,indicator_point.y-15,80,30);
+
+			ctx.font="36px Arial";
+			ctx.fillStyle="black";
+			ctx.textAlign="center";
+			ctx.textBaseline = "middle";
+			ctx.lineWidth = 3;
+			ctx.strokeStyle = "black";
+        	ctx.fillText(axisRad * 180 / Math.PI + "\xB0",indicator_point.x,indicator_point.y);
 // 		}		
 		
 		// Legend - steep axis
