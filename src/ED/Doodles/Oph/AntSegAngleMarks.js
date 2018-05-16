@@ -208,7 +208,7 @@ ED.AntSegAngleMarks.prototype.draw = function(_point) {
 			
 			// Draw steep axis
 			ctx.beginPath();
-			ctx.strokeStyle = "blue";
+			ctx.strokeStyle = "rgb(242, 72, 72)";
 			ctx.lineWidth = 8;
 		
 			ctx.save();
