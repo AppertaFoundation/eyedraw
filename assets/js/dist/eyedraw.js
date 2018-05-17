@@ -15990,7 +15990,7 @@ ED.AntSegAngleMarks.prototype.draw = function(_point) {
 		ctx.strokeStyle = "white";
 		ctx.fillText("SN",440 * eyeToggle,-440);
 
-this.axis = 48;
+this.axis = 310;
 		// Convert axis from degrees to radians
 		var axisRad = this.axis / 180 * Math.PI;		
 		
@@ -16005,10 +16005,10 @@ this.axis = 48;
 			ctx.beginPath();
 			ctx.strokeStyle = "rgb(242, 72, 72)";
 			ctx.lineWidth = 8;
-		
+
 			ctx.save();
 			ctx.rotate(-axisRad);
-			
+
 			var w = 420;
 			var z = Math.round(2 * w / (d*2));
 			for (var j=0; j<z; j++) {
@@ -16018,21 +16018,27 @@ this.axis = 48;
 			ctx.stroke();
 			ctx.restore();
 
+			ctx.save();
+			ctx.beginPath();
 
-        	var indicator_point = new ED.Point(0,0);
-        	indicator_point.setWithPolars(r+d,2 * Math.PI - axisRad + 0.5*Math.PI);
+			var indicator_point = new ED.Point(0,0);
+			indicator_point.setWithPolars(r+d+35,2 * Math.PI - axisRad + 0.5*Math.PI);
 
-        	ctx.fillStyle = '#e4edf5';
-        	//ctx.fillStyle = 'white';
-        	ctx.fillRect(indicator_point.x-40,indicator_point.y-15,80,30);
-
-			ctx.font="36px Arial";
+			ctx.fillStyle = '#e4edf5';
+			ctx.strokeStyle = 'black';
+			//ctx.fillStyle = 'white';
+			ctx.rect(indicator_point.x-50,indicator_point.y-25,100,50);
+			ctx.stroke();
+			ctx.fill();
+			ctx.font="bold 40px Arial";
 			ctx.fillStyle="black";
 			ctx.textAlign="center";
 			ctx.textBaseline = "middle";
 			ctx.lineWidth = 3;
 			ctx.strokeStyle = "black";
-        	ctx.fillText(axisRad * 180 / Math.PI + "\xB0",indicator_point.x,indicator_point.y);
+			ctx.fillText(axisRad * 180 / Math.PI + "\xB0",indicator_point.x,indicator_point.y);
+
+			ctx.restore();
 // 		}		
 		
 		// Legend - steep axis
