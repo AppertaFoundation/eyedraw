@@ -15990,7 +15990,6 @@ ED.AntSegAngleMarks.prototype.draw = function(_point) {
 		ctx.strokeStyle = "white";
 		ctx.fillText("SN",440 * eyeToggle,-440);
 
-this.axis = 310;
 		// Convert axis from degrees to radians
 		var axisRad = this.axis / 180 * Math.PI;		
 		
@@ -16000,7 +15999,7 @@ this.axis = 310;
 // 		if (toricLens) {
 // 			var phi = 0.7 * Math.PI / 4;
 // 			var axisRotation = toricLens.rotation + phi - 0.5077 * Math.PI;
-			
+
 			// Draw steep axis
 			ctx.beginPath();
 			ctx.strokeStyle = "rgb(242, 72, 72)";
