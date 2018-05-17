@@ -87,8 +87,6 @@ ED.RPEAtrophy.prototype.dependentParameterValues = function(_parameter, _value) 
             this.setSimpleParameter('originX', newOriginX);
             this.setSimpleParameter('originY', newOriginY);
 
-console.log(-r*_value);
-
 			break;
     }
     return returnArray;

@@ -211,7 +211,6 @@ class DoodleInfo
         'ViewObscured' => 'View obscured',
         'VitreousOpacity' => 'Vitreous opacity',
         'VPattern' => 'V pattern',
-
         'Crepitations' => 'Crepitations',
         'Stenosis' => 'Stenosis',
         'Wheeze' => 'Wheeze',

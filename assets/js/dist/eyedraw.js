@@ -8784,6 +8784,7 @@ ED.trans['Fuchs'] = 'Drag handle to change shape';
 ED.trans['Geographic'] = 'Drag middle handle to alter size of remaining central island of RPE<br/>Drag outside handle to scale';
 ED.trans['Gonioscopy'] = 'Drag top left handle up and down to alter pigment density<br/>Drag top left handle left and right to alter pigment homogeneity';
 ED.trans['HardDrusen'] = 'Drag middle handle up and down to alter density of drusen<br/>Drag outside handle to scale';
+ED.trans['Drusen'] = 'Drag middle handle up and down to alter density of drusen<br/>Drag outside handle to scale';
 ED.trans['HardExudate'] = 'Drag to position';
 ED.trans['Hyphaema'] = 'Drag handle vertically to change size<br/>Drag handle horizontally to change density';
 ED.trans['Hypopyon'] = 'Drag handle vertically to change size';
@@ -16471,7 +16472,7 @@ ED.AntSynech.prototype.setParameterDefaults = function() {
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.AntSynech.prototype.draw = function(_point) { console.log(this.apexY);
+ED.AntSynech.prototype.draw = function(_point) {
 	// Get context
 	var ctx = this.drawing.context;
 
@@ -46685,8 +46686,6 @@ ED.RPEAtrophy.prototype.dependentParameterValues = function(_parameter, _value) 
 
             this.setSimpleParameter('originX', newOriginX);
             this.setSimpleParameter('originY', newOriginY);
-
-console.log(-r*_value);
 
 			break;
     }
