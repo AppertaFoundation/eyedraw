@@ -230,5 +230,6 @@ class DoodleInfo
         'Pingueculum' => 'Pingueculum',
         'Pterygium' => 'Pterygium',
         'Drusen' => 'Drusen',
+        'MaculaPostPole' => 'Macula (posterior pole)',
     );
 }
