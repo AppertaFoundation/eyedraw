@@ -211,7 +211,6 @@ class DoodleInfo
         'ViewObscured' => 'View obscured',
         'VitreousOpacity' => 'Vitreous opacity',
         'VPattern' => 'V pattern',
-
         'Crepitations' => 'Crepitations',
         'Stenosis' => 'Stenosis',
         'Wheeze' => 'Wheeze',
@@ -229,6 +228,7 @@ class DoodleInfo
         'MetallicForeignBody' => 'Metallic foreign body',
         'Pingueculum' => 'Pingueculum',
         'Pterygium' => 'Pterygium',
+        'Drusen' => 'Drusen',
         'MaculaPostPole' => 'Macula (posterior pole)',
     );
 }
