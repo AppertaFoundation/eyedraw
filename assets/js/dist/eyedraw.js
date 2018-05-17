@@ -15904,6 +15904,8 @@ ED.AntSegAngleMarks.prototype.draw = function(_point) {
 	// Get context
 	var ctx = this.drawing.context;
 
+    ccc = ctx;
+
 	// Call draw method in superclass
 	ED.AntSegAngleMarks.superclass.draw.call(this, _point);
 	
@@ -15997,15 +15999,15 @@ ED.AntSegAngleMarks.prototype.draw = function(_point) {
 // 		if (toricLens) {
 // 			var phi = 0.7 * Math.PI / 4;
 // 			var axisRotation = toricLens.rotation + phi - 0.5077 * Math.PI;
-			
+
 			// Draw steep axis
 			ctx.beginPath();
 			ctx.strokeStyle = "rgb(242, 72, 72)";
 			ctx.lineWidth = 8;
-		
+
 			ctx.save();
 			ctx.rotate(-axisRad);
-			
+
 			var w = 420;
 			var z = Math.round(2 * w / (d*2));
 			for (var j=0; j<z; j++) {
@@ -16013,6 +16015,28 @@ ED.AntSegAngleMarks.prototype.draw = function(_point) {
 				ctx.lineTo(-w + j*d*2 + d, 0);
 			};
 			ctx.stroke();
+			ctx.restore();
+
+			ctx.save();
+			ctx.beginPath();
+
+			var indicator_point = new ED.Point(0,0);
+			indicator_point.setWithPolars(r+d+35,2 * Math.PI - axisRad + 0.5*Math.PI);
+
+			ctx.fillStyle = '#e4edf5';
+			ctx.strokeStyle = 'black';
+			//ctx.fillStyle = 'white';
+			ctx.rect(indicator_point.x-50,indicator_point.y-25,100,50);
+			ctx.stroke();
+			ctx.fill();
+			ctx.font="bold 40px Arial";
+			ctx.fillStyle="black";
+			ctx.textAlign="center";
+			ctx.textBaseline = "middle";
+			ctx.lineWidth = 3;
+			ctx.strokeStyle = "black";
+			ctx.fillText(axisRad * 180 / Math.PI + "\xB0",indicator_point.x,indicator_point.y);
+
 			ctx.restore();
 // 		}		
 		
