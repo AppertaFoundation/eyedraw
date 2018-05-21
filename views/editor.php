@@ -38,7 +38,7 @@
 			</ul>
 			<!-- SELECTED DOODLE -->
 			<div class="ed-selected-doodle">
-				<select class="ed-selected-doodle-select" id="ed_example_selected_doodle" class="ed-selected-doodle-select">
+				<select class="ed-selected-doodle-select cols-full" id="ed_example_selected_doodle">
 				</select>
 			</div>
 		</div>
