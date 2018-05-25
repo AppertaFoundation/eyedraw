@@ -23,13 +23,14 @@
 	padding: 5px;
 	position: absolute;
 	top: 0;
-	z-index: 100;
+	z-index: 102;
 	opacity: 1;
 	// default width, override in the module
 	width: 188px;
 	&.closed {
 		right: 0;
 		opacity: 0;
+		display: none;
 		.ed-button {
 			.label {
 				display: none;

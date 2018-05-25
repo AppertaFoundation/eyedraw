@@ -167,41 +167,44 @@
   top: 32px;
   white-space: nowrap;
   z-index: 103;
-  left: -9999px;
+  pointer-events: none;
+  display: none;
 }
-/* line 29, ../sass/components/toolbar/_label.scss */
+/* line 30, ../sass/components/toolbar/_label.scss */
 .ed-button .left {
   left: inherit;
-  right: -9999px;
+  display: none;
 }
-/* line 34, ../sass/components/toolbar/_label.scss */
+/* line 35, ../sass/components/toolbar/_label.scss */
 .ed-button:hover .label {
   -moz-transition-delay: 0.25s;
   -o-transition-delay: 0.25s;
   -webkit-transition-delay: 0.25s;
   transition-delay: 0.25s;
   left: -1px;
+  display: unset;
 }
-/* line 38, ../sass/components/toolbar/_label.scss */
+/* line 40, ../sass/components/toolbar/_label.scss */
 .ed-button:hover .left {
   left: inherit;
   right: -1px;
+  display: unset;
 }
-/* line 44, ../sass/components/toolbar/_label.scss */
+/* line 47, ../sass/components/toolbar/_label.scss */
 .ed-button:active .label, .ed-drawer-open > .ed-button .label {
   -moz-transition-delay: 0s;
   -o-transition-delay: 0s;
   -webkit-transition-delay: 0s;
   transition-delay: 0s;
-  left: -9999px;
+  display: none;
 }
-/* line 51, ../sass/components/toolbar/_label.scss */
+/* line 54, ../sass/components/toolbar/_label.scss */
 .ed-button.disabled:hover .label {
   -moz-transition-delay: 0s;
   -o-transition-delay: 0s;
   -webkit-transition-delay: 0s;
   transition-delay: 0s;
-  left: -9999px;
+  display: none;
 }
 
 /* line 20, ../sass/components/_icons.scss */
@@ -1792,7 +1795,7 @@ span.squiggle {
   padding: 5px;
   position: absolute;
   top: 0;
-  z-index: 100;
+  z-index: 102;
   opacity: 1;
   width: 188px;
 }
@@ -1800,33 +1803,34 @@ span.squiggle {
 .ed-doodle-popup.closed {
   right: 0;
   opacity: 0;
+  display: none;
 }
-/* line 34, ../sass/components/_doodle-popup.scss */
+/* line 35, ../sass/components/_doodle-popup.scss */
 .ed-doodle-popup.closed .ed-button .label {
   display: none;
 }
-/* line 39, ../sass/components/_doodle-popup.scss */
+/* line 40, ../sass/components/_doodle-popup.scss */
 .ed-doodle-popup.left {
   border-width: 1px 0px 1px 1px;
 }
 
-/* line 45, ../sass/components/_doodle-popup.scss */
+/* line 46, ../sass/components/_doodle-popup.scss */
 .ed-doodle-popup-toolbar li {
   margin-bottom: 0;
   margin-right: 4px;
   width: 32px;
   height: 32px;
 }
-/* line 50, ../sass/components/_doodle-popup.scss */
+/* line 51, ../sass/components/_doodle-popup.scss */
 .sub-element .ed-doodle-popup-toolbar li {
   margin-right: 1px;
 }
-/* line 53, ../sass/components/_doodle-popup.scss */
+/* line 54, ../sass/components/_doodle-popup.scss */
 .ed-doodle-popup-toolbar li:last-child {
   margin-right: 0;
 }
 
-/* line 59, ../sass/components/_doodle-popup.scss */
+/* line 60, ../sass/components/_doodle-popup.scss */
 .ed-doodle-description {
   color: #444;
   font-size: 11px;
@@ -1835,42 +1839,42 @@ span.squiggle {
   padding: 12px 0 6px 0;
 }
 
-/* line 67, ../sass/components/_doodle-popup.scss */
+/* line 68, ../sass/components/_doodle-popup.scss */
 .ed-doodle-controls {
   max-height: 294px;
   overflow: auto;
 }
-/* line 70, ../sass/components/_doodle-popup.scss */
+/* line 71, ../sass/components/_doodle-popup.scss */
 .ed-doodle-controls > div {
   line-height: 12px;
   padding-bottom: 8px;
 }
-/* line 74, ../sass/components/_doodle-popup.scss */
+/* line 75, ../sass/components/_doodle-popup.scss */
 .ed-doodle-controls > div:first-child {
   margin-top: 14px;
 }
-/* line 78, ../sass/components/_doodle-popup.scss */
+/* line 79, ../sass/components/_doodle-popup.scss */
 .ed-doodle-controls label {
   color: #477792;
   float: left;
   font-size: 12px;
   margin: 0 6px 0 0;
 }
-/* line 83, ../sass/components/_doodle-popup.scss */
+/* line 84, ../sass/components/_doodle-popup.scss */
 .ed-doodle-controls label:after {
   content: ":";
 }
-/* line 86, ../sass/components/_doodle-popup.scss */
+/* line 87, ../sass/components/_doodle-popup.scss */
 .ed-doodle-controls label .validation-msg {
   color: red;
   padding-left: 5px;
 }
-/* line 91, ../sass/components/_doodle-popup.scss */
+/* line 92, ../sass/components/_doodle-popup.scss */
 .ed-doodle-controls select {
   width: auto;
 }
 
-/* line 96, ../sass/components/_doodle-popup.scss */
+/* line 97, ../sass/components/_doodle-popup.scss */
 .combo div {
   float: left;
 }
