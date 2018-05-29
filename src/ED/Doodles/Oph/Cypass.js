@@ -15,7 +15,7 @@
  */
 
 /**
- * Chandelier (single)
+ * Cypass (single)
  *
  * @class Cypass
  * @property {String} className Name of doodle subclass
@@ -60,6 +60,7 @@ ED.Cypass.superclass = ED.Doodle.prototype;
 ED.Cypass.prototype.setPropertyDefaults = function() {
     this.isScaleable = false;
     this.isMoveable = false;
+    this.isUnique = true;
 
     this.parameterValidationArray['miotic'] = {
         kind: 'derived',
@@ -177,20 +178,16 @@ ED.Cypass.prototype.draw = function(_point) {
 };
 
 /**
- * Returns a String which, if not empty, determines the root descriptions of multiple instances of the doodle
- *
- * @returns {String} Group description
- */
-ED.Cypass.prototype.groupDescription = function() {
-	return "Chandelier at ";
-};
-
-/**
  * Returns a string containing a text description of the doodle
  *
  * @returns {String} Description of doodle
  */
 ED.Cypass.prototype.description = function() {
-	// Location (clockhours)
-	return this.clockHour() + " o'clock";
+	var desc = '';
+
+    desc += "Miotic: " + this.miotic + "\n";
+    desc += "Viscoelastic: " + this.viscoelastic + "\n";
+    desc += "Complication: " + this.complication + "\n";
+
+    return desc;
 };
