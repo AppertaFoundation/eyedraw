@@ -25839,8 +25839,19 @@ ED.Cypass = function(_drawing, _parameterJSON) {
 	// Private parameters
 	this.limbus = -400;
 
+    // Derived parameters
+    this.miotic = 'Miochol';
+    this.viscoelastic = 'Viscoelastic';
+    this.complication = 'Haemorrhage +';
+
 	// Saved parameters
-	this.savedParameterArray = ['rotation', 'radius'];
+	this.savedParameterArray = ['rotation', 'radius', 'miotic', 'viscoelastic', 'complication'];
+
+    this.controlParameterArray = {
+        'miotic':'Miotic',
+        'viscoelastic':'Viscoelastic',
+        'complication':'Complication',
+    };
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -25859,6 +25870,27 @@ ED.Cypass.superclass = ED.Doodle.prototype;
 ED.Cypass.prototype.setPropertyDefaults = function() {
     this.isScaleable = false;
     this.isMoveable = false;
+
+    this.parameterValidationArray['miotic'] = {
+        kind: 'derived',
+        type: 'string',
+        list: ['Miochol', 'Carbachol', 'Pilocarpine 2%'],
+        animate: true
+    };
+
+    this.parameterValidationArray['viscoelastic'] = {
+        kind: 'derived',
+        type: 'string',
+        list: ['Viscoelastic'],
+        animate: true
+    };
+
+    this.parameterValidationArray['complication'] = {
+        kind: 'derived',
+        type: 'string',
+        list: ['Haemorrhage +', 'Haemorrhage ++', 'Haemorrhage +++'],
+        animate: true
+    };
 }
 
 /**
@@ -25876,6 +25908,10 @@ ED.Cypass.prototype.setParameterDefaults = function() {
 	}
 
     this.parameterValidationArray['radius']['range'].setMinAndMax(415, 480);
+
+    this.setParameterFromString('miotic', 'Miochol');
+    this.setParameterFromString('viscoelastic', 'Viscoelastic');
+    this.setParameterFromString('complication', 'Haemorrhage +');
 }
 
 /**
@@ -25904,6 +25940,14 @@ ED.Cypass.prototype.draw = function(_point) {
 		var ring = {w: 14, h: 36},
             ringDistance = 19;
 
+		//Corneal incision
+        ctx.beginPath();
+        ctx.moveTo(360,-60);
+        ctx.lineTo(360,60);
+        ctx.strokeStyle = "rgba(0, 0, 0, 1)";
+        ctx.stroke();
+        ctx.closePath();
+
 		// Body
 		ctx.beginPath();
 
@@ -25911,9 +25955,6 @@ ED.Cypass.prototype.draw = function(_point) {
         ctx.rect(-200-(r), -10, 300, 20);
 
         //rings
-        /*ctx.rect(36-(r), -18, ring.w, ring.h);
-        ctx.rect(57-(r), -18, ring.w, ring.h);
-        ctx.rect(78-(r), -18, ring.w, ring.h);*/
         for (var i = 1; i < 4; i++) {
             ctx.rect( (99-(r)-5) - (i*ringDistance), -18, ring.w, ring.h);
         }
@@ -25939,12 +25980,11 @@ ED.Cypass.prototype.draw = function(_point) {
         ctx.rect(-200-(r), -15, 300, 30);
         ctx.fillStyle = "rgba(0, 0, 0, 0)";
         ctx.fill();
-
 	}
 
 	// Return value indicating successful hittest
 	return this.isClicked;
-}
+};
 
 /**
  * Returns a String which, if not empty, determines the root descriptions of multiple instances of the doodle
@@ -25953,7 +25993,7 @@ ED.Cypass.prototype.draw = function(_point) {
  */
 ED.Cypass.prototype.groupDescription = function() {
 	return "Chandelier at ";
-}
+};
 
 /**
  * Returns a string containing a text description of the doodle
@@ -25963,7 +26003,7 @@ ED.Cypass.prototype.groupDescription = function() {
 ED.Cypass.prototype.description = function() {
 	// Location (clockhours)
 	return this.clockHour() + " o'clock";
-}
+};
 
 /**
  * OpenEyes
