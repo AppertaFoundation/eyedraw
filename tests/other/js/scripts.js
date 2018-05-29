@@ -83,6 +83,7 @@ window.eyedrawScripts = [
     "ED/Doodles/Oph/CottonWoolSpot.js",
     "ED/Doodles/Oph/Cryo.js",
     "ED/Doodles/Oph/CutterPI.js",
+    "ED/Doodles/Oph/Cypass.js",
     "ED/Doodles/Oph/CystoidMacularOedema.js",
     "ED/Doodles/Oph/DiabeticNV.js",
     "ED/Doodles/Oph/Dialysis.js",
