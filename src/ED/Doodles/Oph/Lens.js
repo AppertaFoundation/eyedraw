@@ -282,6 +282,13 @@ ED.Lens.prototype.draw = function(_point) {
 				p.setWithPolars(rc, a);
 				this.drawCircle(ctx, p.x, p.y, sr, "rgba(200,200,255,1)", 4, "rgba(200,200,255,1)");
 			}
+
+			//Blue dots
+            for (var a = 0; a < 2 * Math.PI; a += Math.PI / 6) {
+                var p = new ED.Point(0, 0);
+                p.setWithPolars(rc+72, a);
+                this.drawCircle(ctx, p.x, p.y, sr+5, "rgba(168,194,218,1)", 4, "rgba(168,194,218,1)");
+            }
 		}
 
 		// Anterior Polar
