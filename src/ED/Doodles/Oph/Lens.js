@@ -34,11 +34,12 @@ ED.Lens = function(_drawing, _parameterJSON) {
 	this.anteriorPolar = false;
 	this.posteriorPolar = false;
 	this.coronary = false;
+	this.blueDot = false;
 	this.phakodonesis = false;
 	this.csOriginX = 0;
 
 	// Saved parameters
-	this.savedParameterArray = ['rotation', 'originX', 'originY', 'nuclearGrade', 'corticalGrade', 'posteriorSubcapsularGrade', 'anteriorPolar', 'posteriorPolar', 'coronary', 'phakodonesis', 'csOriginX'];
+	this.savedParameterArray = ['rotation', 'originX', 'originY', 'nuclearGrade', 'corticalGrade', 'posteriorSubcapsularGrade', 'anteriorPolar', 'posteriorPolar', 'coronary', 'phakodonesis','blueDot', 'csOriginX'];
 
 	// Parameters in doodle control bar (parameter name: parameter label)
 	this.controlParameterArray = {
@@ -49,6 +50,7 @@ ED.Lens = function(_drawing, _parameterJSON) {
 		'posteriorPolar':'Posterior polar',
 		'coronary':'Coronary',
 		'phakodonesis':'Phacodonesis',
+        'blueDot':'Blue Dot',
 		};
 
 	// Call superclass constructor
@@ -106,6 +108,12 @@ ED.Lens.prototype.setPropertyDefaults = function() {
 		type: 'bool',
 		display: false
 	};
+	this.parameterValidationArray['blueDot'] = {
+		kind: 'derived',
+		type: 'bool',
+		display: false
+	};
+
 	this.parameterValidationArray['phakodonesis'] = {
 		kind: 'derived',
 		type: 'bool',
@@ -270,11 +278,11 @@ ED.Lens.prototype.draw = function(_point) {
 		}
 
 		// Coronary cataracts
+        // Spot data
+        var rc = 130;
+        var sr = 10;
+        var inc = Math.PI / 8;
 		if (this.coronary) {
-			// Spot data
-			var rc = 130;
-			var sr = 10;
-			var inc = Math.PI / 8;
 
 			// Iterate through radius and angle to draw spots
 			for (var a = 0; a < 2 * Math.PI; a += inc) {
@@ -282,8 +290,10 @@ ED.Lens.prototype.draw = function(_point) {
 				p.setWithPolars(rc, a);
 				this.drawCircle(ctx, p.x, p.y, sr, "rgba(200,200,255,1)", 4, "rgba(200,200,255,1)");
 			}
+		}
 
-			//Blue dots
+        //Blue dots
+		if(this.blueDot){
             for (var a = 0; a < 2 * Math.PI; a += Math.PI / 6) {
                 var p = new ED.Point(0, 0);
                 p.setWithPolars(rc+72, a);
@@ -384,6 +394,11 @@ ED.Lens.prototype.description = function() {
 		returnValue += returnValue.length > 0?", ":"";
 		returnValue += 'Coronary cataract';
 	}
+	if (this.blueDot) {
+		returnValue += returnValue.length > 0?", ":"";
+		returnValue += 'Blue dot cataract';
+	}
+
 	if (this.anteriorPolar) {
 		returnValue += returnValue.length > 0?", ":"";
 		returnValue += 'Anterior polar cataract';
