@@ -46,6 +46,7 @@ window.eyedrawDoodleTitles = {
     "CorticalCataract": "Cortical cataract",
     "CottonWoolSpot": "Cotton wool spot",
     "Cryo": "Cryotherapy scar",
+    "Cypass": "Cypass",
     "CutterPI": "Cutter iridectomy",
     "CystoidMacularOedema": "Cystoid macular oedema",
     "DiabeticNV": "Diabetic new vessels",
