@@ -25900,13 +25900,7 @@ ED.Cypass.prototype.setPropertyDefaults = function() {
 ED.Cypass.prototype.setParameterDefaults = function() {
 
     this.radius = 462;
-    this.setRotationWithDisplacements(315, 0);
-	
-	// Position over SidePort if present
-	var doodle = this.drawing.lastDoodleOfClass("SidePort");
-	if (doodle) {
-		this.rotation = doodle.rotation;
-	}
+    this.setRotationWithDisplacements(315, 270);
 
     this.parameterValidationArray['radius']['range'].setMinAndMax(415, 480);
 
@@ -25998,6 +25992,7 @@ ED.Cypass.prototype.description = function() {
     desc += "Miotic: " + this.miotic + "\n";
     desc += "Viscoelastic: " + this.viscoelastic + "\n";
     desc += "Complication: " + this.complication + "\n";
+    desc += "Cypass stent at " + this.clockHour(-3) + " o'clock";
 
     return desc;
 };
