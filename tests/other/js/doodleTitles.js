@@ -108,6 +108,7 @@ window.eyedrawDoodleTitles = {
     "Papilloedema": "Papilloedema",
     "Patch": "Tube patch",
     "PCIOL": "Posterior chamber IOL",
+    "PCV": "Polypoidal Choroidal Vascularisation",
     "PeripapillaryAtrophy": "Peripapillary atrophy",
     "PeripheralRetinectomy": "Peripheral retinectomy",
     "PhakoIncision": "Phako incision",

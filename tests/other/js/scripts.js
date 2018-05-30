@@ -141,6 +141,7 @@ window.eyedrawScripts = [
     "ED/Doodles/Oph/OpticDisc.js",
     "ED/Doodles/Oph/OpticDiscPit.js",
     "ED/Doodles/Oph/PCIOL.js",
+    "ED/Doodles/Oph/PCV.js",
     "ED/Doodles/Oph/PI.js",
     "ED/Doodles/Oph/PRPPostPole.js",
     "ED/Doodles/Oph/Papilloedema.js",
