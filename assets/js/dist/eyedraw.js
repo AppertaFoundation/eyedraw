@@ -27275,6 +27275,210 @@ ED.DrainageSite.prototype.description = function() {
  */
 
 /**
+ * Hard Drusen
+ *
+ * @class Drusen
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Object} _parameterJSON
+ */
+ED.Drusen = function(_drawing, _parameterJSON) {
+	// Set classname
+	this.className = "Drusen";
+
+    this.drusenType = 'Hard';
+    this.blur = 0;
+
+	// Saved parameters
+	this.savedParameterArray = ['apexY', 'scaleX', 'scaleY', 'drusenType', 'blur'];
+
+    this.controlParameterArray = {
+        'drusenType':'Drusen type'
+    }
+
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _parameterJSON);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.Drusen.prototype = new ED.Doodle;
+ED.Drusen.prototype.constructor = ED.Drusen;
+ED.Drusen.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.Drusen.prototype.setHandles = function() {
+	this.handleArray[2] = new ED.Doodle.Handle(null, true, ED.Mode.Scale, false);
+	this.handleArray[4] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
+}
+
+/**
+ * Sets default dragging attributes
+ */
+ED.Drusen.prototype.setPropertyDefaults = function() {
+	this.isMoveable = false;
+	this.isRotatable = false;
+	this.isUnique = true;
+
+	// Update component of validation array for simple parameters
+	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
+	this.parameterValidationArray['apexY']['range'].setMinAndMax(-160, +0);
+	this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.5, +1.5);
+	this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.5, +1.5);
+
+    this.parameterValidationArray.drusenType = {
+        kind: 'derived',
+        type: 'string',
+        list: ['Hard', 'Soft', 'Confluent'],
+    };
+}
+
+/**
+ * Sets default parameters (Only called for new doodles)
+ * Use the setParameter function for derived parameters, as this will also update dependent variables
+ */
+ED.Drusen.prototype.setParameterDefaults = function() {
+	// Hard drusen is displaced for Fundus, central for others
+	if (this.drawing.hasDoodleOfClass('Fundus')) {
+		this.originX = this.drawing.eye == ED.eye.Right ? -100 : 100;
+		this.scaleX = 0.5;
+		this.scaleY = 0.5;
+	}
+
+    this.setParameterFromString('drusenType', 'Hard');
+}
+
+/**
+ * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
+ * The returned parameters are animated if the 'animate' property in the parameterValidationArray is set to true
+ *
+ * @param {String} _parameter Name of parameter that has changed
+ * @value {Undefined} _value Value of parameter to calculate
+ * @returns {Array} Associative array of values of dependent parameters
+ */
+ED.Drusen.prototype.dependentParameterValues = function(_parameter, _value) {
+    var returnArray = new Array();
+
+    switch (_parameter) {
+        case 'drusenType':
+            switch (_value) {
+                case 'Hard':
+                    returnArray.blur = 0;
+                    break;
+                case 'Soft':
+                    returnArray.blur = 1;
+                    break;
+                case 'Confluent':
+                    returnArray.blur = 2;
+                    break;
+            }
+	}
+
+	return returnArray;
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.Drusen.prototype.draw = function(_point) {
+	// Get context
+	var ctx = this.drawing.context;
+
+	// Call draw method in superclass
+	ED.Drusen.superclass.draw.call(this, _point);
+
+	// Boundary path
+	ctx.beginPath();
+
+	// Invisible boundary
+	var r = 200;
+	ctx.arc(0, 0, r, 0, Math.PI * 2, true);
+
+	// Close path
+	ctx.closePath();
+
+	// Set line attributes
+	ctx.lineWidth = 0;
+	ctx.fillStyle = "rgba(0, 0, 0, 0)";
+	ctx.strokeStyle = "rgba(0, 0, 0, 0)";
+
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+
+	// Non boundary paths
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+		// Colours
+		var fill = "lightgray",
+			dr, gradient,
+        	base_radius = this.drusenType === 'Soft' ? 25 : ( this.drusenType === 'Confluent' ? 31 : 10);
+
+        var p = new ED.Point(0, 0);
+        var n = 20 + Math.abs(Math.floor(this.apexY / 2));
+
+        dr = base_radius / this.scaleX;
+
+		for (var i = 0; i < n; i++) {
+			p.setWithPolars(r * ED.randomArray[i], 2 * Math.PI * ED.randomArray[i + 100]);
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, dr, 0, Math.PI * 2, true);
+
+            gradient = ctx.createRadialGradient(p.x, p.y, (10 / this.scaleX), p.x, p.y, dr);
+            gradient.addColorStop(0, fill);
+            gradient.addColorStop(1, 'rgba(255,255,255,0)');
+            ctx.fillStyle = this.drusenType === 'Hard' ? fill : gradient;
+            ctx.lineWidth = 0;
+            ctx.fill();
+            ctx.stroke();
+            ctx.closePath();
+		}
+	}
+
+	// Coordinates of handles (in canvas plane)
+	this.handleArray[2].location = this.transform.transformPoint(new ED.Point(r * 0.7, -r * 0.7));
+	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
+
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.Drusen.prototype.description = function() {
+	var returnString = "Signficant numbers of ";
+	if (this.apexY > -100) returnString = "Moderate numbers of ";
+	if (this.apexY > -50) returnString = "Several ";
+
+	return returnString + this.drusenType.toLowerCase() + " drusen";
+}
+/**
+ * OpenEyes
+ *
+ * Copyright (C) OpenEyes Foundation, 2011-2017
+ * This file is part of OpenEyes.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package OpenEyes
+ * @link http://www.openeyes.org.uk
+ * @author OpenEyes <info@openeyes.org.uk>
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
+ */
+
+/**
  * EncirclingBand buckle
  *
  * @class EncirclingBand
@@ -36233,6 +36437,132 @@ ED.Macroaneurysm.prototype.snomedCode = function() {
  */
 
 /**
+ * MaculaPostPole template with disc and arcades
+ *
+ * @class MaculaPostPole
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Object} _parameterJSON
+ */
+ED.MaculaPostPole = function(_drawing, _parameterJSON) {
+	// Set classname
+	this.className = "MaculaPostPole";
+
+    // Other parameters
+    this.watzke = 'Not assessed';
+
+	// Saved parameters
+	this.savedParameterArray = ['watzke'];
+
+    this.controlParameterArray = {
+        'watzke': 'Watzke Result'
+    };
+
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _parameterJSON);
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.MaculaPostPole.prototype = new ED.Doodle;
+ED.MaculaPostPole.prototype.constructor = ED.MaculaPostPole;
+ED.MaculaPostPole.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.MaculaPostPole.prototype.setHandles = function() {}
+
+/**
+ * Set default properties
+ */
+ED.MaculaPostPole.prototype.setPropertyDefaults = function() {
+	this.isDeletable = false;
+	this.isScaleable = false;
+	this.isMoveable = false;
+	this.isRotatable = false;
+	this.isUnique = true;
+    this.willReport = true;
+    this.inFrontOfClassArray = ['PostPole'];
+
+    this.parameterValidationArray.watzke = {
+		kind: 'derived',
+		type: 'string',
+		list: ['Not assessed', 'Normal', 'Abnormal'],
+		animate: true
+    };
+}
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.MaculaPostPole.prototype.draw = function(_point) {
+	// Get context
+	var ctx = this.drawing.context;
+    var foveaX = 0;
+
+	// Call draw method in superclass
+	ED.MaculaPostPole.superclass.draw.call(this, _point);
+
+	// Disc location
+	var x = this.drawing.eye == ED.eye.Right ? 300 : -300;
+
+	// Boundary path
+	ctx.beginPath();
+
+	// Set attributes
+	ctx.lineWidth = 4;
+	ctx.strokeStyle = "rgba(249,187,76,0)";
+	ctx.fillStyle = "rgba(249,187,76,0)";
+
+	ctx.arc(0,0,20,0,2*Math.PI,true);
+
+    // Draw boundary path (also hit testing)
+    this.drawBoundary(_point);
+
+	// Return value indicating successful hittest
+	return this.isClicked;
+}
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.MaculaPostPole.prototype.description = function() {
+    var returnValue = "";
+
+	if(this.watzke !== 'Not assessed'){
+		returnValue += 'Watzke: ' + this.watzke.toLowerCase() + " ";
+	}
+
+    if (returnValue.length === 0 && this.drawing.doodleArray.length === 1) {
+        returnValue = "No abnormality";
+	}
+
+	return returnValue;
+}
+
+/**
+ * OpenEyes
+ *
+ * Copyright (C) OpenEyes Foundation, 2011-2017
+ * This file is part of OpenEyes.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package OpenEyes
+ * @link http://www.openeyes.org.uk
+ * @author OpenEyes <info@openeyes.org.uk>
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
+ */
+
+/**
  * Blot Haemorrhage
  *
  * @class MacularDystrophy
@@ -40615,6 +40945,178 @@ ED.PCIOLCrossSection.prototype.draw = function(_point) {
 	return this.isClicked;
 }
 
+/**
+ * OpenEyes
+ *
+ * Copyright (C) OpenEyes Foundation, 2011-2017
+ * This file is part of OpenEyes.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package OpenEyes
+ * @link http://www.openeyes.org.uk
+ * @author OpenEyes <info@openeyes.org.uk>
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
+ */
+
+/**
+ * Corneal Oedema
+ *
+ * @class PCV
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Object} _parameterJSON
+ */
+ED.PCV = function(_drawing, _parameterJSON) {
+    // Set classname
+    this.className = "PCV";
+
+    this.savedParameterArray = ['originX', 'originY', 'scaleX', 'scaleY'];
+
+    // Call superclass constructor
+    ED.Doodle.call(this, _drawing, _parameterJSON);
+};
+
+/**
+ * Sets superclass and constructor
+ */
+ED.PCV.prototype = new ED.Doodle;
+ED.PCV.prototype.constructor = ED.PCV;
+ED.PCV.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.PCV.prototype.setHandles = function() {
+    this.handleArray[2] = new ED.Doodle.Handle(null, true, ED.Mode.Scale, false);
+};
+
+/**
+ * Sets default properties
+ */
+ED.PCV.prototype.setPropertyDefaults = function() {
+    this.isRotatable = false;
+    this.isUnique = true;
+
+    this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.5, +1.2);
+    this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.5, +1.2);
+
+    this.parameterValidationArray['originY']['range'].setMinAndMax(-300 + 175, +300 - 175);
+    this.parameterValidationArray['originX']['range'].setMinAndMax(-300+ 175 , +300 - 175);
+
+};
+
+ED.PCV.prototype.setParameterDefaults = function() {
+    this.scaleY = 1.2;
+    this.scaleX = 1.2;
+};
+
+/**
+ * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
+ * The returned parameters are animated if their 'animate' property is set to true
+ *
+ * @param {String} _parameter Name of parameter that has changed
+ * @value {Undefined} _value Value of parameter to calculate
+ * @returns {Array} Associative array of values of dependent parameters
+ */
+ED.PCV.prototype.dependentParameterValues = function(_parameter, _value) {
+    console.log('dependentParameterValues:', _parameter,_value);
+
+    var returnArray = [];
+
+    var r = 175;
+    switch (_parameter) {
+        case 'scaleX':
+        case 'scaleY':
+            this.parameterValidationArray['originX']['range'].setMinAndMax(-300+(r*_value), 300-(r*_value));
+            this.parameterValidationArray['originY']['range'].setMinAndMax(-300+(r*_value), 300-(r*_value));
+
+            var newOriginY = this.parameterValidationArray['originY']['range'].constrain(this.originY);
+            var newOriginX = this.parameterValidationArray['originX']['range'].constrain(this.originX);
+
+            this.setSimpleParameter('originX', newOriginX);
+            this.setSimpleParameter('originY', newOriginY);
+
+            break;
+    }
+
+    return returnArray;
+};
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.PCV.prototype.draw = function(_point) {
+
+    // Get context
+    var ctx = this.drawing.context;
+
+    // Call draw method in superclass
+    ED.PCV.superclass.draw.call(this, _point);
+
+    // Boundary path
+    ctx.beginPath();
+
+    // Invisible boundary
+    var r = 200;
+    ctx.arc(0, 0, r, 0, Math.PI * 2, true);
+
+    // Set line attributes
+    ctx.lineWidth = 0;
+    ctx.fillStyle = "rgba(0, 0, 0, 0)";
+    ctx.strokeStyle = "rgba(0, 0, 0, 0)";
+    ctx.closePath();
+
+    this.drawBoundary(_point);
+
+
+    // Non boundary paths
+    if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+
+        var angle = Math.PI / 180;
+        var angles = [33, 64 , 121, 153, 200, 232, 305, 338];
+        var blood_color = 'rgba(188, 25, 0, 1)';
+
+        ctx.beginPath();
+        for (var i = 0; i < 8; i++) {
+            var blob = new ED.Point(0, 0);
+            blob.setWithPolars(155, angle * angles[i]);
+            this.drawSpot(ctx, blob.x, blob.y, 20, blood_color);
+
+            ctx.moveTo(0,0);
+            //Bezier Curve to draw squiggly blood vessels - maybe later
+            ctx.bezierCurveTo(0,0,0,0,blob.x, blob.y);
+            ctx.lineWidth = 5;
+            ctx.strokeStyle = blood_color;
+            ctx.stroke();
+        }
+
+        this.drawSpot(ctx, 0, 0, 100, "rgba(188, 25, 0, 1)");
+    }
+
+
+    // Coordinates of handles (in canvas plane)
+    this.handleArray[2].location = this.transform.transformPoint(new ED.Point(r * 0.7, -r * 0.7));
+
+    // Draw handles if selected
+    if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+
+    // Return value indicating successful hittest
+    return this.isClicked;
+};
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.PCV.prototype.description = function() {
+    return "PCV";
+}
 /**
  * OpenEyes
  *

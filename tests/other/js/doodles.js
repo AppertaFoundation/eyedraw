@@ -34,6 +34,7 @@ window.eyedrawDoodleScripts = [
     "ED/Doodles/Oph/AngleRecession.js",
     "ED/Doodles/Oph/AntPVR.js",
     "ED/Doodles/Oph/AntSeg.js",
+    "ED/Doodles/Oph/AntSegAngleMarks.js",
     "ED/Doodles/Oph/AntSegCrossSection.js",
     "ED/Doodles/Oph/AntSynech.js",
     "ED/Doodles/Oph/AnteriorCapsulotomy.js",
@@ -127,6 +128,7 @@ window.eyedrawDoodleScripts = [
     "ED/Doodles/Oph/OpticDisc.js",
     "ED/Doodles/Oph/OpticDiscPit.js",
     "ED/Doodles/Oph/PCIOL.js",
+    "ED/Doodles/Oph/PCV.js",
     "ED/Doodles/Oph/PI.js",
     "ED/Doodles/Oph/PRPPostPole.js",
     "ED/Doodles/Oph/Papilloedema.js",
@@ -189,5 +191,8 @@ window.eyedrawDoodleScripts = [
     "ED/Doodles/Oph/ViewObscured.js",
     "ED/Doodles/Oph/VisualField.js",
     "ED/Doodles/Oph/VisualFieldChart.js",
-    "ED/Doodles/Oph/VitreousOpacity.js"
+    "ED/Doodles/Oph/VitreousOpacity.js",
+    "ED/Doodles/Oph/Drusen.js",
+    "ED/Doodles/Oph/MaculaPostPole.js",
+    "ED/Doodles/Oph/MaculaPostPole.js"
 ];

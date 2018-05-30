@@ -12,6 +12,7 @@ window.eyedrawDoodleTitles = {
     "AngleRecession": "Angle recession",
     "AntPVR": "Anterior PVR",
     "AntSeg": "Anterior segment",
+    "AntSegAngleMarks": "AntSegAngleMarks",
     "AntSynech": "Anterior synechiae",
     "APattern": "A pattern",
     "ArcuateScotoma": "Arcuate scotoma",
@@ -54,6 +55,7 @@ window.eyedrawDoodleTitles = {
     "DiscPallor": "Disc pallor",
     "DrainageRetinotomy": "Drainage retinotomy",
     "DrainageSite": "Drainage site",
+    "Drusen": "Drusen",
     "EncirclingBand": "Encircling band",
     "EntrySiteBreak": "Entry site break",
     "EpiretinalMembrane": "Epiretinal membrane",
@@ -106,6 +108,7 @@ window.eyedrawDoodleTitles = {
     "Papilloedema": "Papilloedema",
     "Patch": "Tube patch",
     "PCIOL": "Posterior chamber IOL",
+    "PCV": "Polypoidal Choroidal Vascularisation",
     "PeripapillaryAtrophy": "Peripapillary atrophy",
     "PeripheralRetinectomy": "Peripheral retinectomy",
     "PhakoIncision": "Phako incision",
@@ -177,5 +180,6 @@ window.eyedrawDoodleTitles = {
     "Bypass": "Coronary artery bypass",
     "Bruit": "Bruit",
     "Bruising": "Bruising",
-    "Haematoma": "Haematoma"
+    "Haematoma": "Haematoma",
+    "MaculaPostPole": "Macula PostPole"
 };
