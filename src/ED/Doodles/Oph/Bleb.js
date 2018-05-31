@@ -32,7 +32,7 @@ ED.Bleb = function(_drawing, _parameterJSON) {
     this.leakage = "None";
 
     // Saved parameters
-    this.savedParameterArray = ['rotation', 'arc', 'leakage', 'apexX', 'apexY'];
+    this.savedParameterArray = ['rotation','arc', 'leakage'];
 
     // Parameters in doodle control bar (parameter name: parameter label)
     this.controlParameterArray = {'leakage':'Leakage'};

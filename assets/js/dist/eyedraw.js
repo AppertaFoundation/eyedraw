@@ -17374,7 +17374,7 @@ ED.Bleb = function(_drawing, _parameterJSON) {
     this.leakage = "None";
 
     // Saved parameters
-    this.savedParameterArray = ['rotation', 'arc', 'leakage', 'apexX', 'apexY'];
+    this.savedParameterArray = ['rotation','arc', 'leakage'];
 
     // Parameters in doodle control bar (parameter name: parameter label)
     this.controlParameterArray = {'leakage':'Leakage'};
@@ -17430,6 +17430,18 @@ ED.Bleb.prototype.setParameterDefaults = function() {
     this.setParameterFromString('leakage', 'None');
 };
 
+    switch (_parameter) {
+        case 'arc':
+            // Adjust limit of apexX according to size of bleb (represented by arc parameter)
+            var lx = 1.2 * 400 * Math.tan(_value/2);
+            this.parameterValidationArray['apexX']['range'].setMinAndMax(-lx, +lx);
+            var ly = 0.9 * 400 * Math.cos(_value/2);
+            this.parameterValidationArray['apexY']['range'].setMinAndMax(-500, -ly);
+            break;
+    }
+
+    return returnArray;
+};
 /**
  * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
  * The returned parameters are animated if the 'animate' property in the parameterValidationArray is set to true
