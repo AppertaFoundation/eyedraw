@@ -41438,7 +41438,6 @@ ED.PCV.prototype.setParameterDefaults = function() {
  * @returns {Array} Associative array of values of dependent parameters
  */
 ED.PCV.prototype.dependentParameterValues = function(_parameter, _value) {
-    console.log('dependentParameterValues:', _parameter,_value);
 
     var returnArray = [];
 
