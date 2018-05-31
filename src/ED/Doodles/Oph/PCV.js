@@ -51,7 +51,7 @@ ED.PCV.prototype.setHandles = function() {
  */
 ED.PCV.prototype.setPropertyDefaults = function() {
     this.isRotatable = false;
-    this.isUnique = true;
+    this.isUnique = false;
 
     this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.5, +1.7);
     this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.5, +1.7);
