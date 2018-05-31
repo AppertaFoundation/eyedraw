@@ -41416,17 +41416,17 @@ ED.PCV.prototype.setPropertyDefaults = function() {
     this.isRotatable = false;
     this.isUnique = true;
 
-    this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.5, +1.2);
-    this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.5, +1.2);
+    this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.5, +1.7);
+    this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.5, +1.7);
 
-    this.parameterValidationArray['originY']['range'].setMinAndMax(-300 + 175, +300 - 175);
-    this.parameterValidationArray['originX']['range'].setMinAndMax(-300+ 175 , +300 - 175);
+    this.parameterValidationArray['originY']['range'].setMinAndMax(-5, +5);
+    this.parameterValidationArray['originX']['range'].setMinAndMax(-5 , +5);
 
 };
 
 ED.PCV.prototype.setParameterDefaults = function() {
-    this.scaleY = 1.2;
-    this.scaleX = 1.2;
+    this.scaleY = 1.7;
+    this.scaleX = 1.7;
 };
 
 /**
@@ -41434,10 +41434,11 @@ ED.PCV.prototype.setParameterDefaults = function() {
  * The returned parameters are animated if their 'animate' property is set to true
  *
  * @param {String} _parameter Name of parameter that has changed
- * @value {Undefined} _value Value of parameter to calculate
+ * @param {Undefined} _value Value of parameter to calculate
  * @returns {Array} Associative array of values of dependent parameters
  */
 ED.PCV.prototype.dependentParameterValues = function(_parameter, _value) {
+    console.log('dependentParameterValues:', _parameter,_value);
 
     var returnArray = [];
 
@@ -41509,8 +41510,12 @@ ED.PCV.prototype.draw = function(_point) {
             ctx.strokeStyle = blood_color;
             ctx.stroke();
         }
+        ctx.closePath();
+        ctx.beginPath();
 
-        this.drawSpot(ctx, 0, 0, 100, "rgba(188, 25, 0, 1)");
+        ctx.fillStyle = blood_color;
+        ctx.ellipse(0,0, 85,70, 0, 0, 360);
+        ctx.fill();
     }
 
 
@@ -41530,8 +41535,8 @@ ED.PCV.prototype.draw = function(_point) {
  * @returns {String} Description of doodle
  */
 ED.PCV.prototype.description = function() {
-    return "PCV";
-}
+    return "";
+};
 /**
  * OpenEyes
  *
