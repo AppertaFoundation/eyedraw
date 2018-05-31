@@ -53,17 +53,17 @@ ED.PCV.prototype.setPropertyDefaults = function() {
     this.isRotatable = false;
     this.isUnique = true;
 
-    this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.5, +1.7);
-    this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.5, +1.7);
+    this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.5, +1.2);
+    this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.5, +1.2);
 
-    this.parameterValidationArray['originY']['range'].setMinAndMax(-5, +5);
-    this.parameterValidationArray['originX']['range'].setMinAndMax(-5 , +5);
+    this.parameterValidationArray['originY']['range'].setMinAndMax(-200, 200);
+    this.parameterValidationArray['originX']['range'].setMinAndMax(-200 , 200);
 
 };
 
 ED.PCV.prototype.setParameterDefaults = function() {
-    this.scaleY = 1.7;
-    this.scaleX = 1.7;
+    this.scaleY = 0.5;
+    this.scaleX = 0.5;
 };
 
 /**
@@ -75,7 +75,6 @@ ED.PCV.prototype.setParameterDefaults = function() {
  * @returns {Array} Associative array of values of dependent parameters
  */
 ED.PCV.prototype.dependentParameterValues = function(_parameter, _value) {
-    console.log('dependentParameterValues:', _parameter,_value);
 
     var returnArray = [];
 
