@@ -231,5 +231,8 @@ window.eyedrawImages = [
     "old/Wheeze.png",
     "old/lock.png",
     "old/resetEyedraw.png",
-    "old/unlock.png"
+    "old/unlock.png",
+    "old/RPEAtrophy.png",
+    "new/RPEAtrophy.png",
+
 ];

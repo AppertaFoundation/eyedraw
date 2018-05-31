@@ -115,7 +115,7 @@ ED.Fuchs.prototype.description = function() {
  * @returns {Int} SnoMed code of entity representated by doodle
  */
 ED.Fuchs.prototype.snomedCode = function() {
-	return 0;
+	return 373424008;
 };
 
 /**

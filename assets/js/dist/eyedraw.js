@@ -8784,6 +8784,7 @@ ED.trans['Fuchs'] = 'Drag handle to change shape';
 ED.trans['Geographic'] = 'Drag middle handle to alter size of remaining central island of RPE<br/>Drag outside handle to scale';
 ED.trans['Gonioscopy'] = 'Drag top left handle up and down to alter pigment density<br/>Drag top left handle left and right to alter pigment homogeneity';
 ED.trans['HardDrusen'] = 'Drag middle handle up and down to alter density of drusen<br/>Drag outside handle to scale';
+ED.trans['Drusen'] = 'Drag middle handle up and down to alter density of drusen<br/>Drag outside handle to scale';
 ED.trans['HardExudate'] = 'Drag to position';
 ED.trans['Hyphaema'] = 'Drag handle vertically to change size<br/>Drag handle horizontally to change density';
 ED.trans['Hypopyon'] = 'Drag handle vertically to change size';
@@ -15818,9 +15819,16 @@ ED.AntSegAngleMarks = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "AntSegAngleMarks";
 
+	// Parameters from biometry
+	this.axis = 180; // steep axis
+	this.flatK = 999.9;
+	this.steepK = 999.9;
+	
+	// Calculated parameter
+	this.deltaK = 0;
 	
 	// Saved parameters
-	this.savedParameterArray = [];
+	this.savedParameterArray = ['axis','flatK','steepK','deltaK'];
 	
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -15839,6 +15847,31 @@ ED.AntSegAngleMarks.superclass = ED.Doodle.prototype;
 ED.AntSegAngleMarks.prototype.setPropertyDefaults = function() {
 	this.isSelectable = false;
 	this.addAtBack = true;
+	this.isUnique = true;
+
+	// Add complete validation arrays for derived parameters
+	this.parameterValidationArray['axis'] = {
+		kind: 'derived',
+		type: 'mod',
+		range: new ED.Range(0, 180),
+		clock: 'bottom',
+		animate: true
+	};
+	this.parameterValidationArray['flatK'] = {
+		kind: 'derived',
+		type: 'float',
+		range: new ED.Range(0, 1000),
+		precision: 2,
+		animate: true
+	};
+	this.parameterValidationArray['steepK'] = {
+		kind: 'derived',
+		type: 'float',
+		range: new ED.Range(0, 1000),
+		precision: 2,
+		animate: true
+	};
+
 }
 
 /**
@@ -15871,6 +15904,8 @@ ED.AntSegAngleMarks.prototype.draw = function(_point) {
 	
 	// Get context
 	var ctx = this.drawing.context;
+
+    ccc = ctx;
 
 	// Call draw method in superclass
 	ED.AntSegAngleMarks.superclass.draw.call(this, _point);
@@ -15924,43 +15959,112 @@ ED.AntSegAngleMarks.prototype.draw = function(_point) {
 			ctx.lineTo(point2.x, point2.y);
 			ctx.fillText(angleDeg + "\xB0",point3.x,point3.y);
 		}
-		
-/*
-		ctx.moveTo(-500,0);
-		ctx.lineTo(500,0);
-*/
-		
+
+		// draw tick marks and label with angle in degrees
 		ctx.stroke();
 		
+		// Indicate Infero-nasal corner of canvas
+		//// ** TO DO ** confirm will always be in corner of canvas - might need to use this.drawing.canvas.width*0.5 etc
+		ctx.beginPath();
 		
+		// Fill triangle in appropriate corner and colour for eye
+		ctx.fillStyle = (this.drawing.eye == ED.eye.Right) ? "green" : "red";
+		var eyeToggle = (this.drawing.eye == ED.eye.Right) ? +1 : -1;
+		ctx.moveTo(300 * eyeToggle,-500);
+		ctx.lineTo(500 * eyeToggle,-500);
+		ctx.lineTo(500 * eyeToggle,-300);
+		ctx.fill();
 		
+		// Label "R" or "L" eye
+		ctx.font="84px Arial";
+		ctx.lineWidth = 3;
+		ctx.strokeStyle = ctx.fillStyle;
+		var eyeText = (this.drawing.eye == ED.eye.Right) ? "R" : "L"
+		ctx.fillText(eyeText,-445 * eyeToggle,-440);		
+		
+		// Label "SN" text in appropriate corner for eye
+		ctx.font="56px Arial";
+		ctx.fillStyle="white";
+		ctx.textAlign="center"; 
+		ctx.textBaseline = "middle";
+		ctx.lineWidth = 3;
+		ctx.strokeStyle = "white";
+		ctx.fillText("SN",440 * eyeToggle,-440);
+
+		// Convert axis from degrees to radians
+		var axisRad = this.axis / 180 * Math.PI;		
+		
+		// Commented out by MSC 05/2018 so will indicate axis for all IOL types, not just the Toric
 		// If toric lens exists, draw flat axis
-		var toricLens = this.drawing.lastDoodleOfClass('ToricPCIOL');
-		if (toricLens) {
-			var phi = 0.7 * Math.PI / 4;
-			var axisRotation = toricLens.rotation + phi - 0.5077 * Math.PI;
-			
+// 		var toricLens = this.drawing.lastDoodleOfClass('ToricPCIOL');
+// 		if (toricLens) {
+// 			var phi = 0.7 * Math.PI / 4;
+// 			var axisRotation = toricLens.rotation + phi - 0.5077 * Math.PI;
+
+			// Draw steep axis
 			ctx.beginPath();
-			ctx.save();
-			ctx.rotate(axisRotation);
-			
-			ctx.strokeStyle = "blue";
+			ctx.strokeStyle = "rgb(242, 72, 72)";
 			ctx.lineWidth = 8;
-			
+
+			ctx.save();
+			ctx.rotate(-axisRad);
+
 			var w = 420;
 			var z = Math.round(2 * w / (d*2));
 			for (var j=0; j<z; j++) {
 				ctx.moveTo(-w + j*d*2, 0);
 				ctx.lineTo(-w + j*d*2 + d, 0);
 			};
-/*
-			ctx.moveTo(-w, 0);
-			ctx.lineTo(w,0);
-*/
 			ctx.stroke();
 			ctx.restore();
-		}		
+
+			ctx.save();
+			ctx.beginPath();
+
+			var indicator_point = new ED.Point(0,0);
+			indicator_point.setWithPolars(r+d+35,2 * Math.PI - axisRad + 0.5*Math.PI);
+
+			ctx.fillStyle = '#e4edf5';
+			ctx.strokeStyle = 'black';
+			//ctx.fillStyle = 'white';
+			ctx.rect(indicator_point.x-50,indicator_point.y-25,100,50);
+			ctx.stroke();
+			ctx.fill();
+			ctx.font="bold 40px Arial";
+			ctx.fillStyle="black";
+			ctx.textAlign="center";
+			ctx.textBaseline = "middle";
+			ctx.lineWidth = 3;
+			ctx.strokeStyle = "black";
+			ctx.fillText(axisRad * 180 / Math.PI + "\xB0",indicator_point.x,indicator_point.y);
+
+			ctx.restore();
+// 		}		
 		
+		// Legend - steep axis
+		ctx.beginPath();
+		ctx.moveTo(-495 * eyeToggle, 480);
+		ctx.lineTo(-480 * eyeToggle, 480);
+		ctx.moveTo(-475 * eyeToggle, 480);
+		ctx.lineTo(-460 * eyeToggle, 480);
+		ctx.moveTo(-455 * eyeToggle, 480);
+		ctx.lineTo(-440 * eyeToggle, 480);
+		ctx.stroke();
+		
+		ctx.font="italic 36px Arial";
+		ctx.fillStyle="black";
+		ctx.textAlign="center"; 
+		ctx.textBaseline = "middle";
+		ctx.lineWidth = 3;
+		ctx.strokeStyle = "black";
+		ctx.fillText("Steep axis",-350 * eyeToggle,480);
+		
+		// Write delta K value, if derived from biometry (ie. not default values)
+		if (this.flatK !== 999.9 && this.steepK !== 999.9) {
+			this.calculateDeltaK();
+			ctx.font="bold 44px Arial";
+			ctx.fillText("\u0394 " + this.deltaK + "D",-400 * eyeToggle,430);
+		}
 	}
 
 	// Return value indicating successful hittest
@@ -15968,6 +16072,9 @@ ED.AntSegAngleMarks.prototype.draw = function(_point) {
 }
 
 
+ED.AntSegAngleMarks.prototype.calculateDeltaK = function(_point) {
+	this.deltaK = (this.steepK - this.flatK).toFixed(2);
+}
 
 /**
  * OpenEyes
@@ -16365,7 +16472,7 @@ ED.AntSynech.prototype.setParameterDefaults = function() {
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.AntSynech.prototype.draw = function(_point) { console.log(this.apexY);
+ED.AntSynech.prototype.draw = function(_point) {
 	// Get context
 	var ctx = this.drawing.context;
 
@@ -29297,7 +29404,7 @@ ED.Fuchs.prototype.description = function() {
  * @returns {Int} SnoMed code of entity representated by doodle
  */
 ED.Fuchs.prototype.snomedCode = function() {
-	return 0;
+	return 373424008;
 };
 
 /**
@@ -42866,31 +42973,33 @@ ED.PosteriorCapsule.prototype.draw = function(_point) {
 			}
 		}
 
+		// Pattern
+
+		var ptrn = ctx.createPattern(this.drawing.imageArray['PSCPattern'], 'repeat');
+		
+		if (this.opacity > 1) {ctx.fillStyle = ptrn;}
+		ctx.fill();
+
 		// Opacity
-		if (this.opacity != '1') {
-			// Pattern
-
-			var ptrn = ctx.createPattern(this.drawing.imageArray['PSCPattern'], 'repeat');
-			ctx.fillStyle = ptrn;
-			ctx.fill();
-
-			// Opacity
-			switch (this.opacity) {
-				case '2':
-					ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
-					break;
-				case '3':
-					ctx.fillStyle = "rgba(200, 200, 200, 0.5)";
-					break;
-				case '4':
-					ctx.fillStyle = "rgba(150, 150, 150, 0.5)";
-					break;
-			}
-			ctx.fill();
-			ctx.stroke();
+		switch (this.opacity) {
+			case '1':
+				ctx.fillStyle = "rgba(255, 255, 255, 0.1)";
+				break;
+			case '2':
+				ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
+				break;
+			case '3':
+				ctx.fillStyle = "rgba(200, 200, 200, 0.5)";
+				break;
+			case '4':
+				ctx.fillStyle = "rgba(150, 150, 150, 0.5)";
+				break;
+			default:
+				ctx.fillStyle = "rgba(255, 150, 100, 0.1)";
+				break;
 		}
-
-
+		ctx.fill();
+		ctx.stroke();
 	}
 
 	// Draw handles if selected
@@ -43497,6 +43606,7 @@ ED.PostPole.prototype.setPropertyDefaults = function() {
 	this.isMoveable = false;
 	this.isRotatable = false;
 	this.isUnique = true;
+    this.willReport = true;
 
 	// Update component of validation array for simple parameterss
 	var apexX = this.drawing.eye == ED.eye.Right ? 300 : -300;
@@ -43651,7 +43761,12 @@ ED.PostPole.prototype.draw = function(_point) {
  * @returns {String} Description of doodle
  */
 ED.PostPole.prototype.description = function() {
-	return this.drawing.doodleArray.length == 1 ? "No abnormality" : "";
+    var returnValue = "";
+
+    if (returnValue.length === 0 && this.drawing.doodleArray.length === 1) {
+        returnValue = "No abnormality";
+	}
+	return returnValue;
 }
 
 /**
@@ -46998,7 +47113,7 @@ ED.RPEAtrophy = function(_drawing, _parameterJSON) {
 	this.className = "RPEAtrophy";
 	
 	// Saved parameters
-	this.savedParameterArray = ['originX', 'originY', 'scaleX', 'scaleY'];
+	this.savedParameterArray = ['originX', 'originY', 'scaleX', 'scaleY', 'apexX', 'apexY'];
 	
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -47016,7 +47131,22 @@ ED.RPEAtrophy.superclass = ED.Doodle.prototype;
  */
 ED.RPEAtrophy.prototype.setHandles = function() {
 	this.handleArray[2] = new ED.Doodle.Handle(null, true, ED.Mode.Scale, false);
+    this.handleArray[4] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
 }
+
+/**
+ * Sets default dragging attributes
+ */
+ED.RPEAtrophy.prototype.setPropertyDefaults = function() {
+    this.isRotatable = false;
+
+    // Update component of validation array for simple parameters
+    this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +80);
+    this.parameterValidationArray['apexY']['range'].setMinAndMax(-160, +0);
+
+    this.parameterValidationArray['originX']['range'].setMinAndMax(-260-30, 150+30);
+    this.parameterValidationArray['originY']['range'].setMinAndMax(-220-30, 220+30);
+};
 
 /**
  * Sets default parameters (Only called for new doodles)
@@ -47024,6 +47154,28 @@ ED.RPEAtrophy.prototype.setHandles = function() {
  */
 ED.RPEAtrophy.prototype.setParameterDefaults = function() {
 	this.setOriginWithDisplacements(0, -60);
+    this.apexX = 40;
+}
+
+ED.RPEAtrophy.prototype.dependentParameterValues = function(_parameter, _value) {
+    var returnArray = new Array();
+
+    switch (_parameter) {
+        case 'scaleY':
+            var r = 72;
+
+            this.parameterValidationArray['originX']['range'].setMinAndMax(-260-30+r*_value-72, 150+30-r*_value+72);
+            this.parameterValidationArray['originY']['range'].setMinAndMax(-220-30+r*_value-72, 220+30-r*_value+72);
+
+            var newOriginY = this.parameterValidationArray['originY']['range'].constrain(this.originY);
+            var newOriginX = this.parameterValidationArray['originX']['range'].constrain(this.originX);
+
+            this.setSimpleParameter('originX', newOriginX);
+            this.setSimpleParameter('originY', newOriginY);
+
+			break;
+    }
+    return returnArray;
 }
 
 /**
@@ -47039,7 +47191,7 @@ ED.RPEAtrophy.prototype.draw = function(_point) {
 	ED.RPEAtrophy.superclass.draw.call(this, _point);
 
 	// Radius
-	var r = 120;
+	var r = 72;
 
 	// Boundary path
 	ctx.beginPath();
@@ -47049,16 +47201,32 @@ ED.RPEAtrophy.prototype.draw = function(_point) {
 
 	// Set attributes
 	ctx.lineWidth = 1;
-	ctx.fillStyle = "rgba(253, 238, 173, 0.75)";
+	ctx.fillStyle = "rgba(255, 255, 255, 0)";
 	ctx.strokeStyle = ctx.fillStyle;
 	
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 
+    // Non boundary paths
+    if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+        // Colours
+        var fill = "rgba(111, 82, 76, " + (0.2+(this.apexX/100)) +")";
+
+        var dr = 10 / this.scaleX;
+
+        var p = new ED.Point(0, 0);
+        var n = 40 + Math.abs(Math.floor(this.apexY / 2));
+        for (var i = 0; i < n; i++) {
+            p.setWithPolars(r * ED.randomArray[i], 2 * Math.PI * ED.randomArray[i + 100]);
+            this.drawSpot(ctx, p.x, p.y, dr, fill);
+        }
+    }
+
 	// Coordinates of handles (in canvas plane)
 	var point = new ED.Point(0, 0);
 	point.setWithPolars(r, Math.PI / 4);
 	this.handleArray[2].location = this.transform.transformPoint(point);
+    this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
@@ -52526,6 +52694,9 @@ ED.ToricPCIOL = function(_drawing, _parameterJSON) {
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
+
+    this.scaleX = 0.75;
+    this.scaleY = 0.75;
 }
 
 /**
@@ -52660,11 +52831,11 @@ ED.ToricPCIOL.prototype.draw = function(_point) {
 		// Create points
 		var phi = 0.7 * Math.PI / 4;
 		var theta = phi + Math.PI;
-		var p1 = new ED.Point(0, 0)
+		var p1 = new ED.Point(0, 0);
 		p1.setWithPolars(r - 20, phi);
 		var p2 = new ED.Point(0, 0);
 		p2.setWithPolars(r - 100, phi);
-		var p3 = new ED.Point(0, 0)
+		var p3 = new ED.Point(0, 0);
 		p3.setWithPolars(r - 20, theta);
 		var p4 = new ED.Point(0, 0);
 		p4.setWithPolars(r - 100, theta);
@@ -52685,7 +52856,7 @@ ED.ToricPCIOL.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	var point = new ED.Point(0, 0)
+	var point = new ED.Point(0, 0);
 	point.setWithPolars(r, 4 * Math.PI / 4);
 	this.handleArray[2].location = this.transform.transformPoint(point);
 

@@ -82,7 +82,7 @@ ED.AntSynech.prototype.setParameterDefaults = function() {
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.AntSynech.prototype.draw = function(_point) { console.log(this.apexY);
+ED.AntSynech.prototype.draw = function(_point) {
 	// Get context
 	var ctx = this.drawing.context;
 
