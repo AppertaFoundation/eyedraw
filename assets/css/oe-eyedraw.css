@@ -221,11 +221,7 @@
 
 /* line 42, ../sass/_mixins.scss */
 [class*="icon-ed-"] {
-<<<<<<< HEAD
   background-image: url('../img/sprites/icons/32x32-s84254d959f.png');
-=======
-  background-image: url('../img/sprites/icons/32x32-sfc59fdf5ba.png');
->>>>>>> feature/v3-ui
   background-repeat: no-repeat;
   background-position: -9999px -9999px;
   width: 32px;
@@ -398,853 +394,476 @@
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-DiscPallor_hover {
-=======
-.icon-ed-Drusen {
->>>>>>> feature/v3-ui
   background-position: 0 -1056px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-Drusen {
-=======
-.icon-ed-Drusen_hover {
->>>>>>> feature/v3-ui
   background-position: 0 -1088px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-Drusen_hover {
-=======
-.icon-ed-EpiretinalMembrane {
->>>>>>> feature/v3-ui
   background-position: 0 -1120px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-EpiretinalMembrane {
-=======
-.icon-ed-EpiretinalMembrane_hover {
->>>>>>> feature/v3-ui
   background-position: 0 -1152px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-EpiretinalMembrane_hover {
-=======
-.icon-ed-Episcleritis {
->>>>>>> feature/v3-ui
   background-position: 0 -1184px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-Episcleritis {
-=======
-.icon-ed-FibrousProliferation {
->>>>>>> feature/v3-ui
   background-position: 0 -1216px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-FibrousProliferation {
-=======
-.icon-ed-FibrousProliferation_hover {
->>>>>>> feature/v3-ui
   background-position: 0 -1248px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-FibrousProliferation_hover {
-=======
-.icon-ed-FocalLaser {
->>>>>>> feature/v3-ui
   background-position: 0 -1280px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-FocalLaser {
-=======
-.icon-ed-FocalLaser_hover {
->>>>>>> feature/v3-ui
   background-position: 0 -1312px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-FocalLaser_hover {
-=======
-.icon-ed-Freehand {
->>>>>>> feature/v3-ui
   background-position: 0 -1344px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-Freehand {
-=======
-.icon-ed-Fuchs {
->>>>>>> feature/v3-ui
   background-position: 0 -1376px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-Fuchs {
-=======
-.icon-ed-Fuchs_hover {
->>>>>>> feature/v3-ui
   background-position: 0 -1408px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-Fuchs_hover {
-=======
-.icon-ed-Geographic {
->>>>>>> feature/v3-ui
   background-position: 0 -1440px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-Geographic {
-=======
-.icon-ed-Geographic_hover {
->>>>>>> feature/v3-ui
   background-position: 0 -1472px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-Geographic_hover {
-=======
-.icon-ed-HardDrusen {
->>>>>>> feature/v3-ui
   background-position: 0 -1504px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-HardDrusen {
-=======
-.icon-ed-HardDrusen_hover {
->>>>>>> feature/v3-ui
   background-position: 0 -1536px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-HardDrusen_hover {
-=======
-.icon-ed-HardExudate {
->>>>>>> feature/v3-ui
   background-position: 0 -1568px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-HardExudate {
-=======
-.icon-ed-HardExudate_hover {
->>>>>>> feature/v3-ui
   background-position: 0 -1600px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-HardExudate_hover {
-=======
-.icon-ed-IRMA {
->>>>>>> feature/v3-ui
   background-position: 0 -1632px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-IRMA {
-=======
-.icon-ed-IRMA_hover {
->>>>>>> feature/v3-ui
   background-position: 0 -1664px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-IRMA_hover {
-=======
-.icon-ed-LaserSpot {
->>>>>>> feature/v3-ui
   background-position: 0 -1696px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-LaserSpot {
-=======
-.icon-ed-LaserSpot_hover {
->>>>>>> feature/v3-ui
   background-position: 0 -1728px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-LaserSpot_hover {
-=======
-.icon-ed-LasikFlap {
->>>>>>> feature/v3-ui
   background-position: 0 -1760px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-LasikFlap {
-=======
-.icon-ed-LasikFlap_hover {
->>>>>>> feature/v3-ui
   background-position: 0 -1792px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-LasikFlap_hover {
-=======
-.icon-ed-Macroaneurysm {
->>>>>>> feature/v3-ui
   background-position: 0 -1824px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-Macroaneurysm {
-=======
-.icon-ed-Macroaneurysm_hover {
->>>>>>> feature/v3-ui
   background-position: 0 -1856px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-Macroaneurysm_hover {
-=======
-.icon-ed-MacularDystrophy {
->>>>>>> feature/v3-ui
   background-position: 0 -1888px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-MacularDystrophy {
-=======
-.icon-ed-MacularDystrophy_hover {
->>>>>>> feature/v3-ui
   background-position: 0 -1920px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-MacularDystrophy_hover {
-=======
-.icon-ed-MacularGrid {
->>>>>>> feature/v3-ui
   background-position: 0 -1952px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-MacularGrid {
-=======
-.icon-ed-MacularGrid_hover {
->>>>>>> feature/v3-ui
   background-position: 0 -1984px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-MacularGrid_hover {
-=======
-.icon-ed-MacularHole {
->>>>>>> feature/v3-ui
   background-position: 0 -2016px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-MacularHole {
-=======
-.icon-ed-MacularHole_hover {
->>>>>>> feature/v3-ui
   background-position: 0 -2048px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-MacularHole_hover {
-=======
-.icon-ed-MacularThickening {
->>>>>>> feature/v3-ui
   background-position: 0 -2080px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-MacularThickening {
-=======
-.icon-ed-MacularThickening_hover {
->>>>>>> feature/v3-ui
   background-position: 0 -2112px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-MacularThickening_hover {
-=======
-.icon-ed-Malyugin {
->>>>>>> feature/v3-ui
   background-position: 0 -2144px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-Malyugin {
-=======
-.icon-ed-Microaneurysm {
->>>>>>> feature/v3-ui
   background-position: 0 -2176px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-Microaneurysm {
-=======
-.icon-ed-Microaneurysm_hover {
->>>>>>> feature/v3-ui
   background-position: 0 -2208px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-Microaneurysm_hover {
-=======
-.icon-ed-NerveFibreDefect {
->>>>>>> feature/v3-ui
   background-position: 0 -2240px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-NerveFibreDefect {
-=======
-.icon-ed-NerveFibreDefect_hover {
->>>>>>> feature/v3-ui
   background-position: 0 -2272px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-NerveFibreDefect_hover {
-=======
-.icon-ed-NuclearCataract {
->>>>>>> feature/v3-ui
   background-position: 0 -2304px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-NuclearCataract {
-=======
-.icon-ed-NuclearCataract_hover {
->>>>>>> feature/v3-ui
   background-position: 0 -2336px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-NuclearCataract_hover {
-=======
-.icon-ed-OpticDiscPit {
->>>>>>> feature/v3-ui
   background-position: 0 -2368px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-OpticDiscPit {
-=======
-.icon-ed-OpticDiscPit_hover {
->>>>>>> feature/v3-ui
   background-position: 0 -2400px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-OpticDiscPit_hover {
-=======
-.icon-ed-PCIOL {
->>>>>>> feature/v3-ui
   background-position: 0 -2432px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-PCIOL {
-=======
-.icon-ed-PCIOL_hover {
->>>>>>> feature/v3-ui
   background-position: 0 -2464px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-PCIOL_hover {
-=======
-.icon-ed-PI {
->>>>>>> feature/v3-ui
   background-position: 0 -2496px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-PCV {
-=======
-.icon-ed-PI_hover {
->>>>>>> feature/v3-ui
   background-position: 0 -2528px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-PI {
-=======
-.icon-ed-PRPPostPole {
->>>>>>> feature/v3-ui
   background-position: 0 -2560px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-PI_hover {
-=======
-.icon-ed-PRPPostPole_hover {
->>>>>>> feature/v3-ui
   background-position: 0 -2592px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-PRPPostPole {
-=======
-.icon-ed-Papilloedema {
->>>>>>> feature/v3-ui
   background-position: 0 -2624px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-PRPPostPole_hover {
-=======
-.icon-ed-Papilloedema_hover {
->>>>>>> feature/v3-ui
   background-position: 0 -2656px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-Papilloedema {
-=======
-.icon-ed-PeripapillaryAtrophy {
->>>>>>> feature/v3-ui
   background-position: 0 -2688px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-Papilloedema_hover {
-=======
-.icon-ed-PeripapillaryAtrophy_hover {
->>>>>>> feature/v3-ui
   background-position: 0 -2720px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-PeripapillaryAtrophy {
-=======
-.icon-ed-PostSubcapCataract {
->>>>>>> feature/v3-ui
   background-position: 0 -2752px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-PeripapillaryAtrophy_hover {
-=======
-.icon-ed-PostSubcapCataract_hover {
->>>>>>> feature/v3-ui
   background-position: 0 -2784px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-PostSubcapCataract {
-=======
-.icon-ed-PosteriorSynechia {
->>>>>>> feature/v3-ui
   background-position: 0 -2816px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-PostSubcapCataract_hover {
-=======
-.icon-ed-PosteriorSynechia_hover {
->>>>>>> feature/v3-ui
   background-position: 0 -2848px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-PosteriorSynechia {
-=======
-.icon-ed-PreRetinalHaemorrhage {
->>>>>>> feature/v3-ui
   background-position: 0 -2880px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-PosteriorSynechia_hover {
-=======
-.icon-ed-PreRetinalHaemorrhage_hover {
->>>>>>> feature/v3-ui
   background-position: 0 -2912px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-PreRetinalHaemorrhage {
-=======
-.icon-ed-RK {
->>>>>>> feature/v3-ui
   background-position: 0 -2944px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-PreRetinalHaemorrhage_hover {
-=======
-.icon-ed-RK_hover {
->>>>>>> feature/v3-ui
   background-position: 0 -2976px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-RK {
-=======
-.icon-ed-RPEAtrophy {
->>>>>>> feature/v3-ui
   background-position: 0 -3008px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-RK_hover {
-=======
-.icon-ed-RPEDetachment {
->>>>>>> feature/v3-ui
   background-position: 0 -3040px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-RPEAtrophy {
-=======
-.icon-ed-RPEDetachment_hover {
->>>>>>> feature/v3-ui
   background-position: 0 -3072px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-RPEDetachment {
-=======
-.icon-ed-RetinalArteryOcclusionPostPole {
->>>>>>> feature/v3-ui
   background-position: 0 -3104px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-RPEDetachment_hover {
-=======
-.icon-ed-RetinalArteryOcclusionPostPole_hover {
->>>>>>> feature/v3-ui
   background-position: 0 -3136px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-RetinalArteryOcclusionPostPole {
-=======
-.icon-ed-RetinalVeinOcclusionPostPole {
->>>>>>> feature/v3-ui
   background-position: 0 -3168px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-RetinalArteryOcclusionPostPole_hover {
-=======
-.icon-ed-RetinalVeinOcclusionPostPole_hover {
->>>>>>> feature/v3-ui
   background-position: 0 -3200px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-RetinalVeinOcclusionPostPole {
-=======
-.icon-ed-SectorIridectomy {
->>>>>>> feature/v3-ui
   background-position: 0 -3232px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-RetinalVeinOcclusionPostPole_hover {
-=======
-.icon-ed-SectorIridectomy_hover {
->>>>>>> feature/v3-ui
   background-position: 0 -3264px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-SectorIridectomy {
-=======
-.icon-ed-SectorPRPPostPole {
->>>>>>> feature/v3-ui
   background-position: 0 -3296px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-SectorIridectomy_hover {
-=======
-.icon-ed-SectorPRPPostPole_hover {
->>>>>>> feature/v3-ui
   background-position: 0 -3328px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-SectorPRPPostPole {
-=======
-.icon-ed-SwollenDisc {
->>>>>>> feature/v3-ui
   background-position: 0 -3360px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-SectorPRPPostPole_hover {
-=======
-.icon-ed-SwollenDisc_hover {
->>>>>>> feature/v3-ui
   background-position: 0 -3392px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-SwollenDisc {
-=======
-.icon-ed-Telangiectasis {
->>>>>>> feature/v3-ui
   background-position: 0 -3424px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-SwollenDisc_hover {
-=======
-.icon-ed-Telangiectasis_hover {
->>>>>>> feature/v3-ui
   background-position: 0 -3456px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-Telangiectasis {
-=======
-.icon-ed-TrabyConjIncision {
->>>>>>> feature/v3-ui
   background-position: 0 -3488px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-Telangiectasis_hover {
-=======
-.icon-ed-TrabyFlap {
->>>>>>> feature/v3-ui
   background-position: 0 -3520px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-TrabyConjIncision {
-=======
-.icon-ed-TrabyFlap_hover {
->>>>>>> feature/v3-ui
   background-position: 0 -3552px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-TrabyFlap {
-=======
-.icon-ed-TractionRetinalDetachment {
->>>>>>> feature/v3-ui
   background-position: 0 -3584px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-TrabyFlap_hover {
-=======
-.icon-ed-TractionRetinalDetachment_hover {
->>>>>>> feature/v3-ui
   background-position: 0 -3616px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-TractionRetinalDetachment {
-=======
-.icon-ed-Tube {
->>>>>>> feature/v3-ui
   background-position: 0 -3648px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-TractionRetinalDetachment_hover {
-=======
-.icon-ed-Tube_hover {
->>>>>>> feature/v3-ui
   background-position: 0 -3680px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-Tube {
-=======
-.icon-ed-VitreousOpacity {
->>>>>>> feature/v3-ui
   background-position: 0 -3712px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-Tube_hover {
-=======
-.icon-ed-VitreousOpacity_hover {
->>>>>>> feature/v3-ui
   background-position: 0 -3744px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-VitreousOpacity {
-=======
-.icon-ed-APattern {
->>>>>>> feature/v3-ui
   background-position: 0 -3776px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-VitreousOpacity_hover {
-=======
-.icon-ed-Abrasion {
->>>>>>> feature/v3-ui
   background-position: 0 -3808px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-APattern {
-=======
-.icon-ed-AdenoviralKeratitis {
->>>>>>> feature/v3-ui
   background-position: 0 -3840px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-Abrasion {
-=======
-.icon-ed-Ahmed {
->>>>>>> feature/v3-ui
   background-position: 0 -3872px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-AdenoviralKeratitis {
-=======
-.icon-ed-AngleRecession {
->>>>>>> feature/v3-ui
   background-position: 0 -3904px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-Ahmed {
-=======
-.icon-ed-AntPVR {
->>>>>>> feature/v3-ui
   background-position: 0 -3936px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-AngleRecession {
-=======
-.icon-ed-AntSeg {
->>>>>>> feature/v3-ui
   background-position: 0 -3968px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-AntPVR {
-=======
-.icon-ed-ArcuateScotoma {
->>>>>>> feature/v3-ui
   background-position: 0 -4000px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-AntSeg {
-=======
-.icon-ed-Arrow {
->>>>>>> feature/v3-ui
   background-position: 0 -4032px;
 }
 
 /* line 71, ../sass/_mixins.scss */
-<<<<<<< HEAD
 .icon-ed-ArcuateScotoma {
   background-position: 0 -4064px;
 }
@@ -1257,1432 +876,796 @@
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-Baerveldt {
   background-position: 0 -4128px;
-=======
-.icon-ed-Baerveldt {
-  background-position: 0 -4064px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-BiopsySite {
-<<<<<<< HEAD
   background-position: 0 -4160px;
-=======
-  background-position: 0 -4096px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-Bruising {
-<<<<<<< HEAD
   background-position: 0 -4192px;
-=======
-  background-position: 0 -4128px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-Bruit {
-<<<<<<< HEAD
   background-position: 0 -4223px;
-=======
-  background-position: 0 -4159px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-Buckle {
-<<<<<<< HEAD
   background-position: 0 -4255px;
-=======
-  background-position: 0 -4191px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-BuckleSuture {
-<<<<<<< HEAD
   background-position: 0 -4287px;
-=======
-  background-position: 0 -4223px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-BuckleWithMargin {
-<<<<<<< HEAD
   background-position: 0 -4319px;
-=======
-  background-position: 0 -4255px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-BusaccaNodule {
-<<<<<<< HEAD
   background-position: 0 -4351px;
-=======
-  background-position: 0 -4287px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-Bypass {
-<<<<<<< HEAD
   background-position: 0 -4383px;
-=======
-  background-position: 0 -4319px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-CapsularTensionRing {
-<<<<<<< HEAD
   background-position: 0 -4415px;
-=======
-  background-position: 0 -4351px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-Chalazion {
-<<<<<<< HEAD
   background-position: 0 -4447px;
-=======
-  background-position: 0 -4383px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-ChandelierDouble {
-<<<<<<< HEAD
   background-position: 0 -4479px;
-=======
-  background-position: 0 -4415px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-ChandelierSingle {
-<<<<<<< HEAD
   background-position: 0 -4511px;
-=======
-  background-position: 0 -4447px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-CiliaryInjection {
-<<<<<<< HEAD
   background-position: 0 -4543px;
-=======
-  background-position: 0 -4479px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-CircumferentialBuckle {
-<<<<<<< HEAD
   background-position: 0 -4575px;
-=======
-  background-position: 0 -4511px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-ColourWell {
-<<<<<<< HEAD
   background-position: 0 -4607px;
-=======
-  background-position: 0 -4543px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-ConjunctivalFlap {
-<<<<<<< HEAD
   background-position: 0 -4639px;
-=======
-  background-position: 0 -4575px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-ConjunctivalSuture {
-<<<<<<< HEAD
   background-position: 0 -4671px;
-=======
-  background-position: 0 -4607px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-Conjunctivitis {
-<<<<<<< HEAD
   background-position: 0 -4703px;
-=======
-  background-position: 0 -4639px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-CornealAbrasion {
-<<<<<<< HEAD
   background-position: 0 -4735px;
-=======
-  background-position: 0 -4671px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-CornealEpithelialDefect {
-<<<<<<< HEAD
   background-position: 0 -4766px;
-=======
-  background-position: 0 -4702px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-CornealErosion {
-<<<<<<< HEAD
   background-position: 0 -4798px;
-=======
-  background-position: 0 -4734px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-CornealFB {
-<<<<<<< HEAD
   background-position: 0 -4829px;
-=======
-  background-position: 0 -4765px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-CornealGraft {
-<<<<<<< HEAD
   background-position: 0 -4861px;
-=======
-  background-position: 0 -4797px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-CornealLaceration {
-<<<<<<< HEAD
   background-position: 0 -4893px;
-=======
-  background-position: 0 -4829px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-CornealOedema {
-<<<<<<< HEAD
   background-position: 0 -4925px;
-=======
-  background-position: 0 -4861px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-CornealOpacity {
-<<<<<<< HEAD
   background-position: 0 -4957px;
-=======
-  background-position: 0 -4893px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-CornealPigmentation {
-<<<<<<< HEAD
   background-position: 0 -4989px;
-=======
-  background-position: 0 -4925px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-CornealStriae {
-<<<<<<< HEAD
   background-position: 0 -5021px;
-=======
-  background-position: 0 -4957px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-CornealSuture {
-<<<<<<< HEAD
   background-position: 0 -5053px;
-=======
-  background-position: 0 -4989px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-Crepitations {
-<<<<<<< HEAD
   background-position: 0 -5085px;
-=======
-  background-position: 0 -5021px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-Cryo {
-<<<<<<< HEAD
   background-position: 0 -5116px;
-=======
-  background-position: 0 -5052px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-CutterPI {
-<<<<<<< HEAD
   background-position: 0 -5147px;
-=======
-  background-position: 0 -5083px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-Dendrite {
-<<<<<<< HEAD
   background-position: 0 -5178px;
-=======
-  background-position: 0 -5114px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-DendriticUlcer {
-<<<<<<< HEAD
   background-position: 0 -5210px;
-=======
-  background-position: 0 -5146px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-Dialysis {
-<<<<<<< HEAD
   background-position: 0 -5242px;
-=======
-  background-position: 0 -5178px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-DiscHaem {
-<<<<<<< HEAD
   background-position: 0 -5274px;
-=======
-  background-position: 0 -5210px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-DrainageRetinotomy {
-<<<<<<< HEAD
   background-position: 0 -5306px;
-=======
-  background-position: 0 -5242px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-DrainageSite {
-<<<<<<< HEAD
   background-position: 0 -5338px;
-=======
-  background-position: 0 -5274px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-DrawingControl {
-<<<<<<< HEAD
   background-position: 0 -5370px;
-=======
-  background-position: 0 -5306px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-DrugStent {
-<<<<<<< HEAD
   background-position: 0 -5402px;
-=======
-  background-position: 0 -5338px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-Effusion {
-<<<<<<< HEAD
   background-position: 0 -5434px;
-=======
-  background-position: 0 -5370px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-EncirclingBand {
-<<<<<<< HEAD
   background-position: 0 -5466px;
-=======
-  background-position: 0 -5402px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-EntrySiteBreak {
-<<<<<<< HEAD
   background-position: 0 -5498px;
-=======
-  background-position: 0 -5434px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-EyeWithLids {
-<<<<<<< HEAD
   background-position: 0 -5530px;
-=======
-  background-position: 0 -5466px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-GRT {
-<<<<<<< HEAD
   background-position: 0 -5562px;
-=======
-  background-position: 0 -5498px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-Grommet {
-<<<<<<< HEAD
   background-position: 0 -5594px;
-=======
-  background-position: 0 -5530px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-Haematoma {
-<<<<<<< HEAD
   background-position: 0 -5625px;
-=======
-  background-position: 0 -5561px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-Hyphaema {
-<<<<<<< HEAD
   background-position: 0 -5657px;
-=======
-  background-position: 0 -5593px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-Hypopyon {
-<<<<<<< HEAD
   background-position: 0 -5689px;
-=======
-  background-position: 0 -5625px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-ILMPeel {
-<<<<<<< HEAD
   background-position: 0 -5721px;
-=======
-  background-position: 0 -5657px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-IatrogenicBreak {
-<<<<<<< HEAD
   background-position: 0 -5753px;
-=======
-  background-position: 0 -5689px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-InjectionSite {
-<<<<<<< HEAD
   background-position: 0 -5785px;
-=======
-  background-position: 0 -5721px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-InnerLeafBreak {
-<<<<<<< HEAD
   background-position: 0 -5817px;
-=======
-  background-position: 0 -5753px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-InverseYPattern {
-<<<<<<< HEAD
   background-position: 0 -5849px;
-=======
-  background-position: 0 -5785px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-IrisHook {
-<<<<<<< HEAD
   background-position: 0 -5881px;
-=======
-  background-position: 0 -5817px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-IrisNaevus {
-<<<<<<< HEAD
   background-position: 0 -5913px;
-=======
-  background-position: 0 -5849px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-KeraticPrecipitates {
-<<<<<<< HEAD
   background-position: 0 -5945px;
-=======
-  background-position: 0 -5881px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-KoeppeNodule {
-<<<<<<< HEAD
   background-position: 0 -5977px;
-=======
-  background-position: 0 -5913px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-KrukenbergSpindle {
-<<<<<<< HEAD
   background-position: 0 -6009px;
-=======
-  background-position: 0 -5945px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-Label {
-<<<<<<< HEAD
   background-position: 0 -6041px;
-=======
-  background-position: 0 -5977px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-LaserCircle {
-<<<<<<< HEAD
   background-position: 0 -6073px;
-=======
-  background-position: 0 -6009px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-LaserDemarcation {
-<<<<<<< HEAD
   background-position: 0 -6105px;
-=======
-  background-position: 0 -6041px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-Lattice {
-<<<<<<< HEAD
   background-position: 0 -6137px;
-=======
-  background-position: 0 -6073px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-Lens {
-<<<<<<< HEAD
   background-position: 0 -6169px;
-=======
-  background-position: 0 -6105px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-LimbalRelaxingIncision {
-<<<<<<< HEAD
   background-position: 0 -6201px;
-=======
-  background-position: 0 -6137px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-Lump {
-<<<<<<< HEAD
   background-position: 0 -6233px;
-=======
-  background-position: 0 -6169px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-MarginalKeratitis {
-<<<<<<< HEAD
   background-position: 0 -6265px;
-=======
-  background-position: 0 -6201px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-MattressSuture {
-<<<<<<< HEAD
   background-position: 0 -6297px;
-=======
-  background-position: 0 -6233px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-MetalStent {
-<<<<<<< HEAD
   background-position: 0 -6329px;
-=======
-  background-position: 0 -6265px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-MetallicForeignBody {
-<<<<<<< HEAD
   background-position: 0 -6361px;
-=======
-  background-position: 0 -6297px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-Molteno {
-<<<<<<< HEAD
   background-position: 0 -6393px;
-=======
-  background-position: 0 -6329px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-NerveDefect {
-<<<<<<< HEAD
   background-position: 0 -6425px;
-=======
-  background-position: 0 -6361px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-NoPattern {
-<<<<<<< HEAD
   background-position: 0 -6457px;
-=======
-  background-position: 0 -6393px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-OpticCup {
-<<<<<<< HEAD
   background-position: 0 -6488px;
-=======
-  background-position: 0 -6424px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-OpticDisc {
-<<<<<<< HEAD
   background-position: 0 -6520px;
-=======
-  background-position: 0 -6456px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-OrthopticShading {
-<<<<<<< HEAD
   background-position: 0 -6552px;
-=======
-  background-position: 0 -6488px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-OuterLeafBreak {
-<<<<<<< HEAD
   background-position: 0 -6583px;
-=======
-  background-position: 0 -6519px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-PalpebralConjunctivitis {
-<<<<<<< HEAD
   background-position: 0 -6615px;
-=======
-  background-position: 0 -6551px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-Patch {
-<<<<<<< HEAD
   background-position: 0 -6647px;
-=======
-  background-position: 0 -6583px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-Perforation {
-<<<<<<< HEAD
   background-position: 0 -6679px;
-=======
-  background-position: 0 -6615px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-PeripheralRetinectomy {
-<<<<<<< HEAD
   background-position: 0 -6710px;
-=======
-  background-position: 0 -6646px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-PhakoIncision {
-<<<<<<< HEAD
   background-position: 0 -6742px;
-=======
-  background-position: 0 -6678px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-Pingueculum {
-<<<<<<< HEAD
   background-position: 0 -6774px;
-=======
-  background-position: 0 -6710px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-PointInLine {
-<<<<<<< HEAD
   background-position: 0 -6806px;
-=======
-  background-position: 0 -6742px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-PosteriorCapsule {
-<<<<<<< HEAD
   background-position: 0 -6838px;
-=======
-  background-position: 0 -6774px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-PosteriorEmbryotoxon {
-<<<<<<< HEAD
   background-position: 0 -6870px;
-=======
-  background-position: 0 -6806px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-PosteriorRetinectomy {
-<<<<<<< HEAD
   background-position: 0 -6902px;
-=======
-  background-position: 0 -6838px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-Pterygium {
-<<<<<<< HEAD
   background-position: 0 -6934px;
-=======
-  background-position: 0 -6870px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-RPEAtrophy {
-<<<<<<< HEAD
   background-position: 0 -3072px;
-=======
-  background-position: 0 -3008px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-RPERip {
-<<<<<<< HEAD
   background-position: 0 -6998px;
-=======
-  background-position: 0 -6934px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-RRD {
-<<<<<<< HEAD
   background-position: 0 -7030px;
-=======
-  background-position: 0 -6966px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-RadialSponge {
-<<<<<<< HEAD
   background-position: 0 -7062px;
-=======
-  background-position: 0 -6998px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-RecordReading {
-<<<<<<< HEAD
   background-position: 0 -7094px;
-=======
-  background-position: 0 -7030px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-RetinalTouch {
-<<<<<<< HEAD
   background-position: 0 -7126px;
-=======
-  background-position: 0 -7062px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-Retinoschisis {
-<<<<<<< HEAD
   background-position: 0 -7158px;
-=======
-  background-position: 0 -7094px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-RightFundus {
-<<<<<<< HEAD
   background-position: 0 -7190px;
-=======
-  background-position: 0 -7126px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-RightPostPole {
-<<<<<<< HEAD
   background-position: 0 -7222px;
-=======
-  background-position: 0 -7158px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-Rotate {
-<<<<<<< HEAD
   background-position: 0 -7254px;
-=======
-  background-position: 0 -7190px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-RoundHole {
-<<<<<<< HEAD
   background-position: 0 -7286px;
-=======
-  background-position: 0 -7222px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-Rubeosis {
-<<<<<<< HEAD
   background-position: 0 -7318px;
-=======
-  background-position: 0 -7254px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-SPEE {
-<<<<<<< HEAD
   background-position: 0 -7350px;
-=======
-  background-position: 0 -7286px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-STFB {
-<<<<<<< HEAD
   background-position: 0 -7382px;
-=======
-  background-position: 0 -7318px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-Save {
-<<<<<<< HEAD
   background-position: 0 -7415px;
-=======
-  background-position: 0 -7351px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-Scale {
-<<<<<<< HEAD
   background-position: 0 -7447px;
-=======
-  background-position: 0 -7383px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-Scar {
-<<<<<<< HEAD
   background-position: 0 -7479px;
-=======
-  background-position: 0 -7415px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-ScleralIncision {
-<<<<<<< HEAD
   background-position: 0 -7511px;
-=======
-  background-position: 0 -7447px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-Sclerostomy {
-<<<<<<< HEAD
   background-position: 0 -7543px;
-=======
-  background-position: 0 -7479px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-SectorPRP {
-<<<<<<< HEAD
   background-position: 0 -7575px;
-=======
-  background-position: 0 -7511px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-Select {
-<<<<<<< HEAD
   background-position: 0 -7607px;
-=======
-  background-position: 0 -7543px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-Shading {
-<<<<<<< HEAD
   background-position: 0 -7639px;
-=======
-  background-position: 0 -7575px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-SidePort {
-<<<<<<< HEAD
   background-position: 0 -7670px;
-=======
-  background-position: 0 -7606px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-StarFold {
-<<<<<<< HEAD
   background-position: 0 -7702px;
-=======
-  background-position: 0 -7638px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-Stenosis {
-<<<<<<< HEAD
   background-position: 0 -7734px;
-=======
-  background-position: 0 -7670px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-SubretinalFluid {
-<<<<<<< HEAD
   background-position: 0 -7766px;
-=======
-  background-position: 0 -7702px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-SubretinalPFCL {
-<<<<<<< HEAD
   background-position: 0 -7798px;
-=======
-  background-position: 0 -7734px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-Supramid {
-<<<<<<< HEAD
   background-position: 0 -7830px;
-=======
-  background-position: 0 -7766px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-ToricPCIOL {
-<<<<<<< HEAD
   background-position: 0 -7862px;
-=======
-  background-position: 0 -7798px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-Trabectome {
-<<<<<<< HEAD
   background-position: 0 -7894px;
-=======
-  background-position: 0 -7830px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-TrabySuture {
-<<<<<<< HEAD
   background-position: 0 -7925px;
-=======
-  background-position: 0 -7861px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-TransilluminationDefect {
-<<<<<<< HEAD
   background-position: 0 -7957px;
-=======
-  background-position: 0 -7893px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-TubeExtender {
-<<<<<<< HEAD
   background-position: 0 -7989px;
-=======
-  background-position: 0 -7925px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-TubeLigation {
-<<<<<<< HEAD
   background-position: 0 -8021px;
-=======
-  background-position: 0 -7957px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-UTear {
-<<<<<<< HEAD
   background-position: 0 -8053px;
-=======
-  background-position: 0 -7989px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-UpDriftFromLeft {
-<<<<<<< HEAD
   background-position: 0 -8085px;
-=======
-  background-position: 0 -8021px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-UpDriftFromRight {
-<<<<<<< HEAD
   background-position: 0 -8117px;
-=======
-  background-position: 0 -8053px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-UpShootFromLeft {
-<<<<<<< HEAD
   background-position: 0 -8149px;
-=======
-  background-position: 0 -8085px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-UpShootFromRight {
-<<<<<<< HEAD
   background-position: 0 -8181px;
-=======
-  background-position: 0 -8117px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-VPattern {
-<<<<<<< HEAD
   background-position: 0 -8213px;
-=======
-  background-position: 0 -8149px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-Vicryl {
-<<<<<<< HEAD
   background-position: 0 -8244px;
-=======
-  background-position: 0 -8180px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-ViewObscured {
-<<<<<<< HEAD
   background-position: 0 -8276px;
-=======
-  background-position: 0 -8212px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-Wheeze {
-<<<<<<< HEAD
   background-position: 0 -8308px;
-=======
-  background-position: 0 -8244px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-XPattern {
-<<<<<<< HEAD
   background-position: 0 -8340px;
-=======
-  background-position: 0 -8276px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-YPattern {
-<<<<<<< HEAD
   background-position: 0 -8372px;
-=======
-  background-position: 0 -8308px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-lock {
-<<<<<<< HEAD
   background-position: 0 -8404px;
-=======
-  background-position: 0 -8340px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-resetEyedraw {
-<<<<<<< HEAD
   background-position: 0 -8436px;
-=======
-  background-position: 0 -8372px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-unlock {
-<<<<<<< HEAD
   background-position: 0 -8468px;
-=======
-  background-position: 0 -8404px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-More {
-<<<<<<< HEAD
   background-position: 0 -8499px;
-=======
-  background-position: 0 -8435px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-Untitled-2 {
-<<<<<<< HEAD
   background-position: 0 -8531px;
-=======
-  background-position: 0 -8467px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-add-label {
-<<<<<<< HEAD
   background-position: 0 -8563px;
-=======
-  background-position: 0 -8499px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-add-label_hover {
-<<<<<<< HEAD
   background-position: 0 -8595px;
-=======
-  background-position: 0 -8531px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-delete {
-<<<<<<< HEAD
   background-position: 0 -8627px;
-=======
-  background-position: 0 -8563px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-delete_hover {
-<<<<<<< HEAD
   background-position: 0 -8659px;
-=======
-  background-position: 0 -8595px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-help {
-<<<<<<< HEAD
   background-position: 0 -8691px;
-=======
-  background-position: 0 -8627px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-help_hover {
-<<<<<<< HEAD
   background-position: 0 -8723px;
-=======
-  background-position: 0 -8659px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-lock {
-<<<<<<< HEAD
   background-position: 0 -8404px;
-=======
-  background-position: 0 -8340px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-lock_hover {
-<<<<<<< HEAD
   background-position: 0 -8787px;
-=======
-  background-position: 0 -8723px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-move-to-back {
-<<<<<<< HEAD
   background-position: 0 -8819px;
-=======
-  background-position: 0 -8755px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-move-to-back_hover {
-<<<<<<< HEAD
   background-position: 0 -8851px;
-=======
-  background-position: 0 -8787px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-move-to-front {
-<<<<<<< HEAD
   background-position: 0 -8883px;
-=======
-  background-position: 0 -8819px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-move-to-front_hover {
-<<<<<<< HEAD
   background-position: 0 -8915px;
-=======
-  background-position: 0 -8851px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-reset {
-<<<<<<< HEAD
   background-position: 0 -8947px;
-=======
-  background-position: 0 -8883px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-reset_hover {
-<<<<<<< HEAD
   background-position: 0 -8979px;
-=======
-  background-position: 0 -8915px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-unlock {
-<<<<<<< HEAD
   background-position: 0 -8468px;
-=======
-  background-position: 0 -8404px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-unlock_hover {
-<<<<<<< HEAD
   background-position: 0 -9043px;
-=======
-  background-position: 0 -8979px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-zoom-in {
-<<<<<<< HEAD
   background-position: 0 -9075px;
-=======
-  background-position: 0 -9011px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-zoom-in_hover {
-<<<<<<< HEAD
   background-position: 0 -9107px;
-=======
-  background-position: 0 -9043px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-zoom-out {
-<<<<<<< HEAD
   background-position: 0 -9139px;
-=======
-  background-position: 0 -9075px;
->>>>>>> feature/v3-ui
 }
 
 /* line 71, ../sass/_mixins.scss */
 .icon-ed-zoom-out_hover {
-<<<<<<< HEAD
   background-position: 0 -9171px;
-=======
-  background-position: 0 -9107px;
->>>>>>> feature/v3-ui
 }
 
 /* line 42, ../sass/_mixins.scss */

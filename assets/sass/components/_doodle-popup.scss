@@ -13,7 +13,7 @@
 // * @copyright Copyright 2011-2017, OpenEyes Foundation
 // * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
 
-.ed-doodle-popup {
+.ed-doodle-popup { 
 	@include transition(right 0.5s ease);
 	@include box-shadow(2px 5px 14px -4px rgba(0, 0, 0, 0.7));
 	@include user-select(text);
