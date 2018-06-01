@@ -27819,7 +27819,6 @@ ED.Drusen.prototype.draw = function(_point) {
 
 		for (var i = 0; i < n; i++) {
 			p.setWithPolars(r * ED.randomArray[i], 2 * Math.PI * ED.randomArray[i + 100]);
-            ctx.save();
             ctx.beginPath();
             ctx.arc(p.x, p.y, dr, 0, Math.PI * 2, true);
 
