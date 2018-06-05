@@ -81,6 +81,7 @@ class DoodleInfo
         'CottonWoolSpot' => 'Cotton wool spot',
         'Cryo' => 'Cryotherapy scar',
         'CutterPI' => 'Cutter iridectomy',
+        'Cypass' => 'Cypass Stent Insertion',
         'CystoidMacularOedema' => 'Cystoid macular oedema',
         'DendriticUlcer' => 'Dendritic ulcer',
         'DiabeticNV' => 'Diabetic new vessels',
