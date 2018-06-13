@@ -15,114 +15,111 @@
  */
 
 /**
- * Fuch's endothelial Dystrophy
+ * MaculaPostPole template with disc and arcades
  *
- * @class Fuchs
+ * @class MaculaPostPole
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
  * @param {Object} _parameterJSON
  */
-ED.Fuchs = function(_drawing, _parameterJSON) {
+ED.MaculaPostPole = function(_drawing, _parameterJSON) {
 	// Set classname
-	this.className = "Fuchs";
+	this.className = "MaculaPostPole";
+
+    // Other parameters
+    this.watzke = 'Not assessed';
 
 	// Saved parameters
-	this.savedParameterArray = ['originX', 'originY', 'scaleX', 'scaleY'];
+	this.savedParameterArray = ['watzke'];
+
+    this.controlParameterArray = {
+        'watzke': 'Watzke Result'
+    };
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
-};
+}
 
 /**
  * Sets superclass and constructor
  */
-ED.Fuchs.prototype = new ED.Doodle;
-ED.Fuchs.prototype.constructor = ED.Fuchs;
-ED.Fuchs.superclass = ED.Doodle.prototype;
+ED.MaculaPostPole.prototype = new ED.Doodle;
+ED.MaculaPostPole.prototype.constructor = ED.MaculaPostPole;
+ED.MaculaPostPole.superclass = ED.Doodle.prototype;
 
 /**
  * Sets handle attributes
  */
-ED.Fuchs.prototype.setHandles = function() {
-	this.handleArray[2] = new ED.Doodle.Handle(null, true, ED.Mode.Scale, false);
-};
+ED.MaculaPostPole.prototype.setHandles = function() {}
 
 /**
- * Sets default properties
+ * Set default properties
  */
-ED.Fuchs.prototype.setPropertyDefaults = function() {
+ED.MaculaPostPole.prototype.setPropertyDefaults = function() {
+	this.isDeletable = false;
+	this.isScaleable = false;
+	this.isMoveable = false;
 	this.isRotatable = false;
-	this.isSqueezable = true;
 	this.isUnique = true;
-};
+    this.willReport = true;
+    this.inFrontOfClassArray = ['PostPole'];
+
+    this.parameterValidationArray.watzke = {
+		kind: 'derived',
+		type: 'string',
+		list: ['Not assessed', 'Normal', 'Abnormal'],
+		animate: true
+    };
+}
 
 /**
  * Draws doodle or performs a hit test if a Point parameter is passed
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.Fuchs.prototype.draw = function(_point) {
+ED.MaculaPostPole.prototype.draw = function(_point) {
 	// Get context
 	var ctx = this.drawing.context;
+    var foveaX = 0;
 
 	// Call draw method in superclass
-	ED.Fuchs.superclass.draw.call(this, _point);
+	ED.MaculaPostPole.superclass.draw.call(this, _point);
+
+	// Disc location
+	var x = this.drawing.eye == ED.eye.Right ? 300 : -300;
 
 	// Boundary path
 	ctx.beginPath();
 
-	// Fuchs
-	var r = 300;
-	ctx.arc(0, 0, r, 0, Math.PI * 2, false);
+	// Set attributes
+	ctx.lineWidth = 4;
+	ctx.strokeStyle = "rgba(249,187,76,0)";
+	ctx.fillStyle = "rgba(249,187,76,0)";
 
-	// Close path
-	ctx.closePath();
+	ctx.arc(0,0,20,0,2*Math.PI,true);
 
-	// Create fill pattern
-	var ptrn = ctx.createPattern(this.drawing.imageArray['FuchsPattern'], 'repeat');
-	ctx.fillStyle = ptrn;
-
-	// Transparent stroke
-	ctx.strokeStyle = "rgba(255,255,255,0)";
-
-	// Draw boundary path (also hit testing)
-	this.drawBoundary(_point);
-
-	// Coordinates of handles (in canvas plane)
-	var point = new ED.Point(0, 0);
-	point.setWithPolars(r, Math.PI / 4);
-	this.handleArray[2].location = this.transform.transformPoint(point);
-
-	// Draw handles if selected
-	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+    // Draw boundary path (also hit testing)
+    this.drawBoundary(_point);
 
 	// Return value indicating successful hittest
 	return this.isClicked;
-};
+}
 
 /**
  * Returns a string containing a text description of the doodle
  *
  * @returns {String} Description of doodle
  */
-ED.Fuchs.prototype.description = function() {
-	return "Guttata";
-};
+ED.MaculaPostPole.prototype.description = function() {
+    var returnValue = "";
 
-/**
- * Returns the SnoMed code of the doodle
- *
- * @returns {Int} SnoMed code of entity representated by doodle
- */
-ED.Fuchs.prototype.snomedCode = function() {
-	return 373424008;
-};
+	if(this.watzke !== 'Not assessed'){
+		returnValue += 'Watzke: ' + this.watzke.toLowerCase() + " ";
+	}
 
-/**
- * Returns a number indicating position in a hierarchy of diagnoses from 0 to 9 (highest)
- *
- * @returns {Int} Position in diagnostic hierarchy
- */
-ED.Fuchs.prototype.diagnosticHierarchy = function() {
-	return 2;
-};
+    if (returnValue.length === 0 && this.drawing.doodleArray.length === 1) {
+        returnValue = "No abnormality";
+	}
+
+	return returnValue;
+}
