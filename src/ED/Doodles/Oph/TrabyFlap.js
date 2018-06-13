@@ -68,7 +68,6 @@ ED.TrabyFlap.prototype.setPropertyDefaults = function() {
 	this.isMoveable = false;
 	this.isArcSymmetrical = true;
 	this.snapToArc = true;
-	this.isDeletable = false;
 
 	// Update component of validation array for simple parameters
 	this.parameterValidationArray['apexX']['range'].setMinAndMax(-50, +50);
