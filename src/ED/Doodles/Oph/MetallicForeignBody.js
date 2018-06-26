@@ -124,9 +124,9 @@ ED.MetallicForeignBody.prototype.dependentParameterValues = function(_parameter,
 
 	switch (_parameter) {
 		case 'coats':
-			if (_value==true) {
-				returnArray.rustRing = false;
-				returnArray.mfb = false;
+			if (_value == true) {
+				this.setParameterFromString('rustRing', 'false', true);
+				this.setParameterFromString('mfb', 'false', true);
 			}
 			break;
 			
