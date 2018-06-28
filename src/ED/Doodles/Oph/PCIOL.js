@@ -72,7 +72,7 @@ ED.PCIOL.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['fixation'] = {
 		kind: 'derived',
 		type: 'string',
-		list: ['In-the-bag', 'Ciliary sulcus'],
+		list: ['In-the-bag', 'Ciliary sulcus', 'Partly in the bag'],
 		animate: true
 	};
 	this.parameterValidationArray['fx'] = {

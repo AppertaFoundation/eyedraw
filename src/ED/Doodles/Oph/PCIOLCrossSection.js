@@ -67,7 +67,7 @@ ED.PCIOLCrossSection.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['fixation'] = {
 		kind: 'derived',
 		type: 'string',
-		list: ['In-the-bag', 'Ciliary sulcus'],
+		list: ['In-the-bag', 'Ciliary sulcus', 'Partly in the bag'],
 		animate: true
 	};
 	this.parameterValidationArray['fx'] = {
@@ -222,13 +222,22 @@ ED.PCIOLCrossSection.prototype.draw = function(_point) {
 			ctx.moveTo(164 - 44,0 - this.originY);
 			ctx.ellipse(144 - 44, 0 - this.originY, 227, 20, 0.5 * Math.PI, 1.5 * Math.PI, 0.2 * Math.PI);
 		}
-		else {
+		else if (this.fixation == 'Ciliary sulcus') {
 			ctx.arc(115 - this.originX, -350 - this.originY, 15, 0*Math.PI, 1*Math.PI, true);
 			ctx.lineTo(35,-125);
 			ctx.moveTo(120 - this.originX, 350 - this.originY);
 			ctx.arc(115 - this.originX, 350 - this.originY, 15, 0, 1*Math.PI, false);
 			ctx.moveTo(100 - this.originX, 350 - this.originY);
 			ctx.lineTo(65,125);
+		} else {
+            ctx.ellipse(144 - this.originX, 0 - this.originY , 227, 20, 0.5 * Math.PI, 0.9 * Math.PI, 1.2 * Math.PI);
+            ctx.moveTo(144 - this.originX, -227 - this.originY);
+            ctx.lineTo(50,-160);
+
+            ctx.moveTo(120 - this.originX, 350 - this.originY);
+            ctx.arc(115 - this.originX, 350 - this.originY, 15, 0, 1*Math.PI, false);
+            ctx.moveTo(100 - this.originX, 350 - this.originY);
+            ctx.lineTo(65,125);
 		}
 		ctx.strokeStyle = "#898989";
 		ctx.lineWidth = 5;
