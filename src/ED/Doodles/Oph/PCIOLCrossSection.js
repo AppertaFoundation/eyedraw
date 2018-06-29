@@ -73,7 +73,7 @@ ED.PCIOLCrossSection.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['fx'] = {
 		kind: 'other',
 		type: 'int',
-		range: [1, 2],
+		range: new ED.Range(1, 3),
 		animate: false
 	};
 	
@@ -102,21 +102,25 @@ ED.PCIOLCrossSection.prototype.dependentParameterValues = function(_parameter, _
 	var returnArray = new Array();
 
 	switch (_parameter) {
-		case 'fx':
-			if (_value === 2) returnArray['fixation'] = 'Ciliary sulcus';
-			else returnArray['fixation'] = 'In-the-bag';
-			break;
+        case 'fx':
+            if (_value === 1){ returnArray['fixation'] = 'In-the-bag'; }
+            if (_value === 2){ returnArray['fixation'] = 'Partly in the bag'; }
+            if (_value === 3){ returnArray['fixation'] = 'Ciliary sulcus'; }
+            break;
 
-		case 'fixation':
-			switch (_value) {
-				case 'In-the-bag':
-					returnArray['fx'] = 1;
-					break;
-				case 'Ciliary sulcus':
-					returnArray['fx'] = 2;
-					break;
-			}
-			break;
+        case 'fixation':
+            switch (_value) {
+                case 'In-the-bag':
+                    this.setParameterFromString('fx', '1', true);
+                    break;
+                case 'Partly in the bag':
+                    this.setParameterFromString('fx', '2', true);
+                    break;
+                case 'Ciliary sulcus':
+                    this.setParameterFromString('fx', '3', true);
+                    break;
+            }
+            break;
 			
 		case 'originX':
 			var iris = this.drawing.lastDoodleOfClass('AntSegCrossSection');
