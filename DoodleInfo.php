@@ -231,5 +231,6 @@ class DoodleInfo
         'Pterygium' => 'Pterygium',
         'Drusen' => 'Drusen',
         'MaculaPostPole' => 'Macula (posterior pole)',
+        'PCV' => 'Polypoidal choroidal vasculopathy',
     );
 }
