@@ -2539,7 +2539,6 @@ ED.Drawing.prototype.eventHandler = function(_type, _doodleId, _className, _elem
  */
 ED.Drawing.prototype.updateBindings = function(_doodle) {
 	var doodle = _doodle;
-
 	// Check for an argument, otherwise take selected doodle for this drawing
 	if (typeof(doodle) == 'undefined') {
 		doodle = this.selectedDoodle;
@@ -2557,16 +2556,18 @@ ED.Drawing.prototype.updateBindings = function(_doodle) {
 			// Modify value of element according to type
 			switch (element.type) {
 				case 'checkbox':
+
 					if (attribute) {
 						ED.errorHandler('ED.Drawing', 'updateBindings', 'Binding to a checkbox with a non-standard attribute not yet supported');
 					} else {
 
 						if (value == "true") {
-							element.setAttribute('checked', 'checked');
+							element.checked = true;
 						} else {
-							element.removeAttribute('checked');
+							element.checked = false;
 						}
 					}
+
 					break;
 
 				case 'select-one':
@@ -20891,6 +20892,16 @@ ED.CorneaCrossSection.prototype.draw = function(_point) {
 	return this.isClicked;
 }
 
+ED.CorneaCrossSection.prototype.description = function() {
+    var desc = [];
+    if(this.shape !== 'Normal') {
+        desc.push(this.shape);
+    }
+
+    desc = desc.join(", ");
+    return desc.charAt(0).toUpperCase() + desc.slice(1);
+};
+
 /**
  * OpenEyes
  *
@@ -38054,9 +38065,9 @@ ED.MetallicForeignBody.prototype.dependentParameterValues = function(_parameter,
 
 	switch (_parameter) {
 		case 'coats':
-			if (_value==true) {
-				returnArray.rustRing = false;
-				returnArray.mfb = false;
+			if (_value == true) {
+				this.setParameterFromString('rustRing', 'false', true);
+				this.setParameterFromString('mfb', 'false', true);
 			}
 			break;
 			
@@ -38139,6 +38150,21 @@ ED.MetallicForeignBody.prototype.draw = function(_point) {
 	// Return value indicating successful hittest
 	return this.isClicked;
 }
+
+ED.MetallicForeignBody.prototype.description = function() {
+	var desc = [];
+    if(this.fb === 1) {
+        desc.push("metallic foreign body");
+    }
+    if(this.rustRing) {
+        desc.push("rust ring");
+    }
+    if(this.coats) {
+        desc.push("coats ring");
+    }
+    desc = desc.join(", ");
+    return desc.charAt(0).toUpperCase() + desc.slice(1);
+};
 
 /**
  * OpenEyes
