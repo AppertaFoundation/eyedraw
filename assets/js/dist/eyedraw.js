@@ -40715,13 +40715,13 @@ ED.PCIOL.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['fixation'] = {
 		kind: 'derived',
 		type: 'string',
-		list: ['In-the-bag', 'Ciliary sulcus'],
+		list: ['In-the-bag', 'Ciliary sulcus', 'Partly in the bag'],
 		animate: true
 	};
 	this.parameterValidationArray['fx'] = {
 		kind: 'other',
 		type: 'int',
-		range: [1, 2],
+		range:  new ED.Range(1, 8),
 		animate: false
 	};
 	
@@ -40743,24 +40743,29 @@ ED.PCIOL.prototype.dependentParameterValues = function(_parameter, _value) {
 
 	switch (_parameter) {
 		case 'fx':
-			if (_value === 2) returnArray['fixation'] = 'Ciliary sulcus';
-			else returnArray['fixation'] = 'In-the-bag';
+			if (_value === 1){ returnArray['fixation'] = 'In-the-bag'; }
+			if (_value === 2){ returnArray['fixation'] = 'Partly in the bag'; }
+			if (_value === 3){ returnArray['fixation'] = 'Ciliary sulcus'; }
 			break;
 
 		case 'fixation':
 			switch (_value) {
 				case 'In-the-bag':
-					returnArray['fx'] = 1;
+					this.setParameterFromString('fx', '1', true);
+					break;
+				case 'Partly in the bag':
+					this.setParameterFromString('fx', '2', true);
 					break;
 				case 'Ciliary sulcus':
-					returnArray['fx'] = 2;
+					this.setParameterFromString('fx', '3', true);
 					break;
 			}
 			break;
 	}
 
 	return returnArray;
-}
+};
+
 
 /**
  * Draws doodle or performs a hit test if a Point parameter is passed
@@ -40858,7 +40863,7 @@ ED.PCIOL.prototype.description = function() {
 	if (displacementValue.length > 0) returnValue += " displaced" + displacementValue;
 
 	return returnValue;
-}
+};
 
 /**
  * OpenEyes
@@ -40929,13 +40934,13 @@ ED.PCIOLCrossSection.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['fixation'] = {
 		kind: 'derived',
 		type: 'string',
-		list: ['In-the-bag', 'Ciliary sulcus'],
+		list: ['In-the-bag', 'Ciliary sulcus', 'Partly in the bag'],
 		animate: true
 	};
 	this.parameterValidationArray['fx'] = {
 		kind: 'other',
 		type: 'int',
-		range: [1, 2],
+		range: new ED.Range(1, 3),
 		animate: false
 	};
 	
@@ -40964,21 +40969,25 @@ ED.PCIOLCrossSection.prototype.dependentParameterValues = function(_parameter, _
 	var returnArray = new Array();
 
 	switch (_parameter) {
-		case 'fx':
-			if (_value === 2) returnArray['fixation'] = 'Ciliary sulcus';
-			else returnArray['fixation'] = 'In-the-bag';
-			break;
+        case 'fx':
+            if (_value === 1){ returnArray['fixation'] = 'In-the-bag'; }
+            if (_value === 2){ returnArray['fixation'] = 'Partly in the bag'; }
+            if (_value === 3){ returnArray['fixation'] = 'Ciliary sulcus'; }
+            break;
 
-		case 'fixation':
-			switch (_value) {
-				case 'In-the-bag':
-					returnArray['fx'] = 1;
-					break;
-				case 'Ciliary sulcus':
-					returnArray['fx'] = 2;
-					break;
-			}
-			break;
+        case 'fixation':
+            switch (_value) {
+                case 'In-the-bag':
+                    this.setParameterFromString('fx', '1', true);
+                    break;
+                case 'Partly in the bag':
+                    this.setParameterFromString('fx', '2', true);
+                    break;
+                case 'Ciliary sulcus':
+                    this.setParameterFromString('fx', '3', true);
+                    break;
+            }
+            break;
 			
 		case 'originX':
 			var iris = this.drawing.lastDoodleOfClass('AntSegCrossSection');
@@ -41084,13 +41093,22 @@ ED.PCIOLCrossSection.prototype.draw = function(_point) {
 			ctx.moveTo(164 - 44,0 - this.originY);
 			ctx.ellipse(144 - 44, 0 - this.originY, 227, 20, 0.5 * Math.PI, 1.5 * Math.PI, 0.2 * Math.PI);
 		}
-		else {
+		else if (this.fixation == 'Ciliary sulcus') {
 			ctx.arc(115 - this.originX, -350 - this.originY, 15, 0*Math.PI, 1*Math.PI, true);
 			ctx.lineTo(35,-125);
 			ctx.moveTo(120 - this.originX, 350 - this.originY);
 			ctx.arc(115 - this.originX, 350 - this.originY, 15, 0, 1*Math.PI, false);
 			ctx.moveTo(100 - this.originX, 350 - this.originY);
 			ctx.lineTo(65,125);
+		} else {
+            ctx.ellipse(144 - this.originX, 0 - this.originY , 227, 20, 0.5 * Math.PI, 0.9 * Math.PI, 1.2 * Math.PI);
+            ctx.moveTo(144 - this.originX, -227 - this.originY);
+            ctx.lineTo(50,-160);
+
+            ctx.moveTo(120 - this.originX, 350 - this.originY);
+            ctx.arc(115 - this.originX, 350 - this.originY, 15, 0, 1*Math.PI, false);
+            ctx.moveTo(100 - this.originX, 350 - this.originY);
+            ctx.lineTo(65,125);
 		}
 		ctx.strokeStyle = "#898989";
 		ctx.lineWidth = 5;
@@ -41897,11 +41915,11 @@ ED.PhakoIncision.prototype.dependentParameterValues = function(_parameter, _valu
 		case 'radius':
 			if (_value >= 428) {
 			  returnArray['incisionSite'] = 'Scleral';
-      } else if (_value >= 344) {
-			  returnArray['incisionSite'] = 'Limbal';
-      } else {
-			  returnArray['incisionSite'] = 'Corneal';
-      }
+			  } else if (_value >= 344) {
+					  returnArray['incisionSite'] = 'Limbal';
+			  } else {
+					  returnArray['incisionSite'] = 'Corneal';
+			  }
 
 			// Incision length should remain constant despite changes in radius
 			returnArray['arc'] = this.incisionLength * this.defaultRadius / (6 * _value);
