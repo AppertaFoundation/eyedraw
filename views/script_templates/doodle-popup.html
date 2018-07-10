@@ -68,14 +68,14 @@
 			{{/doodle.isDeletable}}
 		</li>
 	</ul>
-	<div class="ed-doodle-info hide">
+	<div class="ed-doodle-info" style="display: none;">
 		{{^doodle.isLocked}}
 			{{#desc}}
 				<div class="ed-doodle-description">{{{desc}}}</div>
 			{{/desc}}
 		{{/doodle.isLocked}}
 	</div>
-	<div class="ed-doodle-controls{{#doodle.isLocked}} hide{{/doodle.isLocked}}" id="{{drawing.canvas.id}}_controls">
+	<div class="ed-doodle-controls" {{#doodle.isLocked}}style="display: none;"{{/doodle.isLocked}} id="{{drawing.canvas.id}}_controls">
 	</div>
 	{{/doodle.isNode}}
 	{{#doodle.isLocked}}
