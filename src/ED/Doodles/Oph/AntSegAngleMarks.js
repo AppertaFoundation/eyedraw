@@ -243,7 +243,7 @@ ED.AntSegAngleMarks.prototype.draw = function(_point) {
 			ctx.textBaseline = "middle";
 			ctx.lineWidth = 3;
 			ctx.strokeStyle = "black";
-			ctx.fillText(axisRad * 180 / Math.PI + "\xB0",indicator_point.x,indicator_point.y);
+			ctx.fillText(this.axis + "\xB0",indicator_point.x,indicator_point.y);
 
 			ctx.restore();
 // 		}		
