@@ -15833,7 +15833,7 @@ ED.AntSegAngleMarks = function(_drawing, _parameterJSON) {
 	
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
-}
+};
 
 /**
  * Sets superclass and constructor
@@ -15851,21 +15851,21 @@ ED.AntSegAngleMarks.prototype.setPropertyDefaults = function() {
 	this.isUnique = true;
 
 	// Add complete validation arrays for derived parameters
-	this.parameterValidationArray['axis'] = {
+	this.parameterValidationArray.axis = {
 		kind: 'derived',
 		type: 'mod',
 		range: new ED.Range(0, 180),
 		clock: 'bottom',
 		animate: true
 	};
-	this.parameterValidationArray['flatK'] = {
+	this.parameterValidationArray.flatK = {
 		kind: 'derived',
 		type: 'float',
 		range: new ED.Range(0, 1000),
 		precision: 2,
 		animate: true
 	};
-	this.parameterValidationArray['steepK'] = {
+	this.parameterValidationArray.steepK = {
 		kind: 'derived',
 		type: 'float',
 		range: new ED.Range(0, 1000),
@@ -15873,25 +15873,25 @@ ED.AntSegAngleMarks.prototype.setPropertyDefaults = function() {
 		animate: true
 	};
 
-}
+};
 
 /**
  * Sets default parameters (Only called for new doodles)
  * Use the setParameter function for derived parameters, as this will also update dependent variables
  */
 ED.AntSegAngleMarks.prototype.setParameterDefaults = function() {
-}
+};
 
 /**
  * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
  * The returned parameters are animated if their 'animate' property is set to true
  *
  * @param {String} _parameter Name of parameter that has changed
- * @value {Undefined} _value Value of parameter to calculate
+ * @param {Undefined} _value Value of parameter to calculate
  * @returns {Array} Associative array of values of dependent parameters
  */
 ED.AntSegAngleMarks.prototype.dependentParameterValues = function(_parameter, _value) {
-}
+};
 
 /**
  * Draws doodle or performs a hit test if a Point parameter is passed
@@ -15919,13 +15919,13 @@ ED.AntSegAngleMarks.prototype.draw = function(_point) {
 	ctx.lineTo(-l,-l);
 	
 	ctx.fillStyle = "rgba(255, 255, 255, 0)";
-	ctx.strokeStyle = "rgba(0,0,0,0)"
+	ctx.strokeStyle = "rgba(0,0,0,0)";
 	
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 	
 	// Non boundary drawing
-	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+	if (this.drawFunctionMode === ED.drawFunctionMode.Draw) {
 		ctx.beginPath();
 		
 		// Set style defaults
@@ -15980,8 +15980,8 @@ ED.AntSegAngleMarks.prototype.draw = function(_point) {
 		ctx.font="84px Arial";
 		ctx.lineWidth = 3;
 		ctx.strokeStyle = ctx.fillStyle;
-		var eyeText = (this.drawing.eye == ED.eye.Right) ? "R" : "L"
-		ctx.fillText(eyeText,-445 * eyeToggle,-440);		
+		var eyeText = (this.drawing.eye == ED.eye.Right) ? "R" : "L";
+		ctx.fillText(eyeText,-445 * eyeToggle,-440);
 		
 		// Label "SN" text in appropriate corner for eye
 		ctx.font="56px Arial";
@@ -16015,7 +16015,7 @@ ED.AntSegAngleMarks.prototype.draw = function(_point) {
 			for (var j=0; j<z; j++) {
 				ctx.moveTo(-w + j*d*2, 0);
 				ctx.lineTo(-w + j*d*2 + d, 0);
-			};
+			}
 			ctx.stroke();
 			ctx.restore();
 
@@ -16037,7 +16037,7 @@ ED.AntSegAngleMarks.prototype.draw = function(_point) {
 			ctx.textBaseline = "middle";
 			ctx.lineWidth = 3;
 			ctx.strokeStyle = "black";
-			ctx.fillText(axisRad * 180 / Math.PI + "\xB0",indicator_point.x,indicator_point.y);
+			ctx.fillText(Math.round(axisRad * 180 / Math.PI) + "\xB0",indicator_point.x,indicator_point.y);
 
 			ctx.restore();
 // 		}		
@@ -16070,12 +16070,12 @@ ED.AntSegAngleMarks.prototype.draw = function(_point) {
 
 	// Return value indicating successful hittest
 	return this.isClicked;
-}
+};
 
 
 ED.AntSegAngleMarks.prototype.calculateDeltaK = function(_point) {
 	this.deltaK = (this.steepK - this.flatK).toFixed(2);
-}
+};
 
 /**
  * OpenEyes
