@@ -126,8 +126,9 @@ ED.AntSegCrossSection.prototype.dependentParameterValues = function(_parameter, 
 				/// MSC: Max position dependent on lens type present
 			var lens = this.drawing.lastDoodleOfClass('LensCrossSection');
 			if (!lens) lens = this.drawing.lastDoodleOfClass('PCIOLCrossSection');
-			
-			var maxApexX = (lens.className == 'LensCrossSection') ? 32 - (72 / 220) * (this.apexY + 280) + lens.originX - 44: (lens.className == 'PCIOLCrossSection') ? lens.originX - 21 : 25;
+			if (!lens) lens = this.drawing.lastDoodleOfClass('ToricPCIOLCrossSection');
+
+			var maxApexX = (lens.className == 'LensCrossSection') ? 32 - (72 / 220) * (this.apexY + 280) + lens.originX - 44: (lens.className == 'PCIOLCrossSection' || lens.className == 'ToricPCIOLCrossSection') ? lens.originX - 21 : 25;
 			this.parameterValidationArray['apexX']['range'].setMinAndMax(-40 - (140 / 220) * (this.apexY + 280), maxApexX);
 
 			// If being synced, make sensible decision about x

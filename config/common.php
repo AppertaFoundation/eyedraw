@@ -30,7 +30,6 @@ return array(
 						"js/dist/oe-eyedraw{$min}.js"
 					),
 					'css' => array(
-						'css/oe-eyedraw.css'
 					),
 					'basePath' => 'application.modules.eyedraw.assets',
 					'depends' => array(
