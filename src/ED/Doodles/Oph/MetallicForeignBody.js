@@ -124,9 +124,9 @@ ED.MetallicForeignBody.prototype.dependentParameterValues = function(_parameter,
 
 	switch (_parameter) {
 		case 'coats':
-			if (_value==true) {
-				returnArray.rustRing = false;
-				returnArray.mfb = false;
+			if (_value == true) {
+				this.setParameterFromString('rustRing', 'false', true);
+				this.setParameterFromString('mfb', 'false', true);
 			}
 			break;
 			
@@ -209,3 +209,18 @@ ED.MetallicForeignBody.prototype.draw = function(_point) {
 	// Return value indicating successful hittest
 	return this.isClicked;
 }
+
+ED.MetallicForeignBody.prototype.description = function() {
+	var desc = [];
+    if(this.fb === 1) {
+        desc.push("metallic foreign body");
+    }
+    if(this.rustRing) {
+        desc.push("rust ring");
+    }
+    if(this.coats) {
+        desc.push("coats ring");
+    }
+    desc = desc.join(", ");
+    return desc.charAt(0).toUpperCase() + desc.slice(1);
+};
