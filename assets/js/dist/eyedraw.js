@@ -26222,6 +26222,7 @@ ED.Cypass = function(_drawing, _parameterJSON) {
 
 	// Private parameters
 	this.limbus = -400;
+    this.radius = 462;
 
     // Derived parameters
     this.miotic = 'Miochol';
@@ -26256,6 +26257,8 @@ ED.Cypass.prototype.setPropertyDefaults = function() {
     this.isMoveable = false;
     this.isUnique = true;
 
+    this.parameterValidationArray['radius']['range'].setMinAndMax(415, 480);
+
     this.parameterValidationArray['miotic'] = {
         kind: 'derived',
         type: 'string',
@@ -26285,8 +26288,6 @@ ED.Cypass.prototype.setParameterDefaults = function() {
 
     this.radius = 462;
     this.setRotationWithDisplacements(315, 270);
-
-    this.parameterValidationArray['radius']['range'].setMinAndMax(415, 480);
 
     this.setParameterFromString('miotic', 'Miochol');
     this.setParameterFromString('viscoelastic', 'Viscoelastic');
