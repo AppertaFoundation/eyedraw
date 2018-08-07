@@ -144,11 +144,11 @@ ED.PhakoIncision.prototype.dependentParameterValues = function(_parameter, _valu
 		case 'radius':
 			if (_value >= 428) {
 			  returnArray['incisionSite'] = 'Scleral';
-      } else if (_value >= 344) {
-			  returnArray['incisionSite'] = 'Limbal';
-      } else {
-			  returnArray['incisionSite'] = 'Corneal';
-      }
+			  } else if (_value >= 344) {
+					  returnArray['incisionSite'] = 'Limbal';
+			  } else {
+					  returnArray['incisionSite'] = 'Corneal';
+			  }
 
 			// Incision length should remain constant despite changes in radius
 			returnArray['arc'] = this.incisionLength * this.defaultRadius / (6 * _value);

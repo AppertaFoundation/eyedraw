@@ -232,3 +232,13 @@ ED.CorneaCrossSection.prototype.draw = function(_point) {
 	// Return value indicating successful hittest
 	return this.isClicked;
 }
+
+ED.CorneaCrossSection.prototype.description = function() {
+    var desc = [];
+    if(this.shape !== 'Normal') {
+        desc.push(this.shape);
+    }
+
+    desc = desc.join(", ");
+    return desc.charAt(0).toUpperCase() + desc.slice(1);
+};

@@ -2279,7 +2279,6 @@ ED.Drawing.prototype.eventHandler = function(_type, _doodleId, _className, _elem
  */
 ED.Drawing.prototype.updateBindings = function(_doodle) {
 	var doodle = _doodle;
-
 	// Check for an argument, otherwise take selected doodle for this drawing
 	if (typeof(doodle) == 'undefined') {
 		doodle = this.selectedDoodle;
@@ -2297,16 +2296,18 @@ ED.Drawing.prototype.updateBindings = function(_doodle) {
 			// Modify value of element according to type
 			switch (element.type) {
 				case 'checkbox':
+
 					if (attribute) {
 						ED.errorHandler('ED.Drawing', 'updateBindings', 'Binding to a checkbox with a non-standard attribute not yet supported');
 					} else {
 
 						if (value == "true") {
-							element.setAttribute('checked', 'checked');
+							element.checked = true;
 						} else {
-							element.removeAttribute('checked');
+							element.checked = false;
 						}
 					}
+
 					break;
 
 				case 'select-one':
