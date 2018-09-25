@@ -81,6 +81,7 @@ class DoodleInfo
         'CottonWoolSpot' => 'Cotton wool spot',
         'Cryo' => 'Cryotherapy scar',
         'CutterPI' => 'Cutter iridectomy',
+        'Cypass' => 'Cypass Stent Insertion',
         'CystoidMacularOedema' => 'Cystoid macular oedema',
         'DendriticUlcer' => 'Dendritic ulcer',
         'DiabeticNV' => 'Diabetic new vessels',
@@ -211,7 +212,6 @@ class DoodleInfo
         'ViewObscured' => 'View obscured',
         'VitreousOpacity' => 'Vitreous opacity',
         'VPattern' => 'V pattern',
-
         'Crepitations' => 'Crepitations',
         'Stenosis' => 'Stenosis',
         'Wheeze' => 'Wheeze',
@@ -228,6 +228,9 @@ class DoodleInfo
         'CornealLaceration' => 'Corneal laceration',
         'MetallicForeignBody' => 'Metallic foreign body',
         'Pingueculum' => 'Pingueculum',
-        'Pterygium' => 'Pterygium'
+        'Pterygium' => 'Pterygium',
+        'Drusen' => 'Drusen',
+        'MaculaPostPole' => 'Macula (posterior pole)',
+        'PCV' => 'Polypoidal choroidal vasculopathy',
     );
 }

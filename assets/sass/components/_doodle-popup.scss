@@ -13,7 +13,7 @@
 // * @copyright Copyright 2011-2017, OpenEyes Foundation
 // * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
 
-.ed-doodle-popup {
+.ed-doodle-popup { 
 	@include transition(right 0.5s ease);
 	@include box-shadow(2px 5px 14px -4px rgba(0, 0, 0, 0.7));
 	@include user-select(text);
@@ -23,13 +23,14 @@
 	padding: 5px;
 	position: absolute;
 	top: 0;
-	z-index: 100;
+	z-index: 102;
 	opacity: 1;
 	// default width, override in the module
 	width: 188px;
 	&.closed {
 		right: 0;
 		opacity: 0;
+		display: none;
 		.ed-button {
 			.label {
 				display: none;

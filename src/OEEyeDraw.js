@@ -85,8 +85,6 @@ ED.init = (function() {
 	 */
 	return function init(properties, done) {
 		done = $.isFunction(done) ? done : $.noop;
-		waitForStyleSheet('oe-eyedraw', 5000, function() {
-			done(new ED.Controller(properties));
-		});
+		done(new ED.Controller(properties));
 	};
 }());
