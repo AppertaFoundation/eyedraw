@@ -15726,8 +15726,9 @@ ED.AntSeg.prototype.description = function() {
 	var returnValue = "";
 	var pupilSize = Math.round(-this.apexY * 0.03);
 
-	// Pupil size and coloboma
-	returnValue += this.pupilSize.toLowerCase() + " pupil (diameter: " + pupilSize + "mm), ";
+	// Pupil size and coloboma and corneal size
+	returnValue += this.pupilSize.toLowerCase() + " pupil (diameter: " + pupilSize + "mm), " +
+		' corneal size : ' + this.cornealSize.toLowerCase();
 
 	// Coloboma
 	if (this.coloboma) {
