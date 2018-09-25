@@ -171,5 +171,9 @@ ED.PCV.prototype.draw = function(_point) {
  * @returns {String} Description of doodle
  */
 ED.PCV.prototype.description = function() {
-    return "";
+    return 'Polypoidal choroidal vasculopathy';
+};
+
+ED.PCV.prototype.snomedCode = function() {
+    return 313001006;
 };
