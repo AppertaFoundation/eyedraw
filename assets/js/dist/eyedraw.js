@@ -53074,7 +53074,7 @@ ED.ToricPCIOL.prototype.draw = function(_point) {
 		ctx.beginPath();
 
 		// Create points
-		var phi = 0.7 * Math.PI / 4;
+		var phi = 0.67 * Math.PI / 4;
 		var theta = phi + Math.PI;
 		var p1 = new ED.Point(0, 0);
 		p1.setWithPolars(r - 20, phi);
