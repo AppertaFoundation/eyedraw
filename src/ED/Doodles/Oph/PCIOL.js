@@ -72,13 +72,13 @@ ED.PCIOL.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['fixation'] = {
 		kind: 'derived',
 		type: 'string',
-		list: ['In-the-bag', 'Ciliary sulcus'],
+		list: ['In-the-bag', 'Ciliary sulcus', 'Partly in the bag'],
 		animate: true
 	};
 	this.parameterValidationArray['fx'] = {
 		kind: 'other',
 		type: 'int',
-		range: [1, 2],
+		range:  new ED.Range(1, 8),
 		animate: false
 	};
 	
@@ -100,24 +100,29 @@ ED.PCIOL.prototype.dependentParameterValues = function(_parameter, _value) {
 
 	switch (_parameter) {
 		case 'fx':
-			if (_value === 2) returnArray['fixation'] = 'Ciliary sulcus';
-			else returnArray['fixation'] = 'In-the-bag';
+			if (_value === 1){ returnArray['fixation'] = 'In-the-bag'; }
+			if (_value === 2){ returnArray['fixation'] = 'Partly in the bag'; }
+			if (_value === 3){ returnArray['fixation'] = 'Ciliary sulcus'; }
 			break;
 
 		case 'fixation':
 			switch (_value) {
 				case 'In-the-bag':
-					returnArray['fx'] = 1;
+					this.setParameterFromString('fx', '1', true);
+					break;
+				case 'Partly in the bag':
+					this.setParameterFromString('fx', '2', true);
 					break;
 				case 'Ciliary sulcus':
-					returnArray['fx'] = 2;
+					this.setParameterFromString('fx', '3', true);
 					break;
 			}
 			break;
 	}
 
 	return returnArray;
-}
+};
+
 
 /**
  * Draws doodle or performs a hit test if a Point parameter is passed
@@ -215,4 +220,4 @@ ED.PCIOL.prototype.description = function() {
 	if (displacementValue.length > 0) returnValue += " displaced" + displacementValue;
 
 	return returnValue;
-}
+};

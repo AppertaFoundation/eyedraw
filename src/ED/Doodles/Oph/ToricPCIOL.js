@@ -31,15 +31,21 @@ ED.ToricPCIOL = function(_drawing, _parameterJSON) {
 	
 	// Other parameters
 	this.model = 'Type 1';
+	this.fixation = 'In-the-bag';
+	this.fx = 1;
+    this.csOriginX = 0;
 
 	// Saved parameters
-	this.savedParameterArray = ['originX', 'originY', 'rotation', 'model'];
+	this.savedParameterArray = ['fixation', 'fx', 'originX', 'originY', 'rotation', 'csOriginX', 'model'];
 	
 	// Parameters in doodle control bar (parameter name: parameter label)
 	this.controlParameterArray = {'model':'Model'};
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
+
+    this.scaleX = 0.75;
+    this.scaleY = 0.75;
 }
 
 /**
@@ -66,7 +72,20 @@ ED.ToricPCIOL.prototype.setPropertyDefaults = function() {
 	this.isUnique = true;
 	
 	// Add complete validation arrays for derived parameters
-	this.parameterValidationArray['axis'] = {
+	this.parameterValidationArray['fixation'] = {
+		kind: 'derived',
+		type: 'string',
+		list: ['In-the-bag', 'Ciliary sulcus'],
+		animate: true
+	};
+	this.parameterValidationArray['fx'] = {
+		kind: 'other',
+		type: 'int',
+		range: [1, 2],
+		animate: false
+	};	
+
+    this.parameterValidationArray['axis'] = {
 		kind: 'derived',
 		type: 'mod',
 		range: new ED.Range(0, 180),
@@ -80,6 +99,10 @@ ED.ToricPCIOL.prototype.setPropertyDefaults = function() {
 		list: ['AcrySof T3 (+1.50 D)', 'AcrySof T4 (+2.25 D)', 'AcrySof T5 (+3.00 D)', 'AA4203-TF (+2.00 D)', 'AA4203-TL (+3.50 D)'],
 		animate: false
 	}
+
+	// Update component of validation array for simple parameters
+	this.parameterValidationArray['originX']['range'].setMinAndMax(-200, +200);
+	this.parameterValidationArray['originY']['range'].setMinAndMax(-200, +200);
 }
 
 /**
@@ -105,6 +128,21 @@ ED.ToricPCIOL.prototype.dependentParameterValues = function(_parameter, _value) 
 
 	// Similar to TrialLens but with correction to line up haptics correctly
 	switch (_parameter) {
+	    case 'fx':
+			if (_value === 2) returnArray['fixation'] = 'Ciliary sulcus';
+			else returnArray['fixation'] = 'In-the-bag';
+			break;
+
+		case 'fixation':
+			switch (_value) {
+				case 'In-the-bag':
+					returnArray['fx'] = 1;
+					break;
+				case 'Ciliary sulcus':
+					returnArray['fx'] = 2;
+					break;
+			}
+			break;
 		case 'rotation':
 			returnArray['axis'] = (-120 + 720 - 180 * _value / Math.PI) % 180;
 			break;
@@ -174,11 +212,11 @@ ED.ToricPCIOL.prototype.draw = function(_point) {
 		// Create points
 		var phi = 0.7 * Math.PI / 4;
 		var theta = phi + Math.PI;
-		var p1 = new ED.Point(0, 0)
+		var p1 = new ED.Point(0, 0);
 		p1.setWithPolars(r - 20, phi);
 		var p2 = new ED.Point(0, 0);
 		p2.setWithPolars(r - 100, phi);
-		var p3 = new ED.Point(0, 0)
+		var p3 = new ED.Point(0, 0);
 		p3.setWithPolars(r - 20, theta);
 		var p4 = new ED.Point(0, 0);
 		p4.setWithPolars(r - 100, theta);
@@ -199,7 +237,7 @@ ED.ToricPCIOL.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of handles (in canvas plane)
-	var point = new ED.Point(0, 0)
+	var point = new ED.Point(0, 0);
 	point.setWithPolars(r, 4 * Math.PI / 4);
 	this.handleArray[2].location = this.transform.transformPoint(point);
 
