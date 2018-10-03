@@ -34,7 +34,7 @@ ED.AntSeg = function(_drawing, _parameterJSON) {
 	this.coloboma = false;
 	this.colour = 'Blue';
 	this.ectropion = false;
-	this.cornealSize = 'Normal';
+	this.cornealSize = 'Not Checked';
 	this.cells = 'Not Checked';
 	this.flare = 'Not Checked';
 	this.csApexX = 0;
@@ -134,7 +134,7 @@ ED.AntSeg.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray.cornealSize = {
 		kind: 'other',
 		type: 'string',
-		list: ['Micro', 'Normal', 'Macro'],
+		list: ['Not Checked' ,'Micro', 'Normal', 'Macro'],
 		animate: false
 	};
 
@@ -160,7 +160,7 @@ ED.AntSeg.prototype.setPropertyDefaults = function() {
 ED.AntSeg.prototype.setParameterDefaults = function() {
 	this.setParameterFromString('pupilSize', 'Large');
 	this.setParameterFromString('pxe', 'false');
-	this.setParameterFromString('cornealSize', 'Normal');
+	this.setParameterFromString('cornealSize', 'Not Checked');
 };
 
 /**
@@ -369,8 +369,10 @@ ED.AntSeg.prototype.description = function() {
 	var pupilSize = Math.round(-this.apexY * 0.03);
 
 	// Pupil size and coloboma and corneal size
-	returnValue += this.pupilSize.toLowerCase() + " pupil (diameter: " + pupilSize + "mm), " +
-		' corneal size : ' + this.cornealSize.toLowerCase();
+	returnValue += this.pupilSize.toLowerCase() + " pupil (diameter: " + pupilSize + "mm)";
+		if(this.cornealSize.toLowerCase() !== 'not checked'){
+			returnValue += ', corneal size : ' +  this.cornealSize.toLowerCase();
+        }
 
 	// Coloboma
 	if (this.coloboma) {
