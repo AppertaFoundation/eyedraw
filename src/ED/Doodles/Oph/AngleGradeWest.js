@@ -31,10 +31,9 @@ ED.AngleGradeWest = function(_drawing, _parameterJSON) {
 	this.rsli = 470;
 	this.rtmo = 404;
 	this.rtmi = 304;
-	this.rcbo = 270;
-	this.rcbi = 190;
-	this.riro = 190;
-	this.riri = 176;
+	this.rcbo = 306;
+	this.riro = 270;
+	this.riri = 230;
 	this.rpu = 100;
 
 	// Derived parameters
@@ -50,7 +49,7 @@ ED.AngleGradeWest = function(_drawing, _parameterJSON) {
 	// Invariant simple parameters
 	this.arc = 90 * Math.PI / 180;
 	this.rotation = 3 * Math.PI / 2;
-}
+};
 
 /**
  * Sets superclass and constructor
@@ -64,7 +63,7 @@ ED.AngleGradeWest.superclass = ED.Doodle.prototype;
  */
 ED.AngleGradeWest.prototype.setHandles = function() {
 	this.handleArray[4] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
-}
+};
 
 /**
  * Sets default dragging attributes
@@ -115,11 +114,11 @@ ED.AngleGradeWest.prototype.setParameterDefaults = function() {
  */
 ED.AngleGradeWest.prototype.dependentParameterValues = function(_parameter, _value) {
 	var returnArray = new Array();
+    var returnValue = "4";
 
 	switch (_parameter) {
 		case 'apexY':
 			// Return value uses Schaffer classificaton (although visibility is based on Scheie)
-			var returnValue = "4";
 			if (-_value >= this.riro) returnValue = "3";
 			if (-_value >= this.rcbo) returnValue = "2";
 			if (-_value >= this.rtmo) returnValue = "1";
@@ -129,7 +128,7 @@ ED.AngleGradeWest.prototype.dependentParameterValues = function(_parameter, _val
 			break;
 
 		case 'grade':
-			var returnValue = "";
+			returnValue = "";
 			switch (_value) {
 				case '0':
 					if (-this.apexY >= this.rsli) returnValue = this.apexY;
@@ -141,11 +140,11 @@ ED.AngleGradeWest.prototype.dependentParameterValues = function(_parameter, _val
 					break;
 				case '2':
 					if (-this.apexY >= this.rcbo && -this.apexY < this.rtmo) returnValue = this.apexY;
-					else returnValue = -360; //-this.rcbo;
+					else returnValue = -306; //-this.rcbo;
 					break;
 				case '3':
 					if (-this.apexY >= this.riro && -this.apexY < this.rcbo) returnValue = this.apexY;
-					else returnValue = -230; //-this.riro;
+					else returnValue = -270; //-this.riro;
 					break;
 				case '4':
 					if (-this.apexY >= this.riri && -this.apexY < this.riro) returnValue = this.apexY;
@@ -156,7 +155,7 @@ ED.AngleGradeWest.prototype.dependentParameterValues = function(_parameter, _val
 			break;
 
 		case 'seen':
-			var returnValue = "";
+			returnValue = "";
 			switch (_value) {
 				case 'No':
 					if (-this.apexY >= this.rtmo) returnValue = this.apexY;
@@ -164,7 +163,7 @@ ED.AngleGradeWest.prototype.dependentParameterValues = function(_parameter, _val
 					break;
 				case 'Yes':
 					if (-this.apexY < this.rtmo) returnValue = this.apexY;
-					else returnValue = -this.riri;
+					else returnValue = -this.riro;
 					break;
 			}
 			returnArray['apexY'] = returnValue;
@@ -172,7 +171,7 @@ ED.AngleGradeWest.prototype.dependentParameterValues = function(_parameter, _val
 	}
 
 	return returnArray;
-}
+};
 
 /**
  * Draws doodle or performs a hit test if a Point parameter is passed
@@ -215,4 +214,4 @@ ED.AngleGradeWest.prototype.draw = function(_point) {
 
 	// Return value indicating successful hittest
 	return this.isClicked;
-}
+};

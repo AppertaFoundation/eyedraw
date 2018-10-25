@@ -27,15 +27,14 @@ ED.AngleGradeNorth = function(_drawing, _parameterJSON) {
 	this.className = "AngleGradeNorth";
 
 	// Private parameters
-	this.rsl = 480;
-	this.rsli = 470;
-	this.rtmo = 404;
-	this.rtmi = 304;
-	this.rcbo = 270;
-	this.rcbi = 190;
-	this.riro = 190;
-	this.riri = 176;
-	this.rpu = 100;
+    this.rsl = 480;
+    this.rsli = 470;
+    this.rtmo = 404;
+    this.rtmi = 304;
+    this.rcbo = 306;
+    this.riro = 270;
+    this.riri = 230;
+    this.rpu = 100;
 
 	// Derived parameters
 	this.grade = "4";
@@ -141,11 +140,11 @@ ED.AngleGradeNorth.prototype.dependentParameterValues = function(_parameter, _va
 					break;
 				case '2':
 					if (-this.apexY >= this.rcbo && -this.apexY < this.rtmo) returnValue = this.apexY;
-					else returnValue = -360; //-this.rcbo;
+					else returnValue = -306; //-this.rcbo;
 					break;
 				case '3':
 					if (-this.apexY >= this.riro && -this.apexY < this.rcbo) returnValue = this.apexY;
-					else returnValue = -230; //-this.riro;
+					else returnValue = -270; //-this.riro;
 					break;
 				case '4':
 					if (-this.apexY >= this.riri && -this.apexY < this.riro) returnValue = this.apexY;
@@ -164,7 +163,7 @@ ED.AngleGradeNorth.prototype.dependentParameterValues = function(_parameter, _va
 					break;
 				case 'Yes':
 					if (-this.apexY < this.rtmo) returnValue = this.apexY;
-					else returnValue = -this.riri;
+					else returnValue = -this.riro;
 					break;
 			}
 			returnArray['apexY'] = returnValue;
