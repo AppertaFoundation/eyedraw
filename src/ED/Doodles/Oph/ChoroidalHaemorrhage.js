@@ -176,4 +176,15 @@ ED.ChoroidalHaemorrhage.prototype.description = function() {
  */
 ED.ChoroidalHaemorrhage.prototype.snomedCode = function() {
 	return 419596007;
-}
+};
+
+/**
+ * Returns the SnoMed code of the doodle
+ *
+ * @returns {number} SnoMed code of entity represented by doodle
+ */
+ED.ChoroidalHaemorrhage.prototype.snomedCode = function() {
+    'use strict';
+
+    return 122003;
+};
