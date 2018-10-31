@@ -148,4 +148,13 @@ ED.Telangiectasis.prototype.draw = function(_point) {
  */
 ED.Telangiectasis.prototype.description = function() {
 	return "Parafoveal telangiectasia";
-}
+};
+
+/**
+ * Returns the SnoMed code of the doodle
+ *
+ * @returns {number} SnoMed code of entity representated by doodle
+ */
+ED.CNV.prototype.snomedCode = function() {
+    return 232024000;
+};
