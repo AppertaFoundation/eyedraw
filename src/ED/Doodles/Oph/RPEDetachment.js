@@ -174,4 +174,15 @@ ED.RPEDetachment.prototype.draw = function(_point) {
  */
 ED.RPEDetachment.prototype.description = function() {
 	return 'Retinal pigment epithelial detachment';
-}
+};
+
+/**
+ * Returns the SnoMed code of the doodle
+ *
+ * @returns {number} SnoMed code of entity represented by doodle
+ */
+ED.RPEDetachment.prototype.snomedCode = function() {
+    'use strict';
+
+    return 232067008; // retinal pigment epithelial detachment
+};

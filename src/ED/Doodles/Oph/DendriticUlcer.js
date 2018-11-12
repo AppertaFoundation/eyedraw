@@ -196,13 +196,15 @@ ED.DendriticUlcer.prototype.draw = function(_point) {
  */
 ED.DendriticUlcer.prototype.description = function() {
 	return 'Dendritic ulcer';
-}
+};
 
 /**
  * Returns the SnoMed code of the doodle
  *
- * @returns {Int} SnoMed code of entity representated by doodle
+ * @returns {number} SnoMed code of entity represented by doodle
  */
-// ED.DendriticUlcer.prototype.snomedCode = function() {
-// 	return 11111111;
-// }
+ED.DendriticUlcer.prototype.snomedCode = function() {
+    'use strict';
+
+    return 193764001;
+};
