@@ -32,7 +32,7 @@ ED.MarginalKeratitis = function(_drawing, _parameterJSON) {
 	
 	// Parameters in doodle control bar (parameter name: parameter label)
 	this.controlParameterArray = {
-		'epithelialDefectPercent':"% Epithelial defect of corneal infiltrate"
+		'epithelialDefectPercent':"% Epithelial defect \n of corneal infiltrate"
 	};
 
 	// Call superclass constructor
