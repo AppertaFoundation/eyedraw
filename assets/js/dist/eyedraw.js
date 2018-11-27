@@ -38508,6 +38508,14 @@ ED.MetallicForeignBody.prototype.description = function() {
 };
 
 /**
+ * Returns the SnoMed code of the doodle
+ *
+ * @returns {Int} SnoMed code of entity representated by doodle
+ */
+ED.MetallicForeignBody.prototype.snomedCode = function () {
+    return 422321007;
+}
+/**
  * OpenEyes
  *
  * (C) OpenEyes Foundation, 2017
@@ -42921,8 +42929,8 @@ ED.Pingueculum.prototype.draw = function(_point) {
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
 
-	// Return value indicating successful hittest
-	return this.isClicked;
+    // Return value indicating successful hittest
+    return this.isClicked;
 }
 
 /**
@@ -42930,9 +42938,18 @@ ED.Pingueculum.prototype.draw = function(_point) {
  *
  * @returns {String} Description of doodle
  */
-ED.Pingueculum.prototype.description = function() {
-	var returnValue = "Pingueculum";
-	return returnValue;
+ED.Pingueculum.prototype.description = function () {
+    var returnValue = "Pinguecula";
+    return returnValue;
+}
+
+/**
+ * Returns the SnoMed code of the doodle
+ *
+ * @returns {Int} SnoMed code of entity representated by doodle
+ */
+ED.Pingueculum.prototype.snomedCode = function () {
+    return 87614000;
 }
 
 /**
