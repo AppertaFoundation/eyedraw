@@ -2643,16 +2643,28 @@ ED.Drawing.prototype.reportData = function() {
  * @returns {String} Description of the drawing
  */
 ED.Drawing.prototype.report = function() {
-	var returnString = "";
+    var returnString = "";
+    var doodleArray = this.doodleArray;
+    var reports = this.reportData();
+    for (var i = 0; i < reports.length; i++) {
+        var description = reports[i];
 
-	var data = this.reportData();
-	for (var i = 0; i < data.length; i++) {
-		returnString += (i === 0) ? data[i] : ", " + ED.firstLetterToLowerCase(data[i]);
-	}
+        /* handled special formats with doodle's own formatReport method */
+        var special = (function(description) {
+            return doodleArray.find(function(obj) {
+                return obj.description() === description && typeof obj.formatReport === 'function';
+            });
+        }(description));
+        if (special) {
+            description = special.formatReport();
+		} else {
+            description = ED.firstLetterToLowerCase(reports[i]);
+		}
 
-	return (returnString.length > 0) ? returnString : "No abnormality";
-};
-
+        returnString += (i === 0) ? ED.firstLetterToUpperCase(description) : ", " + description;
+    }
+    return returnString;
+}
 
 /**
  * Returns a SNOMED diagnostic code derived from the drawing, returns empty array if no code
