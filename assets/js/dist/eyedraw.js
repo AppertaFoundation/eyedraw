@@ -1912,7 +1912,7 @@ ED.Drawing.prototype.deleteSelectedDoodle = function() {
 
 ED.Drawing.prototype.resetEyedraw = function() {
 	this.notify("beforeReset");
-
+console.log('resetEyedraw');
 	this.deleteAllDoodles(true);
 
 	if (this.resetDoodleSet !== false) {
@@ -4774,7 +4774,7 @@ ED.Doodle.prototype.increment = function(_parameter, _value, _updateBindings) {
 	var interval = 1000 / this.animationFrameRate;
 
 	// Complete or continue animation
-	if (this.animationDataArray[_parameter]['frameCounter'] == this.animationDataArray[_parameter]['frames']) {
+	if (this.animationDataArray[_parameter]['frameCounter'] >= this.animationDataArray[_parameter]['frames']) {
 		// Set  parameter to exact value
 		this.setSimpleParameter(_parameter, _value);
 
@@ -14098,8 +14098,8 @@ ED.AngleGradeEast.prototype.dependentParameterValues = function(_parameter, _val
 			var returnValue = "";
 			switch (_value) {
 				case 'No':
-					if (-this.apexY >= this.rtmo) returnValue = this.apexY;
-					else returnValue = -this.rtmo;
+					if (-this.apexY >= this.rsli) returnValue = this.apexY;
+					else returnValue = -this.rsli;
 					break;
 				case 'Yes':
 					if (-this.apexY < this.rtmo) returnValue = this.apexY;
@@ -14317,8 +14317,8 @@ ED.AngleGradeNorth.prototype.dependentParameterValues = function(_parameter, _va
 			var returnValue = "";
 			switch (_value) {
 				case 'No':
-					if (-this.apexY >= this.rtmo) returnValue = this.apexY;
-					else returnValue = -this.rtmo;
+					if (-this.apexY >= this.rsli) returnValue = this.apexY;
+					else returnValue = -this.rsli;
 					break;
 				case 'Yes':
 					if (-this.apexY < this.rtmo) returnValue = this.apexY;
@@ -14536,8 +14536,8 @@ ED.AngleGradeSouth.prototype.dependentParameterValues = function(_parameter, _va
 			var returnValue = "";
 			switch (_value) {
 				case 'No':
-					if (-this.apexY >= this.rtmo) returnValue = this.apexY;
-					else returnValue = -this.rtmo;
+					if (-this.apexY >= this.rsli) returnValue = this.apexY;
+					else returnValue = -this.rsli;
 					break;
 				case 'Yes':
 					if (-this.apexY < this.rtmo) returnValue = this.apexY;
@@ -14755,8 +14755,8 @@ ED.AngleGradeWest.prototype.dependentParameterValues = function(_parameter, _val
 			var returnValue = "";
 			switch (_value) {
 				case 'No':
-					if (-this.apexY >= this.rtmo) returnValue = this.apexY;
-					else returnValue = -this.rtmo;
+					if (-this.apexY >= this.rsli) returnValue = this.apexY;
+					else returnValue = -this.rsli;
 					break;
 				case 'Yes':
 					if (-this.apexY < this.rtmo) returnValue = this.apexY;

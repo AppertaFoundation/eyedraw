@@ -159,8 +159,8 @@ ED.AngleGradeNorth.prototype.dependentParameterValues = function(_parameter, _va
 			var returnValue = "";
 			switch (_value) {
 				case 'No':
-					if (-this.apexY >= this.rtmo) returnValue = this.apexY;
-					else returnValue = -this.rtmo;
+					if (-this.apexY >= this.rsli) returnValue = this.apexY;
+					else returnValue = -this.rsli;
 					break;
 				case 'Yes':
 					if (-this.apexY < this.rtmo) returnValue = this.apexY;
