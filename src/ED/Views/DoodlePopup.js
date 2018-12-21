@@ -37,7 +37,7 @@ ED.Views.DoodlePopup = (function() {
 	 * the animation time set in CSS.
 	 * @type {Number}
 	 */
-	var animateTime = 440;
+	var animateTime = 0;
 
 	/**
 	 * DoodlePopup constructor
@@ -171,15 +171,11 @@ ED.Views.DoodlePopup = (function() {
 
 			this.emit('hide.before');
 
+			this.container.addClass('closed');
+			this.emit('hide.after');
 			var css = {};
 			css[this.side] = 0;
 			this.container.css(css);
-
-			setTimeout(function() {
-				this.container.addClass('closed');
-				this.emit('hide.after');
-			}.bind(this), animateTime);
-
 		}.bind(this));
 	};
 
@@ -203,10 +199,7 @@ ED.Views.DoodlePopup = (function() {
 			}
 			this.container.removeClass('closed');
 
-
-			setTimeout(function() {
-				this.emit('show.after');
-			}.bind(this), animateTime);
+			this.emit('show.after');
 
 		}.bind(this));
 	};

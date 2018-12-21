@@ -132,4 +132,15 @@ ED.Hypopyon.prototype.draw = function(_point) {
 ED.Hypopyon.prototype.description = function() {
 	var height = Math.round(10 * (this.ro - this.apexY) / (2 * this.ro));
 	return height + "mm hypopyon";
-}
+};
+
+/**
+ * Returns the SnoMed code of the doodle
+ *
+ * @returns {number} SnoMed code of entity represented by doodle
+ */
+ED.Hypopyon.prototype.snomedCode = function() {
+    'use strict';
+
+    return 87807004;
+};

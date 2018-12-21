@@ -38,7 +38,7 @@
 			</ul>
 			<!-- SELECTED DOODLE -->
 			<div class="ed-selected-doodle">
-				<select class="ed-selected-doodle-select" id="ed_example_selected_doodle" class="ed-selected-doodle-select">
+				<select class="ed-selected-doodle-select cols-full" id="ed_example_selected_doodle">
 				</select>
 			</div>
 		</div>
@@ -55,7 +55,6 @@
 		id="<?php echo $canvasId ?>"
 		class="<?php if ($isEditable) { echo 'ed-canvas-edit'; } else { echo 'ed-canvas-display'; } ?>"
 		width="<?php echo $width ?>" height="<?php echo $height ?>"
-		tabindex="1"
 		data-drawing-name="<?php echo $drawingName ?>"
 		<?php if ($canvasStyle) { ?> style="<?php echo $canvasStyle ?>"<?php } ?>>
 	</canvas>

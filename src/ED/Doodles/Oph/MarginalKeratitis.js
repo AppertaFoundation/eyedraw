@@ -32,7 +32,7 @@ ED.MarginalKeratitis = function(_drawing, _parameterJSON) {
 	
 	// Parameters in doodle control bar (parameter name: parameter label)
 	this.controlParameterArray = {
-		'epithelialDefectPercent':"% Epithelial defect of corneal infiltrate"
+		'epithelialDefectPercent':"% Epithelial defect \n of corneal infiltrate"
 	};
 
 	// Call superclass constructor
@@ -251,4 +251,15 @@ ED.MarginalKeratitis.prototype.draw = function(_point) {
  */
 ED.MarginalKeratitis.prototype.description = function() {
 	return "Marginal keratitis";
-}
+};
+
+/**
+ * Returns the SnoMed code of the doodle
+ *
+ * @returns {number} SnoMed code of entity represented by doodle
+ */
+ED.MarginalKeratitis.prototype.snomedCode = function() {
+    'use strict';
+
+    return 95730003;
+};

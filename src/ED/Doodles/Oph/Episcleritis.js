@@ -249,4 +249,15 @@ ED.Episcleritis.prototype.drawSoftLine = function(x1, y1, x2, y2, lineWidth, r, 
 	ctx.lineTo(x2, y2);
 	ctx.stroke();
 	ctx.restore();
-}
+};
+
+/**
+ * Returns the SnoMed code of the doodle
+ *
+ * @returns {number} SnoMed code of entity represented by doodle
+ */
+ED.Episcleritis.prototype.snomedCode = function() {
+    'use strict';
+
+    return 815008;
+};
