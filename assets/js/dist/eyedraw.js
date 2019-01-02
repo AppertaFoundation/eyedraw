@@ -877,7 +877,7 @@ ED.Drawing.prototype.drawAllDoodles = function() {
 ED.Drawing.prototype.mousedown = function(_point) {
 	// Set flag to indicate dragging can now take place
 	this.mouseIsDown = true;
-	
+
 	var doodle = this.selectedDoodle;
 
 	// Detect double click
@@ -913,7 +913,7 @@ ED.Drawing.prototype.mousedown = function(_point) {
 						// Add new squiggle
 						this.doodleArray[i].addSquiggle();
 					}
-					
+
 				}
 			}
 			// Ensure that unselected doodles are marked as such
@@ -1409,7 +1409,7 @@ ED.Drawing.prototype.mouseup = function(_point) {
 		}
 	}
 
-	
+
 	// Redraw to get rid of select rectangle
 	this.repaint();
 
@@ -2169,7 +2169,7 @@ ED.Drawing.prototype.selectDoodle = function(doodle) {
 
 	doodle.isSelected = true;
 	this.selectedDoodle = doodle;
-	
+
 	// Run onDeselection code for last doodle
 	if (this.lastSelectedDoodle) this.lastSelectedDoodle.onDeselection();
 
@@ -2201,7 +2201,7 @@ ED.Drawing.prototype.isReady = function() {
  * @returns {Doodle} The newly added doodle
  */
 ED.Drawing.prototype.addDoodle = function(_className, _parameterDefaults, _parameterBindings) {
-		
+
 	// Set flag to indicate whether a doodle of this className already exists
 	var doodleExists = this.hasDoodleOfClass(_className);
 
@@ -2874,9 +2874,7 @@ ED.Drawing.prototype.reportData = function() {
 						'end': doodle.groupDescriptionEnd()
 					}
 				}
-                if (description.length) {
-                    grouped[doodle.className]['descriptions'].push(description)
-                }
+				grouped[doodle.className]['descriptions'].push(description)
 			} else {
 				if (description.length) {
 					reports.push(description);
@@ -2905,16 +2903,28 @@ ED.Drawing.prototype.reportData = function() {
  * @returns {String} Description of the drawing
  */
 ED.Drawing.prototype.report = function() {
-	var returnString = "";
+    var returnString = "";
+    var doodleArray = this.doodleArray;
+    var reports = this.reportData();
+    for (var i = 0; i < reports.length; i++) {
+        var description = reports[i];
 
-	var data = this.reportData();
-	for (var i = 0; i < data.length; i++) {
-		returnString += (i === 0) ? data[i] : ", " + ED.firstLetterToLowerCase(data[i]);
-	}
+        /* handled special formats with doodle's own formatReport method */
+        var special = (function(description) {
+            return doodleArray.find(function(obj) {
+                return obj.description() === description && typeof obj.formatReport === 'function';
+            });
+        }(description));
+        if (special) {
+            description = special.formatReport();
+		} else {
+            description = ED.firstLetterToLowerCase(reports[i]);
+		}
 
-	return (returnString.length > 0) ? returnString : "No abnormality";
-};
-
+        returnString += (i === 0) ? ED.firstLetterToUpperCase(description) : ", " + description;
+    }
+    return returnString;
+}
 
 /**
  * Returns a SNOMED diagnostic code derived from the drawing, returns empty array if no code
@@ -37749,6 +37759,10 @@ ED.Malyugin = function(_drawing, _parameterJSON) {
 ED.Malyugin.prototype = new ED.Doodle;
 ED.Malyugin.prototype.constructor = ED.Malyugin;
 ED.Malyugin.superclass = ED.Doodle.prototype;
+
+ED.Malyugin.prototype.formatReport = function() {
+	return this.description();
+}
 
 /**
  * Sets handle attributes
