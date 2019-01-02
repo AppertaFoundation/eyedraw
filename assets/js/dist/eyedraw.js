@@ -877,7 +877,7 @@ ED.Drawing.prototype.drawAllDoodles = function() {
 ED.Drawing.prototype.mousedown = function(_point) {
 	// Set flag to indicate dragging can now take place
 	this.mouseIsDown = true;
-	
+
 	var doodle = this.selectedDoodle;
 
 	// Detect double click
@@ -913,7 +913,7 @@ ED.Drawing.prototype.mousedown = function(_point) {
 						// Add new squiggle
 						this.doodleArray[i].addSquiggle();
 					}
-					
+
 				}
 			}
 			// Ensure that unselected doodles are marked as such
@@ -1409,7 +1409,7 @@ ED.Drawing.prototype.mouseup = function(_point) {
 		}
 	}
 
-	
+
 	// Redraw to get rid of select rectangle
 	this.repaint();
 
@@ -2169,7 +2169,7 @@ ED.Drawing.prototype.selectDoodle = function(doodle) {
 
 	doodle.isSelected = true;
 	this.selectedDoodle = doodle;
-	
+
 	// Run onDeselection code for last doodle
 	if (this.lastSelectedDoodle) this.lastSelectedDoodle.onDeselection();
 
@@ -2201,7 +2201,7 @@ ED.Drawing.prototype.isReady = function() {
  * @returns {Doodle} The newly added doodle
  */
 ED.Drawing.prototype.addDoodle = function(_className, _parameterDefaults, _parameterBindings) {
-		
+
 	// Set flag to indicate whether a doodle of this className already exists
 	var doodleExists = this.hasDoodleOfClass(_className);
 
