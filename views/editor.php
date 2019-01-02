@@ -55,7 +55,6 @@
 		id="<?php echo $canvasId ?>"
 		class="<?php if ($isEditable) { echo 'ed-canvas-edit'; } else { echo 'ed-canvas-display'; } ?>"
 		width="<?php echo $width ?>" height="<?php echo $height ?>"
-		tabindex="1"
 		data-drawing-name="<?php echo $drawingName ?>"
 		<?php if ($canvasStyle) { ?> style="<?php echo $canvasStyle ?>"<?php } ?>>
 	</canvas>

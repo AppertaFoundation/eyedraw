@@ -25,10 +25,10 @@
 ED.ToricPCIOL = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "ToricPCIOL";
-	
+
 	// Derived parameters
 	this.axis = 0;
-	
+
 	// Other parameters
 	this.model = 'Type 1';
 	this.fixation = 'In-the-bag';
@@ -37,7 +37,7 @@ ED.ToricPCIOL = function(_drawing, _parameterJSON) {
 
 	// Saved parameters
 	this.savedParameterArray = ['fixation', 'fx', 'originX', 'originY', 'rotation', 'csOriginX', 'model'];
-	
+
 	// Parameters in doodle control bar (parameter name: parameter label)
 	this.controlParameterArray = {'model':'Model'};
 
@@ -70,7 +70,7 @@ ED.ToricPCIOL.prototype.setPropertyDefaults = function() {
 	this.isOrientated = false;
 	this.isScaleable = false;
 	this.isUnique = true;
-	
+
 	// Add complete validation arrays for derived parameters
 	this.parameterValidationArray['fixation'] = {
 		kind: 'derived',
@@ -83,7 +83,7 @@ ED.ToricPCIOL.prototype.setPropertyDefaults = function() {
 		type: 'int',
 		range: [1, 2],
 		animate: false
-	};	
+	};
 
     this.parameterValidationArray['axis'] = {
 		kind: 'derived',
@@ -92,7 +92,7 @@ ED.ToricPCIOL.prototype.setPropertyDefaults = function() {
 		clock: 'bottom',
 		animate: true
 	};
-	
+
 	this.parameterValidationArray['model'] = {
 		kind: 'derived',
 		type: 'string',

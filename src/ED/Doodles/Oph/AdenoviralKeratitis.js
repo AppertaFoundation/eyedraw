@@ -177,4 +177,15 @@ ED.AdenoviralKeratitis.prototype.draw = function(_point) {
  */
 ED.AdenoviralKeratitis.prototype.description = function() {
 	return "Adenoviral keratitis";
-}
+};
+
+/**
+ * Returns the SnoMed code of the doodle
+ *
+ * @returns {number} SnoMed code of entity represented by doodle
+ */
+ED.AdenoviralKeratitis.prototype.snomedCode = function() {
+    'use strict';
+
+    return 314559002;
+};
