@@ -40,6 +40,10 @@ ED.Malyugin.prototype = new ED.Doodle;
 ED.Malyugin.prototype.constructor = ED.Malyugin;
 ED.Malyugin.superclass = ED.Doodle.prototype;
 
+ED.Malyugin.prototype.formatReport = function() {
+	return this.description();
+}
+
 /**
  * Sets handle attributes
  */

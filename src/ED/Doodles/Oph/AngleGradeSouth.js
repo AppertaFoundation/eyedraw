@@ -27,15 +27,14 @@ ED.AngleGradeSouth = function(_drawing, _parameterJSON) {
 	this.className = "AngleGradeSouth";
 
 	// Private parameters
-	this.rsl = 480;
-	this.rsli = 470;
-	this.rtmo = 404;
-	this.rtmi = 304;
-	this.rcbo = 270;
-	this.rcbi = 190;
-	this.riro = 190;
-	this.riri = 176;
-	this.rpu = 100;
+    this.rsl = 480;
+    this.rsli = 470;
+    this.rtmo = 404;
+    this.rtmi = 304;
+    this.rcbo = 306;
+    this.riro = 270;
+    this.riri = 230;
+    this.rpu = 100;
 
 	// Derived parameters
 	this.grade = "4";
@@ -132,24 +131,40 @@ ED.AngleGradeSouth.prototype.dependentParameterValues = function(_parameter, _va
 			var returnValue = "";
 			switch (_value) {
 				case '0':
-					if (-this.apexY >= this.rsli) returnValue = this.apexY;
-					else returnValue = -this.rsli;
+					if (-this.apexY >= this.rsli) {
+                        returnValue = this.apexY;
+					} else {
+                        returnValue = -this.rsli;
+					}
 					break;
 				case '1':
-					if (-this.apexY >= this.rtmo && -this.apexY < this.rsli) returnValue = this.apexY;
-					else returnValue = -this.rtmo;
+					if (-this.apexY >= this.rtmo && -this.apexY < this.rsli) {
+                        returnValue = this.apexY;
+					} else {
+                        returnValue = -this.rtmo;
+					}
 					break;
 				case '2':
-					if (-this.apexY >= this.rcbo && -this.apexY < this.rtmo) returnValue = this.apexY;
-					else returnValue = -360; //-this.rcbo;
+					if (-this.apexY >= this.rcbo && -this.apexY < this.rtmo) {
+                        returnValue = this.apexY;
+					} else {
+                        returnValue = -306; //-this.rcbo;
+					}
 					break;
 				case '3':
-					if (-this.apexY >= this.riro && -this.apexY < this.rcbo) returnValue = this.apexY;
-					else returnValue = -230; //-this.riro;
+					if (-this.apexY >= this.riro && -this.apexY < this.rcbo){
+                        returnValue = this.apexY;
+					}
+					else {
+                        returnValue = -270; //-this.riro;
+					}
 					break;
 				case '4':
-					if (-this.apexY >= this.riri && -this.apexY < this.riro) returnValue = this.apexY;
-					else returnValue = -this.riri;
+					if (-this.apexY >= this.riri && -this.apexY < this.riro) {
+                        returnValue = this.apexY;
+					} else {
+                        returnValue = -this.riri;
+					}
 					break;
 			}
 			returnArray['apexY'] = returnValue;

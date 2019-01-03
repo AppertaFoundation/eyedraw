@@ -129,4 +129,15 @@ ED.Hyphaema.prototype.draw = function(_point) {
 ED.Hyphaema.prototype.description = function() {
 	var percent = 10 * Math.round(10 * (this.ro - this.apexY) / (2 * this.ro));
 	return percent + "% hyphaema";
-}
+};
+
+/**
+ * Returns the SnoMed code of the doodle
+ *
+ * @returns {number} SnoMed code of entity represented by doodle
+ */
+ED.Hyphaema.prototype.snomedCode = function() {
+	'use strict';
+
+    return 75229002;
+};
