@@ -1599,7 +1599,7 @@ ED.Doodle.prototype.increment = function(_parameter, _value, _updateBindings) {
 	var interval = 1000 / this.animationFrameRate;
 
 	// Complete or continue animation
-	if (this.animationDataArray[_parameter]['frameCounter'] == this.animationDataArray[_parameter]['frames']) {
+	if (this.animationDataArray[_parameter]['frameCounter'] >= this.animationDataArray[_parameter]['frames']) {
 		// Set  parameter to exact value
 		this.setSimpleParameter(_parameter, _value);
 
