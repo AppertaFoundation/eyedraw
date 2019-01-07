@@ -124,7 +124,7 @@ ED.AngleGradeSouth.prototype.dependentParameterValues = function(_parameter, _va
 			if (-_value >= this.rtmo) returnValue = "1";
 			if (-_value >= this.rsli) returnValue = "0";
 			returnArray['grade'] = returnValue;
-			returnArray['seen'] = (-_value >= this.rtmo) ? 'No' : 'Yes';
+			returnArray['seen'] = (-_value >= this.rsli) ? 'No' : 'Yes';
 			break;
 
 		case 'grade':
@@ -174,12 +174,12 @@ ED.AngleGradeSouth.prototype.dependentParameterValues = function(_parameter, _va
 			var returnValue = "";
 			switch (_value) {
 				case 'No':
-					if (-this.apexY >= this.rtmo) returnValue = this.apexY;
-					else returnValue = -this.rtmo;
+					if (-this.apexY >= this.rsli) returnValue = this.apexY;
+					else returnValue = -this.rsli;
 					break;
 				case 'Yes':
-					if (-this.apexY < this.rtmo) returnValue = this.apexY;
-					else returnValue = -this.riro;
+					if (-this.apexY < this.rsli) returnValue = this.apexY;
+					else returnValue = -this.riri;
 					break;
 			}
 			returnArray['apexY'] = returnValue;

@@ -32,7 +32,7 @@ ED.MetallicForeignBody = function(_drawing, _parameterJSON) {
 	this.rustRing = false;
 	this.h = 30;
 	this.fb=1;
-	
+
 	// Saved parameters
 	this.savedParameterArray = ['originX','originY','scaleX', 'scaleY','mfb','coats','rustRing','h'];
 
@@ -70,26 +70,26 @@ ED.MetallicForeignBody.prototype.setPropertyDefaults = function() {
 	// Update component of validation array for simple parameters
 	this.parameterValidationArray['scaleX']['range'].setMinAndMax(+1, +2.5);
 	this.parameterValidationArray['scaleY']['range'].setMinAndMax(+1, +2.5);
-	
-	
+
+
 	this.parameterValidationArray['mfb'] = {
 		kind: 'derived',
 		type: 'bool',
 		display: false
 	};
-	
+
 	this.parameterValidationArray['coats'] = {
 		kind: 'derived',
 		type: 'bool',
 		display: false
 	};
-	
+
 	this.parameterValidationArray['rustRing'] = {
 		kind: 'derived',
 		type: 'bool',
 		display: false
 	};
-	
+
 	this.parameterValidationArray['h'] = {
 		kind: 'derived',
 		type: 'int',
@@ -129,16 +129,16 @@ ED.MetallicForeignBody.prototype.dependentParameterValues = function(_parameter,
 				this.setParameterFromString('mfb', 'false', true);
 			}
 			break;
-			
+
 		case 'scaleX':
 			returnArray.h = Math.round(_value * 30);
 			break;
-			
+
 		case 'mfb':
 			if (_value == true) returnArray['fb'] = 1;
 			else if (_value == false) returnArray['fb'] = 0;
 			break;
-						
+
 	}
 
 	return returnArray;
@@ -182,7 +182,7 @@ ED.MetallicForeignBody.prototype.draw = function(_point) {
 			ctx.fillStyle = "brown";
 			ctx.fill();
 		}
-		
+
 		if (this.rustRing) {
 			ctx.beginPath()
 			ctx.arc(0,0,r*1.05,0,2*Math.PI,true);
@@ -190,7 +190,7 @@ ED.MetallicForeignBody.prototype.draw = function(_point) {
 			ctx.strokeStyle = "brown";
 			ctx.stroke();
 		}
-		
+
 		if (this.coats) {
 			ctx.beginPath()
 			ctx.arc(0,0,r,0,2*Math.PI,true);

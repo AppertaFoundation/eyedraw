@@ -877,7 +877,7 @@ ED.Drawing.prototype.drawAllDoodles = function() {
 ED.Drawing.prototype.mousedown = function(_point) {
 	// Set flag to indicate dragging can now take place
 	this.mouseIsDown = true;
-	
+
 	var doodle = this.selectedDoodle;
 
 	// Detect double click
@@ -913,7 +913,7 @@ ED.Drawing.prototype.mousedown = function(_point) {
 						// Add new squiggle
 						this.doodleArray[i].addSquiggle();
 					}
-					
+
 				}
 			}
 			// Ensure that unselected doodles are marked as such
@@ -1409,7 +1409,7 @@ ED.Drawing.prototype.mouseup = function(_point) {
 		}
 	}
 
-	
+
 	// Redraw to get rid of select rectangle
 	this.repaint();
 
@@ -2169,7 +2169,7 @@ ED.Drawing.prototype.selectDoodle = function(doodle) {
 
 	doodle.isSelected = true;
 	this.selectedDoodle = doodle;
-	
+
 	// Run onDeselection code for last doodle
 	if (this.lastSelectedDoodle) this.lastSelectedDoodle.onDeselection();
 
@@ -2201,7 +2201,7 @@ ED.Drawing.prototype.isReady = function() {
  * @returns {Doodle} The newly added doodle
  */
 ED.Drawing.prototype.addDoodle = function(_className, _parameterDefaults, _parameterBindings) {
-		
+
 	// Set flag to indicate whether a doodle of this className already exists
 	var doodleExists = this.hasDoodleOfClass(_className);
 
@@ -2903,16 +2903,28 @@ ED.Drawing.prototype.reportData = function() {
  * @returns {String} Description of the drawing
  */
 ED.Drawing.prototype.report = function() {
-	var returnString = "";
+    var returnString = "";
+    var doodleArray = this.doodleArray;
+    var reports = this.reportData();
+    for (var i = 0; i < reports.length; i++) {
+        var description = reports[i];
 
-	var data = this.reportData();
-	for (var i = 0; i < data.length; i++) {
-		returnString += (i === 0) ? data[i] : ", " + ED.firstLetterToLowerCase(data[i]);
-	}
+        /* handled special formats with doodle's own formatReport method */
+        var special = (function(description) {
+            return doodleArray.find(function(obj) {
+                return obj.description() === description && typeof obj.formatReport === 'function';
+            });
+        }(description));
+        if (special) {
+            description = special.formatReport();
+		} else {
+            description = ED.firstLetterToLowerCase(reports[i]);
+		}
 
-	return (returnString.length > 0) ? returnString : "No abnormality";
-};
-
+        returnString += (i === 0) ? ED.firstLetterToUpperCase(description) : ", " + description;
+    }
+    return returnString;
+}
 
 /**
  * Returns a SNOMED diagnostic code derived from the drawing, returns empty array if no code
@@ -4774,7 +4786,7 @@ ED.Doodle.prototype.increment = function(_parameter, _value, _updateBindings) {
 	var interval = 1000 / this.animationFrameRate;
 
 	// Complete or continue animation
-	if (this.animationDataArray[_parameter]['frameCounter'] == this.animationDataArray[_parameter]['frames']) {
+	if (this.animationDataArray[_parameter]['frameCounter'] >= this.animationDataArray[_parameter]['frames']) {
 		// Set  parameter to exact value
 		this.setSimpleParameter(_parameter, _value);
 
@@ -14074,7 +14086,7 @@ ED.AngleGradeEast.prototype.dependentParameterValues = function(_parameter, _val
 			if (-_value >= this.rtmo) returnValue = "1";
 			if (-_value >= this.rsli) returnValue = "0";
 			returnArray['grade'] = returnValue;
-			returnArray['seen'] = (-_value >= this.rtmo) ? 'No' : 'Yes';
+			returnArray['seen'] = (-_value >= this.rsli) ? 'No' : 'Yes';
 			break;
 
 		case 'grade':
@@ -14123,12 +14135,13 @@ ED.AngleGradeEast.prototype.dependentParameterValues = function(_parameter, _val
 			var returnValue = "";
 			switch (_value) {
 				case 'No':
-					if (-this.apexY >= this.rtmo) returnValue = this.apexY;
-					else returnValue = -this.rtmo;
+					if (-this.apexY >= this.rsli) returnValue = this.apexY;
+					else returnValue = -this.rsli;
 					break;
 				case 'Yes':
-					if (-this.apexY < this.rtmo) returnValue = this.apexY;
-					else returnValue = -this.riro;
+
+					if (-this.apexY < this.rsli) returnValue = this.apexY;
+					else returnValue = -this.riri;
 					break;
 			}
 			returnArray['apexY'] = returnValue;
@@ -14307,7 +14320,7 @@ ED.AngleGradeNorth.prototype.dependentParameterValues = function(_parameter, _va
 			if (-_value >= this.rtmo) returnValue = "1";
 			if (-_value >= this.rsli) returnValue = "0";
 			returnArray['grade'] = returnValue;
-			returnArray['seen'] = (-_value >= this.rtmo) ? 'No' : 'Yes';
+			returnArray['seen'] = (-_value >= this.rsli) ? 'No' : 'Yes';
 			break;
 
 		case 'grade':
@@ -14357,12 +14370,12 @@ ED.AngleGradeNorth.prototype.dependentParameterValues = function(_parameter, _va
 			var returnValue = "";
 			switch (_value) {
 				case 'No':
-					if (-this.apexY >= this.rtmo) returnValue = this.apexY;
-					else returnValue = -this.rtmo;
+					if (-this.apexY >= this.rsli) returnValue = this.apexY;
+					else returnValue = -this.rsli;
 					break;
 				case 'Yes':
-					if (-this.apexY < this.rtmo) returnValue = this.apexY;
-					else returnValue = -this.riro;
+					if (-this.apexY < this.rsli) returnValue = this.apexY;
+					else returnValue = -this.riri;
 					break;
 			}
 			returnArray['apexY'] = returnValue;
@@ -14541,7 +14554,7 @@ ED.AngleGradeSouth.prototype.dependentParameterValues = function(_parameter, _va
 			if (-_value >= this.rtmo) returnValue = "1";
 			if (-_value >= this.rsli) returnValue = "0";
 			returnArray['grade'] = returnValue;
-			returnArray['seen'] = (-_value >= this.rtmo) ? 'No' : 'Yes';
+			returnArray['seen'] = (-_value >= this.rsli) ? 'No' : 'Yes';
 			break;
 
 		case 'grade':
@@ -14591,12 +14604,12 @@ ED.AngleGradeSouth.prototype.dependentParameterValues = function(_parameter, _va
 			var returnValue = "";
 			switch (_value) {
 				case 'No':
-					if (-this.apexY >= this.rtmo) returnValue = this.apexY;
-					else returnValue = -this.rtmo;
+					if (-this.apexY >= this.rsli) returnValue = this.apexY;
+					else returnValue = -this.rsli;
 					break;
 				case 'Yes':
-					if (-this.apexY < this.rtmo) returnValue = this.apexY;
-					else returnValue = -this.riro;
+					if (-this.apexY < this.rsli) returnValue = this.apexY;
+					else returnValue = -this.riri;
 					break;
 			}
 			returnArray['apexY'] = returnValue;
@@ -14775,7 +14788,7 @@ ED.AngleGradeWest.prototype.dependentParameterValues = function(_parameter, _val
 			if (-_value >= this.rtmo) returnValue = "1";
 			if (-_value >= this.rsli) returnValue = "0";
 			returnArray['grade'] = returnValue;
-			returnArray['seen'] = (-_value >= this.rtmo) ? 'No' : 'Yes';
+			returnArray['seen'] = (-_value >= this.rsli) ? 'No' : 'Yes';
 			break;
 
 		case 'grade':
@@ -14824,12 +14837,12 @@ ED.AngleGradeWest.prototype.dependentParameterValues = function(_parameter, _val
 			returnValue = "";
 			switch (_value) {
 				case 'No':
-					if (-this.apexY >= this.rtmo) returnValue = this.apexY;
-					else returnValue = -this.rtmo;
+					if (-this.apexY >= this.rsli) returnValue = this.apexY;
+					else returnValue = -this.rsli;
 					break;
 				case 'Yes':
-					if (-this.apexY < this.rtmo) returnValue = this.apexY;
-					else returnValue = -this.riro;
+					if (-this.apexY < this.rsli) returnValue = this.apexY;
+					else returnValue = -this.riri;
 					break;
 			}
 			returnArray['apexY'] = returnValue;
@@ -37748,6 +37761,10 @@ ED.Malyugin.prototype = new ED.Doodle;
 ED.Malyugin.prototype.constructor = ED.Malyugin;
 ED.Malyugin.superclass = ED.Doodle.prototype;
 
+ED.Malyugin.prototype.formatReport = function() {
+	return this.description();
+}
+
 /**
  * Sets handle attributes
  */
@@ -38314,7 +38331,7 @@ ED.MetallicForeignBody = function(_drawing, _parameterJSON) {
 	this.rustRing = false;
 	this.h = 30;
 	this.fb=1;
-	
+
 	// Saved parameters
 	this.savedParameterArray = ['originX','originY','scaleX', 'scaleY','mfb','coats','rustRing','h'];
 
@@ -38352,26 +38369,26 @@ ED.MetallicForeignBody.prototype.setPropertyDefaults = function() {
 	// Update component of validation array for simple parameters
 	this.parameterValidationArray['scaleX']['range'].setMinAndMax(+1, +2.5);
 	this.parameterValidationArray['scaleY']['range'].setMinAndMax(+1, +2.5);
-	
-	
+
+
 	this.parameterValidationArray['mfb'] = {
 		kind: 'derived',
 		type: 'bool',
 		display: false
 	};
-	
+
 	this.parameterValidationArray['coats'] = {
 		kind: 'derived',
 		type: 'bool',
 		display: false
 	};
-	
+
 	this.parameterValidationArray['rustRing'] = {
 		kind: 'derived',
 		type: 'bool',
 		display: false
 	};
-	
+
 	this.parameterValidationArray['h'] = {
 		kind: 'derived',
 		type: 'int',
@@ -38411,16 +38428,16 @@ ED.MetallicForeignBody.prototype.dependentParameterValues = function(_parameter,
 				this.setParameterFromString('mfb', 'false', true);
 			}
 			break;
-			
+
 		case 'scaleX':
 			returnArray.h = Math.round(_value * 30);
 			break;
-			
+
 		case 'mfb':
 			if (_value == true) returnArray['fb'] = 1;
 			else if (_value == false) returnArray['fb'] = 0;
 			break;
-						
+
 	}
 
 	return returnArray;
@@ -38464,7 +38481,7 @@ ED.MetallicForeignBody.prototype.draw = function(_point) {
 			ctx.fillStyle = "brown";
 			ctx.fill();
 		}
-		
+
 		if (this.rustRing) {
 			ctx.beginPath()
 			ctx.arc(0,0,r*1.05,0,2*Math.PI,true);
@@ -38472,7 +38489,7 @@ ED.MetallicForeignBody.prototype.draw = function(_point) {
 			ctx.strokeStyle = "brown";
 			ctx.stroke();
 		}
-		
+
 		if (this.coats) {
 			ctx.beginPath()
 			ctx.arc(0,0,r,0,2*Math.PI,true);
@@ -38515,6 +38532,7 @@ ED.MetallicForeignBody.prototype.description = function() {
 ED.MetallicForeignBody.prototype.snomedCode = function () {
     return 422321007;
 }
+
 /**
  * OpenEyes
  *
@@ -53059,10 +53077,10 @@ ED.CNV.prototype.snomedCode = function() {
 ED.ToricPCIOL = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "ToricPCIOL";
-	
+
 	// Derived parameters
 	this.axis = 0;
-	
+
 	// Other parameters
 	this.model = 'Type 1';
 	this.fixation = 'In-the-bag';
@@ -53071,7 +53089,7 @@ ED.ToricPCIOL = function(_drawing, _parameterJSON) {
 
 	// Saved parameters
 	this.savedParameterArray = ['fixation', 'fx', 'originX', 'originY', 'rotation', 'csOriginX', 'model'];
-	
+
 	// Parameters in doodle control bar (parameter name: parameter label)
 	this.controlParameterArray = {'model':'Model'};
 
@@ -53104,7 +53122,7 @@ ED.ToricPCIOL.prototype.setPropertyDefaults = function() {
 	this.isOrientated = false;
 	this.isScaleable = false;
 	this.isUnique = true;
-	
+
 	// Add complete validation arrays for derived parameters
 	this.parameterValidationArray['fixation'] = {
 		kind: 'derived',
@@ -53117,7 +53135,7 @@ ED.ToricPCIOL.prototype.setPropertyDefaults = function() {
 		type: 'int',
 		range: [1, 2],
 		animate: false
-	};	
+	};
 
     this.parameterValidationArray['axis'] = {
 		kind: 'derived',
@@ -53126,7 +53144,7 @@ ED.ToricPCIOL.prototype.setPropertyDefaults = function() {
 		clock: 'bottom',
 		animate: true
 	};
-	
+
 	this.parameterValidationArray['model'] = {
 		kind: 'derived',
 		type: 'string',
@@ -53244,7 +53262,7 @@ ED.ToricPCIOL.prototype.draw = function(_point) {
 		ctx.beginPath();
 
 		// Create points
-		var phi = 0.7 * Math.PI / 4;
+		var phi = 0.67 * Math.PI / 4;
 		var theta = phi + Math.PI;
 		var p1 = new ED.Point(0, 0);
 		p1.setWithPolars(r - 20, phi);
