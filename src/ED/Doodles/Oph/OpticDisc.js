@@ -38,7 +38,7 @@ ED.OpticDisc = function(_drawing, _parameterJSON) {
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
-}
+};
 
 /**
  * Sets superclass and constructor
@@ -58,7 +58,7 @@ ED.OpticDisc.prototype.setHandles = function() {
 
 	// Apex handle for basic mode
 	this.handleArray[this.numberOfHandles] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
-}
+};
 
 /**
  * Sets default properties
@@ -89,18 +89,18 @@ ED.OpticDisc.prototype.setPropertyDefaults = function() {
 	};
 
 	// Create ranges to constrain handles
-	this.handleVectorRangeArray = new Array();
+	this.handleVectorRangeArray = [];
 	for (var i = 0; i < this.numberOfHandles; i++) {
 		// Full circle in radians
 		var cir = 2 * Math.PI;
 
 		// Create a range object for each handle
-		var range = new Object;
+		var range = {};
 		range.length = new ED.Range(+50, +290);
 		range.angle = new ED.Range(((15 * cir / 16) + i * cir / 8) % cir, ((1 * cir / 16) + i * cir / 8) % cir);
 		this.handleVectorRangeArray[i] = range;
 	}
-}
+};
 
 /**
  * Sets default parameters
@@ -124,7 +124,7 @@ ED.OpticDisc.prototype.setParameterDefaults = function() {
 
 	this.setParameterFromString('mode', 'Basic');
 	this.setParameterFromString('cdRatio', 'Not checked');
-}
+};
 
 /**
  * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
@@ -136,12 +136,13 @@ ED.OpticDisc.prototype.setParameterDefaults = function() {
  */
 ED.OpticDisc.prototype.dependentParameterValues = function(_parameter, _value) {
 
-	var returnArray = new Array();
+	var returnArray = [];
+	var newValue;
 
 	switch (_parameter) {
 		case 'mode':
 			this.setHandleProperties();
-			if (_value == 'Expert') {
+			if (_value === 'Expert') {
 				// Set points to mean
 				if (this.drawing.isReady) {
 					this.setMeanRadius(-this.apexY);
@@ -163,8 +164,11 @@ ED.OpticDisc.prototype.dependentParameterValues = function(_parameter, _value) {
 			break;
 
 		case 'cdRatio':
-			if (_value != "No view") {
-				var newValue = parseFloat(_value) * 300;
+
+			if (_value === "Not checked") {
+				returnArray['apexY'] = -(parseFloat("0.3") * 300);
+			} else if(_value !== "No view") {
+				newValue = parseFloat(_value) * 300;
 				returnArray['apexY'] = -newValue;
 			} else {
 				returnArray['apexY'] = -320;
@@ -183,7 +187,7 @@ ED.OpticDisc.prototype.dependentParameterValues = function(_parameter, _value) {
 	}
 
 	return returnArray;
-}
+};
 
 /**
  * Draws doodle or performs a hit test if a Point parameter is passed
