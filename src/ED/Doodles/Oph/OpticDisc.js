@@ -31,7 +31,7 @@ ED.OpticDisc = function(_drawing, _parameterJSON) {
 
 	// Derived parameters
 	this.mode = "Basic";
-	this.cdRatio = '0';
+	this.cdRatio = 'Not checked';
 
 	// Saved parameters
 	this.savedParameterArray = ['apexY', 'mode'];
@@ -84,7 +84,7 @@ ED.OpticDisc.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['cdRatio'] = {
 		kind: 'derived',
 		type: 'string',
-		list: ['0.1', '0.2', '0.3', '0.4', '0.5', '0.6', '0.7', '0.8', '0.9', '1.0', 'No view'],
+		list: ['Not checked', '0.1', '0.2', '0.3', '0.4', '0.5', '0.6', '0.7', '0.8', '0.9', '1.0', 'No view'],
 		animate: true
 	};
 
@@ -123,7 +123,7 @@ ED.OpticDisc.prototype.setParameterDefaults = function() {
 	}
 
 	this.setParameterFromString('mode', 'Basic');
-	this.setParameterFromString('cdRatio', '0.3');
+	this.setParameterFromString('cdRatio', 'Not checked');
 }
 
 /**
@@ -216,22 +216,21 @@ ED.OpticDisc.prototype.draw = function(_point) {
 
 	// Set attributes
 	ctx.lineWidth = 2;
-	var ptrn = ctx.createPattern(this.drawing.imageArray['CribriformPattern'], 'repeat');
-	ctx.fillStyle = ptrn;
+	ctx.fillStyle = ctx.createPattern(this.drawing.imageArray['CribriformPattern'], 'repeat');
 	ctx.strokeStyle = "gray";
 
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
 
 	// Non boundary drawing
-	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+	if (this.drawFunctionMode === ED.drawFunctionMode.Draw) {
 		// Begin path
 		ctx.beginPath();
 
 		// Do a 360 arc
 		ctx.arc(0, 0, ro, arcStart, arcEnd, true);
 
-		if (this.mode == "Basic") {
+		if (this.mode === "Basic") {
 			// Move to inner circle
 			ctx.moveTo(ri, 0);
 
@@ -281,7 +280,7 @@ ED.OpticDisc.prototype.draw = function(_point) {
 
 		// Vessels start on nasal side of disc
 		var sign;
-		if (this.drawing.eye == ED.eye.Right) {
+		if (this.drawing.eye === ED.eye.Right) {
 			sign = -1;
 		} else {
 			sign = 1;
@@ -303,45 +302,45 @@ ED.OpticDisc.prototype.draw = function(_point) {
 		ctx.bezierCurveTo(controlPoint1.x, controlPoint1.y, controlPoint2.x, controlPoint2.y, endPoint.x, endPoint.y);
 
 		// Inferotemporal vessel
-		var startPoint = new ED.Point(0, 0);
+		startPoint = new ED.Point(0, 0);
 		startPoint.setWithPolars(150, -sign * Math.PI / 2);
 
-		var controlPoint1 = new ED.Point(0, 0);
+		controlPoint1 = new ED.Point(0, 0);
 		controlPoint1.setWithPolars(400, -sign * 7 * Math.PI / 8);
-		var controlPoint2 = new ED.Point(0, 0);
+		controlPoint2 = new ED.Point(0, 0);
 		controlPoint2.setWithPolars(450, sign * 7 * Math.PI / 8);
 
-		var endPoint = new ED.Point(0, 0);
+		endPoint = new ED.Point(0, 0);
 		endPoint.setWithPolars(500, sign * 3 * Math.PI / 4);
 
 		ctx.moveTo(startPoint.x, startPoint.y);
 		ctx.bezierCurveTo(controlPoint1.x, controlPoint1.y, controlPoint2.x, controlPoint2.y, endPoint.x, endPoint.y);
 
 		// Superonasal vessel
-		var startPoint = new ED.Point(0, 0);
+		startPoint = new ED.Point(0, 0);
 		startPoint.setWithPolars(150, -sign * Math.PI / 2);
 
-		var controlPoint1 = new ED.Point(0, 0);
+		controlPoint1 = new ED.Point(0, 0);
 		controlPoint1.setWithPolars(300, -sign * 2 * Math.PI / 8);
-		var controlPoint2 = new ED.Point(0, 0);
+		controlPoint2 = new ED.Point(0, 0);
 		controlPoint2.setWithPolars(350, -sign * 5 * Math.PI / 16);
 
-		var endPoint = new ED.Point(0, 0);
+		endPoint = new ED.Point(0, 0);
 		endPoint.setWithPolars(450, -sign * 3 * Math.PI / 8);
 
 		ctx.moveTo(startPoint.x, startPoint.y);
 		ctx.bezierCurveTo(controlPoint1.x, controlPoint1.y, controlPoint2.x, controlPoint2.y, endPoint.x, endPoint.y);
 
 		// Inferonasal vessel
-		var startPoint = new ED.Point(0, 0);
+		startPoint = new ED.Point(0, 0);
 		startPoint.setWithPolars(150, -sign * Math.PI / 2);
 
-		var controlPoint1 = new ED.Point(0, 0);
+		controlPoint1 = new ED.Point(0, 0);
 		controlPoint1.setWithPolars(300, -sign * 6 * Math.PI / 8);
-		var controlPoint2 = new ED.Point(0, 0);
+		controlPoint2 = new ED.Point(0, 0);
 		controlPoint2.setWithPolars(350, -sign * 11 * Math.PI / 16);
 
-		var endPoint = new ED.Point(0, 0);
+		endPoint = new ED.Point(0, 0);
 		endPoint.setWithPolars(450, -sign * 5 * Math.PI / 8);
 
 		ctx.moveTo(startPoint.x, startPoint.y);
@@ -356,7 +355,7 @@ ED.OpticDisc.prototype.draw = function(_point) {
 		ctx.stroke();
 
 		// Obscure whole disc if no view
-		if (this.cdRatio == "No view") {
+		if (this.cdRatio === "No view") {
 			// disk to obscure disc
 			ctx.beginPath();
 			ctx.arc(0, 0, 400, 0, 2 * Math.PI, true);
@@ -367,9 +366,9 @@ ED.OpticDisc.prototype.draw = function(_point) {
 	}
 
 	// Coordinates of expert handles (in canvas plane)
-	if (this.mode == "Expert") {
-		for (var i = 0; i < this.numberOfHandles; i++) {
-			this.handleArray[i].location = this.transform.transformPoint(this.squiggleArray[0].pointsArray[i]);
+	if (this.mode === "Expert") {
+		for (var x = 0; x < this.numberOfHandles; x++) {
+			this.handleArray[x].location = this.transform.transformPoint(this.squiggleArray[0].pointsArray[x]);
 		}
 	}
 
@@ -392,20 +391,20 @@ ED.OpticDisc.prototype.description = function() {
 	var returnString = "";
 
 	// Expert mode
-	if (this.mode == "Expert") {
+	if (this.mode === "Expert") {
 		// Get mean
 		var mean = this.getMeanRadius();
 
 		// Look for notches by detecting outliers
-		var notchArray = new Array();
+		var notchArray = [];
 		var inNotch = false;
 		var notch;
 
 		// Find a non-notch point to start with
 		var s = 0;
-		for (var i = 0; i < this.numberOfHandles; i++) {
-			if (this.squiggleArray[0].pointsArray[i].length() < mean * 1.1) {
-				s = i;
+		for (var x = 0; x < this.numberOfHandles; x++) {
+			if (this.squiggleArray[0].pointsArray[x].length() < mean * 1.1) {
+				s = x;
 				break;
 			}
 		}
@@ -416,7 +415,7 @@ ED.OpticDisc.prototype.description = function() {
 
 			if (this.squiggleArray[0].pointsArray[j].length() > mean * 1.1) {
 				if (!inNotch) {
-					notch = new Object();
+					notch = {};
 					notch.startHour = this.squiggleArray[0].pointsArray[j].clockHour();
 					notch.endHour = this.squiggleArray[0].pointsArray[j].clockHour();
 					inNotch = true;
@@ -431,7 +430,7 @@ ED.OpticDisc.prototype.description = function() {
 			}
 
 			// Deal with boundary condition
-			if (i == this.numberOfHandles - 1) {
+			if (i === this.numberOfHandles - 1) {
 				if (inNotch) {
 					notch.endHour = this.squiggleArray[0].pointsArray[j].clockHour();
 					notchArray.push(notch);
@@ -446,25 +445,25 @@ ED.OpticDisc.prototype.description = function() {
 
 			returnString = many ? "Notches" : "Notch";
 
-			for (var i = 0; i < notchArray.length; i++) {
-				if (notchArray[i].startHour == notchArray[i].endHour) {
-					returnString += " at " + notchArray[i].startHour;
+			for (var k = 0; k < notchArray.length; j++) {
+				if (notchArray[k].startHour === notchArray[k].endHour) {
+					returnString += " at " + notchArray[k].startHour;
 				} else {
-					returnString += " from " + notchArray[i].startHour + " to " + notchArray[i].endHour + " o'clock";
+					returnString += " from " + notchArray[k].startHour + " to " + notchArray[k].endHour + " o'clock";
 				}
 
-				if (many && i != notchArray.length - 1) {
+				if (many && k !== notchArray.length - 1) {
 					returnString += ", and";
 				}
 			}
 		} else {
 
-			returnString = this.drawing.doodleArray.length == 1 ? "No abnormality" : "";
+			returnString = this.drawing.doodleArray.length === 1 ? "No abnormality" : "";
 		}
 	}
 	// Basic mode
 	else {
-		if (this.cdRatio == "No view") {
+		if (this.cdRatio === "No view") {
 			returnString = "No view";
 		}
     if (returnString.length === 0 && this.drawing.doodleArray.length === 1) {
@@ -480,7 +479,7 @@ ED.OpticDisc.prototype.description = function() {
  */
 ED.OpticDisc.prototype.setHandleProperties = function() {
 	// Basic mode
-	if (this.mode == "Basic") {
+	if (this.mode === "Basic") {
 		// Make handles invisible, except for apex handle
 		for (var i = 0; i < this.numberOfHandles; i++) {
 			this.handleArray[i].isVisible = false;
@@ -490,12 +489,12 @@ ED.OpticDisc.prototype.setHandleProperties = function() {
 	// Expert mode
 	else {
 		// Make handles visible, except for apex handle,
-		for (var i = 0; i < this.numberOfHandles; i++) {
-			this.handleArray[i].isVisible = true;
+		for (var j = 0; i < this.numberOfHandles; j++) {
+			this.handleArray[j].isVisible = true;
 		}
 		this.handleArray[this.numberOfHandles].isVisible = false;
 	}
-}
+};
 
 /**
  * Returns minimum radius
@@ -505,7 +504,7 @@ ED.OpticDisc.prototype.setHandleProperties = function() {
 ED.OpticDisc.prototype.minimumRadius = function() {
 	var returnValue = 500;
 
-	if (this.mode == "Basic") {
+	if (this.mode === "Basic") {
 		returnValue = Math.abs(this.apexY);
 	} else {
 		// Iterate through points
@@ -520,7 +519,7 @@ ED.OpticDisc.prototype.minimumRadius = function() {
 	}
 
 	return returnValue;
-}
+};
 
 /**
  * Returns mean radius
@@ -538,7 +537,7 @@ ED.OpticDisc.prototype.getMeanRadius = function() {
 	} else {
 		return -this.apexY;
 	}
-}
+};
 
 /**
  * Sets radius of handle points
@@ -562,7 +561,7 @@ ED.OpticDisc.prototype.setMeanRadius = function(_radius) {
 		// Set point
 		this.squiggleArray[0].pointsArray[i].setWithPolars(newLength, direction);
 	}
-}
+};
 
 /**
  * Resets radius of handle points to equal values corresponding to c/d ratio
@@ -572,4 +571,4 @@ ED.OpticDisc.prototype.resetHandles = function() {
 	for (var i = 0; i < this.numberOfHandles; i++) {
 		this.squiggleArray[0].pointsArray[i].setWithPolars(-this.apexY, i * 2 * Math.PI / this.numberOfHandles);
 	}
-}
+};

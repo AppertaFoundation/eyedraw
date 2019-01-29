@@ -39728,7 +39728,7 @@ ED.OpticDisc = function(_drawing, _parameterJSON) {
 
 	// Derived parameters
 	this.mode = "Basic";
-	this.cdRatio = '0';
+	this.cdRatio = 'Not checked';
 
 	// Saved parameters
 	this.savedParameterArray = ['apexY', 'mode'];
@@ -39781,7 +39781,7 @@ ED.OpticDisc.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['cdRatio'] = {
 		kind: 'derived',
 		type: 'string',
-		list: ['0.1', '0.2', '0.3', '0.4', '0.5', '0.6', '0.7', '0.8', '0.9', '1.0', 'No view'],
+		list: ['Not checked', '0.1', '0.2', '0.3', '0.4', '0.5', '0.6', '0.7', '0.8', '0.9', '1.0', 'No view'],
 		animate: true
 	};
 
@@ -39820,7 +39820,7 @@ ED.OpticDisc.prototype.setParameterDefaults = function() {
 	}
 
 	this.setParameterFromString('mode', 'Basic');
-	this.setParameterFromString('cdRatio', '0.3');
+	this.setParameterFromString('cdRatio', 'Not checked');
 }
 
 /**
