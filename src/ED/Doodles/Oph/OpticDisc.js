@@ -156,6 +156,11 @@ ED.OpticDisc.prototype.dependentParameterValues = function(_parameter, _value) {
 			break;
 
 		case 'apexY':
+			if (this.cdRatio === "Not checked") {
+			    returnArray['cdRatio'] = (-0.3 / 300).toFixed(1);
+			    break;
+			}
+
 			if (_value < -300) {
 				returnArray['cdRatio'] = "No view";
 			} else {
