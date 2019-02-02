@@ -110,6 +110,7 @@ ED.trans['ICL'] = 'Drag to move<br/>Drag handle to scale and rotate';
 ED.trans['IOL'] = 'Drag to move<br/>Drag handle to scale and rotate';
 ED.trans['IrisHook'] = 'Drag to move around the clock<br/><br/>The hook will match the size of the pupil as it changes<br/>Subsequent hooks are added to the next quadrant';
 ED.trans['IrisNaevus'] = 'Drag to move<br/>Drag handle to change size';
+ED.trans['IrisTrauma'] = 'Drag to rotate<br/>Drag handle to change extent of trauma';
 ED.trans['IRMA'] = 'Drag to move<br/>Drag inner handle to change size<br/>Drag outer handle to rotate';
 ED.trans['KeraticPrecipitates'] = 'Drag middle handle up and down to alter density<br/>Drag middle handle left and right to alter size<br/>Drag outside handle to scale';
 ED.trans['KoeppeNodule'] = 'Drag to move around the iris';
