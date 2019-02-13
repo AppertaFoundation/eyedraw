@@ -142,6 +142,7 @@ ED.trans['PeripheralRetinectomy'] = 'Drag to rotate<br/>Drag each end handle to 
 ED.trans['PeripheralRRD'] = 'Drag to rotate<br/>Drag each end handle to increase extent<br/>Drag the middle handle to move posterior limit';
 ED.trans['PhakoIncision'] = 'Drag end handle to change length<br/>Drag the middle handle to change section type<br/>Drag the incision itself to move';
 ED.trans['PI'] = 'Drag to move around the iris';
+ED.trans['PigmentEpitheliumDetachment'] = 'Drag to move<br/>Drag the handle to scale';
 ED.trans['PosteriorCapsule'] = '';
 ED.trans['PosteriorEmbryotoxon'] = '';
 ED.trans['PosteriorRetinectomy'] = 'Drag to position<br/>Drag the handle to change size';
