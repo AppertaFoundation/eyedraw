@@ -210,6 +210,7 @@ class DoodleInfo
         'UTear' => 'Traction ‘U’ tear',
         'Vicryl' => 'Vicryl suture',
         'ViewObscured' => 'View obscured',
+        'VitelliformMacularLesion' => 'Vitelliform lesions',
         'VitreousOpacity' => 'Vitreous opacity',
         'VPattern' => 'V pattern',
         'Crepitations' => 'Crepitations',

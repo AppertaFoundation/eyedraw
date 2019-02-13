@@ -189,6 +189,7 @@ ED.trans['TubeExtender'] = 'Drag to change quadrant<br/>Drag handle to move end 
 ED.trans['TubeLigation'] = 'Drag to change position';
 ED.trans['UTear'] = '';
 ED.trans['ViewObscured'] = 'Drag handle to change opacity';
+ED.trans['VitelliformMacularLesion'] = 'Drag to move<br/>Drag the handle to scale';
 ED.trans['VitreousOpacity'] = 'Drag to move<br/>Drag the inner handle up and down to alter opacity<br/>Drag the outer handle to scale';
 
 // ENT
