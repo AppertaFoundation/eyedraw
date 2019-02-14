@@ -41,7 +41,7 @@ ED.PigmentEpitheliumDetachment = function(_drawing, _parameterJSON) {
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
-}
+};
 
 /**
  * Sets superclass and constructor
@@ -55,7 +55,7 @@ ED.PigmentEpitheliumDetachment.superclass = ED.Doodle.prototype;
  */
 ED.PigmentEpitheliumDetachment.prototype.setHandles = function() {
 	this.handleArray[4] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
-}
+};
 
 /**
  * Sets default properties
@@ -69,17 +69,17 @@ ED.PigmentEpitheliumDetachment.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['type'] = {
 		kind: 'derived',
 		type: 'string',
-		list: ['Serous', 'Drusenoid', 'Type 1 neovascularisation','Type 3 neovascularisation RAP','PCV'],
+		list: ['Serous', 'Drusenoid', 'Type 1 nv','Type 3 nv RAP','PCV'],
 		animate: false
 	};
-}
+};
 
 /**
  * Sets default parameters
  */
 ED.PigmentEpitheliumDetachment.prototype.setParameterDefaults = function() {
 	this.apexX = 2 * this.discRadius;
-}
+};
 
 /**
  * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
@@ -90,7 +90,7 @@ ED.PigmentEpitheliumDetachment.prototype.setParameterDefaults = function() {
  * @returns {Array} Associative array of values of dependent parameters
  */
 ED.PigmentEpitheliumDetachment.prototype.dependentParameterValues = function(_parameter, _value) {
-}
+};
 
 /**
  * Draws doodle or performs a hit test if a Point parameter is passed
@@ -170,7 +170,7 @@ ED.PigmentEpitheliumDetachment.prototype.draw = function(_point) {
 								
 				break;
 			
-			case 'Type 1 neovascularisation':
+			case 'Type 1 nv':
 				var r = this.discRadius / 1.2;
 				
 				var grd2 = ctx.createRadialGradient(0, 0, r*0.5, 0, 0, r);
@@ -184,7 +184,7 @@ ED.PigmentEpitheliumDetachment.prototype.draw = function(_point) {
 				
 				break;
 				
-			case 'Type 3 neovascularisation RAP':
+			case 'Type 3 nv RAP':
 				var r = this.discRadius / 2;
 				ctx.beginPath();
 				ctx.arc(0,0,r,0,2*Math.PI);
@@ -236,7 +236,7 @@ ED.PigmentEpitheliumDetachment.prototype.draw = function(_point) {
 
 	// Return value indicating successful hittest
 	return this.isClicked;
-}
+};
 
 /**
  * Returns a string containing a text description of the doodle
@@ -254,10 +254,10 @@ ED.PigmentEpitheliumDetachment.prototype.description = function() {
 		case 'Drusenoid':
 			returnStr = "Drusenoid PED";
 			break;
-		case 'Type 1 neovascularisation':
+		case 'Type 1 nv':
 			returnStr = "Neovascular PED Type 1";
 			break;
-		case 'Type 3 neovascularisation RAP':
+		case 'Type 3 nv RAP':
 			returnStr = "Neovascular PED Type 3 RAP";
 			break;
 		case 'PCV':
@@ -266,7 +266,7 @@ ED.PigmentEpitheliumDetachment.prototype.description = function() {
 	}
 	
 	return returnStr;
-}
+};
 
 ED.PigmentEpitheliumDetachment.prototype.snomedCodes = function() {
 	
@@ -275,7 +275,7 @@ ED.PigmentEpitheliumDetachment.prototype.snomedCodes = function() {
     if (this.type==='Drusenoid') snomedCodes.push([342581000119102, 3]);
     else snomedCodes.push([52002008, 3]);
     
-    if (this.type==='Type 1 neovascularisation' || this.type==='Type 3 neovascularisation RAP') {
+    if (this.type==='Type 1 nv' || this.type==='Type 3 nv RAP') {
         snomedCodes.push([75971007, 3]);
     }
     else if (this.type==='PCV') {
@@ -283,4 +283,4 @@ ED.PigmentEpitheliumDetachment.prototype.snomedCodes = function() {
     }
     
     return snomedCodes;
-}
+};
