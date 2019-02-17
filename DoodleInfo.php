@@ -66,6 +66,7 @@ class DoodleInfo
         'ConjunctivalFlap' => 'Conjunctival flap',
         'ConjunctivalSuture' => 'Conjunctival suture',
         'Conjunctivitis' => 'Conjunctivitis',
+        'ContinuousCornealSuture' => 'Continuous suture',
         'CornealAbrasion' => 'Corneal abrasion',
         'CornealEpithelialDefect' => 'Corneal epithelial defect',
         'CornealErosion' => 'Removal of corneal epithelium',
