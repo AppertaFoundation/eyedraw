@@ -85,7 +85,7 @@ class DoodleInfo
         'Cypass' => 'Cypass Stent Insertion',
         'CystoidMacularOedema' => 'Cystoid macular oedema',
         'DendriticUlcer' => 'Dendritic ulcer',
-        'DiabeticNV' => 'Diabetic new vessels',
+        'DiabeticNV' => 'Retinal neovascularisation',
         'Dialysis' => 'Dialysis',
         'DiscHaemorrhage' => 'Disc haemorrhage',
         'DiscPallor' => 'Disc pallor',

@@ -27948,8 +27948,13 @@ ED.DiabeticNV = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "DiabeticNV";
 
+	this.type = "Active";
+	
 	// Saved parameters
-	this.savedParameterArray = ['originX', 'originY', 'scaleX', 'scaleY'];
+	this.savedParameterArray = ['originX', 'originY', 'scaleX', 'scaleY','type'];
+
+	// Parameters in doodle control bar
+	this.controlParameterArray = {'type':'Type'};
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -27972,7 +27977,15 @@ ED.DiabeticNV.prototype.setHandles = function() {
 /**
  * Set default properties
  */
-ED.DiabeticNV.prototype.setPropertyDefaults = function() {}
+ED.DiabeticNV.prototype.setPropertyDefaults = function() {
+	// Validation arrays for other parameters
+	this.parameterValidationArray['type'] = {
+		kind: 'derived',
+		type: 'string',
+		list: ['Active', 'Inactive'],
+		animate: false
+	};
+}
 
 /**
  * Sets default parameters (Only called for new doodles)
@@ -28054,6 +28067,7 @@ ED.DiabeticNV.prototype.draw = function(_point) {
 	// Set attributes
 	ctx.lineWidth = 3;
 	ctx.strokeStyle = "red";
+	if (this.type=="Inactive") ctx.strokeStyle = "gray";
 
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
@@ -28076,7 +28090,8 @@ ED.DiabeticNV.prototype.draw = function(_point) {
  * @returns {String} Group description
  */
 ED.DiabeticNV.prototype.groupDescription = function() {
-	return "Diabetic new vessels ";
+// 	return "Diabetic new vessels ";
+	return "New vessels ";	
 }
 
 /**
@@ -28085,7 +28100,10 @@ ED.DiabeticNV.prototype.groupDescription = function() {
  * @returns {String} Description of doodle
  */
 ED.DiabeticNV.prototype.description = function() {
-	return this.locationRelativeToDisc();
+// 	return this.locationRelativeToDisc();
+
+	var returnStr = this.locationRelativeToDisc() + " (" + this.type.toLowerCase() + ")";
+	return returnStr;
 }
 
 /**
@@ -28094,7 +28112,8 @@ ED.DiabeticNV.prototype.description = function() {
  * @returns {Int} SnoMed code of entity representated by doodle
  */
 ED.DiabeticNV.prototype.snomedCode = function() {
-	return 59276001;
+// 	return 59276001;
+	return 61267008;
 }
 
 /**
