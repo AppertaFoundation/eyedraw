@@ -152,6 +152,7 @@ class DoodleInfo
         'PeripheralRetinectomy' => 'Peripheral retinectomy',
         'PhakoIncision' => 'Phako incision',
         'PI' => 'Peripheral iridectomy',
+        'PigmentEpitheliumDetachment' => 'Pigment epithelium detachment',
         'PointInLine' => 'Point in line',
         'PosteriorCapsule' => 'Posterior capsule',
         'PosteriorEmbryotoxon' => 'Posterior embryotoxon',
