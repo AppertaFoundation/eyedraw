@@ -91,7 +91,7 @@ class DoodleInfo
         'DrainageRetinotomy' => 'Drainage retinotomy',
         'DrainageSite' => 'Drainage site',
         'EncirclingBand' => 'Encircling band',
-        'EndothelialKeratoplasty' => 'Endothelial keratoplasty',
+        'EndothelialKeratoplasty' => 'DMEK/DSAEK',
         'EntrySiteBreak' => 'Entry site break',
         'EpiretinalMembrane' => 'Epiretinal membrane',
         'Episcleritis' => 'Episcleritis',
