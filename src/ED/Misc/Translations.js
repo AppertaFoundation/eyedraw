@@ -67,6 +67,7 @@ ED.trans['CiliaryInjection'] = 'Drag to rotate around centre<br/>Drag handles to
 ED.trans['Circinate'] = 'Drag to position<br/>Drag handle to change size';
 ED.trans['CircumferentialBuckle'] = 'Drag to position<br/>Drag outer handles to change extent<br/>Drag middle handle to change width';
 ED.trans['ConjunctivalFlap'] = 'Drag to move around the limbus<br/>Drag handles to change size and depth';
+ED.trans['ContinuousCornealSuture'] = '';
 ED.trans['CornealAbrasion'] = 'Drag to position<br/>Drag handle to change size';
 ED.trans['CorneaCrossSection'] = '';
 ED.trans['CornealErosion'] = 'Drag to position<br/>Drag handle to change size';
