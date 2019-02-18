@@ -8768,7 +8768,8 @@ ED.trans['ConjunctivalFlap'] = 'Drag to move around the limbus<br/>Drag handles 
 ED.trans['CornealAbrasion'] = 'Drag to position<br/>Drag handle to change size';
 ED.trans['CorneaCrossSection'] = '';
 ED.trans['CornealErosion'] = 'Drag to position<br/>Drag handle to change size';
-ED.trans['CornealGraft'] = 'Drag handle to change size';
+ED.trans['CornealGraft'] = 'Drag handle to change size<br/>Drag to position';
+ED.trans['CornealGraftCrossSection'] = '';
 ED.trans['CornealInlay'] = '';
 ED.trans['CornealOedema'] = 'Drag to position<br/>Drag handle to change size';
 ED.trans['CornealStriae'] = '';
@@ -21612,7 +21613,7 @@ ED.CornealErosion.prototype.groupDescription = function() {
  */
 
 /**
- * Corneal Oedema
+ * Corneal Graft
  *
  * @class CornealGraft
  * @property {String} className Name of doodle subclass
@@ -21625,23 +21626,32 @@ ED.CornealGraft = function(_drawing, _parameterJSON) {
 
 	// Private parameters
 	this.pixelsPerMillimetre = 63.3333;
-	this.sutureLength = 60;
+// 	this.sutureLength = 60;
+	this.antsegRadius = 190;
 
 	// Derived parameters
-	this.diameter = 7.5;
+	this.diameter = 9;
+	this.depth = 100;
+	this.interruptedSutures = 0;
+	this.existingSutures = 0;
+	
+	this.csOriginX = 0;
 	
 	// Other parameters
-	this.type = 'Penetrating';
+	this.d = 100;
+// 	this.type = 'Penetrating';
+/*    // Reference to sutures removed throughout as to be a separate doodle
 	this.showSutures = true;
 	this.sutureType = 'Interrupted';
 	this.numberOfSutures = 16;
-	this.opaque = false;
+*/
+// 	this.opaque = false;
 
 	// Saved parameters
-	this.savedParameterArray = ['originX', 'originY', 'apexY', 'type', 'showSutures', 'sutureType', 'numberOfSutures', 'opaque'];
+	this.savedParameterArray = ['originX', 'originY', 'apexY', 'depth','d','interruptedSutures','existingSutures','csOriginX' /* 'type', */ /* 'showSutures', 'sutureType', 'numberOfSutures',  *//* 'opaque' */];
 
 	// Parameters in doodle control bar (parameter name: parameter label)
-	this.controlParameterArray = {'type':'Type', 'showSutures':'Show Sutures', 'sutureType':'Suture type', 'numberOfSutures':'Sutures', 'opaque':'Opaque'};
+	this.controlParameterArray = {'depth':'Depth (%)','interruptedSutures':'Interrupted sutures' /* 'type':'Type', */ /* 'showSutures':'Show Sutures', 'sutureType':'Suture type', 'numberOfSutures':'Sutures',  *//* 'opaque':'Opaque' */};
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -21658,7 +21668,8 @@ ED.CornealGraft.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.CornealGraft.prototype.setHandles = function() {
-	this.handleArray[4] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
+// 	this.handleArray[4] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
+	this.handleArray[0] = new ED.Doodle.Handle(null, true, ED.Mode.Handles, false);
 }
 
 /**
@@ -21666,30 +21677,74 @@ ED.CornealGraft.prototype.setHandles = function() {
  */
 ED.CornealGraft.prototype.setPropertyDefaults = function() {
 	this.isRotatable = false;
-	this.isUnique = true;
+	this.isUnique = false;
 
 	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
-	this.parameterValidationArray['apexY']['range'].setMinAndMax(-8.5 * this.pixelsPerMillimetre/2, -6.5 * this.pixelsPerMillimetre/2);
+	this.parameterValidationArray['apexY']['range'].setMinAndMax(-11.9 * this.pixelsPerMillimetre/2, -6.5 * this.pixelsPerMillimetre/2);
+
+	// Create ranges to constrain handles
+	this.handleCoordinateRangeArray = new Array();
+	this.handleCoordinateRangeArray[0] = {
+		x: new ED.Range(-0, +0), 
+		y: new ED.Range(-2.9 * this.pixelsPerMillimetre/2, 2.5 * this.pixelsPerMillimetre/2)
+	}
 
 	// Add complete validation arrays for derived parameters
+/*
+	this.parameterValidationArray['depth'] = {
+		kind: 'derived',
+		type: 'string',
+		list: ['Full', 'Partial (DALK)'],
+		animate: false
+	};
+*/
+	this.parameterValidationArray['depth'] = {
+		kind: 'derived',
+		type: 'int',
+		range: new ED.Range(1, 100),
+		precision: 1,
+		animate: false
+	};
+	this.parameterValidationArray['d'] = {
+		kind: 'other',
+		type: 'int',
+		range: new ED.Range(1, 100),
+		animate: false
+	};
+	this.parameterValidationArray['interruptedSutures'] = {
+		kind: 'other',
+		type: 'int',
+		range: new ED.Range(0, 50),
+		animate: false
+	};
+	this.parameterValidationArray['existingSutures'] = {
+		kind: 'other',
+		type: 'int',
+		range: new ED.Range(0, 50),
+		animate: false
+	};
+/*
 	this.parameterValidationArray['type'] = {
 		kind: 'derived',
 		type: 'string',
 		list: ['Penetrating', 'DMEK', 'DSEAK'],
 		animate: false
 	};
+*/
+/*
 	this.parameterValidationArray['showSutures'] = {
 		kind: 'derived',
 		type: 'bool',
 		display: true
 	};
+*/
 	this.parameterValidationArray['diameter'] = {
 		kind: 'derived',
 		type: 'float',
-		range: new ED.Range(6.5, 8.5),
-		precision: 1,
+		range: new ED.Range(6.5, 12),
 		animate: true
 	};
+/*
 	this.parameterValidationArray['sutureType'] = {
 		kind: 'derived',
 		type: 'string',
@@ -21702,19 +21757,36 @@ ED.CornealGraft.prototype.setPropertyDefaults = function() {
 		range: new ED.Range(4, 32),
 		animate: false
 	};
+*/
+/*
 	this.parameterValidationArray['opaque'] = {
 		kind: 'derived',
 		type: 'bool',
 		display: true
 	};
+*/
 }
 
 /**
  * Sets default parameters
  */
 ED.CornealGraft.prototype.setParameterDefaults = function() {
-	this.setParameterFromString('diameter', '7.5');
-	this.setParameterFromString('sutureType', 'Continuous');
+	this.setParameterFromString('diameter', '9.0');
+// 	this.setParameterFromString('sutureType', 'Continuous');
+	
+	// Create a squiggle to store the handles points
+	var squiggle = new ED.Squiggle(this, new ED.Colour(100, 100, 100, 1), 4, true);
+
+	// Add it to squiggle array
+	this.squiggleArray.push(squiggle);
+	
+	// Add point to squiggle for handle
+	var point = new ED.Point(0, 0);
+	this.addPointToSquiggle(point);
+	
+	// count number of sutures present in doodle before added
+	this.existingSutures = this.drawing.numberOfDoodlesOfClass('CornealSuture');
+	
 }
 
 /**
@@ -21731,11 +21803,176 @@ ED.CornealGraft.prototype.dependentParameterValues = function(_parameter, _value
 	switch (_parameter) {
 		case 'apexY':
 			returnArray['diameter'] = -2 * _value/this.pixelsPerMillimetre;
+			
+			// update range for x and y accordingly
+			var y = Math.sqrt((this.antsegRadius+this.antsegRadius+_value)*(this.antsegRadius+this.antsegRadius+_value) - this.originY*this.originY); 
+			var x = Math.sqrt((this.antsegRadius+this.antsegRadius+_value)*(this.antsegRadius+this.antsegRadius+_value) - this.originX*this.originX); 
+
+			this.parameterValidationArray['originY']['range'].setMinAndMax(-y,+y);
+			this.parameterValidationArray['originX']['range'].setMinAndMax(-x,+x);
+			
+			// If being synced, make sensible decision about y
+/*
+			if (!this.drawing.isActive) {
+				var newX = this.parameterValidationArray['originX'] ['range'].max;
+				var newY = this.parameterValidationArray['originY'] ['range'].max;
+			}
+			else {
+*/
+				var newX = this.parameterValidationArray['originX'] ['range'].constrain(this.originX);
+				var newY = this.parameterValidationArray['originY'] ['range'].constrain(this.originY);
+// 			}
+			this.setSimpleParameter('originY', newY);
+			this.setSimpleParameter('originX', newX);
 			break;
 
 		case 'diameter':
 			returnArray['apexY'] = -_value * this.pixelsPerMillimetre/2;
 			break;
+		
+		case 'originX':
+			// update boundary range for y coordinate so constrained within AntSeg
+				// using equation of circle, using (radius of antseg + difference in graft size) for length of one side
+			var y = Math.sqrt((this.antsegRadius+this.antsegRadius+this.apexY)*(this.antsegRadius+this.antsegRadius+this.apexY) - _value*_value); 
+			this.parameterValidationArray['originY']['range'].setMinAndMax(-y,+y);
+			
+			// If being synced, make sensible decision about y
+			if (!this.drawing.isActive) {
+				var newY = this.parameterValidationArray['originY']['range'].max;
+			}
+			else {
+				var newY = this.parameterValidationArray['originY'] ['range'].constrain(this.originY);
+			}
+			this.setSimpleParameter('originY', newY);
+			
+			// update suture positions, if appropriate
+			var continuousSutures = this.drawing.allDoodlesOfClass("ContinuousCornealSuture");
+			if (continuousSutures.length>0) {
+				for (var i=0; i<continuousSutures.length;i++) {
+					if (continuousSutures[i].cornealGraft == this) continuousSutures[i].setSimpleParameter('originX', _value);
+				}
+			}
+			var individualSutures = this.drawing.allDoodlesOfClass("CornealSuture");
+			if (individualSutures.length>0) {
+				for (var i=0; i<individualSutures.length;i++) {
+					if (individualSutures[i].cornealGraft == this) individualSutures[i].setSimpleParameter('originX', _value);
+				}
+			}
+			
+			// update rejection, if present
+			var rejectionDoodle = this.drawing.lastDoodleOfClass("CornealGraftRejection");
+			if (rejectionDoodle && rejectionDoodle.cornealGraft == this) {		  			
+				rejectionDoodle.setSimpleParameter('originX', _value);		
+  				rejectionDoodle.computeDoodleHeight();		
+  			}
+			break;
+		
+		case 'originY':
+			// update boundary range for x coordinate within a circle
+			var x = Math.sqrt((this.antsegRadius+this.antsegRadius+this.apexY)*(this.antsegRadius+this.antsegRadius+this.apexY) - _value*_value);
+			this.parameterValidationArray['originX']['range'].setMinAndMax(-x,+x);
+			
+			// If being synced, make sensible decision about x 
+			if (!this.drawing.isActive) {
+				var newX = this.originX;
+			}
+			else {
+				var newX = this.parameterValidationArray['originX'] ['range'].constrain(this.originX);
+			}
+			this.setSimpleParameter('originX', newX);
+			
+			// update suture positions, if appropriate
+			var continuousSutures = this.drawing.allDoodlesOfClass("ContinuousCornealSuture");
+			if (continuousSutures.length>0) {
+				for (var i=0; i<continuousSutures.length;i++) {
+					if (continuousSutures[i].cornealGraft == this) continuousSutures[i].setSimpleParameter('originY', _value);
+				}
+			}
+			var individualSutures = this.drawing.allDoodlesOfClass("CornealSuture");
+			if (individualSutures.length>0) {
+				for (var i=0; i<individualSutures.length;i++) {
+					if (individualSutures[i].cornealGraft == this) individualSutures[i].setSimpleParameter('originY', _value);
+				}
+			}
+			
+			// update rejection, if present
+			var rejectionDoodle = this.drawing.lastDoodleOfClass("CornealGraftRejection");
+			if (rejectionDoodle && rejectionDoodle.cornealGraft == this) {
+				rejectionDoodle.setSimpleParameter('originY', _value);		
+  				rejectionDoodle.computeDoodleHeight();		
+  			}
+			break;
+			
+		case 'depth':
+			returnArray['d'] = parseInt(_value);
+			break;
+			
+		case 'handles':
+			// update apex and diameter values - historically used to draw doodle (TODO remove)
+			var newApexY = this.squiggleArray[0].pointsArray[0].y - 9 * this.pixelsPerMillimetre/2;
+			returnArray['diameter'] = -2 * newApexY/this.pixelsPerMillimetre;
+			returnArray['apexY'] = newApexY;
+			
+			// update origin range
+			var y = Math.sqrt((this.antsegRadius+this.antsegRadius+newApexY)*(this.antsegRadius+this.antsegRadius+newApexY) - this.originY*this.originY); 
+			var x = Math.sqrt((this.antsegRadius+this.antsegRadius+newApexY)*(this.antsegRadius+this.antsegRadius+newApexY) - this.originX*this.originX); 
+
+			this.parameterValidationArray['originY']['range'].setMinAndMax(-y,+y);
+			this.parameterValidationArray['originX']['range'].setMinAndMax(-x,+x);
+			
+			var newX = this.parameterValidationArray['originX'] ['range'].constrain(this.originX);
+			var newY = this.parameterValidationArray['originY'] ['range'].constrain(this.originY);
+			this.setSimpleParameter('originY', newY);
+			this.setSimpleParameter('originX', newX);
+			
+			// and update synced continuous suture doodle
+			var continuousSutures = this.drawing.allDoodlesOfClass("ContinuousCornealSuture");
+			if (continuousSutures.length>0) {
+				for (var i=0; i<continuousSutures.length;i++) {
+					if (continuousSutures[i].cornealGraft == this) {
+						continuousSutures[i].setSimpleParameter('originY', newY);
+						continuousSutures[i].setSimpleParameter('originX', newX);
+					}
+				}
+			}
+			
+			var individualSutures = this.drawing.allDoodlesOfClass("CornealSuture");
+			if (individualSutures.length>0) {
+				for (var i=0; i<individualSutures.length;i++) {
+					if (individualSutures[i].cornealGraft == this) {
+						individualSutures[i].setSimpleParameter('originY', newY);
+						individualSutures[i].setSimpleParameter('originX', newX);
+					}
+				}
+			}
+			break;
+		
+		case 'interruptedSutures':
+			// use parameter to add /remove sutures from drawing.
+			var currentNumber = this.getSutures();
+			var difference = _value - currentNumber;
+			if (difference>0) {
+				for (var i=0; i<difference; i++) {
+					this.drawing.addDoodle('CornealSuture');
+				}
+			}
+			else if (difference<0) {
+				difference = Math.abs(difference);
+				for (var i=0; i<difference; i++) {
+					var suture = this.drawing.lastDoodleOfClass('CornealSuture');
+					this.drawing.deleteDoodle(suture);
+				
+				}
+			}
+			
+			// adjust angle between sutures so equidistant
+			var sutures = this.drawing.allDoodlesOfClass('CornealSuture');
+			var theta = (2*Math.PI)/_value;
+			for (var j=0; j<sutures.length;j++) {
+				sutures[j].setSimpleParameter('rotation',theta*j);
+			}
+			break;
+			
 	}
 
 	return returnArray;
@@ -21767,16 +22004,20 @@ ED.CornealGraft.prototype.draw = function(_point) {
 	ctx.strokeStyle = "gray";
 	ctx.fillStyle = "rgba(255, 255, 255, 0)";
 	ctx.stroke();
+/*
 	if (this.opaque) {
 		ctx.fillStyle = "rgba(150, 150, 150, 0.8)";
 		ctx.fill();
 	}
+*/
 
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
+	ctx.closePath();
 
 	// Non boundary paths
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+/*
 		if (this.showSutures) {
 			// Sutures
 			var ro = -this.apexY + this.sutureLength/2;
@@ -21825,16 +22066,27 @@ ED.CornealGraft.prototype.draw = function(_point) {
 			ctx.strokeStyle = "gray";
 			ctx.stroke();
 		}
+*/
 	}
 
 	// Coordinates of handles (in canvas plane)
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
+// 	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
+	this.handleArray[0].location = this.transform.transformPoint(this.squiggleArray[0].pointsArray[0]);
 
 	// Draw handles if selected
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
-
+	
 	// Return value indicating successful hittest
 	return this.isClicked;
+}
+
+/**
+ * Returns the SnoMed code of the doodle
+ *
+ * @returns {Int} SnoMed code of entity representated by doodle
+ */
+ED.CornealGraft.prototype.snomedCode = function() {
+	return (this.depth=="Full" ? 424960002 : 0); // no SNOMED CT code available for DALK in 2017 v1.36.4
 }
 
 /**
@@ -21843,8 +22095,517 @@ ED.CornealGraft.prototype.draw = function(_point) {
  * @returns {String} Description of doodle
  */
 ED.CornealGraft.prototype.description = function() {
-	return "Corneal Graft";
+	
+	this.interruptedSutures = this.getSutures(); // update suture counter
+	
+	var strng = "Penetrating keratoplasty";
+	
+	if (this.depth<100) strng = "Deep anterior lamellar keratoplasty";
+// 	if (this.depth !== "Full") strng = "Deep anterior lamellar keratoplasty";
+	
+	return strng;
 }
+
+/**
+ * Counts the number of sutures associated with this doodle in the drawing
+ * 
+ * @returns {Int} Number of corneal suture doodles
+ */
+ED.CornealGraft.prototype.getSutures = function() {
+	
+	var sutures = this.drawing.allDoodlesOfClass('CornealSuture');
+	var counter = 0;
+	
+	for (var i=0;i<sutures.length;i++) {
+		if (sutures[i].cornealGraft && !sutures[i].removed) counter++; // won't count sutures not associated with graft / "removed" sutures
+	}
+	
+	return counter;
+}
+
+/**
+ * OpenEyes
+ *
+ *
+ * Copyright (C) OpenEyes Foundation, 2011-2017
+ * This file is part of OpenEyes.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package OpenEyes
+ * @link http://www.openeyes.org.uk
+ * @author OpenEyes <info@openeyes.org.uk>
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
+ */
+
+/**
+ * 
+ *
+ * @class CornealGraftCrossSection
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Object} _parameterJSON
+ */
+ED.CornealGraftCrossSection = function(_drawing, _parameterJSON) {
+	
+	// Set classname
+	this.className = "CornealGraftCrossSection";
+
+	// Private parameters
+	this.pixelsPerMillimetre = 63.3333;
+	this.initialRadius = 360;
+	
+	// Derived parameters
+	this.diameter = 9;
+	
+	// Other parameters
+	this.d = 100;
+	
+	// Saved parameters
+	this.savedParameterArray = ['originX', 'originY', 'apexY','d','diameter'];
+	
+	// Parameters in doodle control bar
+	this.controlParameterArray = {};
+
+	// Call superclass constructor
+	ED.Doodle.call(this, _drawing, _parameterJSON);
+	
+	this.linkedDoodleParameters = {
+        'CornealGraft': {
+            source: ['originY','apexY','d','diameter'],
+            store: [['originX','csOriginX']]
+        }
+    };
+}
+
+/**
+ * Sets superclass and constructor
+ */
+ED.CornealGraftCrossSection.prototype = new ED.Doodle;
+ED.CornealGraftCrossSection.prototype.constructor = ED.CornealGraftCrossSection;
+ED.CornealGraftCrossSection.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.CornealGraftCrossSection.prototype.setHandles = function() {
+}
+
+/**
+ * Sets default properties
+ */
+ED.CornealGraftCrossSection.prototype.setPropertyDefaults = function() {
+	this.isSelectable = false;
+	this.isUnique = false;
+	this.isFilled = false;
+		
+	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
+	this.parameterValidationArray['apexY']['range'].setMinAndMax(-12.0 * this.pixelsPerMillimetre/2, -6.5 * this.pixelsPerMillimetre/2);
+
+	// Add complete validation arrays for derived parameters
+	this.parameterValidationArray['d'] = {
+		kind: 'other',
+		type: 'int',
+		range: new ED.Range(1, 100),
+		animate: false
+	};
+	
+	this.parameterValidationArray['diameter'] = {
+		kind: 'derived',
+		type: 'float',
+		range: new ED.Range(6.5, 12),
+		precision: 1,
+		animate: true
+	};
+}
+
+/**
+ * Sets default parameters
+ */
+ED.CornealGraftCrossSection.prototype.setParameterDefaults = function() {
+	this.originX = 50; // as is in Cornea cross section doodle to dulicate bezier control points
+	this.setParameterFromString('diameter', '9.0');
+}
+
+/**
+ * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
+ * The returned parameters are animated if their 'animate' property is set to true
+ *
+ * @param {String} _parameter Name of parameter that has changed
+ * @value {Undefined} _value Value of parameter to calculate
+ * @returns {Array} Associative array of values of dependent parameters
+ */
+ED.CornealGraftCrossSection.prototype.dependentParameterValues = function(_parameter, _value) {
+	var returnArray = new Array();
+
+	switch (_parameter) {
+		case 'apexY':
+			returnArray['diameter'] = -2 * _value/this.pixelsPerMillimetre;
+			break;
+
+		case 'diameter':
+			returnArray['apexY'] = -_value * this.pixelsPerMillimetre/2;
+			break;
+		
+		case 'd':
+			returnArray['d'] = parseInt(_value);
+			break;
+			
+	}
+
+	return returnArray;
+}
+
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+ED.CornealGraftCrossSection.prototype.draw = function(_point) {
+
+	// Get context
+	var ctx = this.drawing.context;
+
+	var cornea = this.drawing.lastDoodleOfClass('CorneaCrossSection');
+	var cornealThickness = cornea.pachymetry/5;
+
+	// Call draw method in superclass
+	ED.CornealGraftCrossSection.superclass.draw.call(this, _point);
+
+	// Boundary path
+	ctx.beginPath();
+	
+	// Calculate segment extent in terms of time along curve
+	var startY = this.originY + this.apexY;
+	var endY = this.originY - this.apexY;
+	
+	var startT = (startY + 380) / 760;
+	if (startT<0) startT = 0;
+	var endT = (endY + 380) / 760;
+	if (endT>1) endT = 1;
+		
+	if (startT < 0.5) {
+		
+		var superiorBezier = new Object;
+		var superiorBezierBack = new Object;
+
+		// define start and end time points
+		var tI0 = startT * 2;
+		var tI1 = (endT < 0.5) ? endT * 2 : 1;
+		
+		// default bezier points (as in cornea cross section)
+		if (cornea && cornea.shape == "Keratoconus") {
+			superiorBezier.SP = new ED.Point(-120, -380 - this.originY);
+			superiorBezier.CP1 = new ED.Point(-240, -260 - this.originY);
+			superiorBezier.CP2 = new ED.Point(cornea.apexX, cornea.apexY - 100 - this.originY);
+			superiorBezier.EP = new ED.Point(cornea.apexX, cornea.apexY - this.originY);
+			
+			superiorBezierBack.SP = new ED.Point(-120 + 120*this.d/100, -380 - this.originY);
+			superiorBezierBack.CP1 = new ED.Point(-240 + 160*this.d/100, -260 - this.originY);
+			superiorBezierBack.CP2 = new ED.Point(cornea.apexX + cornealThickness*this.d/100, cornea.apexY - 120 - this.originY);
+			superiorBezierBack.EP = new ED.Point(cornea.apexX + cornealThickness*this.d/100, cornea.apexY - this.originY);
+		}
+		else if (cornea && cornea.shape == "Keratoglobus") {
+			superiorBezier.SP = new ED.Point(-120, -380 - this.originY);
+			superiorBezier.CP1 = new ED.Point(-240, -260 - this.originY);
+			superiorBezier.CP2 = new ED.Point(-380, -100 - this.originY);
+			superiorBezier.EP = new ED.Point(-380, 100 - this.originY);
+			
+			superiorBezierBack.SP = new ED.Point(-120 + 120*this.d/100, -380 - this.originY);
+			superiorBezierBack.CP1 = new ED.Point(-240 + 120*this.d/100, -200 - this.originY);
+			superiorBezierBack.CP2 = new ED.Point(-380 + 100*this.d/100, -140 - this.originY);
+			superiorBezierBack.EP = new ED.Point(-380 + 100*this.d/100, 100 - this.originY);
+		}
+		else {
+			superiorBezier.SP = new ED.Point(-120, -380 - this.originY);
+			superiorBezier.CP1 = new ED.Point(-240, -260 - this.originY);
+			superiorBezier.CP2 = new ED.Point(-320, -160 - this.originY);
+			superiorBezier.EP = new ED.Point(-320, 0 - this.originY);
+			
+			superiorBezierBack.SP = new ED.Point(-120 + 120*this.d/100, -380 - this.originY);
+			superiorBezierBack.CP1 = new ED.Point(-240 + 160*this.d/100, -260 - this.originY);
+			superiorBezierBack.CP2 = new ED.Point(-320 + 100*this.d/100, -160 - this.originY);
+			superiorBezierBack.EP = new ED.Point(-320 + 100*this.d/100, 0 - this.originY);
+		}
+		
+			
+		if (tI0 > 0) {
+		// Trim start of curve			
+			
+			// front of cornea
+			var sq0 = new ED.Point(0,0);
+			sq0.y = (1-tI0)*(1-tI0)*(1-tI0)*superiorBezier.SP.y + 3*(1-tI0)*(1-tI0)*tI0*superiorBezier.CP1.y + 3*(1-tI0)*tI0*tI0*superiorBezier.CP2.y + tI0*tI0*tI0*superiorBezier.EP.y;
+			sq0.x = (1-tI0)*(1-tI0)*(1-tI0)*superiorBezier.SP.x + 3*(1-tI0)*(1-tI0)*tI0*superiorBezier.CP1.x + 3*(1-tI0)*tI0*tI0*superiorBezier.CP2.x + tI0*tI0*tI0*superiorBezier.EP.x;
+			
+			var iP23 = new ED.Point(0,0);
+			iP23.x = superiorBezier.CP1.x + tI0 * (superiorBezier.CP2.x - superiorBezier.CP1.x);
+			iP23.y = superiorBezier.CP1.y + tI0 * (superiorBezier.CP2.y - superiorBezier.CP1.y);
+			
+			var iP34 = new ED.Point(0,0);
+			iP34.x = superiorBezier.CP2.x + tI0 * (superiorBezier.EP.x - superiorBezier.CP2.x);
+			iP34.y = superiorBezier.CP2.y + tI0 * (superiorBezier.EP.y - superiorBezier.CP2.y);
+			
+			var iP2334 = new ED.Point(0,0);
+			iP2334.x = iP23.x + tI0 * (iP34.x - iP23.x);
+			iP2334.y = iP23.y + tI0 * (iP34.y - iP23.y);
+			
+			superiorBezier.SP = sq0;
+			superiorBezier.CP1 = iP2334;
+			superiorBezier.CP2 = iP34;
+			
+			
+			// back of cornea
+			var sq0b = new ED.Point(0,0);
+			sq0b.y = (1-tI0)*(1-tI0)*(1-tI0)*superiorBezierBack.SP.y + 3*(1-tI0)*(1-tI0)*tI0*superiorBezierBack.CP1.y + 3*(1-tI0)*tI0*tI0*superiorBezierBack.CP2.y + tI0*tI0*tI0*superiorBezierBack.EP.y;
+			sq0b.x = (1-tI0)*(1-tI0)*(1-tI0)*superiorBezierBack.SP.x + 3*(1-tI0)*(1-tI0)*tI0*superiorBezierBack.CP1.x + 3*(1-tI0)*tI0*tI0*superiorBezierBack.CP2.x + tI0*tI0*tI0*superiorBezierBack.EP.x;
+			
+			var iP23b = new ED.Point(0,0);
+			iP23b.x = superiorBezierBack.CP1.x + tI0 * (superiorBezierBack.CP2.x - superiorBezierBack.CP1.x);
+			iP23b.y = superiorBezierBack.CP1.y + tI0 * (superiorBezierBack.CP2.y - superiorBezierBack.CP1.y);
+			
+			var iP34b = new ED.Point(0,0);
+			iP34b.x = superiorBezierBack.CP2.x + tI0 * (superiorBezierBack.EP.x - superiorBezierBack.CP2.x);
+			iP34b.y = superiorBezierBack.CP2.y + tI0 * (superiorBezierBack.EP.y - superiorBezierBack.CP2.y);
+			
+			var iP2334b = new ED.Point(0,0);
+			iP2334b.x = iP23b.x + tI0 * (iP34b.x - iP23b.x);
+			iP2334b.y = iP23b.y + tI0 * (iP34b.y - iP23b.y);
+			
+			superiorBezierBack.SP = sq0b;
+			superiorBezierBack.CP1 = iP2334b;
+			superiorBezierBack.CP2 = iP34b;
+		}
+		
+		if (tI1 < 1) {
+		// Trim end of curve
+			
+			// front of cornea
+			var iq1 = new ED.Point(0,0);
+			iq1.y = (1-tI1)*(1-tI1)*(1-tI1)*superiorBezier.SP.y + 3*(1-tI1)*(1-tI1)*tI1*superiorBezier.CP1.y + 3*(1-tI1)*tI1*tI1*superiorBezier.CP2.y + tI1*tI1*tI1*superiorBezier.EP.y;
+			iq1.x = (1-tI1)*(1-tI1)*(1-tI1)*superiorBezier.SP.x + 3*(1-tI1)*(1-tI1)*tI1*superiorBezier.CP1.x + 3*(1-tI1)*tI1*tI1*superiorBezier.CP2.x + tI1*tI1*tI1*superiorBezier.EP.x;
+
+			var iP12 = new ED.Point(0,0);
+			iP12.x = superiorBezier.SP.x + tI1 * (superiorBezier.CP1.x - superiorBezier.SP.x);
+			iP12.y = superiorBezier.SP.y + tI1 * (superiorBezier.CP1.y - superiorBezier.SP.y);
+			
+			var iP23 = new ED.Point(0,0);
+			iP23.x = superiorBezier.CP1.x + tI1 * (superiorBezier.CP2.x - superiorBezier.CP1.x);
+			iP23.y = superiorBezier.CP1.y + tI1 * (superiorBezier.CP2.y - superiorBezier.CP1.y);
+			
+			var iP1223 = new ED.Point(0,0);
+			iP1223.x = iP12.x + tI1 * (iP23.x - iP12.x);
+			iP1223.y = iP12.y + tI1 * (iP23.y - iP12.y);
+			
+			superiorBezier.CP1 = iP12;
+			superiorBezier.CP2 = iP1223;
+			superiorBezier.EP = iq1;
+			
+			
+			// back of cornea
+			var iq1b = new ED.Point(0,0);
+			iq1b.y = (1-tI1)*(1-tI1)*(1-tI1)*superiorBezierBack.SP.y + 3*(1-tI1)*(1-tI1)*tI1*superiorBezierBack.CP1.y + 3*(1-tI1)*tI1*tI1*superiorBezierBack.CP2.y + tI1*tI1*tI1*superiorBezierBack.EP.y;
+			iq1b.x = (1-tI1)*(1-tI1)*(1-tI1)*superiorBezierBack.SP.x + 3*(1-tI1)*(1-tI1)*tI1*superiorBezierBack.CP1.x + 3*(1-tI1)*tI1*tI1*superiorBezierBack.CP2.x + tI1*tI1*tI1*superiorBezierBack.EP.x;
+
+			var iP12b = new ED.Point(0,0);
+			iP12b.x = superiorBezierBack.SP.x + tI1 * (superiorBezierBack.CP1.x - superiorBezierBack.SP.x);
+			iP12b.y = superiorBezierBack.SP.y + tI1 * (superiorBezierBack.CP1.y - superiorBezierBack.SP.y);
+			
+			var iP23b = new ED.Point(0,0);
+			iP23b.x = superiorBezierBack.CP1.x + tI1 * (superiorBezierBack.CP2.x - superiorBezierBack.CP1.x);
+			iP23b.y = superiorBezierBack.CP1.y + tI1 * (superiorBezierBack.CP2.y - superiorBezierBack.CP1.y);
+			
+			var iP1223b = new ED.Point(0,0);
+			iP1223b.x = iP12b.x + tI1 * (iP23b.x - iP12b.x);
+			iP1223b.y = iP12b.y + tI1 * (iP23b.y - iP12b.y);
+			
+			superiorBezierBack.CP1 = iP12b;
+			superiorBezierBack.CP2 = iP1223b;
+			superiorBezierBack.EP = iq1b;
+		}
+	}
+	
+	
+	if (endT > 0.5) {
+		
+		var inferiorBezier = new Object;
+		var inferiorBezierBack = new Object;
+		
+		// define start and end time points
+		var tS0 = (startT > 0.5) ? (startT - 0.5) * 2 : 0;
+		var tS1 = (endT - 0.5) * 2;
+		
+		// default bezier points (as in cornea cross section)
+		if (cornea && cornea.shape == "Keratoconus") {
+			inferiorBezier.SP = new ED.Point(cornea.apexX, cornea.apexY - this.originY);
+			inferiorBezier.CP1 = new ED.Point(cornea.apexX, cornea.apexY + 100 - this.originY);
+			inferiorBezier.CP2 = new ED.Point(-240, 260 - this.originY);
+			inferiorBezier.EP = new ED.Point(-120, 380 - this.originY);
+			
+			inferiorBezierBack.SP = new ED.Point(cornea.apexX + cornealThickness*this.d/100, cornea.apexY - this.originY);
+			inferiorBezierBack.CP1 = new ED.Point(cornea.apexX + cornealThickness*this.d/100, cornea.apexY + 120 - this.originY);
+			inferiorBezierBack.CP2 = new ED.Point(-240 + 160*this.d/100, 260 - this.originY);
+			inferiorBezierBack.EP = new ED.Point(-120 + 120*this.d/100, 380 - this.originY);
+		}
+		else if (cornea && cornea.shape == "Keratoglobus") {
+			inferiorBezier.SP = new ED.Point(-380, 100 - this.originY);
+			inferiorBezier.CP1 = new ED.Point(-380, 200 - this.originY);
+			inferiorBezier.CP2 = new ED.Point(-240, 360 - this.originY);
+			inferiorBezier.EP = new ED.Point(-120, 380 - this.originY);
+			
+			inferiorBezierBack.SP = new ED.Point(-380 + 100*this.d/100, 100 - this.originY);
+			inferiorBezierBack.CP1 = new ED.Point(-380 + 120*this.d/100, 220 - this.originY);
+			inferiorBezierBack.CP2 = new ED.Point(-240 + 160*this.d/100, 260 - this.originY);
+			inferiorBezierBack.EP = new ED.Point(-120 + 120*this.d/100, 380 - this.originY);
+		}
+		else {
+			inferiorBezier.SP = new ED.Point(-320, -0 - this.originY);
+			inferiorBezier.CP1 = new ED.Point(-320, 160 - this.originY);
+			inferiorBezier.CP2 = new ED.Point(-240, 260 - this.originY);
+			inferiorBezier.EP = new ED.Point(-120, 380 - this.originY);
+			
+			inferiorBezierBack.SP = new ED.Point(-320 + 100*this.d/100, -0 - this.originY);
+			inferiorBezierBack.CP1 = new ED.Point(-320 + 100*this.d/100, 160 - this.originY);
+			inferiorBezierBack.CP2 = new ED.Point(-240 + 160*this.d/100, 260 - this.originY);
+			inferiorBezierBack.EP = new ED.Point(-120 + 120*this.d/100, 380 - this.originY);
+		}			
+		
+		
+		if (tS0 > 0) {
+		// Trim start of curve
+		
+			// front of cornea			
+			var sq0 = new ED.Point(0,0);
+			sq0.y = (1-tS0)*(1-tS0)*(1-tS0)*inferiorBezier.SP.y + 3*(1-tS0)*(1-tS0)*tS0*inferiorBezier.CP1.y + 3*(1-tS0)*tS0*tS0*inferiorBezier.CP2.y + tS0*tS0*tS0*inferiorBezier.EP.y;
+			sq0.x = (1-tS0)*(1-tS0)*(1-tS0)*inferiorBezier.SP.x + 3*(1-tS0)*(1-tS0)*tS0*inferiorBezier.CP1.x + 3*(1-tS0)*tS0*tS0*inferiorBezier.CP2.x + tS0*tS0*tS0*inferiorBezier.EP.x;
+			
+			var sP23 = new ED.Point(0,0);
+			sP23.x = inferiorBezier.CP1.x + tS0 * (inferiorBezier.CP2.x - inferiorBezier.CP1.x);
+			sP23.y = inferiorBezier.CP1.y + tS0 * (inferiorBezier.CP2.y - inferiorBezier.CP1.y);
+			
+			var sP34 = new ED.Point(0,0);
+			sP34.x = inferiorBezier.CP2.x + tS0 * (inferiorBezier.EP.x - inferiorBezier.CP2.x);
+			sP34.y = inferiorBezier.CP2.y + tS0 * (inferiorBezier.EP.y - inferiorBezier.CP2.y);
+			
+			var sP2334 = new ED.Point(0,0);
+			sP2334.x = sP23.x + tS0 * (sP34.x - sP23.x);
+			sP2334.y = sP23.y + tS0 * (sP34.y - sP23.y);
+			
+			inferiorBezier.SP = sq0;
+			inferiorBezier.CP1 = sP2334;
+			inferiorBezier.CP2 = sP34;
+			
+			// back of cornea
+			var sq0b = new ED.Point(0,0);
+			sq0b.y = (1-tS0)*(1-tS0)*(1-tS0)*inferiorBezierBack.SP.y + 3*(1-tS0)*(1-tS0)*tS0*inferiorBezierBack.CP1.y + 3*(1-tS0)*tS0*tS0*inferiorBezierBack.CP2.y + tS0*tS0*tS0*inferiorBezierBack.EP.y;
+			sq0b.x = (1-tS0)*(1-tS0)*(1-tS0)*inferiorBezierBack.SP.x + 3*(1-tS0)*(1-tS0)*tS0*inferiorBezierBack.CP1.x + 3*(1-tS0)*tS0*tS0*inferiorBezierBack.CP2.x + tS0*tS0*tS0*inferiorBezierBack.EP.x;
+			
+			var sP23b = new ED.Point(0,0);
+			sP23b.x = inferiorBezierBack.CP1.x + tS0 * (inferiorBezierBack.CP2.x - inferiorBezierBack.CP1.x);
+			sP23b.y = inferiorBezierBack.CP1.y + tS0 * (inferiorBezierBack.CP2.y - inferiorBezierBack.CP1.y);
+			
+			var sP34b = new ED.Point(0,0);
+			sP34b.x = inferiorBezierBack.CP2.x + tS0 * (inferiorBezierBack.EP.x - inferiorBezierBack.CP2.x);
+			sP34b.y = inferiorBezierBack.CP2.y + tS0 * (inferiorBezierBack.EP.y - inferiorBezierBack.CP2.y);
+			
+			var sP2334b = new ED.Point(0,0);
+			sP2334b.x = sP23b.x + tS0 * (sP34b.x - sP23b.x);
+			sP2334b.y = sP23b.y + tS0 * (sP34b.y - sP23b.y);
+			
+			inferiorBezierBack.SP = sq0b;
+			inferiorBezierBack.CP1 = sP2334b;
+			inferiorBezierBack.CP2 = sP34b;
+		}
+		
+		if (tS1 < 1) {
+		// Trim end of curve
+		
+			// front of cornea
+			var sq1 = new ED.Point(0,0);
+			sq1.y = (1-tS1)*(1-tS1)*(1-tS1)*inferiorBezier.SP.y + 3*(1-tS1)*(1-tS1)*tS1*inferiorBezier.CP1.y + 3*(1-tS1)*tS1*tS1*inferiorBezier.CP2.y + tS1*tS1*tS1*inferiorBezier.EP.y;
+			sq1.x = (1-tS1)*(1-tS1)*(1-tS1)*inferiorBezier.SP.x + 3*(1-tS1)*(1-tS1)*tS1*inferiorBezier.CP1.x + 3*(1-tS1)*tS1*tS1*inferiorBezier.CP2.x + tS1*tS1*tS1*inferiorBezier.EP.x;
+
+			var sP12 = new ED.Point(0,0);
+			sP12.x = inferiorBezier.SP.x + tS1 * (inferiorBezier.CP1.x - inferiorBezier.SP.x);
+			sP12.y = inferiorBezier.SP.y + tS1 * (inferiorBezier.CP1.y - inferiorBezier.SP.y);
+			
+			var sP23 = new ED.Point(0,0);
+			sP23.x = inferiorBezier.CP1.x + tS1 * (inferiorBezier.CP2.x - inferiorBezier.CP1.x);
+			sP23.y = inferiorBezier.CP1.y + tS1 * (inferiorBezier.CP2.y - inferiorBezier.CP1.y);
+			
+			var sP1223 = new ED.Point(0,0);
+			sP1223.x = sP12.x + tS1 * (sP23.x - sP12.x);
+			sP1223.y = sP12.y + tS1 * (sP23.y - sP12.y);
+
+			inferiorBezier.CP1 = sP12;
+			inferiorBezier.CP2 = sP1223;
+			inferiorBezier.EP = sq1;
+			
+			
+			// back of cornea
+			var sq1b = new ED.Point(0,0);
+			sq1b.y = (1-tS1)*(1-tS1)*(1-tS1)*inferiorBezierBack.SP.y + 3*(1-tS1)*(1-tS1)*tS1*inferiorBezierBack.CP1.y + 3*(1-tS1)*tS1*tS1*inferiorBezierBack.CP2.y + tS1*tS1*tS1*inferiorBezierBack.EP.y;
+			sq1b.x = (1-tS1)*(1-tS1)*(1-tS1)*inferiorBezierBack.SP.x + 3*(1-tS1)*(1-tS1)*tS1*inferiorBezierBack.CP1.x + 3*(1-tS1)*tS1*tS1*inferiorBezierBack.CP2.x + tS1*tS1*tS1*inferiorBezierBack.EP.x;
+
+			var sP12b = new ED.Point(0,0);
+			sP12b.x = inferiorBezierBack.SP.x + tS1 * (inferiorBezierBack.CP1.x - inferiorBezierBack.SP.x);
+			sP12b.y = inferiorBezierBack.SP.y + tS1 * (inferiorBezierBack.CP1.y - inferiorBezierBack.SP.y);
+			
+			var sP23b = new ED.Point(0,0);
+			sP23b.x = inferiorBezierBack.CP1.x + tS1 * (inferiorBezierBack.CP2.x - inferiorBezierBack.CP1.x);
+			sP23b.y = inferiorBezierBack.CP1.y + tS1 * (inferiorBezierBack.CP2.y - inferiorBezierBack.CP1.y);
+			
+			var sP1223b = new ED.Point(0,0);
+			sP1223b.x = sP12b.x + tS1 * (sP23b.x - sP12b.x);
+			sP1223b.y = sP12b.y + tS1 * (sP23b.y - sP12b.y);
+
+			inferiorBezierBack.CP1 = sP12b;
+			inferiorBezierBack.CP2 = sP1223b;
+			inferiorBezierBack.EP = sq1b;
+		}
+	}
+	
+	if (inferiorBezier) {
+		ctx.moveTo(inferiorBezier.EP.x, inferiorBezier.EP.y);	
+		ctx.lineTo(inferiorBezierBack.EP.x, inferiorBezierBack.EP.y);
+		if (this.d<100) ctx.bezierCurveTo(inferiorBezierBack.CP2.x, inferiorBezierBack.CP2.y, inferiorBezierBack.CP1.x, inferiorBezierBack.CP1.y, inferiorBezierBack.SP.x, inferiorBezierBack.SP.y);
+		ctx.moveTo(inferiorBezier.EP.x, inferiorBezier.EP.y);
+	}
+	if (superiorBezier) {
+		if (this.d<100) {
+			ctx.moveTo(superiorBezierBack.EP.x, superiorBezierBack.EP.y);
+			ctx.bezierCurveTo(superiorBezierBack.CP2.x, superiorBezierBack.CP2.y, superiorBezierBack.CP1.x, superiorBezierBack.CP1.y, superiorBezierBack.SP.x, superiorBezierBack.SP.y);
+		}
+		ctx.moveTo(superiorBezierBack.SP.x, superiorBezierBack.SP.y);
+		ctx.lineTo(superiorBezier.SP.x, superiorBezier.SP.y);
+	}
+	
+	
+	// Close path
+	ctx.closePath();
+
+	// Set attributes
+	ctx.lineWidth = 4;
+	ctx.fillStyle = "rgba(0,0,0,0)";
+	ctx.strokeStyle = "gray";
+
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+		
+	// Non boundary drawing
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {}
+	
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+
+	// Return value indicating successful hittest
+	return this.isClicked;
+	
+}
+
+
 
 /**
  * OpenEyes
@@ -25405,6 +26166,9 @@ ED.CornealSuture = function(_drawing, _parameterJSON) {
 	// Derived parameters
 	this.removed = false;
 	
+	// Other parameters
+	this.cornealGraft = null; // graft a property of doodle so can have multiple graft-suture pairs in one drawing
+	
 	// Saved parameters
 	this.savedParameterArray = ['radius', 'rotation','removed'];
 	
@@ -25441,6 +26205,16 @@ ED.CornealSuture.prototype.setPropertyDefaults = function() {
 ED.CornealSuture.prototype.setParameterDefaults = function() {
 	this.radius = 374;
 	this.setRotationWithDisplacements(10, 20);
+	
+	// if corneal graft doodle in drawing, sutures will centre around graft
+		// TODO - what if subsequently want to add sutures and not associate with graft?
+	this.cornealGraft = this.drawing.lastDoodleOfClass("CornealGraft");
+	if (this.cornealGraft) {
+		this.originX = this.cornealGraft.originX;
+		this.originY = this.cornealGraft.originY;
+		
+		this.radius = this.cornealGraft.diameter * this.cornealGraft.pixelsPerMillimetre/2;
+	}
 }
 
 /**
@@ -25458,6 +26232,7 @@ ED.CornealSuture.prototype.draw = function(_point) {
 	// Boundary path
 	ctx.beginPath();
 
+	if (this.cornealGraft) this.radius = this.cornealGraft.diameter * this.cornealGraft.pixelsPerMillimetre/2;
 	var r = this.radius;
 	ctx.rect(-20, -(r + 40), 40, 80);
 
@@ -25506,6 +26281,7 @@ ED.CornealSuture.prototype.draw = function(_point) {
  *
  * @returns {String} Description of doodle
  */
+/*
 ED.CornealSuture.prototype.description = function() {
 	var returnString = "Corneal suture at ";
 
@@ -25513,7 +26289,24 @@ ED.CornealSuture.prototype.description = function() {
 
 	return returnString;
 }
+*/
 
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.CornealSuture.prototype.groupDescription = function() {
+	
+	var returnString = "";
+
+	var number = this.drawing.numberOfDoodlesOfClass(this.className);
+	returnString = number + " corneal suture";
+
+	if (number > 1) returnString += "s";
+
+	return returnString;
+}
 /**
  * OpenEyes
  *
