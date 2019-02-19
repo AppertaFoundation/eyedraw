@@ -18833,17 +18833,6 @@ ED.ChoroidalEffusion.prototype.groupDescription = function() {
 		returnObject[this.getDescriptionForDoodle(doodle)] = typeof returnObject[this.getDescriptionForDoodle(doodle)] !== "undefined" ? returnObject[this.getDescriptionForDoodle(doodle)]+1 : 1;
 	}
 
-	rr = returnObject;
-	console.log(rr);
-
-/*	for (var z = 0; z < returnObject.length; z++) {
-	//	desc = returnObject[z];
-		if(returnString !== ''){
-			returnString += ', ';
-		}
-		returnString += returnString
-	}*/
-
 	for (var desc in returnObject) {
 		if (!returnObject.hasOwnProperty(desc)){
 			continue;
@@ -18851,22 +18840,9 @@ ED.ChoroidalEffusion.prototype.groupDescription = function() {
 		if(returnString !== ''){
 			returnString += ', ';
 		}
-
 		returnString += desc + " [" + returnObject[desc] + "]";
-
 	}
 
-/*
-
-	// Construct description
-
-
-	// Use trigonometry on rotation field to determine quadrant
-	returnString = returnString + (Math.cos(this.rotation) > 0 ? "Supero" : "Infero");
-	returnString = returnString + (Math.sin(this.rotation) > 0 ? (this.drawing.eye === ED.eye.Right ? "nasal" : "temporal") : (this.drawing.eye === ED.eye.Right ? "temporal" : "nasal"));
-	returnString = returnString + " choroidal effusion";*/
-
-	// Return description
 	return returnString;
 };
 
@@ -18878,7 +18854,6 @@ ED.ChoroidalEffusion.prototype.getDescriptionForDoodle = function(doodle) {
 	returnString = returnString + (Math.sin(doodle.rotation) > 0 ? (doodle.drawing.eye === ED.eye.Right ? "nasal" : "temporal") : (doodle.drawing.eye === ED.eye.Right ? "temporal" : "nasal"));
 	returnString = returnString + " choroidal effusion";
 
-	// Return description
 	return returnString;
 };
 

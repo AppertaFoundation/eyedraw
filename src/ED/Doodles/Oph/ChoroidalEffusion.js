@@ -170,7 +170,6 @@ ED.ChoroidalEffusion.prototype.getDescriptionForDoodle = function(doodle) {
 	returnString = returnString + (Math.sin(doodle.rotation) > 0 ? (doodle.drawing.eye === ED.eye.Right ? "nasal" : "temporal") : (doodle.drawing.eye === ED.eye.Right ? "temporal" : "nasal"));
 	returnString = returnString + " choroidal effusion";
 
-	// Return description
 	return returnString;
 };
 
