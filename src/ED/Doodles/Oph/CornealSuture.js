@@ -169,4 +169,4 @@ ED.CornealSuture.prototype.groupDescription = function() {
 	if (number > 1) returnString += "s";
 
 	return returnString;
-}
+};
