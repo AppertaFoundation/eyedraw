@@ -27698,7 +27698,11 @@ ED.CornealThinningCrossSection.prototype.getCornealBezierPoint = function(_time)
 ED.CornealThinningCrossSection.prototype.draw = function(_point) {
 
 	var backgroundFillColour = this.drawing.canvas.style.backgroundColor;
-	if (!backgroundFillColour) var backgroundFillColour = "white"; // in case canvas has no background fill
+	// in case canvas has no background fill
+	//@TODO : this.drawing.canvas.style.backgroundColor is always empty so hack #dae6f1 into here
+	if (!backgroundFillColour) {
+		backgroundFillColour = "#dae6f1";
+	}
 	
 	// Get context
 	var ctx = this.drawing.context;
