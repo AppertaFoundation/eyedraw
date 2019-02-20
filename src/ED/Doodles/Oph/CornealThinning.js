@@ -1,6 +1,5 @@
 /**
  * OpenEyes
- * MSC
  *
  * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
@@ -16,22 +15,21 @@
  */
 
 /**
- * TODO: infiltrate control point definitions 
+ * 
  *
- * @class CornealOpacity
+ * @class CornealThinning
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
  * @param {Object} _parameterJSON
  */
-ED.CornealOpacity = function(_drawing, _parameterJSON) {
+ED.CornealThinning = function(_drawing, _parameterJSON) {
 	// Set classname
-	this.className = "CornealOpacity";
+	this.className = "CornealThinning";
 
 	// Private parameters
 	this.numberOfHandles = 4;
 	this.initialRadius = 81;
 	this.resetWidth = true;
-	this.resetInfiltrate = true;
 
 	this.bezierTimeIntervals = [0.0,0.125,0.25,0.375,0.50,0.625,0.75,0.875,1];
 	this.minX = this.minY = this.initialRadius * -1;
@@ -40,19 +38,26 @@ ED.CornealOpacity = function(_drawing, _parameterJSON) {
 	// Other parameters
 	this.height = Math.round(this.initialRadius * 2 / 54);
 	this.width = Math.round(this.initialRadius * 2 / 54);
-	this.depth = 33;
-	this.infiltrateWidth = 0;
-		
+
 	this.h = Math.round(this.initialRadius * 2 / 54);
 	this.w = Math.round(this.initialRadius * 2 / 54);
-	this.d = 33;
-	this.iW = 0;
-
+	this.d = 0;
+	this.p = 0;
+	
+	this.type = 'Dellen';
+	this.descemetacoele = false;
+	this.perforation = false;
+	
+	// side view params
+	this.csApexX = 0;
+	this.csApexY = 0;
+	this.csOriginX = 0;
+	
 	// Saved parameters
-	this.savedParameterArray = ['originX', 'originY', 'rotation', 'height', 'width', 'depth', 'infiltrateWidth','h','w','d','iW','minY','maxY'];
+	this.savedParameterArray = ['originX', 'originY', 'rotation', 'height', 'width','h','w','minY','maxY','type','depth','descemetacoele','perforation','csApexX','csApexY','csOriginX'];
 	
 	// Parameters in doodle control bar
-	this.controlParameterArray = {'height':'Height', 'width':'Width', 'depth':'Depth (%)', 'infiltrateWidth':'Infiltrate width'};
+	this.controlParameterArray = {'type':'Type'};
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -61,28 +66,24 @@ ED.CornealOpacity = function(_drawing, _parameterJSON) {
 /**
  * Sets superclass and constructor
  */
-ED.CornealOpacity.prototype = new ED.Doodle;
-ED.CornealOpacity.prototype.constructor = ED.CornealOpacity;
-ED.CornealOpacity.superclass = ED.Doodle.prototype;
+ED.CornealThinning.prototype = new ED.Doodle;
+ED.CornealThinning.prototype.constructor = ED.CornealThinning;
+ED.CornealThinning.superclass = ED.Doodle.prototype;
 
 /**
  * Sets handle attributes
  */
-ED.CornealOpacity.prototype.setHandles = function() {
+ED.CornealThinning.prototype.setHandles = function() {
 	// Array of handles
 	for (var i = 0; i < this.numberOfHandles; i++) {
 		this.handleArray[i] = new ED.Doodle.Handle(null, true, ED.Mode.Handles, false);
 	}
-
-	// Allow top handle to rotate doodle
-	/// ? Removed as need specific handles to be along X and Y axis - can change... **TODO**
-// 	this.handleArray[0].isRotatable = true;
 }
 
 /**
  * Sets default properties
  */
-ED.CornealOpacity.prototype.setPropertyDefaults = function() {
+ED.CornealThinning.prototype.setPropertyDefaults = function() {
 	// Create ranges to constrain handles
 	this.handleVectorRangeArray = new Array();
 	for (var i = 0; i < this.numberOfHandles; i++) {
@@ -103,6 +104,12 @@ ED.CornealOpacity.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['originY']['range'].setMinAndMax(-350, +350);
 	
 	// Validation arrays for other parameters
+	this.parameterValidationArray['type'] = {
+		kind: 'derived',
+		type: 'string',
+		list: ['Dellen', 'Keratitis'],
+		animate: false
+	};
 	this.parameterValidationArray['height'] = {
 		kind: 'other',
 		type: 'int',
@@ -114,20 +121,6 @@ ED.CornealOpacity.prototype.setPropertyDefaults = function() {
 		kind: 'other',
 		type: 'int',
 		range: new ED.Range(1, 14),
-		precision: 1,
-		animate: false
-	};
-	this.parameterValidationArray['depth'] = {
-		kind: 'other',
-		type: 'int',
-		range: new ED.Range(1, 100),
-		precision: 1,
-		animate: false
-	};
-	this.parameterValidationArray['infiltrateWidth'] = {
-		kind: 'other',
-		type: 'int',
-		range: new ED.Range(0, 15),
 		precision: 1,
 		animate: false
 	};
@@ -143,16 +136,16 @@ ED.CornealOpacity.prototype.setPropertyDefaults = function() {
 		range: [1, 14],
 		animate: false
 	};
-	this.parameterValidationArray['iW'] = {
-		kind: 'other',
-		type: 'int',
-		range: [0, 15],
-		animate: false
-	};
 	this.parameterValidationArray['d'] = {
 		kind: 'other',
 		type: 'int',
-		range: [1, 100],
+		range: [0, 1],
+		animate: false
+	};
+	this.parameterValidationArray['p'] = {
+		kind: 'other',
+		type: 'int',
+		range: [0, 1],
 		animate: false
 	};
 	this.parameterValidationArray['resetWidth'] = {
@@ -160,7 +153,12 @@ ED.CornealOpacity.prototype.setPropertyDefaults = function() {
 		type: 'bool',
 		display: false
 	};
-	this.parameterValidationArray['resetInfiltrate'] = {
+	this.parameterValidationArray['descemetacoele'] = {
+		kind: 'derived',
+		type: 'bool',
+		display: false
+	};
+	this.parameterValidationArray['perforation'] = {
 		kind: 'derived',
 		type: 'bool',
 		display: false
@@ -188,7 +186,7 @@ ED.CornealOpacity.prototype.setPropertyDefaults = function() {
  * @value {Undefined} _value Value of parameter to calculate
  * @returns {Array} Associative array of values of dependent parameters
  */
-ED.CornealOpacity.prototype.dependentParameterValues = function(_parameter, _value) {
+ED.CornealThinning.prototype.dependentParameterValues = function(_parameter, _value) {
 	var returnArray = new Array();
 
 	switch (_parameter) {
@@ -205,29 +203,12 @@ ED.CornealOpacity.prototype.dependentParameterValues = function(_parameter, _val
 			returnArray['maxY'] = this.calculateMaxY();
 			break;
 			
-		case 'infiltrateWidth':
-			returnArray['resetInfiltrate'] = true;
-			returnArray['iW'] = parseInt(_value);
-			break;
-		
-		case 'depth':
-			returnArray['d'] = parseInt(_value);
-			break;
-			
 		case 'h':
 			returnArray['h'] = _value;
-			break;
-		
-		case 'd':
-			returnArray['depth'] = _value;
 			break;
 			
 		case 'w':
 			returnArray['w'] = _value;
-			break;
-		
-		case 'iW':
-			returnArray['infiltrateWidth'] = _value;
 			break;
 			
 		case 'minY':
@@ -240,11 +221,20 @@ ED.CornealOpacity.prototype.dependentParameterValues = function(_parameter, _val
 			
 		case 'handles':
 			returnArray['w'] = this.calculateWidth();
-            returnArray['h'] = this.calculateHeight();
+			returnArray['h'] = this.calculateHeight();
 			returnArray['height'] = this.calculateHeight();
 			returnArray['minY'] = this.calculateMinY();
 			returnArray['maxY'] = this.calculateMaxY();
 			break;
+		
+		case 'd':
+			returnArray['descemetacoele'] = (_value==1) ? true : false;
+			break;
+		
+		case 'p':
+			returnArray['perforation'] = (_value==1) ? true : false;
+			break;
+			
 	}
 
 	return returnArray;
@@ -253,15 +243,19 @@ ED.CornealOpacity.prototype.dependentParameterValues = function(_parameter, _val
 /**
  * Sets default parameters
  */
-ED.CornealOpacity.prototype.setParameterDefaults = function() {
+ED.CornealThinning.prototype.setParameterDefaults = function() {
+/*
 	var doodle = this.drawing.lastDoodleOfClass(this.className);
 	if (doodle) {
 		var np = new ED.Point(doodle.originX + 100, 1);
 		this.move(np.x, np.y);
 	} else {
-		this.move(100, 1);
+		this.move(1, 200);
 	}
-
+*/
+	this.originY = 200;
+	this.originX = 0;
+	
 	// Create a squiggle to store the handles points
 	var squiggle = new ED.Squiggle(this, new ED.Colour(100, 100, 100, 1), 4, true);
 
@@ -272,23 +266,21 @@ ED.CornealOpacity.prototype.setParameterDefaults = function() {
 	for (var i = 0; i < this.numberOfHandles; i++) {
 		var point = new ED.Point(0, 0);
 		point.setWithPolars(this.initialRadius, i * 2 * Math.PI / this.numberOfHandles);
+		if (i%2) {
+			if (i>1) point.x += 20;
+			else point.x -= 20;
+		}
 		this.addPointToSquiggle(point);
 	}
-	for (var i = 0; i < this.numberOfHandles; i++) {
-		var point = new ED.Point(0, 0);
-		point.setWithPolars(this.initialRadius, i * 2 * Math.PI / this.numberOfHandles);
-		this.addPointToSquiggle(point);
-	}
-};
+
+}
 
 // Angle of control point from radius line to point (this value makes path a circle Math.PI/12 for 8 points
-ED.CornealOpacity.prototype.getPhi = function()
-{
+ED.CornealThinning.prototype.getPhi = function() {
 	return 2 * Math.PI / (3 * this.numberOfHandles);
-};
+}
 
-ED.CornealOpacity.prototype.calculateWidth = function()
-{
+ED.CornealThinning.prototype.calculateWidth = function() {
 	/// solve bezier to find min and max point along axis
 	var maxX = '';
 	var minX = '';
@@ -319,18 +311,17 @@ ED.CornealOpacity.prototype.calculateWidth = function()
 	this.maxX = maxX;
 	this.minX = minX;
 	return Math.round((maxX - minX) / 54);
-};
+}
 
-ED.CornealOpacity.prototype.calculateHeight = function()
-{
+ED.CornealThinning.prototype.calculateHeight = function() {
 	// recalculate height /// solve bezier to find min and max point along axis
 	var minY = this.calculateMinY();
 	var maxY = this.calculateMaxY();
 
 	return Math.round((maxY - minY) / 54);
-};
+}
 
-ED.CornealOpacity.prototype.calculateMinY = function() {
+ED.CornealThinning.prototype.calculateMinY = function() {
 	// recalculate height/// solve bezier to find min and max point along axis
 	var phi = this.getPhi();
 	var minY = '';
@@ -355,7 +346,8 @@ ED.CornealOpacity.prototype.calculateMinY = function() {
 	}
 	return minY;
 }
-ED.CornealOpacity.prototype.calculateMaxY = function() {
+
+ED.CornealThinning.prototype.calculateMaxY = function() {
 	// recalculate height/// solve bezier to find min and max point along axis
 	var phi = this.getPhi();
 	var minY = '';
@@ -392,13 +384,13 @@ ED.CornealOpacity.prototype.calculateMaxY = function() {
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.CornealOpacity.prototype.draw = function(_point) {
+ED.CornealThinning.prototype.draw = function(_point) {
 	
 	// Get context
 	var ctx = this.drawing.context;
 
 	// Call draw method in superclass
-	ED.CornealOpacity.superclass.draw.call(this, _point);
+	ED.CornealThinning.superclass.draw.call(this, _point);
 
 	// Boundary path
 	ctx.beginPath();
@@ -447,8 +439,14 @@ ED.CornealOpacity.prototype.draw = function(_point) {
 
 	// Set attributes
 	ctx.lineWidth = 4;
-	ctx.fillStyle = "gray";
-	ctx.strokeStyle = "gray";
+/*
+	ctx.fillStyle = "rgba(200,200,200,0.8)";
+	ctx.strokeStyle = "rgba(200,200,200,0.8)";
+*/
+	
+	// fill pattern
+	ctx.fillStyle = ctx.createPattern(this.drawing.imageArray['ThinningPattern'], 'repeat');
+	ctx.strokeStyle = "rgba(200,200,200,0)";
 
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
@@ -461,86 +459,15 @@ ED.CornealOpacity.prototype.draw = function(_point) {
 
 	// Non boundary drawing
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
-		
-		// Infiltrate
-		if (this.infiltrateWidth > 0) {
-			// Convert infiltrate width to doodle scale
-			var iW = this.infiltrateWidth * 54;
-			var n = this.numberOfHandles;
-			
-			var infiltratePoints = [];
-
-			// If do not exist, create extra handles for infiltrate boundary
-// 			if (this.resetInfiltrate) {
-				// redefine infiltrate control points based on width
-				this.resetInfiltrate = false;
-				for (var i=0; i<this.numberOfHandles; i++) {
-					var handle = this.squiggleArray[0].pointsArray[i];
-					var x = Math.abs(handle.x);
-					var y = Math.abs(handle.y);
-					
-					// Length of new handle from origin
-					var h = Math.sqrt(x*x + y*y) + iW;
-					
-					// Angle of handle from origin
-					var theta = Math.atan(y/x);
-					
-					// Height of new point above origin
-					var o = h * Math.sin(theta);
-					// X displacement of new point from origin
-					var a = h * Math.cos(theta);
-					
-					// get sign of handle coordinates
-					var xS = (handle.x>=0) ? 1 : -1;
-					var yS = (handle.y>=0) ? 1 : -1;
-					
-					var p = new ED.Point(a * xS, o * yS);
-					infiltratePoints.push(p);
-					
-					this.squiggleArray[0].pointsArray[n+i] = p;				
-				}
-// 			}
-			
-			// Draw infiltrate
+		// Draw perforation - always in centre of shape
+		if (this.perforation) {
 			ctx.beginPath();
-			ctx.moveTo(this.squiggleArray[0].pointsArray[4].x, this.squiggleArray[0].pointsArray[4].y);
-			// Complete curve segments
-			for (var j=0; j< this.numberOfHandles; j++) {
-				// From and to points
-				fp = this.squiggleArray[0].pointsArray[j + n];
-				var toIndex = (j < this.numberOfHandles - 1) ? j + 1 + n : this.numberOfHandles;
-				tp = this.squiggleArray[0].pointsArray[toIndex];
-		
-				// Control points
-				cp1 = fp.tangentialControlPoint(+phi);
-				cp2 = tp.tangentialControlPoint(-phi);
-		
-				// Draw Bezier curve
-				ctx.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, tp.x, tp.y);
-			}
-			ctx.fillStyle = "rgba(0,0,0,0.2)";
-			ctx.fill();
 			
-			// Flood fill shape on ontop of gradient
-			ctx.beginPath();
-			ctx.moveTo(this.squiggleArray[0].pointsArray[0].x, this.squiggleArray[0].pointsArray[0].y);
-			// Complete curve segments
-			for (var i = 0; i < this.numberOfHandles; i++) {
-				// From and to points
-				fp = this.squiggleArray[0].pointsArray[i];
-				var toIndex = (i < this.numberOfHandles - 1) ? i + 1 : 0;
-				tp = this.squiggleArray[0].pointsArray[toIndex];
-		
-				// Control points
-				cp1 = fp.tangentialControlPoint(+phi);
-				cp2 = tp.tangentialControlPoint(-phi);
-		
-				// Draw Bezier curve
-				ctx.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, tp.x, tp.y);
-			}
 			ctx.fillStyle = "gray";
-			ctx.stroke();
+			ctx.arc(this.minX + 0.5*(this.maxX - this.minX),this.minY + 0.5*(this.maxY - this.minY),40,0,2*Math.PI);
+			
 			ctx.fill();
+			
 		}
 	}
 	
@@ -556,6 +483,27 @@ ED.CornealOpacity.prototype.draw = function(_point) {
  *
  * @returns {String} Description of doodle
  */
-ED.CornealOpacity.prototype.description = function() {
-	return 'Corneal opacity: H-W: ' + this.height + 'x' + this.width + 'mm // Stromal depth: ' + this.depth + '% // Infiltrate width: ' + this.infiltrateWidth + 'mm';
+ED.CornealThinning.prototype.description = function() {
+	
+	var returnStr = "Corneal thinning: " + this.type.toLowerCase();
+	
+	if (this.descemetacoele) returnStr += ", descemetacoele";
+	if (this.perforation) returnStr += ", corneal perforation";
+	
+	return returnStr;	
+}
+
+/**
+ * Returns the SnoMed code of the doodle
+ *
+ * @returns {Int} SnoMed code of entity representated by doodle
+ */
+ED.CornealThinning.prototype.snomedCode = function() {
+	var code = 246938006; // Corneal Dellen (disorder) TODO: check appropriate for keratitis thinning
+
+	if (this.descemetacoele) code = 83110007; // Descemetacoele
+
+	else if (this.perforation) code = 74895004; // Corneal perforation
+	
+	return code;
 }
