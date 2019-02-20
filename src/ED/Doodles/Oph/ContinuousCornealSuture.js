@@ -256,9 +256,9 @@ ED.ContinuousCornealSuture.prototype.draw = function(_point) {
  *
  * @returns {Int} SnoMed code of entity representated by doodle
  */
-ED.ContinuousCornealSuture.prototype.snomedCode = function() {
+/*ED.ContinuousCornealSuture.prototype.snomedCode = function() {
 	return (this.removed) ? 0 : 42505000; // only report code if suture hasnt been removed
-}
+};*/
 
 /**
  * Returns a string containing a text description of the doodle

@@ -21108,9 +21108,9 @@ ED.ContinuousCornealSuture.prototype.draw = function(_point) {
  *
  * @returns {Int} SnoMed code of entity representated by doodle
  */
-ED.ContinuousCornealSuture.prototype.snomedCode = function() {
+/*ED.ContinuousCornealSuture.prototype.snomedCode = function() {
 	return (this.removed) ? 0 : 42505000; // only report code if suture hasnt been removed
-}
+};*/
 
 /**
  * Returns a string containing a text description of the doodle
@@ -45922,7 +45922,7 @@ ED.PeripheralVascularisation.prototype.setHandles = function() {
 	this.handleArray[1] = new ED.Doodle.Handle(null, true, ED.Mode.Arc, false);
 	this.handleArray[2] = new ED.Doodle.Handle(null, true, ED.Mode.Arc, false);
 	this.handleArray[4] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
-}
+};
 
 /**
  * Sets default properties
@@ -45941,7 +45941,7 @@ ED.PeripheralVascularisation.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
 	this.parameterValidationArray['apexY']['range'].setMinAndMax(-420, -20);
 	this.parameterValidationArray['arc']['range'].setMinAndMax(5 * Math.PI / 180, 2*Math.PI);
-}
+};
 
 /**
  * Sets default parameters (Only called for new doodles)
@@ -45951,7 +45951,7 @@ ED.PeripheralVascularisation.prototype.setParameterDefaults = function() {
 	this.arc = 5 * Math.PI / 180;
 	this.apexY = -380;
 	this.setRotationWithDisplacements(0, 120);
-}
+};
 
 /**
  * Draws doodle or performs a hit test if a Point parameter is passed
@@ -45968,7 +45968,10 @@ ED.PeripheralVascularisation.prototype.draw = function(_point) {
 	// Radius of outer boundary
 	var rOuter = 952 / 2;
 	var rInner = Math.abs(this.apexY);
-	
+
+	console.log("apexY" + this.apexY);
+	console.log("apexX" + this.apexX);
+
 	// Calculate parameters for arcs
 	var theta = this.arc / 2;
 	var arcStart = -Math.PI / 2 + theta;
