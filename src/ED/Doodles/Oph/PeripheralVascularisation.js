@@ -75,7 +75,7 @@ ED.PeripheralVascularisation.prototype.setPropertyDefaults = function() {
 	
 	// Update component of validation array for simple parameters
 	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
-	this.parameterValidationArray['apexY']['range'].setMinAndMax(-420, -20);
+	this.parameterValidationArray['apexY']['range'].setMinAndMax(-420, -220);
 	this.parameterValidationArray['arc']['range'].setMinAndMax(5 * Math.PI / 180, 2*Math.PI);
 };
 
@@ -104,9 +104,6 @@ ED.PeripheralVascularisation.prototype.draw = function(_point) {
 	// Radius of outer boundary
 	var rOuter = 952 / 2;
 	var rInner = Math.abs(this.apexY);
-
-	console.log("apexY" + this.apexY);
-	console.log("apexX" + this.apexX);
 
 	// Calculate parameters for arcs
 	var theta = this.arc / 2;
