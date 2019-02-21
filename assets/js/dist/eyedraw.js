@@ -40151,7 +40151,7 @@ ED.OpticDisc.prototype.description = function() {
 
 			returnString = many ? "Notches" : "Notch";
 
-			for (var k = 0; k < notchArray.length; j++) {
+			for (var k = 0; k < notchArray.length; k++) {
 				if (notchArray[k].startHour === notchArray[k].endHour) {
 					returnString += " at " + notchArray[k].startHour;
 				} else {
