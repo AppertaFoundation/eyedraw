@@ -40195,7 +40195,7 @@ ED.OpticDisc.prototype.setHandleProperties = function() {
 	// Expert mode
 	else {
 		// Make handles visible, except for apex handle,
-		for (var j = 0; i < this.numberOfHandles; j++) {
+		for (var j = 0; j < this.numberOfHandles; j++) {
 			this.handleArray[j].isVisible = true;
 		}
 		this.handleArray[this.numberOfHandles].isVisible = false;
