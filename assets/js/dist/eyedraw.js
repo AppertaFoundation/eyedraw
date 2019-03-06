@@ -2876,7 +2876,9 @@ ED.Drawing.prototype.reportData = function() {
 						'end': doodle.groupDescriptionEnd()
 					}
 				}
-				grouped[doodle.className]['descriptions'].push(description)
+				if (description.length) {
+					grouped[doodle.className]['descriptions'].push(description)
+				}
 			} else {
 				if (description.length) {
 					reports.push(description);
