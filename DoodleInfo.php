@@ -122,6 +122,7 @@ class DoodleInfo
         'Iris' => 'Iris',
         'IrisHook' => 'Iris hook',
         'IrisNaevus' => 'Iris naevus',
+        'IrisTrauma' => 'Iris trauma',
         'IRMA' => 'Intraretinal microvascular abnormalities',
         'KeraticPrecipitates' => 'Keratic precipitates',
         'KoeppeNodule' => 'Koeppe nodule',

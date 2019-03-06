@@ -454,7 +454,7 @@ ED.OpticDisc.prototype.description = function() {
 
 			returnString = many ? "Notches" : "Notch";
 
-			for (var k = 0; k < notchArray.length; j++) {
+			for (var k = 0; k < notchArray.length; k++) {
 				if (notchArray[k].startHour === notchArray[k].endHour) {
 					returnString += " at " + notchArray[k].startHour;
 				} else {
@@ -498,7 +498,7 @@ ED.OpticDisc.prototype.setHandleProperties = function() {
 	// Expert mode
 	else {
 		// Make handles visible, except for apex handle,
-		for (var j = 0; i < this.numberOfHandles; j++) {
+		for (var j = 0; j < this.numberOfHandles; j++) {
 			this.handleArray[j].isVisible = true;
 		}
 		this.handleArray[this.numberOfHandles].isVisible = false;
