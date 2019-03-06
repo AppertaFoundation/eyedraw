@@ -1,0 +1,389 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Eyedraw doodle popup menu prototype</title>
+
+        <!-- This is the main OpenEyes stylesheet -->
+        <link rel="stylesheet" type="text/css" href="css/style.css" />
+
+        <!-- The eyedraw stylesheet -->
+        <link rel="stylesheet" type="text/css" href="../../assets/css/oe-eyedraw.css" />
+
+        <!-- Other dependent scripts -->
+        <script type="text/javascript" src="../../assets/components/jquery/jquery.min.js"></script>
+        <script type="text/javascript" src="../../assets/components/mustache/mustache.js"></script>
+        <script type="text/javascript" src="../../assets/components/eventemitter2/lib/eventemitter2.js"></script>
+
+        <!-- Eyedraw -->
+        <script type="text/javascript" src="../../assets/js/dist/eyedraw.js"></script>
+        <script type="text/javascript" src="../../assets/js/dist/oe-eyedraw.js"></script>
+
+        <style type="text/css">
+            .ed-fields-container{
+                left: -15px;
+                padding-top: 36px;
+            }
+        </style>
+
+        <!-- This script handles the drawings for the page -->
+        <script>
+
+            // Assign a global variable to each drawing
+            var drawingEdit1;
+            var drawingEdit2;
+
+            function init(){
+                // Create a drawing linked to the canvas
+                drawingEdit1 = new ED.Drawing(document.getElementById('canvasEdit1'), ED.eye.Right, 'RPS', true, {graphicsPath:'../../assets/img/'});
+                drawingEdit2 = new ED.Drawing(document.getElementById('canvasEdit2'), ED.eye.Right, 'LPS', true, {graphicsPath:'../../assets/img/'});
+
+                // Create controller objects
+                var controller1 = new eyeDrawController(drawingEdit1);
+                var controller2 = new eyeDrawController(drawingEdit2);
+
+                // Initialise drawings
+                drawingEdit1.init();
+                drawingEdit2.init();
+
+            }
+
+            // Shared Controller class
+            function eyeDrawController(_drawing){
+
+                var self = this;
+
+                var masterDoodle;
+
+                this.drawing = _drawing;
+
+                this.callBack = callBack;
+                this.drawing.showDoodleControls = true;
+
+                // Create an array of synchronisations
+                var syncArray = new Array();
+                if (_drawing.idSuffix == 'RPS')
+                {
+                    syncArray['LPS'] = {
+                        AntSeg:{AntSegCrossSection:{parameters:['apexY','c']}},
+                        PCIOL:{PCIOLCrossSection:{parameters:['originY', 'fx']}},
+                        PosteriorCapsule:{PosteriorCapsuleCrossSection:{parameters:['originY','opacity','apexY']}},
+                        CornealOpacity:{CornealOpacityCrossSection:{parameters:['yMidPoint','d','h','w','iW','originY','minY','maxY']}}
+                    };
+
+                    syncArray['RPS'] = {};
+                }
+                if (_drawing.idSuffix == 'LPS')
+                {
+                    syncArray['RPS'] = {
+                        AntSegCrossSection:{AntSeg:{parameters:['apexY']}},
+                        PCIOLCrossSection:{PCIOL:{parameters:['originY', 'fx']}},
+                        PosteriorCapsuleCrossSection:{PosteriorCapsule:{parameters:['originY','apexY']}},
+                        CornealOpacityCrossSection:{CornealOpacity:{parameters:[]}},
+                    };
+
+                    syncArray['LPS'] = {};
+                }
+
+                // Array of paired doodles which add and delete together between the two diagrams
+                var pairArray = new Array();
+                /*
+                            if (_drawing.idSuffix == 'RPS')
+                            {
+                */
+                pairArray = {
+                    PCIOL:'PCIOLCrossSection',
+                    PosteriorCapsule:'PosteriorCapsuleCrossSection',
+                    CornealOpacity:'CornealOpacityCrossSection',
+                };
+
+                // Specify call back function
+//                this.callBack = callBack;
+
+                // Register controller for notifications
+                _drawing.registerForNotifications(this, 'callBack', ['ready', 'doodleSelected', 'doodleAdded', 'doodleDeleted', 'mousedragged','parameterChanged']);
+
+                // Method called for notification
+                function callBack(_messageArray)
+                {
+                    switch (_messageArray['eventName'])
+                    {
+                        // Eye draw image files all loaded
+                        case 'ready':
+                            if (self.drawing.idSuffix == 'RPS')
+                            {
+                                this.drawing.addDoodle('AntSeg');
+                                this.drawing.addDoodle('PCIOL');
+
+                            }
+                            if (self.drawing.idSuffix == 'LPS')
+                            {
+                                doodle = this.drawing.addDoodle('CorneaCrossSection');
+                                doodle = this.drawing.addDoodle('AntSegCrossSection');
+                                this.drawing.addDoodle('CornealThinningCrossSection');
+                            }
+                            this.drawing.deselectDoodles();
+                            addToReport();
+                            break;
+
+                        case 'doodleSelected':
+                            var otherDrawing = (_messageArray['selectedDoodle'].drawing.idSuffix == 'RPS')?drawingEdit2:drawingEdit1;
+                            otherDrawing.deselectDoodles();
+                            break;
+
+                        case 'doodleAdded':
+                            // Newly added doodle is passed in message object
+                            var newDoodle = _messageArray['object'];
+
+                            // Get other drawing (New doodles are only added to first drawing)
+                            var otherDrawing = drawingEdit2;
+
+                            // Check pair array
+                            for (var className in pairArray)
+                            {
+                                // Only consider array entries for newly added doodle
+                                if (newDoodle.className == className)
+                                {
+                                    slaveClassName = pairArray[className];
+
+                                    // Check it doesn't already exist
+                                    if (!otherDrawing.hasDoodleOfClass(slaveClassName))
+                                    {
+                                        otherDrawing.addDoodle(slaveClassName);
+                                        otherDrawing.deselectDoodles();
+                                    }
+                                }
+                            }
+
+                            // Adjust position in relation to other doodles (array defined in the doodle subclass)
+                            for (var i = 0; i < newDoodle.inFrontOfClassArray.length; i++)
+                            {
+                                newDoodle.drawing.moveNextTo(newDoodle, newDoodle.inFrontOfClassArray[i], true)
+                            }
+
+                            // Sync with any parent doodle
+                            var parentDoodle = newDoodle.drawing.firstDoodleOfClass(newDoodle.parentClass);
+                            if (parentDoodle)
+                            {
+                                for (var className in syncArray[newDoodle.drawing.idSuffix])
+                                {
+                                    if (className == parentDoodle.className)
+                                    {
+                                        for (var slaveClassName in syncArray[newDoodle.drawing.idSuffix][className])
+                                        {
+                                            if (slaveClassName == newDoodle.className)
+                                            {
+                                                // Get array of parameters to sync
+                                                var parameterArray = syncArray[newDoodle.drawing.idSuffix][className][slaveClassName]['parameters'];
+
+                                                if (typeof(parameterArray) != 'undefined')
+                                                {
+                                                    // Iterate through parameters to sync
+                                                    for (var i = 0; i < parameterArray.length; i++)
+                                                    {
+                                                        // Sync slave parameter to value of master
+                                                        newDoodle.setSimpleParameter(parameterArray[i], parentDoodle[parameterArray[i]]);
+                                                        newDoodle.updateDependentParameters(parameterArray[i]);
+
+                                                        // Update any bindings associated with the slave doodle
+                                                        newDoodle.drawing.updateBindings(newDoodle);
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            addToReport();
+                            break;
+
+                        case 'doodleDeleted':
+                            // Class of deleted doodle
+                            var deletedDoodleClass = _messageArray['object'];
+
+                            // Get drawings (doodles can only deleted from first drawing)
+                            var thisDrawing = drawingEdit;
+                            var otherDrawing = drawingEdit2;
+
+                            // Check pair array
+                            for (var className in pairArray)
+                            {
+                                slaveClassName = pairArray[className];
+
+                                // Only consider array entries for newly added doodle
+                                if (deletedDoodleClass == className)
+                                {
+                                    // Check it exists
+                                    if (otherDrawing.hasDoodleOfClass(slaveClassName))
+                                    {
+                                        otherDrawing.deleteDoodlesOfClass(slaveClassName);
+                                    }
+                                }
+                                else if (deletedDoodleClass == slaveClassName) {
+                                    if (thisDrawing.hasDoodleOfClass(className))
+                                    {
+                                        thisDrawing.deleteDoodlesOfClass(className);
+                                    }
+                                }
+                            }
+
+                            // Look for any doodles which are children of the deleted one
+                            var drawing = (_drawing.idSuffix == 'RPS')?thisDrawing:otherDrawing;
+                            for (var i = 0; i < drawing.doodleArray.length; i++)
+                            {
+                                if (deletedDoodleClass == drawing.doodleArray[i].parentClass)
+                                {
+                                    drawing.deleteDoodlesOfClass(drawing.doodleArray[i].className);
+                                }
+                            }
+                            addToReport();
+                            break;
+
+                        case 'parameterChanged':
+                            // Master doodle
+                            var masterDoodle = _messageArray['object'].doodle;
+
+                            /*
+                                                    if (masterDoodle.className=="PosteriorCapsule") {
+                                                        if (_messageArray['object'].parameter=="capsulotomy") drawingEdit2.lastDoodleOfClass("PCIOLCrossSection").capsulotomy = _messageArray.object.value;
+                                                        else if (_messageArray['object'].parameter=="opacity") drawingEdit2.lastDoodleOfClass("PCIOLCrossSection").opacity = _messageArray.object.value;
+                                                    }
+                            */
+
+                            // Iterate through syncArray for each syncronised drawing
+                            for (var idSuffix in syncArray)
+                            {
+                                // Define which drawing is slave
+                                var slaveDrawing = idSuffix == 'RPS'?drawingEdit1:drawingEdit2;
+
+                                // Iterate through each specified className doing syncronisation
+                                for (var className in syncArray[idSuffix])
+                                {
+                                    // Iterate through slave class names
+                                    for (var slaveClassName in syncArray[idSuffix][className])
+                                    {
+                                        // Slave doodle (uses first doodle in the drawing matching the className)
+                                        var slaveDoodle = slaveDrawing.firstDoodleOfClass(slaveClassName);
+
+                                        // Check that doodles exist, className matches, and sync is allowed
+                                        if (masterDoodle && masterDoodle.className == className && slaveDoodle && slaveDoodle.willSync)
+                                        {
+                                            // Get array of parameters to sync
+                                            var parameterArray = syncArray[idSuffix][className][slaveClassName]['parameters'];
+
+                                            if (typeof(parameterArray) != 'undefined')
+                                            {
+                                                // Iterate through parameters to sync
+                                                for (var i = 0; i < parameterArray.length; i++)
+                                                {
+                                                    // Check that parameter array member matches changed parameter
+                                                    if (parameterArray[i] == _messageArray.object.parameter)
+                                                    {
+
+                                                        // Avoid infinite loop by checking values are not equal before setting
+                                                        if (masterDoodle[_messageArray.object.parameter] != slaveDoodle[_messageArray.object.parameter])
+                                                        {
+                                                            var increment = _messageArray.object.value - _messageArray.object.oldValue;
+                                                            var newValue = slaveDoodle[_messageArray.object.parameter] + increment;
+
+                                                            // Sync slave parameter to value of master
+                                                            slaveDoodle.setSimpleParameter(_messageArray.object.parameter, newValue);
+                                                            slaveDoodle.updateDependentParameters(_messageArray.object.parameter);
+
+                                                            // Update any bindings associated with the slave doodle
+                                                            slaveDrawing.updateBindings(slaveDoodle);
+
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
+                                // Refresh slave drawing
+                                slaveDrawing.repaint();
+                            }
+                            addToReport();
+                            break;
+
+                        case 'mouseup':
+                            addToReport();
+                            break;
+
+                        case 'setParameterWithAnimationComplete':
+                            addToReport();
+                            break;
+                    }
+                }
+
+            }
+
+            function addToReport(){
+                console.log("Report");
+            }
+
+        </script>
+
+
+    </head>
+    <body onload="init();">
+
+        <div class="container main" role="main">
+            <div class="ed-widget" id="eyedrawwidget_example">
+                <div class="ed-toolbar">
+                    <ul class="ed-toolbar-panel ed-main-toolbar" id="toolbar">
+                        <li>
+                            <a class="ed-button" href="#" data-function="addDoodle" data-arg="CornealOpacity" onclick="drawingEdit1.addDoodle('CornealThinning');">
+                                <span class="icon-ed-CornealOpacity"></span>
+                                <span class="label"> (CornealOpacity)</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="ed-body">
+                    <div class="ed-editor-container">
+                        <div class="ed-editor">
+                            <div class="ed-drawing-controls">
+                                <ul class="ed-toolbar-panel ed-drawing-toolbar">
+                                    <li>
+                                        <a class="ed-button" href="#" data-function="resetEyedraw">
+                                            <span class="icon-ed-reset"></span>
+                                            <span class="label">Reset eyedraw</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                                <div class="ed-selected-doodle">
+                                    <select id="ed_example_selected_doodle" class="ed-selected-doodle-select">
+                                    </select>
+                                </div>
+                            </div>
+                            <div id="canvasEdit1_controls" class="ed-doodle-popup" style="position: absolute; left: 600px;"></div>
+                            <div id="canvasEdit2_controls" class="ed-doodle-popup" style="display:none;position: absolute; left: 600px;"></div>
+                            <!-- Canvas elements -->
+                            <canvas id="canvasEdit1" class="ed-canvas-edit" width="300" height="300"></canvas>
+                        </div>
+                    </div>
+                    <div class="ed-fields-container">
+
+                        <div class="ed-widget" id="eyedrawwidget_example_2">
+
+                            <div class="ed-body">
+                                <div class="ed-editor-container">
+                                    <div class="ed-editor">
+
+                                        <!-- Canvas elements -->
+                                        <canvas id="canvasEdit2" class="ed-canvas-edit" width="170" height="300"></canvas>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </body>
+</html>
+
+
