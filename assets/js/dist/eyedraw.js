@@ -57301,7 +57301,7 @@ ED.Telangiectasis.prototype.description = function() {
  *
  * @returns {number} SnoMed code of entity representated by doodle
  */
-ED.CNV.prototype.snomedCode = function() {
+ED.Telangiectasis.prototype.snomedCode = function() {
     return 232024000;
 };
 
