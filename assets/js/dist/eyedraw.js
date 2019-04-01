@@ -15690,8 +15690,8 @@ ED.AntSeg.prototype.draw = function(_point) {
 	ED.AntSeg.superclass.draw.call(this, _point);
 
 	// Radius of limbus
-	var ro = 380;
-	var ri = -this.apexY;
+	let ro = 380;
+	const ri = -this.apexY;
 
 	// Calculate parameters for arcs
 	var arcStart = 0;
