@@ -39,11 +39,40 @@ ED.Gonioscopy = function(_drawing, _parameterJSON) {
 
     this.mode = "Basic";
 
+	// Parameters in doodle control bar (parameter name: parameter label)
+	this.controlParameterArray = {
+		'pigmentation':'Meshwork Pigmentation',
+	};
+
+	this.PigmentationNotChecked	= 'Not checked';
+	this.PigmentationVeryLight	= 'Very light';
+	this.PigmentationLight		= 'Light';
+	this.PigmentationModerate	= 'Moderate';
+	this.PigmentationHeavy		= 'Heavy';
+	this.PigmentationVeryHeavy	= 'Very heavy';
+
 	// Saved parameters
-	this.savedParameterArray = ['apexX', 'apexY', 'mode'];
+	this.savedParameterArray = ['apexX', 'apexY', 'mode', 'pigmentation'];
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
+
+	this.updatePigmentation = function() {
+		// Pattern
+		if (this.apexX < -440) {
+			if (this.apexY < -440) this.pigmentation = this.PigmentationNotChecked;
+			else if (this.apexY < -420) this.pigmentation = this.PigmentationVeryLight;
+			else this.pigmentation = this.PigmentationLight;
+		}
+		// Uniform
+		else {
+			if (this.apexY < -440) this.pigmentation = this.PigmentationModerate;
+			else if (this.apexY < -420) this.pigmentation = this.PigmentationHeavy;
+			else this.pigmentation = this.PigmentationVeryHeavy;
+		}
+	};
+
+	this.updatePigmentation();
 }
 
 /**
@@ -80,6 +109,21 @@ ED.Gonioscopy.prototype.setPropertyDefaults = function() {
 	list: ['Basic', 'Expert'],
 	animate: false
     };
+
+	// Other parameters
+	this.parameterValidationArray['pigmentation'] = {
+		kind: 'other',
+		type: 'string',
+		list: [
+			this.PigmentationNotChecked,
+			this.PigmentationVeryLight,
+			this.PigmentationLight,
+			this.PigmentationModerate,
+			this.PigmentationHeavy,
+			this.PigmentationVeryHeavy,
+		],
+		animate: false
+	};
 }
 
 /**
@@ -89,6 +133,51 @@ ED.Gonioscopy.prototype.setParameterDefaults = function() {
 	this.apexX = -460;
 	this.apexY = -460;
     this.setParameterFromString('mode', 'Basic');
+	this.setParameterFromString('pigmentation', this.PigmentationNotChecked);
+}
+
+/**
+ * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
+ * The returned parameters are animated if their 'animate' property is set to true
+ *
+ * @param {String} _parameter Name of parameter that has changed
+ * @value {Undefined} _value Value of parameter to calculate
+ * @returns {Array} Associative array of values of dependent parameters
+ */
+ED.Gonioscopy.prototype.dependentParameterValues = function(_parameter, _value) {
+	var returnArray = [];
+	switch (_parameter) {
+		case 'pigmentation':
+			returnArray['pigmentation'] = _value;
+			switch (_value) {
+				case this.PigmentationNotChecked:
+					returnArray['apexX'] = -450;
+					returnArray['apexY'] = -450;
+					break;
+				case this.PigmentationVeryLight:
+					returnArray['apexX'] = -450;
+					returnArray['apexY'] = -430;
+					break;
+				case this.PigmentationLight:
+					returnArray['apexX'] = -450;
+					returnArray['apexY'] = -410;
+					break;
+				case this.PigmentationModerate:
+					returnArray['apexX'] = -400;
+					returnArray['apexY'] = -450;
+					break;
+				case this.PigmentationHeavy:
+					returnArray['apexX'] = -400;
+					returnArray['apexY'] = -430;
+					break;
+				case this.PigmentationVeryHeavy:
+					returnArray['apexX'] = -400;
+					returnArray['apexY'] = -410;
+					break;
+			}
+			break;
+	}
+	return returnArray;
 }
 
 /**
@@ -134,21 +223,26 @@ ED.Gonioscopy.prototype.draw = function(_point) {
 		// Set line attributes
 		ctx.lineWidth = 1;
 
-		// Fill style
-		var ptrn;
-
-		// Pattern
-		if (this.apexX < -440) {
-			if (this.apexY < -440) ptrn = ctx.createPattern(this.drawing.imageArray['MeshworkPatternLight'], 'repeat');
-			else if (this.apexY < -420) ptrn = ctx.createPattern(this.drawing.imageArray['MeshworkPatternMedium'], 'repeat');
-			else ptrn = ctx.createPattern(this.drawing.imageArray['MeshworkPatternHeavy'], 'repeat');
-			ctx.fillStyle = ptrn;
-		}
-		// Uniform
-		else {
-			if (this.apexY < -440) ctx.fillStyle = "rgba(250, 200, 0, 1)";
-			else if (this.apexY < -420) ctx.fillStyle = "rgba(200, 150, 0, 1)";
-			else ctx.fillStyle = "rgba(150, 100, 0, 1)";
+		this.updatePigmentation();
+		switch (this.pigmentation) {
+			case this.PigmentationNotChecked:
+				ctx.fillStyle = ctx.createPattern(this.drawing.imageArray['MeshworkPatternLight'], 'repeat');
+				break;
+			case this.PigmentationVeryLight:
+				ctx.fillStyle = ctx.createPattern(this.drawing.imageArray['MeshworkPatternMedium'], 'repeat');
+				break;
+			case this.PigmentationLight:
+				ctx.fillStyle = ctx.createPattern(this.drawing.imageArray['MeshworkPatternHeavy'], 'repeat');
+				break;
+			case this.PigmentationModerate:
+				ctx.fillStyle = "rgba(250, 200, 0, 1)";
+				break;
+			case this.PigmentationHeavy:
+				ctx.fillStyle = "rgba(200, 150, 0, 1)";
+				break;
+			case this.PigmentationVeryHeavy:
+				ctx.fillStyle = "rgba(150, 100, 0, 1)";
+				break;
 		}
 
 		// Stroke style
