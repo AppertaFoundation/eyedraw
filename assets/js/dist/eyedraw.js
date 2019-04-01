@@ -33627,13 +33627,6 @@ ED.Gonioscopy.prototype.constructor = ED.Gonioscopy;
 ED.Gonioscopy.superclass = ED.Doodle.prototype;
 
 /**
- * Sets handle attributes
- */
-ED.Gonioscopy.prototype.setHandles = function() {
-	this.handleArray[4] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
-}
-
-/**
  * Set default properties
  */
 ED.Gonioscopy.prototype.setPropertyDefaults = function() {
@@ -33856,12 +33849,6 @@ ED.Gonioscopy.prototype.draw = function(_point) {
 		ctx.fill();
 		ctx.stroke();
 	}
-
-	// Coordinates of handles (in canvas plane)
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
-
-	// Draw handles if selected
-	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
 
 	// Return value indicating successful hit test
 	return this.isClicked;
