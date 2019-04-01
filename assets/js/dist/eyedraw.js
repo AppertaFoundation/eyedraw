@@ -33862,17 +33862,8 @@ ED.Gonioscopy.prototype.draw = function(_point) {
 ED.Gonioscopy.prototype.description = function() {
 	var returnValue = "";
 
-	if (this.apexX < -440) {
-		if (this.apexY < -440) returnValue = "Light patchy pigment";
-		else if (this.apexY < -420) returnValue = "Medium patchy pigment";
-		else returnValue = "Heavy patchy pigment";
-	}
-	// Uniform
-	else {
-		if (this.apexY < -440) returnValue = "Light homogenous pigment";
-		else if (this.apexY < -420) returnValue = "Medium homogenous pigment";
-		else returnValue = "Heavy homogenous pigment";
-	}
+	if(this.pigmentation != this.PigmentationNotChecked)
+		returnValue = "TM pigmentation: " + this.pigmentation;
 
 	return returnValue;
 }
