@@ -44,7 +44,6 @@ ED.Gonioscopy = function(_drawing, _parameterJSON) {
 		'pigmentation':'Meshwork Pigmentation',
 	};
 
-	this.PigmentationNotChecked	= 'Not checked';
 	this.PigmentationVeryLight	= 'Very light';
 	this.PigmentationLight		= 'Light';
 	this.PigmentationModerate	= 'Moderate';
@@ -58,18 +57,22 @@ ED.Gonioscopy = function(_drawing, _parameterJSON) {
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 
 	this.updatePigmentation = function() {
-		// Pattern
-		if (this.apexX < -440) {
-			if (this.apexY < -440) this.pigmentation = this.PigmentationNotChecked;
-			else if (this.apexY < -420) this.pigmentation = this.PigmentationVeryLight;
-			else this.pigmentation = this.PigmentationLight;
-		}
-		// Uniform
-		else {
-			if (this.apexY < -440) this.pigmentation = this.PigmentationModerate;
-			else if (this.apexY < -420) this.pigmentation = this.PigmentationHeavy;
-			else this.pigmentation = this.PigmentationVeryHeavy;
-		}
+
+		// inter-
+		// vallum				suggested
+		// begin	name		value
+		// --------------------------------
+		// [-500	Very Light	-500	)
+		// [-460	Light		-460	)
+		// [-440	Moderate	-430	)
+		// [-420	Heavy		-420	)
+		// [-390	Very Heavy	-390  -380)
+
+		if (this.apexY < -460) this.pigmentation = this.PigmentationVeryLight;
+		else if (this.apexY < -440) this.pigmentation = this.PigmentationLight;
+		else if (this.apexY < -420) this.pigmentation = this.PigmentationModerate;
+		else if (this.apexY < -390) this.pigmentation = this.PigmentationHeavy;
+		else this.pigmentation = this.PigmentationVeryHeavy;
 	};
 
 	this.updatePigmentation();
@@ -94,7 +97,7 @@ ED.Gonioscopy.prototype.setPropertyDefaults = function() {
 
 	// Update component of validation array for simple parameters
 	this.parameterValidationArray['apexX']['range'].setMinAndMax(-460, -420);
-	this.parameterValidationArray['apexY']['range'].setMinAndMax(-460, -400);
+	this.parameterValidationArray['apexY']['range'].setMinAndMax(-500, -380);
 
     this.parameterValidationArray['mode'] = {
 	kind: 'derived',
@@ -108,7 +111,6 @@ ED.Gonioscopy.prototype.setPropertyDefaults = function() {
 		kind: 'other',
 		type: 'string',
 		list: [
-			this.PigmentationNotChecked,
 			this.PigmentationVeryLight,
 			this.PigmentationLight,
 			this.PigmentationModerate,
@@ -126,7 +128,7 @@ ED.Gonioscopy.prototype.setParameterDefaults = function() {
 	this.apexX = -460;
 	this.apexY = -460;
     this.setParameterFromString('mode', 'Basic');
-	this.setParameterFromString('pigmentation', this.PigmentationNotChecked);
+	this.setParameterFromString('pigmentation', this.PigmentationLight);
 }
 
 /**
@@ -142,30 +144,22 @@ ED.Gonioscopy.prototype.dependentParameterValues = function(_parameter, _value) 
 	switch (_parameter) {
 		case 'pigmentation':
 			returnArray['pigmentation'] = _value;
+			returnArray['apexX'] = -460;
 			switch (_value) {
-				case this.PigmentationNotChecked:
-					returnArray['apexX'] = -450;
-					returnArray['apexY'] = -450;
-					break;
 				case this.PigmentationVeryLight:
-					returnArray['apexX'] = -450;
-					returnArray['apexY'] = -430;
+					returnArray['apexY'] = -500;
 					break;
 				case this.PigmentationLight:
-					returnArray['apexX'] = -450;
-					returnArray['apexY'] = -410;
+					returnArray['apexY'] = -460;
 					break;
 				case this.PigmentationModerate:
-					returnArray['apexX'] = -400;
-					returnArray['apexY'] = -450;
-					break;
-				case this.PigmentationHeavy:
-					returnArray['apexX'] = -400;
 					returnArray['apexY'] = -430;
 					break;
+				case this.PigmentationHeavy:
+					returnArray['apexY'] = -420;
+					break;
 				case this.PigmentationVeryHeavy:
-					returnArray['apexX'] = -400;
-					returnArray['apexY'] = -410;
+					returnArray['apexY'] = -390;
 					break;
 			}
 			break;
@@ -218,23 +212,20 @@ ED.Gonioscopy.prototype.draw = function(_point) {
 
 		this.updatePigmentation();
 		switch (this.pigmentation) {
-			case this.PigmentationNotChecked:
-				ctx.fillStyle = ctx.createPattern(this.drawing.imageArray['MeshworkPatternLight'], 'repeat');
-				break;
 			case this.PigmentationVeryLight:
-				ctx.fillStyle = ctx.createPattern(this.drawing.imageArray['MeshworkPatternMedium'], 'repeat');
+				ctx.fillStyle = "rgba(200, 200, 200, 1)";
 				break;
 			case this.PigmentationLight:
-				ctx.fillStyle = ctx.createPattern(this.drawing.imageArray['MeshworkPatternHeavy'], 'repeat');
-				break;
-			case this.PigmentationModerate:
 				ctx.fillStyle = "rgba(250, 200, 0, 1)";
 				break;
-			case this.PigmentationHeavy:
+			case this.PigmentationModerate:
 				ctx.fillStyle = "rgba(200, 150, 0, 1)";
 				break;
-			case this.PigmentationVeryHeavy:
+			case this.PigmentationHeavy:
 				ctx.fillStyle = "rgba(150, 100, 0, 1)";
+				break;
+			case this.PigmentationVeryHeavy:
+				ctx.fillStyle = "rgba(100, 50, 0, 1)";
 				break;
 		}
 
@@ -316,10 +307,5 @@ ED.Gonioscopy.prototype.draw = function(_point) {
  * @returns {String} Description of doodle
  */
 ED.Gonioscopy.prototype.description = function() {
-	var returnValue = "";
-
-	if(this.pigmentation != this.PigmentationNotChecked)
-		returnValue = "TM pigmentation: " + this.pigmentation;
-
-	return returnValue;
+	return "TM pigmentation: " + this.pigmentation;
 }
