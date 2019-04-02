@@ -33593,7 +33593,6 @@ ED.Gonioscopy = function(_drawing, _parameterJSON) {
 	this.PigmentationModerate	= 'Moderate';
 	this.PigmentationHeavy		= 'Heavy';
 	this.PigmentationVeryHeavy	= 'Very heavy';
-	this.pigmentation = this.PigmentationLight;
 
 	// Saved parameters
 	this.savedParameterArray = ['apexX', 'apexY', 'mode'];
@@ -33601,26 +33600,21 @@ ED.Gonioscopy = function(_drawing, _parameterJSON) {
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 
-	this.updatePigmentation = function() {
 
-		// inter-
-		// vallum				suggested
-		// begin	name		value
-		// --------------------------------
-		// [-500	Very Light	-500	)
-		// [-460	Light		-460	)
-		// [-440	Moderate	-430	)
-		// [-420	Heavy		-420	)
-		// [-390	Very Heavy	-390  -380)
-
-		if (this.apexY < -460) this.pigmentation = this.PigmentationVeryLight;
-		else if (this.apexY < -440) this.pigmentation = this.PigmentationLight;
-		else if (this.apexY < -420) this.pigmentation = this.PigmentationModerate;
-		else if (this.apexY < -390) this.pigmentation = this.PigmentationHeavy;
-		else this.pigmentation = this.PigmentationVeryHeavy;
-	};
-
-	this.updatePigmentation();
+	// inter-
+	// vallum				suggested
+	// begin	name		value
+	// --------------------------------
+	// [-500	Very Light	-500	)
+	// [-460	Light		-460	)
+	// [-440	Moderate	-430	)
+	// [-420	Heavy		-420	)
+	// [-390	Very Heavy	-390  -380)
+	if (this.apexY < -460) this.pigmentation = this.PigmentationVeryLight;
+	else if (this.apexY < -440) this.pigmentation = this.PigmentationLight;
+	else if (this.apexY < -420) this.pigmentation = this.PigmentationModerate;
+	else if (this.apexY < -390) this.pigmentation = this.PigmentationHeavy;
+	else this.pigmentation = this.PigmentationVeryHeavy;
 }
 
 /**
@@ -33755,7 +33749,6 @@ ED.Gonioscopy.prototype.draw = function(_point) {
 		// Set line attributes
 		ctx.lineWidth = 1;
 
-		this.updatePigmentation();
 		switch (this.pigmentation) {
 			case this.PigmentationVeryLight:
 				ctx.fillStyle = "rgba(200, 200, 200, 1)";
