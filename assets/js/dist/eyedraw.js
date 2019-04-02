@@ -4337,7 +4337,7 @@ ED.Doodle.prototype.parameterElement = function(_parameter, showLabel) {
 			for (var i in this.parameterValidationArray[_parameter].list) {
 				var option = document.createElement('option');
 				option.innerText = this.parameterValidationArray[_parameter].list[i];
-				//if (option.innerText == this[_parameter]) option.selected = true;
+				if (option.innerText == this[_parameter]) option.selected = true;
 				element.appendChild(option);
 			}
 			break;
@@ -33593,9 +33593,10 @@ ED.Gonioscopy = function(_drawing, _parameterJSON) {
 	this.PigmentationModerate	= 'Moderate';
 	this.PigmentationHeavy		= 'Heavy';
 	this.PigmentationVeryHeavy	= 'Very heavy';
+	this.pigmentation = this.PigmentationLight;
 
 	// Saved parameters
-	this.savedParameterArray = ['apexX', 'apexY', 'mode', 'pigmentation'];
+	this.savedParameterArray = ['apexX', 'apexY', 'mode'];
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);

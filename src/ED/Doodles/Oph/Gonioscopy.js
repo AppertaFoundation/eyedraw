@@ -49,9 +49,10 @@ ED.Gonioscopy = function(_drawing, _parameterJSON) {
 	this.PigmentationModerate	= 'Moderate';
 	this.PigmentationHeavy		= 'Heavy';
 	this.PigmentationVeryHeavy	= 'Very heavy';
+	this.pigmentation = this.PigmentationLight;
 
 	// Saved parameters
-	this.savedParameterArray = ['apexX', 'apexY', 'mode', 'pigmentation'];
+	this.savedParameterArray = ['apexX', 'apexY', 'mode'];
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
