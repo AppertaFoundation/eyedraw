@@ -17382,7 +17382,7 @@ ED.BandKeratophy = function(_drawing, _parameterJSON) {
 
     // Private parameters
     this.numberOfOuterHandles = 4;
-    this.numberOfInnerHandles = 4;
+    this.numberOfInnerHandles = 6;
     this.initialRadius = 380;
     this.opacity = 0.25;
 
@@ -17419,6 +17419,8 @@ ED.BandKeratophy.prototype.setHandles = function() {
     this.handleArray[5] = new ED.Doodle.Handle(null, true, ED.Mode.Handles, false);
     this.handleArray[6] = new ED.Doodle.Handle(null, true, ED.Mode.Handles, false);
     this.handleArray[7] = new ED.Doodle.Handle(null, true, ED.Mode.Handles, false);
+    this.handleArray[8] = new ED.Doodle.Handle(null, true, ED.Mode.Handles, false);
+    this.handleArray[9] = new ED.Doodle.Handle(null, true, ED.Mode.Handles, false);
 
     // Allow top handle to rotate doodle
     //this.handleArray[0].isRotatable = true;
@@ -17463,8 +17465,8 @@ ED.BandKeratophy.prototype.setPropertyDefaults = function() {
     // probably it should be in sync with this.handleArray
     for (var ii = 0; ii < this.numberOfInnerHandles; ii++) {
         this.handleVectorRangeArray.push({
-            'length' : new ED.Range(-350, +350),
-            'angle' : new ED.Range(2 * Math.PI / 180, 355 * Math.PI / 180)
+            'length' : new ED.Range(0, +390),
+            'angle' : new ED.Range(0, 2 * Math.PI)
         });
     }
 
@@ -17480,23 +17482,38 @@ ED.BandKeratophy.prototype.setPropertyDefaults = function() {
 
     //left top
     this.handleCoordinateRangeArray[4] = {
-        x: new ED.Range(-300, 0),
-        y: new ED.Range(-100, +80)
+        x: new ED.Range(-300, -100),
+        y: new ED.Range(-390, +80)
     };
 
+    //top right
     this.handleCoordinateRangeArray[5] = {
-        x: new ED.Range(0, 300),
-        y: new ED.Range(-100, +80)
+        x: new ED.Range(100, 300),
+        y: new ED.Range(-390, +80)
     };
 
+    //bottom left
     this.handleCoordinateRangeArray[6] = {
-        x: new ED.Range(-300, 0),
-        y: new ED.Range(-100, 80)
+        x: new ED.Range(-300, -100),
+        y: new ED.Range(-80, 390)
     };
 
+    //bottom right
     this.handleCoordinateRangeArray[7] = {
-        x: new ED.Range(0, 300),
-        y: new ED.Range(-100, 80)
+        x: new ED.Range(100, 300),
+        y: new ED.Range(-80, 390)
+    };
+
+    //top center
+    this.handleCoordinateRangeArray[8] = {
+        x: new ED.Range(-100, +100),
+        y: new ED.Range(-390, +80)
+    };
+
+    //bottom center
+    this.handleCoordinateRangeArray[9] = {
+        x: new ED.Range(-100, +100),
+        y: new ED.Range(-80, 390)
     };
 };
 
@@ -17554,6 +17571,12 @@ ED.BandKeratophy.prototype.setParameterDefaults = function() {
 
     //bottom right
     this.addPointToSquiggle(new ED.Point(100, 100));
+
+    //top center
+    this.addPointToSquiggle(new ED.Point(0, -90));
+
+    //bottom center
+    this.addPointToSquiggle(new ED.Point(0, 90));
 };
 
 /**
@@ -17630,26 +17653,43 @@ ED.BandKeratophy.prototype.createCatmullRomSpline = function(cps, ts, vStart, vE
 };
 
 
-ED.BandKeratophy.prototype.drawShape = function(ctx, center, radius, pointA, pointB, pointC, pointD, pointE, pointF, pointG, pointH) {
+ED.BandKeratophy.prototype.drawShape = function(ctx, center, radius, shapeControlPoints) {
     var parametricCurves = [
-        this.createArcCurveFromPoints(center, radius, pointE, pointD),
-        this.createCatmullRomSpline([pointD, pointC, pointB, pointA]),
-        this.createArcCurveFromPoints(center, radius, pointA, pointH),
-        this.createCatmullRomSpline([pointH, pointG, pointF, pointE]),
+        this.createArcCurveFromPoints(center, radius,
+            shapeControlPoints.controlPointOuterBottomRight, shapeControlPoints.controlPointOuterTopRight),
+        this.createCatmullRomSpline([
+            shapeControlPoints.controlPointOuterTopRight,
+            shapeControlPoints.controlPointInnerTopRight,
+            shapeControlPoints.controlPointInnerTopCenter,
+            shapeControlPoints.controlPointInnerTopLeft,
+            shapeControlPoints.controlPointOuterTopLeft,
+        ]),
+        this.createArcCurveFromPoints(center, radius,
+            shapeControlPoints.controlPointOuterTopLeft, shapeControlPoints.controlPointOuterBottomLeft),
+        this.createCatmullRomSpline([
+            shapeControlPoints.controlPointOuterBottomLeft,
+            shapeControlPoints.controlPointInnerBottomLeft,
+            shapeControlPoints.controlPointInnerBottomCenter,
+            shapeControlPoints.controlPointInnerBottomRight,
+            shapeControlPoints.controlPointOuterBottomRight,
+        ]),
     ];
 
+    var parametricCurveTrim = [false, true, false, true,];  // Trim only the Catmull-Rom splines
 
     var resolution = 100;
     var dt = 1 / resolution;
     var startPoint = parametricCurves[0](0);
     ctx.moveTo(startPoint.x, startPoint.y);
     for(var i = 0; i < parametricCurves.length; ++i) {
-        for(var t = 0; t <= 1; t += dt) {
+        var tStart  = parametricCurveTrim[i] ? 0.03 : 0;
+        var tEnd    = parametricCurveTrim[i] ? 0.97 : 1;
+        for(var t = tStart; t <= tEnd; t += dt) {
             var actualPoint = parametricCurves[i](t);
             ctx.lineTo(actualPoint.x, actualPoint.y);
         }
     }
-
+    ctx.strokeStyle = "rgb(0,0,0,0)";
     ctx.fillStyle = "rgb(169,169,169," + this.opacity + ")";
     ctx.fill();
 };
@@ -17661,18 +17701,20 @@ ED.BandKeratophy.prototype.draw = function(_point) {
     // Call draw method in superclass
     ED.BandKeratophy.superclass.draw.call(this, _point);
 
-    var pointA = new Vector2D(this.squiggleArray[0].pointsArray[2].x, this.squiggleArray[0].pointsArray[2].y);
-    var pointB = new Vector2D(this.squiggleArray[0].pointsArray[4].x, this.squiggleArray[0].pointsArray[4].y);
-    var pointC = new Vector2D(this.squiggleArray[0].pointsArray[5].x, this.squiggleArray[0].pointsArray[5].y);
-    var pointD = new Vector2D(this.squiggleArray[0].pointsArray[3].x, this.squiggleArray[0].pointsArray[3].y);
-    var pointE = new Vector2D(this.squiggleArray[0].pointsArray[0].x, this.squiggleArray[0].pointsArray[0].y);
-    var pointF = new Vector2D(this.squiggleArray[0].pointsArray[7].x, this.squiggleArray[0].pointsArray[7].y);
-    var pointG = new Vector2D(this.squiggleArray[0].pointsArray[6].x, this.squiggleArray[0].pointsArray[6].y);
-    var pointH = new Vector2D(this.squiggleArray[0].pointsArray[1].x, this.squiggleArray[0].pointsArray[1].y);
+    var shapeControlPoints = {};
+    shapeControlPoints.controlPointOuterTopLeft = new Vector2D(this.squiggleArray[0].pointsArray[2].x, this.squiggleArray[0].pointsArray[2].y);
+    shapeControlPoints.controlPointInnerTopLeft = new Vector2D(this.squiggleArray[0].pointsArray[4].x, this.squiggleArray[0].pointsArray[4].y);
+    shapeControlPoints.controlPointInnerTopRight = new Vector2D(this.squiggleArray[0].pointsArray[5].x, this.squiggleArray[0].pointsArray[5].y);
+    shapeControlPoints.controlPointOuterTopRight = new Vector2D(this.squiggleArray[0].pointsArray[3].x, this.squiggleArray[0].pointsArray[3].y);
+    shapeControlPoints.controlPointOuterBottomRight = new Vector2D(this.squiggleArray[0].pointsArray[0].x, this.squiggleArray[0].pointsArray[0].y);
+    shapeControlPoints.controlPointInnerBottomRight = new Vector2D(this.squiggleArray[0].pointsArray[7].x, this.squiggleArray[0].pointsArray[7].y);
+    shapeControlPoints.controlPointInnerBottomLeft = new Vector2D(this.squiggleArray[0].pointsArray[6].x, this.squiggleArray[0].pointsArray[6].y);
+    shapeControlPoints.controlPointOuterBottomLeft = new Vector2D(this.squiggleArray[0].pointsArray[1].x, this.squiggleArray[0].pointsArray[1].y);
+    shapeControlPoints.controlPointInnerTopCenter = new Vector2D(this.squiggleArray[0].pointsArray[8].x, this.squiggleArray[0].pointsArray[8].y);
+    shapeControlPoints.controlPointInnerBottomCenter = new Vector2D(this.squiggleArray[0].pointsArray[9].x, this.squiggleArray[0].pointsArray[9].y);
 
     ctx.beginPath();
-    this.drawShape(ctx, new Vector2D(0, 0), this.initialRadius, pointA, pointB, pointC, pointD, pointE, pointF, pointG, pointH);
-
+    this.drawShape(ctx, new Vector2D(0, 0), this.initialRadius, shapeControlPoints);
     // Draw boundary path (also hit testing)
     this.drawBoundary(_point);
 
@@ -17687,6 +17729,8 @@ ED.BandKeratophy.prototype.draw = function(_point) {
     this.handleArray[5].location = this.transform.transformPoint(this.squiggleArray[0].pointsArray[5]);
     this.handleArray[6].location = this.transform.transformPoint(this.squiggleArray[0].pointsArray[6]);
     this.handleArray[7].location = this.transform.transformPoint(this.squiggleArray[0].pointsArray[7]);
+    this.handleArray[8].location = this.transform.transformPoint(this.squiggleArray[0].pointsArray[8]);
+    this.handleArray[9].location = this.transform.transformPoint(this.squiggleArray[0].pointsArray[9]);
 
     // Draw handles if selected
     if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
