@@ -17389,7 +17389,7 @@ ED.BandKeratophy = function(_drawing, _parameterJSON) {
     // Saved parameters
     this.savedParameterArray = ['originX', 'originY', 'rotation', 'gradeOfOpacity'];
     this.controlParameterArray = {
-        'gradeOfOpacity': 'Grade of opacity',
+        'gradeOfOpacity': 'Opacity grade',
     };
 
     // Call superclass constructor
@@ -17456,7 +17456,8 @@ ED.BandKeratophy.prototype.setPropertyDefaults = function() {
         // Create a range object for each handle
         var range = {};
         range.length = new ED.Range(+390, +390);
-        range.angle = new ED.Range(minMax[i].min, minMax[i].max);
+        var epsilonAngle = 3 / 180 * Math.PI;
+        range.angle = new ED.Range(minMax[i].min + epsilonAngle, minMax[i].max - epsilonAngle);
         this.handleVectorRangeArray[i] = range;
     }
 
@@ -17483,37 +17484,37 @@ ED.BandKeratophy.prototype.setPropertyDefaults = function() {
     //left top
     this.handleCoordinateRangeArray[4] = {
         x: new ED.Range(-300, -100),
-        y: new ED.Range(-390, +80)
+        y: new ED.Range(-390, -30)
     };
 
     //top right
     this.handleCoordinateRangeArray[5] = {
         x: new ED.Range(100, 300),
-        y: new ED.Range(-390, +80)
+        y: new ED.Range(-390, -30)
     };
 
     //bottom left
     this.handleCoordinateRangeArray[6] = {
         x: new ED.Range(-300, -100),
-        y: new ED.Range(-80, 390)
+        y: new ED.Range(+30, 390)
     };
 
     //bottom right
     this.handleCoordinateRangeArray[7] = {
         x: new ED.Range(100, 300),
-        y: new ED.Range(-80, 390)
+        y: new ED.Range(+30, 390)
     };
 
     //top center
     this.handleCoordinateRangeArray[8] = {
         x: new ED.Range(-100, +100),
-        y: new ED.Range(-390, +80)
+        y: new ED.Range(-390, -30)
     };
 
     //bottom center
     this.handleCoordinateRangeArray[9] = {
         x: new ED.Range(-100, +100),
-        y: new ED.Range(-80, 390)
+        y: new ED.Range(+30, 390)
     };
 };
 
