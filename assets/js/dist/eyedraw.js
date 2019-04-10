@@ -1946,6 +1946,7 @@ ED.Drawing.prototype.resetEyedraw = function() {
 	this.deselectDoodles();
 
 	this.addBindings(this.bindingArray);
+	this.notify("afterReset");
 };
 
 /**
