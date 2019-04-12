@@ -14009,7 +14009,7 @@ ED.AngleGradeEast = function(_drawing, _parameterJSON) {
     this.riro = 270;
     this.riri = 230;
     this.rpu = 100;
-	this.colour = 'Blue';
+	this.colour = (typeof default_iris_colour) !== 'undefined' ? default_iris_colour : 'Blue';
 
 	// Derived parameters
 	this.grade = "4";
@@ -14269,7 +14269,7 @@ ED.AngleGradeNorth = function(_drawing, _parameterJSON) {
     this.riro = 270;
     this.riri = 230;
     this.rpu = 100;
-	this.colour = 'Blue';
+	this.colour = (typeof default_iris_colour) !== 'undefined' ? default_iris_colour : 'Blue';
 
 	// Derived parameters
 	this.grade = "4";
@@ -14529,7 +14529,7 @@ ED.AngleGradeSouth = function(_drawing, _parameterJSON) {
     this.riro = 270;
     this.riri = 230;
     this.rpu = 100;
-	this.colour = 'Blue';
+	this.colour = (typeof default_iris_colour) !== 'undefined' ? default_iris_colour : 'Blue';
 
 	// Derived parameters
 	this.grade = "4";
@@ -14789,7 +14789,7 @@ ED.AngleGradeWest = function(_drawing, _parameterJSON) {
 	this.riro = 270;
 	this.riri = 230;
 	this.rpu = 100;
-	this.colour = 'Blue';
+	this.colour = (typeof default_iris_colour) !== 'undefined' ? default_iris_colour : 'Blue';
 
 	// Derived parameters
 	this.grade = "4";
@@ -15588,7 +15588,7 @@ ED.AntSeg = function(_drawing, _parameterJSON) {
 	// Other parameters
 	this.pxe = false;
 	this.coloboma = false;
-	this.colour = 'Blue';
+	this.colour = (typeof default_iris_colour) !== 'undefined' ? default_iris_colour : 'Blue';
 	this.ectropion = false;
 	this.cornealSize = 'Not Checked';
 	this.cells = 'Not Checked';
@@ -16310,7 +16310,7 @@ ED.AntSegCrossSection = function(_drawing, _parameterJSON) {
 	// Derived parameters
 	this.pupilSize = 'Large';
 
-	this.colour = 'Blue';
+	this.colour = (typeof default_iris_colour) !== 'undefined' ? default_iris_colour : 'Blue';
     
 	// Saved parameters
 	this.savedParameterArray = ['apexY', 'apexX','colour','c'];

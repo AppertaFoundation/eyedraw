@@ -35,7 +35,7 @@ ED.AngleGradeEast = function(_drawing, _parameterJSON) {
     this.riro = 270;
     this.riri = 230;
     this.rpu = 100;
-	this.colour = 'Blue';
+	this.colour = (typeof default_iris_colour) !== 'undefined' ? default_iris_colour : 'Blue';
 
 	// Derived parameters
 	this.grade = "4";

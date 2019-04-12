@@ -32,7 +32,7 @@ ED.AntSeg = function(_drawing, _parameterJSON) {
 	// Other parameters
 	this.pxe = false;
 	this.coloboma = false;
-	this.colour = 'Blue';
+	this.colour = (typeof default_iris_colour) !== 'undefined' ? default_iris_colour : 'Blue';
 	this.ectropion = false;
 	this.cornealSize = 'Not Checked';
 	this.cells = 'Not Checked';
