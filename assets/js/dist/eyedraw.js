@@ -17746,10 +17746,10 @@ ED.BandKeratophy.prototype.draw = function(_point) {
  * @returns {String} Description of doodle
  */
 ED.BandKeratophy.prototype.description = function() {
-    return 'Band Keratophy';
+    return 'Band Keratophy ' + this.gradeOfOpacity;
 };
 
-ED.AntSeg.prototype.snomedCode = function()
+ED.BandKeratophy.prototype.snomedCode = function()
 {
     return 35055000;
 };
