@@ -6625,6 +6625,44 @@ ED.Squiggle.prototype.json = function() {
 	return s;
 }
 /**
+ * Copyright (C) OpenEyes Foundation, 2011-2017
+ * This file is part of OpenEyes.
+ *
+ * OpenEyes is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * OpenEyes is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with OpenEyes.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+var Vector2D = function(x, y) {
+    this.x = x;
+    this.y = y;
+};
+
+Vector2D.prototype.add = function(rval) {
+    return new Vector2D(this.x + rval.x, this.y + rval.y);
+};
+
+Vector2D.prototype.sub = function(rval) {
+    return this.add(rval.scale(-1));
+};
+
+Vector2D.prototype.scale = function(rval) {
+    return new Vector2D(this.x * rval, this.y * rval);
+};
+
+Vector2D.prototype.log = function() {
+    console.log("Vector2D {x: " + this.x + ", y: " + this.y + "}");
+};
+/**
  * 
  * @author <a href="mailto:bill.aylward@mac.com">Bill Aylward</a>
  * @version 0.9
@@ -27799,6 +27837,111 @@ ED.CornealThinningCrossSection.prototype.getCornealBezierPoint = function(_time)
 	return point;
 }
 
+var calculateStopAndRestartAngles = function(firstBezier, secondBezier, centreX, centreY, radius) {
+
+	// Helper functions
+	var calculateBezier = function(bezierData, t) {
+		// Calculate scalars
+		var t2 = t * t;
+		var t3 = t2 * t;
+		var mt = 1 - t;
+		var mt2 = mt * mt;
+		var mt3 = mt2 * mt;
+
+		// Calculate x and y values of point
+		var x = bezierData.SP.x * mt3 + 3 * bezierData.CP1.x * mt2 * t + 3 * bezierData.CP2.x * mt * t2 + bezierData.EP.x * t3;
+		var y = bezierData.SP.y * mt3 + 3 * bezierData.CP1.y * mt2 * t + 3 * bezierData.CP2.y * mt * t2 + bezierData.EP.y * t3;
+
+		// Return Vector
+		return new Vector2D(x, y);
+	};
+
+	var bezierCurveAndCircleIntersectionFunction = function(bezierData, centre, radius, t) {
+		var bezierPoint = calculateBezier(bezierData, t);
+
+		var xDiff = bezierPoint.x - centre.x;
+		var yDiff = bezierPoint.y - centre.y;
+
+		return xDiff * xDiff + yDiff * yDiff - radius * radius;
+	};
+
+	var newtonRaphsonSolve = function(f, t0, df, maxIter) {
+		t0 = t0 || 0;
+
+		df = df || function(t) {
+			var dt = 0.001;
+			return (f(t + dt) - f(t - dt)) / (2 * dt);
+		}
+
+		maxIter = maxIter || 10;
+
+		var t = t0;
+		for(var i = 0; i < maxIter; ++i) {
+			t = t - f(t) / df(t);
+		}
+		return t;
+	};
+
+	var isRoot = function(f, t, tmin, tmax) {
+		if(tmin !== undefined)
+			if(t < tmin)
+				return false;
+		if(tmax !== undefined)
+			if(t > tmax)
+				return false;
+		return Math.abs(f(t)) < 0.001;
+	};
+
+	var result = new Object;
+
+	var functionToSolveFirstBezier = function(t) {
+		return bezierCurveAndCircleIntersectionFunction(firstBezier, new Vector2D(centreX, centreY), radius, t);
+	}
+
+	var functionToSolveSecondBezier = function(t) {
+		return bezierCurveAndCircleIntersectionFunction(secondBezier, new Vector2D(centreX, centreY), radius, t);
+	}
+
+	var t0 = newtonRaphsonSolve(functionToSolveFirstBezier, 0);
+	var t1 = newtonRaphsonSolve(functionToSolveFirstBezier, 1);
+	var t2 = newtonRaphsonSolve(functionToSolveSecondBezier, 0);
+	var t3 = newtonRaphsonSolve(functionToSolveSecondBezier, 1);
+
+	var t0isRoot = isRoot(functionToSolveFirstBezier, t0, undefined, 1);
+	var t1isRoot = isRoot(functionToSolveFirstBezier, t1, 0, 1);
+	var t2isRoot = isRoot(functionToSolveSecondBezier, t2, 0, 1);
+	var t3isRoot = isRoot(functionToSolveSecondBezier, t3, 0, undefined);
+
+	if(t0isRoot && t1isRoot && Math.abs(t0 - t1) < 0.01)	// delete duplicated roots
+		t0isRoot = false;
+	if(t2isRoot && t3isRoot && Math.abs(t2 - t3) < 0.01)
+		t2isRoot = false;
+
+	var bezierT0 = calculateBezier(firstBezier, t0);
+	var bezierT1 = calculateBezier(firstBezier, t1);
+	var bezierT2 = calculateBezier(secondBezier, t2);
+	var bezierT3 = calculateBezier(secondBezier, t3);
+
+	var angleForT0 = Math.atan2(bezierT0.y - centreY, bezierT0.x - centreX);
+	var angleForT1 = Math.atan2(bezierT1.y - centreY, bezierT1.x - centreX);
+	var angleForT2 = Math.atan2(bezierT2.y - centreY, bezierT2.x - centreX);
+	var angleForT3 = Math.atan2(bezierT3.y - centreY, bezierT3.x - centreX);
+
+	result.stopAngle = 0;
+	result.restartAngle = 0;
+	if(t0isRoot && t1isRoot) {
+		result.stopAngle = angleForT1;
+		result.restartAngle = angleForT0;
+	} else if (t2isRoot && t3isRoot) {
+		result.stopAngle = angleForT3;
+		result.restartAngle = angleForT2;
+	} else if(   (t0isRoot || t1isRoot)  &&  (t2isRoot || t3isRoot)  ) {
+		result.stopAngle = t2isRoot ? angleForT2 : angleForT3;
+		result.restartAngle = t0isRoot ? angleForT0 : angleForT1;
+	}
+	return result;
+};
+
 /**
  * Draws doodle or performs a hit test if a Point parameter is passed
  *
@@ -28070,28 +28213,49 @@ ED.CornealThinningCrossSection.prototype.draw = function(_point) {
 		ctx.stroke();
 		
 		if (this.perforation) {
-			// draw white line alongside cornea to hide any curve within the AC
-			ctx.beginPath();
-			var xDif = 14; // shift line along x axis to cover area adjacent to cornea: half line width + line width of cornea outline
+			var firstBezier = new Object;
+			firstBezier.SP = new ED.Point(0, 380 - this.originY);
+			var secondBezier = new Object;
+
 			switch (cornea.shape) {
 				case "Normal":
-					ctx.bezierCurveTo(-80+xDif, 260-this.originY, -220+xDif, 180-this.originY, -220+xDif, 0-this.originY);
-					ctx.bezierCurveTo(-220+xDif, -180-this.originY, -80+xDif, -260-this.originY, 0+xDif, -380-this.originY);
+					firstBezier.CP1 = new ED.Point(-80, 260-this.originY);
+					firstBezier.CP2 = new ED.Point(-220, 180-this.originY);
+					firstBezier.EP = new ED.Point(-220, 0-this.originY);
+					secondBezier.SP = firstBezier.EP;
+					secondBezier.CP1 = new ED.Point(-220, -180-this.originY);
+					secondBezier.CP2 = new ED.Point(-80, -260-this.originY);
+					secondBezier.EP = new ED.Point(0, -380-this.originY);
 					break;
 				
 				case "Keratoconus":
-					ctx.bezierCurveTo(-80+xDif, 260-this.originY, cornea.apexX + cornealThickness+xDif, cornea.apexY + 120-this.originY, cornea.apexX + cornealThickness+xDif, cornea.apexY-this.originY);
-					ctx.bezierCurveTo(cornea.apexX + cornealThickness+xDif, cornea.apexY - 120-this.originY, -80+xDif, -260-this.originY, 0+xDif, -380-this.originY);
+					firstBezier.CP1 = new ED.Point(-80, 260-this.originY);
+					firstBezier.CP2 = new ED.Point(cornea.apexX + cornealThickness, cornea.apexY + 120-this.originY);
+					firstBezier.EP = new ED.Point(cornea.apexX + cornealThickness, cornea.apexY-this.originY);
+					secondBezier.SP = firstBezier.EP;
+					secondBezier.CP1 = new ED.Point(cornea.apexX + cornealThickness, cornea.apexY - 120-this.originY);
+					secondBezier.CP2 = new ED.Point(-80, -260-this.originY);
+					secondBezier.EP = new ED.Point(0, -380-this.originY);
 					break;
 					
 				case "Keratoglobus":
-					ctx.bezierCurveTo(-80+xDif, 260-this.originY, -260+xDif, 220-this.originY, -280+xDif, 100-this.originY);
-					ctx.bezierCurveTo(-280+xDif, -140-this.originY, -120+xDif, -200-this.originY, 0+xDif, -380-this.originY);
+					firstBezier.CP1 = new ED.Point(-80, 260-this.originY);
+					firstBezier.CP2 = new ED.Point(-260, 220-this.originY);
+					firstBezier.EP = new ED.Point(-280, 100-this.originY);
+					secondBezier.SP = firstBezier.EP;
+					secondBezier.CP1 = new ED.Point(-280, -140-this.originY);
+					secondBezier.CP2 = new ED.Point(-120, -200-this.originY);
+					secondBezier.EP = new ED.Point(0, -380-this.originY);
 					break;
 			}
-			
-			ctx.strokeStyle = "white";
-			ctx.lineWidth = 20;
+
+			var stopAndRestartAngles = calculateStopAndRestartAngles(firstBezier, secondBezier, x, y, r);
+
+			ctx.beginPath();
+			ctx.arc(x, y, r + 2, stopAndRestartAngles.stopAngle, stopAndRestartAngles.restartAngle);
+			ctx.fillStyle = backgroundFillColour;
+			ctx.strokeStyle = backgroundFillColour;
+			ctx.fill();
 			ctx.stroke();
 		}
 	}
