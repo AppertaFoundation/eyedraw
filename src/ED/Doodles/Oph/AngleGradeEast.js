@@ -35,7 +35,7 @@ ED.AngleGradeEast = function(_drawing, _parameterJSON) {
     this.riro = 270;
     this.riri = 230;
     this.rpu = 100;
-	this.colour = 'Blue';
+	this.colour = (typeof default_iris_colour) !== 'undefined' ? default_iris_colour : 'Blue';
 
 	// Derived parameters
 	this.grade = "4";
@@ -230,16 +230,16 @@ ED.AngleGradeEast.prototype.draw = function(_point) {
 	// Set fill attributes (same colour as Iris)
 	switch (this.colour) {
 		case 'Blue':
-			ctx.fillStyle = "rgba(100, 200, 250, 1.0)";
+			ctx.fillStyle = "rgba(160, 221, 251, 1)";
 			break;
 		case 'Brown':
-			ctx.fillStyle = "rgba(172, 100, 55, 1.0)";
+			ctx.fillStyle = "rgba(203, 161, 134, 1)";
 			break;
 		case 'Gray':
-			ctx.fillStyle = "rgba(125, 132, 116, 1.0)";
+			ctx.fillStyle = "rgba(177, 181, 172, 1)";
 			break;
 		case 'Green':
-			ctx.fillStyle = "rgba(114, 172, 62, 1.0)";
+			ctx.fillStyle = "rgba(169, 206, 141, 1)";
 			break;
 	}
 	ctx.strokeStyle = "rgba(100, 100, 100, 1.0)";

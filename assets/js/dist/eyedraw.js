@@ -14009,7 +14009,7 @@ ED.AngleGradeEast = function(_drawing, _parameterJSON) {
     this.riro = 270;
     this.riri = 230;
     this.rpu = 100;
-	this.colour = 'Blue';
+	this.colour = (typeof default_iris_colour) !== 'undefined' ? default_iris_colour : 'Blue';
 
 	// Derived parameters
 	this.grade = "4";
@@ -14204,16 +14204,16 @@ ED.AngleGradeEast.prototype.draw = function(_point) {
 	// Set fill attributes (same colour as Iris)
 	switch (this.colour) {
 		case 'Blue':
-			ctx.fillStyle = "rgba(100, 200, 250, 1.0)";
+			ctx.fillStyle = "rgba(160, 221, 251, 1)";
 			break;
 		case 'Brown':
-			ctx.fillStyle = "rgba(172, 100, 55, 1.0)";
+			ctx.fillStyle = "rgba(203, 161, 134, 1)";
 			break;
 		case 'Gray':
-			ctx.fillStyle = "rgba(125, 132, 116, 1.0)";
+			ctx.fillStyle = "rgba(177, 181, 172, 1)";
 			break;
 		case 'Green':
-			ctx.fillStyle = "rgba(114, 172, 62, 1.0)";
+			ctx.fillStyle = "rgba(169, 206, 141, 1)";
 			break;
 	}
 	ctx.strokeStyle = "rgba(100, 100, 100, 1.0)";
@@ -14269,7 +14269,7 @@ ED.AngleGradeNorth = function(_drawing, _parameterJSON) {
     this.riro = 270;
     this.riri = 230;
     this.rpu = 100;
-	this.colour = 'Blue';
+	this.colour = (typeof default_iris_colour) !== 'undefined' ? default_iris_colour : 'Blue';
 
 	// Derived parameters
 	this.grade = "4";
@@ -14464,16 +14464,16 @@ ED.AngleGradeNorth.prototype.draw = function(_point) {
 	// Set fill attributes (same colour as Iris)
 	switch (this.colour) {
 		case 'Blue':
-			ctx.fillStyle = "rgba(100, 200, 250, 1.0)";
+			ctx.fillStyle = "rgba(160, 221, 251, 1)";
 			break;
 		case 'Brown':
-			ctx.fillStyle = "rgba(172, 100, 55, 1.0)";
+			ctx.fillStyle = "rgba(203, 161, 134, 1)";
 			break;
 		case 'Gray':
-			ctx.fillStyle = "rgba(125, 132, 116, 1.0)";
+			ctx.fillStyle = "rgba(177, 181, 172, 1)";
 			break;
 		case 'Green':
-			ctx.fillStyle = "rgba(114, 172, 62, 1.0)";
+			ctx.fillStyle = "rgba(169, 206, 141, 1)";
 			break;
 	}
 	ctx.strokeStyle = "rgba(100, 100, 100, 1.0)";
@@ -14529,7 +14529,7 @@ ED.AngleGradeSouth = function(_drawing, _parameterJSON) {
     this.riro = 270;
     this.riri = 230;
     this.rpu = 100;
-	this.colour = 'Blue';
+	this.colour = (typeof default_iris_colour) !== 'undefined' ? default_iris_colour : 'Blue';
 
 	// Derived parameters
 	this.grade = "4";
@@ -14724,16 +14724,16 @@ ED.AngleGradeSouth.prototype.draw = function(_point) {
 	// Set fill attributes (same colour as Iris)
 	switch (this.colour) {
 		case 'Blue':
-			ctx.fillStyle = "rgba(100, 200, 250, 1.0)";
+			ctx.fillStyle = "rgba(160, 221, 251, 1)";
 			break;
 		case 'Brown':
-			ctx.fillStyle = "rgba(172, 100, 55, 1.0)";
+			ctx.fillStyle = "rgba(203, 161, 134, 1)";
 			break;
 		case 'Gray':
-			ctx.fillStyle = "rgba(125, 132, 116, 1.0)";
+			ctx.fillStyle = "rgba(177, 181, 172, 1)";
 			break;
 		case 'Green':
-			ctx.fillStyle = "rgba(114, 172, 62, 1.0)";
+			ctx.fillStyle = "rgba(169, 206, 141, 1)";
 			break;
 	}
 	ctx.strokeStyle = "rgba(100, 100, 100, 1.0)";
@@ -14789,7 +14789,7 @@ ED.AngleGradeWest = function(_drawing, _parameterJSON) {
 	this.riro = 270;
 	this.riri = 230;
 	this.rpu = 100;
-	this.colour = 'Blue';
+	this.colour = (typeof default_iris_colour) !== 'undefined' ? default_iris_colour : 'Blue';
 
 	// Derived parameters
 	this.grade = "4";
@@ -14983,16 +14983,16 @@ ED.AngleGradeWest.prototype.draw = function(_point) {
 	// Set fill attributes (same colour as Iris)
 	switch (this.colour) {
 		case 'Blue':
-			ctx.fillStyle = "rgba(100, 200, 250, 1.0)";
+			ctx.fillStyle = "rgba(160, 221, 251, 1)";
 			break;
 		case 'Brown':
-			ctx.fillStyle = "rgba(172, 100, 55, 1.0)";
+			ctx.fillStyle = "rgba(203, 161, 134, 1)";
 			break;
 		case 'Gray':
-			ctx.fillStyle = "rgba(125, 132, 116, 1.0)";
+			ctx.fillStyle = "rgba(177, 181, 172, 1)";
 			break;
 		case 'Green':
-			ctx.fillStyle = "rgba(114, 172, 62, 1.0)";
+			ctx.fillStyle = "rgba(169, 206, 141, 1)";
 			break;
 	}
 	ctx.strokeStyle = "rgba(100, 100, 100, 1.0)";
@@ -15588,7 +15588,7 @@ ED.AntSeg = function(_drawing, _parameterJSON) {
 	// Other parameters
 	this.pxe = false;
 	this.coloboma = false;
-	this.colour = 'Blue';
+	this.colour = (typeof default_iris_colour) !== 'undefined' ? default_iris_colour : 'Blue';
 	this.ectropion = false;
 	this.cornealSize = 'Not Checked';
 	this.cells = 'Not Checked';
@@ -16310,7 +16310,7 @@ ED.AntSegCrossSection = function(_drawing, _parameterJSON) {
 	// Derived parameters
 	this.pupilSize = 'Large';
 
-	this.colour = 'Blue';
+	this.colour = (typeof default_iris_colour) !== 'undefined' ? default_iris_colour : 'Blue';
     
 	// Saved parameters
 	this.savedParameterArray = ['apexY', 'apexX','colour','c'];
