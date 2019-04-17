@@ -1946,6 +1946,7 @@ ED.Drawing.prototype.resetEyedraw = function() {
 	this.deselectDoodles();
 
 	this.addBindings(this.bindingArray);
+	this.notify("afterReset");
 };
 
 /**
@@ -14046,13 +14047,19 @@ ED.AngleGradeEast = function(_drawing, _parameterJSON) {
     this.riro = 270;
     this.riri = 230;
     this.rpu = 100;
+	this.colour = (typeof default_iris_colour) !== 'undefined' ? default_iris_colour : 'Blue';
 
 	// Derived parameters
 	this.grade = "4";
 	this.seen = "Yes";
 
 	// Saved parameters
-	this.savedParameterArray = ['apexY'];
+	this.savedParameterArray = ['apexY', 'colour'];
+
+	// Parameters in doodle control bar (parameter name: parameter label)
+	this.controlParameterArray = {
+		'colour' : 'Colour',
+	};
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -14103,6 +14110,13 @@ ED.AngleGradeEast.prototype.setPropertyDefaults = function() {
 		type: 'string',
 		list: ['Yes', 'No'],
 		animate: true
+	};
+
+	this.parameterValidationArray['colour'] = {
+		kind: 'other',
+		type: 'string',
+		list: ['Blue', 'Brown', 'Gray', 'Green'],
+		animate: false
 	};
 }
 
@@ -14226,7 +14240,20 @@ ED.AngleGradeEast.prototype.draw = function(_point) {
 	ctx.closePath();
 
 	// Set fill attributes (same colour as Iris)
-	ctx.fillStyle = "rgba(100, 200, 250, 1.0)";
+	switch (this.colour) {
+		case 'Blue':
+			ctx.fillStyle = "rgba(160, 221, 251, 1)";
+			break;
+		case 'Brown':
+			ctx.fillStyle = "rgba(203, 161, 134, 1)";
+			break;
+		case 'Gray':
+			ctx.fillStyle = "rgba(177, 181, 172, 1)";
+			break;
+		case 'Green':
+			ctx.fillStyle = "rgba(169, 206, 141, 1)";
+			break;
+	}
 	ctx.strokeStyle = "rgba(100, 100, 100, 1.0)";
 	ctx.lineWidth = 4;
 
@@ -14280,13 +14307,19 @@ ED.AngleGradeNorth = function(_drawing, _parameterJSON) {
     this.riro = 270;
     this.riri = 230;
     this.rpu = 100;
+	this.colour = (typeof default_iris_colour) !== 'undefined' ? default_iris_colour : 'Blue';
 
 	// Derived parameters
 	this.grade = "4";
 	this.seen = "Yes";
 
 	// Saved parameters
-	this.savedParameterArray = ['apexY'];
+	this.savedParameterArray = ['apexY', 'colour'];
+
+	// Parameters in doodle control bar (parameter name: parameter label)
+	this.controlParameterArray = {
+		'colour' : 'Colour',
+	};
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -14337,6 +14370,13 @@ ED.AngleGradeNorth.prototype.setPropertyDefaults = function() {
 		type: 'string',
 		list: ['Yes', 'No'],
 		animate: true
+	};
+
+	this.parameterValidationArray['colour'] = {
+		kind: 'other',
+		type: 'string',
+		list: ['Blue', 'Brown', 'Gray', 'Green'],
+		animate: false
 	};
 }
 
@@ -14460,7 +14500,20 @@ ED.AngleGradeNorth.prototype.draw = function(_point) {
 	ctx.closePath();
 
 	// Set fill attributes (same colour as Iris)
-	ctx.fillStyle = "rgba(100, 200, 250, 1.0)";
+	switch (this.colour) {
+		case 'Blue':
+			ctx.fillStyle = "rgba(160, 221, 251, 1)";
+			break;
+		case 'Brown':
+			ctx.fillStyle = "rgba(203, 161, 134, 1)";
+			break;
+		case 'Gray':
+			ctx.fillStyle = "rgba(177, 181, 172, 1)";
+			break;
+		case 'Green':
+			ctx.fillStyle = "rgba(169, 206, 141, 1)";
+			break;
+	}
 	ctx.strokeStyle = "rgba(100, 100, 100, 1.0)";
 	ctx.lineWidth = 4;
 
@@ -14514,13 +14567,19 @@ ED.AngleGradeSouth = function(_drawing, _parameterJSON) {
     this.riro = 270;
     this.riri = 230;
     this.rpu = 100;
+	this.colour = (typeof default_iris_colour) !== 'undefined' ? default_iris_colour : 'Blue';
 
 	// Derived parameters
 	this.grade = "4";
 	this.seen = "Yes";
 
 	// Saved parameters
-	this.savedParameterArray = ['apexY'];
+	this.savedParameterArray = ['apexY', 'colour'];
+
+	// Parameters in doodle control bar (parameter name: parameter label)
+	this.controlParameterArray = {
+		'colour' : 'Colour',
+	};
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -14571,6 +14630,13 @@ ED.AngleGradeSouth.prototype.setPropertyDefaults = function() {
 		type: 'string',
 		list: ['Yes', 'No'],
 		animate: true
+	};
+
+	this.parameterValidationArray['colour'] = {
+		kind: 'other',
+		type: 'string',
+		list: ['Blue', 'Brown', 'Gray', 'Green'],
+		animate: false
 	};
 }
 
@@ -14694,7 +14760,20 @@ ED.AngleGradeSouth.prototype.draw = function(_point) {
 	ctx.closePath();
 
 	// Set fill attributes (same colour as Iris)
-	ctx.fillStyle = "rgba(100, 200, 250, 1.0)";
+	switch (this.colour) {
+		case 'Blue':
+			ctx.fillStyle = "rgba(160, 221, 251, 1)";
+			break;
+		case 'Brown':
+			ctx.fillStyle = "rgba(203, 161, 134, 1)";
+			break;
+		case 'Gray':
+			ctx.fillStyle = "rgba(177, 181, 172, 1)";
+			break;
+		case 'Green':
+			ctx.fillStyle = "rgba(169, 206, 141, 1)";
+			break;
+	}
 	ctx.strokeStyle = "rgba(100, 100, 100, 1.0)";
 	ctx.lineWidth = 4;
 
@@ -14748,13 +14827,19 @@ ED.AngleGradeWest = function(_drawing, _parameterJSON) {
 	this.riro = 270;
 	this.riri = 230;
 	this.rpu = 100;
+	this.colour = (typeof default_iris_colour) !== 'undefined' ? default_iris_colour : 'Blue';
 
 	// Derived parameters
 	this.grade = "4";
 	this.seen = "Yes";
 
 	// Saved parameters
-	this.savedParameterArray = ['apexY'];
+	this.savedParameterArray = ['apexY', 'colour'];
+
+	// Parameters in doodle control bar (parameter name: parameter label)
+	this.controlParameterArray = {
+		'colour' : 'Colour',
+	};
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -14805,6 +14890,13 @@ ED.AngleGradeWest.prototype.setPropertyDefaults = function() {
 		type: 'string',
 		list: ['Yes', 'No'],
 		animate: true
+	};
+
+	this.parameterValidationArray['colour'] = {
+		kind: 'other',
+		type: 'string',
+		list: ['Blue', 'Brown', 'Gray', 'Green'],
+		animate: false
 	};
 }
 
@@ -14927,7 +15019,20 @@ ED.AngleGradeWest.prototype.draw = function(_point) {
 	ctx.closePath();
 
 	// Set fill attributes (same colour as Iris)
-	ctx.fillStyle = "rgba(100, 200, 250, 1.0)";
+	switch (this.colour) {
+		case 'Blue':
+			ctx.fillStyle = "rgba(160, 221, 251, 1)";
+			break;
+		case 'Brown':
+			ctx.fillStyle = "rgba(203, 161, 134, 1)";
+			break;
+		case 'Gray':
+			ctx.fillStyle = "rgba(177, 181, 172, 1)";
+			break;
+		case 'Green':
+			ctx.fillStyle = "rgba(169, 206, 141, 1)";
+			break;
+	}
 	ctx.strokeStyle = "rgba(100, 100, 100, 1.0)";
 	ctx.lineWidth = 4;
 
@@ -15521,7 +15626,7 @@ ED.AntSeg = function(_drawing, _parameterJSON) {
 	// Other parameters
 	this.pxe = false;
 	this.coloboma = false;
-	this.colour = 'Blue';
+	this.colour = (typeof default_iris_colour) !== 'undefined' ? default_iris_colour : 'Blue';
 	this.ectropion = false;
 	this.cornealSize = 'Not Checked';
 	this.cells = 'Not Checked';
@@ -16243,7 +16348,7 @@ ED.AntSegCrossSection = function(_drawing, _parameterJSON) {
 	// Derived parameters
 	this.pupilSize = 'Large';
 
-	this.colour = 'Blue';
+	this.colour = (typeof default_iris_colour) !== 'undefined' ? default_iris_colour : 'Blue';
     
 	// Saved parameters
 	this.savedParameterArray = ['apexY', 'apexX','colour','c'];
