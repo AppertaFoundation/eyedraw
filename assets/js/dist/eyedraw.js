@@ -1946,6 +1946,7 @@ ED.Drawing.prototype.resetEyedraw = function() {
 	this.deselectDoodles();
 
 	this.addBindings(this.bindingArray);
+	this.notify("afterReset");
 };
 
 /**
@@ -6623,6 +6624,44 @@ ED.Squiggle.prototype.json = function() {
 
 	return s;
 }
+/**
+ * Copyright (C) OpenEyes Foundation, 2011-2017
+ * This file is part of OpenEyes.
+ *
+ * OpenEyes is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * OpenEyes is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with OpenEyes.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+var Vector2D = function(x, y) {
+    this.x = x;
+    this.y = y;
+};
+
+Vector2D.prototype.add = function(rval) {
+    return new Vector2D(this.x + rval.x, this.y + rval.y);
+};
+
+Vector2D.prototype.sub = function(rval) {
+    return this.add(rval.scale(-1));
+};
+
+Vector2D.prototype.scale = function(rval) {
+    return new Vector2D(this.x * rval, this.y * rval);
+};
+
+Vector2D.prototype.log = function() {
+    console.log("Vector2D {x: " + this.x + ", y: " + this.y + "}");
+};
 /**
  * 
  * @author <a href="mailto:bill.aylward@mac.com">Bill Aylward</a>
@@ -14008,13 +14047,19 @@ ED.AngleGradeEast = function(_drawing, _parameterJSON) {
     this.riro = 270;
     this.riri = 230;
     this.rpu = 100;
+	this.colour = (typeof default_iris_colour) !== 'undefined' ? default_iris_colour : 'Blue';
 
 	// Derived parameters
 	this.grade = "4";
 	this.seen = "Yes";
 
 	// Saved parameters
-	this.savedParameterArray = ['apexY'];
+	this.savedParameterArray = ['apexY', 'colour'];
+
+	// Parameters in doodle control bar (parameter name: parameter label)
+	this.controlParameterArray = {
+		'colour' : 'Colour',
+	};
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -14065,6 +14110,13 @@ ED.AngleGradeEast.prototype.setPropertyDefaults = function() {
 		type: 'string',
 		list: ['Yes', 'No'],
 		animate: true
+	};
+
+	this.parameterValidationArray['colour'] = {
+		kind: 'other',
+		type: 'string',
+		list: ['Blue', 'Brown', 'Gray', 'Green'],
+		animate: false
 	};
 }
 
@@ -14188,7 +14240,20 @@ ED.AngleGradeEast.prototype.draw = function(_point) {
 	ctx.closePath();
 
 	// Set fill attributes (same colour as Iris)
-	ctx.fillStyle = "rgba(100, 200, 250, 1.0)";
+	switch (this.colour) {
+		case 'Blue':
+			ctx.fillStyle = "rgba(160, 221, 251, 1)";
+			break;
+		case 'Brown':
+			ctx.fillStyle = "rgba(203, 161, 134, 1)";
+			break;
+		case 'Gray':
+			ctx.fillStyle = "rgba(177, 181, 172, 1)";
+			break;
+		case 'Green':
+			ctx.fillStyle = "rgba(169, 206, 141, 1)";
+			break;
+	}
 	ctx.strokeStyle = "rgba(100, 100, 100, 1.0)";
 	ctx.lineWidth = 4;
 
@@ -14242,13 +14307,19 @@ ED.AngleGradeNorth = function(_drawing, _parameterJSON) {
     this.riro = 270;
     this.riri = 230;
     this.rpu = 100;
+	this.colour = (typeof default_iris_colour) !== 'undefined' ? default_iris_colour : 'Blue';
 
 	// Derived parameters
 	this.grade = "4";
 	this.seen = "Yes";
 
 	// Saved parameters
-	this.savedParameterArray = ['apexY'];
+	this.savedParameterArray = ['apexY', 'colour'];
+
+	// Parameters in doodle control bar (parameter name: parameter label)
+	this.controlParameterArray = {
+		'colour' : 'Colour',
+	};
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -14299,6 +14370,13 @@ ED.AngleGradeNorth.prototype.setPropertyDefaults = function() {
 		type: 'string',
 		list: ['Yes', 'No'],
 		animate: true
+	};
+
+	this.parameterValidationArray['colour'] = {
+		kind: 'other',
+		type: 'string',
+		list: ['Blue', 'Brown', 'Gray', 'Green'],
+		animate: false
 	};
 }
 
@@ -14422,7 +14500,20 @@ ED.AngleGradeNorth.prototype.draw = function(_point) {
 	ctx.closePath();
 
 	// Set fill attributes (same colour as Iris)
-	ctx.fillStyle = "rgba(100, 200, 250, 1.0)";
+	switch (this.colour) {
+		case 'Blue':
+			ctx.fillStyle = "rgba(160, 221, 251, 1)";
+			break;
+		case 'Brown':
+			ctx.fillStyle = "rgba(203, 161, 134, 1)";
+			break;
+		case 'Gray':
+			ctx.fillStyle = "rgba(177, 181, 172, 1)";
+			break;
+		case 'Green':
+			ctx.fillStyle = "rgba(169, 206, 141, 1)";
+			break;
+	}
 	ctx.strokeStyle = "rgba(100, 100, 100, 1.0)";
 	ctx.lineWidth = 4;
 
@@ -14476,13 +14567,19 @@ ED.AngleGradeSouth = function(_drawing, _parameterJSON) {
     this.riro = 270;
     this.riri = 230;
     this.rpu = 100;
+	this.colour = (typeof default_iris_colour) !== 'undefined' ? default_iris_colour : 'Blue';
 
 	// Derived parameters
 	this.grade = "4";
 	this.seen = "Yes";
 
 	// Saved parameters
-	this.savedParameterArray = ['apexY'];
+	this.savedParameterArray = ['apexY', 'colour'];
+
+	// Parameters in doodle control bar (parameter name: parameter label)
+	this.controlParameterArray = {
+		'colour' : 'Colour',
+	};
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -14533,6 +14630,13 @@ ED.AngleGradeSouth.prototype.setPropertyDefaults = function() {
 		type: 'string',
 		list: ['Yes', 'No'],
 		animate: true
+	};
+
+	this.parameterValidationArray['colour'] = {
+		kind: 'other',
+		type: 'string',
+		list: ['Blue', 'Brown', 'Gray', 'Green'],
+		animate: false
 	};
 }
 
@@ -14656,7 +14760,20 @@ ED.AngleGradeSouth.prototype.draw = function(_point) {
 	ctx.closePath();
 
 	// Set fill attributes (same colour as Iris)
-	ctx.fillStyle = "rgba(100, 200, 250, 1.0)";
+	switch (this.colour) {
+		case 'Blue':
+			ctx.fillStyle = "rgba(160, 221, 251, 1)";
+			break;
+		case 'Brown':
+			ctx.fillStyle = "rgba(203, 161, 134, 1)";
+			break;
+		case 'Gray':
+			ctx.fillStyle = "rgba(177, 181, 172, 1)";
+			break;
+		case 'Green':
+			ctx.fillStyle = "rgba(169, 206, 141, 1)";
+			break;
+	}
 	ctx.strokeStyle = "rgba(100, 100, 100, 1.0)";
 	ctx.lineWidth = 4;
 
@@ -14710,13 +14827,19 @@ ED.AngleGradeWest = function(_drawing, _parameterJSON) {
 	this.riro = 270;
 	this.riri = 230;
 	this.rpu = 100;
+	this.colour = (typeof default_iris_colour) !== 'undefined' ? default_iris_colour : 'Blue';
 
 	// Derived parameters
 	this.grade = "4";
 	this.seen = "Yes";
 
 	// Saved parameters
-	this.savedParameterArray = ['apexY'];
+	this.savedParameterArray = ['apexY', 'colour'];
+
+	// Parameters in doodle control bar (parameter name: parameter label)
+	this.controlParameterArray = {
+		'colour' : 'Colour',
+	};
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -14767,6 +14890,13 @@ ED.AngleGradeWest.prototype.setPropertyDefaults = function() {
 		type: 'string',
 		list: ['Yes', 'No'],
 		animate: true
+	};
+
+	this.parameterValidationArray['colour'] = {
+		kind: 'other',
+		type: 'string',
+		list: ['Blue', 'Brown', 'Gray', 'Green'],
+		animate: false
 	};
 }
 
@@ -14889,7 +15019,20 @@ ED.AngleGradeWest.prototype.draw = function(_point) {
 	ctx.closePath();
 
 	// Set fill attributes (same colour as Iris)
-	ctx.fillStyle = "rgba(100, 200, 250, 1.0)";
+	switch (this.colour) {
+		case 'Blue':
+			ctx.fillStyle = "rgba(160, 221, 251, 1)";
+			break;
+		case 'Brown':
+			ctx.fillStyle = "rgba(203, 161, 134, 1)";
+			break;
+		case 'Gray':
+			ctx.fillStyle = "rgba(177, 181, 172, 1)";
+			break;
+		case 'Green':
+			ctx.fillStyle = "rgba(169, 206, 141, 1)";
+			break;
+	}
 	ctx.strokeStyle = "rgba(100, 100, 100, 1.0)";
 	ctx.lineWidth = 4;
 
@@ -15483,7 +15626,7 @@ ED.AntSeg = function(_drawing, _parameterJSON) {
 	// Other parameters
 	this.pxe = false;
 	this.coloboma = false;
-	this.colour = 'Blue';
+	this.colour = (typeof default_iris_colour) !== 'undefined' ? default_iris_colour : 'Blue';
 	this.ectropion = false;
 	this.cornealSize = 'Not Checked';
 	this.cells = 'Not Checked';
@@ -16205,7 +16348,7 @@ ED.AntSegCrossSection = function(_drawing, _parameterJSON) {
 	// Derived parameters
 	this.pupilSize = 'Large';
 
-	this.colour = 'Blue';
+	this.colour = (typeof default_iris_colour) !== 'undefined' ? default_iris_colour : 'Blue';
     
 	// Saved parameters
 	this.savedParameterArray = ['apexY', 'apexX','colour','c'];
@@ -17314,6 +17457,407 @@ ED.AxialLengthGraph.prototype.draw = function(_point) {
 	return this.isClicked;
 }
 
+/**
+ * OpenEyes
+ *
+ * Copyright (C) OpenEyes Foundation, 2011-2017
+ * This file is part of OpenEyes.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package OpenEyes
+ * @link http://www.openeyes.org.uk
+ * @author OpenEyes <info@openeyes.org.uk>
+ * @copyright Copyright 2011-2017, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
+ */
+
+/**
+ * The optic disc
+ *
+ * @class BandKeratophy
+ * @property {String} className Name of doodle subclass
+ * @param {Drawing} _drawing
+ * @param {Object} _parameterJSON
+ */
+ED.BandKeratophy = function(_drawing, _parameterJSON) {
+    // Set classname
+    this.className = "BandKeratophy";
+
+    // Private parameters
+    this.numberOfOuterHandles = 4;
+    this.numberOfInnerHandles = 6;
+    this.initialRadius = 380;
+    this.opacity = 0.25;
+
+    // Saved parameters
+    this.savedParameterArray = ['originX', 'originY', 'rotation', 'gradeOfOpacity'];
+    this.controlParameterArray = {
+        'gradeOfOpacity': 'Opacity grade',
+    };
+
+    // Call superclass constructor
+    ED.Doodle.call(this, _drawing, _parameterJSON);
+};
+
+/**
+ * Sets superclass and constructor
+ */
+ED.BandKeratophy.prototype = new ED.Doodle;
+ED.BandKeratophy.prototype.constructor = ED.BandKeratophy;
+ED.BandKeratophy.superclass = ED.Doodle.prototype;
+
+/**
+ * Sets handle attributes
+ */
+ED.BandKeratophy.prototype.setHandles = function() {
+    // Array of handles , 4 circular
+    for (var i = 0; i < this.numberOfOuterHandles; i++) {
+        this.handleArray[i] = new ED.Doodle.Handle(null, true, ED.Mode.Handles, false);
+    }
+
+    //this.handleArray[0] - bottom right
+    //this.handleArray[3] - top right
+
+    this.handleArray[4] = new ED.Doodle.Handle(null, true, ED.Mode.Handles, false);
+    this.handleArray[5] = new ED.Doodle.Handle(null, true, ED.Mode.Handles, false);
+    this.handleArray[6] = new ED.Doodle.Handle(null, true, ED.Mode.Handles, false);
+    this.handleArray[7] = new ED.Doodle.Handle(null, true, ED.Mode.Handles, false);
+    this.handleArray[8] = new ED.Doodle.Handle(null, true, ED.Mode.Handles, false);
+    this.handleArray[9] = new ED.Doodle.Handle(null, true, ED.Mode.Handles, false);
+
+    // Allow top handle to rotate doodle
+    //this.handleArray[0].isRotatable = true;
+};
+
+/**
+ * Sets default properties
+ */
+ED.BandKeratophy.prototype.setPropertyDefaults = function() {
+    this.isScaleable = false;
+    this.isMoveable = false;
+    this.isUnique = true;
+    this.isRotatable = false;
+
+    this.parameterValidationArray.gradeOfOpacity = {
+        kind: 'derived',
+        type: 'string',
+        list: ['+', '++', '+++', '++++']
+    };
+
+    /** Outer (circualar?) handlers **/
+    var cir = (2 * Math.PI) / this.numberOfOuterHandles;
+    var minMax = [
+        {min: cir    , max: cir * 2},
+        {min: cir * 2, max: cir * 3},
+        {min: cir * 3, max: cir * 4},
+        {min: cir * 4, max: cir    },
+    ];
+
+    // Create ranges to constrain handles
+    this.handleVectorRangeArray = [];
+    for (var i = 0; i < this.numberOfOuterHandles; i++) {
+        // Create a range object for each handle
+        var range = {};
+        range.length = new ED.Range(+390, +390);
+        var epsilonAngle = 3 / 180 * Math.PI;
+        range.angle = new ED.Range(minMax[i].min + epsilonAngle, minMax[i].max - epsilonAngle);
+        this.handleVectorRangeArray[i] = range;
+    }
+
+    //create handleVectorRangeArray entry for all the inner handlers
+    //this should not be necessary but it gives error if it isn't set
+    // probably it should be in sync with this.handleArray
+    for (var ii = 0; ii < this.numberOfInnerHandles; ii++) {
+        this.handleVectorRangeArray.push({
+            'length' : new ED.Range(0, +390),
+            'angle' : new ED.Range(0, 2 * Math.PI)
+        });
+    }
+
+    /** Inner handlers **/
+    this.handleCoordinateRangeArray = [];
+    // let's set default entries because of handleVectorRangeArray
+    for (var hcr = 0; hcr < this.numberOfOuterHandles; hcr++) {
+        this.handleCoordinateRangeArray[hcr] = {
+            x: new ED.Range(-400, +400),
+            y: new ED.Range(-400, +400)
+        };
+    }
+
+    //left top
+    this.handleCoordinateRangeArray[4] = {
+        x: new ED.Range(-300, -100),
+        y: new ED.Range(-390, -30)
+    };
+
+    //top right
+    this.handleCoordinateRangeArray[5] = {
+        x: new ED.Range(100, 300),
+        y: new ED.Range(-390, -30)
+    };
+
+    //bottom left
+    this.handleCoordinateRangeArray[6] = {
+        x: new ED.Range(-300, -100),
+        y: new ED.Range(+30, 390)
+    };
+
+    //bottom right
+    this.handleCoordinateRangeArray[7] = {
+        x: new ED.Range(100, 300),
+        y: new ED.Range(+30, 390)
+    };
+
+    //top center
+    this.handleCoordinateRangeArray[8] = {
+        x: new ED.Range(-100, +100),
+        y: new ED.Range(-390, -30)
+    };
+
+    //bottom center
+    this.handleCoordinateRangeArray[9] = {
+        x: new ED.Range(-100, +100),
+        y: new ED.Range(+30, 390)
+    };
+};
+
+/**
+ * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
+ * The returned parameters are animated if the 'animate' property in the parameterValidationArray is set to true
+ *
+ * @param {String} _parameter Name of parameter that has changed
+ * @param {Undefined} _value Value of parameter to calculate
+ * @returns {Array} Associative array of values of dependent parameters
+ */
+ED.BandKeratophy.prototype.dependentParameterValues = function(_parameter, _value) {
+    var returnArray = {};
+
+    switch (_parameter) {
+        case 'gradeOfOpacity':
+            returnArray.opacity = (_value.length * 25) / 100;
+            break;
+    }
+
+    return returnArray;
+};
+
+/**
+ * Sets default parameters
+ */
+ED.BandKeratophy.prototype.setParameterDefaults = function() {
+    var doodle = this.drawing.lastDoodleOfClass(this.className);
+    this.setParameterFromString('gradeOfOpacity', '+');
+
+    // Create a squiggle to store the handles points
+    var squiggle = new ED.Squiggle(this, new ED.Colour(100, 100, 100, 1), 4, true);
+
+    // Add it to squiggle array
+    this.squiggleArray.push(squiggle);
+
+    // top left, bottom left, bottom, right, top right
+    var coords = [120, 240, 300, 60];
+
+    // Populate with handles at equidistant points around circumference
+    for (var i = 0; i < this.numberOfOuterHandles; i++) {
+        var point = new ED.Point(0, 0);
+        point.setWithPolars(this.initialRadius, coords[i] * Math.PI / 180);
+        this.addPointToSquiggle(point);
+    }
+
+    //left top
+    this.addPointToSquiggle(new ED.Point(-100, -100));
+
+    //top right
+    this.addPointToSquiggle(new ED.Point(100, -100));
+
+    //bottom left
+    this.addPointToSquiggle(new ED.Point(-100, 100));
+
+    //bottom right
+    this.addPointToSquiggle(new ED.Point(100, 100));
+
+    //top center
+    this.addPointToSquiggle(new ED.Point(0, -90));
+
+    //bottom center
+    this.addPointToSquiggle(new ED.Point(0, 90));
+};
+
+/**
+ * Draws doodle or performs a hit test if a Point parameter is passed
+ *
+ * @param {Point} _point Optional point in canvas plane, passed if performing hit test
+ */
+
+ED.BandKeratophy.prototype.createArcCurveFromPoints = function(center, radius, startPoint, endPoint) {
+    var createArcCurveFromAngles = function(center, radius, startAngle, endAngle) {
+        var cirlceR = function(arc) {
+            return new Vector2D(center.x + radius * Math.cos(arc), center.y - radius * Math.sin(arc));
+        };
+        return function(t) {
+            var newt = t * (endAngle - startAngle) + startAngle;
+            return cirlceR(newt);
+        };
+    };
+    var startAngle = -1 * Math.atan2(startPoint.y - center.y, startPoint.x - center.x);
+    var endAngle = -1 * Math.atan2(endPoint.y - center.y, endPoint.x - center.x);
+    if(startAngle > endAngle) {
+        startAngle -= 2 * Math.PI;
+    }
+    return createArcCurveFromAngles(center, radius, startAngle, endAngle);
+};
+
+ED.BandKeratophy.prototype.createCatmullRomSpline = function(cps, ts, vStart, vEnd) {
+    if(ts === undefined) {
+        ts = [];
+        for(var i = 0; i < cps.length; ++i) {
+            ts.push(i);
+        }
+    }
+
+    vStart = vStart || new Vector2D(0, 0);
+    vEnd = vEnd || new Vector2D(0, 0);
+
+    var Hermite = function(p0, v0, t0, p1, v1, t1, t) {
+        var a0 = p0;
+        var a1 = v0;
+        var diff = t1 - t0;
+        var diff_2 = diff * diff;
+        var diff_3 = diff_2 * diff;
+        var a2 = (p1.sub(p0).scale(3.0).scale(1 / diff_2)).sub((v1.add(v0.scale(2.0))).scale(1 / diff));
+        var a3 = p0.sub(p1).scale(2.0).scale(1 / diff_3).add(v1.add(v0).scale(1 / diff_2));
+        var x = t - t0;
+        var x_2 = x * x;
+        var x_3 = x_2 * x;
+        return a3.scale(x_3).add(a2.scale(x_2).add(a1.scale(x).add(a0)));
+    };
+
+    var r = function(t) {
+        t = Math.min(t, ts[ts.length - 1]);
+        t = Math.max(t, ts[0]);	// clamp t
+
+        var i = Math.floor(t);
+        var vi = (i === 0) ?
+            vStart :
+            ((cps[i + 1].sub(cps[i])).scale(1 / (ts[i + 1] - ts[i])).
+            add(cps[i].sub(cps[i - 1]).scale(1 / (ts[i] - ts[i - 1])))).
+            scale(0.5);
+        var vi_ = (i === cps.length - 2) ?
+            vEnd :
+            ((cps[i + 2].sub(cps[i + 1])).scale(1 / (ts[i + 2] - ts[i + 1])).
+            add(cps[i + 1].sub(cps[i]).scale(1 / (ts[i + 1] - ts[i])))).
+            scale(0.5);
+        return Hermite(cps[i], vi, ts[i], cps[i + 1], vi_, ts[i + 1], t);
+    };
+
+    return function(t) {
+        var newt = t * (ts[ts.length - 1] - ts[0]) + ts[0];
+        return r(newt);
+    };
+};
+
+
+ED.BandKeratophy.prototype.drawShape = function(ctx, center, radius, shapeControlPoints) {
+    var parametricCurves = [
+        this.createArcCurveFromPoints(center, radius,
+            shapeControlPoints.controlPointOuterBottomRight, shapeControlPoints.controlPointOuterTopRight),
+        this.createCatmullRomSpline([
+            shapeControlPoints.controlPointOuterTopRight,
+            shapeControlPoints.controlPointInnerTopRight,
+            shapeControlPoints.controlPointInnerTopCenter,
+            shapeControlPoints.controlPointInnerTopLeft,
+            shapeControlPoints.controlPointOuterTopLeft,
+        ]),
+        this.createArcCurveFromPoints(center, radius,
+            shapeControlPoints.controlPointOuterTopLeft, shapeControlPoints.controlPointOuterBottomLeft),
+        this.createCatmullRomSpline([
+            shapeControlPoints.controlPointOuterBottomLeft,
+            shapeControlPoints.controlPointInnerBottomLeft,
+            shapeControlPoints.controlPointInnerBottomCenter,
+            shapeControlPoints.controlPointInnerBottomRight,
+            shapeControlPoints.controlPointOuterBottomRight,
+        ]),
+    ];
+
+    var parametricCurveTrim = [false, true, false, true,];  // Trim only the Catmull-Rom splines
+
+    var resolution = 100;
+    var dt = 1 / resolution;
+    var startPoint = parametricCurves[0](0);
+    ctx.moveTo(startPoint.x, startPoint.y);
+    for(var i = 0; i < parametricCurves.length; ++i) {
+        var tStart  = parametricCurveTrim[i] ? 0.03 : 0;
+        var tEnd    = parametricCurveTrim[i] ? 0.97 : 1;
+        for(var t = tStart; t <= tEnd; t += dt) {
+            var actualPoint = parametricCurves[i](t);
+            ctx.lineTo(actualPoint.x, actualPoint.y);
+        }
+    }
+    ctx.strokeStyle = "rgb(0,0,0,0)";
+    ctx.fillStyle = "rgb(169,169,169," + this.opacity + ")";
+    ctx.fill();
+};
+
+ED.BandKeratophy.prototype.draw = function(_point) {
+    // Get context
+    var ctx = this.drawing.context;
+
+    // Call draw method in superclass
+    ED.BandKeratophy.superclass.draw.call(this, _point);
+
+    var shapeControlPoints = {};
+    shapeControlPoints.controlPointOuterTopLeft = new Vector2D(this.squiggleArray[0].pointsArray[2].x, this.squiggleArray[0].pointsArray[2].y);
+    shapeControlPoints.controlPointInnerTopLeft = new Vector2D(this.squiggleArray[0].pointsArray[4].x, this.squiggleArray[0].pointsArray[4].y);
+    shapeControlPoints.controlPointInnerTopRight = new Vector2D(this.squiggleArray[0].pointsArray[5].x, this.squiggleArray[0].pointsArray[5].y);
+    shapeControlPoints.controlPointOuterTopRight = new Vector2D(this.squiggleArray[0].pointsArray[3].x, this.squiggleArray[0].pointsArray[3].y);
+    shapeControlPoints.controlPointOuterBottomRight = new Vector2D(this.squiggleArray[0].pointsArray[0].x, this.squiggleArray[0].pointsArray[0].y);
+    shapeControlPoints.controlPointInnerBottomRight = new Vector2D(this.squiggleArray[0].pointsArray[7].x, this.squiggleArray[0].pointsArray[7].y);
+    shapeControlPoints.controlPointInnerBottomLeft = new Vector2D(this.squiggleArray[0].pointsArray[6].x, this.squiggleArray[0].pointsArray[6].y);
+    shapeControlPoints.controlPointOuterBottomLeft = new Vector2D(this.squiggleArray[0].pointsArray[1].x, this.squiggleArray[0].pointsArray[1].y);
+    shapeControlPoints.controlPointInnerTopCenter = new Vector2D(this.squiggleArray[0].pointsArray[8].x, this.squiggleArray[0].pointsArray[8].y);
+    shapeControlPoints.controlPointInnerBottomCenter = new Vector2D(this.squiggleArray[0].pointsArray[9].x, this.squiggleArray[0].pointsArray[9].y);
+
+    ctx.beginPath();
+    this.drawShape(ctx, new Vector2D(0, 0), this.initialRadius, shapeControlPoints);
+    // Draw boundary path (also hit testing)
+    this.drawBoundary(_point);
+
+    ctx.beginPath();
+
+    // Coordinates of expert handles (in canvas plane)
+    for (var i = 0; i < this.numberOfOuterHandles; i++) {
+        this.handleArray[i].location = this.transform.transformPoint(this.squiggleArray[0].pointsArray[i]);
+    }
+
+    this.handleArray[4].location = this.transform.transformPoint(this.squiggleArray[0].pointsArray[4]);
+    this.handleArray[5].location = this.transform.transformPoint(this.squiggleArray[0].pointsArray[5]);
+    this.handleArray[6].location = this.transform.transformPoint(this.squiggleArray[0].pointsArray[6]);
+    this.handleArray[7].location = this.transform.transformPoint(this.squiggleArray[0].pointsArray[7]);
+    this.handleArray[8].location = this.transform.transformPoint(this.squiggleArray[0].pointsArray[8]);
+    this.handleArray[9].location = this.transform.transformPoint(this.squiggleArray[0].pointsArray[9]);
+
+    // Draw handles if selected
+    if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+
+    // Return value indicating successful hittest
+    return this.isClicked;
+};
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.BandKeratophy.prototype.description = function() {
+    return 'Band Keratophy ' + this.gradeOfOpacity;
+};
+
+ED.BandKeratophy.prototype.snomedCode = function()
+{
+    return 35055000;
+};
 /**
  * OpenEyes
  *
@@ -27694,6 +28238,111 @@ ED.CornealThinningCrossSection.prototype.getCornealBezierPoint = function(_time)
 	return point;
 }
 
+var calculateStopAndRestartAngles = function(firstBezier, secondBezier, centreX, centreY, radius) {
+
+	// Helper functions
+	var calculateBezier = function(bezierData, t) {
+		// Calculate scalars
+		var t2 = t * t;
+		var t3 = t2 * t;
+		var mt = 1 - t;
+		var mt2 = mt * mt;
+		var mt3 = mt2 * mt;
+
+		// Calculate x and y values of point
+		var x = bezierData.SP.x * mt3 + 3 * bezierData.CP1.x * mt2 * t + 3 * bezierData.CP2.x * mt * t2 + bezierData.EP.x * t3;
+		var y = bezierData.SP.y * mt3 + 3 * bezierData.CP1.y * mt2 * t + 3 * bezierData.CP2.y * mt * t2 + bezierData.EP.y * t3;
+
+		// Return Vector
+		return new Vector2D(x, y);
+	};
+
+	var bezierCurveAndCircleIntersectionFunction = function(bezierData, centre, radius, t) {
+		var bezierPoint = calculateBezier(bezierData, t);
+
+		var xDiff = bezierPoint.x - centre.x;
+		var yDiff = bezierPoint.y - centre.y;
+
+		return xDiff * xDiff + yDiff * yDiff - radius * radius;
+	};
+
+	var newtonRaphsonSolve = function(f, t0, df, maxIter) {
+		t0 = t0 || 0;
+
+		df = df || function(t) {
+			var dt = 0.001;
+			return (f(t + dt) - f(t - dt)) / (2 * dt);
+		}
+
+		maxIter = maxIter || 10;
+
+		var t = t0;
+		for(var i = 0; i < maxIter; ++i) {
+			t = t - f(t) / df(t);
+		}
+		return t;
+	};
+
+	var isRoot = function(f, t, tmin, tmax) {
+		if(tmin !== undefined)
+			if(t < tmin)
+				return false;
+		if(tmax !== undefined)
+			if(t > tmax)
+				return false;
+		return Math.abs(f(t)) < 0.001;
+	};
+
+	var result = new Object;
+
+	var functionToSolveFirstBezier = function(t) {
+		return bezierCurveAndCircleIntersectionFunction(firstBezier, new Vector2D(centreX, centreY), radius, t);
+	}
+
+	var functionToSolveSecondBezier = function(t) {
+		return bezierCurveAndCircleIntersectionFunction(secondBezier, new Vector2D(centreX, centreY), radius, t);
+	}
+
+	var t0 = newtonRaphsonSolve(functionToSolveFirstBezier, 0);
+	var t1 = newtonRaphsonSolve(functionToSolveFirstBezier, 1);
+	var t2 = newtonRaphsonSolve(functionToSolveSecondBezier, 0);
+	var t3 = newtonRaphsonSolve(functionToSolveSecondBezier, 1);
+
+	var t0isRoot = isRoot(functionToSolveFirstBezier, t0, undefined, 1);
+	var t1isRoot = isRoot(functionToSolveFirstBezier, t1, 0, 1);
+	var t2isRoot = isRoot(functionToSolveSecondBezier, t2, 0, 1);
+	var t3isRoot = isRoot(functionToSolveSecondBezier, t3, 0, undefined);
+
+	if(t0isRoot && t1isRoot && Math.abs(t0 - t1) < 0.01)	// delete duplicated roots
+		t0isRoot = false;
+	if(t2isRoot && t3isRoot && Math.abs(t2 - t3) < 0.01)
+		t2isRoot = false;
+
+	var bezierT0 = calculateBezier(firstBezier, t0);
+	var bezierT1 = calculateBezier(firstBezier, t1);
+	var bezierT2 = calculateBezier(secondBezier, t2);
+	var bezierT3 = calculateBezier(secondBezier, t3);
+
+	var angleForT0 = Math.atan2(bezierT0.y - centreY, bezierT0.x - centreX);
+	var angleForT1 = Math.atan2(bezierT1.y - centreY, bezierT1.x - centreX);
+	var angleForT2 = Math.atan2(bezierT2.y - centreY, bezierT2.x - centreX);
+	var angleForT3 = Math.atan2(bezierT3.y - centreY, bezierT3.x - centreX);
+
+	result.stopAngle = 0;
+	result.restartAngle = 0;
+	if(t0isRoot && t1isRoot) {
+		result.stopAngle = angleForT1;
+		result.restartAngle = angleForT0;
+	} else if (t2isRoot && t3isRoot) {
+		result.stopAngle = angleForT3;
+		result.restartAngle = angleForT2;
+	} else if(   (t0isRoot || t1isRoot)  &&  (t2isRoot || t3isRoot)  ) {
+		result.stopAngle = t2isRoot ? angleForT2 : angleForT3;
+		result.restartAngle = t0isRoot ? angleForT0 : angleForT1;
+	}
+	return result;
+};
+
 /**
  * Draws doodle or performs a hit test if a Point parameter is passed
  *
@@ -27965,28 +28614,49 @@ ED.CornealThinningCrossSection.prototype.draw = function(_point) {
 		ctx.stroke();
 		
 		if (this.perforation) {
-			// draw white line alongside cornea to hide any curve within the AC
-			ctx.beginPath();
-			var xDif = 14; // shift line along x axis to cover area adjacent to cornea: half line width + line width of cornea outline
+			var firstBezier = new Object;
+			firstBezier.SP = new ED.Point(0, 380 - this.originY);
+			var secondBezier = new Object;
+
 			switch (cornea.shape) {
 				case "Normal":
-					ctx.bezierCurveTo(-80+xDif, 260-this.originY, -220+xDif, 180-this.originY, -220+xDif, 0-this.originY);
-					ctx.bezierCurveTo(-220+xDif, -180-this.originY, -80+xDif, -260-this.originY, 0+xDif, -380-this.originY);
+					firstBezier.CP1 = new ED.Point(-80, 260-this.originY);
+					firstBezier.CP2 = new ED.Point(-220, 180-this.originY);
+					firstBezier.EP = new ED.Point(-220, 0-this.originY);
+					secondBezier.SP = firstBezier.EP;
+					secondBezier.CP1 = new ED.Point(-220, -180-this.originY);
+					secondBezier.CP2 = new ED.Point(-80, -260-this.originY);
+					secondBezier.EP = new ED.Point(0, -380-this.originY);
 					break;
 				
 				case "Keratoconus":
-					ctx.bezierCurveTo(-80+xDif, 260-this.originY, cornea.apexX + cornealThickness+xDif, cornea.apexY + 120-this.originY, cornea.apexX + cornealThickness+xDif, cornea.apexY-this.originY);
-					ctx.bezierCurveTo(cornea.apexX + cornealThickness+xDif, cornea.apexY - 120-this.originY, -80+xDif, -260-this.originY, 0+xDif, -380-this.originY);
+					firstBezier.CP1 = new ED.Point(-80, 260-this.originY);
+					firstBezier.CP2 = new ED.Point(cornea.apexX + cornealThickness, cornea.apexY + 120-this.originY);
+					firstBezier.EP = new ED.Point(cornea.apexX + cornealThickness, cornea.apexY-this.originY);
+					secondBezier.SP = firstBezier.EP;
+					secondBezier.CP1 = new ED.Point(cornea.apexX + cornealThickness, cornea.apexY - 120-this.originY);
+					secondBezier.CP2 = new ED.Point(-80, -260-this.originY);
+					secondBezier.EP = new ED.Point(0, -380-this.originY);
 					break;
 					
 				case "Keratoglobus":
-					ctx.bezierCurveTo(-80+xDif, 260-this.originY, -260+xDif, 220-this.originY, -280+xDif, 100-this.originY);
-					ctx.bezierCurveTo(-280+xDif, -140-this.originY, -120+xDif, -200-this.originY, 0+xDif, -380-this.originY);
+					firstBezier.CP1 = new ED.Point(-80, 260-this.originY);
+					firstBezier.CP2 = new ED.Point(-260, 220-this.originY);
+					firstBezier.EP = new ED.Point(-280, 100-this.originY);
+					secondBezier.SP = firstBezier.EP;
+					secondBezier.CP1 = new ED.Point(-280, -140-this.originY);
+					secondBezier.CP2 = new ED.Point(-120, -200-this.originY);
+					secondBezier.EP = new ED.Point(0, -380-this.originY);
 					break;
 			}
-			
-			ctx.strokeStyle = "white";
-			ctx.lineWidth = 20;
+
+			var stopAndRestartAngles = calculateStopAndRestartAngles(firstBezier, secondBezier, x, y, r);
+
+			ctx.beginPath();
+			ctx.arc(x, y, r + 2, stopAndRestartAngles.stopAngle, stopAndRestartAngles.restartAngle);
+			ctx.fillStyle = backgroundFillColour;
+			ctx.strokeStyle = backgroundFillColour;
+			ctx.fill();
 			ctx.stroke();
 		}
 	}
