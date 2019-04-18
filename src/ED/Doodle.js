@@ -1146,7 +1146,7 @@ ED.Doodle.prototype.parameterElement = function(_parameter, showLabel) {
 			for (var i in this.parameterValidationArray[_parameter].list) {
 				var option = document.createElement('option');
 				option.innerText = this.parameterValidationArray[_parameter].list[i];
-				//if (option.innerText == this[_parameter]) option.selected = true;
+				if (option.innerText == this[_parameter]) option.selected = true;
 				element.appendChild(option);
 			}
 			break;
