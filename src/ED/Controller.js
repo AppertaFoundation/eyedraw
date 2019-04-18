@@ -176,6 +176,7 @@ ED.Controller = (function() {
 			//'doodleSelected',
 			//'mousedragged',
 			'mouseup',
+			'mouseout',
 			'drawingZoom',
 			'parameterChanged'
 		]);
