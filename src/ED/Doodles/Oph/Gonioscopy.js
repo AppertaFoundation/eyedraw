@@ -39,11 +39,38 @@ ED.Gonioscopy = function(_drawing, _parameterJSON) {
 
     this.mode = "Basic";
 
+	// Parameters in doodle control bar (parameter name: parameter label)
+	this.controlParameterArray = {
+		'pigmentation':'Meshwork Pigmentation',
+	};
+
+	this.PigmentationVeryLight	= 'Very light';
+	this.PigmentationLight		= 'Light';
+	this.PigmentationModerate	= 'Moderate';
+	this.PigmentationHeavy		= 'Heavy';
+	this.PigmentationVeryHeavy	= 'Very heavy';
+
 	// Saved parameters
 	this.savedParameterArray = ['apexX', 'apexY', 'mode'];
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
+
+
+	// inter-
+	// vallum				suggested
+	// begin	name		value
+	// --------------------------------
+	// [-500	Very Light	-500	)
+	// [-460	Light		-460	)
+	// [-440	Moderate	-430	)
+	// [-420	Heavy		-420	)
+	// [-390	Very Heavy	-390  -380)
+	if (this.apexY < -460) this.pigmentation = this.PigmentationVeryLight;
+	else if (this.apexY < -440) this.pigmentation = this.PigmentationLight;
+	else if (this.apexY < -420) this.pigmentation = this.PigmentationModerate;
+	else if (this.apexY < -390) this.pigmentation = this.PigmentationHeavy;
+	else this.pigmentation = this.PigmentationVeryHeavy;
 }
 
 /**
@@ -52,13 +79,6 @@ ED.Gonioscopy = function(_drawing, _parameterJSON) {
 ED.Gonioscopy.prototype = new ED.Doodle;
 ED.Gonioscopy.prototype.constructor = ED.Gonioscopy;
 ED.Gonioscopy.superclass = ED.Doodle.prototype;
-
-/**
- * Sets handle attributes
- */
-ED.Gonioscopy.prototype.setHandles = function() {
-	this.handleArray[4] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
-}
 
 /**
  * Set default properties
@@ -72,7 +92,7 @@ ED.Gonioscopy.prototype.setPropertyDefaults = function() {
 
 	// Update component of validation array for simple parameters
 	this.parameterValidationArray['apexX']['range'].setMinAndMax(-460, -420);
-	this.parameterValidationArray['apexY']['range'].setMinAndMax(-460, -400);
+	this.parameterValidationArray['apexY']['range'].setMinAndMax(-500, -380);
 
     this.parameterValidationArray['mode'] = {
 	kind: 'derived',
@@ -80,6 +100,20 @@ ED.Gonioscopy.prototype.setPropertyDefaults = function() {
 	list: ['Basic', 'Expert'],
 	animate: false
     };
+
+	// Other parameters
+	this.parameterValidationArray['pigmentation'] = {
+		kind: 'other',
+		type: 'string',
+		list: [
+			this.PigmentationVeryLight,
+			this.PigmentationLight,
+			this.PigmentationModerate,
+			this.PigmentationHeavy,
+			this.PigmentationVeryHeavy,
+		],
+		animate: false
+	};
 }
 
 /**
@@ -89,6 +123,43 @@ ED.Gonioscopy.prototype.setParameterDefaults = function() {
 	this.apexX = -460;
 	this.apexY = -460;
     this.setParameterFromString('mode', 'Basic');
+	this.setParameterFromString('pigmentation', this.PigmentationLight);
+}
+
+/**
+ * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
+ * The returned parameters are animated if their 'animate' property is set to true
+ *
+ * @param {String} _parameter Name of parameter that has changed
+ * @value {Undefined} _value Value of parameter to calculate
+ * @returns {Array} Associative array of values of dependent parameters
+ */
+ED.Gonioscopy.prototype.dependentParameterValues = function(_parameter, _value) {
+	var returnArray = [];
+	switch (_parameter) {
+		case 'pigmentation':
+			returnArray['pigmentation'] = _value;
+			returnArray['apexX'] = -460;
+			switch (_value) {
+				case this.PigmentationVeryLight:
+					returnArray['apexY'] = -500;
+					break;
+				case this.PigmentationLight:
+					returnArray['apexY'] = -460;
+					break;
+				case this.PigmentationModerate:
+					returnArray['apexY'] = -430;
+					break;
+				case this.PigmentationHeavy:
+					returnArray['apexY'] = -420;
+					break;
+				case this.PigmentationVeryHeavy:
+					returnArray['apexY'] = -390;
+					break;
+			}
+			break;
+	}
+	return returnArray;
 }
 
 /**
@@ -134,21 +205,22 @@ ED.Gonioscopy.prototype.draw = function(_point) {
 		// Set line attributes
 		ctx.lineWidth = 1;
 
-		// Fill style
-		var ptrn;
-
-		// Pattern
-		if (this.apexX < -440) {
-			if (this.apexY < -440) ptrn = ctx.createPattern(this.drawing.imageArray['MeshworkPatternLight'], 'repeat');
-			else if (this.apexY < -420) ptrn = ctx.createPattern(this.drawing.imageArray['MeshworkPatternMedium'], 'repeat');
-			else ptrn = ctx.createPattern(this.drawing.imageArray['MeshworkPatternHeavy'], 'repeat');
-			ctx.fillStyle = ptrn;
-		}
-		// Uniform
-		else {
-			if (this.apexY < -440) ctx.fillStyle = "rgba(250, 200, 0, 1)";
-			else if (this.apexY < -420) ctx.fillStyle = "rgba(200, 150, 0, 1)";
-			else ctx.fillStyle = "rgba(150, 100, 0, 1)";
+		switch (this.pigmentation) {
+			case this.PigmentationVeryLight:
+				ctx.fillStyle = "rgba(200, 200, 200, 1)";
+				break;
+			case this.PigmentationLight:
+				ctx.fillStyle = "rgba(250, 200, 0, 1)";
+				break;
+			case this.PigmentationModerate:
+				ctx.fillStyle = "rgba(200, 150, 0, 1)";
+				break;
+			case this.PigmentationHeavy:
+				ctx.fillStyle = "rgba(150, 100, 0, 1)";
+				break;
+			case this.PigmentationVeryHeavy:
+				ctx.fillStyle = "rgba(100, 50, 0, 1)";
+				break;
 		}
 
 		// Stroke style
@@ -219,12 +291,6 @@ ED.Gonioscopy.prototype.draw = function(_point) {
 		ctx.stroke();
 	}
 
-	// Coordinates of handles (in canvas plane)
-	this.handleArray[4].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
-
-	// Draw handles if selected
-	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
-
 	// Return value indicating successful hit test
 	return this.isClicked;
 }
@@ -235,19 +301,5 @@ ED.Gonioscopy.prototype.draw = function(_point) {
  * @returns {String} Description of doodle
  */
 ED.Gonioscopy.prototype.description = function() {
-	var returnValue = "";
-
-	if (this.apexX < -440) {
-		if (this.apexY < -440) returnValue = "Light patchy pigment";
-		else if (this.apexY < -420) returnValue = "Medium patchy pigment";
-		else returnValue = "Heavy patchy pigment";
-	}
-	// Uniform
-	else {
-		if (this.apexY < -440) returnValue = "Light homogenous pigment";
-		else if (this.apexY < -420) returnValue = "Medium homogenous pigment";
-		else returnValue = "Heavy homogenous pigment";
-	}
-
-	return returnValue;
+	return "TM pigmentation: " + this.pigmentation;
 }
