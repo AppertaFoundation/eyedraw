@@ -163,5 +163,5 @@ ED.RoundHole.prototype.snomedCode = function() {
  * @returns {Int} Position in diagnostic hierarchy
  */
 ED.RoundHole.prototype.diagnosticHierarchy = function() {
-	return 3;
+	return 0;
 }

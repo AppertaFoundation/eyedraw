@@ -124,5 +124,5 @@ ED.Fuchs.prototype.snomedCode = function() {
  * @returns {Int} Position in diagnostic hierarchy
  */
 ED.Fuchs.prototype.diagnosticHierarchy = function() {
-	return 2;
+	return 0;
 };

@@ -13012,7 +13012,7 @@ ED.Perforation.prototype.snomedCode = function() {
  * @returns {Int} Position in diagnostic hierarchy
  */
 ED.Perforation.prototype.diagnosticHierarchy = function() {
-	return 3;
+	return 0;
 }
 
 /**
@@ -15589,7 +15589,7 @@ ED.AntPVR.prototype.snomedCode = function() {
  * @returns {Int} Position in diagnostic hierarchy
  */
 ED.AntPVR.prototype.diagnosticHierarchy = function() {
-	return 2;
+	return 0;
 }
 
 /**
@@ -20594,7 +20594,7 @@ ED.CNV.prototype.snomedCode = function() {
  * @returns {Int} Position in diagnostic hierarchy
  */
 ED.CNV.prototype.diagnosticHierarchy = function() {
-	return 2;
+	return 0;
 }
 
 /**
@@ -27021,7 +27021,7 @@ ED.CornealScar.prototype.snomedCode = function() {
  * @returns {Int} Position in diagnostic hierarchy
  */
 ED.CornealScar.prototype.diagnosticHierarchy = function() {
-	return 2;
+	return 0;
 }
 
 /**
@@ -28895,7 +28895,7 @@ ED.CorticalCataract.prototype.snomedCode = function() {
  * @returns {Int} Position in diagnostic hierarchy
  */
 ED.CorticalCataract.prototype.diagnosticHierarchy = function() {
-	return 3;
+	return 0;
 }
 
 /**
@@ -29805,7 +29805,7 @@ ED.CystoidMacularOedema.prototype.snomedCode = function() {
  * @returns {Int} Position in diagnostic hierarchy
  */
 ED.CystoidMacularOedema.prototype.diagnosticHierarchy = function() {
-	return 2;
+	return 0;
 }
 
 /**
@@ -30369,7 +30369,7 @@ ED.Dialysis.prototype.snomedCode = function() {
  * @returns {Int} Position in diagnostic hierarchy
  */
 ED.Dialysis.prototype.diagnosticHierarchy = function() {
-	return 4;
+	return 0;
 }
 
 /**
@@ -32610,7 +32610,7 @@ ED.EpiretinalMembrane.prototype.snomedCode = function() {
  * @returns {Int} Position in diagnostic hierarchy
  */
 ED.EpiretinalMembrane.prototype.diagnosticHierarchy = function() {
-	return 2;
+	return 0;
 }
 
 /**
@@ -33912,7 +33912,7 @@ ED.Fuchs.prototype.snomedCode = function() {
  * @returns {Int} Position in diagnostic hierarchy
  */
 ED.Fuchs.prototype.diagnosticHierarchy = function() {
-	return 2;
+	return 0;
 };
 
 /**
@@ -34209,7 +34209,7 @@ ED.Geographic.prototype.snomedCode = function() {
  * @returns {Int} Position in diagnostic hierarchy
  */
 ED.Geographic.prototype.diagnosticHierarchy = function() {
-	return 2;
+	return 0;
 }
 
 /**
@@ -34699,7 +34699,7 @@ ED.GRT.prototype.snomedCode = function() {
  * @returns {Int} Position in diagnostic hierarchy
  */
 ED.GRT.prototype.diagnosticHierarchy = function() {
-	return 7;
+	return 0;
 }
 
 /**
@@ -39906,7 +39906,7 @@ ED.Lattice.prototype.snomedCode = function()
  */
 ED.Lattice.prototype.diagnosticHierarchy = function()
 {
-    return 2;
+    return 0;
 }
 
 /**
@@ -42017,7 +42017,7 @@ ED.MacularHole.prototype.snomedCode = function() {
  * @returns {Int} Position in diagnostic hierarchy
  */
 ED.MacularHole.prototype.diagnosticHierarchy = function() {
-	return 2;
+	return 0;
 }
 
 /**
@@ -43962,7 +43962,7 @@ ED.NuclearCataract.prototype.snomedCode = function() {
  * @returns {Int} Position in diagnostic hierarchy
  */
 ED.NuclearCataract.prototype.diagnosticHierarchy = function() {
-	return 3;
+	return 0;
 }
 
 /**
@@ -46781,7 +46781,7 @@ ED.PeripheralRRD.prototype.snomedCode = function() {
  * @returns {Int} Position in diagnostic hierarchy
  */
 ED.PeripheralRRD.prototype.diagnosticHierarchy = function() {
-	return 8;
+	return 0;
 }
 
 /**
@@ -49329,7 +49329,7 @@ ED.PostSubcapCataract.prototype.snomedCode = function() {
  * @returns {Int} Position in diagnostic hierarchy
  */
 ED.PostSubcapCataract.prototype.diagnosticHierarchy = function() {
-	return 3;
+	return 0;
 }
 
 /**
@@ -50044,7 +50044,7 @@ ED.Pterygium.prototype.snomedCode = function() {
  * @returns {Int} Position in diagnostic hierarchy
  */
 ED.Pterygium.prototype.diagnosticHierarchy = function() {
-	return 4;
+	return 0;
 }
 
 /**
@@ -51647,7 +51647,7 @@ ED.Retinoschisis.prototype.snomedCode = function()
  */
 ED.Retinoschisis.prototype.diagnosticHierarchy = function()
 {
-    return 6;
+    return 0;
 }
 
 /**
@@ -52436,7 +52436,7 @@ ED.RoundHole.prototype.snomedCode = function() {
  * @returns {Int} Position in diagnostic hierarchy
  */
 ED.RoundHole.prototype.diagnosticHierarchy = function() {
-	return 3;
+	return 0;
 }
 
 /**
@@ -53262,7 +53262,7 @@ ED.RRD.prototype.snomedCode = function() {
  * @returns {Int} Position in diagnostic hierarchy
  */
 ED.RRD.prototype.diagnosticHierarchy = function() {
-	return (this.isMacOff() ? 10 : 9);
+	return 0;
 }
 
 /**
@@ -55274,7 +55274,7 @@ ED.StarFold.prototype.snomedCode = function() {
  * @returns {Int} Position in diagnostic hierarchy
  */
 ED.StarFold.prototype.diagnosticHierarchy = function() {
-	return 2;
+	return 0;
 }
 
 /**
@@ -61370,7 +61370,7 @@ ED.UTear.prototype.snomedCode = function() {
  * @returns {Int} Position in diagnostic hierarchy
  */
 ED.UTear.prototype.diagnosticHierarchy = function() {
-	return 6;
+	return 0;
 }
 
 
