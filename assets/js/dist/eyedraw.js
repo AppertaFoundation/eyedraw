@@ -20041,7 +20041,7 @@ ED.CNV.prototype.description = function() {
  * @returns {Int} SnoMed code of entity representated by doodle
  */
 ED.CNV.prototype.snomedCode = function() {
-	return 314517003;
+	return 75971007;
 }
 
 /**
