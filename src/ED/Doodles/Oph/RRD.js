@@ -200,7 +200,7 @@ ED.RRD.prototype.snomedCode = function() {
  * @returns {Int} Position in diagnostic hierarchy
  */
 ED.RRD.prototype.diagnosticHierarchy = function() {
-	return (this.isMacOff() ? 10 : 9);
+	return 0;
 }
 
 /**

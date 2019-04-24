@@ -208,5 +208,5 @@ ED.Perforation.prototype.snomedCode = function() {
  * @returns {Int} Position in diagnostic hierarchy
  */
 ED.Perforation.prototype.diagnosticHierarchy = function() {
-	return 3;
+	return 0;
 }
