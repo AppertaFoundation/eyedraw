@@ -27,7 +27,7 @@ ED.KeraticPrecipitates = function(_drawing, _parameterJSON) {
 	this.className = "KeraticPrecipitates";
 
 	// Saved parameters
-	this.savedParameterArray = ['apexX', 'apexY', 'scaleX', 'scaleY'];
+	this.savedParameterArray = ['apexX', 'apexY', 'scaleX', 'scaleY', 'originX', 'originY'];
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
