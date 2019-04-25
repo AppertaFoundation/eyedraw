@@ -179,5 +179,5 @@ ED.PeripheralRRD.prototype.snomedCode = function() {
  * @returns {Int} Position in diagnostic hierarchy
  */
 ED.PeripheralRRD.prototype.diagnosticHierarchy = function() {
-	return 8;
+	return 0;
 }

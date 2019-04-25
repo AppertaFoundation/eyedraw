@@ -181,5 +181,5 @@ ED.Lattice.prototype.snomedCode = function()
  */
 ED.Lattice.prototype.diagnosticHierarchy = function()
 {
-    return 2;
+    return 0;
 }

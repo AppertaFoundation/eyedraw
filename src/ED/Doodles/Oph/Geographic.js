@@ -158,5 +158,5 @@ ED.Geographic.prototype.snomedCode = function() {
  * @returns {Int} Position in diagnostic hierarchy
  */
 ED.Geographic.prototype.diagnosticHierarchy = function() {
-	return 2;
+	return 0;
 }

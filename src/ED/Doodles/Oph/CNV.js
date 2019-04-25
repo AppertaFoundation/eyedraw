@@ -185,5 +185,5 @@ ED.CNV.prototype.snomedCode = function() {
  * @returns {Int} Position in diagnostic hierarchy
  */
 ED.CNV.prototype.diagnosticHierarchy = function() {
-	return 2;
+	return 0;
 }
