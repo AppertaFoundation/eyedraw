@@ -17531,6 +17531,160 @@ ED.BandKeratophy.prototype.setHandles = function() {
     //this.handleArray[0].isRotatable = true;
 };
 
+ED.BandKeratophy.prototype.updateHandleCoordinateRanges = function() {
+    var shapeControlPoints = {};
+    shapeControlPoints.controlPointOuterTopLeft = new Vector2D(this.squiggleArray[0].pointsArray[2].x, this.squiggleArray[0].pointsArray[2].y);
+    shapeControlPoints.controlPointInnerTopLeft = new Vector2D(this.squiggleArray[0].pointsArray[4].x, this.squiggleArray[0].pointsArray[4].y);
+    shapeControlPoints.controlPointInnerTopRight = new Vector2D(this.squiggleArray[0].pointsArray[5].x, this.squiggleArray[0].pointsArray[5].y);
+    shapeControlPoints.controlPointOuterTopRight = new Vector2D(this.squiggleArray[0].pointsArray[3].x, this.squiggleArray[0].pointsArray[3].y);
+    shapeControlPoints.controlPointOuterBottomRight = new Vector2D(this.squiggleArray[0].pointsArray[0].x, this.squiggleArray[0].pointsArray[0].y);
+    shapeControlPoints.controlPointInnerBottomRight = new Vector2D(this.squiggleArray[0].pointsArray[7].x, this.squiggleArray[0].pointsArray[7].y);
+    shapeControlPoints.controlPointInnerBottomLeft = new Vector2D(this.squiggleArray[0].pointsArray[6].x, this.squiggleArray[0].pointsArray[6].y);
+    shapeControlPoints.controlPointOuterBottomLeft = new Vector2D(this.squiggleArray[0].pointsArray[1].x, this.squiggleArray[0].pointsArray[1].y);
+    shapeControlPoints.controlPointInnerTopCenter = new Vector2D(this.squiggleArray[0].pointsArray[8].x, this.squiggleArray[0].pointsArray[8].y);
+    shapeControlPoints.controlPointInnerBottomCenter = new Vector2D(this.squiggleArray[0].pointsArray[9].x, this.squiggleArray[0].pointsArray[9].y);
+
+    this.handleCoordinateRangeArray = [];
+    this.handleVectorRangeArray = [];
+
+    /** Outer  handlers **/
+
+    // let's set default entries because of handleVectorRangeArray
+    for (var hcr = 0; hcr < this.numberOfOuterHandles; hcr++) {
+        this.handleCoordinateRangeArray[hcr] = {
+            x: new ED.Range(-400, +400),
+            y: new ED.Range(-400, +400)
+        };
+    }
+
+    var bottomRightIndex = 0;
+    var bottomLeftIndex = 1;
+    var topLeftIndex = 2;
+    var topRightIndex = 3;
+    var epsilonAngle = 3 / 180 * Math.PI;
+    var gapAngle = 15 / 180 * Math.PI;
+    var minMax = [
+        {min: this.squiggleArray[0].pointsArray[topRightIndex].direction() + gapAngle, max: Math.PI - epsilonAngle},
+        {min: Math.PI + epsilonAngle, max: this.squiggleArray[0].pointsArray[topLeftIndex].direction() - gapAngle},
+        {min: this.squiggleArray[0].pointsArray[bottomLeftIndex].direction() + gapAngle, max: 2 * Math.PI - epsilonAngle},
+        {min: 2 * Math.PI + epsilonAngle, max: this.squiggleArray[0].pointsArray[bottomRightIndex].direction() - gapAngle },
+    ];
+
+    // Create ranges to constrain handles
+    for (var i = 0; i < this.numberOfOuterHandles; i++) {
+        // Create a range object for each handle
+        var range = {};
+        range.length = new ED.Range(+390, +390);
+        range.angle = new ED.Range(minMax[i].min, minMax[i].max);
+        this.handleVectorRangeArray[i] = range;
+    }
+
+
+    /** Inner  handlers **/
+
+    for (var ii = 0; ii < this.numberOfInnerHandles; ii++) {
+        this.handleVectorRangeArray.push({
+            'length' : new ED.Range(0, +390),
+            'angle' : new ED.Range(0, 2 * Math.PI)
+        });
+    }
+
+    var topCatmullRomSpline = this.createCatmullRomSpline([
+        shapeControlPoints.controlPointOuterTopRight,
+        shapeControlPoints.controlPointInnerTopRight,
+        shapeControlPoints.controlPointInnerTopCenter,
+        shapeControlPoints.controlPointInnerTopLeft,
+        shapeControlPoints.controlPointOuterTopLeft,
+    ]);
+
+    var bottomCatmullRomSpline = this.createCatmullRomSpline([
+        shapeControlPoints.controlPointOuterBottomLeft,
+        shapeControlPoints.controlPointInnerBottomLeft,
+        shapeControlPoints.controlPointInnerBottomCenter,
+        shapeControlPoints.controlPointInnerBottomRight,
+        shapeControlPoints.controlPointOuterBottomRight,
+    ]);
+
+    var searchMinimaOrMaximaOfSpline = function(spline, x, searchForMinima) {
+        var searchFunction = searchForMinima ? Math.min : Math.max;
+        var minimaOrMaxima = searchForMinima ? 500 : -500;
+        var steps = 1000;
+        var max_diff = 3;
+        var dt = 1 / steps;
+        for(var t = 0; t <= 1; t += dt) {
+            var r = spline(t);
+            if(Math.abs(r.x - x) < max_diff) {
+                minimaOrMaxima = searchFunction(minimaOrMaxima, r.y);
+            }
+        }
+        return minimaOrMaxima;
+    }
+
+    var space = 60;
+
+    //left top
+    this.handleCoordinateRangeArray[4] = {
+        x: new ED.Range(-300, -100),
+        y: new ED.Range(-390, searchMinimaOrMaximaOfSpline(bottomCatmullRomSpline,
+            shapeControlPoints.controlPointInnerTopLeft.x, true) - space)
+    };
+
+    //top right
+    this.handleCoordinateRangeArray[5] = {
+        x: new ED.Range(100, 300),
+        y: new ED.Range(-390, searchMinimaOrMaximaOfSpline(bottomCatmullRomSpline,
+            shapeControlPoints.controlPointInnerTopRight.x, true) - space)
+    };
+
+    //bottom left
+    this.handleCoordinateRangeArray[6] = {
+        x: new ED.Range(-300, -100),
+        y: new ED.Range(searchMinimaOrMaximaOfSpline(topCatmullRomSpline,
+            shapeControlPoints.controlPointInnerBottomLeft.x, false) + space,
+            390)
+    };
+
+    //bottom right
+    this.handleCoordinateRangeArray[7] = {
+        x: new ED.Range(100, 300),
+        y: new ED.Range(searchMinimaOrMaximaOfSpline(topCatmullRomSpline,
+            shapeControlPoints.controlPointInnerBottomRight.x, false) + space,
+            390)
+    };
+
+    //top center
+    this.handleCoordinateRangeArray[8] = {
+        x: new ED.Range(-100, +100),
+        y: new ED.Range(-390, searchMinimaOrMaximaOfSpline(bottomCatmullRomSpline,
+            shapeControlPoints.controlPointInnerTopCenter.x, true) - space)
+    };
+
+    //bottom center
+    this.handleCoordinateRangeArray[9] = {
+        x: new ED.Range(-100, +100),
+        y: new ED.Range(searchMinimaOrMaximaOfSpline(topCatmullRomSpline,
+            shapeControlPoints.controlPointInnerBottomCenter.x, false) + space,
+            390)
+    };
+}
+
+ED.BandKeratophy.prototype.updateHandlePositions = function (){
+    for(var index = 0; index < this.squiggleArray[0].pointsArray.length; ++index) {
+        var newPosition = new ED.Point(
+            this.handleCoordinateRangeArray[index]['x'].constrain(this.squiggleArray[0].pointsArray[index].x),
+            this.handleCoordinateRangeArray[index]['y'].constrain(this.squiggleArray[0].pointsArray[index].y)
+        );
+        var length = this.handleVectorRangeArray[index]['length'].constrain(newPosition.length());
+        var angle = this.handleVectorRangeArray[index]['angle'].constrainToAngularRange(newPosition.direction(), false);
+        newPosition.setWithPolars(length, angle);
+
+        // Set new position for handle
+        this.squiggleArray[0].pointsArray[index].x = newPosition.x;
+        this.squiggleArray[0].pointsArray[index].y = newPosition.y;
+    }
+};
+
+
 /**
  * Sets default properties
  */
@@ -17544,82 +17698,6 @@ ED.BandKeratophy.prototype.setPropertyDefaults = function() {
         kind: 'derived',
         type: 'string',
         list: ['+', '++', '+++', '++++']
-    };
-
-    /** Outer (circualar?) handlers **/
-    var cir = (2 * Math.PI) / this.numberOfOuterHandles;
-    var minMax = [
-        {min: cir    , max: cir * 2},
-        {min: cir * 2, max: cir * 3},
-        {min: cir * 3, max: cir * 4},
-        {min: cir * 4, max: cir    },
-    ];
-
-    // Create ranges to constrain handles
-    this.handleVectorRangeArray = [];
-    for (var i = 0; i < this.numberOfOuterHandles; i++) {
-        // Create a range object for each handle
-        var range = {};
-        range.length = new ED.Range(+390, +390);
-        var epsilonAngle = 3 / 180 * Math.PI;
-        range.angle = new ED.Range(minMax[i].min + epsilonAngle, minMax[i].max - epsilonAngle);
-        this.handleVectorRangeArray[i] = range;
-    }
-
-    //create handleVectorRangeArray entry for all the inner handlers
-    //this should not be necessary but it gives error if it isn't set
-    // probably it should be in sync with this.handleArray
-    for (var ii = 0; ii < this.numberOfInnerHandles; ii++) {
-        this.handleVectorRangeArray.push({
-            'length' : new ED.Range(0, +390),
-            'angle' : new ED.Range(0, 2 * Math.PI)
-        });
-    }
-
-    /** Inner handlers **/
-    this.handleCoordinateRangeArray = [];
-    // let's set default entries because of handleVectorRangeArray
-    for (var hcr = 0; hcr < this.numberOfOuterHandles; hcr++) {
-        this.handleCoordinateRangeArray[hcr] = {
-            x: new ED.Range(-400, +400),
-            y: new ED.Range(-400, +400)
-        };
-    }
-
-    //left top
-    this.handleCoordinateRangeArray[4] = {
-        x: new ED.Range(-300, -100),
-        y: new ED.Range(-390, -30)
-    };
-
-    //top right
-    this.handleCoordinateRangeArray[5] = {
-        x: new ED.Range(100, 300),
-        y: new ED.Range(-390, -30)
-    };
-
-    //bottom left
-    this.handleCoordinateRangeArray[6] = {
-        x: new ED.Range(-300, -100),
-        y: new ED.Range(+30, 390)
-    };
-
-    //bottom right
-    this.handleCoordinateRangeArray[7] = {
-        x: new ED.Range(100, 300),
-        y: new ED.Range(+30, 390)
-    };
-
-    //top center
-    this.handleCoordinateRangeArray[8] = {
-        x: new ED.Range(-100, +100),
-        y: new ED.Range(-390, -30)
-    };
-
-    //bottom center
-    this.handleCoordinateRangeArray[9] = {
-        x: new ED.Range(-100, +100),
-        y: new ED.Range(+30, 390)
     };
 };
 
@@ -17801,6 +17879,9 @@ ED.BandKeratophy.prototype.drawShape = function(ctx, center, radius, shapeContro
 };
 
 ED.BandKeratophy.prototype.draw = function(_point) {
+    this.updateHandleCoordinateRanges();
+    this.updateHandlePositions();
+
     // Get context
     var ctx = this.drawing.context;
 
