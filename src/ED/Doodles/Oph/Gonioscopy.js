@@ -121,9 +121,9 @@ ED.Gonioscopy.prototype.setPropertyDefaults = function() {
  */
 ED.Gonioscopy.prototype.setParameterDefaults = function() {
 	this.apexX = -460;
-	this.apexY = -460;
+	this.apexY = -430;
     this.setParameterFromString('mode', 'Basic');
-	this.setParameterFromString('pigmentation', this.PigmentationLight);
+	this.setParameterFromString('pigmentation', this.PigmentationModerate);
 }
 
 /**
