@@ -47,7 +47,7 @@ class DoodleInfo
         'ArcuateKeratotomy' => 'Arcuate keratotomy',
         'ArcuateScotoma' => 'Arcuate scotoma',
         'Arrow' => 'Arrow',
-        'BandKeratophy' => 'Band Keratophy',
+        'BandKeratopathy' => 'Band Keratopathy',
         'BiopsySite' => 'Biopsy site',
         'Bleb' => 'Trabeculectomy bleb',
         'BlotHaemorrhage' => 'Blot haemorrhage',
