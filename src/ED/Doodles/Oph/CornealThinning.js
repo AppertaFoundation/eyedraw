@@ -54,7 +54,8 @@ ED.CornealThinning = function(_drawing, _parameterJSON) {
 	this.csOriginX = 0;
 	
 	// Saved parameters
-	this.savedParameterArray = ['originX', 'originY', 'rotation', 'height', 'width','h','w','minY','maxY','type','depth','descemetacoele','perforation','csApexX','csApexY','csOriginX'];
+	this.savedParameterArray = ['originX', 'originY', 'rotation', 'height', 'width', 'h', 'w', 'minY', 'maxY', 'type',
+		'descemetacoele', 'perforation', 'csApexX', 'csApexY', 'csOriginX'];
 	
 	// Parameters in doodle control bar
 	this.controlParameterArray = {'type':'Type'};
