@@ -22730,7 +22730,7 @@ ED.CornealGraft = function(_drawing, _parameterJSON) {
 	this.interruptedSutures = 0;
 	this.existingSutures = 0;
 	
-	this.csOriginX = 0;
+	this.csOriginX = 50;
 	
 	// Other parameters
 	this.d = 100;
@@ -22900,8 +22900,8 @@ ED.CornealGraft.prototype.dependentParameterValues = function(_parameter, _value
 			returnArray['diameter'] = -2 * _value/this.pixelsPerMillimetre;
 			
 			// update range for x and y accordingly
-			var y = Math.sqrt((this.antsegRadius+this.antsegRadius+_value)*(this.antsegRadius+this.antsegRadius+_value) - this.originY*this.originY); 
-			var x = Math.sqrt((this.antsegRadius+this.antsegRadius+_value)*(this.antsegRadius+this.antsegRadius+_value) - this.originX*this.originX); 
+			var y = Math.sqrt((this.antsegRadius+this.antsegRadius+_value)*(this.antsegRadius+this.antsegRadius+_value) - this.originX*this.originX);
+			var x = Math.sqrt((this.antsegRadius+this.antsegRadius+_value)*(this.antsegRadius+this.antsegRadius+_value) - this.originY*this.originY);
 
 			this.parameterValidationArray['originY']['range'].setMinAndMax(-y,+y);
 			this.parameterValidationArray['originX']['range'].setMinAndMax(-x,+x);
@@ -22933,7 +22933,7 @@ ED.CornealGraft.prototype.dependentParameterValues = function(_parameter, _value
 			
 			// If being synced, make sensible decision about y
 			if (!this.drawing.isActive) {
-				var newY = this.parameterValidationArray['originY']['range'].max;
+				var newY = this.originY;
 			}
 			else {
 				var newY = this.parameterValidationArray['originY'] ['range'].constrain(this.originY);
@@ -23009,8 +23009,8 @@ ED.CornealGraft.prototype.dependentParameterValues = function(_parameter, _value
 			returnArray['apexY'] = newApexY;
 			
 			// update origin range
-			var y = Math.sqrt((this.antsegRadius+this.antsegRadius+newApexY)*(this.antsegRadius+this.antsegRadius+newApexY) - this.originY*this.originY); 
-			var x = Math.sqrt((this.antsegRadius+this.antsegRadius+newApexY)*(this.antsegRadius+this.antsegRadius+newApexY) - this.originX*this.originX); 
+			var y = Math.sqrt((this.antsegRadius+this.antsegRadius+newApexY)*(this.antsegRadius+this.antsegRadius+newApexY) - this.originX*this.originX);
+			var x = Math.sqrt((this.antsegRadius+this.antsegRadius+newApexY)*(this.antsegRadius+this.antsegRadius+newApexY) - this.originY*this.originY);
 
 			this.parameterValidationArray['originY']['range'].setMinAndMax(-y,+y);
 			this.parameterValidationArray['originX']['range'].setMinAndMax(-x,+x);
@@ -27455,10 +27455,11 @@ ED.CornealThinning = function(_drawing, _parameterJSON) {
 	// side view params
 	this.csApexX = 0;
 	this.csApexY = 0;
-	this.csOriginX = 0;
+	this.csOriginX = 50;
 	
 	// Saved parameters
-	this.savedParameterArray = ['originX', 'originY', 'rotation', 'height', 'width','h','w','minY','maxY','type','depth','descemetacoele','perforation','csApexX','csApexY','csOriginX'];
+	this.savedParameterArray = ['originX', 'originY', 'rotation', 'height', 'width', 'h', 'w', 'minY', 'maxY', 'type',
+		'descemetacoele', 'perforation', 'csApexX', 'csApexY', 'csOriginX'];
 	
 	// Parameters in doodle control bar
 	this.controlParameterArray = {'type':'Type'};
