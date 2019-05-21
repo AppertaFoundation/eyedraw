@@ -31409,7 +31409,7 @@ ED.EndothelialKeratoplasty = function(_drawing, _parameterJSON) {
 	this.typeSimple = 1;
 	
 	// cross section parameters
-	this.csOriginX = 0;
+	this.csOriginX = 50;
 
 	// Saved parameters
 	this.savedParameterArray = ['originX', 'originY', 'apexY', 'type','typeSimple','csOriginX'];
@@ -31508,8 +31508,8 @@ ED.EndothelialKeratoplasty.prototype.dependentParameterValues = function(_parame
 			returnArray['diameter'] = -2 * _value/this.pixelsPerMillimetre;
 			
 			// update range for x and y accordingly
-			var y = Math.sqrt((this.antsegRadius+this.antsegRadius+_value)*(this.antsegRadius+this.antsegRadius+_value) - this.originY*this.originY); 
-			var x = Math.sqrt((this.antsegRadius+this.antsegRadius+_value)*(this.antsegRadius+this.antsegRadius+_value) - this.originX*this.originX); 
+			var y = Math.sqrt((this.antsegRadius+this.antsegRadius+_value)*(this.antsegRadius+this.antsegRadius+_value) - this.originX*this.originX);
+			var x = Math.sqrt((this.antsegRadius+this.antsegRadius+_value)*(this.antsegRadius+this.antsegRadius+_value) - this.originY*this.originY);
 
 			this.parameterValidationArray['originY']['range'].setMinAndMax(-y,+y);
 			this.parameterValidationArray['originX']['range'].setMinAndMax(-x,+x);
@@ -31541,7 +31541,7 @@ ED.EndothelialKeratoplasty.prototype.dependentParameterValues = function(_parame
 			
 			// If being synced, make sensible decision about y
 			if (!this.drawing.isActive) {
-				var newY = this.parameterValidationArray['originY']['range'].max;
+				var newY = this.originY;
 			}
 			else {
 				var newY = this.parameterValidationArray['originY'] ['range'].constrain(this.originY);
@@ -31589,8 +31589,8 @@ ED.EndothelialKeratoplasty.prototype.dependentParameterValues = function(_parame
 			returnArray['apexY'] = newApexY;
 			
 			// update origin range
-			var y = Math.sqrt((this.antsegRadius+this.antsegRadius+newApexY)*(this.antsegRadius+this.antsegRadius+newApexY) - this.originY*this.originY); 
-			var x = Math.sqrt((this.antsegRadius+this.antsegRadius+newApexY)*(this.antsegRadius+this.antsegRadius+newApexY) - this.originX*this.originX); 
+			var y = Math.sqrt((this.antsegRadius+this.antsegRadius+newApexY)*(this.antsegRadius+this.antsegRadius+newApexY) - this.originX*this.originX);
+			var x = Math.sqrt((this.antsegRadius+this.antsegRadius+newApexY)*(this.antsegRadius+this.antsegRadius+newApexY) - this.originY*this.originY);
 
 			this.parameterValidationArray['originY']['range'].setMinAndMax(-y,+y);
 			this.parameterValidationArray['originX']['range'].setMinAndMax(-x,+x);
@@ -31714,7 +31714,6 @@ ED.EndothelialKeratoplastyCrossSection = function(_drawing, _parameterJSON) {
 	this.diameter = 9;
 	
 	// Other parameters
-	this.d = 100;
 	this.typeSimple = 1; // inherited from en face view
 							// 1: DSEK, 2: DMEAK
 	this.handle1Y = -4.5 * this.pixelsPerMillimetre;
@@ -31725,7 +31724,7 @@ ED.EndothelialKeratoplastyCrossSection = function(_drawing, _parameterJSON) {
 	this.handle3X = -60;
 	
 	// Saved parameters
-	this.savedParameterArray = ['originX', 'originY', 'apexY','d','diameter','typeSimple'];
+	this.savedParameterArray = ['originX', 'originY', 'apexY','diameter','typeSimple'];
 	
 	// Parameters in doodle control bar
 	this.controlParameterArray = {};
@@ -31735,7 +31734,7 @@ ED.EndothelialKeratoplastyCrossSection = function(_drawing, _parameterJSON) {
 	
 	this.linkedDoodleParameters = {
         'EndothelialKeratoplasty': {
-            source: ['originY','apexY','d','diameter','typeSimple'],
+            source: ['originY','apexY','diameter','typeSimple'],
             store: [['originX','csOriginX']]
         }
     };
@@ -31853,8 +31852,8 @@ ED.EndothelialKeratoplastyCrossSection.prototype.dependentParameterValues = func
 				
 				var sup = this.getXLimitOnCornea(_value);
 				var inf = this.getXLimitOnCornea(-_value);
-				this.squiggleArray[0].pointsArray[0].y = new ED.Point(sup,_value);
-				this.squiggleArray[0].pointsArray[2].y = new ED.Point(inf,-_value);
+				this.squiggleArray[0].pointsArray[0] = new ED.Point(sup,_value);
+				this.squiggleArray[0].pointsArray[2] = new ED.Point(inf,-_value);
 				
 				// update handle range
 /*
@@ -31882,15 +31881,6 @@ ED.EndothelialKeratoplastyCrossSection.prototype.dependentParameterValues = func
 
 		case 'diameter':
 			returnArray['apexY'] = -_value * this.pixelsPerMillimetre/2;
-			break;
-		
-		case 'd':
-			returnArray['d'] = parseInt(_value);
-			
-			// update handle range boundaries
-			
-			// update handle positions
-			
 			break;
 		
 		case 'typeSimple':
