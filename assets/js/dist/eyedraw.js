@@ -22730,7 +22730,7 @@ ED.CornealGraft = function(_drawing, _parameterJSON) {
 	this.interruptedSutures = 0;
 	this.existingSutures = 0;
 	
-	this.csOriginX = 0;
+	this.csOriginX = 50;
 	
 	// Other parameters
 	this.d = 100;
