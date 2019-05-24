@@ -55,6 +55,15 @@ ED.CornealGraft = function(_drawing, _parameterJSON) {
 	// Parameters in doodle control bar (parameter name: parameter label)
 	this.controlParameterArray = {'depth':'Depth (%)','interruptedSutures':'Interrupted sutures' /* 'type':'Type', */ /* 'showSutures':'Show Sutures', 'sutureType':'Suture type', 'numberOfSutures':'Sutures',  *//* 'opaque':'Opaque' */};
 
+	var individualSutures = _drawing.allDoodlesOfClass("CornealSuture");
+	for (var i = 0; i < individualSutures.length; i++) {
+		var individualSuture = individualSutures[i];
+		if (!individualSuture.cornealGraft) {
+			individualSuture.cornealGraft = this;
+			individualSuture.setParametersFromCornealGraft();
+		}
+	}
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
@@ -351,30 +360,32 @@ ED.CornealGraft.prototype.dependentParameterValues = function(_parameter, _value
 		
 		case 'interruptedSutures':
 			// use parameter to add /remove sutures from drawing.
-			var currentNumber = this.getSutures();
-			var difference = _value - currentNumber;
-			if (difference>0) {
-				for (var i=0; i<difference; i++) {
-					this.drawing.addDoodle('CornealSuture');
+			if (this.drawing.isActive) {
+				var currentNumber = this.getSutures();
+				var difference = _value - currentNumber;
+				if (difference>0) {
+					for (var i=0; i<difference; i++) {
+						this.drawing.addDoodle('CornealSuture');
+					}
 				}
-			}
-			else if (difference<0) {
-				difference = Math.abs(difference);
-				for (var i=0; i<difference; i++) {
-					var suture = this.drawing.lastDoodleOfClass('CornealSuture');
-					this.drawing.deleteDoodle(suture);
-				
+				else if (difference<0) {
+					difference = Math.abs(difference);
+					for (var i=0; i<difference; i++) {
+						var suture = this.drawing.lastDoodleOfClass('CornealSuture');
+						this.drawing.deleteDoodle(suture);
+
+					}
 				}
-			}
-			
-			// adjust angle between sutures so equidistant
-			var sutures = this.drawing.allDoodlesOfClass('CornealSuture');
-			var theta = (2*Math.PI)/_value;
-			for (var j=0; j<sutures.length;j++) {
-				sutures[j].setSimpleParameter('rotation',theta*j);
+
+				// adjust angle between sutures so equidistant
+				var sutures = this.drawing.allDoodlesOfClass('CornealSuture');
+				var theta = (2*Math.PI)/_value;
+				for (var j=0; j<sutures.length;j++) {
+					sutures[j].setSimpleParameter('rotation',theta*j);
+				}
 			}
 			break;
-			
+
 	}
 
 	return returnArray;
@@ -519,7 +530,7 @@ ED.CornealGraft.prototype.getSutures = function() {
 	var counter = 0;
 	
 	for (var i=0;i<sutures.length;i++) {
-		if (sutures[i].cornealGraft && !sutures[i].removed) counter++; // won't count sutures not associated with graft / "removed" sutures
+		if (sutures[i].cornealGraft === this && !sutures[i].removed) counter++; // won't count sutures not associated with graft / "removed" sutures
 	}
 	
 	return counter;

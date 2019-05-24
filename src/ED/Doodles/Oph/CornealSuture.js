@@ -30,10 +30,12 @@ ED.CornealSuture = function(_drawing, _parameterJSON) {
 	this.removed = false;
 	
 	// Other parameters
-	this.cornealGraft = null; // graft a property of doodle so can have multiple graft-suture pairs in one drawing
+	var cornealGraft = _drawing.firstDoodleOfClass("CornealGraft");
+	this.cornealGraft = cornealGraft ? cornealGraft : null;
+	this.setParametersFromCornealGraft();
 	
 	// Saved parameters
-	this.savedParameterArray = ['radius', 'rotation','removed'];
+	this.savedParameterArray = ['originX', 'originY', 'radius', 'rotation','removed'];
 	
 	this.controlParameterArray = {'removed':'Removed'};
 	
@@ -62,22 +64,22 @@ ED.CornealSuture.prototype.setPropertyDefaults = function() {
 	}
 }
 
+ED.CornealSuture.prototype.setParametersFromCornealGraft = function() {
+	if (this.cornealGraft) {
+		this.originX = this.cornealGraft.originX;
+		this.originY = this.cornealGraft.originY;
+		this.radius = this.cornealGraft.diameter * this.cornealGraft.pixelsPerMillimetre/2;
+	}
+};
+
+
 /**
  * Sets default parameters
  */
 ED.CornealSuture.prototype.setParameterDefaults = function() {
 	this.radius = 374;
 	this.setRotationWithDisplacements(10, 20);
-	
-	// if corneal graft doodle in drawing, sutures will centre around graft
-		// TODO - what if subsequently want to add sutures and not associate with graft?
-	this.cornealGraft = this.drawing.lastDoodleOfClass("CornealGraft");
-	if (this.cornealGraft) {
-		this.originX = this.cornealGraft.originX;
-		this.originY = this.cornealGraft.originY;
-		
-		this.radius = this.cornealGraft.diameter * this.cornealGraft.pixelsPerMillimetre/2;
-	}
+	this.setParametersFromCornealGraft();
 }
 
 /**
