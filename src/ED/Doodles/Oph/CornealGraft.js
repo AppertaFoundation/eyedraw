@@ -90,7 +90,7 @@ ED.CornealGraft.prototype.setHandles = function() {
  */
 ED.CornealGraft.prototype.setPropertyDefaults = function() {
 	this.isRotatable = false;
-	this.isUnique = false;
+	this.isUnique = true;
 
 	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
 	this.parameterValidationArray['apexY']['range'].setMinAndMax(-11.9 * this.pixelsPerMillimetre/2, -6.5 * this.pixelsPerMillimetre/2);
