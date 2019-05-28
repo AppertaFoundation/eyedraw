@@ -56,11 +56,13 @@ ED.CornealGraft = function(_drawing, _parameterJSON) {
 	this.controlParameterArray = {'depth':'Depth (%)','interruptedSutures':'Interrupted sutures' /* 'type':'Type', */ /* 'showSutures':'Show Sutures', 'sutureType':'Suture type', 'numberOfSutures':'Sutures',  *//* 'opaque':'Opaque' */};
 
 	var individualSutures = _drawing.allDoodlesOfClass("CornealSuture");
-	for (var i = 0; i < individualSutures.length; i++) {
-		var individualSuture = individualSutures[i];
-		if (!individualSuture.cornealGraft) {
-			individualSuture.cornealGraft = this;
-			individualSuture.setParametersFromCornealGraft();
+	var continuousSutures = _drawing.allDoodlesOfClass("ContinuousCornealSuture");
+	var sutures = individualSutures.concat(continuousSutures);
+	for (var i = 0; i < sutures.length; i++) {
+		var suture = sutures[i];
+		if (!suture.cornealGraft) {
+			suture.cornealGraft = this;
+			suture.setParametersFromCornealGraft();
 		}
 	}
 
