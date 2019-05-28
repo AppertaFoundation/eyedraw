@@ -23071,7 +23071,6 @@ ED.CornealGraft.prototype.dependentParameterValues = function(_parameter, _value
 					for (var i=0; i<difference; i++) {
 						var suture = this.drawing.lastDoodleOfClass('CornealSuture');
 						this.drawing.deleteDoodle(suture);
-
 					}
 				}
 
@@ -27319,7 +27318,6 @@ ED.CornealSuture.prototype.setParametersFromCornealGraft = function() {
 		this.radius = this.cornealGraft.diameter * this.cornealGraft.pixelsPerMillimetre/2;
 	}
 };
-
 
 /**
  * Sets default parameters

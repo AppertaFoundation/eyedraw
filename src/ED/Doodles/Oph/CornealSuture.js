@@ -72,7 +72,6 @@ ED.CornealSuture.prototype.setParametersFromCornealGraft = function() {
 	}
 };
 
-
 /**
  * Sets default parameters
  */
