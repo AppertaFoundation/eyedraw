@@ -16683,9 +16683,15 @@ ED.AntSynech = function(_drawing, _parameterJSON) {
 	// Private parameters
 	this.rtmi = 304;
 	this.riri = 176;
+	this.colour = (typeof default_iris_colour) !== 'undefined' ? default_iris_colour : 'Blue';
 
 	// Saved parameters
-	this.savedParameterArray = ['arc', 'rotation', 'apexY'];
+	this.savedParameterArray = ['arc', 'rotation', 'apexY', 'colour'];
+
+	// Parameters in doodle control bar (parameter name: parameter label)
+	this.controlParameterArray = {
+		'colour' : 'Colour',
+	};
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -16720,6 +16726,13 @@ ED.AntSynech.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
 	this.parameterValidationArray['apexY']['range'].setMinAndMax(-480, -260);
 	this.parameterValidationArray['arc']['range'].setMinAndMax(30 * Math.PI / 180, Math.PI * 2);
+
+	this.parameterValidationArray['colour'] = {
+		kind: 'other',
+		type: 'string',
+		list: ['Blue', 'Brown', 'Gray', 'Green'],
+		animate: false
+	};
 }
 
 /**
@@ -16773,7 +16786,20 @@ ED.AntSynech.prototype.draw = function(_point) {
 	ctx.closePath();
 
 	// Set fill attributes (same colour as Iris)
-	ctx.fillStyle = "rgba(100, 200, 250, 1.0)";
+	switch (this.colour) {
+		case 'Blue':
+			ctx.fillStyle = "rgba(160, 221, 251, 1)";
+			break;
+		case 'Brown':
+			ctx.fillStyle = "rgba(203, 161, 134, 1)";
+			break;
+		case 'Gray':
+			ctx.fillStyle = "rgba(177, 181, 172, 1)";
+			break;
+		case 'Green':
+			ctx.fillStyle = "rgba(169, 206, 141, 1)";
+			break;
+	}
 	ctx.strokeStyle = "rgba(100, 100, 100, 1.0)";
 	ctx.lineWidth = 4;
 
@@ -34459,9 +34485,9 @@ ED.Gonioscopy.prototype.setPropertyDefaults = function() {
  */
 ED.Gonioscopy.prototype.setParameterDefaults = function() {
 	this.apexX = -460;
-	this.apexY = -460;
+	this.apexY = -430;
     this.setParameterFromString('mode', 'Basic');
-	this.setParameterFromString('pigmentation', this.PigmentationLight);
+	this.setParameterFromString('pigmentation', this.PigmentationModerate);
 }
 
 /**
