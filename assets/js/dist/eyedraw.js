@@ -7317,6 +7317,29 @@ ED.GraphAxes.prototype.draw = function(_point) {
 }
 
 /**
+ * (C) OpenEyes Foundation, 2019
+ * This file is part of OpenEyes.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @link http://www.openeyes.org.uk
+ *
+ * @author OpenEyes <info@openeyes.org.uk>
+ * @copyright Copyright (C) 2019, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
+ */
+
+var HelperMath = HelperMath || {};
+
+HelperMath.calculateLinearFunctionFromPoints = function(x1, y1, x2, y2, x) {
+    /** y = f(x) = a * x + b */
+    var a = (y2 - y1) / (x2 - x1);
+    var b = y2 - a * x2;
+    return a * x + b;
+};
+
+/**
  * OpenEyes
  *
  * Copyright (C) OpenEyes Foundation, 2011-2017
@@ -8844,7 +8867,7 @@ ED.trans['Fuchs'] = 'Drag handle to change shape';
 ED.trans['Geographic'] = 'Drag middle handle to alter size of remaining central island of RPE<br/>Drag outside handle to scale';
 ED.trans['Gonioscopy'] = 'Select Meshwork Pigmentation from the list';
 ED.trans['HardDrusen'] = 'Drag middle handle up and down to alter density of drusen<br/>Drag outside handle to scale';
-ED.trans['Drusen'] = 'Drag middle handle up and down to alter density of drusen<br/>Drag outside handle to scale';
+ED.trans['Drusen'] = 'Drag to position<br/>Drag middle handle up and down to alter density of drusen<br/>Drag outside handle to scale';
 ED.trans['HardExudate'] = 'Drag to position';
 ED.trans['Hyphaema'] = 'Drag handle vertically to change size<br/>Drag handle horizontally to change density';
 ED.trans['Hypopyon'] = 'Drag handle vertically to change size';
@@ -31021,8 +31044,20 @@ ED.Drusen = function(_drawing, _parameterJSON) {
     this.drusenType = 'Hard';
     this.blur = 0;
 
+    this.scaleRangeMin = 0.5;
+    this.scaleRangeMax = 1.5;
+    this.biggestOriginXRangeMin = -290;
+    this.biggestOriginXRangeMax = +180;
+    this.biggestOriginYRangeMin = -250;
+    this.biggestOriginYRangeMax = +250;
+
+	this.smallestOriginXRangeMin = -85;
+	this.smallestOriginXRangeMax = -25;
+	this.smallestOriginYRangeMin = -30;
+	this.smallestOriginYRangeMax = +30;
+
 	// Saved parameters
-	this.savedParameterArray = ['apexY', 'scaleX', 'scaleY', 'drusenType', 'blur'];
+	this.savedParameterArray = ['originX', 'originY', 'apexY', 'scaleX', 'scaleY', 'drusenType', 'blur'];
 
     this.controlParameterArray = {
         'drusenType':'Drusen type'
@@ -31051,15 +31086,20 @@ ED.Drusen.prototype.setHandles = function() {
  * Sets default dragging attributes
  */
 ED.Drusen.prototype.setPropertyDefaults = function() {
-	this.isMoveable = false;
+	this.isMoveable = true;
 	this.isRotatable = false;
 	this.isUnique = true;
 
 	// Update component of validation array for simple parameters
 	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
 	this.parameterValidationArray['apexY']['range'].setMinAndMax(-160, +0);
-	this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.5, +1.5);
-	this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.5, +1.5);
+	this.parameterValidationArray['scaleX']['range'].setMinAndMax(this.scaleRangeMin, this.scaleRangeMax);
+	this.parameterValidationArray['scaleY']['range'].setMinAndMax(this.scaleRangeMin, this.scaleRangeMax);
+
+	this.parameterValidationArray['originX']['range'].setMinAndMax(this.biggestOriginXRangeMin,
+		this.biggestOriginXRangeMax);
+	this.parameterValidationArray['originY']['range'].setMinAndMax(this.biggestOriginYRangeMin,
+		this.biggestOriginYRangeMax);
 
     this.parameterValidationArray.drusenType = {
         kind: 'derived',
@@ -31107,6 +31147,28 @@ ED.Drusen.prototype.dependentParameterValues = function(_parameter, _value) {
                     returnArray.blur = 2;
                     break;
             }
+            break;
+		case 'scaleY':
+			var x = _value;
+			this.parameterValidationArray['originX']['range'].setMinAndMax(
+				HelperMath.calculateLinearFunctionFromPoints(this.scaleRangeMin, this.biggestOriginXRangeMin,
+					this.scaleRangeMax, this.smallestOriginXRangeMin, x),
+				HelperMath.calculateLinearFunctionFromPoints(this.scaleRangeMin, this.biggestOriginXRangeMax,
+					this.scaleRangeMax, this.smallestOriginXRangeMax, x)
+			);
+
+			this.parameterValidationArray['originY']['range'].setMinAndMax(
+				HelperMath.calculateLinearFunctionFromPoints(this.scaleRangeMin, this.biggestOriginYRangeMin,
+					this.scaleRangeMax, this.smallestOriginYRangeMin, x),
+				HelperMath.calculateLinearFunctionFromPoints(this.scaleRangeMin, this.biggestOriginYRangeMax,
+					this.scaleRangeMax, this.smallestOriginYRangeMax, x)
+			);
+
+			var newOriginY = this.parameterValidationArray['originY']['range'].constrain(this.originY);
+			var newOriginX = this.parameterValidationArray['originX']['range'].constrain(this.originX);
+			this.setSimpleParameter('originX', newOriginX);
+			this.setSimpleParameter('originY', newOriginY);
+			break;
 	}
 
 	return returnArray;
