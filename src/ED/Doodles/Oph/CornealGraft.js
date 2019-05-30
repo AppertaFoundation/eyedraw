@@ -37,7 +37,7 @@ ED.CornealGraft = function(_drawing, _parameterJSON) {
 	this.interruptedSutures = 0;
 	this.existingSutures = 0;
 	
-	this.csOriginX = 0;
+	this.csOriginX = 50;
 	
 	// Other parameters
 	this.d = 100;
@@ -54,6 +54,17 @@ ED.CornealGraft = function(_drawing, _parameterJSON) {
 
 	// Parameters in doodle control bar (parameter name: parameter label)
 	this.controlParameterArray = {'depth':'Depth (%)','interruptedSutures':'Interrupted sutures' /* 'type':'Type', */ /* 'showSutures':'Show Sutures', 'sutureType':'Suture type', 'numberOfSutures':'Sutures',  *//* 'opaque':'Opaque' */};
+
+	var individualSutures = _drawing.allDoodlesOfClass("CornealSuture");
+	var continuousSutures = _drawing.allDoodlesOfClass("ContinuousCornealSuture");
+	var sutures = individualSutures.concat(continuousSutures);
+	for (var i = 0; i < sutures.length; i++) {
+		var suture = sutures[i];
+		if (!suture.cornealGraft) {
+			suture.cornealGraft = this;
+			suture.setParametersFromCornealGraft();
+		}
+	}
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -79,7 +90,7 @@ ED.CornealGraft.prototype.setHandles = function() {
  */
 ED.CornealGraft.prototype.setPropertyDefaults = function() {
 	this.isRotatable = false;
-	this.isUnique = false;
+	this.isUnique = true;
 
 	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
 	this.parameterValidationArray['apexY']['range'].setMinAndMax(-11.9 * this.pixelsPerMillimetre/2, -6.5 * this.pixelsPerMillimetre/2);
@@ -207,8 +218,8 @@ ED.CornealGraft.prototype.dependentParameterValues = function(_parameter, _value
 			returnArray['diameter'] = -2 * _value/this.pixelsPerMillimetre;
 			
 			// update range for x and y accordingly
-			var y = Math.sqrt((this.antsegRadius+this.antsegRadius+_value)*(this.antsegRadius+this.antsegRadius+_value) - this.originY*this.originY); 
-			var x = Math.sqrt((this.antsegRadius+this.antsegRadius+_value)*(this.antsegRadius+this.antsegRadius+_value) - this.originX*this.originX); 
+			var y = Math.sqrt((this.antsegRadius+this.antsegRadius+_value)*(this.antsegRadius+this.antsegRadius+_value) - this.originX*this.originX);
+			var x = Math.sqrt((this.antsegRadius+this.antsegRadius+_value)*(this.antsegRadius+this.antsegRadius+_value) - this.originY*this.originY);
 
 			this.parameterValidationArray['originY']['range'].setMinAndMax(-y,+y);
 			this.parameterValidationArray['originX']['range'].setMinAndMax(-x,+x);
@@ -240,7 +251,7 @@ ED.CornealGraft.prototype.dependentParameterValues = function(_parameter, _value
 			
 			// If being synced, make sensible decision about y
 			if (!this.drawing.isActive) {
-				var newY = this.parameterValidationArray['originY']['range'].max;
+				var newY = this.originY;
 			}
 			else {
 				var newY = this.parameterValidationArray['originY'] ['range'].constrain(this.originY);
@@ -316,8 +327,8 @@ ED.CornealGraft.prototype.dependentParameterValues = function(_parameter, _value
 			returnArray['apexY'] = newApexY;
 			
 			// update origin range
-			var y = Math.sqrt((this.antsegRadius+this.antsegRadius+newApexY)*(this.antsegRadius+this.antsegRadius+newApexY) - this.originY*this.originY); 
-			var x = Math.sqrt((this.antsegRadius+this.antsegRadius+newApexY)*(this.antsegRadius+this.antsegRadius+newApexY) - this.originX*this.originX); 
+			var y = Math.sqrt((this.antsegRadius+this.antsegRadius+newApexY)*(this.antsegRadius+this.antsegRadius+newApexY) - this.originX*this.originX);
+			var x = Math.sqrt((this.antsegRadius+this.antsegRadius+newApexY)*(this.antsegRadius+this.antsegRadius+newApexY) - this.originY*this.originY);
 
 			this.parameterValidationArray['originY']['range'].setMinAndMax(-y,+y);
 			this.parameterValidationArray['originX']['range'].setMinAndMax(-x,+x);
@@ -351,30 +362,31 @@ ED.CornealGraft.prototype.dependentParameterValues = function(_parameter, _value
 		
 		case 'interruptedSutures':
 			// use parameter to add /remove sutures from drawing.
-			var currentNumber = this.getSutures();
-			var difference = _value - currentNumber;
-			if (difference>0) {
-				for (var i=0; i<difference; i++) {
-					this.drawing.addDoodle('CornealSuture');
+			if (this.drawing.isActive) {
+				var currentNumber = this.getSutures();
+				var difference = _value - currentNumber;
+				if (difference>0) {
+					for (var i=0; i<difference; i++) {
+						this.drawing.addDoodle('CornealSuture');
+					}
 				}
-			}
-			else if (difference<0) {
-				difference = Math.abs(difference);
-				for (var i=0; i<difference; i++) {
-					var suture = this.drawing.lastDoodleOfClass('CornealSuture');
-					this.drawing.deleteDoodle(suture);
-				
+				else if (difference<0) {
+					difference = Math.abs(difference);
+					for (var i=0; i<difference; i++) {
+						var suture = this.drawing.lastDoodleOfClass('CornealSuture');
+						this.drawing.deleteDoodle(suture);
+					}
 				}
-			}
-			
-			// adjust angle between sutures so equidistant
-			var sutures = this.drawing.allDoodlesOfClass('CornealSuture');
-			var theta = (2*Math.PI)/_value;
-			for (var j=0; j<sutures.length;j++) {
-				sutures[j].setSimpleParameter('rotation',theta*j);
+
+				// adjust angle between sutures so equidistant
+				var sutures = this.drawing.allDoodlesOfClass('CornealSuture');
+				var theta = (2*Math.PI)/_value;
+				for (var j=0; j<sutures.length;j++) {
+					sutures[j].setSimpleParameter('rotation',theta*j);
+				}
 			}
 			break;
-			
+
 	}
 
 	return returnArray;
@@ -519,7 +531,7 @@ ED.CornealGraft.prototype.getSutures = function() {
 	var counter = 0;
 	
 	for (var i=0;i<sutures.length;i++) {
-		if (sutures[i].cornealGraft && !sutures[i].removed) counter++; // won't count sutures not associated with graft / "removed" sutures
+		if (sutures[i].cornealGraft === this && !sutures[i].removed) counter++; // won't count sutures not associated with graft / "removed" sutures
 	}
 	
 	return counter;
