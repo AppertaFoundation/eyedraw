@@ -27522,6 +27522,8 @@ ED.CornealThinning.prototype.setHandles = function() {
  * Sets default properties
  */
 ED.CornealThinning.prototype.setPropertyDefaults = function() {
+	this.isUnique = true;
+	
 	// Create ranges to constrain handles
 	this.handleVectorRangeArray = new Array();
 	for (var i = 0; i < this.numberOfHandles; i++) {
