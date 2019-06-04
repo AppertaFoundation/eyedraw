@@ -22907,7 +22907,23 @@ ED.CornealGraft.prototype.setParameterDefaults = function() {
  * @returns {Array} Associative array of values of dependent parameters
  */
 ED.CornealGraft.prototype.dependentParameterValues = function(_parameter, _value) {
-	var returnArray = new Array();
+	var returnArray = [];
+
+	var continuousSutures = this.drawing.allDoodlesOfClass("ContinuousCornealSuture");
+
+	//Setting initial value
+	if (continuousSutures.length > 0) {
+		for (var i=0; i<continuousSutures.length;i++) {
+			if (continuousSutures[i].cornealGraft === this) {
+				if (continuousSutures[i].originX === undefined) {
+					continuousSutures[i].setSimpleParameter('originX', this.originX);
+				}
+				if (continuousSutures[i].originY === undefined) {
+					continuousSutures[i].setSimpleParameter('originY', this.originY);
+				}
+			}
+		}
+	}
 
 	switch (_parameter) {
 		case 'apexY':
@@ -22944,7 +22960,7 @@ ED.CornealGraft.prototype.dependentParameterValues = function(_parameter, _value
 				// using equation of circle, using (radius of antseg + difference in graft size) for length of one side
 			var y = Math.sqrt((this.antsegRadius+this.antsegRadius+this.apexY)*(this.antsegRadius+this.antsegRadius+this.apexY) - _value*_value); 
 			this.parameterValidationArray['originY']['range'].setMinAndMax(-y,+y);
-			
+
 			// If being synced, make sensible decision about y
 			if (!this.drawing.isActive) {
 				var newY = this.originY;
@@ -22953,18 +22969,19 @@ ED.CornealGraft.prototype.dependentParameterValues = function(_parameter, _value
 				var newY = this.parameterValidationArray['originY'] ['range'].constrain(this.originY);
 			}
 			this.setSimpleParameter('originY', newY);
-			
+
 			// update suture positions, if appropriate
-			var continuousSutures = this.drawing.allDoodlesOfClass("ContinuousCornealSuture");
 			if (continuousSutures.length>0) {
 				for (var i=0; i<continuousSutures.length;i++) {
-					if (continuousSutures[i].cornealGraft == this) continuousSutures[i].setSimpleParameter('originX', _value);
+					if (continuousSutures[i].cornealGraft === this) continuousSutures[i].setSimpleParameter('originX', _value);
 				}
 			}
 			var individualSutures = this.drawing.allDoodlesOfClass("CornealSuture");
 			if (individualSutures.length>0) {
-				for (var i=0; i<individualSutures.length;i++) {
-					if (individualSutures[i].cornealGraft == this) individualSutures[i].setSimpleParameter('originX', _value);
+				for (var ii=0; ii<individualSutures.length;ii++) {
+					if (individualSutures[ii].cornealGraft === this) {
+						individualSutures[ii].setSimpleParameter('originX', _value);
+					}
 				}
 			}
 			
@@ -27505,6 +27522,8 @@ ED.CornealThinning.prototype.setHandles = function() {
  * Sets default properties
  */
 ED.CornealThinning.prototype.setPropertyDefaults = function() {
+	this.isUnique = true;
+	
 	// Create ranges to constrain handles
 	this.handleVectorRangeArray = new Array();
 	for (var i = 0; i < this.numberOfHandles; i++) {
