@@ -36,7 +36,6 @@ ED.EndothelialKeratoplastyCrossSection = function(_drawing, _parameterJSON) {
 	this.diameter = 9;
 	
 	// Other parameters
-	this.d = 100;
 	this.typeSimple = 1; // inherited from en face view
 							// 1: DSEK, 2: DMEAK
 	this.handle1Y = -4.5 * this.pixelsPerMillimetre;
@@ -47,7 +46,7 @@ ED.EndothelialKeratoplastyCrossSection = function(_drawing, _parameterJSON) {
 	this.handle3X = -60;
 	
 	// Saved parameters
-	this.savedParameterArray = ['originX', 'originY', 'apexY','d','diameter','typeSimple'];
+	this.savedParameterArray = ['originX', 'originY', 'apexY','diameter','typeSimple'];
 	
 	// Parameters in doodle control bar
 	this.controlParameterArray = {};
@@ -57,7 +56,7 @@ ED.EndothelialKeratoplastyCrossSection = function(_drawing, _parameterJSON) {
 	
 	this.linkedDoodleParameters = {
         'EndothelialKeratoplasty': {
-            source: ['originY','apexY','d','diameter','typeSimple'],
+            source: ['originY','apexY','diameter','typeSimple'],
             store: [['originX','csOriginX']]
         }
     };
@@ -175,8 +174,8 @@ ED.EndothelialKeratoplastyCrossSection.prototype.dependentParameterValues = func
 				
 				var sup = this.getXLimitOnCornea(_value);
 				var inf = this.getXLimitOnCornea(-_value);
-				this.squiggleArray[0].pointsArray[0].y = new ED.Point(sup,_value);
-				this.squiggleArray[0].pointsArray[2].y = new ED.Point(inf,-_value);
+				this.squiggleArray[0].pointsArray[0] = new ED.Point(sup,_value);
+				this.squiggleArray[0].pointsArray[2] = new ED.Point(inf,-_value);
 				
 				// update handle range
 /*
@@ -204,15 +203,6 @@ ED.EndothelialKeratoplastyCrossSection.prototype.dependentParameterValues = func
 
 		case 'diameter':
 			returnArray['apexY'] = -_value * this.pixelsPerMillimetre/2;
-			break;
-		
-		case 'd':
-			returnArray['d'] = parseInt(_value);
-			
-			// update handle range boundaries
-			
-			// update handle positions
-			
 			break;
 		
 		case 'typeSimple':

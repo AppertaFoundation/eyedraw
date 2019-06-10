@@ -17,14 +17,14 @@
 /**
  * The optic disc
  *
- * @class BandKeratophy
+ * @class BandKeratopathy
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
  * @param {Object} _parameterJSON
  */
-ED.BandKeratophy = function(_drawing, _parameterJSON) {
+ED.BandKeratopathy = function(_drawing, _parameterJSON) {
     // Set classname
-    this.className = "BandKeratophy";
+    this.className = "BandKeratopathy";
 
     // Private parameters
     this.numberOfOuterHandles = 4;
@@ -45,14 +45,14 @@ ED.BandKeratophy = function(_drawing, _parameterJSON) {
 /**
  * Sets superclass and constructor
  */
-ED.BandKeratophy.prototype = new ED.Doodle;
-ED.BandKeratophy.prototype.constructor = ED.BandKeratophy;
-ED.BandKeratophy.superclass = ED.Doodle.prototype;
+ED.BandKeratopathy.prototype = new ED.Doodle;
+ED.BandKeratopathy.prototype.constructor = ED.BandKeratopathy;
+ED.BandKeratopathy.superclass = ED.Doodle.prototype;
 
 /**
  * Sets handle attributes
  */
-ED.BandKeratophy.prototype.setHandles = function() {
+ED.BandKeratopathy.prototype.setHandles = function() {
     // Array of handles , 4 circular
     for (var i = 0; i < this.numberOfOuterHandles; i++) {
         this.handleArray[i] = new ED.Doodle.Handle(null, true, ED.Mode.Handles, false);
@@ -72,7 +72,7 @@ ED.BandKeratophy.prototype.setHandles = function() {
     //this.handleArray[0].isRotatable = true;
 };
 
-ED.BandKeratophy.prototype.updateHandleCoordinateRanges = function(shapeControlPoints) {
+ED.BandKeratopathy.prototype.updateHandleCoordinateRanges = function(shapeControlPoints) {
     this.handleCoordinateRangeArray = [];
     this.handleVectorRangeArray = [];
 
@@ -184,7 +184,7 @@ ED.BandKeratophy.prototype.updateHandleCoordinateRanges = function(shapeControlP
     };
 }
 
-ED.BandKeratophy.prototype.updateHandlePositions = function (){
+ED.BandKeratopathy.prototype.updateHandlePositions = function (){
     for(var index = 0; index < this.squiggleArray[0].pointsArray.length; ++index) {
         var newPosition = new ED.Point(
             this.handleCoordinateRangeArray[index]['x'].constrain(this.squiggleArray[0].pointsArray[index].x),
@@ -200,7 +200,7 @@ ED.BandKeratophy.prototype.updateHandlePositions = function (){
     }
 };
 
-ED.BandKeratophy.prototype.createTopCatmullRomSpline = function (shapeControlPoints) {
+ED.BandKeratopathy.prototype.createTopCatmullRomSpline = function (shapeControlPoints) {
     return this.createCatmullRomSpline([
         shapeControlPoints.controlPointOuterTopRight,
         shapeControlPoints.controlPointInnerTopRight,
@@ -210,7 +210,7 @@ ED.BandKeratophy.prototype.createTopCatmullRomSpline = function (shapeControlPoi
     ]);
 };
 
-ED.BandKeratophy.prototype.createBottomCatmullRomSpline = function (shapeControlPoints) {
+ED.BandKeratopathy.prototype.createBottomCatmullRomSpline = function (shapeControlPoints) {
     return this.createCatmullRomSpline([
         shapeControlPoints.controlPointOuterBottomLeft,
         shapeControlPoints.controlPointInnerBottomLeft,
@@ -223,7 +223,7 @@ ED.BandKeratophy.prototype.createBottomCatmullRomSpline = function (shapeControl
 /**
  * Sets default properties
  */
-ED.BandKeratophy.prototype.setPropertyDefaults = function() {
+ED.BandKeratopathy.prototype.setPropertyDefaults = function() {
     this.isScaleable = false;
     this.isMoveable = false;
     this.isUnique = true;
@@ -244,7 +244,7 @@ ED.BandKeratophy.prototype.setPropertyDefaults = function() {
  * @param {Undefined} _value Value of parameter to calculate
  * @returns {Array} Associative array of values of dependent parameters
  */
-ED.BandKeratophy.prototype.dependentParameterValues = function(_parameter, _value) {
+ED.BandKeratopathy.prototype.dependentParameterValues = function(_parameter, _value) {
     var returnArray = {};
 
     switch (_parameter) {
@@ -259,7 +259,7 @@ ED.BandKeratophy.prototype.dependentParameterValues = function(_parameter, _valu
 /**
  * Sets default parameters
  */
-ED.BandKeratophy.prototype.setParameterDefaults = function() {
+ED.BandKeratopathy.prototype.setParameterDefaults = function() {
     this.setParameterFromString('gradeOfOpacity', '+');
 
     // Create a squiggle to store the handles points
@@ -303,7 +303,7 @@ ED.BandKeratophy.prototype.setParameterDefaults = function() {
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
 
-ED.BandKeratophy.prototype.createArcCurveFromPoints = function(center, radius, startPoint, endPoint) {
+ED.BandKeratopathy.prototype.createArcCurveFromPoints = function(center, radius, startPoint, endPoint) {
     var createArcCurveFromAngles = function(center, radius, startAngle, endAngle) {
         var cirlceR = function(arc) {
             return new Vector2D(center.x + radius * Math.cos(arc), center.y - radius * Math.sin(arc));
@@ -321,7 +321,7 @@ ED.BandKeratophy.prototype.createArcCurveFromPoints = function(center, radius, s
     return createArcCurveFromAngles(center, radius, startAngle, endAngle);
 };
 
-ED.BandKeratophy.prototype.createCatmullRomSpline = function(cps, ts, vStart, vEnd) {
+ED.BandKeratopathy.prototype.createCatmullRomSpline = function(cps, ts, vStart, vEnd) {
     if(ts === undefined) {
         ts = [];
         for(var i = 0; i < cps.length; ++i) {
@@ -371,7 +371,7 @@ ED.BandKeratophy.prototype.createCatmullRomSpline = function(cps, ts, vStart, vE
 };
 
 
-ED.BandKeratophy.prototype.drawShape = function(ctx, center, radius, shapeControlPoints) {
+ED.BandKeratopathy.prototype.drawShape = function(ctx, center, radius, shapeControlPoints) {
     var parametricCurves = [
         this.createArcCurveFromPoints(center, radius,
             shapeControlPoints.controlPointOuterBottomRight, shapeControlPoints.controlPointOuterTopRight),
@@ -400,7 +400,7 @@ ED.BandKeratophy.prototype.drawShape = function(ctx, center, radius, shapeContro
     ctx.fill();
 };
 
-ED.BandKeratophy.prototype.draw = function(_point) {
+ED.BandKeratopathy.prototype.draw = function(_point) {
     var shapeControlPoints = {};
     shapeControlPoints.controlPointOuterTopLeft = new Vector2D(this.squiggleArray[0].pointsArray[2].x, this.squiggleArray[0].pointsArray[2].y);
     shapeControlPoints.controlPointInnerTopLeft = new Vector2D(this.squiggleArray[0].pointsArray[4].x, this.squiggleArray[0].pointsArray[4].y);
@@ -420,7 +420,7 @@ ED.BandKeratophy.prototype.draw = function(_point) {
     var ctx = this.drawing.context;
 
     // Call draw method in superclass
-    ED.BandKeratophy.superclass.draw.call(this, _point);
+    ED.BandKeratopathy.superclass.draw.call(this, _point);
 
     ctx.beginPath();
     this.drawShape(ctx, new Vector2D(0, 0), this.initialRadius, shapeControlPoints);
@@ -453,11 +453,11 @@ ED.BandKeratophy.prototype.draw = function(_point) {
  *
  * @returns {String} Description of doodle
  */
-ED.BandKeratophy.prototype.description = function() {
-    return 'Band Keratophy ' + this.gradeOfOpacity;
+ED.BandKeratopathy.prototype.description = function() {
+    return 'Band Keratopathy ' + this.gradeOfOpacity;
 };
 
-ED.BandKeratophy.prototype.snomedCode = function()
+ED.BandKeratopathy.prototype.snomedCode = function()
 {
     return 35055000;
 };
