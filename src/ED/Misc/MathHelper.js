@@ -12,9 +12,9 @@
  * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 
-var HelperMath = HelperMath || {};
+var MathHelper = MathHelper || {};
 
-HelperMath.calculateLinearFunctionFromPoints = function(x1, y1, x2, y2, x) {
+MathHelper.calculateLinearFunctionFromPoints = function(x1, y1, x2, y2, x) {
     /** y = f(x) = a * x + b */
     var a = (y2 - y1) / (x2 - x1);
     var b = y2 - a * x2;

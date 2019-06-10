@@ -31,15 +31,14 @@ ED.Drusen = function(_drawing, _parameterJSON) {
 
     this.scaleRangeMin = 0.5;
     this.scaleRangeMax = 1.5;
-    this.biggestOriginXRangeMin = -290;
-    this.biggestOriginXRangeMax = +180;
-    this.biggestOriginYRangeMin = -250;
-    this.biggestOriginYRangeMax = +250;
-
-	this.smallestOriginXRangeMin = -85;
-	this.smallestOriginXRangeMax = -25;
-	this.smallestOriginYRangeMin = -30;
-	this.smallestOriginYRangeMax = +30;
+    this.maximumExtentOriginXRangeMin = -290;
+	this.maximumExtentOriginXRangeMax = +180;
+    this.maximumExtentOriginYRangeMin = -250;
+	this.maximumExtentOriginYRangeMax = +250;
+	this.minimumExtentOriginXRangeMin = -85;
+	this.minimumExtentOriginXRangeMax = -25;
+	this.minimumExtentOriginYRangeMin = -30;
+	this.minimumExtentOriginYRangeMax = +30;
 
 	// Saved parameters
 	this.savedParameterArray = ['originX', 'originY', 'apexY', 'scaleX', 'scaleY', 'drusenType', 'blur'];
@@ -81,10 +80,10 @@ ED.Drusen.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['scaleX']['range'].setMinAndMax(this.scaleRangeMin, this.scaleRangeMax);
 	this.parameterValidationArray['scaleY']['range'].setMinAndMax(this.scaleRangeMin, this.scaleRangeMax);
 
-	this.parameterValidationArray['originX']['range'].setMinAndMax(this.biggestOriginXRangeMin,
-		this.biggestOriginXRangeMax);
-	this.parameterValidationArray['originY']['range'].setMinAndMax(this.biggestOriginYRangeMin,
-		this.biggestOriginYRangeMax);
+	this.parameterValidationArray['originX']['range'].setMinAndMax(this.maximumExtentOriginXRangeMin,
+		this.maximumExtentOriginXRangeMax);
+	this.parameterValidationArray['originY']['range'].setMinAndMax(this.maximumExtentOriginYRangeMin,
+		this.maximumExtentOriginYRangeMax);
 
     this.parameterValidationArray.drusenType = {
         kind: 'derived',
@@ -136,17 +135,17 @@ ED.Drusen.prototype.dependentParameterValues = function(_parameter, _value) {
 		case 'scaleY':
 			var x = _value;
 			this.parameterValidationArray['originX']['range'].setMinAndMax(
-				HelperMath.calculateLinearFunctionFromPoints(this.scaleRangeMin, this.biggestOriginXRangeMin,
-					this.scaleRangeMax, this.smallestOriginXRangeMin, x),
-				HelperMath.calculateLinearFunctionFromPoints(this.scaleRangeMin, this.biggestOriginXRangeMax,
-					this.scaleRangeMax, this.smallestOriginXRangeMax, x)
+				MathHelper.calculateLinearFunctionFromPoints(this.scaleRangeMin, this.maximumExtentOriginXRangeMin,
+					this.scaleRangeMax, this.minimumExtentOriginXRangeMin, x),
+				MathHelper.calculateLinearFunctionFromPoints(this.scaleRangeMin, this.maximumExtentOriginXRangeMax,
+					this.scaleRangeMax, this.minimumExtentOriginXRangeMax, x)
 			);
 
 			this.parameterValidationArray['originY']['range'].setMinAndMax(
-				HelperMath.calculateLinearFunctionFromPoints(this.scaleRangeMin, this.biggestOriginYRangeMin,
-					this.scaleRangeMax, this.smallestOriginYRangeMin, x),
-				HelperMath.calculateLinearFunctionFromPoints(this.scaleRangeMin, this.biggestOriginYRangeMax,
-					this.scaleRangeMax, this.smallestOriginYRangeMax, x)
+				MathHelper.calculateLinearFunctionFromPoints(this.scaleRangeMin, this.maximumExtentOriginYRangeMin,
+					this.scaleRangeMax, this.minimumExtentOriginYRangeMin, x),
+				MathHelper.calculateLinearFunctionFromPoints(this.scaleRangeMin, this.maximumExtentOriginYRangeMax,
+					this.scaleRangeMax, this.minimumExtentOriginYRangeMax, x)
 			);
 
 			var newOriginY = this.parameterValidationArray['originY']['range'].constrain(this.originY);

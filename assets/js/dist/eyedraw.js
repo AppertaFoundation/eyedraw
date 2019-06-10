@@ -7317,29 +7317,6 @@ ED.GraphAxes.prototype.draw = function(_point) {
 }
 
 /**
- * (C) OpenEyes Foundation, 2019
- * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
- * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
- *
- * @link http://www.openeyes.org.uk
- *
- * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (C) 2019, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
- */
-
-var HelperMath = HelperMath || {};
-
-HelperMath.calculateLinearFunctionFromPoints = function(x1, y1, x2, y2, x) {
-    /** y = f(x) = a * x + b */
-    var a = (y2 - y1) / (x2 - x1);
-    var b = y2 - a * x2;
-    return a * x + b;
-};
-
-/**
  * OpenEyes
  *
  * Copyright (C) OpenEyes Foundation, 2011-2017
@@ -7689,6 +7666,29 @@ ED.Label.prototype.onSelection = function() {
 // 		this.drawing.notify('parameterChanged', object);
 // 	}
 // }
+
+/**
+ * (C) OpenEyes Foundation, 2019
+ * This file is part of OpenEyes.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @link http://www.openeyes.org.uk
+ *
+ * @author OpenEyes <info@openeyes.org.uk>
+ * @copyright Copyright (C) 2019, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
+ */
+
+var MathHelper = MathHelper || {};
+
+MathHelper.calculateLinearFunctionFromPoints = function(x1, y1, x2, y2, x) {
+    /** y = f(x) = a * x + b */
+    var a = (y2 - y1) / (x2 - x1);
+    var b = y2 - a * x2;
+    return a * x + b;
+};
 
 /**
  * OpenEyes
@@ -31072,15 +31072,16 @@ ED.Drusen = function(_drawing, _parameterJSON) {
 
     this.scaleRangeMin = 0.5;
     this.scaleRangeMax = 1.5;
-    this.biggestOriginXRangeMin = -290;
-    this.biggestOriginXRangeMax = +180;
-    this.biggestOriginYRangeMin = -250;
-    this.biggestOriginYRangeMax = +250;
+    this.maximumExtentOriginXRangeMin = -290;
+	this.maximumExtentOriginXRangeMax = +180;
+    this.maximumExtentOriginYRangeMin = -250;
+	this.maximumExtentOriginYRangeMax = +250;
 
-	this.smallestOriginXRangeMin = -85;
-	this.smallestOriginXRangeMax = -25;
-	this.smallestOriginYRangeMin = -30;
-	this.smallestOriginYRangeMax = +30;
+	this.minimumExtentOriginXRangeMin = -85;
+	this.minimumExtentOriginXRangeMax = -25;
+	this.minimumExtentOriginYRangeMin = -30;
+	this.minimumExtentOriginYRangeMax = +30;
+
 
 	// Saved parameters
 	this.savedParameterArray = ['originX', 'originY', 'apexY', 'scaleX', 'scaleY', 'drusenType', 'blur'];
@@ -31122,10 +31123,10 @@ ED.Drusen.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['scaleX']['range'].setMinAndMax(this.scaleRangeMin, this.scaleRangeMax);
 	this.parameterValidationArray['scaleY']['range'].setMinAndMax(this.scaleRangeMin, this.scaleRangeMax);
 
-	this.parameterValidationArray['originX']['range'].setMinAndMax(this.biggestOriginXRangeMin,
-		this.biggestOriginXRangeMax);
-	this.parameterValidationArray['originY']['range'].setMinAndMax(this.biggestOriginYRangeMin,
-		this.biggestOriginYRangeMax);
+	this.parameterValidationArray['originX']['range'].setMinAndMax(this.maximumExtentOriginXRangeMin,
+		this.maximumExtentOriginXRangeMax);
+	this.parameterValidationArray['originY']['range'].setMinAndMax(this.maximumExtentOriginYRangeMin,
+		this.maximumExtentOriginYRangeMax);
 
     this.parameterValidationArray.drusenType = {
         kind: 'derived',
@@ -31177,17 +31178,17 @@ ED.Drusen.prototype.dependentParameterValues = function(_parameter, _value) {
 		case 'scaleY':
 			var x = _value;
 			this.parameterValidationArray['originX']['range'].setMinAndMax(
-				HelperMath.calculateLinearFunctionFromPoints(this.scaleRangeMin, this.biggestOriginXRangeMin,
-					this.scaleRangeMax, this.smallestOriginXRangeMin, x),
-				HelperMath.calculateLinearFunctionFromPoints(this.scaleRangeMin, this.biggestOriginXRangeMax,
-					this.scaleRangeMax, this.smallestOriginXRangeMax, x)
+				MathHelper.calculateLinearFunctionFromPoints(this.scaleRangeMin, this.maximumExtentOriginXRangeMin,
+					this.scaleRangeMax, this.minimumExtentOriginXRangeMin, x),
+				MathHelper.calculateLinearFunctionFromPoints(this.scaleRangeMin, this.maximumExtentOriginXRangeMax,
+					this.scaleRangeMax, this.minimumExtentOriginXRangeMax, x)
 			);
 
 			this.parameterValidationArray['originY']['range'].setMinAndMax(
-				HelperMath.calculateLinearFunctionFromPoints(this.scaleRangeMin, this.biggestOriginYRangeMin,
-					this.scaleRangeMax, this.smallestOriginYRangeMin, x),
-				HelperMath.calculateLinearFunctionFromPoints(this.scaleRangeMin, this.biggestOriginYRangeMax,
-					this.scaleRangeMax, this.smallestOriginYRangeMax, x)
+				MathHelper.calculateLinearFunctionFromPoints(this.scaleRangeMin, this.maximumExtentOriginYRangeMin,
+					this.scaleRangeMax, this.minimumExtentOriginYRangeMin, x),
+				MathHelper.calculateLinearFunctionFromPoints(this.scaleRangeMin, this.maximumExtentOriginYRangeMax,
+					this.scaleRangeMax, this.minimumExtentOriginYRangeMax, x)
 			);
 
 			var newOriginY = this.parameterValidationArray['originY']['range'].constrain(this.originY);
