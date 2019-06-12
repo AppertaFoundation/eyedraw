@@ -594,6 +594,10 @@ ED.Controller = (function() {
 	Controller.prototype.runOnDoodlesLoadedCommands = function() {
 		var arr = (this.properties.onDoodlesLoadedCommandArray || []);
 		this.runCommands(arr);
+
+		if(this.mainToolbar != null) {
+			this.mainToolbar.updateState();
+		}
 	};
 
 	/**
