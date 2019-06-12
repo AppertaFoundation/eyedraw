@@ -594,6 +594,10 @@ ED.Controller = (function() {
 	Controller.prototype.runOnDoodlesLoadedCommands = function() {
 		var arr = (this.properties.onDoodlesLoadedCommandArray || []);
 		this.runCommands(arr);
+
+		if(this.mainToolbar != null) {
+			this.mainToolbar.updateState();
+		}
 	};
 
 	/**
@@ -1579,6 +1583,8 @@ ED.Views.Toolbar = (function() {
 	 * Update the state of all toolbar buttons.
 	 */
 	Toolbar.prototype.updateState  = function() {
+		console.log("byba");
+
 		this.buttons.each(function(i, button) {
 			this.updateButtonState($(button));
 		}.bind(this));
