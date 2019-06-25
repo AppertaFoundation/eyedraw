@@ -151,5 +151,5 @@ ED.StarFold.prototype.snomedCode = function() {
  * @returns {Int} Position in diagnostic hierarchy
  */
 ED.StarFold.prototype.diagnosticHierarchy = function() {
-	return 2;
+	return 0;
 }

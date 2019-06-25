@@ -218,5 +218,5 @@ ED.Retinoschisis.prototype.snomedCode = function()
  */
 ED.Retinoschisis.prototype.diagnosticHierarchy = function()
 {
-    return 6;
+    return 0;
 }

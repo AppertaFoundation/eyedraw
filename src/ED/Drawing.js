@@ -180,6 +180,8 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 	this.imageArray['OedemaPatternBullous'] = new Image();
 	this.imageArray['BrownSpotPattern'] = new Image();
 	this.imageArray['TranslucentPattern'] = new Image();
+	this.imageArray['ThinningPattern'] = new Image();
+	this.imageArray['TraumaPattern'] = new Image();
 
 	// Set transform to map from doodle to canvas plane
 	this.transform.translate(this.canvas.width / 2, this.canvas.height / 2);
@@ -1684,6 +1686,7 @@ ED.Drawing.prototype.resetEyedraw = function() {
 	this.deselectDoodles();
 
 	this.addBindings(this.bindingArray);
+	this.notify("afterReset");
 };
 
 /**
@@ -2614,7 +2617,9 @@ ED.Drawing.prototype.reportData = function() {
 						'end': doodle.groupDescriptionEnd()
 					}
 				}
-				grouped[doodle.className]['descriptions'].push(description)
+				if (description.length) {
+					grouped[doodle.className]['descriptions'].push(description)
+				}
 			} else {
 				if (description.length) {
 					reports.push(description);

@@ -169,6 +169,6 @@ ED.UTear.prototype.snomedCode = function() {
  * @returns {Int} Position in diagnostic hierarchy
  */
 ED.UTear.prototype.diagnosticHierarchy = function() {
-	return 6;
+	return 0;
 }
 

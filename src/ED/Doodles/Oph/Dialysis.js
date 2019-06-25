@@ -152,5 +152,5 @@ ED.Dialysis.prototype.snomedCode = function() {
  * @returns {Int} Position in diagnostic hierarchy
  */
 ED.Dialysis.prototype.diagnosticHierarchy = function() {
-	return 4;
+	return 0;
 }

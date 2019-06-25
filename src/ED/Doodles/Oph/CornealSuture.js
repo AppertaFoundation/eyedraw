@@ -29,8 +29,13 @@ ED.CornealSuture = function(_drawing, _parameterJSON) {
 	// Derived parameters
 	this.removed = false;
 	
+	// Other parameters
+	var cornealGraft = _drawing.firstDoodleOfClass("CornealGraft");
+	this.cornealGraft = cornealGraft ? cornealGraft : null;
+	this.setParametersFromCornealGraft();
+	
 	// Saved parameters
-	this.savedParameterArray = ['radius', 'rotation','removed'];
+	this.savedParameterArray = ['originX', 'originY', 'radius', 'rotation','removed'];
 	
 	this.controlParameterArray = {'removed':'Removed'};
 	
@@ -59,12 +64,21 @@ ED.CornealSuture.prototype.setPropertyDefaults = function() {
 	}
 }
 
+ED.CornealSuture.prototype.setParametersFromCornealGraft = function() {
+	if (this.cornealGraft) {
+		this.originX = this.cornealGraft.originX;
+		this.originY = this.cornealGraft.originY;
+		this.radius = this.cornealGraft.diameter * this.cornealGraft.pixelsPerMillimetre/2;
+	}
+};
+
 /**
  * Sets default parameters
  */
 ED.CornealSuture.prototype.setParameterDefaults = function() {
 	this.radius = 374;
 	this.setRotationWithDisplacements(10, 20);
+	this.setParametersFromCornealGraft();
 }
 
 /**
@@ -82,6 +96,7 @@ ED.CornealSuture.prototype.draw = function(_point) {
 	// Boundary path
 	ctx.beginPath();
 
+	if (this.cornealGraft) this.radius = this.cornealGraft.diameter * this.cornealGraft.pixelsPerMillimetre/2;
 	var r = this.radius;
 	ctx.rect(-20, -(r + 40), 40, 80);
 
@@ -130,6 +145,7 @@ ED.CornealSuture.prototype.draw = function(_point) {
  *
  * @returns {String} Description of doodle
  */
+/*
 ED.CornealSuture.prototype.description = function() {
 	var returnString = "Corneal suture at ";
 
@@ -137,3 +153,21 @@ ED.CornealSuture.prototype.description = function() {
 
 	return returnString;
 }
+*/
+
+/**
+ * Returns a string containing a text description of the doodle
+ *
+ * @returns {String} Description of doodle
+ */
+ED.CornealSuture.prototype.groupDescription = function() {
+	
+	var returnString = "";
+
+	var number = this.drawing.numberOfDoodlesOfClass(this.className);
+	returnString = number + " corneal suture";
+
+	if (number > 1) returnString += "s";
+
+	return returnString;
+};
