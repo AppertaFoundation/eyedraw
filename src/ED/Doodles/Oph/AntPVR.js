@@ -142,5 +142,5 @@ ED.AntPVR.prototype.snomedCode = function() {
  * @returns {Int} Position in diagnostic hierarchy
  */
 ED.AntPVR.prototype.diagnosticHierarchy = function() {
-	return 2;
+	return 0;
 }

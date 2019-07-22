@@ -192,13 +192,8 @@ window.eyedrawDoodleScripts = [
     "ED/Doodles/Oph/VisualField.js",
     "ED/Doodles/Oph/VisualFieldChart.js",
     "ED/Doodles/Oph/VitreousOpacity.js",
-<<<<<<< HEAD
     "ED/Doodles/Oph/Drusen.js",
-    "ED/Doodles/Oph/MaculaPostPole.js",
-    "ED/Doodles/Oph/MaculaPostPole.js"
-=======
     "ED/Doodles/Oph/MaculaPostPole.js",
     "ED/Doodles/Oph/CornealOpacity.js",
     "ED/Doodles/Oph/CornealThinningCrossSection.js"
->>>>>>> feature/EDS-13
 ];
