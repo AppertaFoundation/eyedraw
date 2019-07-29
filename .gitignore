@@ -9,3 +9,4 @@
 /jsdocs
 .idea
 config.rb
+package-lock.json
