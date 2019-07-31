@@ -1527,7 +1527,7 @@ ED.Drawing.prototype.flipHor = function() {
  */
 ED.Drawing.prototype.deleteDoodle = function(_doodle, really) {
 	// Class name and flag for successful deletion
-	let deletedDoodle = false;
+	var deletedDoodle = false;
 
 	var errorMessage = 'Attempt to delete a doodle that does not exist';
 	// Check that doodle will delete
