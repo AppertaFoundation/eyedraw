@@ -1787,7 +1787,7 @@ ED.Drawing.prototype.flipHor = function() {
  */
 ED.Drawing.prototype.deleteDoodle = function(_doodle, really) {
 	// Class name and flag for successful deletion
-	var deletedClassName = false;
+	var deletedDoodle = false;
 
 	var errorMessage = 'Attempt to delete a doodle that does not exist';
 	// Check that doodle will delete
@@ -1796,7 +1796,7 @@ ED.Drawing.prototype.deleteDoodle = function(_doodle, really) {
 		for (var i = 0; i < this.doodleArray.length; i++) {
 			if (this.doodleArray[i].id == _doodle.id) {
 				if (really || this.doodleArray[i].isDeletable) {
-					deletedClassName = _doodle.className;
+					deletedDoodle = _doodle;
 
 					// If its selected, deselect it
 					if (this.selectedDoodle != null && this.selectedDoodle.id == _doodle.id) {
@@ -1867,7 +1867,7 @@ ED.Drawing.prototype.deleteDoodle = function(_doodle, really) {
 	}
 
 	// If successfully deleted, tidy up
-	if (deletedClassName) {
+	if (deletedDoodle) {
 		// Re-assign ordinal numbers within array
 		for (var i = 0; i < this.doodleArray.length; i++) {
 			this.doodleArray[i].order = i;
@@ -1877,7 +1877,7 @@ ED.Drawing.prototype.deleteDoodle = function(_doodle, really) {
 		this.repaint();
 
 		// Notify
-		this.notify("doodleDeleted", deletedClassName);
+		this.notify("doodleDeleted", deletedDoodle);
 	} else {
 		ED.errorHandler('ED.Drawing', 'deleteDoodle', errorMessage);
 	}
@@ -27545,7 +27545,7 @@ ED.CornealThinning.prototype.setHandles = function() {
  * Sets default properties
  */
 ED.CornealThinning.prototype.setPropertyDefaults = function() {
-	this.isUnique = true;
+	this.isUnique = false;
 	
 	// Create ranges to constrain handles
 	this.handleVectorRangeArray = new Array();
