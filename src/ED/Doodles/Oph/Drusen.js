@@ -29,8 +29,19 @@ ED.Drusen = function(_drawing, _parameterJSON) {
     this.drusenType = 'Hard';
     this.blur = 0;
 
+    this.scaleRangeMin = 0.5;
+    this.scaleRangeMax = 1.5;
+    this.maximumExtentOriginXRangeMin = -290;
+	this.maximumExtentOriginXRangeMax = +180;
+    this.maximumExtentOriginYRangeMin = -250;
+	this.maximumExtentOriginYRangeMax = +250;
+	this.minimumExtentOriginXRangeMin = -85;
+	this.minimumExtentOriginXRangeMax = -25;
+	this.minimumExtentOriginYRangeMin = -30;
+	this.minimumExtentOriginYRangeMax = +30;
+
 	// Saved parameters
-	this.savedParameterArray = ['apexY', 'scaleX', 'scaleY', 'drusenType', 'blur'];
+	this.savedParameterArray = ['originX', 'originY', 'apexY', 'scaleX', 'scaleY', 'drusenType', 'blur'];
 
     this.controlParameterArray = {
         'drusenType':'Drusen type'
@@ -59,15 +70,20 @@ ED.Drusen.prototype.setHandles = function() {
  * Sets default dragging attributes
  */
 ED.Drusen.prototype.setPropertyDefaults = function() {
-	this.isMoveable = false;
+	this.isMoveable = true;
 	this.isRotatable = false;
 	this.isUnique = true;
 
 	// Update component of validation array for simple parameters
 	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
 	this.parameterValidationArray['apexY']['range'].setMinAndMax(-160, +0);
-	this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.5, +1.5);
-	this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.5, +1.5);
+	this.parameterValidationArray['scaleX']['range'].setMinAndMax(this.scaleRangeMin, this.scaleRangeMax);
+	this.parameterValidationArray['scaleY']['range'].setMinAndMax(this.scaleRangeMin, this.scaleRangeMax);
+
+	this.parameterValidationArray['originX']['range'].setMinAndMax(this.maximumExtentOriginXRangeMin,
+		this.maximumExtentOriginXRangeMax);
+	this.parameterValidationArray['originY']['range'].setMinAndMax(this.maximumExtentOriginYRangeMin,
+		this.maximumExtentOriginYRangeMax);
 
     this.parameterValidationArray.drusenType = {
         kind: 'derived',
@@ -115,6 +131,28 @@ ED.Drusen.prototype.dependentParameterValues = function(_parameter, _value) {
                     returnArray.blur = 2;
                     break;
             }
+            break;
+		case 'scaleY':
+			var x = _value;
+			this.parameterValidationArray['originX']['range'].setMinAndMax(
+				MathHelper.calculateLinearFunctionFromPoints(this.scaleRangeMin, this.maximumExtentOriginXRangeMin,
+					this.scaleRangeMax, this.minimumExtentOriginXRangeMin, x),
+				MathHelper.calculateLinearFunctionFromPoints(this.scaleRangeMin, this.maximumExtentOriginXRangeMax,
+					this.scaleRangeMax, this.minimumExtentOriginXRangeMax, x)
+			);
+
+			this.parameterValidationArray['originY']['range'].setMinAndMax(
+				MathHelper.calculateLinearFunctionFromPoints(this.scaleRangeMin, this.maximumExtentOriginYRangeMin,
+					this.scaleRangeMax, this.minimumExtentOriginYRangeMin, x),
+				MathHelper.calculateLinearFunctionFromPoints(this.scaleRangeMin, this.maximumExtentOriginYRangeMax,
+					this.scaleRangeMax, this.minimumExtentOriginYRangeMax, x)
+			);
+
+			var newOriginY = this.parameterValidationArray['originY']['range'].constrain(this.originY);
+			var newOriginX = this.parameterValidationArray['originX']['range'].constrain(this.originX);
+			this.setSimpleParameter('originX', newOriginX);
+			this.setSimpleParameter('originY', newOriginY);
+			break;
 	}
 
 	return returnArray;
