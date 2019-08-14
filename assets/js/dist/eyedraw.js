@@ -46566,7 +46566,7 @@ ED.PeripapillaryAtrophy.prototype.description = function() {
 	if (max > this.radius) {
 		var degree = "Mild";
 		if (max > 350) degree = "Moderate";
-		if (max > 400) degree = "Signficant";
+		if (max > 400) degree = "Significant";
 		returnString += degree;
 		returnString += " peri-papillary atrophy, maximum ";
 		returnString += sector;
