@@ -96,7 +96,7 @@ ED.ToricPCIOL.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['model'] = {
 		kind: 'derived',
 		type: 'string',
-		list: ['AcrySof T3 (+1.50 D)', 'AcrySof T4 (+2.25 D)', 'AcrySof T5 (+3.00 D)', 'AA4203-TF (+2.00 D)', 'AA4203-TL (+3.50 D)'],
+		list: ['AcrySof T3 (+1.50 D)', 'AcrySof T4 (+2.25 D)', 'AcrySof T5 (+3.00 D)', 'AA4203-TF (+2.00 D)', 'AA4203-TL (+3.50 D)','Lisa Tri-toric','AT Torbi'],
 		animate: false
 	}
 
