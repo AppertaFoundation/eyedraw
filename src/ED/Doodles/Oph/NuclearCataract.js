@@ -195,5 +195,5 @@ ED.NuclearCataract.prototype.snomedCode = function() {
  * @returns {Int} Position in diagnostic hierarchy
  */
 ED.NuclearCataract.prototype.diagnosticHierarchy = function() {
-	return 3;
+	return 0;
 }

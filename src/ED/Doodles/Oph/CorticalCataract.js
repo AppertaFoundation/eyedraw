@@ -213,5 +213,5 @@ ED.CorticalCataract.prototype.snomedCode = function() {
  * @returns {Int} Position in diagnostic hierarchy
  */
 ED.CorticalCataract.prototype.diagnosticHierarchy = function() {
-	return 3;
+	return 0;
 }

@@ -179,5 +179,5 @@ ED.GRT.prototype.snomedCode = function() {
  * @returns {Int} Position in diagnostic hierarchy
  */
 ED.GRT.prototype.diagnosticHierarchy = function() {
-	return 7;
+	return 0;
 }

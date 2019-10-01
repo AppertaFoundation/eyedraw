@@ -310,5 +310,5 @@ ED.Pterygium.prototype.snomedCode = function() {
  * @returns {Int} Position in diagnostic hierarchy
  */
 ED.Pterygium.prototype.diagnosticHierarchy = function() {
-	return 4;
+	return 0;
 }

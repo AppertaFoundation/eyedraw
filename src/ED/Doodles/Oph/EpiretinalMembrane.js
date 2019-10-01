@@ -176,5 +176,5 @@ ED.EpiretinalMembrane.prototype.snomedCode = function() {
  * @returns {Int} Position in diagnostic hierarchy
  */
 ED.EpiretinalMembrane.prototype.diagnosticHierarchy = function() {
-	return 2;
+	return 0;
 }

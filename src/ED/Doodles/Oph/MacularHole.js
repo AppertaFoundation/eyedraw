@@ -150,5 +150,5 @@ ED.MacularHole.prototype.snomedCode = function() {
  * @returns {Int} Position in diagnostic hierarchy
  */
 ED.MacularHole.prototype.diagnosticHierarchy = function() {
-	return 2;
+	return 0;
 }

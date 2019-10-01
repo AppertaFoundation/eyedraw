@@ -176,7 +176,7 @@ ED.CNV.prototype.description = function() {
  * @returns {Int} SnoMed code of entity representated by doodle
  */
 ED.CNV.prototype.snomedCode = function() {
-	return 314517003;
+	return 75971007;
 }
 
 /**
@@ -185,5 +185,5 @@ ED.CNV.prototype.snomedCode = function() {
  * @returns {Int} Position in diagnostic hierarchy
  */
 ED.CNV.prototype.diagnosticHierarchy = function() {
-	return 2;
+	return 0;
 }

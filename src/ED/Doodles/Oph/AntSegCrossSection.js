@@ -30,7 +30,7 @@ ED.AntSegCrossSection = function(_drawing, _parameterJSON) {
 	// Derived parameters
 	this.pupilSize = 'Large';
 
-	this.colour = 'Blue';
+	this.colour = (typeof default_iris_colour) !== 'undefined' ? default_iris_colour : 'Blue';
     
 	// Saved parameters
 	this.savedParameterArray = ['apexY', 'apexX','colour','c'];

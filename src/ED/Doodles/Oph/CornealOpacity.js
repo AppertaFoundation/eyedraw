@@ -240,7 +240,7 @@ ED.CornealOpacity.prototype.dependentParameterValues = function(_parameter, _val
 			
 		case 'handles':
 			returnArray['w'] = this.calculateWidth();
-			returnArray['h'] = this.calculateHeight();
+            returnArray['h'] = this.calculateHeight();
 			returnArray['height'] = this.calculateHeight();
 			returnArray['minY'] = this.calculateMinY();
 			returnArray['maxY'] = this.calculateMaxY();
