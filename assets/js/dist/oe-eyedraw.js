@@ -594,6 +594,10 @@ ED.Controller = (function() {
 	Controller.prototype.runOnDoodlesLoadedCommands = function() {
 		var arr = (this.properties.onDoodlesLoadedCommandArray || []);
 		this.runCommands(arr);
+
+		if(this.mainToolbar != null) {
+			this.mainToolbar.updateState();
+		}
 	};
 
 	/**
@@ -1028,7 +1032,12 @@ ED.Views.DoodlePopup = (function() {
 		var html = Mustache.render(this.template, data);
 
 		// Forced GC. Remove data & event handlers from all child nodes.
-		this.container.empty();
+		// Both will clear out the element content however empty() is faster. html('') is a fallback for the removeChild() error that shows when jquery tries to access an element that no longer exists
+		try {
+			this.container.empty();
+		} catch(e) {
+			this.container.html('');
+		}
 
 		// Now we can safely replace the html.
 		this.container.html(html);
