@@ -160,7 +160,6 @@ ED.AntSegSteepAxis.prototype.draw = function(_point) {
 			var textOffset = 4;
 
 			if (angleDeg === 90.0 || angleDeg === 270.0) {
-				console.log('Changing offset');
 				textOffset = 2.75;
 			}
 			
