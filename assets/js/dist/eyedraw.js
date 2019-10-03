@@ -16767,8 +16767,6 @@ ED.AntSegSteepAxis.prototype.draw = function(_point) {
 	// Get context
 	var ctx = this.drawing.context;
 
-    ccc = ctx;
-
 	// Call draw method in superclass
 	ED.AntSegSteepAxis.superclass.draw.call(this, _point);
 	
