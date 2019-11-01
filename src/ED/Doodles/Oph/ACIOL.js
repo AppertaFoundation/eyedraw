@@ -25,6 +25,7 @@
 ED.ACIOL = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "ACIOL";
+  this.classGroupUnique = "Lens";
     this.csOriginX = -140;
 
 	// Saved parameters
