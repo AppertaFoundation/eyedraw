@@ -25,6 +25,7 @@
 ED.IOL = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "IOL";
+  this.classGroupUnique = "Lens";
 
 	// Other parameters
 	this.type = "PC";

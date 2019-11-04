@@ -13065,6 +13065,7 @@ ED.Perforation.prototype.diagnosticHierarchy = function() {
 ED.ACIOL = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "ACIOL";
+  this.classGroupUnique = "Lens";
     this.csOriginX = -140;
 
 	// Saved parameters
@@ -37614,6 +37615,7 @@ ED.InnerLeafBreak.prototype.description = function()
 ED.IOL = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "IOL";
+  this.classGroupUnique = "Lens";
 
 	// Other parameters
 	this.type = "PC";
@@ -40112,6 +40114,7 @@ ED.Lattice.prototype.diagnosticHierarchy = function()
 ED.Lens = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "Lens";
+  this.classGroupUnique = "Lens";
 
 	// Derived parameters
 	this.nuclearGrade = 'None';
@@ -45679,6 +45682,7 @@ ED.Patch.prototype.description = function() {
 ED.PCIOL = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "PCIOL";
+  this.classGroupUnique = "Lens";
 
 	// Other parameters
 	this.fixation = 'In-the-bag';
@@ -58229,6 +58233,7 @@ ED.Telangiectasis.prototype.snomedCode = function() {
 ED.ToricPCIOL = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "ToricPCIOL";
+  this.classGroupUnique = "Lens";
 
 	// Derived parameters
 	this.axis = 0;

@@ -25,6 +25,7 @@
 ED.ToricPCIOL = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "ToricPCIOL";
+  this.classGroupUnique = "Lens";
 
 	// Derived parameters
 	this.axis = 0;
