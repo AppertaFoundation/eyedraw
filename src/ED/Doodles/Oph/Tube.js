@@ -67,7 +67,7 @@ ED.Tube.prototype.setPropertyDefaults = function() {
 	this.isMoveable = false;
 	this.isRotatable = true;
 	this.snapToAngles = true;
-	this.isDeletable = false;
+	this.isDeletable = true;
 	this.isUnique = true;
 
 	// Update component of validation array for simple parameters

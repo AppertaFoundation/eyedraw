@@ -25,6 +25,7 @@
 ED.PCIOL = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "PCIOL";
+  this.classGroupUnique = "Lens";
 
 	// Other parameters
 	this.fixation = 'In-the-bag';
