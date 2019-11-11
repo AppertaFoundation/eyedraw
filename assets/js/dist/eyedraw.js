@@ -13065,8 +13065,7 @@ ED.Perforation.prototype.diagnosticHierarchy = function() {
 ED.ACIOL = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "ACIOL";
-  this.classGroupUnique = "Lens";
-    this.csOriginX = -140;
+  this.csOriginX = -140;
 
 	// Saved parameters
 	this.savedParameterArray = ['originX', 'originY', 'rotation', 'csOriginX'];
