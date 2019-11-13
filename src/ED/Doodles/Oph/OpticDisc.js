@@ -34,7 +34,7 @@ ED.OpticDisc = function(_drawing, _parameterJSON) {
 	this.cdRatio = 'Not checked';
 
 	// Saved parameters
-	this.savedParameterArray = ['apexY', 'mode'];
+	this.savedParameterArray = ['apexY', 'mode', 'cdRatio'];
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
