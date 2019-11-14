@@ -16818,8 +16818,13 @@ ED.AntSegSteepAxis.prototype.draw = function(_point) {
 	
 	// Non boundary drawing
 	if (this.drawFunctionMode === ED.drawFunctionMode.Draw) {
+		// Add background colour (black).
 		ctx.beginPath();
-		
+		ctx.fillStyle = "rgba(0, 0, 0, 1)";
+		ctx.fillRect(-(this.drawing.canvas.width / 2), -(this.drawing.canvas.height / 2), this.drawing.canvas.width, this.drawing.canvas.height);
+
+		ctx.beginPath();
+
 		// Set style defaults
 		ctx.font="bold 120px Arial";
 		ctx.fillStyle="white";
@@ -16875,9 +16880,9 @@ ED.AntSegSteepAxis.prototype.draw = function(_point) {
 		// Fill triangle in appropriate corner and colour for eye
 		ctx.fillStyle = (this.drawing.eye == ED.eye.Right) ? "green" : "red";
 		var eyeToggle = (this.drawing.eye == ED.eye.Right) ? +1 : -1;
-		ctx.moveTo(150 * eyeToggle, -900);
-		ctx.lineTo(900 * eyeToggle, -900);
-		ctx.lineTo(900 * eyeToggle, -150);
+		ctx.moveTo(110 * eyeToggle, -950);
+		ctx.lineTo(950 * eyeToggle, -950);
+		ctx.lineTo(950 * eyeToggle, -110);
 		ctx.fill();
 		
 		// Label "R" or "L" eye
