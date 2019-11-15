@@ -160,16 +160,29 @@ ED.AntSegSteepAxis.prototype.draw = function(_point) {
 		for (var i=0; i<n; i++) {
 			var angleRad = 2*Math.PI / n * i;
 			var angleDeg = angleRad * 180 / Math.PI;
-			var textOffset = 4;
+			var textOffset = 70;
 
-			if (angleDeg === 90.0 || angleDeg === 270.0) {
-				textOffset = 2.75;
+			switch (angleDeg) {
+				case 0.0:
+					ctx.textAlign = 'left';
+					textOffset = 10;
+					break;
+				case 90.0:
+					ctx.textAlign = 'center';
+					textOffset = 50;
+					break;
+				case 180.0:
+					ctx.textAlign = 'right';
+					textOffset = 10;
+					break;
+				case 270.0:
+					ctx.textAlign = 'center';
+					break;
 			}
-			
 			point1.setWithPolars(r, 2 * Math.PI - angleRad + 0.5*Math.PI);
 			point2.setWithPolars(r+d, 2 * Math.PI - angleRad + 0.5*Math.PI);
-			point3.setWithPolars(r+d*textOffset,2 * Math.PI - angleRad + 0.5*Math.PI);
-			
+			point3.setWithPolars(r+d+textOffset,2 * Math.PI - angleRad + 0.5*Math.PI);
+
 			ctx.moveTo(point1.x, point1.y);
 			ctx.lineTo(point2.x, point2.y);
 			ctx.fillText(angleDeg,point3.x,point3.y);
@@ -198,7 +211,7 @@ ED.AntSegSteepAxis.prototype.draw = function(_point) {
 		ctx.fill();
 		
 		// Label "R" or "L" eye
-		ctx.font="bold 150px Arial";
+		ctx.font="bold 132pt Arial";
 		ctx.lineWidth = 3;
 		ctx.strokeStyle = ctx.fillStyle;
 		var eyeText = (this.drawing.eye == ED.eye.Right) ? "R" : "L";
@@ -214,58 +227,49 @@ ED.AntSegSteepAxis.prototype.draw = function(_point) {
 		ctx.fillText("SN", 800 * eyeToggle, -400);
 
 		// Convert axis from degrees to radians
-		var axisRad = this.axis / 180 * Math.PI;		
-		
-		// Commented out by MSC 05/2018 so will indicate axis for all IOL types, not just the Toric
-		// If toric lens exists, draw flat axis
-// 		var toricLens = this.drawing.lastDoodleOfClass('ToricPCIOL');
-// 		if (toricLens) {
-// 			var phi = 0.7 * Math.PI / 4;
-// 			var axisRotation = toricLens.rotation + phi - 0.5077 * Math.PI;
+		var axisRad = this.axis / 180 * Math.PI;
 
-			// Draw steep axis
-			ctx.beginPath();
-			ctx.strokeStyle = (this.drawing.eye == ED.eye.Right) ? "green" : "red";
-			ctx.lineWidth = 40;
+		// Draw steep axis
+		ctx.beginPath();
+		ctx.strokeStyle = (this.drawing.eye == ED.eye.Right) ? "green" : "red";
+		ctx.lineWidth = 40;
 
-			ctx.save();
-			ctx.rotate(-axisRad);
+		ctx.save();
+		ctx.rotate(-axisRad);
 
-			var w = 380;
-			ctx.moveTo(-w, 0);
-			ctx.lineTo(w, 0);
-			ctx.stroke();
-			ctx.restore();
+		var w = 380;
+		ctx.moveTo(-w, 0);
+		ctx.lineTo(w, 0);
+		ctx.stroke();
+		ctx.restore();
 
-			ctx.save();
+		ctx.save();
 
-			// Central circle
-			ctx.beginPath();
-			ctx.fillStyle="white";
-			//ctx.lineWidth = 50;
-			ctx.arc(0, 0, (r / 1.8), 0, 2*Math.PI);
-			ctx.fill();
+		// Central circle
+		ctx.beginPath();
+		ctx.fillStyle="white";
+		//ctx.lineWidth = 50;
+		ctx.arc(0, 0, (r / 1.8), 0, 2*Math.PI);
+		ctx.fill();
 
-			// Axis value
-			ctx.beginPath();
+		// Axis value
+		ctx.beginPath();
 
-			ctx.font="bold 180px Arial";
-			ctx.fillStyle="black";
-			ctx.textAlign="center";
-			ctx.textBaseline = "middle";
-			ctx.lineWidth = 100;
-			ctx.strokeStyle = "black";
-			ctx.fillText(this.axis, 0,0);
+		ctx.font="bold 128pt Arial";
+		ctx.fillStyle="black";
+		ctx.textAlign="center";
+		ctx.textBaseline = "middle";
+		ctx.strokeStyle = "black";
+		ctx.fillText(this.axis, -8, 8);
 
-			ctx.restore();
-// 		}
+		ctx.restore();
 		
 		// Write delta K value, if derived from biometry (ie. not default values)
 		if (this.flatK !== 999.9 && this.steepK !== 999.9) {
 			this.calculateDeltaK();
-			ctx.font="bold 120px Arial";
+			ctx.font="bold 110pt Arial";
 			ctx.fillStyle = 'white';
-			ctx.fillText(this.deltaK + "D",-700,350);
+			ctx.fillText(this.deltaK + " D",-650,400);
 		}
 	}
 
