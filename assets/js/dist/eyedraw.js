@@ -16820,7 +16820,7 @@ ED.AntSegSteepAxis.prototype.draw = function(_point) {
 	if (this.drawFunctionMode === ED.drawFunctionMode.Draw) {
 		// Add background colour (black).
 		ctx.beginPath();
-		ctx.fillStyle = "rgba(0, 0, 0, 1)";
+		ctx.fillStyle = "rgb(10, 10, 20)";
 		ctx.fillRect(-(this.drawing.canvas.width / 2), -(this.drawing.canvas.height / 2), this.drawing.canvas.width, this.drawing.canvas.height);
 
 		ctx.beginPath();
