@@ -71,7 +71,7 @@ ED.Freehand.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['colourString'] = {
 		kind: 'derived',
 		type: 'colourString',
-		list: ['FF0000FF', '00FF00FF', '0000FFFF'],
+		list: ['FF0000FF', '00FF00FF', '0000FFFF', '974D04'],
 		animate: true
 	};
 	this.parameterValidationArray['filled'] = {
@@ -116,7 +116,7 @@ ED.Freehand.prototype.draw = function(_point) {
 	ctx.beginPath();
 
 	// Freehand drawing area
-	var halfWidth = 200;
+	var halfWidth = 400;
 	ctx.rect(-halfWidth, -halfWidth, halfWidth * 2, halfWidth * 2);
 
 	// Close path
@@ -159,7 +159,7 @@ ED.Freehand.prototype.draw = function(_point) {
 			ctx.stroke();
 
 			// Optionally fill if squiggle is complete (stops filling while drawing)
-			if (squiggle.filled && squiggle.complete) ctx.fill();
+			if (squiggle.filled && this.filled && squiggle.complete) ctx.fill();
 		}
 
 		// Draw optional label
@@ -180,4 +180,4 @@ ED.Freehand.prototype.draw = function(_point) {
 
 	// Return value indicating successful hittest
 	return this.isClicked;
-}
+};

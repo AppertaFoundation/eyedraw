@@ -1172,9 +1172,10 @@ ED.Doodle.prototype.parameterElement = function(_parameter, showLabel) {
 				}
 				else if (this.parameterValidationArray[_parameter].list[i] == "00FF00FF") {
 					option.innerText = "Green";
-				}
-				else {
+				} else if (this.parameterValidationArray[_parameter].list[i] == "0000FFFF") {
 					option.innerText = "Blue";
+				} else {
+					option.innerText = "Brown";
 				}
 				option.value = this.parameterValidationArray[_parameter].list[i];
 				element.appendChild(option);
