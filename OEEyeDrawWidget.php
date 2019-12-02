@@ -225,7 +225,7 @@ class OEEyeDrawWidget extends CWidget
 
 	/**
 	 * Automatically report on changes to the drawing
-	 * 
+	 *
 	 * @var string
 	 */
 	public $autoReport = '';
@@ -327,7 +327,7 @@ class OEEyeDrawWidget extends CWidget
 			$data = json_decode($this->model[$this->attribute]);
 
 			// Get the saved scale level from the first doodle
-			if (count($data)) {
+			if (is_array($data) && count($data)) {
 				$doodle = $data[0];
 				$scale = isset($doodle->scaleLevel) ? $doodle->scaleLevel : $this->scale;
 				// Switch the toggleScale value if the saved scale matches the toggleScale
