@@ -32,7 +32,7 @@ ED.Freehand = function(_drawing, _parameterJSON) {
 	this.labelFont = "60px sans-serif";
 
 	// Derived parameters
-	this.colourString = "00FF00FF";
+	this.colourString = "A35100";
 	this.filled = true;
 	this.thickness = 'Thin';
 	this.labelText = "";
@@ -71,7 +71,19 @@ ED.Freehand.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['colourString'] = {
 		kind: 'derived',
 		type: 'colourString',
-		list: ['FF0000FF', '00FF00FF', '0000FFFF', '974D04'],
+		list: [
+			'FF0000FF',	// RED
+			'FFB8ED', 	// PINK
+			'FF9806', 	// ORANGE
+			'E5A222', 	// LIGHT BROWN
+			'A35100', 	// DARK BROWN
+			'FFED3D', 	// YELLOW
+			'00FF00FF',	// GREEN
+			'0000FFFF',	// BLUE
+			'979797', 	// GREY
+			'252525', 	// BLACK
+			'FFFFFF' 	// WHITE
+		],
 		animate: true
 	};
 	this.parameterValidationArray['filled'] = {

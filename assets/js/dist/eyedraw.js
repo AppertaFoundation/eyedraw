@@ -4366,6 +4366,22 @@ ED.Doodle.prototype.parameterElement = function(_parameter, showLabel) {
 					option.innerText = "Green";
 				} else if (this.parameterValidationArray[_parameter].list[i] == "0000FFFF") {
 					option.innerText = "Blue";
+				} else if (this.parameterValidationArray[_parameter].list[i] == "FFB8ED") {
+					option.innerText = "Pink";
+				} else if (this.parameterValidationArray[_parameter].list[i] == "FF9806") {
+					option.innerText = "Orange";
+				} else if (this.parameterValidationArray[_parameter].list[i] == "FFED3D") {
+					option.innerText = "Yellow";
+				} else if (this.parameterValidationArray[_parameter].list[i] == "E5A222") {
+					option.innerText = "Light brown";
+				} else if (this.parameterValidationArray[_parameter].list[i] == "A35100") {
+					option.innerText = "Dark brown";
+				} else if (this.parameterValidationArray[_parameter].list[i] == "252525") {
+					option.innerText = "Black";
+				} else if (this.parameterValidationArray[_parameter].list[i] == "979797") {
+					option.innerText = "Grey";
+				} else if (this.parameterValidationArray[_parameter].list[i] == "FFFFFF") {
+					option.innerText = "White";
 				} else {
 					option.innerText = "Brown";
 				}
@@ -6994,7 +7010,7 @@ ED.Freehand = function(_drawing, _parameterJSON) {
 	this.labelFont = "60px sans-serif";
 
 	// Derived parameters
-	this.colourString = "00FF00FF";
+	this.colourString = "A35100";
 	this.filled = true;
 	this.thickness = 'Thin';
 	this.labelText = "";
@@ -7033,7 +7049,19 @@ ED.Freehand.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['colourString'] = {
 		kind: 'derived',
 		type: 'colourString',
-		list: ['FF0000FF', '00FF00FF', '0000FFFF', '974D04'],
+		list: [
+			'FF0000FF',	// RED
+			'FFB8ED', 	// PINK
+			'FF9806', 	// ORANGE
+			'E5A222', 	// LIGHT BROWN
+			'A35100', 	// DARK BROWN
+			'FFED3D', 	// YELLOW
+			'00FF00FF', // GREEN
+			'0000FFFF', // BLUE
+			'979797', 	// GREY
+			'252525', 	// BLACK
+			'FFFFFF' 	// WHITE
+		],
 		animate: true
 	};
 	this.parameterValidationArray['filled'] = {
@@ -7130,7 +7158,9 @@ ED.Freehand.prototype.draw = function(_point) {
 			ctx.font = this.labelFont;
 			this.labelWidth = ctx.measureText(this.labelText).width;
 			ctx.fillStyle = "black";
-			ctx.fillText(this.labelText, -this.labelWidth / 2, this.labelHeight / 6);
+			ctx.fillText(this.labelText, this.apexX, this.labelHeight / 6);
+
+			console.log(this.apexX);
 		}
 	}
 
