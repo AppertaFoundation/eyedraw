@@ -26,6 +26,7 @@
 ED.Lens = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "Lens";
+  this.classGroupUnique = "Lens";
 
 	// Derived parameters
 	this.nuclearGrade = 'None';

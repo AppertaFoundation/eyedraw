@@ -13065,7 +13065,7 @@ ED.Perforation.prototype.diagnosticHierarchy = function() {
 ED.ACIOL = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "ACIOL";
-    this.csOriginX = -140;
+  this.csOriginX = -140;
 
 	// Saved parameters
 	this.savedParameterArray = ['originX', 'originY', 'rotation', 'csOriginX'];
@@ -16372,7 +16372,7 @@ ED.AntSegCrossSection = function(_drawing, _parameterJSON) {
 	this.pupilSize = 'Large';
 
 	this.colour = (typeof default_iris_colour) !== 'undefined' ? default_iris_colour : 'Blue';
-    
+
 	// Saved parameters
 	this.savedParameterArray = ['apexY', 'apexX','colour','c'];
 
@@ -16424,13 +16424,13 @@ ED.AntSegCrossSection.prototype.setPropertyDefaults = function() {
 		list: ['Large', 'Medium', 'Small'],
 		animate: true
 	};
-	
+
 	this.parameterValidationArray['c'] = {
 		kind: 'other',
 		type: 'int',
 		animate: false
 	};
-	
+
 	this.parameterValidationArray.colour = {
 		kind: 'other',
 		type: 'string',
@@ -16474,12 +16474,13 @@ ED.AntSegCrossSection.prototype.dependentParameterValues = function(_parameter, 
 
 			// If being synced, make sensible decision about x
 			// Commented out by MCS as was preventing display of saved values ... the above prevents overlap with the PCIOL though
-			// if (!this.drawing.isActive) {
-			// 	var newOriginX = this.parameterValidationArray['apexX']['range'].max;
-			// } else {
-			// 	var newOriginX = this.parameterValidationArray['apexX']['range'].constrain(this.apexX);
-			// }
-			// this.setSimpleParameter('apexX', newOriginX);
+			// Uncommented for now as need to fix the overlap of iris
+			if (!this.drawing.isActive) {
+				var newOriginX = this.parameterValidationArray['apexX']['range'].max;
+			} else {
+				var newOriginX = this.parameterValidationArray['apexX']['range'].constrain(this.apexX);
+			}
+			this.setSimpleParameter('apexX', newOriginX);
 
 			// Set pupil size value
 			if (_value < -200) returnArray['pupilSize'] = 'Large';
@@ -16589,9 +16590,9 @@ ED.AntSegCrossSection.prototype.draw = function(_point) {
 				ctx.fillStyle = "rgba(169, 206, 141, 1)";
 				break;
 		}
-		
+
 // 		ctx.fillStyle = "rgba(255, 160, 40, 1)";
-		
+
 		// bottom iris
 		ctx.beginPath();
 		ctx.moveTo(70, 380);
@@ -16601,8 +16602,8 @@ ED.AntSegCrossSection.prototype.draw = function(_point) {
 		ctx.lineTo(55,480);
 		ctx.fill();
 		ctx.stroke();
-		ctx.closePath();	
-		
+		ctx.closePath();
+
 		// top iris
 		ctx.beginPath();
 		ctx.moveTo(70,-380);
@@ -16613,27 +16614,27 @@ ED.AntSegCrossSection.prototype.draw = function(_point) {
 		ctx.fill();
 		ctx.stroke();
 		ctx.closePath();
-		
-		ctx.fillStyle = "rgba(255, 160, 40, 1)";		
+
+		ctx.fillStyle = "rgba(255, 160, 40, 1)";
 		// top cilliary body and cutaway
 		ctx.beginPath();
 		ctx.moveTo(55, -480);
 		ctx.lineTo(140, -480);
 		ctx.lineTo(140, -380);
-	
+
 		ctx.bezierCurveTo(120, -340, 120, -340, 100, -380);
 		ctx.bezierCurveTo(80, -340, 80, -340, 55, -380);
 		ctx.fill();
 		ctx.stroke();
 		ctx.closePath();
 
-		
+
 		// bottom cilliary body	and cut away
 		ctx.beginPath();
 		ctx.moveTo(55, 480);
 		ctx.lineTo(140, 480);
 		ctx.lineTo(140, 380);
-	
+
 		ctx.bezierCurveTo(120, 340, 120, 340, 100, 380);
 		ctx.bezierCurveTo(80, 340, 80, 340, 55, 380);
 		ctx.fill();
@@ -37614,6 +37615,7 @@ ED.InnerLeafBreak.prototype.description = function()
 ED.IOL = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "IOL";
+  this.classGroupUnique = "Lens";
 
 	// Other parameters
 	this.type = "PC";
@@ -40112,6 +40114,7 @@ ED.Lattice.prototype.diagnosticHierarchy = function()
 ED.Lens = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "Lens";
+  this.classGroupUnique = "Lens";
 
 	// Derived parameters
 	this.nuclearGrade = 'None';
@@ -44367,7 +44370,7 @@ ED.OpticDisc = function(_drawing, _parameterJSON) {
 	this.cdRatio = 'Not checked';
 
 	// Saved parameters
-	this.savedParameterArray = ['apexY', 'mode'];
+	this.savedParameterArray = ['apexY', 'mode', 'cdRatio'];
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -45679,6 +45682,7 @@ ED.Patch.prototype.description = function() {
 ED.PCIOL = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "PCIOL";
+  this.classGroupUnique = "Lens";
 
 	// Other parameters
 	this.fixation = 'In-the-bag';
@@ -58229,6 +58233,7 @@ ED.Telangiectasis.prototype.snomedCode = function() {
 ED.ToricPCIOL = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "ToricPCIOL";
+  this.classGroupUnique = "Lens";
 
 	// Derived parameters
 	this.axis = 0;
