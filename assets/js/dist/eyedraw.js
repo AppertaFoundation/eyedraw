@@ -18679,7 +18679,7 @@ ED.Bleb.prototype.draw = function(_point) {
  * @returns {String} Description of doodle
  */
 ED.Bleb.prototype.description = function() {
-    var returnString = "Trabeculectomy bleb at " + this.clockHour() + " o'clock";
+    var returnString = "Drainage bleb at " + this.clockHour() + " o'clock";
     if (this.leakage !== "None") {
     	returnString += " with " + this.leakage.toLowerCase() + " leakage";
     }
