@@ -13,6 +13,7 @@ window.eyedrawDoodleTitles = {
     "AntPVR": "Anterior PVR",
     "AntSeg": "Anterior segment",
     "AntSegAngleMarks": "AntSegAngleMarks",
+    "AntSegSteepAxis": "AntSegSteepAxis",
     "AntSynech": "Anterior synechiae",
     "APattern": "A pattern",
     "ArcuateScotoma": "Arcuate scotoma",

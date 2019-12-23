@@ -49,7 +49,7 @@ class DoodleInfo
         'Arrow' => 'Arrow',
         'BandKeratopathy' => 'Band Keratopathy',
         'BiopsySite' => 'Biopsy site',
-        'Bleb' => 'Trabeculectomy bleb',
+        'Bleb' => 'Drainage bleb',
         'BlotHaemorrhage' => 'Blot haemorrhage',
         'Buckle' => 'Buckle',
         'BuckleOperation' => 'Buckle operation',
