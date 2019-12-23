@@ -21475,9 +21475,24 @@ ED.ConjunctivalFlap.prototype.description = function() {
 ED.ConjunctivalHaem = function(_drawing, _parameterJSON) {
     // Set classname
     this.className = "ConjunctivalHaem";
+    this.haemorrhage = false;
+    this.swelling = false;
+    this.bleedGrade = '+';
+    this.swellingGrade = '+';
+    this.conjunctivitis = false;
+    this.conjunctivitisType = 'Papillary';
 
     // Saved parameters
-    this.savedParameterArray = ['arc', 'rotation'];
+    this.savedParameterArray = ['haemorrhage', 'bleedGrade', 'swelling', 'swellingGrade', 'conjunctivitis', 'conjunctivitisType', 'arc', 'rotation'];
+
+    this.controlParameterArray = {
+        'haemorrhage': 'Haemorrhage',
+        'bleedGrade': 'Bleed Grade',
+        'swelling':'Swelling',
+        'swellingGrade':'Swelling Grade',
+        'conjunctivitis': 'Conjunctivitis',
+        'conjunctivitisType': 'Conjunctivitis Type'
+    };
 
     // Call super-class constructor
     ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -21504,15 +21519,61 @@ ED.ConjunctivalHaem.prototype.setHandles = function() {
  */
 ED.ConjunctivalHaem.prototype.setPropertyDefaults = function() {
     this.isMoveable = false;
+
+    this.parameterValidationArray['haemorrhage'] = {
+        kind: 'derived',
+        type: 'bool',
+        display: true
+    };
+    this.parameterValidationArray['bleedGrade'] = {
+        kind: 'other',
+        type: 'string',
+        list: ['+', '++', '+++'],
+        animate: false
+    };
+    this.parameterValidationArray['swelling'] = {
+        kind: 'derived',
+        type: 'bool',
+        display: true
+    };
+    this.parameterValidationArray['swellingGrade'] = {
+        kind: 'other',
+        type: 'string',
+        list: ['+', '++'],
+        animate: false
+    };
+    this.parameterValidationArray['conjunctivitis'] = {
+        kind: 'derived',
+        type: 'bool',
+        display: true
+    };
+    this.parameterValidationArray['conjunctivitisType'] = {
+        kind: 'other',
+        type: 'string',
+        list: ['Papillary', 'Follicular'],
+        animate: false
+    };
+};
+
+ED.ConjunctivalHaem.prototype.createPattern = function(density, colour) {
+    var pattern = document.createElement('canvas');
+    pattern.width = 20 * density;
+    pattern.height = 20 * density;
+    var pctx = pattern.getContext('2d');
+    pctx.fillStyle = colour;
+    pctx.fillRect(0,0,5* density,5 * density);
+    pctx.fillRect(10 * density,10 * density,5 * density,5 * density);
+
+    return pattern;
 };
 
 /**
  * Sets default parameters
  */
 ED.ConjunctivalHaem.prototype.setParameterDefaults = function() {
-    this.arc = 2.0944;
+    this.arc = 120 * Math.PI / 180;
 
-    this.setRotationWithDisplacements(120, 150);
+    this.setRotationWithDisplacements(180, 0);
 };
 
 /**
@@ -21546,19 +21607,68 @@ ED.ConjunctivalHaem.prototype.draw = function(_point) {
     // Boundary path
     ctx.beginPath();
 
-    // Arc across to mirror image point on the other side
-    ctx.arc(0, 0, ro, arcStart, arcEnd, true);
+    if (this.haemorrhage || this.swelling || this.conjunctivitis) {
+        // Arc across to mirror image point on the other side
+        ctx.arc(0, 0, ro, arcStart, arcEnd, true);
 
-    // Arc back to mirror image point on the other side
-    ctx.arc(0, 0, ri, arcEnd, arcStart, false);
+        // Arc back to mirror image point on the other side
+        ctx.arc(0, 0, ri, arcEnd, arcStart, false);
 
-    // Close path
+        // Close path
+        // ctx.closePath();
+
+        // Set line attributes
+        ctx.lineWidth = 0;
+        ctx.fillStyle = "rgba(255, 255, 255, 0)";
+        ctx.strokeStyle = "#dae6f1";
+    }
+
+    // When the conjunctiva is first selected- its default is to be blank
+
+    // If conjunctival haemorrahge is selected from the flyout [the color is red]
+
+
+
+
+    // If Haemorrhage - then regardless of additionselection the fill in colour for haemorrhage is shown.
+    if (this.haemorrhage) {
+
+        let density = 1.5;
+        let colour = "rgba(238,222,222,1)";
+
+        if(this.bleedGrade === '++' ) {
+            colour = "rgba(217,150,148,1)";
+            density = 1.25;
+        }
+        if(this.bleedGrade === '+++' ) {
+            colour = "rgba(255,37,3,1)";
+            density = 1;
+        }
+
+        ctx.fillStyle = ctx.createPattern(this.createPattern(density, colour), "repeat");
+    } else {
+        let density = 1.5;
+        let colour;
+
+        if (this.conjunctivitis) {
+            // PINK
+            colour = "rgba(255, 192, 203)";
+
+        } else if (!this.conjunctivitis && this.swelling) {
+            density = 1.5;
+            colour = "rgba(149,179,217,0.75)";
+
+            if (this.swellingGrade === '++' ) {
+                density = 1.25;
+                ctx.fillStyle = "rgba(85,141,213,0.75)";
+            }
+        }
+
+        ctx.fillStyle = ctx.createPattern(this.createPattern(density, colour), "repeat");
+    }
+
     ctx.closePath();
 
-    // Set line attributes
-    ctx.lineWidth = 4;
-    ctx.fillStyle = "rgba(200, 200, 200, 0.75)";
-    ctx.strokeStyle = "gray";
 
     // Draw boundary path (also hit testing)
     this.drawBoundary(_point);
