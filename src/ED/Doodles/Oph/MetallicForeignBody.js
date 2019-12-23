@@ -231,5 +231,5 @@ ED.MetallicForeignBody.prototype.description = function() {
  * @returns {Int} SnoMed code of entity representated by doodle
  */
 ED.MetallicForeignBody.prototype.snomedCode = function () {
-    return 422321007;
+    return 37450000;
 }
