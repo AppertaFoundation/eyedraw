@@ -28280,11 +28280,17 @@ ED.CornealThinning.prototype.description = function() {
  * @returns {Int} SnoMed code of entity representated by doodle
  */
 ED.CornealThinning.prototype.snomedCode = function() {
-	var code = 246938006; // Corneal Dellen (disorder) TODO: check appropriate for keratitis thinning
+	var code = 246938006; // Corneal Dellen
 
-	if (this.descemetacoele) code = 83110007; // Descemetacoele
+	if(this.type === "Keratitis") {
+		code = 5888003; // Keratitis
+	}
 
-	else if (this.perforation) code = 74895004; // Corneal perforation
+	if (this.descemetacoele) {
+		code = 83110007; // Descemetacoele
+	} else if (this.perforation){
+		code = 74895004; // Corneal perforation
+	}
 	
 	return code;
 }
@@ -43486,7 +43492,7 @@ ED.MetallicForeignBody.prototype.description = function() {
  * @returns {Int} SnoMed code of entity representated by doodle
  */
 ED.MetallicForeignBody.prototype.snomedCode = function () {
-    return 422321007;
+    return 37450000;
 }
 
 /**
