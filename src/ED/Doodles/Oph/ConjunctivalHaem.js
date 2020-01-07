@@ -25,23 +25,28 @@
 ED.ConjunctivalHaem = function(_drawing, _parameterJSON) {
     // Set classname
     this.className = "ConjunctivalHaem";
-    this.haemorrhage = false;
-    this.swelling = false;
-    this.bleedGrade = '+';
-    this.swellingGrade = '+';
-    this.conjunctivitis = false;
-    this.conjunctivitisType = 'Papillary';
+    //this.haemorrhage = false;
+    //this.swelling = false;
+    this.bleedGrade = 'None';
+    this.swellingGrade = 'None';
+    this.mucopurulent = false;
+    this.conjunctivitisType = 'None';
 
     // Saved parameters
-    this.savedParameterArray = ['haemorrhage', 'bleedGrade', 'swelling', 'swellingGrade', 'conjunctivitis', 'conjunctivitisType', 'arc', 'rotation'];
+    this.savedParameterArray = [
+        'bleedGrade',
+        'swellingGrade',
+        'conjunctivitisType',
+        'mucopurulent',
+        'arc',
+        'rotation'
+    ];
 
     this.controlParameterArray = {
-        'haemorrhage': 'Haemorrhage',
         'bleedGrade': 'Bleed Grade',
-        'swelling':'Swelling',
         'swellingGrade':'Swelling Grade',
-        'conjunctivitis': 'Conjunctivitis',
-        'conjunctivitisType': 'Conjunctivitis Type'
+        'conjunctivitisType': 'Conjunctivitis Type',
+        'mucopurulent': 'Mucopurulent'
     };
 
     // Call super-class constructor
@@ -70,29 +75,19 @@ ED.ConjunctivalHaem.prototype.setHandles = function() {
 ED.ConjunctivalHaem.prototype.setPropertyDefaults = function() {
     this.isMoveable = false;
 
-    this.parameterValidationArray['haemorrhage'] = {
-        kind: 'derived',
-        type: 'bool',
-        display: true
-    };
     this.parameterValidationArray['bleedGrade'] = {
         kind: 'other',
         type: 'string',
-        list: ['+', '++', '+++'],
+        list: ['None', '+', '++', '+++'],
         animate: false
-    };
-    this.parameterValidationArray['swelling'] = {
-        kind: 'derived',
-        type: 'bool',
-        display: true
     };
     this.parameterValidationArray['swellingGrade'] = {
         kind: 'other',
         type: 'string',
-        list: ['+', '++'],
+        list: ['None', '+', '++'],
         animate: false
     };
-    this.parameterValidationArray['conjunctivitis'] = {
+    this.parameterValidationArray['mucopurulent'] = {
         kind: 'derived',
         type: 'bool',
         display: true
@@ -100,7 +95,7 @@ ED.ConjunctivalHaem.prototype.setPropertyDefaults = function() {
     this.parameterValidationArray['conjunctivitisType'] = {
         kind: 'other',
         type: 'string',
-        list: ['Papillary', 'Follicular'],
+        list: ['None', 'Papillary', 'Follicular'],
         animate: false
     };
 };
