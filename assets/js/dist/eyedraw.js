@@ -463,16 +463,36 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 		var drawing = this;
 
 		// Mouse listeners
-		this.canvas.addEventListener('mousedown', function(e) {
+		this.canvas.addEventListener('touchstart', function(e) {
+			e.preventDefault();
 			var position = ED.findPosition(this, e);
 			var point = new ED.Point(position.x, position.y);
 			drawing.mousedown(point);
+		}, false);
+
+		this.canvas.addEventListener('mousedown', function(e) {
+			e.preventDefault();
+			var position = ED.findPosition(this, e);
+			var point = new ED.Point(position.x, position.y);
+			drawing.mousedown(point);
+		}, false);
+
+		this.canvas.addEventListener('touchend', function(e) {
+			var position = ED.findPosition(this, e);
+			var point = new ED.Point(position.x, position.y);
+			drawing.mouseup(point);
 		}, false);
 
 		this.canvas.addEventListener('mouseup', function(e) {
 			var position = ED.findPosition(this, e);
 			var point = new ED.Point(position.x, position.y);
 			drawing.mouseup(point);
+		}, false);
+
+		this.canvas.addEventListener('touchmove', function(e) {
+			var position = ED.findPosition(this, e);
+			var point = new ED.Point(position.x, position.y);
+			drawing.mousemove(point);
 		}, false);
 
 		this.canvas.addEventListener('mousemove', function(e) {
