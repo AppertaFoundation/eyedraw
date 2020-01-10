@@ -27,14 +27,15 @@ ED.ConjunctivalHaem = function(_drawing, _parameterJSON) {
     this.className = "ConjunctivalHaem";
     //this.haemorrhage = false;
     //this.swelling = false;
-    this.bleedGrade = 'None';
+    this.haemorrhageGrade = 'None';
     this.swellingGrade = 'None';
+  //  this.bleedGrade = 'None';
     this.mucopurulent = false;
     this.conjunctivitisType = 'None';
 
     // Saved parameters
     this.savedParameterArray = [
-        'bleedGrade',
+        'haemorrhageGrade',
         'swellingGrade',
         'conjunctivitisType',
         'mucopurulent',
@@ -43,9 +44,9 @@ ED.ConjunctivalHaem = function(_drawing, _parameterJSON) {
     ];
 
     this.controlParameterArray = {
-        'bleedGrade': 'Bleed Grade',
-        'swellingGrade':'Swelling Grade',
-        'conjunctivitisType': 'Conjunctivitis Type',
+        'haemorrhageGrade': 'Haemorrhage',
+        'swellingGrade':'Swelling',
+        'conjunctivitisType': 'Conjunctivitis',
         'mucopurulent': 'Mucopurulent'
     };
 
@@ -75,12 +76,20 @@ ED.ConjunctivalHaem.prototype.setHandles = function() {
 ED.ConjunctivalHaem.prototype.setPropertyDefaults = function() {
     this.isMoveable = false;
 
+    this.parameterValidationArray['haemorrhageGrade'] = {
+        kind: 'other',
+        type: 'string',
+        list: ['None', '+', '++', '+++'],
+        animate: false
+    };
+
     this.parameterValidationArray['bleedGrade'] = {
         kind: 'other',
         type: 'string',
         list: ['None', '+', '++', '+++'],
         animate: false
     };
+
     this.parameterValidationArray['swellingGrade'] = {
         kind: 'other',
         type: 'string',
@@ -152,7 +161,7 @@ ED.ConjunctivalHaem.prototype.draw = function(_point) {
     // Boundary path
     ctx.beginPath();
 
-    if (this.haemorrhage || this.swelling || this.conjunctivitis) {
+    if (this.haemorrhageGrade !== 'None' || this.swellingGrade !== 'None' || this.conjunctivitisType !== 'None') {
         // Arc across to mirror image point on the other side
         ctx.arc(0, 0, ro, arcStart, arcEnd, true);
 
@@ -176,16 +185,16 @@ ED.ConjunctivalHaem.prototype.draw = function(_point) {
 
 
     // If Haemorrhage - then regardless of additionselection the fill in colour for haemorrhage is shown.
-    if (this.haemorrhage) {
+    if (this.haemorrhageGrade !== 'None') {
 
         let density = 1.5;
         let colour = "rgba(238,222,222,1)";
 
-        if(this.bleedGrade === '++' ) {
+        if(this.haemorrhageGrade === '++' ) {
             colour = "rgba(217,150,148,1)";
             density = 1.25;
         }
-        if(this.bleedGrade === '+++' ) {
+        if(this.haemorrhageGrade === '+++' ) {
             colour = "rgba(255,37,3,1)";
             density = 1;
         }
@@ -195,11 +204,11 @@ ED.ConjunctivalHaem.prototype.draw = function(_point) {
         let density = 1.5;
         let colour;
 
-        if (this.conjunctivitis) {
+        if (this.conjunctivitisType !== 'None') {
             // PINK
             colour = "rgba(255, 192, 203)";
 
-        } else if (!this.conjunctivitis && this.swelling) {
+        } else if (this.conjunctivitisType === 'None' && this.swellingGrade !== 'None') {
             density = 1.5;
             colour = "rgba(149,179,217,0.75)";
 
