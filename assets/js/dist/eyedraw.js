@@ -463,39 +463,16 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 		var drawing = this;
 
 		// Mouse listeners
-		this.canvas.addEventListener("touchstart", function (e) {
-			//const mousePos = getTouchPos(canvas, e);
-			const touch = e.touches[0];
-			const mouseEvent = new MouseEvent("mousedown", {
-				clientX: touch.clientX,
-				clientY: touch.clientY
-			});
-			this.canvas.dispatchEvent(mouseEvent);
-		}, false);
-
 		this.canvas.addEventListener('mousedown', function(e) {
-			e.preventDefault();
 			var position = ED.findPosition(this, e);
 			var point = new ED.Point(position.x, position.y);
 			drawing.mousedown(point);
-		}, false);
-
-		this.canvas.addEventListener('touchend', function(e) {
-			var position = ED.findPosition(this, e);
-			var point = new ED.Point(position.x, position.y);
-			drawing.mouseup(point);
 		}, false);
 
 		this.canvas.addEventListener('mouseup', function(e) {
 			var position = ED.findPosition(this, e);
 			var point = new ED.Point(position.x, position.y);
 			drawing.mouseup(point);
-		}, false);
-
-		this.canvas.addEventListener('touchmove', function(e) {
-			var position = ED.findPosition(this, e);
-			var point = new ED.Point(position.x, position.y);
-			drawing.mousemove(point);
 		}, false);
 
 		this.canvas.addEventListener('mousemove', function(e) {
@@ -536,7 +513,7 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 				isEyeDrawElement = new RegExp(ignore).test(elem.className);
 			} while (
 				(elem = elem.parentNode) && (elem !== document.body) && (!isEyeDrawElement)
-			);
+				);
 
 			if (!isEyeDrawElement) {
 				drawing.deselectDoodles();
@@ -562,7 +539,7 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 		}, false);
 
 		this.canvas.addEventListener('touchend', function(e) {
-            if (this.lastTouchPoint !== undefined) {
+			if (this.lastTouchPoint !== undefined) {
 				drawing.mouseup(this.lastTouchPoint);
 				this.lastTouchPoint = undefined;
 			}
@@ -572,7 +549,7 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 			if (e.targetTouches[0] !== undefined) {
 				var canvas_pos = drawing.getPositionOfElement(drawing.canvas);
 				var point = new ED.Point(e.targetTouches[0].pageX - canvas_pos[0] - this.offsetLeft, e.targetTouches[0].pageY - canvas_pos[1]);
-                this.lastTouchPoint = point;
+				this.lastTouchPoint = point;
 				drawing.mousemove(point);
 			}
 		}, false);
@@ -590,17 +567,17 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 };
 
 ED.Drawing.prototype.getPositionOfElement = function(element) {
-		var x=0;
-		var y=0;
-		while(true){
-				x += element.offsetLeft;
-				y += element.offsetTop;
-				if(element.offsetParent === null){
-						break;
-				}
-				element = element.offsetParent;
+	var x=0;
+	var y=0;
+	while(true){
+		x += element.offsetLeft - element.scrollLeft;
+		y += element.offsetTop - element.scrollTop;
+		if(element.offsetParent === null){
+			break;
 		}
-		return [x, y];
+		element = element.offsetParent;
+	}
+	return [x, y];
 };
 
 /**
@@ -2609,9 +2586,9 @@ ED.Drawing.prototype.updateBindings = function(_doodle) {
 						element.value = value;
 					}
 					if (originalValue !== element.value) {
-                        // trigger a change event for anything listen to the bound html elements
-                        // instead of the eyedraw doodles.
-                        window.setTimeout(function(el) { el.dispatchEvent(new Event('change', {bubbles: true, cancelable: true})); }.bind(null, element), 100)
+						// trigger a change event for anything listen to the bound html elements
+						// instead of the eyedraw doodles.
+						window.setTimeout(function(el) { el.dispatchEvent(new Event('change', {bubbles: true, cancelable: true})); }.bind(null, element), 100)
 					}
 					break;
 
@@ -2912,15 +2889,15 @@ ED.Drawing.prototype.reportData = function() {
 	}
 
 	// consolidate group reports
-  for (var cls in grouped) {
+	for (var cls in grouped) {
 		var groupStr = '';
-    if (grouped.hasOwnProperty(cls)) {
-      groupStr = grouped[cls]['start'];
-      groupStr += ED.addAndAfterLastComma(grouped[cls]['descriptions'].join(", "));
-      groupStr += grouped[cls]['end'];
-      reports.push(groupStr);
-    }
-  }
+		if (grouped.hasOwnProperty(cls)) {
+			groupStr = grouped[cls]['start'];
+			groupStr += ED.addAndAfterLastComma(grouped[cls]['descriptions'].join(", "));
+			groupStr += grouped[cls]['end'];
+			reports.push(groupStr);
+		}
+	}
 
 	return reports;
 }
@@ -2931,27 +2908,27 @@ ED.Drawing.prototype.reportData = function() {
  * @returns {String} Description of the drawing
  */
 ED.Drawing.prototype.report = function() {
-    var returnString = "";
-    var doodleArray = this.doodleArray;
-    var reports = this.reportData();
-    for (var i = 0; i < reports.length; i++) {
-        var description = reports[i];
+	var returnString = "";
+	var doodleArray = this.doodleArray;
+	var reports = this.reportData();
+	for (var i = 0; i < reports.length; i++) {
+		var description = reports[i];
 
-        /* handled special formats with doodle's own formatReport method */
-        var special = (function(description) {
-            return doodleArray.find(function(obj) {
-                return obj.description() === description && typeof obj.formatReport === 'function';
-            });
-        }(description));
-        if (special) {
-            description = special.formatReport();
+		/* handled special formats with doodle's own formatReport method */
+		var special = (function(description) {
+			return doodleArray.find(function(obj) {
+				return obj.description() === description && typeof obj.formatReport === 'function';
+			});
+		}(description));
+		if (special) {
+			description = special.formatReport();
 		} else {
-            description = ED.firstLetterToLowerCase(reports[i]);
+			description = ED.firstLetterToLowerCase(reports[i]);
 		}
 
-        returnString += (i === 0) ? ED.firstLetterToUpperCase(description) : ", " + description;
-    }
-    return returnString;
+		returnString += (i === 0) ? ED.firstLetterToUpperCase(description) : ", " + description;
+	}
+	return returnString;
 }
 
 /**
@@ -2969,17 +2946,17 @@ ED.Drawing.prototype.diagnosis = function() {
 		var codeArray = doodle.snomedCodes();
 		for (var j = 0; j < codeArray.length; j++) {
 			var code = codeArray[j][0];
-            if (code > 0) {
-                var codePosition = codeArray[j][1];
-                if (codePosition > topOfHierarchy) {
-                    topOfHierarchy = codePosition;
-                    returnCodes.push(code);
-                } else if (codePosition == topOfHierarchy) {
-                    if (returnCodes.indexOf(code) < 0) {
-                        returnCodes.push(code);
-                    }
-                }
-            }
+			if (code > 0) {
+				var codePosition = codeArray[j][1];
+				if (codePosition > topOfHierarchy) {
+					topOfHierarchy = codePosition;
+					returnCodes.push(code);
+				} else if (codePosition == topOfHierarchy) {
+					if (returnCodes.indexOf(code) < 0) {
+						returnCodes.push(code);
+					}
+				}
+			}
 
 		}
 	}
@@ -3212,7 +3189,6 @@ ED.Drawing.prototype.getScaleLevel = function() {
 //}
 //
 //ED.DoodleGroups.foo = 4;
-
 /**
  * Doodles are components of drawings which have built in knowledge of what they represent, and how to behave when manipulated;
  * Doodles are drawn in the 'doodle plane' consisting of 1001 pixel square grid with central origin (ie -500 to 500) and
