@@ -219,7 +219,7 @@ class DoodleInfo
         'Vicryl' => 'Vicryl suture',
         'ViewObscured' => 'View obscured',
         'VitelliformMacularLesion' => 'Vitelliform lesions',
-        'VitreousOpacity' => 'Vitreous opacity',
+        'VitreousOpacity' => 'Vitreous haemorrhage',
         'VPattern' => 'V pattern',
         'Crepitations' => 'Crepitations',
         'Stenosis' => 'Stenosis',
