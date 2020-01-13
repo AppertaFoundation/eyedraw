@@ -1720,6 +1720,7 @@ ED.Drawing.prototype.resetEyedraw = function() {
 
 	this.addBindings(this.bindingArray);
 	this.notify("afterReset");
+	$(document).trigger('eyedrawAfterReset');
 };
 
 /**
