@@ -169,7 +169,7 @@ window.eyedrawDoodleTitles = {
     "UTear": "Traction \u2018U\u2019 tear",
     "Vicryl": "Vicryl suture",
     "ViewObscured": "View obscured",
-    "VitreousOpacity": "Vitreous opacity",
+    "VitreousOpacity": "Vitreous haemorrhage",
     "VPattern": "V pattern",
     "Crepitations": "Crepitations",
     "Stenosis": "Stenosis",
