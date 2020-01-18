@@ -49668,10 +49668,10 @@ ED.PosteriorCapsule.prototype.description = function() {
 			returnValue += " with no shaped capsulotomy";
 			break;
 		case 'Diamond':
-			returnValue = "Diamond shapedcapsulotomy of posterior capsule";
+			returnValue = "Diamond shaped capsulotomy of posterior capsule";
 			break;
 		case 'Circle':
-			returnValue = "Circle shapedcapsulotomy of posterior capsule";
+			returnValue = "Circle shaped capsulotomy of posterior capsule";
 			break;
 	}
 
