@@ -188,14 +188,14 @@ ED.ConjunctivalHaem.prototype.draw = function(_point) {
     if (this.haemorrhageGrade !== 'None') {
 
         let density = 1.5;
-        let colour = "rgba(238,222,222,1)";
+        let colour = "rgb(218,186,186)";
 
         if(this.haemorrhageGrade === '++' ) {
-            colour = "rgba(217,150,148,1)";
+            colour = "rgb(198,131,129)";
             density = 1.25;
         }
         if(this.haemorrhageGrade === '+++' ) {
-            colour = "rgba(255,37,3,1)";
+            colour = "rgb(206,37,3)";
             density = 1;
         }
 
@@ -214,7 +214,7 @@ ED.ConjunctivalHaem.prototype.draw = function(_point) {
 
             if (this.swellingGrade === '++' ) {
                 density = 1.25;
-                ctx.fillStyle = "rgba(85,141,213,0.75)";
+                colour = "rgba(85,141,213,0.75)";
             }
         }
 
@@ -244,14 +244,70 @@ ED.ConjunctivalHaem.prototype.draw = function(_point) {
  * @returns {String} Group description
  */
 ED.ConjunctivalHaem.prototype.groupDescription = function() {
-    return "Nerve fibre layer defect at ";
+    var doodles = this.drawing.allDoodlesOfClass(this.className);
+    var returnObject = {};
+    var returnString = "";
+
+    for (let i = 0; i < doodles.length; i++) {
+        let doodle = doodles[i];
+        returnObject[this.getDescriptionForDoodle(doodle)] = this.getDescriptionForDoodle(doodle);
+    }
+
+    for (let desc in returnObject) {
+        if (!returnObject.hasOwnProperty(desc)){
+            continue;
+        }
+        if(returnString !== ''){
+            returnString += ', ';
+        }
+        returnString += desc;
+    }
+    return returnString;
+
 };
 
-/**
- * Returns a string containing a text description of the doodle
- *
- * @returns {String} Description of doodle
- */
-ED.ConjunctivalHaem.prototype.description = function() {
-    return this.clockHour() + " o'clock";
+ED.ConjunctivalHaem.prototype.getDescriptionForDoodle = function(doodle) {
+    let description = '';
+    if (doodle.haemorrhageGrade !== 'None') {
+        description += "Haemorrhage " + doodle.haemorrhageGrade + " at " + doodle.clockHour() + " o'clock";
+    }
+
+    if (doodle.swellingGrade !== 'None') {
+        description += "Swelling " + doodle.swellingGrade + " at " + doodle.clockHour() + " o'clock";
+    }
+
+    if (doodle.conjunctivitisType !== 'None') {
+        if (doodle.conjunctivitisType === 'Papillary') {
+            description += "Papillary conjunctivitis";
+        }
+        if (doodle.conjunctivitisType === 'Follicular') {
+            description += "Follicular conjunctivitis";
+        }
+    }
+    if (doodle.mucopurulent === true) {
+        description += "Mucopurulent";
+
+    }
+
+    return description;
+};
+
+ED.ConjunctivalHaem.prototype.snomedCodes = function()
+{
+    const snomedCodes = [];
+
+    if (this.haemorrhageGrade !== 'None') {
+        snomedCodes.push([1117005, 3]);
+    }
+    if (this.swellingGrade !== 'None') {
+        snomedCodes.push([84178004, 3]);
+    }
+    if (this.conjunctivitisType === 'Papillary') {
+        snomedCodes.push([416878008, 3]);
+    }
+    if (this.conjunctivitisType === 'Follicular') {
+        snomedCodes.push([86402005, 3]);
+    }
+
+    return snomedCodes;
 };

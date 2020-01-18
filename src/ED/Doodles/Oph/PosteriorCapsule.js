@@ -27,7 +27,7 @@ ED.PosteriorCapsule = function(_drawing, _parameterJSON) {
 	this.className = "PosteriorCapsule";
 
 	// Derived parameters
-	this.opacity = '1';
+	this.opacity = 'None';
 	this.capsulotomy = 'None';
 
 	// Saved parameters
@@ -64,7 +64,7 @@ ED.PosteriorCapsule.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['opacity'] = {
 		kind: 'derived',
 		type: 'string',
-		list: ['1', '2', '3', '4'],
+		list: ['None', 'Mild', 'Moderate', 'Severe'],
 		animate: false
 	};
 	this.parameterValidationArray['capsulotomy'] = {
@@ -144,16 +144,16 @@ ED.PosteriorCapsule.prototype.draw = function(_point) {
 
 		// Opacity
 		switch (this.opacity) {
-			case '1':
+			case 'None':
 				ctx.fillStyle = "rgba(255, 255, 255, 0.1)";
 				break;
-			case '2':
+			case 'Mild':
 				ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
 				break;
-			case '3':
+			case 'Moderate':
 				ctx.fillStyle = "rgba(200, 200, 200, 0.5)";
 				break;
-			case '4':
+			case 'Severe':
 				ctx.fillStyle = "rgba(150, 150, 150, 0.5)";
 				break;
 			default:
@@ -179,26 +179,36 @@ ED.PosteriorCapsule.prototype.draw = function(_point) {
 ED.PosteriorCapsule.prototype.description = function() {
 	var returnValue = "";
 
-	if (this.opacity != '1') {
+	if (this.opacity != 'None') {
 		returnValue += this.opacity + " posterior capsular opacity";
 	}
 
 	switch (this.opacity) {
-				case '2':
-					returnValue = "Mild PCO reducing the red reflex, Elschnig pearls to the IOL edge";
-					break;
-				case '3':
-					returnValue = "Moderate fibrosis or Elschnig pearls inside IOL edge, but with a clear visual axis";
-					break;
-				case '4':
-					returnValue = "Severe fibrosis or Elschnig pearls covering the visual axis and severely reducing the red reflex";
-					break;
+		case 'None':
+			returnValue = 'No posterior capsule opacification';
+			break;
+		case 'Mild':
+			returnValue = "Mild posterior capsule opacification";
+			break;
+		case 'Moderate':
+			returnValue = "Moderate posterior capsule opacification";
+			break;
+		case 'Severe':
+			returnValue = "Severe posterior capsule opacification";
+			break;
 	}
 
-	if (this.capsulotomy != 'None') {
-		var shape = this.capsulotomy.toLowerCase();
-		returnValue += " with " + shape + " shaped capsulotomy";
+	switch (this.capsulotomy) {
+		case 'None':
+			returnValue += " with no shaped capsulotomy";
+			break;
+		case 'Diamond':
+			returnValue = "Diamond shapedcapsulotomy of posterior capsule";
+			break;
+		case 'Circle':
+			returnValue = "Circle shapedcapsulotomy of posterior capsule";
+			break;
 	}
 
 	return returnValue;
-}
+};
