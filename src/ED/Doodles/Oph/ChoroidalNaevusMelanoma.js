@@ -30,12 +30,28 @@ ED.ChoroidalNaevusMelanoma = function(_drawing, _parameterJSON) {
 	this.numberOfHandles = 4;
 	this.initialRadius = 120;
 	this.type = 'Naevus';
+	this.thickness = 3;
+	this.margin = 3;
+	this.subretinal_fluid = false;
+	this.orange_pigment = false;
+	this.pigment_halo = false;
+	this.drusen = false;
 
 	// Saved parameters
 	this.savedParameterArray = [
 		'originX', 'originY', 'apexX', 'apexY', 'rotation',
 		'type', 'thickness', 'margin', 'subretinal_fluid', 'orange_pigment', 'pigment_halo', 'drusen'
 	];
+
+	this.controlParameterArray = {
+		'type':'Type',
+		'thickness': 'Thickness',
+		'margin': 'margin to optic disc',
+		'subretinal_fluid': 'Subretinal fluid',
+		'orange_pigment': 'Orange pigment',
+		'pigment_halo': 'Pigment halo',
+		'drusen': 'Drusen'
+	};
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -62,7 +78,7 @@ ED.ChoroidalNaevusMelanoma.prototype.setHandles = function() {
 
 	// Handle for apex
 	this.handleArray[this.numberOfHandles] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
-}
+};
 
 /**
  * Sets default properties
@@ -93,6 +109,19 @@ ED.ChoroidalNaevusMelanoma.prototype.setPropertyDefaults = function() {
 		type: 'string',
 		list: ['Melanoma', 'Naevus', 'Osteoma'],
 		animate: false
+	};
+
+	this.parameterValidationArray['thickness'] = {
+		kind: 'derived',
+		type: 'mod',
+		range: new ED.Range(3, 10),
+		display: true
+	};
+	this.parameterValidationArray['margin'] = {
+		kind: 'derived',
+		type: 'mod',
+		range: new ED.Range(3, 10),
+		display: true
 	};
 
 	this.parameterValidationArray['subretinal_fluid'] = {
@@ -136,7 +165,7 @@ ED.ChoroidalNaevusMelanoma.prototype.setParameterDefaults = function() {
 		point.setWithPolars(this.initialRadius, i * 2 * Math.PI / this.numberOfHandles);
 		this.addPointToSquiggle(point);
 	}
-}
+};
 
 /**
  * Draws doodle or performs a hit test if a Point parameter is passed
@@ -166,10 +195,10 @@ ED.ChoroidalNaevusMelanoma.prototype.draw = function(_point) {
 	ctx.moveTo(this.squiggleArray[0].pointsArray[0].x, this.squiggleArray[0].pointsArray[0].y);
 
 	// Complete curve segments
-	for (var i = 0; i < this.numberOfHandles; i++) {
+	for (let i = 0; i < this.numberOfHandles; i++) {
 		// From and to points
 		fp = this.squiggleArray[0].pointsArray[i];
-		var toIndex = (i < this.numberOfHandles - 1) ? i + 1 : 0;
+		let toIndex = (i < this.numberOfHandles - 1) ? i + 1 : 0;
 		tp = this.squiggleArray[0].pointsArray[toIndex];
 
 		// Control points
@@ -185,7 +214,14 @@ ED.ChoroidalNaevusMelanoma.prototype.draw = function(_point) {
 
 	// Set attributes
 	ctx.lineWidth = 4;
-	ctx.fillStyle = "rgba(125, 65, 54, 0.8)";
+	ctx.fillStyle = "rgba(219,87,13,0.8)"; //Naevus
+	if (this.type === 'Melanoma') {
+		ctx.fillStyle = "rgba(125, 65, 54, 0.8)";
+	}
+	if (this.type === 'Osteoma') {
+		ctx.fillStyle = "rgba(213,209,182,0.8)";
+	}
+
 	ctx.strokeStyle = ctx.fillStyle;
 
 	// Draw boundary path (also hit testing)
@@ -194,28 +230,30 @@ ED.ChoroidalNaevusMelanoma.prototype.draw = function(_point) {
 	// Non boundary paths
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
 		// Drusen
-		p = new ED.Point(0,0);
-		fill = "yellow";
-		var dr = 4;
-		n = Math.abs(Math.floor((-this.apexY + 50) / 5));
-		for (var i = 0; i < n; i++) {
+		let p = new ED.Point(0,0);
+		let fill = "yellow";
+		let dr = 4;
+		let n = Math.abs(Math.floor((-this.apexY + 50) / 5));
+		for (let i = 0; i < n; i++) {
 			p.setWithPolars(this.initialRadius * 0.8 * ED.randomArray[i + 10], 2 * Math.PI * ED.randomArray[i + 100]);
 			this.drawSpot(ctx, p.x, p.y, dr * 2, fill);
 		}
 	}
 
 	// Coordinates of handles (in canvas plane)
-	for (var i = 0; i < this.numberOfHandles; i++) {
+	for (let i = 0; i < this.numberOfHandles; i++) {
 		this.handleArray[i].location = this.transform.transformPoint(this.squiggleArray[0].pointsArray[i]);
 	}
 	this.handleArray[this.numberOfHandles].location = this.transform.transformPoint(new ED.Point(this.apexX, this.apexY));
 
 	// Draw handles if selected
-	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+	if (this.isSelected && !this.isForDrawing) {
+		this.drawHandles(_point);
+	}
 
 	// Return value indicating successful hittest
 	return this.isClicked;
-}
+};
 
 /**
  * Returns a string containing a text description of the doodle
@@ -223,14 +261,41 @@ ED.ChoroidalNaevusMelanoma.prototype.draw = function(_point) {
  * @returns {String} Description of doodle
  */
 ED.ChoroidalNaevusMelanoma.prototype.description = function() {
-	return 'Choroidal naevus';
-}
+	let desc = this.type;
+	
+	if (this.subretinal_fluid) {
+		desc += ', subretinal fluid';
+	}
+	if (this.orange_pigment) {
+		desc += ' with lipofuscin';
+	}
+	if (this.pigment_halo) {
+		desc += ' with pigment halo';
+	}
+	if (this.dursen) {
+		desc += ' with dursen';
+	}
+
+	return desc;
+};
 
 /**
  * Returns the SnoMed code of the doodle
  *
  * @returns {Int} SnoMed code of entity representated by doodle
  */
-ED.ChoroidalNaevusMelanoma.prototype.snomedCode = function() {
-	return 255024002;
-}
+ED.ChoroidalNaevusMelanoma.prototype.snomedCodes = function() {
+	const snomedCodes = [];
+
+	if (this.type === 'Melanoma') {
+		snomedCodes.push([399634005, 3]);
+	}
+	if (this.type === 'Naevus') {
+		snomedCodes.push([255024002, 3]);
+	}
+	if (this.type === 'Osteoma') {
+		snomedCodes.push([255025001, 3]);
+	}
+
+	return snomedCodes;
+};

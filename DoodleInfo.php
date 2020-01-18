@@ -61,7 +61,7 @@ class DoodleInfo
         'ChoroidalHaemorrhage' => 'Choroidal haemorrhage',
         'ChoroidalEffusion' => 'Choroidal effusion',
         'ChoroidalNaevus' => 'Choroidal naevus',
-        'ChoroidalNaevus' => 'Choroidal mass/pigment',
+        'ChoroidalNaevusMelanoma' => 'Choroidal mass/pigment',
         'CiliaryInjection' => 'Cilary injection',
         'Circinate' => 'Circinate retinopathy',
         'CircumferentialBuckle' => 'Circumferential buckle',
