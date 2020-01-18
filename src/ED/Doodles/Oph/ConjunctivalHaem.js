@@ -269,23 +269,23 @@ ED.ConjunctivalHaem.prototype.groupDescription = function() {
 ED.ConjunctivalHaem.prototype.getDescriptionForDoodle = function(doodle) {
     let description = '';
     if (doodle.haemorrhageGrade !== 'None') {
-        description += "Haemorrhage " + doodle.haemorrhageGrade + " at " + doodle.clockHour() + " o'clock";
+        description += " Haemorrhage " + doodle.haemorrhageGrade + " at " + doodle.clockHour() + " o'clock";
     }
 
     if (doodle.swellingGrade !== 'None') {
-        description += "Swelling " + doodle.swellingGrade + " at " + doodle.clockHour() + " o'clock";
+        description += " Swelling " + doodle.swellingGrade + " at " + doodle.clockHour() + " o'clock";
     }
 
     if (doodle.conjunctivitisType !== 'None') {
         if (doodle.conjunctivitisType === 'Papillary') {
-            description += "Papillary conjunctivitis";
+            description += " Papillary conjunctivitis";
         }
         if (doodle.conjunctivitisType === 'Follicular') {
-            description += "Follicular conjunctivitis";
+            description += " Follicular conjunctivitis";
         }
     }
     if (doodle.mucopurulent === true) {
-        description += "Mucopurulent";
+        description += " Mucopurulent";
 
     }
 
