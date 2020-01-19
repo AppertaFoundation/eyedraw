@@ -45,8 +45,8 @@ ED.ChoroidalNaevusMelanoma = function(_drawing, _parameterJSON) {
 
 	this.controlParameterArray = {
 		'type':'Type',
-		'thickness': 'Thickness',
-		'margin': 'margin to optic disc',
+		'thickness': 'Thickness (mm)',
+		'margin': 'Margin to optic disc (mm)',
 		'subretinal_fluid': 'Subretinal fluid',
 		'orange_pigment': 'Orange pigment',
 		'pigment_halo': 'Pigment halo',
@@ -275,6 +275,8 @@ ED.ChoroidalNaevusMelanoma.prototype.description = function() {
 	if (this.dursen) {
 		desc += ' with dursen';
 	}
+
+	desc += '. Thickness ' + this.thickness + ' mm and Margin to optic disc ' + this.margin + ' mm';
 
 	return desc;
 };
