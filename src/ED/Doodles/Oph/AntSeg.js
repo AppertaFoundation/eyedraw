@@ -369,9 +369,9 @@ ED.AntSeg.prototype.description = function() {
 	var pupilSize = Math.round(-this.apexY * 0.03);
 
 	// Pupil size and coloboma and corneal size
-	returnValue += this.pupilSize.toLowerCase() + " pupil (diameter: " + pupilSize + "mm)";
+	returnValue += this.pupilSize.toLowerCase() + " pupil (diameter: " + pupilSize + "mm), ";
 		if(this.cornealSize.toLowerCase() !== 'not checked'){
-			returnValue += ', corneal size : ' +  this.cornealSize.toLowerCase();
+			returnValue += 'corneal size : ' +  this.cornealSize.toLowerCase() + ", ";
         }
 
 	// Coloboma
@@ -422,7 +422,7 @@ ED.AntSeg.prototype.description = function() {
 */
 
 	// Remove final comma and space and capitalise first letter
-	returnValue = returnValue.replace(/, +$/, '');
+	returnValue = returnValue.replace(/, +$/, '').replace('<', '&lt;');
 	returnValue = returnValue.charAt(0).toUpperCase() + returnValue.slice(1);
 
 	return returnValue;
