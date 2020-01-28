@@ -30878,7 +30878,7 @@ ED.DendriticUlcer.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
 	this.parameterValidationArray['apexY']['range'].setMinAndMax(-50, +50);
 
-	this.addAtBack = true;
+	this.addAtBack = false;
 }
 
 /**
@@ -50078,7 +50078,7 @@ ED.PosteriorSynechia.prototype.draw = function(_point) {
 	// Outer radius is position of apex handle
 	var ri = -this.apexY;
 
-	// Radius of control pointssur
+	// Radius of control points
 	var rc = ri + (ro - ri) / 2;
 
 	// Boundary path

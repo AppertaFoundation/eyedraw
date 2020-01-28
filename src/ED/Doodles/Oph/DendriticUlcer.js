@@ -79,7 +79,7 @@ ED.DendriticUlcer.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
 	this.parameterValidationArray['apexY']['range'].setMinAndMax(-50, +50);
 
-	this.addAtBack = true;
+	this.addAtBack = false;
 }
 
 /**
