@@ -21941,18 +21941,18 @@ ED.ConjunctivalHaem.prototype.draw = function(_point) {
     if (this.haemorrhageGrade !== 'None') {
 
         let density = 1.5;
-        let colour = "rgb(218,186,186)";
+        let colour = "rgb(240,10,8)";
 
         if(this.haemorrhageGrade === '++' ) {
-            colour = "rgb(198,131,129)";
+            colour = "rgb(208,10,8)";
             density = 1.25;
         }
         if(this.haemorrhageGrade === '+++' ) {
-            colour = "rgb(206,37,3)";
+            colour = "rgb(148,10,8)";
             density = 1;
         }
 
-        ctx.fillStyle = ctx.createPattern(this.createPattern(density, colour), "repeat");
+        ctx.fillStyle = colour; //ctx.createPattern(this.createPattern(density, colour), "repeat");
     } else {
         let density = 1.5;
         let colour;
