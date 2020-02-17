@@ -63,6 +63,7 @@
                 var syncArray = new Array();
                 if (_drawing.idSuffix == 'RPS')
                 {
+				console.log(_drawing.idSuffix);
                     syncArray['LPS'] = {
                         AntSeg:{AntSegCrossSection:{parameters:['apexY','c']}},
                         PCIOL:{PCIOLCrossSection:{parameters:['originY', 'fx']}},
@@ -338,6 +339,13 @@
                                 <span class="label"> (CornealOpacity)</span>
                             </a>
                         </li>
+						<li>
+                            <a class="ed-button" href="#" data-function="addDoodle" data-arg="PosteriorCapsule" onclick="drawingEdit1.addDoodle('PosteriorCapsule');">
+                                <span class="icon-ed-PosteriorCapsule"></span>
+                                <span class="label"> (PosteriorCapsule)</span>
+                            </a>
+                        </li>
+						
                     </ul>
                 </div>
                 <div class="ed-body">
