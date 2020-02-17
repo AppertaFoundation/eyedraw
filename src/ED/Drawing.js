@@ -350,6 +350,39 @@ ED.Drawing.prototype.replaceWithImage = function() {
 };
 
 /**
+ * Replaces the Eyedraw canvas inline with a div containing a background image. This can be used to create a static image that
+ * can dynamically scale with the generated container.
+ * @param {String} class_list String of CSS classes to append to the container.
+ * @param {boolean} remove_ed_container true if the Eyedraw container needs to be removed after generating the div container; otherwise false.
+ */
+ED.Drawing.prototype.replaceWithBGImage = function(class_list, remove_ed_container) {
+	// Create a new image element
+	var container = document.createElement("div");
+
+	container.setAttribute('class', class_list);
+
+	// Base64 encoded PNG version of the canvas element
+	container.setAttribute('style', 'background-image:url(' + this.canvas.toDataURL('image/png') + ');');
+
+	// Removes canvas and hidden input element (+ any other children) as they will be replaced with an image
+	if (this.canvasParent.hasChildNodes()) {
+		while (this.canvasParent.childNodes.length >= 1) {
+			this.canvasParent.removeChild(this.canvasParent.firstChild);
+		}
+	}
+
+	if (remove_ed_container) {
+		// Add the background image div to the parent container for the Eyedraw container.
+		this.canvasParent.parentNode.parentNode.parentNode.parentNode.appendChild(container);
+
+		// Remove the Eyedraw container.
+		this.canvasParent.parentNode.parentNode.parentNode.remove();
+	} else {
+		this.canvasParent.appendChild(container);
+	}
+};
+
+/**
  * Preloads image files
  *
  * @param {String} Relative path to directory where images are stored
@@ -1687,6 +1720,7 @@ ED.Drawing.prototype.resetEyedraw = function() {
 
 	this.addBindings(this.bindingArray);
 	this.notify("afterReset");
+	$(document).trigger('eyedrawAfterReset');
 };
 
 /**

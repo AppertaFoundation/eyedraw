@@ -2179,6 +2179,7 @@ ED.Doodle.prototype.json = function() {
 				} else if (typeof(o) == 'number') {
 					o = o.toFixed(2);
 				} else if (typeof(o) == 'string') {
+          o = o.replace('<', '&lt;');
 					o = '"' + o + '"';
 				} else if (typeof(o) == 'boolean') {
 					o = o;
