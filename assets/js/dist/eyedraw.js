@@ -45860,7 +45860,6 @@ ED.OpticDisc = function(_drawing, _parameterJSON) {
 
 	// Derived parameters
 	this.mode = "Basic";
-	this.cdRatio = 'Not checked';
 
 	// Saved parameters
 	this.savedParameterArray = ['apexY', 'mode', 'cdRatio'];
@@ -45998,14 +45997,15 @@ ED.OpticDisc.prototype.dependentParameterValues = function(_parameter, _value) {
 			break;
 
 		case 'cdRatio':
-
-			if (_value === "Not checked") {
-				returnArray['apexY'] = -(parseFloat("0.3") * 300);
-			} else if(_value !== "No view") {
-				newValue = parseFloat(_value) * 300;
-				returnArray['apexY'] = -newValue;
-			} else {
-				returnArray['apexY'] = -320;
+			if (_value !== "-0.0") {
+				if (_value === "Not checked") {
+					returnArray['apexY'] = -(parseFloat("0.3") * 300);
+				} else if (_value !== "No view") {
+					newValue = parseFloat(_value) * 300;
+					returnArray['apexY'] = -newValue;
+				} else {
+					returnArray['apexY'] = -320;
+				}
 			}
 			break;
 
