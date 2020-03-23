@@ -60,6 +60,8 @@ ED.Fovea.prototype.setHandles = function() {
  */
 ED.Fovea.prototype.setPropertyDefaults = function() {
 	this.isRotatable = false;
+	this.isMoveable = false;
+	this.isUnique = true;
 
 	// Update component of validation array for simple parameters
 	this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.5, +2);
