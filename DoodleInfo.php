@@ -65,7 +65,7 @@ class DoodleInfo
         'CiliaryInjection' => 'Cilary injection',
         'Circinate' => 'Circinate retinopathy',
         'CircumferentialBuckle' => 'Circumferential buckle',
-        'CNV' => 'Choroidal new vessels',
+        'CNV' => 'Extra-foveal CNV',
         'ConjunctivalFlap' => 'Conjunctival flap',
         'ConjunctivalSuture' => 'Conjunctival suture',
         'Conjunctivitis' => 'Conjunctivitis',
