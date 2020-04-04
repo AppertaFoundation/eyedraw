@@ -26,15 +26,15 @@ ED.Fovea = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "Fovea";
 
-	this.type = 'Normal fovea';
-	this.subfoveal = 'Type1';
+	this.type = 'Normal';
+	this.subfoveal = 'Normal';
 
 	// Saved parameters
-	this.savedParameterArray = ['originX', 'originY', 'scaleX', 'scaleY', 'type'];
+	this.savedParameterArray = ['originX', 'originY', 'scaleX', 'scaleY', 'type', 'subfoveal'];
 
 	this.controlParameterArray = {
 		'type': 'Type',
-		'subfoveal': 'Subfoveal'
+		'subfoveal': 'CNV type'
 	};
 
 	// Call superclass constructor
@@ -70,14 +70,16 @@ ED.Fovea.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['type'] = {
 		kind: 'other',
 		type: 'string',
-		list: ['Normal fovea', 'CNV', 'Disciform scar'],
+		list: ['Normal', 'CNV', 'Disciform', 'Macular Hole'],
 		animate: false
 	};
 
 	this.parameterValidationArray['subfoveal'] = {
 		kind: 'other',
 		type: 'string',
-		list: ['Type1', 'Type2', 'Type3'],
+		list: ['Normal', 'Type 1 CNV', 'Type 2 CNV', 'Type 3 CNV', 'Disciform AMD',
+				'Stage I macula hole', 'Stage II macula hole', 'Stage III macula hole', 'Stage IV macula hole'
+		],
 		animate: false
 	};
 
@@ -89,8 +91,15 @@ ED.Fovea.prototype.setPropertyDefaults = function() {
  */
 ED.Fovea.prototype.setParameterDefaults = function() {
 	this.setOriginWithDisplacements(0, -100);
-	this.setParameterFromString('type', 'Normal fovea');
-	this.setParameterFromString('subfoveal', 'Type1');
+	this.setParameterFromString('type', 'Normal');
+	this.setParameterFromString('subfoveal', 'Normal');
+
+	// Macular hole is displaced for Fundus, central for others
+	if (this.drawing.hasDoodleOfClass('Fundus') && this.type === 'Macular Hole') {
+		this.originX = this.drawing.eye == ED.eye.Right ? -100 : 100;
+		this.scaleX = 0.5;
+		this.scaleY = 0.5;
+	}
 };
 
 /**
@@ -105,12 +114,14 @@ ED.Fovea.prototype.draw = function(_point) {
 	// Call draw method in superclass
 	ED.Fovea.superclass.draw.call(this, _point);
 
-	if (this.type === 'Normal fovea') {
+	if (this.type === 'Normal') {
 		this.drawNormalFovea(ctx, _point);
 	} else if (this.type === 'CNV') {
 		this.drawCNV(ctx, _point, false);
-	} else if(this.type === 'Disciform scar') {
+	} else if(this.type === 'Disciform') {
 		this.drawCNV(ctx, _point, true);
+	} else if(this.type === 'Macular Hole') {
+		this.drawMacularHole(ctx, _point, true);
 	}
 
 	// Return value indicating successful hit test
@@ -221,6 +232,45 @@ ED.Fovea.prototype.drawCNV = function(ctx, _point, isDisciform) {
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
 };
 
+ED.Fovea.prototype.drawMacularHole = function(ctx, _point) {
+	// Radius
+	var r = 40;
+
+	// Boundary path
+	ctx.beginPath();
+
+	// Large yellow circle - hole and subretinal fluid
+	ctx.arc(0, 0, r, 0, Math.PI * 2, true);
+
+	// Close path
+	ctx.closePath();
+
+	// Set line attributes
+	ctx.lineWidth = 0;
+	ctx.fillStyle = "yellow";
+	ctx.strokeStyle = "red";
+
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+
+	// Non boundary paths
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+		ctx.beginPath();
+		ctx.arc(0, 0, 2 * r / 3, 0, Math.PI * 2, true);
+		ctx.closePath();
+		ctx.fillStyle = "red";
+		ctx.fill();
+	}
+
+	// Coordinates of handles (in canvas plane)
+	const point = new ED.Point(0, 0);
+	point.setWithPolars(r, Math.PI / 4);
+	this.handleArray[2].location = this.transform.transformPoint(point);
+
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+};
+
 /**
  * Returns a string containing a text description of the doodle
  *
@@ -230,10 +280,12 @@ ED.Fovea.prototype.description = function() {
 
 	if (this.type === 'CNV') {
 		return 'Choroidal neovascular membrane (' + this.subfoveal + ')';
-	} else if (this.type === 'Disciform scar') {
-		return 'Disciform scar';
+	} else if (this.type === 'Disciform') {
+		return 'Disciform';
+	} else if (this.type === 'Macular Hole') {
+		return "Macular hole";
 	}
-	return "Normal fovea";
+	return "Normal";
 };
 
 /**
@@ -243,10 +295,12 @@ ED.Fovea.prototype.description = function() {
  */
 ED.Fovea.prototype.snomedCode = function() {
 
-	if (this.type === 'Normal fovea') {
+	if (this.type === 'Normal') {
 		return 67046006;
 	} else if (this.type === 'CNV') {
 		return 75971007;
+	} else if (this.type === 'Macular Hole') {
+		return 232006002;
 	}
 
 	// Disciform scar
