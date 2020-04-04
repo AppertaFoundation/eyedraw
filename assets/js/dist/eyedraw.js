@@ -35273,7 +35273,6 @@ ED.Fovea.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['type'] = {
 		kind: 'other',
 		type: 'string',
-		// list: ['Normal fovea', 'CNV', 'Disciform scar'],
 		list: ['Normal', 'CNV', 'Disciform', 'Macular Hole'],
 		animate: false
 	};
