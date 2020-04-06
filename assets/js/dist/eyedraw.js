@@ -35229,15 +35229,13 @@ ED.Fovea = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "Fovea";
 
-	this.type = 'Normal fovea';
-	this.subfoveal = 'Type1';
+	this.type = 'Normal';
 
 	// Saved parameters
 	this.savedParameterArray = ['originX', 'originY', 'scaleX', 'scaleY', 'type'];
 
 	this.controlParameterArray = {
-		'type': 'Type',
-		'subfoveal': 'Subfoveal'
+		'type': 'Type'
 	};
 
 	// Call superclass constructor
@@ -35273,18 +35271,14 @@ ED.Fovea.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['type'] = {
 		kind: 'other',
 		type: 'string',
-		list: ['Normal fovea', 'CNV', 'Disciform scar'],
+		list: [
+			'Normal',
+			'Type 1 CNV', 'Type 2 CNV', 'Type 3 CNV',
+			'Disciform AMD',
+			'Stage I macula hole', 'Stage II macula hole', 'Stage III macula hole', 'Stage IV macula hole'
+		],
 		animate: false
 	};
-
-	this.parameterValidationArray['subfoveal'] = {
-		kind: 'other',
-		type: 'string',
-		list: ['Type1', 'Type2', 'Type3'],
-		animate: false
-	};
-
-
 };
 
 /**
@@ -35292,8 +35286,7 @@ ED.Fovea.prototype.setPropertyDefaults = function() {
  */
 ED.Fovea.prototype.setParameterDefaults = function() {
 	this.setOriginWithDisplacements(0, -100);
-	this.setParameterFromString('type', 'Normal fovea');
-	this.setParameterFromString('subfoveal', 'Type1');
+	this.setParameterFromString('type', 'Normal');
 };
 
 /**
@@ -35308,12 +35301,14 @@ ED.Fovea.prototype.draw = function(_point) {
 	// Call draw method in superclass
 	ED.Fovea.superclass.draw.call(this, _point);
 
-	if (this.type === 'Normal fovea') {
+	if (this.type === 'Normal') {
 		this.drawNormalFovea(ctx, _point);
-	} else if (this.type === 'CNV') {
+	} else if (this.type.indexOf(' CNV') > -1) {
 		this.drawCNV(ctx, _point, false);
-	} else if(this.type === 'Disciform scar') {
+	} else if(this.type === 'Disciform AMD') {
 		this.drawCNV(ctx, _point, true);
+	} else if(this.type.indexOf('macula hole') > -1) {
+		this.drawMacularHole(ctx, _point, true);
 	}
 
 	// Return value indicating successful hit test
@@ -35424,6 +35419,45 @@ ED.Fovea.prototype.drawCNV = function(ctx, _point, isDisciform) {
 	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
 };
 
+ED.Fovea.prototype.drawMacularHole = function(ctx, _point) {
+	// Radius
+	var r = 40;
+
+	// Boundary path
+	ctx.beginPath();
+
+	// Large yellow circle - hole and subretinal fluid
+	ctx.arc(0, 0, r, 0, Math.PI * 2, true);
+
+	// Close path
+	ctx.closePath();
+
+	// Set line attributes
+	ctx.lineWidth = 0;
+	ctx.fillStyle = "yellow";
+	ctx.strokeStyle = "red";
+
+	// Draw boundary path (also hit testing)
+	this.drawBoundary(_point);
+
+	// Non boundary paths
+	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+		ctx.beginPath();
+		ctx.arc(0, 0, 2 * r / 3, 0, Math.PI * 2, true);
+		ctx.closePath();
+		ctx.fillStyle = "red";
+		ctx.fill();
+	}
+
+	// Coordinates of handles (in canvas plane)
+	const point = new ED.Point(0, 0);
+	point.setWithPolars(r, Math.PI / 4);
+	this.handleArray[2].location = this.transform.transformPoint(point);
+
+	// Draw handles if selected
+	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+};
+
 /**
  * Returns a string containing a text description of the doodle
  *
@@ -35431,10 +35465,12 @@ ED.Fovea.prototype.drawCNV = function(ctx, _point, isDisciform) {
  */
 ED.Fovea.prototype.description = function() {
 
-	if (this.type === 'CNV') {
-		return 'Choroidal neovascular membrane (' + this.subfoveal + ')';
-	} else if (this.type === 'Disciform scar') {
-		return 'Disciform scar';
+	if (this.type.indexOf(' CNV') > -1) {
+		return 'Choroidal neovascular membrane (' + this.type.replace(' CNV', '') + ')';
+	} else if (this.type === 'Disciform AMD') {
+		return this.type;
+	} else if (this.type.indexOf('macula hole') > -1) {
+		return 'Macula hole (' + this.type.replace(' macula hole' , '') + ')';
 	}
 	return "Normal fovea";
 };
@@ -35446,10 +35482,12 @@ ED.Fovea.prototype.description = function() {
  */
 ED.Fovea.prototype.snomedCode = function() {
 
-	if (this.type === 'Normal fovea') {
+	if (this.type === 'Normal') {
 		return 67046006;
-	} else if (this.type === 'CNV') {
+	} else if (this.type.indexOf(' CNV') > -1) {
 		return 75971007;
+	} else if (this.type.indexOf('macula hole') > -1) {
+		return 232006002;
 	}
 
 	// Disciform scar
@@ -40204,12 +40242,20 @@ ED.KeraticPrecipitates = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "KeraticPrecipitates";
 
+	this.size = 'Fine';
+	this.number = '+';
+
 	// Saved parameters
-	this.savedParameterArray = ['apexX', 'apexY', 'scaleX', 'scaleY', 'originX', 'originY'];
+	this.savedParameterArray = ['apexX', 'apexY', 'scaleX', 'scaleY', 'originX', 'originY', 'type', 'number'];
+
+	this.controlParameterArray = {
+		'size': 'Size',
+		'number': 'Number',
+	};
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
-}
+};
 
 /**
  * Sets superclass and constructor
@@ -40238,7 +40284,23 @@ ED.KeraticPrecipitates.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['apexY']['range'].setMinAndMax(-160, +0);
 	this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.5, +1.5);
 	this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.5, +1.5);
-}
+
+	this.parameterValidationArray.size = {
+		kind: 'derived',
+		type: 'string',
+		list: ['Fine', 'Medium', 'Large (mutton fat)', 'Stellate', 'Confluent'],
+		animate: true
+	};
+
+	this.parameterValidationArray.number = {
+		kind: 'derived',
+		type: 'string',
+		list: ['Solitary', '+', '++', '+++'],
+		animate: true
+	};
+
+
+};
 
 /**
  * Sets default parameters (Only called for new doodles)
@@ -40251,7 +40313,22 @@ ED.KeraticPrecipitates.prototype.setParameterDefaults = function() {
 		this.scaleX = 0.5;
 		this.scaleY = 0.5;
 	}
-}
+
+	this.setParameterFromString('size', 'Fine');
+	this.setParameterFromString('number', 'Solitary');
+};
+
+ED.KeraticPrecipitates.prototype.dependentParameterValues = function(_parameter, _value) {
+	let returnArray = {};
+
+	switch (_parameter) {
+		case 'type':
+		case 'number':
+			alert("to be implemented");
+	}
+
+	return returnArray;
+};
 
 /**
  * Draws doodle or performs a hit test if a Point parameter is passed
