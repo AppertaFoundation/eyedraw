@@ -27,7 +27,6 @@ ED.Fovea = function(_drawing, _parameterJSON) {
 	this.className = "Fovea";
 
 	this.type = 'Normal';
-	this.subfoveal = 'Normal';
 
 	// Saved parameters
 	this.savedParameterArray = ['originX', 'originY', 'scaleX', 'scaleY', 'type'];
@@ -77,17 +76,6 @@ ED.Fovea.prototype.setPropertyDefaults = function() {
 		],
 		animate: false
 	};
-
-	// this.parameterValidationArray['subfoveal'] = {
-	// 	kind: 'other',
-	// 	type: 'string',
-	// 	list: ['Normal', 'Type 1 CNV', 'Type 2 CNV', 'Type 3 CNV', 'Disciform AMD',
-	// 			'Stage I macula hole', 'Stage II macula hole', 'Stage III macula hole', 'Stage IV macula hole'
-	// 	],
-	// 	animate: false
-	// };
-
-
 };
 
 /**
@@ -96,13 +84,6 @@ ED.Fovea.prototype.setPropertyDefaults = function() {
 ED.Fovea.prototype.setParameterDefaults = function() {
 	this.setOriginWithDisplacements(0, -100);
 	this.setParameterFromString('type', 'Normal');
-
-	// Macular hole is displaced for Fundus, central for others
-	// if (this.drawing.hasDoodleOfClass('Fundus') && this.type.indexOf('macula hole') > -1) {
-	// 	this.originX = this.drawing.eye == ED.eye.Right ? -100 : 100;
-	// 	this.scaleX = 0.5;
-	// 	this.scaleY = 0.5;
-	// }
 };
 
 /**
@@ -282,13 +263,13 @@ ED.Fovea.prototype.drawMacularHole = function(ctx, _point) {
 ED.Fovea.prototype.description = function() {
 
 	if (this.type.indexOf(' CNV') > -1) {
-		return 'Choroidal neovascular membrane (' + this.subfoveal + ')';
+		return 'Choroidal neovascular membrane (' + this.type.replace(' CNV', '') + ')';
 	} else if (this.type === 'Disciform AMD') {
-		return 'Disciform';
+		return this.type;
 	} else if (this.type.indexOf('macula hole') > -1) {
-		return "Macular hole";
+		return 'Macula hole (' + this.type.replace(' macula hole' , '') + ')';
 	}
-	return "Normal";
+	return "Normal fovea";
 };
 
 /**
