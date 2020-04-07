@@ -112,6 +112,21 @@ ED.Fovea.prototype.draw = function(_point) {
 	return this.isClicked;
 };
 
+ED.Fovea.prototype.dependentParameterValues = function(_parameter, _value) {
+	var returnArray = {};
+
+	switch (_parameter) {
+		case 'type':
+
+			if (_value === 'Normal') {
+				this.scaleX = 1;
+				this.scaleY = 1;
+			}
+			break;
+	}
+	return returnArray;
+};
+
 ED.Fovea.prototype.drawNormalFovea = function(ctx, _point) {
 
 	var r = 28;
