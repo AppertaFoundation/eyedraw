@@ -20570,8 +20570,8 @@ ED.ChoroidalNaevusMelanoma = function(_drawing, _parameterJSON) {
 	this.numberOfHandles = 4;
 	this.initialRadius = 120;
 	this.type = 'Naevus';
-	this.thickness = 3;
-	this.margin = 3;
+	this.thickness = null;
+	this.margin = null;
 	this.subretinal_fluid = false;
 	this.orange_pigment = false;
 	this.pigment_halo = false;
@@ -20608,6 +20608,7 @@ ED.ChoroidalNaevusMelanoma.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.ChoroidalNaevusMelanoma.prototype.setHandles = function() {
+
 	// Array of handles
 	for (var i = 0; i < this.numberOfHandles; i++) {
 		this.handleArray[i] = new ED.Doodle.Handle(null, true, ED.Mode.Handles, false);
@@ -20617,7 +20618,7 @@ ED.ChoroidalNaevusMelanoma.prototype.setHandles = function() {
 	this.handleArray[0].isRotatable = true;
 
 	// Handle for apex
-	this.handleArray[this.numberOfHandles] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
+	this.handleArray[this.numberOfHandles] = new ED.Doodle.Handle(null, this.drusen, ED.Mode.Apex, false);
 };
 
 /**
@@ -20654,13 +20655,15 @@ ED.ChoroidalNaevusMelanoma.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['thickness'] = {
 		kind: 'derived',
 		type: 'mod',
-		range: new ED.Range(3, 10),
+		range: new ED.Range(null, 10),
+		defaultValue: null,
 		display: true
 	};
 	this.parameterValidationArray['margin'] = {
 		kind: 'derived',
 		type: 'mod',
-		range: new ED.Range(3, 10),
+		range: new ED.Range(null, 10),
+		defaultValue: null,
 		display: true
 	};
 
@@ -20705,6 +20708,19 @@ ED.ChoroidalNaevusMelanoma.prototype.setParameterDefaults = function() {
 		point.setWithPolars(this.initialRadius, i * 2 * Math.PI / this.numberOfHandles);
 		this.addPointToSquiggle(point);
 	}
+};
+
+ED.ChoroidalNaevusMelanoma.prototype.dependentParameterValues = function(_parameter, _value) {
+	var returnArray = {};
+
+	switch (_parameter) {
+		// dependent parameters for bound side view doodle
+		case 'drusen':
+			this.setHandles();
+			break;
+	}
+
+	return returnArray;
 };
 
 /**
@@ -20769,14 +20785,17 @@ ED.ChoroidalNaevusMelanoma.prototype.draw = function(_point) {
 
 	// Non boundary paths
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+
 		// Drusen
-		let p = new ED.Point(0,0);
-		let fill = "yellow";
-		let dr = 4;
-		let n = Math.abs(Math.floor((-this.apexY + 50) / 5));
-		for (let i = 0; i < n; i++) {
-			p.setWithPolars(this.initialRadius * 0.8 * ED.randomArray[i + 10], 2 * Math.PI * ED.randomArray[i + 100]);
-			this.drawSpot(ctx, p.x, p.y, dr * 2, fill);
+		if (this.drusen) {
+			let p = new ED.Point(0, 0);
+			let fill = "yellow";
+			let dr = 4;
+			let n = Math.abs(Math.floor((-this.apexY + 50) / 5));
+			for (let i = 0; i < n; i++) {
+				p.setWithPolars(this.initialRadius * 0.8 * ED.randomArray[i + 10], 2 * Math.PI * ED.randomArray[i + 100]);
+				this.drawSpot(ctx, p.x, p.y, dr * 2, fill);
+			}
 		}
 	}
 
@@ -20816,7 +20835,18 @@ ED.ChoroidalNaevusMelanoma.prototype.description = function() {
 		desc += ' with dursen';
 	}
 
-	desc += '. Thickness ' + this.thickness + ' mm and Margin to optic disc ' + this.margin + ' mm';
+	desc += '.';
+	//desc += '. Thickness ' + this.thickness + ' mm and Margin to optic disc ' + this.margin + ' mm';
+	if (this.thickness) {
+		desc += ' Thickness ' + this.thickness + ' mm';
+	}
+
+	if (this.margin) {
+		desc += this.thickness ? ' and' : '';
+		desc += ' Margin to optic disc ' + this.margin + ' mm.';
+	}
+
+
 
 	return desc;
 };
