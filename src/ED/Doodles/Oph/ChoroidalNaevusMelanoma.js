@@ -114,16 +114,12 @@ ED.ChoroidalNaevusMelanoma.prototype.setPropertyDefaults = function() {
 
 	this.parameterValidationArray['thickness'] = {
 		kind: 'derived',
-		type: 'mod',
-		range: new ED.Range(null, 10),
-		defaultValue: null,
+		type: 'freeText',
 		display: true
 	};
 	this.parameterValidationArray['margin'] = {
 		kind: 'derived',
-		type: 'mod',
-		range: new ED.Range(null, 10),
-		defaultValue: null,
+		type: 'freeText',
 		display: true
 	};
 
@@ -168,6 +164,10 @@ ED.ChoroidalNaevusMelanoma.prototype.setParameterDefaults = function() {
 		point.setWithPolars(this.initialRadius, i * 2 * Math.PI / this.numberOfHandles);
 		this.addPointToSquiggle(point);
 	}
+
+	const endPoint = new ED.Point(this.originX, this.originY);
+	const startPoint = new ED.Point(0, 0);
+	this.margin =  ((startPoint.distanceTo(endPoint) * 3) / 150).toFixed(0);
 };
 
 ED.ChoroidalNaevusMelanoma.prototype.dependentParameterValues = function(_parameter, _value) {
@@ -175,8 +175,15 @@ ED.ChoroidalNaevusMelanoma.prototype.dependentParameterValues = function(_parame
 
 	switch (_parameter) {
 		// dependent parameters for bound side view doodle
+
 		case 'drusen':
 			this.setHandles();
+			break;
+		case 'originX':
+		case 'originY':
+			const endPoint = new ED.Point(this.originX, this.originY);
+			const startPoint = new ED.Point(0, 0);
+			returnArray.margin =  ((startPoint.distanceTo(endPoint) * 3) / 150).toFixed(0);
 			break;
 	}
 
@@ -305,8 +312,6 @@ ED.ChoroidalNaevusMelanoma.prototype.description = function() {
 		desc += this.thickness ? ' and' : '';
 		desc += ' Margin to optic disc ' + this.margin + ' mm.';
 	}
-
-
 
 	return desc;
 };
