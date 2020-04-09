@@ -30,7 +30,7 @@ ED.ChoroidalNaevusMelanoma = function(_drawing, _parameterJSON) {
 	this.numberOfHandles = 4;
 	this.initialRadius = 120;
 	this.type = 'Naevus';
-	this.thickness = null;
+	this.thickness = 'Not recorded';
 	this.margin = null;
 	this.subretinal_fluid = false;
 	this.orange_pigment = false;
@@ -108,13 +108,23 @@ ED.ChoroidalNaevusMelanoma.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['type'] = {
 		kind: 'other',
 		type: 'string',
-		list: ['Melanoma', 'Naevus', 'Osteoma'],
+		list: ['Melanoma', 'Naevus', 'Osteoma', 'CHRPE'],
 		animate: false
 	};
 
 	this.parameterValidationArray['thickness'] = {
 		kind: 'derived',
 		type: 'freeText',
+		validate: function (value) {
+			// Test that value is a float
+			let valid = (value.match(/^-?\d*(\.\d+)?$/));
+
+			if (typeof value === 'string' && value.toLowerCase() === 'not recorded') {
+				valid = true;
+			}
+
+			return valid;
+		},
 		display: true
 	};
 	this.parameterValidationArray['margin'] = {
@@ -167,7 +177,23 @@ ED.ChoroidalNaevusMelanoma.prototype.setParameterDefaults = function() {
 
 	const endPoint = new ED.Point(this.originX, this.originY);
 	const startPoint = new ED.Point(0, 0);
-	this.margin =  ((startPoint.distanceTo(endPoint) * 3) / 150).toFixed(0);
+	this.margin = this.calculateDistance(new ED.Point(this.originX, this.originY));
+};
+
+ED.ChoroidalNaevusMelanoma.prototype.calculateDistance = function(pointOfDoodle) {
+
+	// Start point and end point
+	//var pointOfDoodle = new ED.Point(-300, -250);
+
+	const origin = new ED.Point(0, 0);
+	const canvasTop = new ED.Point(0, -480);
+
+	const x = this.drawing.innerAngle(canvasTop, origin, pointOfDoodle);
+
+	var p1c2 = new ED.Point(0, 0);
+	p1c2.setWithPolars(480, x);
+
+	return ((pointOfDoodle.distanceTo(p1c2) * 4.8) / 100).toFixed(1);
 };
 
 ED.ChoroidalNaevusMelanoma.prototype.dependentParameterValues = function(_parameter, _value) {
@@ -181,9 +207,10 @@ ED.ChoroidalNaevusMelanoma.prototype.dependentParameterValues = function(_parame
 			break;
 		case 'originX':
 		case 'originY':
-			const endPoint = new ED.Point(this.originX, this.originY);
-			const startPoint = new ED.Point(0, 0);
-			returnArray.margin =  ((startPoint.distanceTo(endPoint) * 3) / 150).toFixed(0);
+			returnArray.margin = this.calculateDistance(new ED.Point(this.originX, this.originY));
+			// const endPoint = new ED.Point(this.originX, this.originY);
+			// const startPoint = new ED.Point(0, 0);
+			// returnArray.margin =  ((startPoint.distanceTo(endPoint) * 4.8) / 100).toFixed(1);
 			break;
 	}
 
@@ -243,6 +270,9 @@ ED.ChoroidalNaevusMelanoma.prototype.draw = function(_point) {
 	}
 	if (this.type === 'Osteoma') {
 		ctx.fillStyle = "rgba(213,209,182,0.8)";
+	}
+	if (this.type === 'CHRPE') {
+		ctx.fillStyle = "rgba(29,7,6,0.8)";
 	}
 
 	ctx.strokeStyle = ctx.fillStyle;
@@ -333,6 +363,10 @@ ED.ChoroidalNaevusMelanoma.prototype.snomedCodes = function() {
 	if (this.type === 'Osteoma') {
 		snomedCodes.push([255025001, 3]);
 	}
+	if (this.type === 'CHRPE') {
+		snomedCodes.push([232074003, 3]);
+	}
+
 
 	return snomedCodes;
 };
