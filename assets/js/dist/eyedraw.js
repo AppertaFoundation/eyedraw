@@ -1947,6 +1947,7 @@ ED.Drawing.prototype.resetEyedraw = function() {
 
 	this.addBindings(this.bindingArray);
 	this.notify("afterReset");
+	$(document).trigger('eyedrawAfterReset');
 };
 
 /**
@@ -5354,6 +5355,7 @@ ED.Doodle.prototype.json = function() {
 				} else if (typeof(o) == 'number') {
 					o = o.toFixed(2);
 				} else if (typeof(o) == 'string') {
+          o = o.replace('<', '&lt;');
 					o = '"' + o + '"';
 				} else if (typeof(o) == 'boolean') {
 					o = o;
@@ -5593,6 +5595,7 @@ ED.Doodle.Handle = function(_location, _isVisible, _mode, _isRotatable) {
 	this.mode = _mode;
 	this.isRotatable = _isRotatable;
 };
+
 /**
  * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
@@ -15986,9 +15989,9 @@ ED.AntSeg.prototype.description = function() {
 	var pupilSize = Math.round(-this.apexY * 0.03);
 
 	// Pupil size and coloboma and corneal size
-	returnValue += this.pupilSize.toLowerCase() + " pupil (diameter: " + pupilSize + "mm)";
+	returnValue += this.pupilSize.toLowerCase() + " pupil (diameter: " + pupilSize + "mm), ";
 		if(this.cornealSize.toLowerCase() !== 'not checked'){
-			returnValue += ', corneal size : ' +  this.cornealSize.toLowerCase();
+			returnValue += 'corneal size : ' +  this.cornealSize.toLowerCase() + ", ";
         }
 
 	// Coloboma
@@ -16039,7 +16042,7 @@ ED.AntSeg.prototype.description = function() {
 */
 
 	// Remove final comma and space and capitalise first letter
-	returnValue = returnValue.replace(/, +$/, '');
+	returnValue = returnValue.replace(/, +$/, '').replace('<', '&lt;');
 	returnValue = returnValue.charAt(0).toUpperCase() + returnValue.slice(1);
 
 	return returnValue;
@@ -43169,7 +43172,7 @@ ED.MetallicForeignBody.prototype.description = function() {
  * @returns {Int} SnoMed code of entity representated by doodle
  */
 ED.MetallicForeignBody.prototype.snomedCode = function () {
-    return 422321007;
+    return 37450000;
 }
 
 /**
@@ -44367,7 +44370,6 @@ ED.OpticDisc = function(_drawing, _parameterJSON) {
 
 	// Derived parameters
 	this.mode = "Basic";
-	this.cdRatio = 'Not checked';
 
 	// Saved parameters
 	this.savedParameterArray = ['apexY', 'mode', 'cdRatio'];
@@ -44505,14 +44507,15 @@ ED.OpticDisc.prototype.dependentParameterValues = function(_parameter, _value) {
 			break;
 
 		case 'cdRatio':
-
-			if (_value === "Not checked") {
-				returnArray['apexY'] = -(parseFloat("0.3") * 300);
-			} else if(_value !== "No view") {
-				newValue = parseFloat(_value) * 300;
-				returnArray['apexY'] = -newValue;
-			} else {
-				returnArray['apexY'] = -320;
+			if (_value !== "-0.0") {
+				if (_value === "Not checked") {
+					returnArray['apexY'] = -(parseFloat("0.3") * 300);
+				} else if (_value !== "No view") {
+					newValue = parseFloat(_value) * 300;
+					returnArray['apexY'] = -newValue;
+				} else {
+					returnArray['apexY'] = -320;
+				}
 			}
 			break;
 
