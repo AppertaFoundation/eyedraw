@@ -20571,7 +20571,7 @@ ED.ChoroidalNaevusMelanoma = function(_drawing, _parameterJSON) {
 	this.initialRadius = 120;
 	this.type = 'Naevus';
 	this.thickness = 'Not recorded';
-	this.margin = null;
+	this.margin = 'Not recorded';
 	this.subretinal_fluid = false;
 	this.orange_pigment = false;
 	this.pigment_halo = false;
@@ -20659,7 +20659,7 @@ ED.ChoroidalNaevusMelanoma.prototype.setPropertyDefaults = function() {
 			// Test that value is a float
 			let valid = (value.match(/^-?\d*(\.\d+)?$/));
 
-			if (typeof value === 'string' && value.toLowerCase() === 'not recorded') {
+			if (typeof value === 'string' && (value.toLowerCase() === 'not recorded' || value === '')) {
 				valid = true;
 			}
 
@@ -20670,6 +20670,16 @@ ED.ChoroidalNaevusMelanoma.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['margin'] = {
 		kind: 'derived',
 		type: 'freeText',
+		validate: function (value) {
+			// Test that value is a float
+			let valid = (value.match(/^-?\d*(\.\d+)?$/));
+
+			if (typeof value === 'string' && (value.toLowerCase() === 'not recorded' || value === '')) {
+				valid = true;
+			}
+
+			return valid;
+		},
 		display: true
 	};
 
@@ -20715,9 +20725,9 @@ ED.ChoroidalNaevusMelanoma.prototype.setParameterDefaults = function() {
 		this.addPointToSquiggle(point);
 	}
 
-	const endPoint = new ED.Point(this.originX, this.originY);
+	/*const endPoint = new ED.Point(this.originX, this.originY);
 	const startPoint = new ED.Point(0, 0);
-	this.margin = this.calculateDistance(new ED.Point(this.originX, this.originY));
+	this.margin = this.calculateDistance(new ED.Point(this.originX, this.originY));*/
 };
 
 ED.ChoroidalNaevusMelanoma.prototype.calculateDistance = function(pointOfDoodle) {
@@ -20747,7 +20757,7 @@ ED.ChoroidalNaevusMelanoma.prototype.dependentParameterValues = function(_parame
 			break;
 		case 'originX':
 		case 'originY':
-			returnArray.margin = this.calculateDistance(new ED.Point(this.originX, this.originY));
+			//returnArray.margin = this.calculateDistance(new ED.Point(this.originX, this.originY));
 			// const endPoint = new ED.Point(this.originX, this.originY);
 			// const startPoint = new ED.Point(0, 0);
 			// returnArray.margin =  ((startPoint.distanceTo(endPoint) * 4.8) / 100).toFixed(1);
@@ -20871,15 +20881,18 @@ ED.ChoroidalNaevusMelanoma.prototype.description = function() {
 	if (this.dursen) {
 		desc += ' with dursen';
 	}
-
 	desc += '.';
-	//desc += '. Thickness ' + this.thickness + ' mm and Margin to optic disc ' + this.margin + ' mm';
-	if (this.thickness) {
+
+	console.log(typeof this.thickness);
+
+	const showThicknessInDesc = this.thickness && (typeof this.thickness.toLowerCase === 'function' && this.thickness.toLowerCase() !== 'not recorded');
+
+	if (showThicknessInDesc) {
 		desc += ' Thickness ' + this.thickness + ' mm';
 	}
 
-	if (this.margin) {
-		desc += this.thickness ? ' and' : '';
+	if (this.margin && (typeof this.margin.toLowerCase === 'function' && this.margin.toLowerCase() !== 'not recorded') ) {
+		desc += showThicknessInDesc ? ' and' : '';
 		desc += ' Margin to optic disc ' + this.margin + ' mm.';
 	}
 
