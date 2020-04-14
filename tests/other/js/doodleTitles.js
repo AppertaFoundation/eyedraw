@@ -1,5 +1,6 @@
 window.eyedrawDoodleTitles = {
     "NONE": "No description available for this doodle",
+	'ChoroidalNaevusMelanoma': "ChoroidalNaevusMelanoma",
     "ACIOL": "Anterior chamber IOL",
     "ACMaintainer": "AC maintainer",
     "AdnexalEye": "Adnexal eye template",

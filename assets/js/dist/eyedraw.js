@@ -20658,10 +20658,21 @@ ED.ChoroidalNaevusMelanoma.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'freeText',
 		validate: function (value) {
-			// Test that value is a float
-			let valid = (value.match(/^-?\d*(\.\d+)?$/));
+			let  valid = false;
 
-			if (typeof value === 'string' && (value.toLowerCase() === 'not recorded' || value === '')) {
+			// check if the number is valid
+			const regexp_result = value.match(/^(\d*|\d*.\d*)(mm|\smm)?$/);
+
+			if (regexp_result !== null && typeof regexp_result[0] !== 'undefined') {
+				valid = true;
+			}
+
+			// probably we need to fix the regexp, it still returns matches when the first group has no match
+			if (value.trim() === 'mm') {
+				return false;
+			}
+
+			if (typeof value === 'string' && (value.toLowerCase() === 'not recorded' || value === '' || value.toLowerCase() === 'nr')) {
 				valid = true;
 			}
 
@@ -20673,10 +20684,21 @@ ED.ChoroidalNaevusMelanoma.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'freeText',
 		validate: function (value) {
-			// Test that value is a float
-			let valid = (value.match(/^-?\d*(\.\d+)?$/));
+			let  valid = false;
 
-			if (typeof value === 'string' && (value.toLowerCase() === 'not recorded' || value === '')) {
+			// check if the number is valid
+			const regexp_result = value.match(/^(\d*|\d*.\d*)(mm|\smm)?$/);
+
+			if (regexp_result !== null && typeof regexp_result[0] !== 'undefined') {
+				valid = true;
+			}
+
+			// probably we need to fix the regexp, it still returns matches when the first group has no match
+			if (value.trim() === 'mm') {
+				return false;
+			}
+
+			if (typeof value === 'string' && (value.toLowerCase() === 'not recorded' || value === '' || value.toLowerCase() === 'nr')) {
 				valid = true;
 			}
 
