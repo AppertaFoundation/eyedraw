@@ -37,6 +37,8 @@ ED.FreehandCopyForOE = function(_drawing, _parameterJSON) {
 	this.thickness = 'Thin';
 	this.labelText = "";
 
+	_drawing.moveToFront();
+
 	// Saved parameters
 	this.savedParameterArray = ['originX', 'originY', 'colourString', 'filled', 'thickness', 'labelText', 'scaleX', 'scaleY'];
 

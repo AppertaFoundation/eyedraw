@@ -7245,6 +7245,8 @@ ED.FreehandCopyForOE = function(_drawing, _parameterJSON) {
 	this.thickness = 'Thin';
 	this.labelText = "";
 
+	_drawing.moveToFront();
+
 	// Saved parameters
 	this.savedParameterArray = ['originX', 'originY', 'colourString', 'filled', 'thickness', 'labelText', 'scaleX', 'scaleY'];
 
@@ -20882,8 +20884,6 @@ ED.ChoroidalNaevusMelanoma.prototype.description = function() {
 		desc += ' with dursen';
 	}
 	desc += '.';
-
-	console.log(typeof this.thickness);
 
 	const showThicknessInDesc = this.thickness && (typeof this.thickness.toLowerCase === 'function' && this.thickness.toLowerCase() !== 'not recorded');
 
