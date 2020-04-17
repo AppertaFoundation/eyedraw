@@ -30,8 +30,8 @@ ED.ChoroidalNaevusMelanoma = function(_drawing, _parameterJSON) {
 	this.numberOfHandles = 4;
 	this.initialRadius = 120;
 	this.type = 'Naevus';
-	this.thickness = 3;
-	this.margin = 3;
+	this.thickness = 'NR';
+	this.margin = 'NR';
 	this.subretinal_fluid = false;
 	this.orange_pigment = false;
 	this.pigment_halo = false;
@@ -68,6 +68,7 @@ ED.ChoroidalNaevusMelanoma.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.ChoroidalNaevusMelanoma.prototype.setHandles = function() {
+
 	// Array of handles
 	for (var i = 0; i < this.numberOfHandles; i++) {
 		this.handleArray[i] = new ED.Doodle.Handle(null, true, ED.Mode.Handles, false);
@@ -77,7 +78,7 @@ ED.ChoroidalNaevusMelanoma.prototype.setHandles = function() {
 	this.handleArray[0].isRotatable = true;
 
 	// Handle for apex
-	this.handleArray[this.numberOfHandles] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
+	this.handleArray[this.numberOfHandles] = new ED.Doodle.Handle(null, this.drusen, ED.Mode.Apex, false);
 };
 
 /**
@@ -107,20 +108,60 @@ ED.ChoroidalNaevusMelanoma.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['type'] = {
 		kind: 'other',
 		type: 'string',
-		list: ['Melanoma', 'Naevus', 'Osteoma'],
+		list: ['Melanoma', 'Naevus', 'Osteoma', 'CHRPE'],
 		animate: false
 	};
 
 	this.parameterValidationArray['thickness'] = {
 		kind: 'derived',
-		type: 'mod',
-		range: new ED.Range(3, 10),
+		type: 'freeText',
+		validate: function (value) {
+			let  valid = false;
+
+			// check if the number is valid
+			const regexp_result = value.match(/^(\d*|\d*.\d*)(mm|\smm)?$/);
+
+			if (regexp_result !== null && typeof regexp_result[0] !== 'undefined') {
+				valid = true;
+			}
+
+			// probably we need to fix the regexp, it still returns matches when the first group has no match
+			if (value.trim() === 'mm') {
+				return false;
+			}
+
+			if (typeof value === 'string' && (value.toLowerCase() === 'not recorded' || value === '' || value.toLowerCase() === 'nr')) {
+				valid = true;
+			}
+
+			return valid;
+		},
 		display: true
 	};
 	this.parameterValidationArray['margin'] = {
 		kind: 'derived',
-		type: 'mod',
-		range: new ED.Range(3, 10),
+		type: 'freeText',
+		validate: function (value) {
+			let  valid = false;
+
+			// check if the number is valid
+			const regexp_result = value.match(/^(\d*|\d*.\d*)(mm|\smm)?$/);
+
+			if (regexp_result !== null && typeof regexp_result[0] !== 'undefined') {
+				valid = true;
+			}
+
+			// probably we need to fix the regexp, it still returns matches when the first group has no match
+			if (value.trim() === 'mm') {
+				return false;
+			}
+
+			if (typeof value === 'string' && (value.toLowerCase() === 'not recorded' || value === '' || value.toLowerCase() === 'nr')) {
+				valid = true;
+			}
+
+			return valid;
+		},
 		display: true
 	};
 
@@ -165,6 +206,47 @@ ED.ChoroidalNaevusMelanoma.prototype.setParameterDefaults = function() {
 		point.setWithPolars(this.initialRadius, i * 2 * Math.PI / this.numberOfHandles);
 		this.addPointToSquiggle(point);
 	}
+
+	/*const endPoint = new ED.Point(this.originX, this.originY);
+	const startPoint = new ED.Point(0, 0);
+	this.margin = this.calculateDistance(new ED.Point(this.originX, this.originY));*/
+};
+
+ED.ChoroidalNaevusMelanoma.prototype.calculateDistance = function(pointOfDoodle) {
+
+	// Start point and end point
+	//var pointOfDoodle = new ED.Point(-300, -250);
+
+	const origin = new ED.Point(0, 0);
+	const canvasTop = new ED.Point(0, -480);
+
+	const x = this.drawing.innerAngle(canvasTop, origin, pointOfDoodle);
+
+	var p1c2 = new ED.Point(0, 0);
+	p1c2.setWithPolars(480, x);
+
+	return ((pointOfDoodle.distanceTo(p1c2) * 4.8) / 100).toFixed(1);
+};
+
+ED.ChoroidalNaevusMelanoma.prototype.dependentParameterValues = function(_parameter, _value) {
+	var returnArray = {};
+
+	switch (_parameter) {
+		// dependent parameters for bound side view doodle
+
+		case 'drusen':
+			this.setHandles();
+			break;
+		case 'originX':
+		case 'originY':
+			//returnArray.margin = this.calculateDistance(new ED.Point(this.originX, this.originY));
+			// const endPoint = new ED.Point(this.originX, this.originY);
+			// const startPoint = new ED.Point(0, 0);
+			// returnArray.margin =  ((startPoint.distanceTo(endPoint) * 4.8) / 100).toFixed(1);
+			break;
+	}
+
+	return returnArray;
 };
 
 /**
@@ -221,6 +303,9 @@ ED.ChoroidalNaevusMelanoma.prototype.draw = function(_point) {
 	if (this.type === 'Osteoma') {
 		ctx.fillStyle = "rgba(213,209,182,0.8)";
 	}
+	if (this.type === 'CHRPE') {
+		ctx.fillStyle = "rgba(29,7,6,0.8)";
+	}
 
 	ctx.strokeStyle = ctx.fillStyle;
 
@@ -229,14 +314,17 @@ ED.ChoroidalNaevusMelanoma.prototype.draw = function(_point) {
 
 	// Non boundary paths
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+
 		// Drusen
-		let p = new ED.Point(0,0);
-		let fill = "yellow";
-		let dr = 4;
-		let n = Math.abs(Math.floor((-this.apexY + 50) / 5));
-		for (let i = 0; i < n; i++) {
-			p.setWithPolars(this.initialRadius * 0.8 * ED.randomArray[i + 10], 2 * Math.PI * ED.randomArray[i + 100]);
-			this.drawSpot(ctx, p.x, p.y, dr * 2, fill);
+		if (this.drusen) {
+			let p = new ED.Point(0, 0);
+			let fill = "yellow";
+			let dr = 4;
+			let n = Math.abs(Math.floor((-this.apexY + 50) / 5));
+			for (let i = 0; i < n; i++) {
+				p.setWithPolars(this.initialRadius * 0.8 * ED.randomArray[i + 10], 2 * Math.PI * ED.randomArray[i + 100]);
+				this.drawSpot(ctx, p.x, p.y, dr * 2, fill);
+			}
 		}
 	}
 
@@ -275,8 +363,18 @@ ED.ChoroidalNaevusMelanoma.prototype.description = function() {
 	if (this.dursen) {
 		desc += ' with dursen';
 	}
+	desc += '.';
 
-	desc += '. Thickness ' + this.thickness + ' mm and Margin to optic disc ' + this.margin + ' mm';
+	const showThicknessInDesc = this.thickness && (typeof this.thickness.toLowerCase === 'function' && this.thickness.toLowerCase() !== 'not recorded' && this.thickness.toLowerCase() !== 'nr');
+
+	if (showThicknessInDesc) {
+		desc += ' Thickness ' + this.thickness + ' mm';
+	}
+
+	if (this.margin && (typeof this.margin.toLowerCase === 'function' && this.margin.toLowerCase() !== 'not recorded' && this.margin.toLowerCase() !== 'nr' ) ) {
+		desc += showThicknessInDesc ? ' and' : '';
+		desc += ' Margin to optic disc ' + this.margin + ' mm.';
+	}
 
 	return desc;
 };
@@ -298,6 +396,10 @@ ED.ChoroidalNaevusMelanoma.prototype.snomedCodes = function() {
 	if (this.type === 'Osteoma') {
 		snomedCodes.push([255025001, 3]);
 	}
+	if (this.type === 'CHRPE') {
+		snomedCodes.push([232074003, 3]);
+	}
+
 
 	return snomedCodes;
 };

@@ -1,4 +1,5 @@
 window.eyedrawDoodleScripts = [
+    "ED/Doodles/Oph/ChoroidalNaevusMelanoma.js",
     "ED/Doodles/An/AgentDose.js",
     "ED/Doodles/An/AgentDuration.js",
     "ED/Doodles/An/RecordGrid.js",
