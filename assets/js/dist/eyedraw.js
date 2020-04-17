@@ -20572,8 +20572,8 @@ ED.ChoroidalNaevusMelanoma = function(_drawing, _parameterJSON) {
 	this.numberOfHandles = 4;
 	this.initialRadius = 120;
 	this.type = 'Naevus';
-	this.thickness = 'Not recorded';
-	this.margin = 'Not recorded';
+	this.thickness = 'NR';
+	this.margin = 'NR';
 	this.subretinal_fluid = false;
 	this.orange_pigment = false;
 	this.pigment_halo = false;
@@ -20907,13 +20907,13 @@ ED.ChoroidalNaevusMelanoma.prototype.description = function() {
 	}
 	desc += '.';
 
-	const showThicknessInDesc = this.thickness && (typeof this.thickness.toLowerCase === 'function' && this.thickness.toLowerCase() !== 'not recorded');
+	const showThicknessInDesc = this.thickness && (typeof this.thickness.toLowerCase === 'function' && this.thickness.toLowerCase() !== 'not recorded' && this.thickness.toLowerCase() !== 'nr');
 
 	if (showThicknessInDesc) {
 		desc += ' Thickness ' + this.thickness + ' mm';
 	}
 
-	if (this.margin && (typeof this.margin.toLowerCase === 'function' && this.margin.toLowerCase() !== 'not recorded') ) {
+	if (this.margin && (typeof this.margin.toLowerCase === 'function' && this.margin.toLowerCase() !== 'not recorded' && this.margin.toLowerCase() !== 'nr' ) ) {
 		desc += showThicknessInDesc ? ' and' : '';
 		desc += ' Margin to optic disc ' + this.margin + ' mm.';
 	}
