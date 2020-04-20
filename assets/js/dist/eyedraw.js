@@ -20733,7 +20733,7 @@ ED.ChoroidalNaevusMelanoma.prototype.setPropertyDefaults = function() {
  * Sets default parameters
  */
 ED.ChoroidalNaevusMelanoma.prototype.setParameterDefaults = function() {
-	this.apexY = 50;
+	this.apexY = 0;
 	this.setOriginWithDisplacements(200, 150);
 
 	// Create a squiggle to store the handles points
