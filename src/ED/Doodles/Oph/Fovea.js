@@ -84,6 +84,11 @@ ED.Fovea.prototype.setPropertyDefaults = function() {
 ED.Fovea.prototype.setParameterDefaults = function() {
 	this.setOriginWithDisplacements(0, -100);
 	this.setParameterFromString('type', 'Normal');
+
+
+	if (this.drawing.hasDoodleOfClass('Fundus')) {
+		this.originX = this.drawing.eye == ED.eye.Right ? -100 : 100;
+	}
 };
 
 /**
