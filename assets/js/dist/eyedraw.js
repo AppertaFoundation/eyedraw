@@ -20902,8 +20902,8 @@ ED.ChoroidalNaevusMelanoma.prototype.description = function() {
 	if (this.pigment_halo) {
 		desc += ' with pigment halo';
 	}
-	if (this.dursen) {
-		desc += ' with dursen';
+	if (this.drusen) {
+		desc += ' with drusen';
 	}
 	desc += '.';
 
