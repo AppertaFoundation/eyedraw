@@ -46,7 +46,7 @@ ED.PCIOLCrossSection = function(_drawing, _parameterJSON) {
             store: [['originX', 'csOriginX']]
         }
     };
-}
+};
 
 /**
  * Sets superclass and constructor
@@ -79,8 +79,8 @@ ED.PCIOLCrossSection.prototype.setPropertyDefaults = function() {
 	
 	// Update component of validation array for simple parameters
 	this.parameterValidationArray['originX']['range'].setMinAndMax(-150, +44);
-	this.parameterValidationArray['originY']['range'].setMinAndMax(-140, +140);
-}
+	this.parameterValidationArray['originY']['range'].setMinAndMax(-200, +200);
+};
 
 /**
  * Sets default parameters (Only called for new doodles)
@@ -88,7 +88,7 @@ ED.PCIOLCrossSection.prototype.setPropertyDefaults = function() {
  */
 ED.PCIOLCrossSection.prototype.setParameterDefaults = function() {
 	this.originX = 44;
-}
+};
 
 /**
  * Calculates values of dependent parameters. This function embodies the relationship between simple and derived parameters
@@ -131,10 +131,11 @@ ED.PCIOLCrossSection.prototype.dependentParameterValues = function(_parameter, _
 				iris.parameterValidationArray['apexX']['range'].setMinAndMax(-40 - (140 / 220) * (iris.apexY + 280), maxApexX);
 	
 				// If being synced, make sensible decision about x
+				var newOriginX;
 				if (!this.drawing.isActive) {
-					var newOriginX = iris.parameterValidationArray['apexX']['range'].max;
+					newOriginX = iris.parameterValidationArray['apexX']['range'].max;
 				} else {
-					var newOriginX = iris.parameterValidationArray['apexX']['range'].constrain(iris.apexX);
+					newOriginX = iris.parameterValidationArray['apexX']['range'].constrain(iris.apexX);
 				}
 				iris.setSimpleParameter('apexX', newOriginX);
 			}
@@ -142,7 +143,7 @@ ED.PCIOLCrossSection.prototype.dependentParameterValues = function(_parameter, _
 	}
 
 	return returnArray;
-}
+};
 
 /**
  * Draws doodle or performs a hit test if a Point parameter is passed
@@ -198,15 +199,22 @@ ED.PCIOLCrossSection.prototype.draw = function(_point) {
 
 	// Non boundary drawing
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
+
+		let y = 0 - this.originY;
+		if (this.originY <= -67) {
+			y = 67;
+		} else if(this.originY >= 57) {
+			y = -57;
+		}
 		
 		var xShift = (this.fixation == 'In-the-bag') ? 0 : this.originX - 44;
 		
 		// Lens bag
 		ctx.beginPath();
-		ctx.arc(ld - x - xShift, 0 - this.originY, r, theta, -theta, true);
-		ctx.arc(ld + x - xShift, 0 - this.originY, r, Math.PI + theta, Math.PI + 0.75*theta, true);
-		ctx.moveTo(ld - xShift, 240 - this.originY);
-		ctx.arc(ld + x - xShift, 0 - this.originY, r, Math.PI - theta, Math.PI - 0.75*theta, false);
+		ctx.arc(ld - x - xShift, y, r, theta, -theta, true);
+		ctx.arc(ld + x - xShift, y, r, Math.PI + theta, Math.PI + 0.75*theta, true);
+		ctx.moveTo(ld - xShift, 240 - (-y));
+		ctx.arc(ld + x - xShift, y, r, Math.PI - theta, Math.PI - 0.75*theta, false);
 		ctx.strokeStyle = "gray";
 		ctx.lineWidth = 3;
 		ctx.stroke();
@@ -221,10 +229,11 @@ ED.PCIOLCrossSection.prototype.draw = function(_point) {
 			ctx.arc(25 + 115 - this.originX, 210 - this.originY, 13, 0, 1*Math.PI, false);
 			ctx.moveTo(100 - this.originX, 210 - this.originY);
 			ctx.lineTo(44 + 65,125);	
-*/	
-			ctx.ellipse(144 - 44, 0 - this.originY, 227, 20, 0.5 * Math.PI, 0.5 * Math.PI, 1.2 * Math.PI);
-			ctx.moveTo(164 - 44,0 - this.originY);
-			ctx.ellipse(144 - 44, 0 - this.originY, 227, 20, 0.5 * Math.PI, 1.5 * Math.PI, 0.2 * Math.PI);
+*/
+			ctx.ellipse(144 - 44, y, 227, 20, 0.5 * Math.PI, 0.5 * Math.PI, 1.2 * Math.PI);
+			ctx.moveTo(164 - 44, y);
+			ctx.ellipse(144 - 44, y, 227, 20, 0.5 * Math.PI, 1.5 * Math.PI, 0.2 * Math.PI);
+
 		}
 		else if (this.fixation == 'Ciliary sulcus') {
 			ctx.arc(115 - this.originX, -350 - this.originY, 15, 0*Math.PI, 1*Math.PI, true);
@@ -253,23 +262,23 @@ ED.PCIOLCrossSection.prototype.draw = function(_point) {
 
 		// Top zonules
 		ctx.moveTo(44 - this.originX + 80, - this.originY - 349);
-		ctx.lineTo(80 - xShift, -207 - this.originY);
+		ctx.lineTo(80 - xShift, -207 - (-y));
 		ctx.moveTo(44 - this.originX + 80, - this.originY - 349);
-		ctx.lineTo(120 - xShift, -207 - this.originY);
+		ctx.lineTo(120 - xShift, -207 - (-y));
 		ctx.moveTo(44  - this.originX + 120, - this.originY - 349);
-		ctx.lineTo(80 - xShift, -207 - this.originY);
+		ctx.lineTo(80 - xShift, -207 - (-y));
 		ctx.moveTo(44 - this.originX + 120, - this.originY - 349);
-		ctx.lineTo(120 - xShift, -207 - this.originY);
+		ctx.lineTo(120 - xShift, -207 - (-y));
 
 		// Bottom zonules
 		ctx.moveTo(44 - this.originX + 80, -this.originY + 349);
-		ctx.lineTo(80 - xShift, 207 - this.originY);
+		ctx.lineTo(80 - xShift, 207 - (-y));
 		ctx.moveTo(44 - this.originX + 80, -this.originY + 349);
-		ctx.lineTo(120 - xShift, 207 - this.originY);
+		ctx.lineTo(120 - xShift, 207 - (-y));
 		ctx.moveTo(44 - this.originX + 120, -this.originY + 349);
-		ctx.lineTo(80 - xShift, 207 - this.originY);
+		ctx.lineTo(80 - xShift, 207 - (-y));
 		ctx.moveTo(44 - this.originX + 120, -this.originY + 349);
-		ctx.lineTo(120 - xShift, 207 - this.originY);
+		ctx.lineTo(120 - xShift, 207 - (-y));
 
 		ctx.lineWidth = 2;
 		ctx.strokeStyle = "gray";
@@ -281,4 +290,5 @@ ED.PCIOLCrossSection.prototype.draw = function(_point) {
 
 	// Return value indicating successful hittest
 	return this.isClicked;
-}
+};
+

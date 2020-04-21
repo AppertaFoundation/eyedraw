@@ -1,4 +1,5 @@
 window.eyedrawDoodleScripts = [
+    "ED/Doodles/Oph/ChoroidalNaevusMelanoma.js",
     "ED/Doodles/An/AgentDose.js",
     "ED/Doodles/An/AgentDuration.js",
     "ED/Doodles/An/RecordGrid.js",
@@ -34,6 +35,7 @@ window.eyedrawDoodleScripts = [
     "ED/Doodles/Oph/AngleRecession.js",
     "ED/Doodles/Oph/AntPVR.js",
     "ED/Doodles/Oph/AntSeg.js",
+    "ED/Doodles/Oph/AntSegSteepAxis.js",
     "ED/Doodles/Oph/AntSegAngleMarks.js",
     "ED/Doodles/Oph/AntSegCrossSection.js",
     "ED/Doodles/Oph/AntSynech.js",

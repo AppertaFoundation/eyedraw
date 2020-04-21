@@ -15,16 +15,16 @@
  */
 
 /**
- * Freehand drawing
+ * FreehandCopyForOE drawing
  *
- * @class Freehand
+ * @class FreehandCopyForOE
  * @property {String} className Name of doodle subclass
  * @param {Drawing} _drawing
  * @param {Object} _parameterJSON
  */
-ED.Freehand = function(_drawing, _parameterJSON) {
+ED.FreehandCopyForOE = function(_drawing, _parameterJSON) {
 	// Set classname
-	this.className = "Freehand";
+	this.className = "FreehandCopyForOE";
 
 	// Private parameters
 	this.labelWidth = 0;
@@ -37,34 +37,36 @@ ED.Freehand = function(_drawing, _parameterJSON) {
 	this.thickness = 'Thin';
 	this.labelText = "";
 
+	_drawing.moveToFront();
+
 	// Saved parameters
-	this.savedParameterArray = ['originX', 'originY', 'colourString', 'filled', 'thickness', 'labelText'];
+	this.savedParameterArray = ['originX', 'originY', 'colourString', 'filled', 'thickness', 'labelText', 'scaleX', 'scaleY'];
 
 	// Parameters in doodle control bar (parameter name: parameter label)
 	this.controlParameterArray = {'colourString':'Colour', 'filled':'Fill', 'thickness':'Thickness', 'labelText':'Label'};
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
-}
+};
 
 /**
  * Sets superclass and constructor
  */
-ED.Freehand.prototype = new ED.Doodle;
-ED.Freehand.prototype.constructor = ED.Freehand;
-ED.Freehand.superclass = ED.Doodle.prototype;
+ED.FreehandCopyForOE.prototype = new ED.Doodle;
+ED.FreehandCopyForOE.prototype.constructor = ED.FreehandCopyForOE;
+ED.FreehandCopyForOE.superclass = ED.Doodle.prototype;
 
 /**
  * Sets handle attributes
  */
-ED.Freehand.prototype.setHandles = function() {
+ED.FreehandCopyForOE.prototype.setHandles = function() {
 	this.handleArray[2] = new ED.Doodle.Handle(null, true, ED.Mode.Scale, true);
-}
+};
 
 /**
  * Sets default dragging attributes
  */
-ED.Freehand.prototype.setPropertyDefaults = function() {
+ED.FreehandCopyForOE.prototype.setPropertyDefaults = function() {
 	this.isDrawable = true;
 
 	// Add complete validation arrays for derived parameters
@@ -102,32 +104,32 @@ ED.Freehand.prototype.setPropertyDefaults = function() {
 		type: 'freeText',
 		animate: true
 	};
-}
+};
 
 /**
  * Sets default parameters (Only called for new doodles)
  * Use the setParameter function for derived parameters, as this will also update dependent variables
  */
-ED.Freehand.prototype.setParameterDefaults = function() {
+ED.FreehandCopyForOE.prototype.setParameterDefaults = function() {
 	this.setOriginWithDisplacements(0, 100);
-}
+};
 
 /**
  * Draws doodle or performs a hit test if a Point parameter is passed
  *
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
-ED.Freehand.prototype.draw = function(_point) {
+ED.FreehandCopyForOE.prototype.draw = function(_point) {
 	// Get context
 	var ctx = this.drawing.context;
 
 	// Call draw method in superclass
-	ED.Freehand.superclass.draw.call(this, _point);
+	ED.FreehandCopyForOE.superclass.draw.call(this, _point);
 
 	// Boundary path
 	ctx.beginPath();
 
-	// Freehand drawing area
+	// FreehandCopyForOE drawing area
 	var halfWidth = 400;
 	ctx.rect(-halfWidth, -halfWidth, halfWidth * 2, halfWidth * 2);
 

@@ -1172,9 +1172,26 @@ ED.Doodle.prototype.parameterElement = function(_parameter, showLabel) {
 				}
 				else if (this.parameterValidationArray[_parameter].list[i] == "00FF00FF") {
 					option.innerText = "Green";
-				}
-				else {
+				} else if (this.parameterValidationArray[_parameter].list[i] == "0000FFFF") {
 					option.innerText = "Blue";
+				} else if (this.parameterValidationArray[_parameter].list[i] == "FFB8ED") {
+					option.innerText = "Pink";
+				} else if (this.parameterValidationArray[_parameter].list[i] == "FF9806") {
+					option.innerText = "Orange";
+				} else if (this.parameterValidationArray[_parameter].list[i] == "FFED3D") {
+					option.innerText = "Yellow";
+				} else if (this.parameterValidationArray[_parameter].list[i] == "E5A222") {
+					option.innerText = "Light brown";
+				} else if (this.parameterValidationArray[_parameter].list[i] == "A35100") {
+					option.innerText = "Dark brown";
+				} else if (this.parameterValidationArray[_parameter].list[i] == "252525") {
+					option.innerText = "Black";
+				} else if (this.parameterValidationArray[_parameter].list[i] == "979797") {
+					option.innerText = "Grey";
+				} else if (this.parameterValidationArray[_parameter].list[i] == "FFFFFF") {
+					option.innerText = "White";
+				} else {
+					option.innerText = "Brown";
 				}
 				option.value = this.parameterValidationArray[_parameter].list[i];
 				element.appendChild(option);

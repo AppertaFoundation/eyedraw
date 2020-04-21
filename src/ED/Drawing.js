@@ -253,7 +253,7 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 				isEyeDrawElement = new RegExp(ignore).test(elem.className);
 			} while (
 				(elem = elem.parentNode) && (elem !== document.body) && (!isEyeDrawElement)
-			);
+				);
 
 			if (!isEyeDrawElement) {
 				drawing.deselectDoodles();
@@ -279,7 +279,7 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 		}, false);
 
 		this.canvas.addEventListener('touchend', function(e) {
-            if (this.lastTouchPoint !== undefined) {
+			if (this.lastTouchPoint !== undefined) {
 				drawing.mouseup(this.lastTouchPoint);
 				this.lastTouchPoint = undefined;
 			}
@@ -289,7 +289,7 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 			if (e.targetTouches[0] !== undefined) {
 				var canvas_pos = drawing.getPositionOfElement(drawing.canvas);
 				var point = new ED.Point(e.targetTouches[0].pageX - canvas_pos[0] - this.offsetLeft, e.targetTouches[0].pageY - canvas_pos[1]);
-                this.lastTouchPoint = point;
+				this.lastTouchPoint = point;
 				drawing.mousemove(point);
 			}
 		}, false);
@@ -307,17 +307,17 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 };
 
 ED.Drawing.prototype.getPositionOfElement = function(element) {
-		var x=0;
-		var y=0;
-		while(true){
-				x += element.offsetLeft;
-				y += element.offsetTop;
-				if(element.offsetParent === null){
-						break;
-				}
-				element = element.offsetParent;
+	var x=0;
+	var y=0;
+	while(true){
+		x += element.offsetLeft - element.scrollLeft;
+		y += element.offsetTop - element.scrollTop;
+		if(element.offsetParent === null){
+			break;
 		}
-		return [x, y];
+		element = element.offsetParent;
+	}
+	return [x, y];
 };
 
 /**
@@ -347,6 +347,39 @@ ED.Drawing.prototype.replaceWithImage = function() {
 	}
 
 	this.canvasParent.appendChild(img);
+};
+
+/**
+ * Replaces the Eyedraw canvas inline with a div containing a background image. This can be used to create a static image that
+ * can dynamically scale with the generated container.
+ * @param {String} class_list String of CSS classes to append to the container.
+ * @param {boolean} remove_ed_container true if the Eyedraw container needs to be removed after generating the div container; otherwise false.
+ */
+ED.Drawing.prototype.replaceWithBGImage = function(class_list, remove_ed_container) {
+	// Create a new image element
+	var container = document.createElement("div");
+
+	container.setAttribute('class', class_list);
+
+	// Base64 encoded PNG version of the canvas element
+	container.setAttribute('style', 'background-image:url(' + this.canvas.toDataURL('image/png') + ');');
+
+	// Removes canvas and hidden input element (+ any other children) as they will be replaced with an image
+	if (this.canvasParent.hasChildNodes()) {
+		while (this.canvasParent.childNodes.length >= 1) {
+			this.canvasParent.removeChild(this.canvasParent.firstChild);
+		}
+	}
+
+	if (remove_ed_container) {
+		// Add the background image div to the parent container for the Eyedraw container.
+		this.canvasParent.parentNode.parentNode.parentNode.parentNode.appendChild(container);
+
+		// Remove the Eyedraw container.
+		this.canvasParent.parentNode.parentNode.parentNode.remove();
+	} else {
+		this.canvasParent.appendChild(container);
+	}
 };
 
 /**
@@ -2327,9 +2360,9 @@ ED.Drawing.prototype.updateBindings = function(_doodle) {
 						element.value = value;
 					}
 					if (originalValue !== element.value) {
-                        // trigger a change event for anything listen to the bound html elements
-                        // instead of the eyedraw doodles.
-                        window.setTimeout(function(el) { el.dispatchEvent(new Event('change', {bubbles: true, cancelable: true})); }.bind(null, element), 100)
+						// trigger a change event for anything listen to the bound html elements
+						// instead of the eyedraw doodles.
+						window.setTimeout(function(el) { el.dispatchEvent(new Event('change', {bubbles: true, cancelable: true})); }.bind(null, element), 100)
 					}
 					break;
 
@@ -2630,15 +2663,15 @@ ED.Drawing.prototype.reportData = function() {
 	}
 
 	// consolidate group reports
-  for (var cls in grouped) {
+	for (var cls in grouped) {
 		var groupStr = '';
-    if (grouped.hasOwnProperty(cls)) {
-      groupStr = grouped[cls]['start'];
-      groupStr += ED.addAndAfterLastComma(grouped[cls]['descriptions'].join(", "));
-      groupStr += grouped[cls]['end'];
-      reports.push(groupStr);
-    }
-  }
+		if (grouped.hasOwnProperty(cls)) {
+			groupStr = grouped[cls]['start'];
+			groupStr += ED.addAndAfterLastComma(grouped[cls]['descriptions'].join(", "));
+			groupStr += grouped[cls]['end'];
+			reports.push(groupStr);
+		}
+	}
 
 	return reports;
 }
@@ -2649,27 +2682,27 @@ ED.Drawing.prototype.reportData = function() {
  * @returns {String} Description of the drawing
  */
 ED.Drawing.prototype.report = function() {
-    var returnString = "";
-    var doodleArray = this.doodleArray;
-    var reports = this.reportData();
-    for (var i = 0; i < reports.length; i++) {
-        var description = reports[i];
+	var returnString = "";
+	var doodleArray = this.doodleArray;
+	var reports = this.reportData();
+	for (var i = 0; i < reports.length; i++) {
+		var description = reports[i];
 
-        /* handled special formats with doodle's own formatReport method */
-        var special = (function(description) {
-            return doodleArray.find(function(obj) {
-                return obj.description() === description && typeof obj.formatReport === 'function';
-            });
-        }(description));
-        if (special) {
-            description = special.formatReport();
+		/* handled special formats with doodle's own formatReport method */
+		var special = (function(description) {
+			return doodleArray.find(function(obj) {
+				return obj.description() === description && typeof obj.formatReport === 'function';
+			});
+		}(description));
+		if (special) {
+			description = special.formatReport();
 		} else {
-            description = ED.firstLetterToLowerCase(reports[i]);
+			description = ED.firstLetterToLowerCase(reports[i]);
 		}
 
-        returnString += (i === 0) ? ED.firstLetterToUpperCase(description) : ", " + description;
-    }
-    return returnString;
+		returnString += (i === 0) ? ED.firstLetterToUpperCase(description) : ", " + description;
+	}
+	return returnString;
 }
 
 /**
@@ -2687,17 +2720,17 @@ ED.Drawing.prototype.diagnosis = function() {
 		var codeArray = doodle.snomedCodes();
 		for (var j = 0; j < codeArray.length; j++) {
 			var code = codeArray[j][0];
-            if (code > 0) {
-                var codePosition = codeArray[j][1];
-                if (codePosition > topOfHierarchy) {
-                    topOfHierarchy = codePosition;
-                    returnCodes.push(code);
-                } else if (codePosition == topOfHierarchy) {
-                    if (returnCodes.indexOf(code) < 0) {
-                        returnCodes.push(code);
-                    }
-                }
-            }
+			if (code > 0) {
+				var codePosition = codeArray[j][1];
+				if (codePosition > topOfHierarchy) {
+					topOfHierarchy = codePosition;
+					returnCodes.push(code);
+				} else if (codePosition == topOfHierarchy) {
+					if (returnCodes.indexOf(code) < 0) {
+						returnCodes.push(code);
+					}
+				}
+			}
 
 		}
 	}

@@ -1,5 +1,6 @@
 window.eyedrawDoodleTitles = {
     "NONE": "No description available for this doodle",
+	'ChoroidalNaevusMelanoma': "ChoroidalNaevusMelanoma",
     "ACIOL": "Anterior chamber IOL",
     "ACMaintainer": "AC maintainer",
     "AdnexalEye": "Adnexal eye template",
@@ -13,6 +14,7 @@ window.eyedrawDoodleTitles = {
     "AntPVR": "Anterior PVR",
     "AntSeg": "Anterior segment",
     "AntSegAngleMarks": "AntSegAngleMarks",
+    "AntSegSteepAxis": "AntSegSteepAxis",
     "AntSynech": "Anterior synechiae",
     "APattern": "A pattern",
     "ArcuateScotoma": "Arcuate scotoma",
@@ -168,7 +170,7 @@ window.eyedrawDoodleTitles = {
     "UTear": "Traction \u2018U\u2019 tear",
     "Vicryl": "Vicryl suture",
     "ViewObscured": "View obscured",
-    "VitreousOpacity": "Vitreous opacity",
+    "VitreousOpacity": "Vitreous haemorrhage",
     "VPattern": "V pattern",
     "Crepitations": "Crepitations",
     "Stenosis": "Stenosis",

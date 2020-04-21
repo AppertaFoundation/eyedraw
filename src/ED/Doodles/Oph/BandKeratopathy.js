@@ -33,9 +33,10 @@ ED.BandKeratopathy = function(_drawing, _parameterJSON) {
     this.opacity = 0.25;
 
     // Saved parameters
-    this.savedParameterArray = ['originX', 'originY', 'rotation', 'gradeOfOpacity'];
+    this.savedParameterArray = ['originX', 'originY', 'rotation', 'gradeOfOpacity', 'configuration'];
     this.controlParameterArray = {
         'gradeOfOpacity': 'Opacity grade',
+        'configuration' : 'Configuration',
     };
 
     // Call superclass constructor
@@ -210,6 +211,24 @@ ED.BandKeratopathy.prototype.createTopCatmullRomSpline = function (shapeControlP
     ]);
 };
 
+ED.BandKeratopathy.prototype.createRightCatmullRomSpline = function (shapeControlPoints) {
+    return this.createCatmullRomSpline([
+        shapeControlPoints.controlPointOuterTopRight,
+        shapeControlPoints.controlPointInnerTopRight,
+        shapeControlPoints.controlPointInnerBottomRight,
+        shapeControlPoints.controlPointOuterBottomRight,
+    ]);
+};
+
+ED.BandKeratopathy.prototype.createLeftCatmullRomSpline = function (shapeControlPoints) {
+    return this.createCatmullRomSpline([
+        shapeControlPoints.controlPointOuterBottomLeft,
+        shapeControlPoints.controlPointInnerBottomLeft,
+        shapeControlPoints.controlPointInnerTopLeft,
+        shapeControlPoints.controlPointOuterTopLeft,
+    ]);
+};
+
 ED.BandKeratopathy.prototype.createBottomCatmullRomSpline = function (shapeControlPoints) {
     return this.createCatmullRomSpline([
         shapeControlPoints.controlPointOuterBottomLeft,
@@ -234,6 +253,12 @@ ED.BandKeratopathy.prototype.setPropertyDefaults = function() {
         type: 'string',
         list: ['+', '++', '+++', '++++']
     };
+
+    this.parameterValidationArray.configuration = {
+        kind: 'derived',
+        type: 'string',
+        list: ['Confluent', 'Peripheral']
+    };
 };
 
 /**
@@ -251,6 +276,10 @@ ED.BandKeratopathy.prototype.dependentParameterValues = function(_parameter, _va
         case 'gradeOfOpacity':
             returnArray.opacity = (_value.length * 25) / 100;
             break;
+        case 'configuration':
+            // center control points are only shown when the configuration is Confluent
+            this.handleArray[8].isVisible = this.handleArray[9].isVisible = (_value === 'Confluent');
+            break;
     }
 
     return returnArray;
@@ -261,6 +290,7 @@ ED.BandKeratopathy.prototype.dependentParameterValues = function(_parameter, _va
  */
 ED.BandKeratopathy.prototype.setParameterDefaults = function() {
     this.setParameterFromString('gradeOfOpacity', '+');
+    this.setParameterFromString('configuration', 'Confluent');
 
     // Create a squiggle to store the handles points
     var squiggle = new ED.Squiggle(this, new ED.Colour(100, 100, 100, 1), 4, true);
@@ -268,13 +298,12 @@ ED.BandKeratopathy.prototype.setParameterDefaults = function() {
     // Add it to squiggle array
     this.squiggleArray.push(squiggle);
 
-    // top left, bottom left, bottom, right, top right
-    var coords = [120, 240, 300, 60];
+    // bottom right, bottom left, top left, top right
+    var angles = [120, 240, 300, 60];
 
-    // Populate with handles at equidistant points around circumference
     for (var i = 0; i < this.numberOfOuterHandles; i++) {
         var point = new ED.Point(0, 0);
-        point.setWithPolars(this.initialRadius, coords[i] * Math.PI / 180);
+        point.setWithPolars(this.initialRadius, angles[i] * Math.PI / 180);
         this.addPointToSquiggle(point);
     }
 
@@ -370,34 +399,77 @@ ED.BandKeratopathy.prototype.createCatmullRomSpline = function(cps, ts, vStart, 
     };
 };
 
+ED.BandKeratopathy.prototype.createShapes = function(center, radius, shapeControlPoints) {
+    let shapes = [];
+    switch (this.configuration) {
+        case 'Confluent':
+            shapes.push({
+                curves: [
+                    this.createArcCurveFromPoints(center, radius,
+                        shapeControlPoints.controlPointOuterBottomRight, shapeControlPoints.controlPointOuterTopRight),
+                    this.createTopCatmullRomSpline(shapeControlPoints),
+                    this.createArcCurveFromPoints(center, radius,
+                        shapeControlPoints.controlPointOuterTopLeft, shapeControlPoints.controlPointOuterBottomLeft),
+                    this.createBottomCatmullRomSpline(shapeControlPoints),
+                ],
+                trimmed:  [ // Trim only the Catmull-Rom splines
+                    false,
+                    true,
+                    false,
+                    true,
+                ],
+            });
+            break;
+        case 'Peripheral':
+            shapes.push({   // Left shape
+                curves: [
+                    this.createArcCurveFromPoints(center, radius,
+                        shapeControlPoints.controlPointOuterTopLeft, shapeControlPoints.controlPointOuterBottomLeft),
+                    this.createLeftCatmullRomSpline(shapeControlPoints),
+                ],
+                trimmed: [
+                    false,
+                    true,
+                ],
+            });
+            shapes.push({   // Right shape
+                curves: [
+                    this.createArcCurveFromPoints(center, radius,
+                        shapeControlPoints.controlPointOuterBottomRight, shapeControlPoints.controlPointOuterTopRight),
+                    this.createRightCatmullRomSpline(shapeControlPoints),
+                ],
+                trimmed: [
+                    false,
+                    true,
+                ],
+            });
+            break;
+    }
+    return shapes;
+};
 
 ED.BandKeratopathy.prototype.drawShape = function(ctx, center, radius, shapeControlPoints) {
-    var parametricCurves = [
-        this.createArcCurveFromPoints(center, radius,
-            shapeControlPoints.controlPointOuterBottomRight, shapeControlPoints.controlPointOuterTopRight),
-        this.createTopCatmullRomSpline(shapeControlPoints),
-        this.createArcCurveFromPoints(center, radius,
-            shapeControlPoints.controlPointOuterTopLeft, shapeControlPoints.controlPointOuterBottomLeft),
-        this.createBottomCatmullRomSpline(shapeControlPoints),
-    ];
+    let shapes = this.createShapes(center, radius, shapeControlPoints);
+    shapes.forEach((shape) => {
+        let curves = shape.curves;
+        let trimmed = shape.trimmed;
 
-    var parametricCurveTrim = [false, true, false, true,];  // Trim only the Catmull-Rom splines
-
-    var resolution = 100;
-    var dt = 1 / resolution;
-    var startPoint = parametricCurves[0](0);
-    ctx.moveTo(startPoint.x, startPoint.y);
-    for(var i = 0; i < parametricCurves.length; ++i) {
-        var tStart  = parametricCurveTrim[i] ? 0.03 : 0;
-        var tEnd    = parametricCurveTrim[i] ? 0.97 : 1;
-        for(var t = tStart; t <= tEnd; t += dt) {
-            var actualPoint = parametricCurves[i](t);
-            ctx.lineTo(actualPoint.x, actualPoint.y);
+        let resolution = 100;
+        let dt = 1 / resolution;
+        let startPoint = curves[0](0);
+        ctx.moveTo(startPoint.x, startPoint.y);
+        for(let i = 0; i < curves.length; ++i) {
+            let tStart  = trimmed[i] ? 0.03 : 0;
+            let tEnd    = trimmed[i] ? 0.97 : 1;
+            for(let t = tStart; t <= tEnd; t += dt) {
+                let actualPoint = curves[i](t);
+                ctx.lineTo(actualPoint.x, actualPoint.y);
+            }
         }
-    }
-    ctx.strokeStyle = "rgb(0,0,0,0)";
-    ctx.fillStyle = "rgb(169,169,169," + this.opacity + ")";
-    ctx.fill();
+        ctx.strokeStyle = "rgb(0,0,0,0)";
+        ctx.fillStyle = "rgb(169,169,169," + this.opacity + ")";
+        ctx.fill();
+    });
 };
 
 ED.BandKeratopathy.prototype.draw = function(_point) {
@@ -454,7 +526,7 @@ ED.BandKeratopathy.prototype.draw = function(_point) {
  * @returns {String} Description of doodle
  */
 ED.BandKeratopathy.prototype.description = function() {
-    return 'Band Keratopathy ' + this.gradeOfOpacity;
+    return 'Band Keratopathy (' + this.configuration + ') ' + this.gradeOfOpacity;
 };
 
 ED.BandKeratopathy.prototype.snomedCode = function()
