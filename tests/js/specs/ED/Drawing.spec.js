@@ -20,7 +20,7 @@
 	describe('Drawing', function() {
 
 		after(function() {
-			$('.ed-widget').empty().remove();
+			$('.ed2-widget').empty().remove();
 		});
 
 		describe('Scaling the drawing', function() {

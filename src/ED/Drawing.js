@@ -242,11 +242,11 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 			var isEyeDrawElement = false;
 
 			var ignore = '(' + [
-				'ed-doodle-popup',
+				'ed2-doodle-popup',
 				'ed-button',
 				'ed-canvas',
 				'ed_canvas',
-				'ed-selected-doodle-select',
+				'ed2-selected-doodle-select',
 			].join(')|(') + ')';
 
 			do {

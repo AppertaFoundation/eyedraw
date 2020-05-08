@@ -52,7 +52,7 @@ ED.Controller = (function() {
 		this.properties = properties;
 		this.canvas = document.getElementById(properties.canvasId);
 		this.input = document.getElementById(properties.inputId);
-		this.container = $(this.canvas).closest('.ed-widget');
+		this.container = $(this.canvas).closest('.ed2-widget');
 		this.previousReport = '';
 
 		this.Checker = Checker || ED.Checker;
@@ -103,7 +103,7 @@ ED.Controller = (function() {
 	 */
 	Controller.prototype.createMainToolbar = function() {
 
-		var container = this.container.find('.ed-main-toolbar');
+		var container = this.container.find('.ed2-main-toolbar');
 
 		return container.length ? new ED.Views.Toolbar.Main(
 			this.drawing,
@@ -113,7 +113,7 @@ ED.Controller = (function() {
 
 	Controller.prototype.createDrawingToolbar = function() {
 
-		var container = this.container.find('.ed-drawing-toolbar');
+		var container = this.container.find('.ed2-drawing-toolbar');
 
 		return container.length ? new ED.Views.Toolbar.Drawing(
 			this.drawing,
@@ -126,7 +126,7 @@ ED.Controller = (function() {
 	 */
 	Controller.prototype.createDoodlePopup = function() {
 
-		var container = this.container.find('.ed-doodle-popup:first');
+		var container = this.container.find('.ed2-doodle-popup:first');
 
 		var popupDoodles = this.properties.showDoodlePopupForDoodles || [];
 
@@ -142,9 +142,7 @@ ED.Controller = (function() {
 	 * @return {ED.Views.SelectedDoodle} [description]
 	 */
 	Controller.prototype.createSelectedDoodle = function() {
-
-		var container = this.container.find('.ed-selected-doodle');
-
+		var container = this.container.find('.ed2-selected-doodle');
 		return container.length ? new ED.Views.SelectedDoodle(
 			this.drawing,
 			container,
@@ -189,11 +187,11 @@ ED.Controller = (function() {
 		if (this.doodlePopup && this.doodlePopup instanceof ED.Views.DoodlePopup) {
 
 			this.doodlePopup.on('show.before', function() {
-				this.container.addClass('ed-state-doodle-popup-show');
+				this.container.addClass('ed-state-doodle-popup-show'); // ed2-state-doodle-popup-show ???
 			}.bind(this));
 
 			this.doodlePopup.on('hide.after', function() {
-				this.container.removeClass('ed-state-doodle-popup-show');
+				this.container.removeClass('ed-state-doodle-popup-show'); // ed2-state-doodle-popup-show ???
 			}.bind(this));
 		}
 	};

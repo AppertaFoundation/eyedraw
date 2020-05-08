@@ -338,7 +338,7 @@ ED.Controller = (function() {
 		this.properties = properties;
 		this.canvas = document.getElementById(properties.canvasId);
 		this.input = document.getElementById(properties.inputId);
-		this.container = $(this.canvas).closest('.ed-widget');
+		this.container = $(this.canvas).closest('.ed2-widget');
 		this.previousReport = '';
 
 		this.Checker = Checker || ED.Checker;
@@ -389,7 +389,7 @@ ED.Controller = (function() {
 	 */
 	Controller.prototype.createMainToolbar = function() {
 
-		var container = this.container.find('.ed-main-toolbar');
+		var container = this.container.find('.ed2-main-toolbar');
 
 		return container.length ? new ED.Views.Toolbar.Main(
 			this.drawing,
@@ -399,7 +399,7 @@ ED.Controller = (function() {
 
 	Controller.prototype.createDrawingToolbar = function() {
 
-		var container = this.container.find('.ed-drawing-toolbar');
+		var container = this.container.find('.ed2-drawing-toolbar');
 
 		return container.length ? new ED.Views.Toolbar.Drawing(
 			this.drawing,
@@ -412,7 +412,7 @@ ED.Controller = (function() {
 	 */
 	Controller.prototype.createDoodlePopup = function() {
 
-		var container = this.container.find('.ed-doodle-popup:first');
+		var container = this.container.find('.ed2-doodle-popup:first');
 
 		var popupDoodles = this.properties.showDoodlePopupForDoodles || [];
 
@@ -428,9 +428,7 @@ ED.Controller = (function() {
 	 * @return {ED.Views.SelectedDoodle} [description]
 	 */
 	Controller.prototype.createSelectedDoodle = function() {
-
-		var container = this.container.find('.ed-selected-doodle');
-
+		var container = this.container.find('.ed2-selected-doodle');
 		return container.length ? new ED.Views.SelectedDoodle(
 			this.drawing,
 			container,
@@ -475,11 +473,11 @@ ED.Controller = (function() {
 		if (this.doodlePopup && this.doodlePopup instanceof ED.Views.DoodlePopup) {
 
 			this.doodlePopup.on('show.before', function() {
-				this.container.addClass('ed-state-doodle-popup-show');
+				this.container.addClass('ed-state-doodle-popup-show'); // ed2-state-doodle-popup-show ???
 			}.bind(this));
 
 			this.doodlePopup.on('hide.after', function() {
-				this.container.removeClass('ed-state-doodle-popup-show');
+				this.container.removeClass('ed-state-doodle-popup-show'); // ed2-state-doodle-popup-show ???
 			}.bind(this));
 		}
 	};
@@ -1242,7 +1240,7 @@ ED.Views.DoodlePopup.Help = (function() {
 	 */
 	DoodleHelp.prototype.onDoodlePopupRender = function() {
 		this.doodleInfo = this.doodlePopup.container.find('.ed-doodle-info');
-		this.doodleControls = this.doodlePopup.container.find('.ed-doodle-controls');
+		this.doodleControls = this.doodlePopup.container.find('.ed2-doodle-controls');
 		this.button = this.doodlePopup.toolbar.container.find('.ed-doodle-help');
 	};
 
@@ -1332,7 +1330,6 @@ ED.Views.SelectedDoodle = (function() {
 	 */
 	function SelectedDoodle(drawing, container, doodlePopup) {
 		ED.View.apply(this, arguments);
-
 		this.drawing = drawing;
 		this.container = container;
 		this.select = this.container.find('select');
@@ -1464,9 +1461,9 @@ ED.Views.SelectedDoodle = (function() {
 
 	return SelectedDoodle;
 }());
-/*! Generated on 20/4/2020 */
+/*! Generated on 8/5/2020 */
 ED.scriptTemplates = {
-  "doodle-popup": "\n\n{{#doodle}}\n{{^doodle.isNode}}\n\t<ul class=\"ed-toolbar-panel ed-doodle-popup-toolbar\">\n\t\t<li>\n\t\t\t{{#desc}}\n\t\t\t\t<a class=\"ed-button ed-doodle-help{{lockedButtonClass}}\" href=\"#\" data-function=\"toggleHelp\">\n\t\t\t\t\t<span class=\"icon-ed-help\"></span>\n\t\t\t\t</a>\n\t\t\t{{/desc}}\n\t\t</li>\n\t\t{{#doodle.isLocked}}\n\t\t\t<li>\n\t\t\t\t<a class=\"ed-button\" href=\"#\" data-function=\"unlock\">\n\t\t\t\t\t<span class=\"icon-ed-unlock\"></span>\n\t\t\t\t\t<span class=\"label\">Unlock</span>\n\t\t\t\t</a>\n\t\t\t</li>\n\t\t{{/doodle.isLocked}}\n\t\t{{^doodle.isLocked}}\n\t\t\t<li>\n\t\t\t\t<a class=\"ed-button\" href=\"#\" data-function=\"lock\">\n\t\t\t\t\t<span class=\"icon-ed-lock\"></span>\n\t\t\t\t\t<span class=\"label\">Lock</span>\n\t\t\t\t</a>\n\t\t\t</li>\n\t\t{{/doodle.isLocked}}\n\t\t<li>\n\t\t\t<a class=\"ed-button{{lockedButtonClass}}\" href=\"#\" data-function=\"moveToBack\">\n\t\t\t\t<span class=\"icon-ed-move-to-back\"></span>\n\t\t\t\t<span class=\"label\">Move to back</span>\n\t\t\t</a>\n\t\t</li>\n\t\t<li>\n\t\t\t<a class=\"ed-button{{lockedButtonClass}}\" href=\"#\" data-function=\"moveToFront\">\n\t\t\t\t<span class=\"icon-ed-move-to-front\"></span>\n\t\t\t\t<span class=\"label\">Move to front</span>\n\t\t\t</a>\n\t\t</li>\n\t\t<li>\n\t\t\t{{#doodle.isDeletable}}\n\t\t\t\t<a class=\"ed-button{{lockedButtonClass}}\" href=\"#\" data-function=\"deleteSelectedDoodle\">\n\t\t\t\t\t<span class=\"icon-ed-delete\"></span>\n\t\t\t\t\t<span class=\"label\">Delete</span>\n\t\t\t\t</a>\n\t\t\t{{/doodle.isDeletable}}\n\t\t</li>\n\t</ul>\n\t<div class=\"ed-doodle-info\" style=\"display: none;\">\n\t\t{{^doodle.isLocked}}\n\t\t\t{{#desc}}\n\t\t\t\t<div class=\"ed-doodle-description\">{{{desc}}}</div>\n\t\t\t{{/desc}}\n\t\t{{/doodle.isLocked}}\n\t</div>\n\t<div class=\"ed-doodle-controls\" {{#doodle.isLocked}}style=\"display: none;\"{{/doodle.isLocked}} id=\"{{drawing.canvas.id}}_controls\">\n\t</div>\n\t{{/doodle.isNode}}\n\t{{#doodle.isLocked}}\n\t\t<div class=\"ed-doodle-description\">\n\t\t\t<strong>This doodle is locked and cannot be edited.</strong>\n\t\t</div>\n\t{{/doodle.isLocked}}\n{{/doodle}}"
+  "doodle-popup": "\n\n{{#doodle}}\n{{^doodle.isNode}}\n\t<ul class=\"ed2-toolbar-panel ed2-doodle-popup-toolbar\">\n\t\t<li>\n\t\t\t{{#desc}}\n\t\t\t\t<a class=\"ed-button ed2-doodle-help{{lockedButtonClass}}\" href=\"#\" data-function=\"toggleHelp\">\n\t\t\t\t\t<span class=\"icon-ed2-help\"></span>\n\t\t\t\t</a>\n\t\t\t{{/desc}}\n\t\t</li>\n\t\t{{#doodle.isLocked}}\n\t\t\t<li>\n\t\t\t\t<a class=\"ed-button\" href=\"#\" data-function=\"unlock\">\n\t\t\t\t\t<span class=\"icon-ed2-unlock\"></span>\n\t\t\t\t\t<span class=\"label\">Unlock</span>\n\t\t\t\t</a>\n\t\t\t</li>\n\t\t{{/doodle.isLocked}}\n\t\t{{^doodle.isLocked}}\n\t\t\t<li>\n\t\t\t\t<a class=\"ed-button\" href=\"#\" data-function=\"lock\">\n\t\t\t\t\t<span class=\"icon-ed2-lock\"></span>\n\t\t\t\t\t<span class=\"label\">Lock</span>\n\t\t\t\t</a>\n\t\t\t</li>\n\t\t{{/doodle.isLocked}}\n\t\t<li>\n\t\t\t<a class=\"ed-button{{lockedButtonClass}}\" href=\"#\" data-function=\"moveToBack\">\n\t\t\t\t<span class=\"icon-ed2-move-to-back\"></span>\n\t\t\t\t<span class=\"label\">Move to back</span>\n\t\t\t</a>\n\t\t</li>\n\t\t<li>\n\t\t\t<a class=\"ed-button{{lockedButtonClass}}\" href=\"#\" data-function=\"moveToFront\">\n\t\t\t\t<span class=\"icon-ed2-move-to-front\"></span>\n\t\t\t\t<span class=\"label\">Move to front</span>\n\t\t\t</a>\n\t\t</li>\n\t\t<li>\n\t\t\t{{#doodle.isDeletable}}\n\t\t\t\t<a class=\"ed-button{{lockedButtonClass}}\" href=\"#\" data-function=\"deleteSelectedDoodle\">\n\t\t\t\t\t<span class=\"icon-ed2-delete\"></span>\n\t\t\t\t\t<span class=\"label\">Delete</span>\n\t\t\t\t</a>\n\t\t\t{{/doodle.isDeletable}}\n\t\t</li>\n\t</ul>\n\t<div class=\"ed2-doodle-info\" style=\"display: none;\">\n\t\t{{^doodle.isLocked}}\n\t\t\t{{#desc}}\n\t\t\t\t<div class=\"ed2-doodle-description\">{{{desc}}}</div>\n\t\t\t{{/desc}}\n\t\t{{/doodle.isLocked}}\n\t</div>\n\t<div class=\"ed2-doodle-controls\" {{#doodle.isLocked}}style=\"display: none;\"{{/doodle.isLocked}} id=\"{{drawing.canvas.id}}_controls\">\n\t</div>\n\t{{/doodle.isNode}}\n\t{{#doodle.isLocked}}\n\t\t<div class=\"ed2-doodle-description\">\n\t\t\t<strong>This doodle is locked and cannot be edited.</strong>\n\t\t</div>\n\t{{/doodle.isLocked}}\n{{/doodle}}"
 };
 /**
  * Copyright (C) OpenEyes Foundation, 2011-2017
