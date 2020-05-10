@@ -28,7 +28,7 @@
 <li id="<?php echo $item['classname'].$idSuffix ?>">
     <a class="ed-button" href="#" data-function="addDoodle" data-arg="<?php echo $item['classname'] ?>">
         <i class="icon-ed-<?=$item['classname'];?>"></i>
-        <span class="label">Lens</span>
+        <span class="label"><?php echo $item['title'] ?></span>
     </a>
 </li><?php } ?>
 				<?php if (count($extraItems)) {?>
@@ -40,7 +40,7 @@
 <li id="<?php echo $item['classname'].$idSuffix ?>">
     <a class="ed-button" href="#" data-function="addDoodle" data-arg="<?php echo $item['classname'] ?>">
         <i class="icon-ed-<?=$item['classname'];?>"></i>
-        <span class="label">Lens</span>
+        <span class="label"><?php echo $item['title'] ?></span>
     </a>
 </li><?php }?>
 	</ul>

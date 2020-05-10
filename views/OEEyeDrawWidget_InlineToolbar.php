@@ -43,6 +43,12 @@
                 </div>
             </div>
 
+        <?php }?>
+        <div class="ed2-editor-wrap">
+            <?php $this->render('editor', $data);?>
+            <?php $this->render('fields', $data);?>
+        </div>
+        <?php if ($showDrawingControls && $mode !== 'view') {?>
             <div class="ed2-no-doodle-elements">
                 <ul class="no-doodles">
                     <li>No Evidence of Glaucoma<i class="oe-i remove-circle small-icon pad-left"></i></li>
@@ -50,12 +56,7 @@
                     <li class="has-options">Has options (like a doodle)</li>
                 </ul>
             </div>
-
         <?php }?>
-        <div class="ed2-editor-wrap">
-            <?php $this->render('editor', $data);?>
-            <?php $this->render('fields', $data);?>
-        </div>
     </div>
 </div>
 
