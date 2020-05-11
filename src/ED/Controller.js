@@ -242,8 +242,8 @@ ED.Controller = (function() {
 	/**
 	 * Save drawing data to the associated input field.
 	 */
-	Controller.prototype.saveDrawingToInputField = function(force) {
-        if ((force && this.hasInputField()) || this.hasInputFieldData()) {
+	Controller.prototype.saveDrawingToInputField = function() {
+        if (this.hasInputField() && this.drawing.isReady) {
             this.input.value = this.drawing.save();
         }
 		clearTimeout(this.saveTimer);
@@ -448,7 +448,6 @@ ED.Controller = (function() {
 		this.addBindings();
 		this.addDeletedValues();
 		this.drawing.notifyZoomLevel();
-		this.saveDrawingToInputField(true);
 
 		// Optionally make canvas element focused
 		if (this.properties.focus) {
@@ -462,6 +461,8 @@ ED.Controller = (function() {
 
 		// Mark drawing object as ready
 		this.drawing.isReady = true;
+
+		this.saveDrawingToInputField();
 	};
 
 	/**
