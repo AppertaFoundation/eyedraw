@@ -108,7 +108,6 @@ ED.KeraticPrecipitates.prototype.dependentParameterValues = function(_parameter,
 	switch (_parameter) {
 		case 'type':
 		case 'number':
-			alert("to be implemented");
 	}
 
 	return returnArray;
