@@ -187,11 +187,11 @@ ED.Controller = (function() {
 		if (this.doodlePopup && this.doodlePopup instanceof ED.Views.DoodlePopup) {
 
 			this.doodlePopup.on('show.before', function() {
-				this.container.addClass('ed-state-doodle-popup-show'); // ed2-state-doodle-popup-show ???
+				this.container.addClass('ed-state-doodle-popup-show');
 			}.bind(this));
 
 			this.doodlePopup.on('hide.after', function() {
-				this.container.removeClass('ed-state-doodle-popup-show'); // ed2-state-doodle-popup-show ???
+				this.container.removeClass('ed-state-doodle-popup-show');
 			}.bind(this));
 		}
 	};

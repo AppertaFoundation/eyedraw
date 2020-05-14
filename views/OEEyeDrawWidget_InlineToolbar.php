@@ -15,14 +15,11 @@
  * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 ?>
-<!-- *******  ED Inline Widget ******* -->
 <div class="ed2-widget <?php echo ($isEditable) ? ' edit' : ' display';?>" id="eyedrawwidget_<?php echo $idSuffix ?>">
-    <!-- Select Doodles -->
     <?php if (isset($toolbar) && $toolbar) :?>
     <div class="ed2-toolbar"><?php $this->render('toolbar', $data);?></div>
     <?php endif; ?>
     <div class="ed2-body">
-        <!-- SELECTED DOODLE -->
         <?php if ($showDrawingControls && $mode !== 'view') {?>
             <!-- WTF -->
             <div class="ed2-drawing-controls flex-layout<?= $toggleScale ? ' ed2-feature-zoom': '';?>">
@@ -36,10 +33,7 @@
                 </div>
                 <div class="ed2-search">
                     <input type="text" class="search" id="js-idg-demo-ed2-search-input">
-                    <!-- note: this can be completely JS generated if you want -->
-                    <ul class="oe-autocomplete" style="display: none;">
-                        <li><a>No Evidence of Glaucoma</a></li><li><a>No Evidence of Glaucoma</a></li><li><a>No Evidence of Glaucoma</a></li><li><a>No Evidence of Glaucoma</a></li><li><a>No Evidence of Glaucoma</a></li><li><a>No Evidence of Glaucoma</a></li><li><a>No Evidence of Glaucoma</a></li><li><a>No Evidence of Glaucoma</a></li><li><a>No Evidence of Glaucoma</a></li><li><a>No Evidence of Glaucoma</a></li><li><a>No Evidence of Glaucoma</a></li><li><a>No Evidence of Glaucoma</a></li><li><a>No Evidence of Glaucoma</a></li><li><a>No Evidence of Glaucoma</a></li><li><a>No Evidence of Glaucoma</a></li><li><a>No Evidence of Glaucoma</a></li><li><a>No Evidence of Glaucoma</a></li><li><a>No Evidence of Glaucoma</a></li><li><a>No Evidence of Glaucoma</a></li><li><a>No Evidence of Glaucoma</a></li><li><a>No Evidence of Glaucoma</a></li><li><a>No Evidence of Glaucoma</a></li><li><a>No Evidence of Glaucoma</a></li><li><a>No Evidence of Glaucoma</a></li><li><a>No Evidence of Glaucoma</a></li><li><a>No Evidence of Glaucoma</a></li><li><a>No Evidence of Glaucoma</a></li><li><a>No Evidence of Glaucoma</a></li><li><a>No Evidence of Glaucoma</a></li><li><a>No Evidence of Glaucoma</a></li><li><a>No Evidence of Glaucoma</a></li><li><a>No Evidence of Glaucoma</a></li><li><a>No Evidence of Glaucoma</a></li><li><a>No Evidence of Glaucoma</a></li><li><a>No Evidence of Glaucoma</a></li><li><a>No Evidence of Glaucoma</a></li><li><a>No Evidence of Glaucoma</a></li><li><a>No Evidence of Glaucoma</a></li><li><a>No Evidence of Glaucoma</a></li><li><a>No Evidence of Glaucoma</a></li><li><a>No Evidence of Glaucoma</a></li><li><a>No Evidence of Glaucoma</a></li><li><a>No Evidence of Glaucoma</a></li><li><a>No Evidence of Glaucoma</a></li><li><a>No Evidence of Glaucoma</a></li><li><a>No Evidence of Glaucoma</a></li><li><a>No Evidence of Glaucoma</a></li><li><a>No Evidence of Glaucoma</a></li><li><a>No Evidence of Glaucoma</a></li>
-                    </ul>
+                    <ul class="oe-autocomplete" style="display: none;"></ul>
                 </div>
             </div>
 
