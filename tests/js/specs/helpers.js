@@ -1,7 +1,7 @@
 function createDOM() {
 
 	var container = $('<div />', {
-		'class': 'ed-widget'
+		'class': 'ed2-widget'
 	}).appendTo(document.body);
 
 	var canvas = $('<canvas />', {
@@ -20,15 +20,15 @@ function createDOM() {
 	}).appendTo(container);
 
 	var mainToolbar = $('<div />', {
-		'class': 'ed-toolbar-panel ed-main-toolbar'
+		'class': 'ed2-toolbar-panel ed2-main-toolbar'
 	}).appendTo(container);
 
 	var canvasToolbar = $('<div />', {
-		'class': 'ed-toolbar-panel ed-canvas-toolbar'
+		'class': 'ed2-toolbar-panel ed2-canvas-toolbar'
 	}).appendTo(container);
 
 	var doodlePopup = $('<div />', {
-		'class': 'ed-doodle-popup'
+		'class': 'ed2-doodle-popup'
 	}).appendTo(container);
 
 	return {

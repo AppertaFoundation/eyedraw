@@ -150,8 +150,8 @@ ED.Views.Toolbar = (function() {
 	};
 
 	Toolbar.prototype.hideDrawers = function() {
-		var openDrawers = this.container.find('.ed-drawer-open');
-		openDrawers.removeClass('ed-drawer-open');
+		var openDrawers = this.container.find('.ed2-drawer-open');
+		openDrawers.removeClass('ed2-drawer-open');
 	}
 
 	/*********************
@@ -183,7 +183,7 @@ ED.Views.Toolbar = (function() {
 		this.hideDrawers();
 
 		var button = $(e.currentTarget);
-		button.closest('li').addClass('ed-drawer-open');
+		button.closest('li').addClass('ed2-drawer-open');
 	};
 
 	/**

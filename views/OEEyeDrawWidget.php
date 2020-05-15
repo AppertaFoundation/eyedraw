@@ -16,15 +16,15 @@
  */
 ?>
 <div class="EyeDrawWidget ed-widget <?php echo ($isEditable) ? ' edit' : ' display';?>" id="eyedrawwidget_<?php echo $idSuffix ?>">
-	<?php $this->render('toolbar', $data);?>
-	<div class="ed-body">
-		<div class="ed-editor-container">
-			<?php if (@$data['imageUrl']) {?>
-				<img src="<?php echo $data['imageUrl']?>" height=<?=$height?> width=<?=$width?> />
-			<?php }else{?>
-				<?php $this->render('editor', $data);?>
-			<?php }?>
-		</div>
-		<?php $this->render('fields', $data);?>
-	</div>
+    <?php $this->render('toolbar', $data);?>
+    <div class="ed-body">
+        <div class="ed-editor-container">
+            <?php if (@$data['imageUrl']) {?>
+                <img src="<?php echo $data['imageUrl']?>" height=<?=$height?> width=<?=$width?> />
+            <?php }else{?>
+                <?php $this->render('editor', $data);?>
+            <?php }?>
+        </div>
+        <?php $this->render('fields', $data);?>
+    </div>
 </div>

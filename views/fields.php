@@ -17,7 +17,7 @@
 ?>
 
 <?php if ($isEditable) {?>
-	<div class="ed-fields-container">
+	<div class="ed2-editor">
 		<?php echo $fields;?>
 	</div>
 <?php }?>

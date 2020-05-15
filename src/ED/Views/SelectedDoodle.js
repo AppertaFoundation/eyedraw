@@ -43,7 +43,6 @@ ED.Views.SelectedDoodle = (function() {
 	 */
 	function SelectedDoodle(drawing, container, doodlePopup) {
 		ED.View.apply(this, arguments);
-
 		this.drawing = drawing;
 		this.container = container;
 		this.select = this.container.find('select');
