@@ -44,11 +44,7 @@
         </div>
         <?php if ($showDrawingControls && $mode !== 'view') {?>
             <div class="ed2-no-doodle-elements">
-                <ul class="no-doodles">
-                    <li>No Evidence of Glaucoma<i class="oe-i remove-circle small-icon pad-left"></i></li>
-                    <li>Glaucoma Suspect<i class="oe-i remove-circle small-icon pad-left"></i></li>
-                    <li class="has-options">Has options (like a doodle)</li>
-                </ul>
+                <ul class="no-doodles"></ul>
             </div>
         <?php }?>
     </div>
