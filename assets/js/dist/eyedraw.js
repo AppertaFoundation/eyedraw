@@ -40366,16 +40366,8 @@ ED.KeraticPrecipitates = function(_drawing, _parameterJSON) {
 	// Set classname
 	this.className = "KeraticPrecipitates";
 
-	this.size = 'Fine';
-	this.number = '+';
-
 	// Saved parameters
-	this.savedParameterArray = ['apexX', 'apexY', 'scaleX', 'scaleY', 'originX', 'originY', 'type', 'number'];
-
-	this.controlParameterArray = {
-		'size': 'Size',
-		'number': 'Number',
-	};
+	this.savedParameterArray = ['apexX', 'apexY', 'scaleX', 'scaleY', 'originX', 'originY'];
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
@@ -40408,23 +40400,7 @@ ED.KeraticPrecipitates.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['apexY']['range'].setMinAndMax(-160, +0);
 	this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.5, +1.5);
 	this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.5, +1.5);
-
-	this.parameterValidationArray.size = {
-		kind: 'derived',
-		type: 'string',
-		list: ['Fine', 'Medium', 'Large (mutton fat)', 'Stellate', 'Confluent'],
-		animate: true
-	};
-
-	this.parameterValidationArray.number = {
-		kind: 'derived',
-		type: 'string',
-		list: ['Solitary', '+', '++', '+++'],
-		animate: true
-	};
-
-
-};
+}
 
 /**
  * Sets default parameters (Only called for new doodles)
@@ -40437,22 +40413,7 @@ ED.KeraticPrecipitates.prototype.setParameterDefaults = function() {
 		this.scaleX = 0.5;
 		this.scaleY = 0.5;
 	}
-
-	this.setParameterFromString('size', 'Fine');
-	this.setParameterFromString('number', 'Solitary');
-};
-
-ED.KeraticPrecipitates.prototype.dependentParameterValues = function(_parameter, _value) {
-	let returnArray = {};
-
-	switch (_parameter) {
-		case 'type':
-		case 'number':
-			alert("to be implemented");
-	}
-
-	return returnArray;
-};
+}
 
 /**
  * Draws doodle or performs a hit test if a Point parameter is passed
