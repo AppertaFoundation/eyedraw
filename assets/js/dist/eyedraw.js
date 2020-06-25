@@ -18085,7 +18085,8 @@ ED.BandKeratopathy = function(_drawing, _parameterJSON) {
     this.numberOfInnerHandles = 6;
     this.initialRadius = 380;
     this.opacity = 0.25;
-
+    this.configuration = 'Confluent';
+    
     // Saved parameters
     this.savedParameterArray = ['originX', 'originY', 'rotation', 'gradeOfOpacity', 'configuration'];
     this.controlParameterArray = {
