@@ -2651,11 +2651,11 @@ ED.Drawing.prototype.reportData = function() {
 						'end': doodle.groupDescriptionEnd()
 					}
 				}
-				if (description.length) {
+				if (description) {
 					grouped[doodle.className]['descriptions'].push(description)
 				}
 			} else {
-				if (description.length) {
+				if (description) {
 					reports.push(description);
 				}
 			}
