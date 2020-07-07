@@ -10,3 +10,4 @@
 .idea
 config.rb
 package-lock.json
+.vscode/

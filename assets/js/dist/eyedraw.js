@@ -16019,7 +16019,7 @@ ED.AntSeg.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray.cells = {
 		kind: 'other',
 		type: 'string',
-		list: ['Not Checked', '0 (&lt;1)', '0.5+ (1-5)', '1+ (6-15)', '2+ (16-25)', '3+ (26-50)', '4+ (>50)'],
+		list: ['Not Checked', '0 (<1)', '0.5+ (1-5)', '1+ (6-15)', '2+ (16-25)', '3+ (26-50)', '4+ (>50)'],
 		animate: false
 	};
 
@@ -18085,6 +18085,7 @@ ED.BandKeratopathy = function(_drawing, _parameterJSON) {
     this.numberOfInnerHandles = 6;
     this.initialRadius = 380;
     this.opacity = 0.25;
+    this.configuration = 'Confluent';
 
     // Saved parameters
     this.savedParameterArray = ['originX', 'originY', 'rotation', 'gradeOfOpacity', 'configuration'];
