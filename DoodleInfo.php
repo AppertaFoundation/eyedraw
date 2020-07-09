@@ -109,7 +109,7 @@ class DoodleInfo
         'FreehandCopyForOE' => 'Freehand - permanent',
         'Fuchs' => 'Guttata',
         'Fundus' => 'Fundus',
-        'ConjunctivalHaem' => 'Conjunctival haemorrhage',
+        'ConjunctivalHaem' => 'Conjunctiva',
         'Geographic' => 'Geographic atrophy',
         'Fovea' => 'Fovea',
         'Gonioscopy' => 'Gonioscopy',

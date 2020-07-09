@@ -22275,28 +22275,28 @@ ED.ConjunctivalFlap.prototype.description = function() {
 ED.ConjunctivalHaem = function(_drawing, _parameterJSON) {
     // Set classname
     this.className = "ConjunctivalHaem";
-    //this.haemorrhage = false;
-    //this.swelling = false;
     this.haemorrhageGrade = 'None';
     this.swellingGrade = 'None';
-  //  this.bleedGrade = 'None';
     this.mucopurulent = false;
-    this.conjunctivitisType = 'None';
+    this.conjunctivitisType = 'Follicular';
+    this.hyperaemia = '+';
 
     // Saved parameters
     this.savedParameterArray = [
         'haemorrhageGrade',
         'swellingGrade',
         'conjunctivitisType',
+        'hyperaemia',
         'mucopurulent',
         'arc',
         'rotation'
     ];
 
     this.controlParameterArray = {
+        'conjunctivitisType': 'Conjunctivitis',
+        'hyperaemia': 'Hyperaemia',
         'haemorrhageGrade': 'Haemorrhage',
         'swellingGrade':'Swelling',
-        'conjunctivitisType': 'Conjunctivitis',
         'mucopurulent': 'Mucopurulent'
     };
 
@@ -22333,7 +22333,7 @@ ED.ConjunctivalHaem.prototype.setPropertyDefaults = function() {
         animate: false
     };
 
-    this.parameterValidationArray['bleedGrade'] = {
+    this.parameterValidationArray['hyperaemia'] = {
         kind: 'other',
         type: 'string',
         list: ['None', '+', '++', '+++'],
@@ -22354,7 +22354,11 @@ ED.ConjunctivalHaem.prototype.setPropertyDefaults = function() {
     this.parameterValidationArray['conjunctivitisType'] = {
         kind: 'other',
         type: 'string',
-        list: ['None', 'Papillary', 'Follicular'],
+        list: [
+            'Follicular',
+            'Papillary',
+            'Giant Papillary'
+        ],
         animate: false
     };
 };
@@ -22378,6 +22382,18 @@ ED.ConjunctivalHaem.prototype.setParameterDefaults = function() {
     this.arc = 120 * Math.PI / 180;
 
     this.setRotationWithDisplacements(180, 0);
+};
+
+ED.ConjunctivalHaem.prototype.dependentParameterValues = function(_parameter, _value) {
+    var returnArray = [];
+
+    switch (_parameter) {
+        case 'conjunctivitisType':
+            returnArray['hyperaemia'] = '+';
+            break;
+    }
+
+    return returnArray;
 };
 
 /**
@@ -22427,13 +22443,6 @@ ED.ConjunctivalHaem.prototype.draw = function(_point) {
         ctx.strokeStyle = "#dae6f1";
     }
 
-    // When the conjunctiva is first selected- its default is to be blank
-
-    // If conjunctival haemorrahge is selected from the flyout [the color is red]
-
-
-
-
     // If Haemorrhage - then regardless of additionselection the fill in colour for haemorrhage is shown.
     if (this.haemorrhageGrade !== 'None') {
 
@@ -22449,7 +22458,12 @@ ED.ConjunctivalHaem.prototype.draw = function(_point) {
             density = 1;
         }
 
-        ctx.fillStyle = colour; //ctx.createPattern(this.createPattern(density, colour), "repeat");
+        ctx.fillStyle = colour;
+
+        if (this.hyperaemia === '+') ctx.filter = "opacity(10%)";
+        if (this.hyperaemia === '++') ctx.filter = "opacity(30%)";
+        if (this.hyperaemia === '+++') ctx.filter = "opacity(50%)";
+
     } else {
         let density = 1.5;
         let colour;
@@ -22517,25 +22531,18 @@ ED.ConjunctivalHaem.prototype.groupDescription = function() {
 };
 
 ED.ConjunctivalHaem.prototype.getDescriptionForDoodle = function(doodle) {
-    let description = '';
+    let description = doodle.conjunctivitisType;
+    description += ", hyperaemia " + doodle.hyperaemia;
     if (doodle.haemorrhageGrade !== 'None') {
-        description += " Haemorrhage " + doodle.haemorrhageGrade + " at " + doodle.clockHour() + " o'clock";
+        description += ", haemorrhage " + doodle.haemorrhageGrade + " at " + doodle.clockHour() + " o'clock";
     }
 
     if (doodle.swellingGrade !== 'None') {
-        description += " Swelling " + doodle.swellingGrade + " at " + doodle.clockHour() + " o'clock";
+        description += ", swelling " + doodle.swellingGrade + " at " + doodle.clockHour() + " o'clock";
     }
 
-    if (doodle.conjunctivitisType !== 'None') {
-        if (doodle.conjunctivitisType === 'Papillary') {
-            description += " Papillary conjunctivitis";
-        }
-        if (doodle.conjunctivitisType === 'Follicular') {
-            description += " Follicular conjunctivitis";
-        }
-    }
     if (doodle.mucopurulent === true) {
-        description += " Mucopurulent";
+        description += ", mucopurulent";
 
     }
 
