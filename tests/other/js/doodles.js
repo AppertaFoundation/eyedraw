@@ -1,5 +1,6 @@
 window.eyedrawDoodleScripts = [
     "ED/Doodles/Oph/ChoroidalNaevusMelanoma.js",
+    "ED/Doodles/Oph/BandKeratopathy.js",
     "ED/Doodles/An/AgentDose.js",
     "ED/Doodles/An/AgentDuration.js",
     "ED/Doodles/An/RecordGrid.js",
@@ -13,6 +14,7 @@ window.eyedrawDoodleScripts = [
     "ED/Doodles/Cd/Crepitations.js",
     "ED/Doodles/Cd/DrugStent.js",
     "ED/Doodles/Cd/Effusion.js",
+    "ED/Doodles/Cd/Episcleritis.js",
     "ED/Doodles/Cd/Groin.js",
     "ED/Doodles/Cd/Haematoma.js",
     "ED/Doodles/Cd/Heart.js",
@@ -70,6 +72,7 @@ window.eyedrawDoodleScripts = [
     "ED/Doodles/Oph/CornealSuture.js",
     "ED/Doodles/Oph/CorticalCataract.js",
     "ED/Doodles/Oph/CorticalCataractCrossSection.js",
+    "ED/Doodles/Oph/CircumcornealInjection.js",
     "ED/Doodles/Oph/CottonWoolSpot.js",
     "ED/Doodles/Oph/Cryo.js",
     "ED/Doodles/Oph/CutterPI.js",

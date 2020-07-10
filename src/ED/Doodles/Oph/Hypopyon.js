@@ -30,19 +30,21 @@ ED.Hypopyon = function(_drawing, _parameterJSON) {
 	this.ro = 380;
 	this.minimum = 304;
 	this.csOriginX = 50;
+	this.apexY = 260;
+	this.apexX = 460;
 	// Saved parameters
-	this.savedParameterArray = ['apexY', 'csOriginX'];
+	this.savedParameterArray = ['apexX', 'apexY', 'csOriginY', 'csApexX', 'csOriginX'];
+
+	this.csApexX = 0;
+	this.csOriginY = 0;
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 
-    this.linkedDoodleParameters = {
-        'Hyphaema': {
-            source: ['apexY'],
-            store: [['originY', 'csOriginY'], ['apexX', 'csApexX'], ['originX', 'csOriginX']]
-        }
-    };
-}
+	// alongside with inFrontOfClassArray, it is handled outside of ED code,
+	// e.g in a controller in 'doodleAdded' section
+	this.behindClassArray = ["KeraticPrecipitates"];
+};
 
 /**
  * Sets superclass and constructor
@@ -67,16 +69,17 @@ ED.Hypopyon.prototype.setPropertyDefaults = function() {
 	this.isUnique = true;
 
 	// Update component of validation array for simple parameters
-	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);
+	this.parameterValidationArray['apexX']['range'].setMinAndMax(460, 460);
 	this.parameterValidationArray['apexY']['range'].setMinAndMax(-380, this.minimum);
-}
+};
 
 /**
  * Sets default parameters
  */
 ED.Hypopyon.prototype.setParameterDefaults = function() {
 	this.apexY = 260;
-}
+	this.apexX = 460;
+};
 
 /**
  * Draws doodle or performs a hit test if a Point parameter is passed
@@ -92,6 +95,8 @@ ED.Hypopyon.prototype.draw = function(_point) {
 
 	// Calculate angle of apex above or below horizontal
 	var phi = Math.asin(this.apexY / this.ro);
+
+	this.drawDashedLine(ctx, phi);
 
 	// Boundary path
 	ctx.beginPath();
@@ -122,7 +127,38 @@ ED.Hypopyon.prototype.draw = function(_point) {
 
 	// Return value indicating successful hittest
 	return this.isClicked;
-}
+};
+
+ED.Hypopyon.prototype.drawDashedLine = function(ctx, phi) {
+
+	if (!this.isSelected || this.isForDrawing) {
+		return;
+	}
+
+	ctx.save();
+	ctx.beginPath();
+
+	// Colour of fill
+	ctx.fillStyle = "red";
+
+	// Set line attributes
+	ctx.lineWidth = 1;
+
+	// Colour of outer line
+	ctx.strokeStyle = ctx.fillStyle;
+
+	const point = new ED.Point(0, 0);
+	point.setWithPolars(this.ro, phi + (Math.PI/2));
+
+	ctx.setLineDash([20,5]);
+	ctx.lineWidth = 5;
+
+	ctx.moveTo(point.x,point.y);
+	ctx.lineTo(this.apexX, this.apexY);
+	ctx.stroke();
+	ctx.closePath();
+	ctx.restore();
+};
 
 /**
  * Returns a string containing a text description of the doodle

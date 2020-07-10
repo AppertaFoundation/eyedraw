@@ -70,8 +70,9 @@ ED.HypopyonCrossSection.prototype.setHandles = function() {
  */
 ED.HypopyonCrossSection.prototype.setPropertyDefaults = function() {
 	this.isSelectable = false;
-	this.addAtBack = true;
 	this.isUnique = true;
+
+	this.inFrontOfClassArray = ["KeraticPrecipitatesCrossSection"];
 
 	// Update component of validation array for simple parameters
 	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);

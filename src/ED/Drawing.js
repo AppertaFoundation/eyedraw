@@ -1489,7 +1489,7 @@ ED.Drawing.prototype.moveNextTo = function(_doodle, _className, _inFront) {
 		// Don't assume that _doodle is in front, so start by putting it there, and reorder
 		_doodle.order = 1000;
 		this.doodleArray.sort(function(a, b) {
-			return a.order - b.order
+			return a.order - b.order;
 		});
 		for (var i = 0; i < this.doodleArray.length; i++) {
 			this.doodleArray[i].order = i;
@@ -1501,7 +1501,7 @@ ED.Drawing.prototype.moveNextTo = function(_doodle, _className, _inFront) {
 			this.doodleArray[i].order = i + offset;
 
 			// Look for doodle of passed classname (will definitely be found first)
-			if (this.doodleArray[i].className == _className) {
+			if (this.doodleArray[i].className === _className) {
 				offset = 1;
 				if (_inFront) {
 					_doodle.order = i + 1;

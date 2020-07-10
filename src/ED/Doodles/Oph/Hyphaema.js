@@ -38,7 +38,7 @@ ED.Hyphaema = function(_drawing, _parameterJSON) {
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
-}
+};
 
 /**
  * Sets superclass and constructor
@@ -52,7 +52,7 @@ ED.Hyphaema.superclass = ED.Doodle.prototype;
  */
 ED.Hyphaema.prototype.setHandles = function() {
 	this.handleArray[4] = new ED.Doodle.Handle(null, true, ED.Mode.Apex, false);
-}
+};
 
 /**
  * Sets default dragging attributes
@@ -63,16 +63,17 @@ ED.Hyphaema.prototype.setPropertyDefaults = function() {
 	this.isUnique = true;
 
 	// Update component of validation array for simple parameters
-	this.parameterValidationArray['apexX']['range'].setMinAndMax(-50, +50);
+	this.parameterValidationArray['apexX']['range'].setMinAndMax(-470, -370);
 	this.parameterValidationArray['apexY']['range'].setMinAndMax(-380, this.minimum);
-}
+};
 
 /**
  * Sets default parameters
  */
 ED.Hyphaema.prototype.setParameterDefaults = function() {
 	this.apexY = 152;
-}
+	this.apexX = -420;
+};
 
 /**
  * Draws doodle or performs a hit test if a Point parameter is passed
@@ -89,6 +90,8 @@ ED.Hyphaema.prototype.draw = function(_point) {
 	// Calculate angle of apex above or below horizontal
 	var phi = Math.asin(this.apexY / this.ro);
 
+	this.drawDashedLine(ctx, Math.PI - phi);
+
 	// Boundary path
 	ctx.beginPath();
 
@@ -99,7 +102,7 @@ ED.Hyphaema.prototype.draw = function(_point) {
 	ctx.closePath();
 
 	// Colour of fill, density depends on setting of apexX
-	var density = (0.1 + (this.apexX + 50) / 111).toFixed(2);
+	var density = (0.1 + (this.apexX + 50 + 420) / 111).toFixed(2);
 	ctx.fillStyle = "rgba(255,0,0," + density + ")";
 
 	// Set line attributes
@@ -119,7 +122,37 @@ ED.Hyphaema.prototype.draw = function(_point) {
 
 	// Return value indicating successful hittest
 	return this.isClicked;
-}
+};
+
+ED.Hyphaema.prototype.drawDashedLine = function(ctx, phi) {
+
+	if (!this.isSelected || this.isForDrawing) {
+		return;
+	}
+	ctx.save();
+	ctx.beginPath();
+
+	// Colour of fill
+	ctx.fillStyle = "red";
+
+	// Set line attributes
+	ctx.lineWidth = 1;
+
+	// Colour of outer line
+	ctx.strokeStyle = ctx.fillStyle;
+
+	const point = new ED.Point(0, 0);
+	point.setWithPolars(this.ro, phi + (Math.PI/2));
+
+	ctx.setLineDash([20,5]);
+	ctx.lineWidth = 5;
+
+	ctx.moveTo(point.x,point.y);
+	ctx.lineTo(this.apexX, this.apexY);
+	ctx.stroke();
+	ctx.closePath();
+	ctx.restore();
+};
 
 /**
  * Returns a string containing a text description of the doodle

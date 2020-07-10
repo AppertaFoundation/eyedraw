@@ -451,7 +451,8 @@ ED.Controller = (function() {
 		this.drawing.registerForNotifications(this, 'notificationHandler', [
 			'ready',
 			'doodlesLoaded',
-			'parameterChanged'
+			'parameterChanged',
+			'doodleAdded'
 		]);
 
 		this.drawing.registerForNotifications(this, 'saveDrawingToInputField', [
@@ -504,6 +505,16 @@ ED.Controller = (function() {
 		var handlerName = 'on' + ucFirst(eventName);
 		if (this[handlerName]) {
 			this[handlerName](notification);
+		}
+	};
+
+	Controller.prototype.onDoodleAdded = function(notification) {
+		const newDoodle = notification.object;
+		// move doodle behind the give doodle
+		// there is a chance that "behindClassArray" should not be an array as the newDoodle will be placed
+		// behind the last doodle in the "behindClassArray" array
+		for (let i = 0; i < newDoodle.behindClassArray.length; i++) {
+			newDoodle.drawing.moveNextTo(newDoodle, newDoodle.behindClassArray[i], false);
 		}
 	};
 

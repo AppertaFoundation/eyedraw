@@ -6,6 +6,7 @@ window.eyedrawScripts = [
     "ED/Drawing/Point.js",
     "ED/Drawing/Range.js",
     "ED/Drawing/Squiggle.js",
+    "ED/Drawing/Pattern.js",
     "ED/Checker.js",
     "ED/Controller.js",
     "ED/Doodle.js",
