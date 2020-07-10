@@ -27,8 +27,13 @@ window.eyedrawDoodleTitles = {
     "BuckleOperation": "Buckle operation",
     "BuckleSuture": "Buckle suture",
     "BusaccaNodule": "Busacca nodule",
+<<<<<<< HEAD
+    "CapsularTensionRing": "Capsular Tension Ring",
+    "CentralSerousRetinopathy": "Central Serous Retinopathy",
+=======
     "CapsularTensionRing": "Capsular Tension ring",
     "CircumcornealInjection": "Circumcorneal injection",
+>>>>>>> release/v4.0
     "ChandelierDouble": "Double chandelier",
     "ChandelierSingle": "Chandelier",
     "ChoroidalHaemorrhage": "Choroidal haemorrhage",

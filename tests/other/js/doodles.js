@@ -52,6 +52,7 @@ window.eyedrawDoodleScripts = [
     "ED/Doodles/Oph/BusaccaNodule.js",
     "ED/Doodles/Oph/CNV.js",
     "ED/Doodles/Oph/CapsularTensionRing.js",
+    "ED/Doodles/Oph/CentralSerousRetinopathy.js",
     "ED/Doodles/Oph/ChandelierDouble.js",
     "ED/Doodles/Oph/ChandelierSingle.js",
     "ED/Doodles/Oph/ChoroidalHaemorrhage.js",

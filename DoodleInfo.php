@@ -246,5 +246,6 @@ class DoodleInfo
         'Drusen' => 'Drusen',
         'MaculaPostPole' => 'Macula (posterior pole)',
         'PCV' => 'Polypoidal choroidal vasculopathy',
+        'CentralSerousRetinopathy' => 'Central Serous Retinopathy'
     );
 }
