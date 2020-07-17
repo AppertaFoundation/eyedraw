@@ -34,8 +34,8 @@ ED.ACIOL = function(_drawing, _parameterJSON) {
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 
 	// Invariate parameters
-	this.scaleX = 0.8;
-	this.scaleY = 0.8;
+	this.scaleX = 0.8 * _drawing.getScaleLevel();
+	this.scaleY = 0.8 * _drawing.getScaleLevel();
 }
 
 /**

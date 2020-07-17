@@ -13335,8 +13335,8 @@ ED.ACIOL = function(_drawing, _parameterJSON) {
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 
 	// Invariate parameters
-	this.scaleX = 0.8;
-	this.scaleY = 0.8;
+	this.scaleX = 0.8 * _drawing.getScaleLevel();
+	this.scaleY = 0.8 * _drawing.getScaleLevel();
 }
 
 /**
@@ -47358,8 +47358,8 @@ ED.PCIOL = function(_drawing, _parameterJSON) {
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 
 	// Invariate parameters
-	this.scaleX = 0.75;
-	this.scaleY = 0.75;
+	this.scaleX = 0.75 * _drawing.getScaleLevel();
+	this.scaleY = 0.75 * _drawing.getScaleLevel();
 }
 
 /**
@@ -59931,8 +59931,8 @@ ED.ToricPCIOL = function(_drawing, _parameterJSON) {
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 
-    this.scaleX = 0.75;
-    this.scaleY = 0.75;
+    this.scaleX = 0.75 * _drawing.getScaleLevel();
+    this.scaleY = 0.75 * _drawing.getScaleLevel();
 }
 
 /**
