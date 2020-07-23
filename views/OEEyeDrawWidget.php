@@ -15,16 +15,22 @@
  * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 ?>
-<div class="EyeDrawWidget ed-widget <?php echo ($isEditable) ? ' edit' : ' display';?>" id="eyedrawwidget_<?php echo $idSuffix ?>">
-    <?php $this->render('toolbar', $data);?>
-    <div class="ed-body">
-        <div class="ed-editor-container">
-            <?php if (@$data['imageUrl']) {?>
-                <img src="<?php echo $data['imageUrl']?>" height=<?=$height?> width=<?=$width?> />
-            <?php }else{?>
-                <?php $this->render('editor', $data);?>
-            <?php }?>
-        </div>
-        <?php $this->render('fields', $data);?>
-    </div>
+<div class="ed2-widget <?php echo ($isEditable) ? ' edit' : ' display';?>" id="eyedrawwidget_<?php echo $idSuffix ?>">
+	<?php $this->render('toolbar', $data);?>
+	<div class="ed2-body">
+		<div class="ed2-editor-wrap">
+			<?php if (@$data['imageUrl']) {?>
+				<img src="<?php echo $data['imageUrl']?>" height=<?=$height?> width=<?=$width?> />
+			<?php }else{?>
+				<?php $this->render('editor', $data);?>
+				<?php $this->render('fields', $data);?>
+			<?php }?>
+		</div>
+
+		<?php if ($showDrawingControls) {?>
+			<div class="ed2-no-doodle-elements">
+				<ul class="no-doodles"></ul>
+			</div>
+		<?php }?>
+	</div>
 </div>

@@ -387,6 +387,21 @@ ED.Doodle = function(_drawing, _parameterJSON) {
 	}
 };
 
+//Things inherited from SearchItem
+ED.Doodle.prototype.getText = function()
+{
+	//Return the name of the doodle
+};
+ED.Doodle.prototype.getIcon = function()
+{
+	//Return the icon for the doodle
+};
+ED.Doodle.prototype.AddToED = function()
+{
+	//Find the drawing in the ED area, then attempt to call add on it
+	//Alternatively piggyback on the current behaviour to add this to the selected drawing when this is called
+};
+
 /**
  * Parses JSON string to reconstitute parameters which are entries in this.parameterObjectTypeArray
  *

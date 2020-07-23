@@ -16,30 +16,29 @@
  */
 ?>
 
+<div class="ed2-editor">
+	<?php if ($isEditable && $showDoodlePopup) {?>
+		<!-- DOODLE POPUP -->
+		<div class="ed2-doodle-popup closed<?= $popupDisplaySide == 'left' ? ' ' . $popupDisplaySide : ''?>" data-display-side="<?= $popupDisplaySide ? $popupDisplaySide : ''?>">
+		</div>
+	<?php }?>
 
-    <div class="ed2-editor">
-        <?php if ($isEditable && $showDoodlePopup) {?>
-            <!-- DOODLE POPUP -->
-            <div class="ed2-doodle-popup closed<?= $popupDisplaySide == 'left' ? ' ' . $popupDisplaySide : ''?>" data-display-side="<?= $popupDisplaySide ? $popupDisplaySide : ''?>">
-            </div>
-        <?php }?>
+	<!-- CANVAS -->
+	<canvas
+		id="<?php echo $canvasId ?>"
+		class="<?php if ($isEditable) { echo 'ed-canvas-edit'; } else { echo 'ed-canvas-display'; } ?>"
+		width="<?php echo $width ?>" height="<?php echo $height ?>"
+		data-drawing-name="<?php echo $drawingName ?>"
+		<?php if ($canvasStyle) { ?> style="<?php echo $canvasStyle ?>"<?php } ?>>
+	</canvas>
 
-        <!-- CANVAS -->
-        <canvas
-            id="<?php echo $canvasId ?>"
-            class="<?php if ($isEditable) { echo 'ed-canvas-edit'; } else { echo 'ed-canvas-display'; } ?>"
-            width="<?php echo $width ?>" height="<?php echo $height ?>"
-            data-drawing-name="<?php echo $drawingName ?>"
-            <?php if ($canvasStyle) { ?> style="<?php echo $canvasStyle ?>"<?php } ?>>
-        </canvas>
-
-        <?php if ($inputId) { ?>
-            <!-- DATA FIELD -->
-            <input
-                type="hidden"
-                id="<?php echo $inputId ?>"
-                name="<?php echo $inputName ?>"
-                value='<?php echo $this->model[$this->attribute] ?>' />
-        <?php } ?>
-    </div>
+	<?php if ($inputId) { ?>
+		<!-- DATA FIELD -->
+		<input
+			type="hidden"
+			id="<?php echo $inputId ?>"
+			name="<?php echo $inputName ?>"
+			value='<?php echo $this->model[$this->attribute] ?>' />
+	<?php } ?>
+</div>
 

@@ -33,7 +33,7 @@
 </li><?php } ?>
 				<?php if (count($extraItems)) {?>
 					<li>
-                        <i class="oe-i more-h pad ed-button-more js-has-tooltip" data-tt-type="basic" data-tooltip-content="More doodles..."></i>
+						<i class="oe-i more-h pad ed-button-more js-has-tooltip" data-tt-type="basic" data-tooltip-content="More doodles..."></i>
 
 						<ul class="ed2-toolbar-panel-drawer">
 							<?php foreach($extraItems as $item) {?>

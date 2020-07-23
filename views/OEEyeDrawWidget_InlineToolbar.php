@@ -15,13 +15,13 @@
  * @license http://www.gnu.org/licenses/agpl-3.0.html The GNU Affero General Public License V3.0
  */
 ?>
+
 <div class="ed2-widget <?php echo ($isEditable) ? ' edit' : ' display';?>" id="eyedrawwidget_<?php echo $idSuffix ?>">
     <?php if (isset($toolbar) && $toolbar) :?>
     <div class="ed2-toolbar"><?php $this->render('toolbar', $data);?></div>
     <?php endif; ?>
     <div class="ed2-body">
         <?php if ($showDrawingControls && $mode !== 'view') {?>
-            <!-- WTF -->
             <div class="ed2-drawing-controls flex-layout<?= $toggleScale ? ' ed2-feature-zoom': '';?>">
                 <!-- DRAWING TOOLBAR -->
                 <?php /* no space between the 2 <li> */?>
@@ -32,7 +32,7 @@
                     </select>
                 </div>
                 <div class="ed2-search">
-                    <input type="text" class="search" id="js-idg-demo-ed2-search-input">
+                    <input type="text" class="search" id="ed2-search-doodle-input" autocomplete="off">
                     <ul class="oe-autocomplete" style="display: none;"></ul>
                 </div>
             </div>
@@ -42,6 +42,7 @@
             <?php $this->render('editor', $data);?>
             <?php $this->render('fields', $data);?>
         </div>
+
         <?php if ($showDrawingControls && $mode !== 'view') {?>
             <div class="ed2-no-doodle-elements">
                 <ul class="no-doodles"></ul>
@@ -49,4 +50,3 @@
         <?php }?>
     </div>
 </div>
-

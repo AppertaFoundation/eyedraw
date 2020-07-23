@@ -785,6 +785,10 @@ ED.Drawing.prototype.loadDoodles = function(_id) {
 	// If it exists and contains something, load it
 	if (sourceElement && sourceElement.value.length > 0) {
 		var doodleSet = window.JSON.parse(sourceElement.value);
+
+		//remove tags from doodle loading
+		doodleSet = doodleSet.filter(doodle => !doodle.hasOwnProperty('tags'));
+
 		this.resetDoodleSet = doodleSet;
 		this.load(doodleSet);
 
@@ -849,6 +853,19 @@ ED.Drawing.prototype.json = function() {
 
 	// Remove last comma
 	s = s.substring(0, s.length - 1);
+
+	let tagContainer = $(this.canvas).closest('.ed2-body').find('.ed2-no-doodle-elements ul');
+	let list = $(tagContainer).find('li.ed-tag');
+
+	let tagarray = [];
+	list.each((i, tag) => {
+		let tagText = $(tag).find('span.text')[0];
+		tagarray.push('{"pk_id":' + $(tag).attr('pk_id') + ',"text":"' + tagText.innerText + '","snomed_code":' + $(tag).attr('snomed_code') + '}');
+	});
+
+	let textarray = JSON.stringify(tagarray);
+
+	s = s + ', {"tags":' + textarray + '}';
 
 	return s;
 };
@@ -3610,6 +3627,21 @@ ED.Doodle = function(_drawing, _parameterJSON) {
 			this.isForDrawing = false;
 		}
 	}
+};
+
+//Things inherited from SearchItem
+ED.Doodle.prototype.getText = function()
+{
+	//Return the name of the doodle
+};
+ED.Doodle.prototype.getIcon = function()
+{
+	//Return the icon for the doodle
+};
+ED.Doodle.prototype.AddToED = function()
+{
+	//Find the drawing in the ED area, then attempt to call add on it
+	//Alternatively piggyback on the current behaviour to add this to the selected drawing when this is called
 };
 
 /**

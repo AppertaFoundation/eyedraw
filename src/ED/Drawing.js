@@ -525,6 +525,10 @@ ED.Drawing.prototype.loadDoodles = function(_id) {
 	// If it exists and contains something, load it
 	if (sourceElement && sourceElement.value.length > 0) {
 		var doodleSet = window.JSON.parse(sourceElement.value);
+
+		//remove tags from doodle loading
+		doodleSet = doodleSet.filter(doodle => !doodle.hasOwnProperty('tags'));
+
 		this.resetDoodleSet = doodleSet;
 		this.load(doodleSet);
 
@@ -589,6 +593,19 @@ ED.Drawing.prototype.json = function() {
 
 	// Remove last comma
 	s = s.substring(0, s.length - 1);
+
+	let tagContainer = $(this.canvas).closest('.ed2-body').find('.ed2-no-doodle-elements ul');
+	let list = $(tagContainer).find('li.ed-tag');
+
+	let tagarray = [];
+	list.each((i, tag) => {
+		let tagText = $(tag).find('span.text')[0];
+		tagarray.push('{"pk_id":' + $(tag).attr('pk_id') + ',"text":"' + tagText.innerText + '","snomed_code":' + $(tag).attr('snomed_code') + '}');
+	});
+
+	let textarray = JSON.stringify(tagarray);
+
+	s = s + ', {"tags":' + textarray + '}';
 
 	return s;
 };
