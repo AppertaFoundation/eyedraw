@@ -75,8 +75,6 @@ ED.TagCloud = (function() {
 		this.TagArray.push({pk_id: pk_id, text: text, snomed_code: snomed_code});
 		let list = this.container.find('.no-doodles');
 
-		console.log(list);
-
 		list.append(tag);
 	};
 

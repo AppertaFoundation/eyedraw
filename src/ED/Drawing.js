@@ -2730,7 +2730,6 @@ ED.Drawing.prototype.report = function() {
 ED.Drawing.prototype.diagnosis = function() {
 	var topOfHierarchy = 0;
 	var returnCodes = new Array();
-
 	// Loop through doodles with diagnoses, taking one highest in hierarchy, or those that are equal
 	for (var i = 0; i < this.doodleArray.length; i++) {
 		var doodle = this.doodleArray[i];
@@ -2748,9 +2747,14 @@ ED.Drawing.prototype.diagnosis = function() {
 					}
 				}
 			}
-
 		}
 	}
+
+	//Retrieve additional diagnoses from tag cloud. Recommend using a different method to do this in future.
+	let tagCloud = $(this.canvas).parents('.ed2-editor').parents('.ed2-editor-wrap').parents('.ed2-body').children('.ed2-no-doodle-elements');
+	let tagCodes = tagCloud.children('ul.no-doodles').children('li.ed-tag').map(function() {return parseInt($(this).attr('snomed_code'), 10)}).toArray();
+
+	returnCodes = returnCodes.concat(tagCodes);
 
 	return returnCodes;
 };

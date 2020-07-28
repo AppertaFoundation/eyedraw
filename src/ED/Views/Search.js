@@ -13,6 +13,7 @@ ED.Views.SearchBar = (function () {
 		this.tagCloud = tagCloud;
 		this.input = this.container[0];
 		this.doodlePopup = doodlePopup;
+		this.searchRequest = null;
 
 		that = this;
 
@@ -68,38 +69,40 @@ ED.Views.SearchBar = (function () {
 		searchResult.css('overflow-y', 'auto');
 		searchResult.css('position', 'absolute');
 
+		var searchTimer = null;
+
 		var toolbar = this.getToolbar();
 		$(this.input).off('keyup').on('keyup', function () {
-			searchResult.empty();
+			if(searchTimer){
+				searchTimer = null;
+			}
 
-			if (this.value.length <= 0) {
-				searchResult.hide();
-				searchResult.html("");
-			} else {
-				searchResult.show();
+			let input = this;
 
-				let targetCloud = that.tagCloud;
+			searchTimer = setTimeout(function() {
+				searchResult.empty();
 
-				$.ajax({
-					url: "/OphCiExamination/Default/EDTagSearch",
-					type: 'POST',
-					async: false,
-					cache: false,
-					timeout: 30000,
-					data: {
+				if (input.value.length <= 0) {
+					searchResult.hide();
+					searchResult.html("");
+				} else {
+					searchResult.show();
+
+					let targetCloud = that.tagCloud;
+
+					if(that.searchRequest !== null){
+						that.searchRequest.abort();
+					}
+
+					that.searchRequest = $.getJSON("/OphCiExamination/Default/EDTagSearch", {
 						YII_CSRF_TOKEN: YII_CSRF_TOKEN,
-						EDSearchTerm: this.value,
-					},
-					error: function (request, error) {
-						console.log(request);
-						console.log(error);
-					},
-					success: function (resp) {
-						JSON.parse(resp).forEach(function (item, index) {
+						EDSearchTerm: input.value,
+					}, function (resp) {
+						resp.forEach(function (item, index) {
 							searchResult.append(
 								createListItem(
 									item['text'],
-									$(document.createElement('span')).text('tag'),
+									$(document.createElement('span')),
 									function () {
 										targetCloud.AddTag(item['pk_id'], item['text'], item['snomed_code']);
 										that.drawing.notify('tagAdded', item['text']);
@@ -108,34 +111,33 @@ ED.Views.SearchBar = (function () {
 										$(that.input).val("");
 									}));
 						});
-					},
-				});
+					});
 
-				var searchList = toolbar.filter((item, index) => {
-					var txt = $(item).find('span.label').text().toLowerCase();
-					if (txt.includes(this.value.toLowerCase())) {
-						return item;
-					}
-				});
+					var searchList = toolbar.filter((item, index) => {
+						var txt = $(item).find('span.label').text().toLowerCase();
+						return txt.includes(input.value.toLowerCase());
+					});
 
-				searchList.forEach(item => {
-					let txt = $(item).find('span.label').text();
-					let arg = $(item).find('a').data('arg');
-					let icon = $(document.createElement('span')).addClass('icon-ed-' + arg);
+					searchList.forEach(item => {
+						let txt = $(item).find('span.label').text();
+						let arg = $(item).find('a').data('arg');
+						let icon = $(document.createElement('span')).addClass('icon-ed-' + arg);
 
-					searchResult.append(
-						createListItem(
-							txt,
-							icon,
-							function () {
-								that.drawing["addDoodle"](arg);
-								searchResult.empty();
-								searchResult.hide();
-								$(that.input).val("");
-							}));
-				});
-			}
-		});
+						searchResult.append(
+							createListItem(
+								txt,
+								icon,
+								function () {
+									that.drawing["addDoodle"](arg);
+									searchResult.empty();
+									searchResult.hide();
+									$(that.input).val("");
+								}));
+					});
+				}
+			}, 500);
+		}
+		);
 	};
 	SearchBar.prototype.getToolbar = function () {
 		var toolbar = [];

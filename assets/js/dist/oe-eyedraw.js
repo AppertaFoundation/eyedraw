@@ -945,8 +945,6 @@ ED.TagCloud = (function() {
 		this.TagArray.push({pk_id: pk_id, text: text, snomed_code: snomed_code});
 		let list = this.container.find('.no-doodles');
 
-		console.log(list);
-
 		list.append(tag);
 	};
 
@@ -1447,6 +1445,7 @@ ED.Views.SearchBar = (function () {
 		this.tagCloud = tagCloud;
 		this.input = this.container[0];
 		this.doodlePopup = doodlePopup;
+		this.searchRequest = null;
 
 		that = this;
 
@@ -1502,38 +1501,40 @@ ED.Views.SearchBar = (function () {
 		searchResult.css('overflow-y', 'auto');
 		searchResult.css('position', 'absolute');
 
+		var searchTimer = null;
+
 		var toolbar = this.getToolbar();
 		$(this.input).off('keyup').on('keyup', function () {
-			searchResult.empty();
+			if(searchTimer){
+				searchTimer = null;
+			}
 
-			if (this.value.length <= 0) {
-				searchResult.hide();
-				searchResult.html("");
-			} else {
-				searchResult.show();
+			let input = this;
 
-				let targetCloud = that.tagCloud;
+			searchTimer = setTimeout(function() {
+				searchResult.empty();
 
-				$.ajax({
-					url: "/OphCiExamination/Default/EDTagSearch",
-					type: 'POST',
-					async: false,
-					cache: false,
-					timeout: 30000,
-					data: {
+				if (input.value.length <= 0) {
+					searchResult.hide();
+					searchResult.html("");
+				} else {
+					searchResult.show();
+
+					let targetCloud = that.tagCloud;
+
+					if(that.searchRequest !== null){
+						that.searchRequest.abort();
+					}
+
+					that.searchRequest = $.getJSON("/OphCiExamination/Default/EDTagSearch", {
 						YII_CSRF_TOKEN: YII_CSRF_TOKEN,
-						EDSearchTerm: this.value,
-					},
-					error: function (request, error) {
-						console.log(request);
-						console.log(error);
-					},
-					success: function (resp) {
-						JSON.parse(resp).forEach(function (item, index) {
+						EDSearchTerm: input.value,
+					}, function (resp) {
+						resp.forEach(function (item, index) {
 							searchResult.append(
 								createListItem(
 									item['text'],
-									$(document.createElement('span')).text('tag'),
+									$(document.createElement('span')),
 									function () {
 										targetCloud.AddTag(item['pk_id'], item['text'], item['snomed_code']);
 										that.drawing.notify('tagAdded', item['text']);
@@ -1542,34 +1543,33 @@ ED.Views.SearchBar = (function () {
 										$(that.input).val("");
 									}));
 						});
-					},
-				});
+					});
 
-				var searchList = toolbar.filter((item, index) => {
-					var txt = $(item).find('span.label').text().toLowerCase();
-					if (txt.includes(this.value.toLowerCase())) {
-						return item;
-					}
-				});
+					var searchList = toolbar.filter((item, index) => {
+						var txt = $(item).find('span.label').text().toLowerCase();
+						return txt.includes(input.value.toLowerCase());
+					});
 
-				searchList.forEach(item => {
-					let txt = $(item).find('span.label').text();
-					let arg = $(item).find('a').data('arg');
-					let icon = $(document.createElement('span')).addClass('icon-ed-' + arg);
+					searchList.forEach(item => {
+						let txt = $(item).find('span.label').text();
+						let arg = $(item).find('a').data('arg');
+						let icon = $(document.createElement('span')).addClass('icon-ed-' + arg);
 
-					searchResult.append(
-						createListItem(
-							txt,
-							icon,
-							function () {
-								that.drawing["addDoodle"](arg);
-								searchResult.empty();
-								searchResult.hide();
-								$(that.input).val("");
-							}));
-				});
-			}
-		});
+						searchResult.append(
+							createListItem(
+								txt,
+								icon,
+								function () {
+									that.drawing["addDoodle"](arg);
+									searchResult.empty();
+									searchResult.hide();
+									$(that.input).val("");
+								}));
+					});
+				}
+			}, 500);
+		}
+		);
 	};
 	SearchBar.prototype.getToolbar = function () {
 		var toolbar = [];
@@ -1761,8 +1761,7 @@ ED.Views.SelectedDoodle = (function() {
 
 	return SelectedDoodle;
 }());
-
-/*! Generated on 20/7/2020 */
+/*! Generated on 27/7/2020 */
 ED.scriptTemplates = {
   "doodle-popup": "\n\n{{#doodle}}\n{{^doodle.isNode}}\n\t<ul class=\"ed2-toolbar-panel ed2-doodle-popup-toolbar\">\n\t\t<li>\n\t\t\t{{#desc}}\n\t\t\t\t<a class=\"ed-button ed2-doodle-help{{lockedButtonClass}}\" href=\"#\" data-function=\"toggleHelp\">\n\t\t\t\t\t<i class=\"icon-ed-help\"></i>\n\t\t\t\t</a>\n\t\t\t{{/desc}}\n\t\t</li>\n\t\t{{#doodle.isLocked}}\n\t\t\t<li>\n\t\t\t\t<a class=\"ed-button\" href=\"#\" data-function=\"unlock\">\n\t\t\t\t\t<i class=\"icon-ed-unlock\"></i>\n\t\t\t\t\t<span class=\"label\">Unlock</span>\n\t\t\t\t</a>\n\t\t\t</li>\n\t\t{{/doodle.isLocked}}\n\t\t{{^doodle.isLocked}}\n\t\t\t<li>\n\t\t\t\t<a class=\"ed-button\" href=\"#\" data-function=\"lock\">\n\t\t\t\t\t<i class=\"icon-ed-lock\"></i>\n\t\t\t\t\t<span class=\"label\">Lock</span>\n\t\t\t\t</a>\n\t\t\t</li>\n\t\t{{/doodle.isLocked}}\n\t\t<li>\n\t\t\t<a class=\"ed-button{{lockedButtonClass}}\" href=\"#\" data-function=\"moveToBack\">\n\t\t\t\t<i class=\"icon-ed-move-to-back\"></i>\n\t\t\t\t<span class=\"label\">Move to back</span>\n\t\t\t</a>\n\t\t</li>\n\t\t<li>\n\t\t\t<a class=\"ed-button{{lockedButtonClass}}\" href=\"#\" data-function=\"moveToFront\">\n\t\t\t\t<i class=\"icon-ed-move-to-front\"></i>\n\t\t\t\t<span class=\"label\">Move to front</span>\n\t\t\t</a>\n\t\t</li>\n\t\t<li>\n\t\t\t{{#doodle.isDeletable}}\n\t\t\t\t<a class=\"ed-button{{lockedButtonClass}}\" href=\"#\" data-function=\"deleteSelectedDoodle\">\n\t\t\t\t\t<i class=\"icon-ed-delete\"></i>\n\t\t\t\t\t<span class=\"label\">Delete</span>\n\t\t\t\t</a>\n\t\t\t{{/doodle.isDeletable}}\n\t\t</li>\n\t</ul>\n\t<div class=\"ed2-doodle-info\" style=\"display: none;\">\n\t\t{{^doodle.isLocked}}\n\t\t\t{{#desc}}\n\t\t\t\t<div class=\"ed2-doodle-description\">{{{desc}}}</div>\n\t\t\t{{/desc}}\n\t\t{{/doodle.isLocked}}\n\t</div>\n\t<div class=\"ed2-doodle-controls\" {{#doodle.isLocked}}style=\"display: none;\"{{/doodle.isLocked}} id=\"{{drawing.canvas.id}}_controls\">\n\t</div>\n\t{{/doodle.isNode}}\n\t{{#doodle.isLocked}}\n\t\t<div class=\"ed2-doodle-description\">\n\t\t\t<strong>This doodle is locked and cannot be edited.</strong>\n\t\t</div>\n\t{{/doodle.isLocked}}\n{{/doodle}}"
 };
