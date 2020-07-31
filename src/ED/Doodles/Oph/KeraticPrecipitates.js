@@ -139,12 +139,13 @@ ED.KeraticPrecipitates.prototype.setParameterDefaults = function() {
 
 ED.KeraticPrecipitates.prototype.dependentParameterValues = function(_parameter, _value) {
 	let returnArray = {};
-
 	switch (_parameter) {
 		case 'sentinel':
-			this.number = 0;
-			returnArray['size'] = 'Fine';
-			this.setParameterFromString('size', 'Fine');
+			if (_value === true) {
+				this.number = 0;
+				returnArray['size'] = 'Fine';
+				this.setParameterFromString('size', 'Fine');
+			}
 			break;
 
 		case 'size':

@@ -13463,8 +13463,8 @@ ED.ACIOL = function(_drawing, _parameterJSON) {
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 
 	// Invariate parameters
-	this.scaleX = 0.8;
-	this.scaleY = 0.8;
+	this.scaleX = 0.8 * _drawing.getScaleLevel();
+	this.scaleY = 0.8 * _drawing.getScaleLevel();
 }
 
 /**
@@ -19878,8 +19878,8 @@ ED.CentralSerousRetinopathy.prototype.dependentParameterValues = function(_param
 			this.parameterValidationArray['originX']['range'].setMinAndMax(-300+(r*_value), 300-(r*_value));
 			this.parameterValidationArray['originY']['range'].setMinAndMax(-300+(r*_value), 300-(r*_value));
 
-			var newOriginY = this.parameterValidationArray['originY']['range'].constrain(this.originY);
-			var newOriginX = this.parameterValidationArray['originX']['range'].constrain(this.originX);
+			const newOriginY = this.parameterValidationArray['originY']['range'].constrain(this.originY);
+			const newOriginX = this.parameterValidationArray['originX']['range'].constrain(this.originX);
 
 			this.setSimpleParameter('originX', newOriginX);
 			this.setSimpleParameter('originY', newOriginY);
@@ -19918,7 +19918,6 @@ ED.CentralSerousRetinopathy.prototype.draw = function(_point) {
 
 	this.drawBoundary(_point);
 
-
 	// Non boundary paths
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
 
@@ -19954,6 +19953,7 @@ ED.CentralSerousRetinopathy.prototype.draw = function(_point) {
 		ctx.fillStyle = 'rgba(83, 130, 53, 1)';
 		ctx.ellipse(0,-100, 10,100, 0, 0, Math.PI);
 		ctx.fill();
+		ctx.restore();
 	}
 
 
@@ -19973,11 +19973,11 @@ ED.CentralSerousRetinopathy.prototype.draw = function(_point) {
  * @returns {String} Description of doodle
  */
 ED.CentralSerousRetinopathy.prototype.description = function() {
-	return 'Polypoidal choroidal vasculopathy';
+	return 'Central serous retinopathy';
 };
 
 ED.CentralSerousRetinopathy.prototype.snomedCode = function() {
-	return 313001006;
+	return 312956001;
 };
 /**
  * OpenEyes
@@ -20953,7 +20953,7 @@ ED.ChoroidalNaevusMelanoma.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['type'] = {
 		kind: 'other',
 		type: 'string',
-		list: ['Melanoma', 'Naevus', 'Osteoma', 'CHRPE'],
+		list: ['Melanoma', 'Naevus', 'Osteoma', 'CHRPE', 'Chorioretinal scar'],
 		animate: false
 	};
 
@@ -21151,6 +21151,9 @@ ED.ChoroidalNaevusMelanoma.prototype.draw = function(_point) {
 	if (this.type === 'CHRPE') {
 		ctx.fillStyle = "rgba(29,7,6,0.8)";
 	}
+	if (this.type === 'Chorioretinal scar') {
+		ctx.fillStyle = "rgba(94,63,62,0.8)";
+	}
 
 	ctx.strokeStyle = ctx.fillStyle;
 
@@ -21244,7 +21247,6 @@ ED.ChoroidalNaevusMelanoma.prototype.snomedCodes = function() {
 	if (this.type === 'CHRPE') {
 		snomedCodes.push([232074003, 3]);
 	}
-
 
 	return snomedCodes;
 };
@@ -22875,6 +22877,7 @@ ED.ConjunctivalHaem.prototype.setPropertyDefaults = function() {
         kind: 'other',
         type: 'string',
         list: [
+            'None',
             'Follicular',
             'Papillary',
             'Giant Papillary'
@@ -22909,7 +22912,9 @@ ED.ConjunctivalHaem.prototype.dependentParameterValues = function(_parameter, _v
 
     switch (_parameter) {
         case 'conjunctivitisType':
-            returnArray['hyperaemia'] = '+';
+            if (_value !== 'None') {
+                returnArray['hyperaemia'] = '+';
+            }
             break;
     }
 
@@ -41076,12 +41081,13 @@ ED.KeraticPrecipitates.prototype.setParameterDefaults = function() {
 
 ED.KeraticPrecipitates.prototype.dependentParameterValues = function(_parameter, _value) {
 	let returnArray = {};
-
 	switch (_parameter) {
 		case 'sentinel':
-			this.number = 0;
-			returnArray['size'] = 'Fine';
-			this.setParameterFromString('size', 'Fine');
+			if (_value === true) {
+				this.number = 0;
+				returnArray['size'] = 'Fine';
+				this.setParameterFromString('size', 'Fine');
+			}
 			break;
 
 		case 'size':
@@ -48689,8 +48695,8 @@ ED.PCIOL = function(_drawing, _parameterJSON) {
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 
 	// Invariate parameters
-	this.scaleX = 0.75;
-	this.scaleY = 0.75;
+	this.scaleX = 0.75 * _drawing.getScaleLevel();
+	this.scaleY = 0.75 * _drawing.getScaleLevel();
 }
 
 /**
@@ -50572,7 +50578,7 @@ ED.PI = function(_drawing, _parameterJSON) {
 	this.className = "PI";
 
 	// Derived parameters
-	this.type = 'Surgical';
+	this.type = 'Laser';
 	this.patent = true;
 
 	// Saved parameters
@@ -50611,14 +50617,14 @@ ED.PI.prototype.setPropertyDefaults = function() {
 		type: 'bool',
 		display: false
 	};
-}
+};
 
 /**
  * Sets default parameters
  */
 ED.PI.prototype.setParameterDefaults = function() {
-	this.setRotationWithDisplacements(30, -30);
-}
+	this.setRotationWithDisplacements(-30, -60);
+};
 
 /**
  * Draws doodle or performs a hit test if a Point parameter is passed
@@ -50653,7 +50659,7 @@ ED.PI.prototype.draw = function(_point) {
 	ctx.lineWidth = 4;
 
 	// Colour of outer line is dark gray
-	ctx.strokeStyle = "rgba(120,120,120,0.75)";;
+	ctx.strokeStyle = "rgba(120,120,120,0.75)";
 
 	// Colour of fill
 	if (this.patent) ctx.fillStyle = "rgba(255,255,255,1)";
@@ -50664,7 +50670,7 @@ ED.PI.prototype.draw = function(_point) {
 
 	// Return value indicating successful hittest
 	return this.isClicked;
-}
+};
 
 /**
  * Returns a string containing a text description of the doodle
@@ -50673,7 +50679,7 @@ ED.PI.prototype.draw = function(_point) {
  */
 ED.PI.prototype.description = function() {
 	return "Peripheral iridectomy at " + this.clockHour() + " o'clock";
-}
+};
 
 /**
  * OpenEyes
@@ -61262,8 +61268,8 @@ ED.ToricPCIOL = function(_drawing, _parameterJSON) {
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 
-    this.scaleX = 0.75;
-    this.scaleY = 0.75;
+    this.scaleX = 0.75 * _drawing.getScaleLevel();
+    this.scaleY = 0.75 * _drawing.getScaleLevel();
 }
 
 /**

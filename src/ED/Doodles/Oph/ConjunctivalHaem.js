@@ -105,6 +105,7 @@ ED.ConjunctivalHaem.prototype.setPropertyDefaults = function() {
         kind: 'other',
         type: 'string',
         list: [
+            'None',
             'Follicular',
             'Papillary',
             'Giant Papillary'
@@ -139,7 +140,9 @@ ED.ConjunctivalHaem.prototype.dependentParameterValues = function(_parameter, _v
 
     switch (_parameter) {
         case 'conjunctivitisType':
-            returnArray['hyperaemia'] = '+';
+            if (_value !== 'None') {
+                returnArray['hyperaemia'] = '+';
+            }
             break;
     }
 

@@ -8,6 +8,7 @@
 
         <!-- The eyedraw stylesheet -->
         <link rel="stylesheet" type="text/css" href="../../assets/css/oe-eyedraw.css" />
+        <link rel="stylesheet" type="text/css" href="css/style_oe3_dark.min.css" />
 
         <!-- Other dependent scripts -->
         <script type="text/javascript" src="../../assets/components/jquery/jquery.min.js"></script>
@@ -17,13 +18,6 @@
         <!-- Eyedraw -->
         <script type="text/javascript" src="../../assets/js/dist/eyedraw.js"></script>
         <script type="text/javascript" src="../../assets/js/dist/oe-eyedraw.js"></script>
-
-        <style type="text/css">
-            .ed-fields-container{
-                left: -15px;
-                padding-top: 36px;
-            }
-        </style>
 
         <!-- This script handles the drawings for the page -->
         <script>
@@ -330,9 +324,9 @@
     <body onload="init();">
 
         <div class="container main" role="main">
-            <div class="ed-widget" id="eyedrawwidget_example">
-                <div class="ed-toolbar">
-                    <ul class="ed-toolbar-panel ed-main-toolbar" id="toolbar">
+            <div class="ed2-widget edit" id="eyedrawwidget_example">
+                <div class="ed2-toolbar">
+                    <ul class="ed2-toolbar-panel ed-main-toolbar" id="toolbar">
                         <li>
                             <a class="ed-button" href="#" data-function="addDoodle" data-arg="CornealOpacity" onclick="mainCanvas.addDoodle('CornealThinning');">
                                 <span class="icon-ed-CornealOpacity"></span>
@@ -369,48 +363,52 @@
                                 <span class="label"> (CircumcornealInjection)</span>
                             </a>
                         </li>
-						
+                        <li>
+                            <a class="ed-button" href="#" data-function="addDoodle" data-arg="CentralSerousRetinopathy" onclick="mainCanvas.addDoodle('CentralSerousRetinopathy');">
+                                <span class="icon-ed-CentralSerousRetinopathy"></span>
+                                <span class="label"> (CentralSerousRetinopathy)</span>
+                            </a>
+                        </li>
+                       <li>
+                            <a class="ed-button" href="#" data-function="addDoodle" data-arg="ConjunctivalHaem" onclick="mainCanvas.addDoodle('ConjunctivalHaem');">
+                                <span class="icon-ed-ConjunctivalHaem"></span>
+                                <span class="label"> (ConjunctivalHaem)</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="ed-button" href="#" data-function="addDoodle" data-arg="ChoroidalNaevusMelanoma" onclick="mainCanvas.addDoodle('ChoroidalNaevusMelanoma');">
+                                <span class="icon-ed-ChoroidalNaevusMelanoma"></span>
+                                <span class="label"> (ChoroidalNaevusMelanoma)</span>
+                            </a>
+                        </li>
+
                     </ul>
+				</div>
+            </div>
+            <div class="ed2-body">
+                <div class="ed2-drawing-controls">
+                    <ul class="ed2-toolbar-panel ed-drawing-toolbar">
+                        <li>
+                            <a class="ed-button" href="#" data-function="resetEyedraw">
+                                <span class="icon-ed-reset"></span>
+                                <span class="label">Reset eyedraw</span>
+                            </a>
+                        </li>
+                    </ul>
+                    <div class="ed2-selected-doodle">
+                        <select id="ed_example_selected_doodle" class="ed2-selected-doodle-select">
+                        </select>
+                    </div>
                 </div>
-                <div class="ed-body">
-                    <div class="ed-editor-container">
-                        <div class="ed-editor">
-                            <div class="ed-drawing-controls">
-                                <ul class="ed-toolbar-panel ed-drawing-toolbar">
-                                    <li>
-                                        <a class="ed-button" href="#" data-function="resetEyedraw">
-                                            <span class="icon-ed-reset"></span>
-                                            <span class="label">Reset eyedraw</span>
-                                        </a>
-                                    </li>
-                                </ul>
-                                <div class="ed-selected-doodle">
-                                    <select id="ed_example_selected_doodle" class="ed-selected-doodle-select">
-                                    </select>
-                                </div>
-                            </div>
-                            <div id="mainCavas_controls" class="ed-doodle-popup" style="position: absolute; left: 600px;"></div>
-                            <div id="sideCanvas_controls" class="ed-doodle-popup" style="display:none;position: absolute; left: 600px;"></div>
-                            <!-- Canvas elements -->
-                            <canvas id="mainCavas" class="ed-canvas-edit" width="300" height="300"></canvas>
-                        </div>
-                    </div>
-                    <div class="ed-fields-container">
-
-                        <div class="ed-widget" id="eyedrawwidget_example_2">
-
-                            <div class="ed-body">
-                                <div class="ed-editor-container">
-                                    <div class="ed-editor">
-
-                                        <!-- Canvas elements -->
-                                        <canvas id="sideCanvas" class="ed-canvas-edit" width="170" height="300"></canvas>
-
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <div class="ed2-editor-wrap">
+					<div class="ed2-editor">
+						<div id="mainCavas_controls" class="ed2-doodle-popup" style="position: absolute; left: 600px;"></div>
+						<canvas id="mainCavas" class="ed-canvas-edit" width="300" height="300"></canvas>
+					</div>
+					<div class="ed2-editor" style="position:absolute;left:460px">
+						<div id="sideCanvas_controls" class="ed-doodle-popup" style="display:none;position: absolute; left: 600px;"></div>
+						<canvas id="sideCanvas" class="ed-canvas-edit" width="170" height="300"></canvas>
+					</div>
                 </div>
             </div>
         </div>

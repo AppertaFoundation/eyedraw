@@ -45,8 +45,8 @@ ED.ToricPCIOL = function(_drawing, _parameterJSON) {
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 
-    this.scaleX = 0.75;
-    this.scaleY = 0.75;
+    this.scaleX = 0.75 * _drawing.getScaleLevel();
+    this.scaleY = 0.75 * _drawing.getScaleLevel();
 }
 
 /**

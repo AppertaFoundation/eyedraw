@@ -85,8 +85,8 @@ ED.CentralSerousRetinopathy.prototype.dependentParameterValues = function(_param
 			this.parameterValidationArray['originX']['range'].setMinAndMax(-300+(r*_value), 300-(r*_value));
 			this.parameterValidationArray['originY']['range'].setMinAndMax(-300+(r*_value), 300-(r*_value));
 
-			var newOriginY = this.parameterValidationArray['originY']['range'].constrain(this.originY);
-			var newOriginX = this.parameterValidationArray['originX']['range'].constrain(this.originX);
+			const newOriginY = this.parameterValidationArray['originY']['range'].constrain(this.originY);
+			const newOriginX = this.parameterValidationArray['originX']['range'].constrain(this.originX);
 
 			this.setSimpleParameter('originX', newOriginX);
 			this.setSimpleParameter('originY', newOriginY);
@@ -125,7 +125,6 @@ ED.CentralSerousRetinopathy.prototype.draw = function(_point) {
 
 	this.drawBoundary(_point);
 
-
 	// Non boundary paths
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
 
@@ -161,6 +160,7 @@ ED.CentralSerousRetinopathy.prototype.draw = function(_point) {
 		ctx.fillStyle = 'rgba(83, 130, 53, 1)';
 		ctx.ellipse(0,-100, 10,100, 0, 0, Math.PI);
 		ctx.fill();
+		ctx.restore();
 	}
 
 
@@ -180,9 +180,9 @@ ED.CentralSerousRetinopathy.prototype.draw = function(_point) {
  * @returns {String} Description of doodle
  */
 ED.CentralSerousRetinopathy.prototype.description = function() {
-	return 'Polypoidal choroidal vasculopathy';
+	return 'Central serous retinopathy';
 };
 
 ED.CentralSerousRetinopathy.prototype.snomedCode = function() {
-	return 313001006;
+	return 312956001;
 };
