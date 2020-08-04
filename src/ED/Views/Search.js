@@ -29,26 +29,13 @@ ED.Views.SearchBar = (function () {
 
 		var aTag = $(document.createElement('a'));
 		aTag.html("");
-		aTag.addClass('ed-button');
-		aTag.css('width', '100%');
-		aTag.css('line-height', '32px');
-		aTag.css('text-decoration', 'none');
-
-		icon.css('float', 'right');
+		aTag.addClass('add-ed-doodle');
 
 		var txtSpan = document.createElement('span');
 		txtSpan.innerText = text;
-		txtSpan.style.float = 'left';
-		$(txtSpan).css('width', '80%');
-		$(txtSpan).css('text-overflow', 'ellipsis');
-		$(txtSpan).css('white-space', 'nowrap');
-		$(txtSpan).css('overflow-x', 'hidden');
 
-		var clearDiv = document.createElement('div');
-		clearDiv.style.clear = 'both';
 		aTag.append(txtSpan);
 		aTag.append(icon);
-		aTag.append(clearDiv);
 
 		aTag.off('click').on('click', callback);
 
@@ -61,13 +48,7 @@ ED.Views.SearchBar = (function () {
 		tb.bindEvents()
 		var that = this;
 		var searchResult = this.container.siblings();
-		searchResult.parent().css('position', 'relative');
-		searchResult.css('list-style-type', 'none');
-		searchResult.css('padding', '0');
-		searchResult.css('margin', '0');
-		searchResult.css('width', '100%');
-		searchResult.css('overflow-y', 'auto');
-		searchResult.css('position', 'absolute');
+		searchResult.addClass('oe-autocomplete');
 
 		var searchTimer = null;
 
