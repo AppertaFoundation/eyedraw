@@ -29,21 +29,17 @@ ED.KeraticPrecipitates = function(_drawing, _parameterJSON) {
 	this.size = 'Fine';
 	this.number = 0;
 	this.pigment = false;
-	this.cells = 'Not Checked';
-	this.flare = 'Not Checked';
 	this.sentinel = false;
 
 	// Saved parameters
 	this.savedParameterArray = [
 		'apexX', 'apexY', 'scaleX', 'scaleY',
 		'originX', 'originY', 'size', 'number',
-		'pigment', 'cells', 'flare', 'sentinel',
+		'pigment', 'sentinel',
 	];
 
 	this.controlParameterArray = {
 		'size': 'KP',
-		'cells': 'Cells',
-		'flare': 'Flare',
 		'sentinel': 'Sentinel',
 		'pigment': 'Pigment'
 	};
@@ -78,8 +74,8 @@ ED.KeraticPrecipitates.prototype.setPropertyDefaults = function() {
 	// Update component of validation array for simple parameters
 	this.parameterValidationArray['apexX']['range'].setMinAndMax(0, 0);
 	this.parameterValidationArray['apexY']['range'].setMinAndMax(-200, +0);
-	this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.5, +1.7);
-	this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.5, +1.7);
+	this.parameterValidationArray['scaleX']['range'].setMinAndMax(+0.5, +1.9);
+	this.parameterValidationArray['scaleY']['range'].setMinAndMax(+0.5, +1.9);
 
 	this.parameterValidationArray['originX']['range'].setMinAndMax(-200, +200);
 	this.parameterValidationArray['originY']['range'].setMinAndMax(-200, +200);
@@ -103,19 +99,6 @@ ED.KeraticPrecipitates.prototype.setPropertyDefaults = function() {
 		display: true
 	};
 
-	this.parameterValidationArray.cells = {
-		kind: 'other',
-		type: 'string',
-		list: ['Not Checked', '0 (>1)', '0.5+ (1-5)', '1+ (6-15)', '2+ (16-25)', '3+ (26-50)', '4+ (>50)'],
-		animate: false
-	};
-
-	this.parameterValidationArray.flare = {
-		kind: 'other',
-		type: 'string',
-		list: ['Not Checked', '0 (None)', '1+ (Faint)', '2+ (Moderate)', '3+ (Marked)', '4+ (Intense)'],
-		animate: false
-	};
 };
 
 /**
@@ -221,6 +204,7 @@ ED.KeraticPrecipitates.prototype.draw = function(_point) {
 
 		if (this.size !== 'Stellate' && this.size !== 'Confluent' && !this.sentinel && this.size !== 'None') {
 			this.handleArray[4].isVisible = true;
+			this.handleArray[2].isVisible = true;
 			for (var i = 0; i < n; i++) {
 				p.setWithPolars(r * ED.randomArray[i], 2 * Math.PI * ED.randomArray[i + 100]);
 				this.drawSpot(ctx, p.x, p.y, dr, fill);
@@ -228,6 +212,7 @@ ED.KeraticPrecipitates.prototype.draw = function(_point) {
 		} else if (this.size !== 'None') {
 			if (this.sentinel) {
 				this.handleArray[4].isVisible = false;
+				this.handleArray[2].isVisible = false;
 				this.drawSpot(ctx, 0, 50, dr, fill);
 			} else if (this.size === 'Stellate') {
 				for (let i = 0; i < n; i++) {
@@ -318,14 +303,6 @@ ED.KeraticPrecipitates.prototype.description = function() {
 	let returnValue = `${this.size} KPs`;
 	if (this.sentinel) {
 		returnValue = `Sentinel KPs`;
-	}
-
-	if (this.cells && this.cells !== 'Not Checked') {
-		returnValue += ", cells: " + this.cells;
-	}
-
-	if (this.flare && this.flare !== 'Not Checked') {
-		returnValue += ", flare: " + this.flare;
 	}
 
 	return returnValue;
