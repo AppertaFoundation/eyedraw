@@ -121,6 +121,9 @@ ED.Freehand.prototype.draw = function(_point) {
 	// Get context
 	var ctx = this.drawing.context;
 
+	//decode LabelText and store in variable
+	var labelText = decodeURI(this.labelText);
+
 	// Call draw method in superclass
 	ED.Freehand.superclass.draw.call(this, _point);
 
@@ -175,12 +178,12 @@ ED.Freehand.prototype.draw = function(_point) {
 		}
 
 		// Draw optional label
-		if (this.labelText.length > 0) {
+		if (labelText.length > 0) {
 			// Draw text
 			ctx.font = this.labelFont;
-			this.labelWidth = ctx.measureText(this.labelText).width;
+			this.labelWidth = ctx.measureText(labelText).width;
 			ctx.fillStyle = "black";
-			ctx.fillText(this.labelText, -this.labelWidth / 2, this.labelHeight / 6);
+			ctx.fillText(labelText, -this.labelWidth / 2, this.labelHeight / 6);
 		}
 	}
 

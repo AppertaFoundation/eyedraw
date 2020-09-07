@@ -226,6 +226,9 @@ ED.Label.prototype.draw = function(_point) {
 	// Get context
 	var ctx = this.drawing.context;
 
+	//decode LabelText and store in variable
+	var labelText = decodeURI(this.labelText);
+
 	// Call draw method in superclass
 	ED.Label.superclass.draw.call(this, _point);
 
@@ -233,7 +236,7 @@ ED.Label.prototype.draw = function(_point) {
 	ctx.font = this.labelFont;
 
 	// Calculate pixel width of text with padding
-	this.labelWidth = ctx.measureText(this.labelText).width + this.padding * 2;
+	this.labelWidth = ctx.measureText(labelText).width + this.padding * 2;
 
 	// Boundary path
 	ctx.beginPath();
@@ -256,7 +259,7 @@ ED.Label.prototype.draw = function(_point) {
 	// Non boundary paths here
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
 		// Draw text
-		ctx.fillText(this.labelText, -this.labelWidth / 2 + this.padding, this.labelHeight / 6);
+		ctx.fillText(labelText, -this.labelWidth / 2 + this.padding, this.labelHeight / 6);
 
 		// Coordinate of start of arrow
 		var arrowStart = new ED.Point(0, 0);
