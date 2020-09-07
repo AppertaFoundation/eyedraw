@@ -4623,7 +4623,7 @@ ED.Doodle.prototype.setParameterFromString = function(_parameter, _value, _updat
 				break;
 
 			case 'freeText':
-				this[_parameter] = _value;
+				this[_parameter] = encodeURI(_value).replace(/'/g, "%27");
 				break;
 
 			default:
@@ -4810,7 +4810,7 @@ ED.Doodle.prototype.getParameter = function(_parameter) {
 				break;
 
 			case 'freeText':
-				value = this[_parameter];
+				value = decodeURI(this[_parameter]);
 				break;
 
 			default:
@@ -7134,6 +7134,9 @@ ED.Freehand.prototype.draw = function(_point) {
 	// Get context
 	var ctx = this.drawing.context;
 
+	//decode LabelText and store in variable
+	var labelText = decodeURI(this.labelText);
+
 	// Call draw method in superclass
 	ED.Freehand.superclass.draw.call(this, _point);
 
@@ -7188,12 +7191,12 @@ ED.Freehand.prototype.draw = function(_point) {
 		}
 
 		// Draw optional label
-		if (this.labelText.length > 0) {
+		if (labelText.length > 0) {
 			// Draw text
 			ctx.font = this.labelFont;
-			this.labelWidth = ctx.measureText(this.labelText).width;
+			this.labelWidth = ctx.measureText(labelText).width;
 			ctx.fillStyle = "black";
-			ctx.fillText(this.labelText, -this.labelWidth / 2, this.labelHeight / 6);
+			ctx.fillText(labelText, -this.labelWidth / 2, this.labelHeight / 6);
 		}
 	}
 
@@ -7331,6 +7334,9 @@ ED.FreehandCopyForOE.prototype.draw = function(_point) {
 	// Get context
 	var ctx = this.drawing.context;
 
+	//decode LabelText and store in variable
+	var labelText = decodeURI(this.labelText);
+
 	// Call draw method in superclass
 	ED.FreehandCopyForOE.superclass.draw.call(this, _point);
 
@@ -7385,12 +7391,12 @@ ED.FreehandCopyForOE.prototype.draw = function(_point) {
 		}
 
 		// Draw optional label
-		if (this.labelText.length > 0) {
+		if (labelText.length > 0) {
 			// Draw text
 			ctx.font = this.labelFont;
-			this.labelWidth = ctx.measureText(this.labelText).width;
+			this.labelWidth = ctx.measureText(labelText).width;
 			ctx.fillStyle = "black";
-			ctx.fillText(this.labelText, -this.labelWidth / 2, this.labelHeight / 6);
+			ctx.fillText(labelText, -this.labelWidth / 2, this.labelHeight / 6);
 		}
 	}
 
@@ -7805,6 +7811,9 @@ ED.Label.prototype.draw = function(_point) {
 	// Get context
 	var ctx = this.drawing.context;
 
+	//decode LabelText and store in variable
+	var labelText = decodeURI(this.labelText);
+
 	// Call draw method in superclass
 	ED.Label.superclass.draw.call(this, _point);
 
@@ -7812,7 +7821,7 @@ ED.Label.prototype.draw = function(_point) {
 	ctx.font = this.labelFont;
 
 	// Calculate pixel width of text with padding
-	this.labelWidth = ctx.measureText(this.labelText).width + this.padding * 2;
+	this.labelWidth = ctx.measureText(labelText).width + this.padding * 2;
 
 	// Boundary path
 	ctx.beginPath();
@@ -7835,7 +7844,7 @@ ED.Label.prototype.draw = function(_point) {
 	// Non boundary paths here
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
 		// Draw text
-		ctx.fillText(this.labelText, -this.labelWidth / 2 + this.padding, this.labelHeight / 6);
+		ctx.fillText(labelText, -this.labelWidth / 2 + this.padding, this.labelHeight / 6);
 
 		// Coordinate of start of arrow
 		var arrowStart = new ED.Point(0, 0);

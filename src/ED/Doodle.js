@@ -1398,7 +1398,7 @@ ED.Doodle.prototype.setParameterFromString = function(_parameter, _value, _updat
 				break;
 
 			case 'freeText':
-				this[_parameter] = _value;
+				this[_parameter] = encodeURI(_value).replace(/'/g, "%27");
 				break;
 
 			default:
@@ -1585,7 +1585,7 @@ ED.Doodle.prototype.getParameter = function(_parameter) {
 				break;
 
 			case 'freeText':
-				value = this[_parameter];
+				value = decodeURI(this[_parameter]);
 				break;
 
 			default:
