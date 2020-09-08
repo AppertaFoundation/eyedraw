@@ -284,6 +284,13 @@ class OEEyeDrawWidget extends CWidget
     public $inputId;
 
     /**
+     * Don't load package dependencies or set titles
+     *
+     * @var bool
+     */
+    public bool $suppressGlobalJs = false;
+
+    /**
      * Represents the eye using the ED object enumeration (0 = right, 1 = left)
      * @var int
      */
@@ -379,7 +386,7 @@ class OEEyeDrawWidget extends CWidget
         $data['data'] = $data;
 
         // Register package (dependent scripts and stylesheets)
-        if (!Yii::app()->clientScript->hasPackage('eyeDraw')) {
+        if (!Yii::app()->clientScript->hasPackage('eyeDraw') && !$this->suppressGlobalJs) {
             Yii::app()->clientScript->registerPackage('eyedraw');
         }
 
@@ -405,8 +412,11 @@ class OEEyeDrawWidget extends CWidget
         $cs = Yii::app()->clientScript;
 
         // Set the eyedraw doodle titles.
-        $titles = CJavaScript::encode(DoodleInfo::$titles);
-        $cs->registerScript('eyedraw_titles', "ED.setTitles({$titles});", CClientScript::POS_END);
+        if (!$this->suppressGlobalJs) {
+            $titles = CJavaScript::encode(DoodleInfo::$titles);
+            $cs->registerScript('eyedraw_titles', "ED.setTitles({$titles});", CClientScript::POS_END);
+        }
+
 
         // Create array of parameters to pass to the javascript function which runs on page load
         $properties = array(
