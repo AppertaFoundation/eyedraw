@@ -1380,7 +1380,7 @@ ED.Doodle.prototype.setParameterFromString = function(_parameter, _value, _updat
 	// Check type of passed value variable
 	var type = typeof(_value);
 	if (type != 'string') {
-		ED.errorHandler('ED.Doodle', 'setParameterFromString', '_value parameter should be of type string, not ' + type);
+		ED.errorHandler('ED.Doodle', 'setParameterFromString', '_value parameter should be of type string, not ' + type + ' for parameter ' + _parameter);
 	}
 
 	// Retrieve validation object for this doodle

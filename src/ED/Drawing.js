@@ -2348,7 +2348,7 @@ ED.Drawing.prototype.updateBindings = function(_doodle) {
 			var attribute = doodle.bindingArray[parameter]['attribute'];
 			var value = doodle.getParameter(parameter);
 			// Modify value of element according to type
-			switch (element.type) {
+            switch (element.type) {
 				case 'checkbox':
 
 					if (attribute) {
@@ -2387,7 +2387,13 @@ ED.Drawing.prototype.updateBindings = function(_doodle) {
 					if (attribute) {
 						ED.errorHandler('ED.Drawing', 'updateBindings', 'Binding to a textfield with a non-standard attribute not yet supported');
 					} else {
-						element.value = value;
+                        var originalValue = element.value;
+					    element.value = value;
+                        if (originalValue !== element.value) {
+                            // trigger a change event for anything listen to the bound html elements
+                            // instead of the eyedraw doodles.
+                            window.setTimeout(function(el) { el.dispatchEvent(new Event('change', {bubbles: true, cancelable: true})); }.bind(null, element), 100)
+                        }
 					}
 					break;
 

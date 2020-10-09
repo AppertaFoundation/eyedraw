@@ -2608,7 +2608,7 @@ ED.Drawing.prototype.updateBindings = function(_doodle) {
 			var attribute = doodle.bindingArray[parameter]['attribute'];
 			var value = doodle.getParameter(parameter);
 			// Modify value of element according to type
-			switch (element.type) {
+            switch (element.type) {
 				case 'checkbox':
 
 					if (attribute) {
@@ -2647,7 +2647,13 @@ ED.Drawing.prototype.updateBindings = function(_doodle) {
 					if (attribute) {
 						ED.errorHandler('ED.Drawing', 'updateBindings', 'Binding to a textfield with a non-standard attribute not yet supported');
 					} else {
-						element.value = value;
+                        var originalValue = element.value;
+					    element.value = value;
+                        if (originalValue !== element.value) {
+                            // trigger a change event for anything listen to the bound html elements
+                            // instead of the eyedraw doodles.
+                            window.setTimeout(function(el) { el.dispatchEvent(new Event('change', {bubbles: true, cancelable: true})); }.bind(null, element), 100)
+                        }
 					}
 					break;
 
@@ -4626,7 +4632,7 @@ ED.Doodle.prototype.setParameterFromString = function(_parameter, _value, _updat
 	// Check type of passed value variable
 	var type = typeof(_value);
 	if (type != 'string') {
-		ED.errorHandler('ED.Doodle', 'setParameterFromString', '_value parameter should be of type string, not ' + type);
+		ED.errorHandler('ED.Doodle', 'setParameterFromString', '_value parameter should be of type string, not ' + type + ' for parameter ' + _parameter);
 	}
 
 	// Retrieve validation object for this doodle
@@ -54879,15 +54885,17 @@ ED.RetinoscopyPowerCross = function(_drawing, _parameterJSON) {
 	this.powerSign2 = "+";
 	this.powerInt1 = 0;
 	this.powerInt2 = 0;
-	this.powerDp1 = ".00";
-	this.powerDp2 = ".00";
-	
+	this.powerDp1 = 0;
+	this.powerDp2 = 0;
+	this.power1 = 0;
+	this.power2 = 0;
+
 	// Saved parameters
 	this.savedParameterArray = ['rotation', 'powerSign1', 'powerSign2', 'powerInt1', 'powerInt2', 'powerDp1', 'powerDp2'];
 
 	// Parameters in doodle control bar (parameter name: parameter label)
 	this.controlParameterArray = {};
-	
+
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 }
@@ -54905,7 +54913,7 @@ ED.RetinoscopyPowerCross.superclass = ED.Doodle.prototype;
 ED.RetinoscopyPowerCross.prototype.setPropertyDefaults = function() {
 	this.isScaleable = false;
 	this.isMoveable = false;
-	
+
 	// Update component of validation array for simple parameters
 	this.parameterValidationArray['rotation']['range'].setMinAndMax(Math.PI, 2*Math.PI);
 
@@ -54920,7 +54928,7 @@ ED.RetinoscopyPowerCross.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['angle1'] = {
 		kind: 'derived',
 		type: 'int',
-		range: new ED.Range(1, 180),
+		range: new ED.Range(0, 180),
 		animate: true
 	};
 	this.parameterValidationArray['powerSign1'] = {
@@ -54937,14 +54945,14 @@ ED.RetinoscopyPowerCross.prototype.setPropertyDefaults = function() {
 	};
 	this.parameterValidationArray['powerDp1'] = {
 		kind: 'derived',
-		type: 'string',
-		list: ['.00', '.25','.50','.75'],
+		type: 'int',
+        range: new ED.Range(0, 99),
 		animate: true
 	};
 	this.parameterValidationArray['angle2'] = {
 		kind: 'derived',
 		type: 'int',
-		range: new ED.Range(1, 180),
+		range: new ED.Range(0, 180),
 		animate: true
 	};
 	this.parameterValidationArray['powerSign2'] = {
@@ -54961,10 +54969,26 @@ ED.RetinoscopyPowerCross.prototype.setPropertyDefaults = function() {
 	};
 	this.parameterValidationArray['powerDp2'] = {
 		kind: 'derived',
-		type: 'string',
-		list: ['.00', '.25','.50','.75'],
+		type: 'int',
+		range: new ED.Range(0, 99),
 		animate: true
 	};
+	// either bind the above separate items for power
+    // or the below complete parameters
+	this.parameterValidationArray['power1'] = {
+	    kind: 'other',
+        type: 'float',
+        precision: 2,
+        range: new ED.Range(-20, 20),
+        animate: false
+    };
+    this.parameterValidationArray['power2'] = {
+        kind: 'other',
+        type: 'float',
+        precision: 2,
+        range: new ED.Range(-20, 20),
+        animate: false
+    };
 
 }
 
@@ -54992,13 +55016,28 @@ ED.RetinoscopyPowerCross.prototype.dependentParameterValues = function(_paramete
 			returnArray['rotation'] = 2*Math.PI - parseFloat(_value*Math.PI/180);
 			returnArray['angle2'] = (parseInt(_value)>90) ? parseInt(_value) - 90 : parseInt(_value) + 90;
 			break;
-			
+
 		case 'rotation':
 			var degAngle = Math.round(_value * 180 / Math.PI);
 			returnArray['angle1'] = 360 - degAngle;
 			returnArray['angle2'] = (360 - degAngle>90) ? 360 - degAngle - 90 : 360 - degAngle + 90;
 			break;
+
+        case 'power1':
+            returnArray['powerSign1'] = parseInt(_value) >= 0 ? '+' : '-';
+            returnArray['powerInt1'] = Math.abs(parseInt(_value));
+            returnArray['powerDp1'] = (Math.abs(_value) - Math.abs(parseInt(_value))).toFixed(2).substring(2, 4);
+            break;
+
+        case 'power2':
+            returnArray['powerSign2'] = parseInt(_value) >= 0 ? '+' : '-';
+            returnArray['powerInt2'] = Math.abs(parseInt(_value));
+            returnArray['powerDp2'] = (Math.abs(_value) - Math.abs(parseInt(_value))).toFixed(2).substring(2, 4);
+            break;
 	}
+
+	// constrain to zero at the limits of rotation
+	['angle1', 'angle2'].forEach(attr => { if (returnArray[attr] >= 360) { returnArray[attr] -= 360; }});
 
 	return returnArray;
 }
@@ -55009,84 +55048,85 @@ ED.RetinoscopyPowerCross.prototype.dependentParameterValues = function(_paramete
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
 ED.RetinoscopyPowerCross.prototype.draw = function(_point) {
-	
+
 	// Axis length
-	var l = 340;
-	
+	var l = 330;
+	var lineSpacing = 50; // used to ensure the cross lines don't swamp text labels
+
 	// Get context
 	var ctx = this.drawing.context;
 
 	// Call draw method in superclass
 	ED.RetinoscopyPowerCross.superclass.draw.call(this, _point);
-	
+
 	// Draw invisible boundary box around axes
 	ctx.moveTo(-l,-l);
 	ctx.lineTo(-l,l);
 	ctx.lineTo(l,l);
 	ctx.lineTo(l,-l);
 	ctx.lineTo(-l,-l);
-	
+
 	ctx.fillStyle = "rgba(255, 255, 255, 0)";
 	ctx.strokeStyle = "rgba(0,0,0,0)";
-	
+
 	// Draw boundary path (also hit testing)
 	this.drawBoundary(_point);
-	
+
 	// Non boundary drawing
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
 		ctx.beginPath();
-		
+
 		// Draw y axis
-		ctx.moveTo(0,-l);
-		ctx.lineTo(0,l);
-		
+		ctx.moveTo(0,lineSpacing-l);
+		ctx.lineTo(0,l-lineSpacing);
+
 		// Draw X axis
-		ctx.moveTo(l,0);
-		ctx.lineTo(-l,0);
-	
+		ctx.moveTo(l-lineSpacing,0);
+		ctx.lineTo(lineSpacing-l,0);
+
 		// Set line attributes
 		ctx.lineWidth = 7;
 		ctx.fillStyle = "rgba(255, 255, 255, 0)";
 		ctx.strokeStyle = "black";
-		
+
 		// Draw it
 		ctx.stroke();
-		
+
 		// Text labels
 		ctx.save();
 		ctx.rotate(-this.rotation);
 		var x;
 		var y;
 
-		ctx.font="48px Arial";
+		ctx.font="72px Arial";
 		ctx.fillStyle="black";
-		ctx.textAlign="center"; 
+		ctx.textAlign="center";
 		ctx.textBaseline = "middle";
-	
+
 		ctx.beginPath();
 
 		var sp = l + 70;
 
-		// axis 1		
+		// axis 1
 		x = sp * Math.cos(this.rotation);
 		y = -sp*Math.sin(-this.rotation);
 		ctx.fillText(this.angle1 + "\xB0",x,y);
-		
+
 		// axis 2
 		x = -sp * Math.sin(this.rotation);
 		y = sp * Math.cos(this.rotation);
 		ctx.fillText(this.angle2 + "\xB0",x,y);
-		
+
 		// power 1
 		x = -sp * Math.cos(this.rotation);
 		y = sp*Math.sin(-this.rotation);
-		ctx.fillText(this.powerSign1 + parseInt(this.powerInt1) + this.powerDp1,x,y);
-		
+		ctx.fillText(this.powerSign1 + this.powerInt1.toString() + '.' + this.powerDp1,x,y);
+
 		// power 2
 		x = sp * Math.sin(this.rotation);
 		y = -sp * Math.cos(-this.rotation);
-		ctx.fillText(this.powerSign2 + parseInt(this.powerInt2) + this.powerDp2,x,y);
-		
+		ctx.fillText(this.powerSign2 + this.powerInt2.toString() + '.' + this.powerDp2,x,y);
+
 		ctx.restore();
 
 	}
@@ -55099,8 +55139,8 @@ ED.RetinoscopyPowerCross.prototype.calcRx = function() {
 	var wdCompensation = (1 / this.workingDistance).toFixed(2);
 
 	// Calculate minus cyl form
-	var power1 = parseFloat(this.powerSign1 + parseInt(this.powerInt1) + this.powerDp1);
-	var power2 = parseFloat(this.powerSign2 + parseInt(this.powerInt2) + this.powerDp2);
+	var power1 = parseFloat(this.powerSign1 + parseInt(this.powerInt1) + '.' + this.powerDp1);
+	var power2 = parseFloat(this.powerSign2 + parseInt(this.powerInt2) + '.' + this.powerDp2);
 	var pSphere = (power1 >= power2) ? (power1 - wdCompensation).toFixed(2) : (power2 - wdCompensation).toFixed(2);
 	var pCyl = (Math.abs(power1 - power2) * -1).toFixed(2); // reports in minus cyl format
 	var angle = (power1>=power2) ? this.angle2 : this.angle1; // as per JEM, use angle of lowest power lens
@@ -55134,7 +55174,7 @@ ED.RetinoscopyPowerCross.prototype.description = function() {
 	var Rx = (calcRx.pSphere >= 0 ) ? '+' + calcRx.pSphere: calcRx.pSphere;
 	Rx += (calcRx.pCyl == 0) ? ' / -' : ' / ';
 	Rx += calcRx.pCyl + ' x ' + calcRx.angle;
-		
+
 	return Rx;
 }
 
