@@ -60,6 +60,7 @@ class DoodleInfo
         'ChandelierSingle' => 'Chandelier',
         'ChoroidalHaemorrhage' => 'Choroidal haemorrhage',
         'ChoroidalEffusion' => 'Choroidal effusion',
+        'CellsAndFlare' => ' Cells and flare',
         'ChoroidalNaevus' => 'Choroidal naevus',
         'ChoroidalNaevusMelanoma' => 'Choroidal mass/pigment',
         'CiliaryInjection' => 'Cilary injection',
