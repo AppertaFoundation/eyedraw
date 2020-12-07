@@ -28797,10 +28797,10 @@ ED.CornealSuture.prototype.description = function() {
  */
 ED.CornealSuture.prototype.groupDescription = function() {
 	
-	var returnString = "";
+	let returnString = "";
 	let corneal_sutures = this.drawing.allDoodlesOfClass(this.className).filter(corneal_suture => corneal_suture.removed === false);
 
-	var number = corneal_sutures.length;
+	let number = corneal_sutures.length;
 	if (number > 0) returnString = number + " corneal suture";
 
 	if (number > 1) returnString += "s";
