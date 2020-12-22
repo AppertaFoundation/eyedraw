@@ -16,6 +16,31 @@
  */
 ?>
 
-	<div class="ed2-editor">
-		<?php echo $fields;?>
-	</div>
+<?php
+echo '
+<div id="ed2-no-doodle-elements" class="ed-tag-cloud Arow divider">
+	<ul class="MultiSelectList multi-select-selections hide">';
+		if (isset($imageUrl))
+		{
+			$tags = array();
+			$decoded_json = json_decode($this->model[$this->attribute]);
+
+			OELog::log(print_r($decoded_json, true));
+
+			foreach ($decoded_json as $doodle)
+			{
+				if (property_exists($doodle, "tags"))
+				{
+					$tags = array_merge($tags, $doodle->tags);
+				}
+			}
+
+			foreach($tags as $tag)
+			{
+				$decoded_tag = json_decode($tag);
+				echo '<li class="ed-tag" pk_id="' . $decoded_tag->pk_id . '" snomed_code="' . $decoded_tag->snomed_code . '"><span class="text">' . $decoded_tag->text . '</span></li>';
+			}
+		}
+echo	'</ul>
+</div>';
+?>

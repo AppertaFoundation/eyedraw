@@ -17,40 +17,36 @@
 ?>
 
 <?php if ($isEditable && count($doodleToolBarArray) > 0) {?>
-	<div class="ed-toolbar">
+
 		<?php foreach ($doodleToolBarArray as $row => $rowItems) { ?>
-			<ul class="ed-toolbar-panel ed-main-toolbar">
+			<ul class="ed2-toolbar-panel ed2-main-toolbar">
 				<?php
 					$mainItems = $maxToolbarButtons > -1 ? array_slice($rowItems, 0, $maxToolbarButtons) : $rowItems;
 					$extraItems = $maxToolbarButtons > -1 ? array_slice($rowItems, $maxToolbarButtons) : array();
 				?>
 				<?php foreach($mainItems as $item) {?>
-					<li id="<?php echo $item['classname'].$idSuffix ?>">
-						<a class="ed-button" href="#" data-function="addDoodle" data-arg="<?php echo $item['classname'] ?>">
-							<span class="icon-ed-<?php echo $item['classname'];?>"></span>
-							<span class="label"><?php echo $item['title'] ?></span>
-						</a>
-					</li>
-				<?php } ?>
+<li id="<?php echo $item['classname'].$idSuffix ?>">
+    <a class="ed-button" href="#" data-function="addDoodle" data-arg="<?php echo $item['classname'] ?>">
+        <i class="icon-ed-<?=$item['classname'];?>"></i>
+        <span class="label"><?php echo $item['title'] ?></span>
+    </a>
+</li><?php } ?>
 				<?php if (count($extraItems)) {?>
 					<li>
-						<a class="ed-button ed-button-more" href="#">
-							<span class="icon-ed-More"></span>
-							<span class="label">More</span>
-						</a>
-						<ul class="ed-toolbar-panel-drawer">
+						<i class="oe-i more-h pad ed-button-more js-has-tooltip" data-tt-type="basic" data-tooltip-content="More doodles..."></i>
+
+						<ul class="ed2-toolbar-panel-drawer">
 							<?php foreach($extraItems as $item) {?>
-								<li id="<?php echo $item['classname'].$idSuffix ?>">
-									<a class="ed-button" href="#" data-function="addDoodle" data-arg="<?php echo $item['classname'] ?>">
-										<span class="icon-ed-<?php echo $item['classname'];?>"></span>
-										<span class="label"><?php echo $item['title'] ?></span>
-									</a>
-								</li>
-							<?php }?>
-						</ul>
+<li id="<?php echo $item['classname'].$idSuffix ?>">
+    <a class="ed-button" href="#" data-function="addDoodle" data-arg="<?php echo $item['classname'] ?>">
+        <i class="icon-ed-<?=$item['classname'];?>"></i>
+        <span class="label"><?php echo $item['title'] ?></span>
+    </a>
+</li><?php }?>
+	</ul>
 					</li>
 				<?php } ?>
 			</ul>
 		<?php } ?>
-	</div>
+
 <?php } ?>

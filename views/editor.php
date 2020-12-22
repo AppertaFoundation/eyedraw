@@ -16,37 +16,10 @@
  */
 ?>
 
-<div class="ed-editor">
-	<?php if ($showDrawingControls && $mode !== 'view') {?>
-		<div class="ed-drawing-controls<?= $toggleScale ? ' ed-feature-zoom': '';?>">
-			<!-- DRAWING TOOLBAR -->
-			<ul class="ed-toolbar-panel ed-drawing-toolbar">
-				<li>
-					<a class="ed-button" href="#" data-function="resetEyedraw">
-						<span class="icon-ed-reset"></span>
-						<span class="label">Reset eyedraw</span>
-					</a>
-				</li>
-				<?php if ($toggleScale) {?>
-					<li>
-						<a class="ed-button" href="#" data-function="toggleZoom">
-							<span class="icon-ed-zoom-out"></span>
-							<span class="label">Toggle Zoom</span>
-						</a>
-					</li>
-				<?php }?>
-			</ul>
-			<!-- SELECTED DOODLE -->
-			<div class="ed-selected-doodle">
-				<select class="ed-selected-doodle-select cols-full" id="ed_example_selected_doodle">
-				</select>
-			</div>
-		</div>
-	<?php }?>
-
+<div class="ed2-editor">
 	<?php if ($isEditable && $showDoodlePopup) {?>
 		<!-- DOODLE POPUP -->
-		<div class="ed-doodle-popup closed<?= $popupDisplaySide == 'left' ? ' ' . $popupDisplaySide : ''?>" data-display-side="<?= $popupDisplaySide ? $popupDisplaySide : ''?>">
+		<div class="ed2-doodle-popup closed<?= $popupDisplaySide == 'left' ? ' ' . $popupDisplaySide : ''?>" data-display-side="<?= $popupDisplaySide ? $popupDisplaySide : ''?>">
 		</div>
 	<?php }?>
 
@@ -68,3 +41,4 @@
 			value='<?php echo $this->model[$this->attribute] ?>' />
 	<?php } ?>
 </div>
+

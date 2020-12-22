@@ -242,11 +242,11 @@ ED.Drawing = function(_canvas, _eye, _idSuffix, _isEditable, _options) {
 			var isEyeDrawElement = false;
 
 			var ignore = '(' + [
-				'ed-doodle-popup',
+				'ed2-doodle-popup',
 				'ed-button',
 				'ed-canvas',
 				'ed_canvas',
-				'ed-selected-doodle-select',
+				'ed2-selected-doodle-select',
 			].join(')|(') + ')';
 
 			do {
@@ -525,6 +525,10 @@ ED.Drawing.prototype.loadDoodles = function(_id) {
 	// If it exists and contains something, load it
 	if (sourceElement && sourceElement.value.length > 0) {
 		var doodleSet = window.JSON.parse(sourceElement.value);
+
+		//remove tags from doodle loading
+		doodleSet = doodleSet.filter(doodle => !doodle.hasOwnProperty('tags'));
+
 		this.resetDoodleSet = doodleSet;
 		this.load(doodleSet);
 
@@ -589,6 +593,19 @@ ED.Drawing.prototype.json = function() {
 
 	// Remove last comma
 	s = s.substring(0, s.length - 1);
+
+	let tagContainer = $(this.canvas).closest('.ed2-body').find('.ed2-no-doodle-elements ul');
+	let list = $(tagContainer).find('li.ed-tag');
+
+	let tagarray = [];
+	list.each((i, tag) => {
+		let tagText = $(tag).find('span.text')[0];
+		tagarray.push('{"pk_id":' + $(tag).attr('pk_id') + ',"text":"' + tagText.innerText + '","snomed_code":' + $(tag).attr('snomed_code') + '}');
+	});
+
+	let textarray = JSON.stringify(tagarray);
+
+	s = s + ', {"tags":' + textarray + '}';
 
 	return s;
 };
@@ -1489,7 +1506,7 @@ ED.Drawing.prototype.moveNextTo = function(_doodle, _className, _inFront) {
 		// Don't assume that _doodle is in front, so start by putting it there, and reorder
 		_doodle.order = 1000;
 		this.doodleArray.sort(function(a, b) {
-			return a.order - b.order
+			return a.order - b.order;
 		});
 		for (var i = 0; i < this.doodleArray.length; i++) {
 			this.doodleArray[i].order = i;
@@ -1501,7 +1518,7 @@ ED.Drawing.prototype.moveNextTo = function(_doodle, _className, _inFront) {
 			this.doodleArray[i].order = i + offset;
 
 			// Look for doodle of passed classname (will definitely be found first)
-			if (this.doodleArray[i].className == _className) {
+			if (this.doodleArray[i].className === _className) {
 				offset = 1;
 				if (_inFront) {
 					_doodle.order = i + 1;
@@ -2651,11 +2668,11 @@ ED.Drawing.prototype.reportData = function() {
 						'end': doodle.groupDescriptionEnd()
 					}
 				}
-				if (description.length) {
+				if (description) {
 					grouped[doodle.className]['descriptions'].push(description)
 				}
 			} else {
-				if (description.length) {
+				if (description) {
 					reports.push(description);
 				}
 			}
@@ -2713,7 +2730,6 @@ ED.Drawing.prototype.report = function() {
 ED.Drawing.prototype.diagnosis = function() {
 	var topOfHierarchy = 0;
 	var returnCodes = new Array();
-
 	// Loop through doodles with diagnoses, taking one highest in hierarchy, or those that are equal
 	for (var i = 0; i < this.doodleArray.length; i++) {
 		var doodle = this.doodleArray[i];
@@ -2731,9 +2747,14 @@ ED.Drawing.prototype.diagnosis = function() {
 					}
 				}
 			}
-
 		}
 	}
+
+	//Retrieve additional diagnoses from tag cloud. Recommend using a different method to do this in future.
+	let tagCloud = $(this.canvas).parents('.ed2-editor').parents('.ed2-editor-wrap').parents('.ed2-body').children('.ed2-no-doodle-elements');
+	let tagCodes = tagCloud.children('ul.no-doodles').children('li.ed-tag').map(function() {return parseInt($(this).attr('snomed_code'), 10)}).toArray();
+
+	returnCodes = returnCodes.concat(tagCodes);
 
 	return returnCodes;
 };

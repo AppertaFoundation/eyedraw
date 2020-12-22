@@ -35,8 +35,6 @@ ED.AntSeg = function(_drawing, _parameterJSON) {
 	this.colour = (typeof default_iris_colour) !== 'undefined' ? default_iris_colour : 'Blue';
 	this.ectropion = false;
 	this.cornealSize = 'Not Checked';
-	this.cells = 'Not Checked';
-	this.flare = 'Not Checked';
 	this.csApexX = 0;
 
 	// Saved parameters
@@ -49,8 +47,6 @@ ED.AntSeg = function(_drawing, _parameterJSON) {
 		'colour',
 		'ectropion',
 		'cornealSize',
-		'cells',
-		'flare',
 		'csApexX' // store of cross section apex x value
 	];
 
@@ -62,8 +58,6 @@ ED.AntSeg = function(_drawing, _parameterJSON) {
 		'colour':'Colour',
 		'ectropion':'Ectropion uveae',
 		'cornealSize':'Corneal size',
-		'cells': 'Cells',
-		'flare': 'Flare'
 	};
 
 	// Call superclass constructor
@@ -387,14 +381,6 @@ ED.AntSeg.prototype.description = function() {
 	// PXE
 	if (this.pxe) {
 		returnValue += "pseudoexfoliation, ";
-	}
-
-	if (this.cells && this.cells !== 'Not Checked') {
-		returnValue += "cells: " + this.cells + ", ";
-	}
-
-	if (this.flare && this.flare !== 'Not Checked') {
-		returnValue += "flare: " + this.flare + ", ";
 	}
 
 	// Empty report so far

@@ -27,7 +27,7 @@ ED.PI = function(_drawing, _parameterJSON) {
 	this.className = "PI";
 
 	// Derived parameters
-	this.type = 'Surgical';
+	this.type = 'Laser';
 	this.patent = true;
 
 	// Saved parameters
@@ -66,14 +66,14 @@ ED.PI.prototype.setPropertyDefaults = function() {
 		type: 'bool',
 		display: false
 	};
-}
+};
 
 /**
  * Sets default parameters
  */
 ED.PI.prototype.setParameterDefaults = function() {
-	this.setRotationWithDisplacements(30, -30);
-}
+	this.setRotationWithDisplacements(-30, -60);
+};
 
 /**
  * Draws doodle or performs a hit test if a Point parameter is passed
@@ -108,7 +108,7 @@ ED.PI.prototype.draw = function(_point) {
 	ctx.lineWidth = 4;
 
 	// Colour of outer line is dark gray
-	ctx.strokeStyle = "rgba(120,120,120,0.75)";;
+	ctx.strokeStyle = "rgba(120,120,120,0.75)";
 
 	// Colour of fill
 	if (this.patent) ctx.fillStyle = "rgba(255,255,255,1)";
@@ -119,7 +119,7 @@ ED.PI.prototype.draw = function(_point) {
 
 	// Return value indicating successful hittest
 	return this.isClicked;
-}
+};
 
 /**
  * Returns a string containing a text description of the doodle
@@ -128,4 +128,4 @@ ED.PI.prototype.draw = function(_point) {
  */
 ED.PI.prototype.description = function() {
 	return "Peripheral iridectomy at " + this.clockHour() + " o'clock";
-}
+};

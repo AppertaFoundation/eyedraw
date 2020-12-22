@@ -77,7 +77,7 @@ ED.Doodle = function(_drawing, _parameterJSON) {
 		this.hitTestMethod = 'path';
 
 		// Optional array of squiggles
-		this.squiggleArray = new Array();
+		this.squiggleArray = [];
 
 		// Transform used to draw doodle (includes additional transforms specific to the doodle)
 		this.transform = new ED.AffineTransform();
@@ -243,19 +243,20 @@ ED.Doodle = function(_drawing, _parameterJSON) {
 		this.animationDataArray = new Array(); // Associative array, key = parameter name, value = array with animation info
 		this.parentClass = ""; // Class of parent that a doodle is dependent on (parent auto-created)
 		this.inFrontOfClassArray = new Array(); // Array of classes to put this doodle in front of (in order)
+		this.behindClassArray = new Array(); // Array of classes to put this doodle behind of (in order)
 
 		// Array of points to snap to
-		this.pointsArray = new Array();
-		this.anglesArray = new Array();
-		this.arcArray = new Array();
+		this.pointsArray = [];
+		this.anglesArray = [];
+		this.arcArray = [];
 		this.quadrantPoint = new ED.Point(200, 200);
 
 		// Bindings to HTML element values. Associative array with parameter name as key
-		this.bindingArray = new Array();
-		this.drawing.listenerArray[this.id] = new Array();
+		this.bindingArray = [];
+		this.drawing.listenerArray[this.id] = [];
 
 		// Array of 5 handles
-		this.handleArray = new Array();
+		this.handleArray = [];
 		this.handleArray[0] = new ED.Doodle.Handle(new ED.Point(-50, 50), false, ED.Mode.Scale, false);
 		this.handleArray[1] = new ED.Doodle.Handle(new ED.Point(-50, -50), false, ED.Mode.Scale, false);
 		this.handleArray[2] = new ED.Doodle.Handle(new ED.Point(50, -50), false, ED.Mode.Scale, false);
@@ -384,6 +385,21 @@ ED.Doodle = function(_drawing, _parameterJSON) {
 			this.isForDrawing = false;
 		}
 	}
+};
+
+//Things inherited from SearchItem
+ED.Doodle.prototype.getText = function()
+{
+	//Return the name of the doodle
+};
+ED.Doodle.prototype.getIcon = function()
+{
+	//Return the icon for the doodle
+};
+ED.Doodle.prototype.AddToED = function()
+{
+	//Find the drawing in the ED area, then attempt to call add on it
+	//Alternatively piggyback on the current behaviour to add this to the selected drawing when this is called
 };
 
 /**
@@ -797,7 +813,7 @@ ED.Doodle.prototype.snomedCodes = function() {
  * @returns {Array} Associative array of values of dependent parameters
  */
 ED.Doodle.prototype.dependentParameterValues = function(_parameter, _value) {
-	return new Array();
+	return [];
 };
 
 /**
@@ -959,7 +975,7 @@ ED.Doodle.prototype.validateParameter = function(_parameter, _value, _trim) {
 	this.showControlValidationMsg(_parameter, valid);
 
 	// Return validity and value
-	var returnArray = new Array();
+	var returnArray = [];
 	returnArray['valid'] = valid;
 	returnArray['value'] = value;
 	return returnArray;
@@ -2230,6 +2246,40 @@ ED.Doodle.prototype.drawSpot = function(_ctx, _x, _y, _r, _colour) {
 	_ctx.save();
 	_ctx.beginPath();
 	_ctx.arc(_x, _y, _r, 0, Math.PI * 2, true);
+	_ctx.fillStyle = _colour;
+	_ctx.strokeStyle = _colour;
+	_ctx.lineWidth = 0;
+	_ctx.fill();
+	_ctx.stroke();
+	_ctx.restore();
+};
+
+ED.Doodle.prototype.drawStellate = function(_ctx, _x, _y, _r, _colour) {
+	_ctx.save();
+	_ctx.beginPath();
+
+	//x, y is the middle
+	const topLeft = new ED.Point(_x-_r, _y-_r);
+	const topRight = new ED.Point(_x+_r, _y-_r);
+	const bottomLeft = new ED.Point(_x-_r, _y+_r);
+	const bottomRight = new ED.Point(_x+_r, _y+_r);
+
+	// calculate the 4 control points
+	const cpt1 = new ED.Point(topLeft.x + (_r*2*0.4), topLeft.y + (_r*2*0.4)); // top left
+	const cpt2 = new ED.Point(topLeft.x + (_r*2*0.6), topLeft.y + (_r*2*0.4)); // top right
+	const cpt3 = new ED.Point(topLeft.x + (_r*2*0.4), topLeft.y + (_r*2*0.6)); // bottom left
+	const cpt4 = new ED.Point(topLeft.x + (_r*2*0.6), topLeft.y + (_r*2*0.6)); // bottom right
+
+	_ctx.moveTo(topLeft.x, topLeft.y);
+	// top
+	_ctx.bezierCurveTo(cpt2.x, cpt2.y, cpt1.x, cpt1.y, topRight.x, topRight.y);
+	// right
+	_ctx.bezierCurveTo(cpt4.x, cpt4.y, cpt2.x, cpt2.y, bottomRight.x, bottomRight.y);
+	// bottom
+	_ctx.bezierCurveTo(cpt3.x, cpt3.y, cpt4.x, cpt4.y, bottomLeft.x, bottomLeft.y);
+	// left
+	_ctx.bezierCurveTo(cpt1.x, cpt1.y, cpt3.x, cpt3.y, topLeft.x, topLeft.y);
+
 	_ctx.fillStyle = _colour;
 	_ctx.strokeStyle = _colour;
 	_ctx.lineWidth = 0;

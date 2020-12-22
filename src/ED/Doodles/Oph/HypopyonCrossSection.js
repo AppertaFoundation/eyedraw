@@ -63,15 +63,16 @@ ED.HypopyonCrossSection.superclass = ED.Doodle.prototype;
  * Sets handle attributes
  */
 ED.HypopyonCrossSection.prototype.setHandles = function() {
-}
+};
 
 /**
  * Sets default properties
  */
 ED.HypopyonCrossSection.prototype.setPropertyDefaults = function() {
 	this.isSelectable = false;
-	this.addAtBack = true;
 	this.isUnique = true;
+
+	this.behindClassArray = ["AntSegCrossSection","HyphaemiaCrossSection"];
 
 	// Update component of validation array for simple parameters
 	this.parameterValidationArray['apexX']['range'].setMinAndMax(-0, +0);

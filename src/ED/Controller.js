@@ -43,26 +43,35 @@ ED.Controller = (function() {
 	 * @param {Object} properties The EyeDraw widget properties.
 	 * @param {ED.Checker} [Checker] The EyeDraw checker.
 	 * @param {ED.Drawing} [drawing] An ED.Drawing instance.
+	 * @param {ED.TagCloud} [tagCloud] An ED.TagCloud instance.
 	 * @param {ED.Views.Toolbar} [mainToolbar] An ED.Views.Toolbar instance.
 	 * @param {ED.Views.Toolbar} [drawingToolbar] An ED.Views.Toolbar instance.
 	 * @param {ED.Views.DoodlePopup} [doodlePopup] An ED.Views.DoodlePopup instance.
 	 */
-	function Controller(properties, Checker, drawing, mainToolbar, drawingToolbar, doodlePopup, selectedDoodle) {
+	function Controller(properties, Checker, drawing, tagCloud, mainToolbar, drawingToolbar, doodlePopup, selectedDoodle) {
 
 		this.properties = properties;
 		this.canvas = document.getElementById(properties.canvasId);
 		this.input = document.getElementById(properties.inputId);
-		this.container = $(this.canvas).closest('.ed-widget');
+		this.container = $(this.canvas).closest('.ed2-widget');
 		this.previousReport = '';
 
 		this.Checker = Checker || ED.Checker;
 		this.drawing = drawing || this.createDrawing();
+		this.tagCloud = this.createTagCloud();
 
 		if (this.properties.isEditable) {
 			this.mainToolbar = mainToolbar || this.createMainToolbar();
 			this.drawingToolbar = drawingToolbar || this.createDrawingToolbar();
 			this.doodlePopup = doodlePopup || this.createDoodlePopup();
 			this.selectedDoodle = selectedDoodle || this.createSelectedDoodle();
+
+			if(this.tagCloud !== null)
+			{
+				this.tagCloud.isEditable = true;
+			}
+
+			this.searchBar = this.createSearchBar();
 			this.bindEditEvents();
 		}
 
@@ -103,7 +112,7 @@ ED.Controller = (function() {
 	 */
 	Controller.prototype.createMainToolbar = function() {
 
-		var container = this.container.find('.ed-main-toolbar');
+		var container = this.container.find('.ed2-main-toolbar');
 
 		return container.length ? new ED.Views.Toolbar.Main(
 			this.drawing,
@@ -113,7 +122,7 @@ ED.Controller = (function() {
 
 	Controller.prototype.createDrawingToolbar = function() {
 
-		var container = this.container.find('.ed-drawing-toolbar');
+		var container = this.container.find('.ed2-drawing-toolbar');
 
 		return container.length ? new ED.Views.Toolbar.Drawing(
 			this.drawing,
@@ -126,7 +135,7 @@ ED.Controller = (function() {
 	 */
 	Controller.prototype.createDoodlePopup = function() {
 
-		var container = this.container.find('.ed-doodle-popup:first');
+		var container = this.container.find('.ed2-doodle-popup:first');
 
 		var popupDoodles = this.properties.showDoodlePopupForDoodles || [];
 
@@ -142,13 +151,38 @@ ED.Controller = (function() {
 	 * @return {ED.Views.SelectedDoodle} [description]
 	 */
 	Controller.prototype.createSelectedDoodle = function() {
-
-		var container = this.container.find('.ed-selected-doodle');
-
+		var container = this.container.find('.ed2-selected-doodle');
 		return container.length ? new ED.Views.SelectedDoodle(
 			this.drawing,
 			container,
 			this.doodlePopup
+		) : null;
+	};
+
+	Controller.prototype.createTagCloud = function() {
+		//TODO: do this more elegantly
+		let container = this.container.find('.ed2-body').find('.ed2-no-doodle-elements');
+
+		return container.length ?
+			new ED.TagCloud(
+				this.drawing,
+				container,
+				false,
+				this.properties.side
+		) : null;
+	};
+
+	Controller.prototype.createSearchBar = function() {
+		if($(this.drawing.canvas).attr('id').endsWith('_side')){
+			return;
+		}
+		var container = this.container.find('#ed2-search-doodle-input');
+
+		return container.length ? new ED.Views.SearchBar(
+			this.drawing,
+			container,
+			this.doodlePopup,
+			this.tagCloud
 		) : null;
 	};
 
@@ -167,12 +201,15 @@ ED.Controller = (function() {
 		this.drawing.registerForNotifications(this, 'notificationHandler', [
 			'ready',
 			'doodlesLoaded',
-			'parameterChanged'
+			'parameterChanged',
+			'doodleAdded'
 		]);
 
 		this.drawing.registerForNotifications(this, 'saveDrawingToInputField', [
 			'doodleAdded',
 			'doodleDeleted',
+			'tagDeleted',
+			'tagAdded',
 			//'doodleSelected',
 			//'mousedragged',
 			'mouseup',
@@ -223,6 +260,16 @@ ED.Controller = (function() {
 		}
 	};
 
+	Controller.prototype.onDoodleAdded = function(notification) {
+		const newDoodle = notification.object;
+		// move doodle behind the give doodle
+		// there is a chance that "behindClassArray" should not be an array as the newDoodle will be placed
+		// behind the last doodle in the "behindClassArray" array
+		for (let i = 0; i < newDoodle.behindClassArray.length; i++) {
+			newDoodle.drawing.moveNextTo(newDoodle, newDoodle.behindClassArray[i], false);
+		}
+	};
+
 	/**
 	 * Check if the associated input field has any data.
 	 * @return {Boolean}
@@ -243,9 +290,9 @@ ED.Controller = (function() {
 	 * Save drawing data to the associated input field.
 	 */
 	Controller.prototype.saveDrawingToInputField = function() {
-        if (this.hasInputField() && this.drawing.isReady) {
-            this.input.value = this.drawing.save();
-        }
+		if (this.hasInputField() && this.drawing.isReady) {
+			this.input.value = this.drawing.save();
+		}
 		clearTimeout(this.saveTimer);
 		this.saveTimer = setTimeout(function() {
 			if (this.properties.autoReport) {
@@ -260,6 +307,10 @@ ED.Controller = (function() {
 	 */
 	Controller.prototype.loadInputFieldData = function() {
 		// Load drawing data from input element
+		if(this.tagCloud !== null)
+		{
+			this.tagCloud.loadTags(this.properties.inputId);
+		}
 		this.drawing.loadDoodles(this.properties.inputId);
 	};
 

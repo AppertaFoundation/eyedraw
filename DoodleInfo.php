@@ -60,6 +60,7 @@ class DoodleInfo
         'ChandelierSingle' => 'Chandelier',
         'ChoroidalHaemorrhage' => 'Choroidal haemorrhage',
         'ChoroidalEffusion' => 'Choroidal effusion',
+        'CellsAndFlare' => ' Cells and flare',
         'ChoroidalNaevus' => 'Choroidal naevus',
         'ChoroidalNaevusMelanoma' => 'Choroidal mass/pigment',
         'CiliaryInjection' => 'Cilary injection',
@@ -109,7 +110,7 @@ class DoodleInfo
         'FreehandCopyForOE' => 'Freehand - permanent',
         'Fuchs' => 'Guttata',
         'Fundus' => 'Fundus',
-        'ConjunctivalHaem' => 'Conjunctival haemorrhage',
+        'ConjunctivalHaem' => 'Conjunctiva',
         'Geographic' => 'Geographic atrophy',
         'Fovea' => 'Fovea',
         'Gonioscopy' => 'Gonioscopy',
@@ -129,9 +130,10 @@ class DoodleInfo
         'IrisNaevus' => 'Iris naevus',
         'IrisTrauma' => 'Iris trauma',
         'IRMA' => 'Intraretinal microvascular abnormalities',
-        'KeraticPrecipitates' => 'Keratic precipitates',
         'KoeppeNodule' => 'Koeppe nodule',
         'KrukenbergSpindle' => 'Krukenberg spindle',
+        'KeraticPrecipitates' => 'Keratic precipitates',
+        'CircumcornealInjection' => 'Circumcorneal Injection',
         'Label' => 'Label',
         'LaserCircle' => 'Circle of laser photocoagulation',
         'LaserDemarcation' => 'Laser demarcation',
@@ -245,5 +247,6 @@ class DoodleInfo
         'Drusen' => 'Drusen',
         'MaculaPostPole' => 'Macula (posterior pole)',
         'PCV' => 'Polypoidal choroidal vasculopathy',
+        'CentralSerousRetinopathy' => 'Central Serous Retinopathy'
     );
 }

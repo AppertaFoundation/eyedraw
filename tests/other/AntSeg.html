@@ -68,7 +68,8 @@
                         AntSeg:{AntSegCrossSection:{parameters:['apexY','c']}},
                         PCIOL:{PCIOLCrossSection:{parameters:['originY', 'fx']}},
                         PosteriorCapsule:{PosteriorCapsuleCrossSection:{parameters:['originY','opacity','apexY']}},
-                        CornealOpacity:{CornealOpacityCrossSection:{parameters:['yMidPoint','d','h','w','iW','originY','minY','maxY']}}
+                        CornealOpacity:{CornealOpacityCrossSection:{parameters:['yMidPoint','d','h','w','iW','originY','minY','maxY']}},
+                        KeraticPrecipitates:{KeraticPrecipitatesCrossSection:{parameters:['cells', 'flare']}}
                     };
 
                     syncArray['RPS'] = {};
@@ -80,6 +81,7 @@
                         PCIOLCrossSection:{PCIOL:{parameters:['originY', 'fx']}},
                         PosteriorCapsuleCrossSection:{PosteriorCapsule:{parameters:['originY','apexY']}},
                         CornealOpacityCrossSection:{CornealOpacity:{parameters:[]}},
+						KeraticPrecipitates:{KeraticPrecipitatesCrossSection:{parameters:['cells', 'flare']}}
                     };
 
                     syncArray['LPS'] = {};
@@ -95,6 +97,7 @@
                     PCIOL:'PCIOLCrossSection',
                     PosteriorCapsule:'PosteriorCapsuleCrossSection',
                     CornealOpacity:'CornealOpacityCrossSection',
+                    KeraticPrecipitates:'KeraticPrecipitatesCrossSection',
                 };
 
                 // Specify call back function
@@ -345,6 +348,13 @@
                                 <span class="label"> (PosteriorCapsule)</span>
                             </a>
                         </li>
+						<li>
+                            <a class="ed-button" href="#" data-function="addDoodle" data-arg="KeraticPrecipitates" onclick="drawingEdit1.addDoodle('KeraticPrecipitates');">
+                                <span class="icon-ed-KeraticPrecipitates"></span>
+                                <span class="label"> (KeraticPrecipitates)</span>
+                            </a>
+                        </li>
+						
 						
                     </ul>
                 </div>

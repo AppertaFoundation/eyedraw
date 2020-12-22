@@ -33,6 +33,7 @@ module.exports = function(grunt) {
 					'src/OEEyeDraw.js',
 					'src/ED/Checker.js',
 					'src/ED/Controller.js',
+					'src/ED/TagCloud.js',
 					'src/ED/View.js',
 					'src/ED/Views/**/*.js'
 				]

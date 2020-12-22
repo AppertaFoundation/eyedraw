@@ -102,7 +102,7 @@ ED.Views.DoodlePopup.Help = (function() {
 	 */
 	DoodleHelp.prototype.onDoodlePopupRender = function() {
 		this.doodleInfo = this.doodlePopup.container.find('.ed-doodle-info');
-		this.doodleControls = this.doodlePopup.container.find('.ed-doodle-controls');
+		this.doodleControls = this.doodlePopup.container.find('.ed2-doodle-controls');
 		this.button = this.doodlePopup.toolbar.container.find('.ed-doodle-help');
 	};
 

@@ -37,14 +37,14 @@
 </head>
 <body>
 	<div class="container main" role="main">
-		<div class="ed-widget" id="eyedrawwidget_example">
-			<div class="ed-toolbar">
-				<ul class="ed-toolbar-panel ed-main-toolbar" id="toolbar">
+		<div class="ed2-widget" id="eyedrawwidget_example">
+			<div class="ed2-toolbar">
+				<ul class="ed2-toolbar-panel ed2-main-toolbar" id="toolbar">
 				</ul>
 			</div>
-			<div class="ed-body">
-				<div class="ed-editor-container">
-					<div class="ed-editor">
+			<div class="ed2-body">
+				<div class="ed2-editor-wrap">
+					<div class="ed2-editor">
 						<div class="ed-drawing-controls">
 							<ul class="ed-toolbar-panel ed-drawing-toolbar">
 								<li>
@@ -100,9 +100,9 @@
 
 		var toolbar = doodles.map(function(doodle) {
 			return [
-				'<li>',
+				'<li style="display:inline-block;margin:0 3px 3px 0">',
 				'	<a class="ed-button" href="#" data-function="addDoodle" data-arg="' + doodle + '">',
-				'		<span class="icon-ed-' + doodle + '"></span>',
+				'		<i class="icon-ed-' + doodle + '"></i>',
 				'		<span class="label">' + (titles[doodle] || '') + ' (' + doodle + ')</span>',
 				'	</a>',
 				'</li>'

@@ -108,7 +108,7 @@ ED.ChoroidalNaevusMelanoma.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['type'] = {
 		kind: 'other',
 		type: 'string',
-		list: ['Melanoma', 'Naevus', 'Osteoma', 'CHRPE'],
+		list: ['Melanoma', 'Naevus', 'Osteoma', 'CHRPE', 'Chorioretinal scar'],
 		animate: false
 	};
 
@@ -306,6 +306,9 @@ ED.ChoroidalNaevusMelanoma.prototype.draw = function(_point) {
 	if (this.type === 'CHRPE') {
 		ctx.fillStyle = "rgba(29,7,6,0.8)";
 	}
+	if (this.type === 'Chorioretinal scar') {
+		ctx.fillStyle = "rgba(94,63,62,0.8)";
+	}
 
 	ctx.strokeStyle = ctx.fillStyle;
 
@@ -399,7 +402,6 @@ ED.ChoroidalNaevusMelanoma.prototype.snomedCodes = function() {
 	if (this.type === 'CHRPE') {
 		snomedCodes.push([232074003, 3]);
 	}
-
 
 	return snomedCodes;
 };

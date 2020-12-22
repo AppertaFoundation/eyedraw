@@ -329,26 +329,35 @@ ED.Controller = (function() {
 	 * @param {Object} properties The EyeDraw widget properties.
 	 * @param {ED.Checker} [Checker] The EyeDraw checker.
 	 * @param {ED.Drawing} [drawing] An ED.Drawing instance.
+	 * @param {ED.TagCloud} [tagCloud] An ED.TagCloud instance.
 	 * @param {ED.Views.Toolbar} [mainToolbar] An ED.Views.Toolbar instance.
 	 * @param {ED.Views.Toolbar} [drawingToolbar] An ED.Views.Toolbar instance.
 	 * @param {ED.Views.DoodlePopup} [doodlePopup] An ED.Views.DoodlePopup instance.
 	 */
-	function Controller(properties, Checker, drawing, mainToolbar, drawingToolbar, doodlePopup, selectedDoodle) {
+	function Controller(properties, Checker, drawing, tagCloud, mainToolbar, drawingToolbar, doodlePopup, selectedDoodle) {
 
 		this.properties = properties;
 		this.canvas = document.getElementById(properties.canvasId);
 		this.input = document.getElementById(properties.inputId);
-		this.container = $(this.canvas).closest('.ed-widget');
+		this.container = $(this.canvas).closest('.ed2-widget');
 		this.previousReport = '';
 
 		this.Checker = Checker || ED.Checker;
 		this.drawing = drawing || this.createDrawing();
+		this.tagCloud = this.createTagCloud();
 
 		if (this.properties.isEditable) {
 			this.mainToolbar = mainToolbar || this.createMainToolbar();
 			this.drawingToolbar = drawingToolbar || this.createDrawingToolbar();
 			this.doodlePopup = doodlePopup || this.createDoodlePopup();
 			this.selectedDoodle = selectedDoodle || this.createSelectedDoodle();
+
+			if(this.tagCloud !== null)
+			{
+				this.tagCloud.isEditable = true;
+			}
+
+			this.searchBar = this.createSearchBar();
 			this.bindEditEvents();
 		}
 
@@ -389,7 +398,7 @@ ED.Controller = (function() {
 	 */
 	Controller.prototype.createMainToolbar = function() {
 
-		var container = this.container.find('.ed-main-toolbar');
+		var container = this.container.find('.ed2-main-toolbar');
 
 		return container.length ? new ED.Views.Toolbar.Main(
 			this.drawing,
@@ -399,7 +408,7 @@ ED.Controller = (function() {
 
 	Controller.prototype.createDrawingToolbar = function() {
 
-		var container = this.container.find('.ed-drawing-toolbar');
+		var container = this.container.find('.ed2-drawing-toolbar');
 
 		return container.length ? new ED.Views.Toolbar.Drawing(
 			this.drawing,
@@ -412,7 +421,7 @@ ED.Controller = (function() {
 	 */
 	Controller.prototype.createDoodlePopup = function() {
 
-		var container = this.container.find('.ed-doodle-popup:first');
+		var container = this.container.find('.ed2-doodle-popup:first');
 
 		var popupDoodles = this.properties.showDoodlePopupForDoodles || [];
 
@@ -428,13 +437,38 @@ ED.Controller = (function() {
 	 * @return {ED.Views.SelectedDoodle} [description]
 	 */
 	Controller.prototype.createSelectedDoodle = function() {
-
-		var container = this.container.find('.ed-selected-doodle');
-
+		var container = this.container.find('.ed2-selected-doodle');
 		return container.length ? new ED.Views.SelectedDoodle(
 			this.drawing,
 			container,
 			this.doodlePopup
+		) : null;
+	};
+
+	Controller.prototype.createTagCloud = function() {
+		//TODO: do this more elegantly
+		let container = this.container.find('.ed2-body').find('.ed2-no-doodle-elements');
+
+		return container.length ?
+			new ED.TagCloud(
+				this.drawing,
+				container,
+				false,
+				this.properties.side
+		) : null;
+	};
+
+	Controller.prototype.createSearchBar = function() {
+		if($(this.drawing.canvas).attr('id').endsWith('_side')){
+			return;
+		}
+		var container = this.container.find('#ed2-search-doodle-input');
+
+		return container.length ? new ED.Views.SearchBar(
+			this.drawing,
+			container,
+			this.doodlePopup,
+			this.tagCloud
 		) : null;
 	};
 
@@ -453,12 +487,15 @@ ED.Controller = (function() {
 		this.drawing.registerForNotifications(this, 'notificationHandler', [
 			'ready',
 			'doodlesLoaded',
-			'parameterChanged'
+			'parameterChanged',
+			'doodleAdded'
 		]);
 
 		this.drawing.registerForNotifications(this, 'saveDrawingToInputField', [
 			'doodleAdded',
 			'doodleDeleted',
+			'tagDeleted',
+			'tagAdded',
 			//'doodleSelected',
 			//'mousedragged',
 			'mouseup',
@@ -509,6 +546,16 @@ ED.Controller = (function() {
 		}
 	};
 
+	Controller.prototype.onDoodleAdded = function(notification) {
+		const newDoodle = notification.object;
+		// move doodle behind the give doodle
+		// there is a chance that "behindClassArray" should not be an array as the newDoodle will be placed
+		// behind the last doodle in the "behindClassArray" array
+		for (let i = 0; i < newDoodle.behindClassArray.length; i++) {
+			newDoodle.drawing.moveNextTo(newDoodle, newDoodle.behindClassArray[i], false);
+		}
+	};
+
 	/**
 	 * Check if the associated input field has any data.
 	 * @return {Boolean}
@@ -529,9 +576,9 @@ ED.Controller = (function() {
 	 * Save drawing data to the associated input field.
 	 */
 	Controller.prototype.saveDrawingToInputField = function() {
-        if (this.hasInputField() && this.drawing.isReady) {
-            this.input.value = this.drawing.save();
-        }
+		if (this.hasInputField() && this.drawing.isReady) {
+			this.input.value = this.drawing.save();
+		}
 		clearTimeout(this.saveTimer);
 		this.saveTimer = setTimeout(function() {
 			if (this.properties.autoReport) {
@@ -546,6 +593,10 @@ ED.Controller = (function() {
 	 */
 	Controller.prototype.loadInputFieldData = function() {
 		// Load drawing data from input element
+		if(this.tagCloud !== null)
+		{
+			this.tagCloud.loadTags(this.properties.inputId);
+		}
 		this.drawing.loadDoodles(this.properties.inputId);
 	};
 
@@ -817,6 +868,97 @@ ED.Controller = (function() {
 	return Controller;
 }());
 
+var ED = ED || {};
+
+/**
+* @property Tag[]
+* @property Drawing
+* @property isEditable Boolean
+*/
+ED.TagCloud = (function() {
+	'use strict';
+
+	function TagCloud(drawing, container, isEditable, side) {
+		this.drawing = drawing;
+		this.container = container;
+		this.TagArray = [];
+		this.isEditable = isEditable;
+		this.side = side;
+	}
+
+	TagCloud.prototype.constructor = TagCloud;
+
+	TagCloud.prototype.loadTags = function(_id) {
+
+		// Get element containing JSON string
+		var sourceElement = document.getElementById(_id);
+
+		// If it exists and contains something, load it
+		if (sourceElement && sourceElement.value.length > 0) {
+			var tagSet = window.JSON.parse(sourceElement.value);
+
+			//remove tags from doodle loading
+			tagSet = tagSet.filter(tag => tag.hasOwnProperty('tags'));
+
+			if(tagSet[0] !== undefined)
+			{
+				let tagList = tagSet[0].tags;
+
+				tagList.forEach(tag => {
+					let tagObject = JSON.parse(tag);
+					this.AddTag(tagObject.pk_id, tagObject.text, tagObject.snomed_code);
+				});
+			}
+		}
+	};
+
+	TagCloud.prototype.AddTag = function(pk_id, text, snomed_code) {
+		//Add tag to array
+		let tag = document.createElement('li');
+		$(tag).addClass('ed-tag');
+		$(tag).attr('pk_id', pk_id);
+		$(tag).attr('snomed_code', snomed_code);
+
+		let textSpan = document.createElement('span');
+		$(textSpan).addClass('text');
+		$(textSpan).text(text);
+		$(tag).append(textSpan);
+
+		if(this.isEditable)
+		{
+			let parentCloud = this;
+
+			let buttonSpan = document.createElement('span');
+			$(buttonSpan).addClass('multi-select-remove remove-one 5');
+
+			let button = document.createElement('i');
+			$(button).addClass('oe-i remove-circle small');
+			$(button).click(function() {
+				$(tag).remove();
+				parentCloud.RemoveTagByText(text);
+			});
+
+			$(buttonSpan).append(button);
+			$(tag).append(buttonSpan);
+		}
+
+		this.TagArray.push({pk_id: pk_id, text: text, snomed_code: snomed_code});
+		let list = this.container.find('.no-doodles');
+
+		list.append(tag);
+	};
+
+	TagCloud.prototype.RemoveTagByText = function(text) {
+		//Remove the tag from the array
+		_.remove(this.TagArray, function(item) {
+				return text === item.text;
+		});
+
+		this.drawing.notify('tagDeleted', text);
+	};
+
+	return TagCloud;
+}());
 /**
  * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
@@ -1243,7 +1385,7 @@ ED.Views.DoodlePopup.Help = (function() {
 	 */
 	DoodleHelp.prototype.onDoodlePopupRender = function() {
 		this.doodleInfo = this.doodlePopup.container.find('.ed-doodle-info');
-		this.doodleControls = this.doodlePopup.container.find('.ed-doodle-controls');
+		this.doodleControls = this.doodlePopup.container.find('.ed2-doodle-controls');
 		this.button = this.doodlePopup.toolbar.container.find('.ed-doodle-help');
 	};
 
@@ -1288,6 +1430,142 @@ ED.Views.DoodlePopup.Help = (function() {
 	return DoodleHelp;
 
 }());
+var ED = ED || {};
+ED.Views = ED.Views || {};
+
+ED.Views.SearchBar = (function () {
+	var tb;
+
+	function SearchBar(drawing, container, doodlePopup, tagCloud) {
+		tb = new ED.Views.Toolbar(drawing, container)
+		ED.View.apply(this, arguments);
+
+		this.drawing = drawing;
+		this.container = container;
+		this.tagCloud = tagCloud;
+		this.input = this.container[0];
+		this.doodlePopup = doodlePopup;
+		this.searchRequest = null;
+
+		that = this;
+
+		this.bindEvents();
+	}
+
+	SearchBar.prototype = Object.create(ED.View.prototype);
+
+	SearchBar.prototype.constructor = SearchBar;
+
+	function createListItem(text, icon, callback) {
+		let item = $(document.createElement('li'));
+
+		var aTag = $(document.createElement('a'));
+		aTag.html("");
+		aTag.addClass('add-ed-doodle');
+
+		var txtSpan = document.createElement('span');
+		txtSpan.innerText = text;
+
+		aTag.append(txtSpan);
+		aTag.append(icon);
+
+		aTag.off('click').on('click', callback);
+
+		item.append(aTag);
+
+		return item;
+	};
+
+	SearchBar.prototype.bindEvents = function () {
+		tb.bindEvents()
+		var that = this;
+		var searchResult = this.container.siblings();
+		searchResult.addClass('oe-autocomplete');
+
+		var searchTimer = null;
+
+		var toolbar = this.getToolbar();
+		$(this.input).off('keyup').on('keyup', function () {
+			if(searchTimer){
+				searchTimer = null;
+			}
+
+			let input = this;
+
+			searchTimer = setTimeout(function() {
+				searchResult.empty();
+
+				if (input.value.length <= 0) {
+					searchResult.hide();
+					searchResult.html("");
+				} else {
+					searchResult.show();
+
+					let targetCloud = that.tagCloud;
+
+					if(that.searchRequest !== null){
+						that.searchRequest.abort();
+					}
+
+					that.searchRequest = $.getJSON("/OphCiExamination/Default/EDTagSearch", {
+						YII_CSRF_TOKEN: YII_CSRF_TOKEN,
+						EDSearchTerm: input.value,
+					}, function (resp) {
+						resp.forEach(function (item, index) {
+							searchResult.append(
+								createListItem(
+									item['text'],
+									$(document.createElement('span')),
+									function () {
+										targetCloud.AddTag(item['pk_id'], item['text'], item['snomed_code']);
+										that.drawing.notify('tagAdded', item['text']);
+										searchResult.empty();
+										searchResult.hide();
+										$(that.input).val("");
+									}));
+						});
+					});
+
+					var searchList = toolbar.filter((item, index) => {
+						var txt = $(item).find('span.label').text().toLowerCase();
+						return txt.includes(input.value.toLowerCase());
+					});
+
+					searchList.forEach(item => {
+						let txt = $(item).find('span.label').text();
+						let arg = $(item).find('a').data('arg');
+						let icon = $(document.createElement('span')).addClass('icon-ed-' + arg);
+
+						searchResult.append(
+							createListItem(
+								txt,
+								icon,
+								function () {
+									that.drawing["addDoodle"](arg);
+									searchResult.empty();
+									searchResult.hide();
+									$(that.input).val("");
+								}));
+					});
+				}
+			}, 500);
+		}
+		);
+	};
+	SearchBar.prototype.getToolbar = function () {
+		var toolbar = [];
+
+		this.container.prevObject.find('.ed2-toolbar ul li').each((index, item) => {
+			var inner_ul = item.getElementsByTagName('ul')
+			if (inner_ul.length <= 0) {
+				toolbar.push(item);
+			}
+		});
+		return toolbar;
+	};
+	return SearchBar;
+}());
+
 /**
  * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
@@ -1333,7 +1611,6 @@ ED.Views.SelectedDoodle = (function() {
 	 */
 	function SelectedDoodle(drawing, container, doodlePopup) {
 		ED.View.apply(this, arguments);
-
 		this.drawing = drawing;
 		this.container = container;
 		this.select = this.container.find('select');
@@ -1465,9 +1742,9 @@ ED.Views.SelectedDoodle = (function() {
 
 	return SelectedDoodle;
 }());
-/*! Generated on 7/9/2020 */
+/*! Generated on 22/12/2020 */
 ED.scriptTemplates = {
-  "doodle-popup": "\n\n{{#doodle}}\n{{^doodle.isNode}}\n\t<ul class=\"ed-toolbar-panel ed-doodle-popup-toolbar\">\n\t\t<li>\n\t\t\t{{#desc}}\n\t\t\t\t<a class=\"ed-button ed-doodle-help{{lockedButtonClass}}\" href=\"#\" data-function=\"toggleHelp\">\n\t\t\t\t\t<span class=\"icon-ed-help\"></span>\n\t\t\t\t</a>\n\t\t\t{{/desc}}\n\t\t</li>\n\t\t{{#doodle.isLocked}}\n\t\t\t<li>\n\t\t\t\t<a class=\"ed-button\" href=\"#\" data-function=\"unlock\">\n\t\t\t\t\t<span class=\"icon-ed-unlock\"></span>\n\t\t\t\t\t<span class=\"label\">Unlock</span>\n\t\t\t\t</a>\n\t\t\t</li>\n\t\t{{/doodle.isLocked}}\n\t\t{{^doodle.isLocked}}\n\t\t\t<li>\n\t\t\t\t<a class=\"ed-button\" href=\"#\" data-function=\"lock\">\n\t\t\t\t\t<span class=\"icon-ed-lock\"></span>\n\t\t\t\t\t<span class=\"label\">Lock</span>\n\t\t\t\t</a>\n\t\t\t</li>\n\t\t{{/doodle.isLocked}}\n\t\t<li>\n\t\t\t<a class=\"ed-button{{lockedButtonClass}}\" href=\"#\" data-function=\"moveToBack\">\n\t\t\t\t<span class=\"icon-ed-move-to-back\"></span>\n\t\t\t\t<span class=\"label\">Move to back</span>\n\t\t\t</a>\n\t\t</li>\n\t\t<li>\n\t\t\t<a class=\"ed-button{{lockedButtonClass}}\" href=\"#\" data-function=\"moveToFront\">\n\t\t\t\t<span class=\"icon-ed-move-to-front\"></span>\n\t\t\t\t<span class=\"label\">Move to front</span>\n\t\t\t</a>\n\t\t</li>\n\t\t<li>\n\t\t\t{{#doodle.isDeletable}}\n\t\t\t\t<a class=\"ed-button{{lockedButtonClass}}\" href=\"#\" data-function=\"deleteSelectedDoodle\">\n\t\t\t\t\t<span class=\"icon-ed-delete\"></span>\n\t\t\t\t\t<span class=\"label\">Delete</span>\n\t\t\t\t</a>\n\t\t\t{{/doodle.isDeletable}}\n\t\t</li>\n\t</ul>\n\t<div class=\"ed-doodle-info\" style=\"display: none;\">\n\t\t{{^doodle.isLocked}}\n\t\t\t{{#desc}}\n\t\t\t\t<div class=\"ed-doodle-description\">{{{desc}}}</div>\n\t\t\t{{/desc}}\n\t\t{{/doodle.isLocked}}\n\t</div>\n\t<div class=\"ed-doodle-controls\" {{#doodle.isLocked}}style=\"display: none;\"{{/doodle.isLocked}} id=\"{{drawing.canvas.id}}_controls\">\n\t</div>\n\t{{/doodle.isNode}}\n\t{{#doodle.isLocked}}\n\t\t<div class=\"ed-doodle-description\">\n\t\t\t<strong>This doodle is locked and cannot be edited.</strong>\n\t\t</div>\n\t{{/doodle.isLocked}}\n{{/doodle}}"
+  "doodle-popup": "\n\n{{#doodle}}\n{{^doodle.isNode}}\n\t<ul class=\"ed2-toolbar-panel ed2-doodle-popup-toolbar\">\n\t\t<li>\n\t\t\t{{#desc}}\n\t\t\t\t<a class=\"ed-button ed2-doodle-help{{lockedButtonClass}}\" href=\"#\" data-function=\"toggleHelp\">\n\t\t\t\t\t<i class=\"icon-ed-help\"></i>\n\t\t\t\t</a>\n\t\t\t{{/desc}}\n\t\t</li>\n\t\t{{#doodle.isLocked}}\n\t\t\t<li>\n\t\t\t\t<a class=\"ed-button\" href=\"#\" data-function=\"unlock\">\n\t\t\t\t\t<i class=\"icon-ed-unlock\"></i>\n\t\t\t\t\t<span class=\"label\">Unlock</span>\n\t\t\t\t</a>\n\t\t\t</li>\n\t\t{{/doodle.isLocked}}\n\t\t{{^doodle.isLocked}}\n\t\t\t<li>\n\t\t\t\t<a class=\"ed-button\" href=\"#\" data-function=\"lock\">\n\t\t\t\t\t<i class=\"icon-ed-lock\"></i>\n\t\t\t\t\t<span class=\"label\">Lock</span>\n\t\t\t\t</a>\n\t\t\t</li>\n\t\t{{/doodle.isLocked}}\n\t\t<li>\n\t\t\t<a class=\"ed-button{{lockedButtonClass}}\" href=\"#\" data-function=\"moveToBack\">\n\t\t\t\t<i class=\"icon-ed-move-to-back\"></i>\n\t\t\t\t<span class=\"label\">Move to back</span>\n\t\t\t</a>\n\t\t</li>\n\t\t<li>\n\t\t\t<a class=\"ed-button{{lockedButtonClass}}\" href=\"#\" data-function=\"moveToFront\">\n\t\t\t\t<i class=\"icon-ed-move-to-front\"></i>\n\t\t\t\t<span class=\"label\">Move to front</span>\n\t\t\t</a>\n\t\t</li>\n\t\t<li>\n\t\t\t{{#doodle.isDeletable}}\n\t\t\t\t<a class=\"ed-button{{lockedButtonClass}}\" href=\"#\" data-function=\"deleteSelectedDoodle\">\n\t\t\t\t\t<i class=\"icon-ed-delete\"></i>\n\t\t\t\t\t<span class=\"label\">Delete</span>\n\t\t\t\t</a>\n\t\t\t{{/doodle.isDeletable}}\n\t\t</li>\n\t</ul>\n\t<div class=\"ed2-doodle-info\" style=\"display: none;\">\n\t\t{{^doodle.isLocked}}\n\t\t\t{{#desc}}\n\t\t\t\t<div class=\"ed2-doodle-description\">{{{desc}}}</div>\n\t\t\t{{/desc}}\n\t\t{{/doodle.isLocked}}\n\t</div>\n\t<div class=\"ed2-doodle-controls\" {{#doodle.isLocked}}style=\"display: none;\"{{/doodle.isLocked}} id=\"{{drawing.canvas.id}}_controls\">\n\t</div>\n\t{{/doodle.isNode}}\n\t{{#doodle.isLocked}}\n\t\t<div class=\"ed2-doodle-description\">\n\t\t\t<strong>This doodle is locked and cannot be edited.</strong>\n\t\t</div>\n\t{{/doodle.isLocked}}\n{{/doodle}}"
 };
 /**
  * Copyright (C) OpenEyes Foundation, 2011-2017
@@ -1621,8 +1898,8 @@ ED.Views.Toolbar = (function() {
 	};
 
 	Toolbar.prototype.hideDrawers = function() {
-		var openDrawers = this.container.find('.ed-drawer-open');
-		openDrawers.removeClass('ed-drawer-open');
+		var openDrawers = this.container.find('.ed2-drawer-open');
+		openDrawers.removeClass('ed2-drawer-open');
 	}
 
 	/*********************
@@ -1654,7 +1931,7 @@ ED.Views.Toolbar = (function() {
 		this.hideDrawers();
 
 		var button = $(e.currentTarget);
-		button.closest('li').addClass('ed-drawer-open');
+		button.closest('li').addClass('ed2-drawer-open');
 	};
 
 	/**
