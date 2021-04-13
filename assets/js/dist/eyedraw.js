@@ -29927,11 +29927,12 @@ ED.CornealSuture.prototype.description = function() {
  * @returns {String} Description of doodle
  */
 ED.CornealSuture.prototype.groupDescription = function() {
-	
-	var returnString = "";
 
-	var number = this.drawing.numberOfDoodlesOfClass(this.className);
-	returnString = number + " corneal suture";
+	let returnString = "";
+	let corneal_sutures = this.drawing.allDoodlesOfClass(this.className).filter(corneal_suture => corneal_suture.removed === false);
+
+	let number = corneal_sutures.length;
+	if (number > 0) returnString = number + " corneal suture";
 
 	if (number > 1) returnString += "s";
 
