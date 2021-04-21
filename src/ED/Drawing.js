@@ -2731,29 +2731,31 @@ ED.Drawing.prototype.report = function() {
 /**
  * Returns a SNOMED diagnostic code derived from the drawing, returns empty array if no code
  *
- * @returns {Int} SnoMed code of doodle with highest position in hierarchy
+ * @returns {*[]} SnoMed code of doodle with highest position in hierarchy
  */
 ED.Drawing.prototype.diagnosis = function() {
-	var topOfHierarchy = 0;
-	var returnCodes = new Array();
+	let returnCodes = [];
+	const returnCodeObjects = [];
 	// Loop through doodles with diagnoses, taking one highest in hierarchy, or those that are equal
-	for (var i = 0; i < this.doodleArray.length; i++) {
-		var doodle = this.doodleArray[i];
-		var codeArray = doodle.snomedCodes();
-		for (var j = 0; j < codeArray.length; j++) {
-			var code = codeArray[j][0];
+	for (let i = 0; i < this.doodleArray.length; i++) {
+		const doodle = this.doodleArray[i];
+		const codeArray = doodle.snomedCodes();
+		for (let j = 0; j < codeArray.length; j++) {
+			const code = codeArray[j][0];
 			if (code > 0) {
-				var codePosition = codeArray[j][1];
-				if (codePosition > topOfHierarchy) {
-					topOfHierarchy = codePosition;
-					returnCodes.push(code);
-				} else if (codePosition == topOfHierarchy) {
-					if (returnCodes.indexOf(code) < 0) {
-						returnCodes.push(code);
-					}
-				}
+				const codePosition = codeArray[j][1];
+				returnCodeObjects.push({code: code, pos:codePosition});
 			}
 		}
+	}
+
+	if (returnCodeObjects) {
+		returnCodeObjects.sort(function(a, b) {
+			return (b['pos'] > a['pos']) ? 1 : ((b['pos'] < a['pos']) ? -1 : 0);
+		});
+		returnCodeObjects.forEach(item => {
+			returnCodes.push(item.code);
+		});
 	}
 
 	//Retrieve additional diagnoses from tag cloud. Recommend using a different method to do this in future.
