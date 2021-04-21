@@ -31,8 +31,8 @@ ED.CornealOpacityCrossSection = function(_drawing, _parameterJSON) {
 	this.initialRadius = 81;
 	
 	// Other parameters
-	this.height = Math.round(this.initialRadius * 2 / 54);
-	this.width = Math.round(this.initialRadius * 2 / 54);
+	this.fHeight = Math.round(this.initialRadius * 2 / 54);
+	this.fWidth = Math.round(this.initialRadius * 2 / 54);
 	this.depth = 33;
 	this.infiltrateWidth = 0;
 	
@@ -45,20 +45,24 @@ ED.CornealOpacityCrossSection = function(_drawing, _parameterJSON) {
 	this.maxY = this.initialRadius;
 	
 	// Saved parameters
-	this.savedParameterArray = ['originX', 'originY', 'height', 'width', 'depth', 'infiltrateWidth','h','w','d','iW','minY','maxY'];
+	this.savedParameterArray = ['originX', 'originY', 'fHeight', 'fWidth', 'depth', 'infiltrateWidth','d','minY','maxY'];
 	
 	// Parameters in doodle control bar
-	this.controlParameterArray = {'height':'Height', 'width':'Width', 'depth':'Depth (%)', 'infiltrateWidth':'Infiltrate width'};
+	this.controlParameterArray = {'fHeight':'Height', 'fWidth':'Width', 'depth':'Depth (%)', 'infiltrateWidth':'Infiltrate fWidth'};
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
 
-    this.linkedDoodleParameters = {
+	// for historical records, where fWidth was saved as width
+	this.fWidth = this.fWidth || this.width;
+	this.fHeight = this.fHeight || this.height;
+
+	this.linkedDoodleParameters = {
         'CornealOpacity': {
-            source: ['yMidPoint','d','h','w','iW','originY','minY','maxY']
+			source: ['d','originY','minY','maxY']
         }
     };
-}
+};
 
 /**
  * Sets superclass and constructor
@@ -84,14 +88,14 @@ ED.CornealOpacityCrossSection.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['originY']['range'].setMinAndMax(-500, +500);
 	
 	// Validation arrays for other parameters
-	this.parameterValidationArray['height'] = {
+	this.parameterValidationArray['fHeight'] = {
 		kind: 'other',
 		type: 'int',
 		range: new ED.Range(1, 14),
 		precision: 1,
 		animate: false
 	};
-	this.parameterValidationArray['width'] = {
+	this.parameterValidationArray['fWidth'] = {
 		kind: 'other',
 		type: 'int',
 		range: new ED.Range(1, 14),
@@ -161,11 +165,11 @@ ED.CornealOpacityCrossSection.prototype.dependentParameterValues = function(_par
 	var returnArray = new Array();
 
 	switch (_parameter) {
-		case 'width':
+		case 'fWidth':
 			returnArray['w'] = parseInt(_value);
 			break;
 
-		case 'height':
+		case 'fHeight':
 			returnArray['h'] = parseInt(_value);
 			break;
 			
@@ -178,7 +182,7 @@ ED.CornealOpacityCrossSection.prototype.dependentParameterValues = function(_par
 			break;
 			
 		case 'h':
-			returnArray['height'] = _value;
+			returnArray['fHeight'] = _value;
 			break;
 		
 		case 'd':
@@ -186,7 +190,7 @@ ED.CornealOpacityCrossSection.prototype.dependentParameterValues = function(_par
 			break;
 			
 		case 'w':
-			returnArray['width'] = _value;
+			returnArray['fWidth'] = _value;
 			break;
 		
 		case 'iW':
@@ -203,8 +207,12 @@ ED.CornealOpacityCrossSection.prototype.dependentParameterValues = function(_par
  */
 ED.CornealOpacityCrossSection.prototype.setParameterDefaults = function() {
 
+	// when loaded, they don't get initialized
+	this.fHeight = Math.round(this.initialRadius * 2 / 54);
+	this.fWidth = Math.round(this.initialRadius * 2 / 54);
+
 	this.originX = 50; // as is in Cornea cross section doodle to dulicate bezier control points
-}
+};
 
 /**
  * Draws doodle or performs a hit test if a Point parameter is passed
@@ -553,9 +561,10 @@ ED.CornealOpacityCrossSection.prototype.draw = function(_point) {
 			var iEndT = (iEndY + 380) / 760;
 			if (iEndT>1) iEndT = 1;
 			
-			var averageDimension = (this.height + this.width) / 2;
-			var averageDimensionTotal = (this.height + this.width + 4*this.infiltrateWidth) / 2;
-			
+			var averageDimension = (this.fHeight + this.fWidth) / 2;
+			var averageDimensionTotal = (this.fHeight + this.fWidth + 4*this.infiltrateWidth) / 2;
+
+
 			var infiltrateScale = this.depth / averageDimension * averageDimensionTotal;
 			if (infiltrateScale > 100) infiltrateScale = 100;
 				
