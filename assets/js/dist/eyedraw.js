@@ -2916,7 +2916,7 @@ ED.Drawing.prototype.reportData = function() {
 	var grouped = {};
 	for (var i = 0; i < this.doodleArray.length; i++) {
 		var doodle = this.doodleArray[i];
-		var description = doodle.description();
+		var description = OpenEyes.Util.htmlDecode(doodle.description());
 
 		if (doodle.willReport) {
 			var groupDescription = doodle.groupDescription();
