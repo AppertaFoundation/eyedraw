@@ -1,6 +1,5 @@
 /**
  * OpenEyes
- * MSC
  *
  * Copyright (C) OpenEyes Foundation, 2011-2017
  * This file is part of OpenEyes.
@@ -33,20 +32,20 @@ ED.CornealEpithelialDefect = function(_drawing, _parameterJSON) {
 	this.resetWidth = true;
 	this.resetHeight = true;
 	this.resetInfiltrate = true;
-	
-	// Other parameters
-	this.height = Math.round(this.initialRadius * 2 / 54);
-	this.width = Math.round(this.initialRadius * 2 / 54);
 
 	// Saved parameters
-	this.savedParameterArray = ['originX', 'originY', 'rotation', 'height', 'width'];
+	this.savedParameterArray = ['originX', 'originY', 'rotation', 'fHeight', 'fWidth'];
 	
 	// Parameters in doodle control bar
-	this.controlParameterArray = {'height':'Height', 'width':'Width'};
+	this.controlParameterArray = {'fHeight':'Height', 'fWidth':'Width'};
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
-}
+
+	// for historical records, where fWidth was saved as width
+	this.fWidth = this.fWidth || this.width;
+	this.fHeight = this.fHeight || this.height;
+};
 
 /**
  * Sets superclass and constructor
@@ -63,25 +62,22 @@ ED.CornealEpithelialDefect.prototype.setHandles = function() {
 	for (var i = 0; i < this.numberOfHandles; i++) {
 		this.handleArray[i] = new ED.Doodle.Handle(null, true, ED.Mode.Handles, false);
 	}
-
-	// Allow top handle to rotate doodle
-	/// ? Removed as need specific handles to be along X and Y axis - can change... **TODO**
-// 	this.handleArray[0].isRotatable = true;
-}
+};
 
 /**
  * Sets default properties
  */
 ED.CornealEpithelialDefect.prototype.setPropertyDefaults = function() {
+
 	// Create ranges to constrain handles
-	this.handleVectorRangeArray = new Array();
-	for (var i = 0; i < this.numberOfHandles; i++) {
+	this.handleVectorRangeArray = [];
+	for (let i = 0; i < this.numberOfHandles; i++) {
 		// Full circle in radians
-		var cir = 2 * Math.PI;
+		const cir = 2 * Math.PI;
 
 		// Create a range object for each handle
-		var n = this.numberOfHandles;
-		var range = new Object;
+		const n = this.numberOfHandles;
+		const range = {};
 		range.length = new ED.Range(+50, +380);
 		range.angle = new ED.Range((((2 * n - 1) * cir / (2 * n)) + i * cir / n) % cir, ((1 * cir / (2 * n)) + i * cir / n) % cir);
 		this.handleVectorRangeArray[i] = range;
@@ -92,17 +88,17 @@ ED.CornealEpithelialDefect.prototype.setPropertyDefaults = function() {
 	this.parameterValidationArray['originY']['range'].setMinAndMax(-350, +350);
 	
 	// Validation arrays for other parameters
-	this.parameterValidationArray['height'] = {
+	this.parameterValidationArray['fHeight'] = {
 		kind: 'other',
-		type: 'int',
-		range: new ED.Range(1, 14),
+		type: 'float',
+		range: new ED.Range(0.01, 14),
 		precision: 1,
 		animate: false
 	};
-	this.parameterValidationArray['width'] = {
+	this.parameterValidationArray['fWidth'] = {
 		kind: 'other',
-		type: 'int',
-		range: new ED.Range(1, 14),
+		type: 'float',
+		range: new ED.Range(0.01, 14),
 		precision: 1,
 		animate: false
 	};
@@ -130,43 +126,47 @@ ED.CornealEpithelialDefect.prototype.dependentParameterValues = function(_parame
 	var returnArray = new Array();
 
 	switch (_parameter) {
-		case 'width':
+		case 'fWidth':
 			returnArray['resetWidth'] = true;
 			break;
 
-		case 'height':
+		case 'fHeight':
 			returnArray['resetHeight'] = true;
 			break;
 	}
 
 	return returnArray;
-}
+};
 
 /**
  * Sets default parameters
  */
 ED.CornealEpithelialDefect.prototype.setParameterDefaults = function() {
-	var doodle = this.drawing.lastDoodleOfClass(this.className);
+	// when loaded, they don't get initialized
+	this.fHeight = Math.round(this.initialRadius * 2 / 54);
+	this.fWidth = Math.round(this.initialRadius * 2 / 54);
+
+	const doodle = this.drawing.lastDoodleOfClass(this.className);
 	if (doodle) {
-		var np = new ED.Point(doodle.originX + 100, doodle.originY);
+		const np = new ED.Point(doodle.originX + 100, doodle.originY);
 		this.move(np.x, np.y);
 	} else {
 		this.move(150, 50);
 	}
 
 	// Create a squiggle to store the handles points
-	var squiggle = new ED.Squiggle(this, new ED.Colour(100, 100, 100, 1), 4, true);
+	const squiggle = new ED.Squiggle(this, new ED.Colour(100, 100, 100, 1), 4, true);
 
 	// Add it to squiggle array
 	this.squiggleArray.push(squiggle);
 
 	// Populate with handles at equidistant points around circumference
-	for (var i = 0; i < this.numberOfHandles; i++) {
-		var point = new ED.Point(0, 0);
+	for (let i = 0; i < this.numberOfHandles; i++) {
+		const point = new ED.Point(0, 0);
 		point.setWithPolars(this.initialRadius, i * 2 * Math.PI / this.numberOfHandles);
 		this.addPointToSquiggle(point);
 	}
-}
+};
 
 /**
  * Draws doodle or performs a hit test if a Point parameter is passed
@@ -174,8 +174,15 @@ ED.CornealEpithelialDefect.prototype.setParameterDefaults = function() {
  * @param {Point} _point Optional point in canvas plane, passed if performing hit test
  */
 ED.CornealEpithelialDefect.prototype.draw = function(_point) {
+	let verticalHandlesVisible = this.fHeight > 2 ? true : false;
+	let horizontalHandlesVisible = this.fWidth > 2 ? true : false;
+	this.handleArray[0].isVisible = verticalHandlesVisible;
+	this.handleArray[2].isVisible = verticalHandlesVisible;
+	this.handleArray[1].isVisible = horizontalHandlesVisible;
+	this.handleArray[3].isVisible = horizontalHandlesVisible;
+
 	// Get context
-	var ctx = this.drawing.context;
+	const ctx = this.drawing.context;
 
 	// Call draw method in superclass
 	ED.CornealEpithelialDefect.superclass.draw.call(this, _point);
@@ -184,102 +191,44 @@ ED.CornealEpithelialDefect.prototype.draw = function(_point) {
 	ctx.beginPath();
 
 	// Bezier points
-	var fp;
-	var tp;
-	var cp1;
-	var cp2;
+	let fp;
+	let tp;
+	let cp1;
+	let cp2;
 
 	// Angle of control point from radius line to point (this value makes path a circle Math.PI/12 for 8 points
-	var phi = 2 * Math.PI / (3 * this.numberOfHandles);
-	
-	// Time intervals along bezier curve
-	var T = [0.0,0.125,0.25,0.375,0.50,0.625,0.75,0.875,1];
+	const phi = 2 * Math.PI / (3 * this.numberOfHandles);
 	
 	// If inputted a dimension, reset pointsArray, 
 	// otherwise recalculate dimension
-	var minY = '';
-	var maxY = '';
 	if (this.resetWidth) {
-		this.squiggleArray[0].pointsArray[1].x = 0.5 * this.width * 54;
-		this.squiggleArray[0].pointsArray[3].x = 0.5 * this.width * -54;
-
+		let currWidth = (this.squiggleArray[0].pointsArray[1].x - this.squiggleArray[0].pointsArray[3].x)/54;
+		this.squiggleArray[0].pointsArray[1].x *= this.fWidth / currWidth;
+		this.squiggleArray[0].pointsArray[3].x *= this.fWidth / currWidth;
 		this.resetWidth = false;
 	}
 	else {
-		/// solve bezier to find min and max point along axis
-		var maxX = '';
-        var minX = '';
-        var squiggle = this.squiggleArray[0];
-		for (var i=0; i<this.numberOfHandles; i++) {
-	        fp = this.squiggleArray[0].pointsArray[i];
-			var toIndex = (i < this.numberOfHandles - 1) ? i + 1 : 0;
-	        tp = this.squiggleArray[0].pointsArray[toIndex];
-	        var x1 = fp.x;
-			var x2 = fp.tangentialControlPoint(+phi).x;
-			var x3 = tp.tangentialControlPoint(-phi).x;
-			var x4 = tp.x;
-		            
-            for (var j=0; j<T.length; j++) {
-                var t = T[j];
-                var x = (1-t)*(1-t)*(1-t)*x1 + 3*(1-t)*(1-t)*t*x2 + 3*(1-t)*t*t*x3 + t*t*t*x4;
-                if (maxX == '' || x > maxX) {
-                    maxX = x;
-                }
-                if (minX == '' || x < minX) {
-                    minX = x;
-                }
-            }
-        }
-        this.width = Math.round((maxX - minX) / 54);
-        this.w = this.width;
+		this.fWidth = (this.squiggleArray[0].pointsArray[1].x - this.squiggleArray[0].pointsArray[3].x) / 54;
 	}
-	
-	if (this.resetHeight) {
-		this.squiggleArray[0].pointsArray[0].y = 0.5 * this.height * -54;
-		this.squiggleArray[0].pointsArray[2].y = 0.5 * this.height * 54;
 
+	if (this.resetHeight) {
+		let currHeight = (this.squiggleArray[0].pointsArray[2].y - this.squiggleArray[0].pointsArray[0].y)/54;
+		this.squiggleArray[0].pointsArray[0].y *= this.fHeight / currHeight;
+		this.squiggleArray[0].pointsArray[2].y *= this.fHeight / currHeight;
 		this.resetHeight = false;
-		minY = this.squiggleArray[0].pointsArray[0].y;
-		maxY = this.squiggleArray[0].pointsArray[2].y;
 	}
 	else {
-		// recalculate height/// solve bezier to find min and max point along axis
-        var squiggle = this.squiggleArray[0];
-		for (var i=0; i<this.numberOfHandles; i++) {
-	        fp = this.squiggleArray[0].pointsArray[i];
-			var toIndex = (i < this.numberOfHandles - 1) ? i + 1 : 0;
-	        tp = this.squiggleArray[0].pointsArray[toIndex];
-	        var y1 = fp.y;
-			var y2 = fp.tangentialControlPoint(+phi).y;
-			var y3 = tp.tangentialControlPoint(-phi).y;
-			var y4 = tp.y;
-		            
-            for (var j=0; j<T.length; j++) {
-                var t = T[j];
-                var y = (1-t)*(1-t)*(1-t)*y1 + 3*(1-t)*(1-t)*t*y2 + 3*(1-t)*t*t*y3 + t*t*t*y4;
-                if (maxY == '' || y > maxY) {
-                    maxY = y;
-                }
-                if (minY == '' || y < minY) {
-                    minY = y;
-                }
-            }
-        }
-				
-        this.height = Math.round((maxY - minY) / 54);
-        this.h = this.height;
-        		
+		this.fHeight = (this.squiggleArray[0].pointsArray[2].y - this.squiggleArray[0].pointsArray[0].y) / 54;
 	}
-	
-	
+
 	// Start curve
 	ctx.moveTo(this.squiggleArray[0].pointsArray[0].x, this.squiggleArray[0].pointsArray[0].y);
 
 	// Complete curve segments
-	for (var i = 0; i < this.numberOfHandles; i++) {
+	for (let i = 0; i < this.numberOfHandles; i++) {
 		// From and to points
 		fp = this.squiggleArray[0].pointsArray[i];
-		var toIndex = (i < this.numberOfHandles - 1) ? i + 1 : 0;
+		let toIndex = (i < this.numberOfHandles - 1) ? i + 1 : 0;
 		tp = this.squiggleArray[0].pointsArray[toIndex];
 
 		// Control points
@@ -302,10 +251,9 @@ ED.CornealEpithelialDefect.prototype.draw = function(_point) {
 	this.drawBoundary(_point);
 	
 	// Coordinates of expert handles (in canvas plane)
-	for (var i = 0; i < this.numberOfHandles /* * 2 */; i++) {
+	for (let i = 0; i < this.numberOfHandles /* * 2 */; i++) {
 		this.handleArray[i].location = this.transform.transformPoint(this.squiggleArray[0].pointsArray[i]);
 	}
-			
 
 	// Non boundary drawing
 	if (this.drawFunctionMode == ED.drawFunctionMode.Draw) {
@@ -313,11 +261,13 @@ ED.CornealEpithelialDefect.prototype.draw = function(_point) {
 	}
 	
 	// Draw handles if selected
-	if (this.isSelected && !this.isForDrawing) this.drawHandles(_point);
+	if (this.isSelected && !this.isForDrawing) {
+		this.drawHandles(_point);
+	}
 
 	// Return value indicating successful hittest
 	return this.isClicked;
-}
+};
 
 /**
  * Returns a string containing a text description of the doodle
@@ -325,5 +275,5 @@ ED.CornealEpithelialDefect.prototype.draw = function(_point) {
  * @returns {String} Description of doodle
  */
 ED.CornealEpithelialDefect.prototype.description = function() {
-	return 'Epithelial defect H-W: ' + this.height + 'x' + this.width + 'mm';
-}
+	return 'Epithelial defect H-W: ' + this.fHeight.toFixed(1) + ' x ' + this.fWidth.toFixed(1) + ' mm';
+};

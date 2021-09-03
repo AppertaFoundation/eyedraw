@@ -40,7 +40,7 @@ ED.Views.DoodlePopup.Help = (function() {
 		return function(data) {
 			return (
 				// If it's the help button and it's not disabled then execute fn.
-				data.button.hasClass('ed-doodle-help') &&
+				data.button.hasClass('ed2-doodle-help') &&
 				!data.button.hasClass('disabled') &&
 				fn(data)
 			);
@@ -101,9 +101,9 @@ ED.Views.DoodlePopup.Help = (function() {
 	 * Store reference to elements whenever the doodlePopup view is re-rendered.
 	 */
 	DoodleHelp.prototype.onDoodlePopupRender = function() {
-		this.doodleInfo = this.doodlePopup.container.find('.ed-doodle-info');
+		this.doodleInfo = this.doodlePopup.container.find('.ed2-doodle-info');
 		this.doodleControls = this.doodlePopup.container.find('.ed2-doodle-controls');
-		this.button = this.doodlePopup.toolbar.container.find('.ed-doodle-help');
+		this.button = this.doodlePopup.toolbar.container.find('.ed2-doodle-help');
 	};
 
 	/**

@@ -140,9 +140,11 @@ ED.ConjunctivalHaem.prototype.dependentParameterValues = function(_parameter, _v
 
     switch (_parameter) {
         case 'conjunctivitisType':
-            if (_value !== 'None') {
-                returnArray['hyperaemia'] = '+';
-            }
+            // this functionality caused a bug when page reloads (error screen eg)
+            // it reverts back to '+' even if user selected '+++'
+            // if (_value !== 'None') {
+            //     returnArray['hyperaemia'] = '+';
+            // }
             break;
     }
 
