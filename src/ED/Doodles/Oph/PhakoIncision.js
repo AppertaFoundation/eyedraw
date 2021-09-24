@@ -86,7 +86,7 @@ ED.PhakoIncision.prototype.setPropertyDefaults = function() {
 		kind: 'derived',
 		type: 'float',
 		range: new ED.Range(1, 9.9),
-		precision: 1,
+		precision: 2,
 		animate: true
 	};
 	this.parameterValidationArray['incisionSite'] = {
