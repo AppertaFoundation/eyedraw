@@ -1,4 +1,5 @@
 <?php
+
 /**
  * OpenEyes.
  *
@@ -144,6 +145,7 @@ class DoodleInfo
         'Lattice' => 'Lattice',
         'Lens' => 'Lens',
         'LidLaxity' => 'Laxity',
+        'LidMass' => 'Lid lesion',
         'LimbalRelaxingIncision' => 'Limbal relaxing incision',
         'Macroaneurysm' => 'Macroaneurysm',
         'MacularDystrophy' => 'Macular dystrophy',

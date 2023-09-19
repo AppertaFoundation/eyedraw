@@ -505,12 +505,13 @@ ED.Doodle.prototype.move = function (_x, _y) {
 				// Update dependencies
 				this.updateDependentParameters('rotation');
 			}
-		}
 
-		// Notify (NB pass doodle in message array, since this is not necessarily selected)
-		this.drawing.notify("doodleMoved", {
-			doodle: this
-		});
+			// Notify (NB pass doodle in message array, since this is not necessarily selected)
+			this.drawing.notify("doodleMoved", {
+				doodle: this
+			});
+
+		}
 	}
 };
 

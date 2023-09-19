@@ -10,28 +10,27 @@ Turtle.prototype.turn = function (angle) {
 };
 
 Turtle.prototype.turnLeft = function () {
-    this.vector.rotate(-Math.PI/2);
+    this.vector.rotate(-Math.PI / 2);
     return this;
 };
 
 Turtle.prototype.turnRight = function () {
-    this.vector.rotate(Math.PI/2);
+    this.vector.rotate(Math.PI / 2);
     return this;
 };
 
 Turtle.prototype.move = function (len) {
     this.vector.setLength(Math.abs(len));
-    if (len>0) {
+    if (len > 0) {
         this.point.add(this.vector);
-    }
-    else {
+    } else {
         this.point.subtract(this.vector);
     }
     return this;
 };
 
 Turtle.prototype.getPoint = function () {
-    return {x: this.point.x, y: this.point.y};
+    return { x: this.point.x, y: this.point.y };
 };
 
 Turtle.Point = function (data) {
@@ -62,7 +61,7 @@ Turtle.Vector.prototype.rotate = function (phi) {
 };
 
 Turtle.Vector.prototype.setLength = function (newLen) {
-    let currLen = Math.sqrt(this.x * this.x +  this.y * this.y);
+    let currLen = Math.sqrt(this.x * this.x + this.y * this.y);
     this.x = this.x / currLen * newLen;
     this.y = this.y / currLen * newLen;
 };

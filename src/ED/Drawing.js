@@ -833,6 +833,11 @@ ED.Drawing.prototype.mousemove = function(_point) {
 		}
 		// Dragging in progress
 		else {
+
+			if (doodle.squiggleArray && doodle.squiggleArray[0]) {
+				doodle.squiggleArray[0].pointsArray.forEach(e => e.hasMoved = false);
+			}
+
 			// Get mouse position in doodle plane
 			var mousePosDoodlePlane = this.inverseTransform.transformPoint(_point);
 			var lastMousePosDoodlePlane = this.inverseTransform.transformPoint(this.lastMousePosition);
@@ -1114,6 +1119,7 @@ ED.Drawing.prototype.mousemove = function(_point) {
 					// Set new position for handle
 					doodle.squiggleArray[0].pointsArray[index].x = newPosition.x;
 					doodle.squiggleArray[0].pointsArray[index].y = newPosition.y;
+					doodle.squiggleArray[0].pointsArray[index].hasMoved = true;
 
 					// Update dependencies (NB handles is not stricly a parameter, but this will call the appropriate doodle methods)
 					doodle.updateDependentParameters('handles');
