@@ -25,7 +25,7 @@
             <div class="ed2-drawing-controls flex-layout<?= $toggleScale ? ' ed2-feature-zoom': '';?>">
                 <!-- DRAWING TOOLBAR -->
                 <?php /* no space between the 2 <li> */?>
-                <ul class="ed2-toolbar-panel ed2-drawing-toolbar"><li><a class="ed-button" href="#" data-function="resetEyedraw"><i class="ed-i icon-ed-reset pad"></i><span class="label">reset pad</span></a></li><?php if ($toggleScale) {?><li><a class="ed-button" href="#" data-function="toggleZoom"><i class="icon-ed-zoom-out pad"></i><span class="label">zoom-out pad</span></a></li><?php }?>
+                <ul class="ed2-toolbar-panel ed2-drawing-toolbar"><li><a class="ed-button" href="#" data-function="resetEyedraw"><i class="ed-i icon-ed-reset pad"></i><span class="label">Reset canvas</span></a></li><?php if ($toggleScale) {?><li><a class="ed-button" href="#" data-function="toggleZoom"><i class="ed-i icon-ed-zoom-out pad"></i><span class="label">zoom in/out </span></a></li><?php }?>
                 </ul>
                 <div class="ed2-selected-doodle">
                     <select class="ed2-selected-doodle-select cols-full" id="ed_example_selected_doodle">
