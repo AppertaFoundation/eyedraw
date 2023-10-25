@@ -31,6 +31,9 @@ ED.Lids = function (_drawing, _parameterJSON) {
 
 	// Call superclass constructor
 	ED.Doodle.call(this, _drawing, _parameterJSON);
+	if (this.drawing.eye === ED.eye.Left) {
+		this.drawing.flipDrawingHorizontally();
+	}
 };
 
 /**
