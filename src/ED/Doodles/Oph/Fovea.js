@@ -300,7 +300,7 @@ ED.Fovea.prototype.description = function() {
 ED.Fovea.prototype.snomedCode = function() {
 
 	if (this.type === 'Normal') {
-		return 67046006;
+		return 0;
 	} else if (this.type.indexOf(' CNV') > -1) {
 		return 75971007;
 	} else if (this.type.indexOf('macula hole') > -1) {
@@ -310,4 +310,3 @@ ED.Fovea.prototype.snomedCode = function() {
 	// Disciform scar
 	return 414173003;
 };
-
